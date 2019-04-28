@@ -150,23 +150,28 @@ public class Util {
      */
     public static String getLastGitCommitID(final boolean full) {
         final String command = "git log --format=\"%H\" -n 1";
-
+        final String defaultHash = "UNKNOWN";
         try {
             final Process p = Runtime.getRuntime().exec(command);
             p.waitFor();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = reader.readLine();
-            if (line == null) {
-                try {
-                    line = Gdx.files.internal(Main.VERSION_FILE).readString();
-                } catch (final Exception e) {
-                    return "UNKNOWN";
-                }
+            String hash = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
+            String savedHash;
+            try {
+                savedHash = Gdx.files.internal(Main.VERSION_FILE).readString();
+            } catch (final Exception e) {
+                savedHash = defaultHash;
             }
+            if ((!savedHash.equals(hash) || savedHash.equals(defaultHash))) {
+                Gdx.files.absolute(Main.VERSION_FILE).writeString(hash, false);
+            }
+            if (hash == null) {
+                hash = savedHash;
+            }
+
             if (!full) {
-                line = line.substring(0, 6);
+                hash = hash.substring(0, 6);
             }
-            return line.toUpperCase();
+            return hash.toUpperCase();
 
         } catch (final IOException | InterruptedException e) {
             e.printStackTrace();

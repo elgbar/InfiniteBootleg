@@ -11,7 +11,6 @@ import com.kotcrab.vis.ui.VisUI;
 import com.strongjoshua.console.Console;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.input.InputHandler;
-import no.elg.infiniteBootleg.util.Util;
 
 import java.io.File;
 
@@ -39,9 +38,6 @@ public class Main extends ApplicationAdapter {
         addInputProcessor(new InputHandler());
 
         batch.setProjectionMatrix(camera.combined);
-
-        System.out.println("git hash = " + Util.getLastGitCommitID(true));
-
     }
 
     @Override
