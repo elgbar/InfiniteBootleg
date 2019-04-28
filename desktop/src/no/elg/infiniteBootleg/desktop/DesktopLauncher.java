@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.Main;
 
 public class DesktopLauncher {
 
-    public static void main(String[] arg) {
+    public static void main(String[] args) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = 1280;
         config.height = 720;
@@ -15,6 +15,6 @@ public class DesktopLauncher {
         config.backgroundFPS = 10;
         config.samples = 16;
         config.title = "Infinite Terraria";
-        new LwjglApplication(new Main(), config);
+        new LwjglApplication(new Main(args), config);
     }
 }

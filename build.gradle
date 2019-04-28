@@ -67,7 +67,7 @@ project(":core") {
         compile "org.junit.jupiter:junit-jupiter-api:5.0.0"
         compile "com.strongjoshua:libgdx-inGameConsole:0.7.1"
         compile "org.apache.commons:commons-lang3:3.8.1"
-        compile "no.kh498.util:CommonUtil:1.0.2"
+        compile "no.kh498.util:CommonUtil:1.0.3"
         compile 'org.jetbrains:annotations:16.0.2'
 
     }

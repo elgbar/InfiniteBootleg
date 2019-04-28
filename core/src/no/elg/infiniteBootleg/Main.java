@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.input.InputHandler;
 
 import java.io.File;
 
+import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
+
 public class Main extends ApplicationAdapter {
 
     public static final String WORLD_FOLDER = "worlds" + File.separatorChar;
@@ -23,6 +25,12 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camera;
     private static InputMultiplexer inputMultiplexer;
     private Console console;
+
+    public static boolean HEADLESS;
+
+    public Main(String[] args) {
+        executeArgs(args);
+    }
 
     @Override
     public void create() {
@@ -38,6 +46,7 @@ public class Main extends ApplicationAdapter {
         addInputProcessor(new InputHandler());
 
         batch.setProjectionMatrix(camera.combined);
+
     }
 
     @Override
