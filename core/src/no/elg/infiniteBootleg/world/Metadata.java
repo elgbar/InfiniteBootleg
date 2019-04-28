@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.blocks;
+package no.elg.infiniteBootleg.world;
 
 import org.jetbrains.annotations.NotNull;
 

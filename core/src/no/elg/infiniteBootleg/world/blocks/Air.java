@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import no.elg.infiniteBootleg.Main;
@@ -13,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @author Elg
  */
-public class Stone extends Block {
+public class Air extends Block {
 
     private static final Texture texture;
 
@@ -23,13 +22,13 @@ public class Stone extends Block {
         }
         else {
             Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pix.setColor(Color.GRAY);
+            pix.setColor(0, 0, 0, 0);
             pix.fill();
             texture = new Texture(pix);
         }
     }
 
-    public Stone(int x, int y, @Nullable World world) {
+    public Air(int x, int y, @Nullable World world) {
         super(x, y, world);
     }
 
@@ -41,6 +40,6 @@ public class Stone extends Block {
 
     @Override
     public @NotNull Material getMaterial() {
-        return Material.STONE;
+        return Material.AIR;
     }
 }

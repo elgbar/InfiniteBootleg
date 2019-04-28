@@ -5,8 +5,8 @@ package no.elg.infiniteBootleg.world;
  */
 public class Location {
 
-    int x;
-    int y;
+    public final int x;
+    public final int y;
 
     public Location(int x, int y) {
 

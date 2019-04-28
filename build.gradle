@@ -62,13 +62,18 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
         compile "com.kotcrab.vis:vis-ui:1.4.2"
         compile 'com.google.guava:guava:25.0-jre'
-        compile "org.junit.jupiter:junit-jupiter-api:5.0.0"
         compile "com.strongjoshua:libgdx-inGameConsole:0.7.1"
         compile "org.apache.commons:commons-lang3:3.8.1"
         compile "no.kh498.util:CommonUtil:1.0.3"
-        compile 'org.jetbrains:annotations:16.0.2'
+        compileOnly 'org.jetbrains:annotations:17.0.0'
+
+        testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testCompile "junit:junit:4.12"
+        testCompile "org.powermock:powermock-module-junit4:1.6.4"
+        testCompile "org.powermock:powermock-api-mockito:1.6.4"
 
     }
 }
