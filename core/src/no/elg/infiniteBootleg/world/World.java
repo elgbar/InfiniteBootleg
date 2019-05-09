@@ -110,11 +110,15 @@ public class World {
         final int blockX = (int) (unproject.x / BLOCK_SIZE);
         final int blockY = (int) (unproject.y / BLOCK_SIZE);
 
-        final int col1 = (int) (viewBounds.x / Chunk.CHUNK_WIDTH);
-        final int col2 = (int) ((viewBounds.x + viewBounds.width + Chunk.CHUNK_WIDTH) / Chunk.CHUNK_WIDTH);
+//        final int maxRows =
+        float chunkTextWidth = Chunk.CHUNK_WIDTH * World.BLOCK_SIZE;
+        float chunkTextHeight = Chunk.CHUNK_HEIGHT * World.BLOCK_SIZE;
 
-        final int row1 = (int) (viewBounds.y / Chunk.CHUNK_HEIGHT);
-        final int row2 = (int) ((viewBounds.y + viewBounds.height + Chunk.CHUNK_HEIGHT) / Chunk.CHUNK_HEIGHT);
+        final int col1 = (int) Math.floor(viewBounds.x / chunkTextWidth);
+        final int col2 = (int) Math.floor((viewBounds.x + viewBounds.width + chunkTextWidth) / chunkTextWidth);
+
+        final int row1 = (int) Math.floor(viewBounds.y / chunkTextHeight);
+        final int row2 = (int) Math.floor((viewBounds.y + viewBounds.height + chunkTextHeight) / chunkTextHeight);
 
 
 //        float y = row2 * World.BLOCK_SIZE;
@@ -122,24 +126,21 @@ public class World {
 //        float size = World.BLOCK_SIZE * camera.zoom; //size of each tile
 
         batch.begin();
-//        for (int row = row2; row >= row1; row--) {
-////            float x = xStart;
-//            for (int col = col1; col < col2; col++) {
-//                System.out.print("col = " + col);
-//                System.out.println(" row = " + row);
-        Chunk chunk = getChunkFromWorld(blockX, blockY);
-        Location chunkLoc = chunk.getChunkPos().mult(Chunk.CHUNK_WIDTH, Chunk.CHUNK_HEIGHT);
+        for (int row = row2; row >= row1; row--) {
+//            float x = xStart;
+            for (int col = col1; col < col2; col++) {
+//                System.out.println("col = " + col + " row = " + row);
+                Chunk chunk = getChunk(col, row);
+                Location chunkLoc = chunk.getChunkPos().mult(Chunk.CHUNK_WIDTH, Chunk.CHUNK_HEIGHT);
 
-        for (Block block : chunk) {
-
-            //camera.position.x + chunkLoc.x * blkLoc.x * size
-            Location blkLoc = block.getLocation();
-            float x = (blkLoc.x + chunkLoc.x) * World.BLOCK_SIZE;
-            float y = (blkLoc.y + chunkLoc.y) * World.BLOCK_SIZE;
-            batch.draw(block.getTexture(), x, y, World.BLOCK_SIZE, World.BLOCK_SIZE);
+                for (Block block : chunk) {
+                    Location blkLoc = block.getLocation();
+                    float x = (blkLoc.x + chunkLoc.x) * World.BLOCK_SIZE;
+                    float y = (blkLoc.y + chunkLoc.y) * World.BLOCK_SIZE;
+                    batch.draw(block.getTexture(), x, y, World.BLOCK_SIZE, World.BLOCK_SIZE);
+                }
+            }
         }
-//            }
-//        }
         batch.end();
 
         //the chunk we're standing in
@@ -150,7 +151,7 @@ public class World {
             System.out.println("cam  = " + camera.position);
             System.out.println("blockX = " + blockX);
             System.out.println("blockY = " + blockY);
-            System.out.println("chunk = " + chunk);
+//            System.out.println("chunk = " + chunk);
             System.out.println("\n");
         }
 
