@@ -13,7 +13,7 @@ import static org.mockito.Mockito.*;
 public class TestGraphic {
 
     // This is our "test" application
-    private static Application application;
+//    private static Application application;
 
     // Before running any tests, initialize the application with the headless backend
     @BeforeClass

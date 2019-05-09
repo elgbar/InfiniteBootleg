@@ -22,7 +22,7 @@ public class Stone extends Block {
             texture = null;
         }
         else {
-            Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            Pixmap pix = new Pixmap(World.BLOCK_SIZE, World.BLOCK_SIZE, Pixmap.Format.RGBA8888);
             pix.setColor(Color.GRAY);
             pix.fill();
             texture = new Texture(pix);

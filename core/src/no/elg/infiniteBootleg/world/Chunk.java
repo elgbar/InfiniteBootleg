@@ -21,20 +21,23 @@ import static java.util.Spliterator.*;
 public class Chunk implements Iterable<Block> {
 
     public static final int CHUNK_WIDTH = 64;
-    public static final int CHUNK_HEIGHT = 256;
+    public static final int CHUNK_HEIGHT = 64;
 
     private final World world;
-    private final int offset;
+    private final Location chunkPos;
     private final Block[][] blocks;
+    private final int[] heightmap;
 
-    /**
-     * @param offset
-     *     Where this chunk is in the world
-     */
-    public Chunk(int offset, @Nullable World world) {
+    private boolean allAir;
+
+    public Chunk(@Nullable World world, @NotNull Location chunkPos) {
         this.world = world;
-        this.offset = offset;
+        this.chunkPos = chunkPos;
+
         blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
+        heightmap = new int[CHUNK_WIDTH];
+        allAir = true;
+
         IntStream.range(0, blocks.length).forEach(x -> Arrays.setAll(blocks[x], y -> new Air(x, y, world)));
     }
 
@@ -53,10 +56,19 @@ public class Chunk implements Iterable<Block> {
         return blocks[x][y];
     }
 
-    public void setBlock(int x, int y, @NotNull Block block) {
+    public void setBlock(int x, int y, @NotNull Material material) {
         Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH));
         Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT));
-        blocks[x][y] = block;
+
+        blocks[x][y] = material.create(x, y, world);
+        checkAllAir();
+    }
+
+    /**
+     * test if all the blocks in this chunk has the material air
+     */
+    private void checkAllAir() {
+        allAir = stream().allMatch(block -> block.getMaterial() == Material.AIR);
     }
 
     @NotNull
@@ -64,9 +76,17 @@ public class Chunk implements Iterable<Block> {
         return blocks;
     }
 
+    public boolean isAllAir() {
+        return allAir;
+    }
+
     @Nullable
     public World getWorld() {
         return world;
+    }
+
+    public Location getChunkPos() {
+        return chunkPos;
     }
 
     @Override
@@ -76,15 +96,15 @@ public class Chunk implements Iterable<Block> {
 
         Chunk chunk = (Chunk) o;
 
-        if (offset != chunk.offset) { return false; }
-        return Objects.equals(world, chunk.world);
+        if (!Objects.equals(world, chunk.world)) { return false; }
+        return chunkPos.equals(chunk.chunkPos);
 
     }
 
     @Override
     public int hashCode() {
         int result = world != null ? world.hashCode() : 0;
-        result = 31 * result + offset;
+        result = 31 * result + chunkPos.hashCode();
         return result;
     }
 
@@ -118,5 +138,10 @@ public class Chunk implements Iterable<Block> {
         Spliterator<Block> spliterator =
             Spliterators.spliterator(iterator(), CHUNK_WIDTH * CHUNK_HEIGHT, SIZED | DISTINCT | NONNULL);
         return StreamSupport.stream(spliterator, false);
+    }
+
+    @Override
+    public String toString() {
+        return "Chunk{" + "world=" + world + ", chunkPos=" + chunkPos + '}';
     }
 }

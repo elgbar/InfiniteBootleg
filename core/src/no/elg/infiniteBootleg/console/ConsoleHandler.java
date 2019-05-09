@@ -15,7 +15,7 @@ public class ConsoleHandler extends GUIConsole {
     private Window consoleWindow;
 
     public ConsoleHandler() {
-        super(VisUI.getSkin(), false, Input.Keys.BACKSLASH);
+        super(VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
 //        setCommandExecutor(new CommandHandler(this));
         Main.addInputProcessor(getInputProcessor());
         logToSystem = true;
@@ -29,7 +29,7 @@ public class ConsoleHandler extends GUIConsole {
 
         setCommandExecutor(new Commands());
 
-        log("INITIATING #" + Util.getLastGitCommitID(false), LogLevel.SUCCESS);
+        log("IB Version #" + Util.getLastGitCommitID(false), LogLevel.SUCCESS);
     }
 
     public void setAlpha(float a) {

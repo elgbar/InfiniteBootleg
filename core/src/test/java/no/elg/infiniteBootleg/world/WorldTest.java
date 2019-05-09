@@ -1,21 +1,51 @@
 package no.elg.infiniteBootleg.world;
 
-import no.elg.infiniteBootleg.world.generator.FlatWorldGenerator;
+import no.elg.infiniteBootleg.TestGraphic;
+import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
+import org.junit.Before;
 import org.junit.Test;
 
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Elg
  */
-public class WorldTest {
+public class WorldTest extends TestGraphic {
+
+    private World world;
+    private Location loc;
+
+    @Before
+    public void setUp() {
+        loc = new Location(0, 0);
+        world = new World(new EmptyChunkGenerator());
+    }
 
     @Test
     public void canGenerateChunks() {
-        World world = new World(new FlatWorldGenerator());
-        Chunk chunk = world.getChunk(0);
+        Chunk chunk = world.getChunkFromWorld(loc);
         assertNotNull(chunk);
-        assertEquals(chunk, world.getChunk(0));
+        assertEquals(chunk, world.getChunkFromWorld(loc));
+    }
+
+    @Test
+    public void getCorrectChunkFromWorldCoords() {
+        Chunk originChunk = world.getChunk(loc);
+        for (int x = 0; x < CHUNK_WIDTH; x++) {
+            Chunk chunk = world.getChunkFromWorld(x, 0);
+            assertEquals(originChunk, chunk);
+        }
+        assertEquals(world.getChunk(-1, 0), world.getChunkFromWorld(-2, 0));
+        assertEquals(world.getChunk(-2, 0), world.getChunkFromWorld(-CHUNK_WIDTH - 1, 0));
+        assertEquals(world.getChunk(-1, 0), world.getChunkFromWorld(-1, 0));
+        assertEquals(world.getChunk(0, -1), world.getChunkFromWorld(0, -CHUNK_HEIGHT + 1));
+        assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_WIDTH, 0));
+        assertEquals(world.getChunk(0, 0), world.getChunkFromWorld(CHUNK_WIDTH - 1, 0));
+        assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_WIDTH + 1, 0));
+        assertEquals(world.getChunk(2, 0), world.getChunkFromWorld(CHUNK_WIDTH * 2, 0));
+        assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(80, 45));
     }
 }

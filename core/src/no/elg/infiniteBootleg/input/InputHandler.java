@@ -1,15 +1,25 @@
 package no.elg.infiniteBootleg.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Elg
  */
 public class InputHandler implements InputProcessor {
 
+    private final OrthographicCamera camera;
+
+    public InputHandler(@NotNull OrthographicCamera camera) {
+
+        this.camera = camera;
+    }
+
     @Override
     public boolean keyDown(int keycode) {
-        System.out.println("keycode = " + keycode);
+//        System.out.println("keycode = " + keycode);
         return false;
     }
 
@@ -35,7 +45,10 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        camera.position.x -= Gdx.input.getDeltaX() * camera.zoom; //* World.BLOCK_SIZE;
+        camera.position.y += Gdx.input.getDeltaY() * camera.zoom; //* World.BLOCK_SIZE;
+
+        return true;
     }
 
     @Override
@@ -45,6 +58,14 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
+        camera.zoom += amount * 0.05f;
+//        if (camera.zoom > 1f) {
+//            camera.zoom = 1f;
+//        }
+//        else
+        if (camera.zoom <= 0) {
+            camera.zoom = 0.04f;
+        }
         return false;
     }
 }

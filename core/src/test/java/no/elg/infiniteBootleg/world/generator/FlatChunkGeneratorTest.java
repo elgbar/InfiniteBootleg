@@ -8,15 +8,15 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
 /**
  * @author Elg
  */
-public class FlatWorldGeneratorTest {
+public class FlatChunkGeneratorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void nullInConstructor() {
-        new FlatWorldGenerator(new Material[CHUNK_HEIGHT]);
+        new FlatChunkGenerator(new Material[CHUNK_HEIGHT]);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidLayerSize() {
-        new FlatWorldGenerator(new Material[0]);
+        new FlatChunkGenerator(new Material[0]);
     }
 }

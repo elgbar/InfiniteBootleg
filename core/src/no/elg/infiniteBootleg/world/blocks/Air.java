@@ -21,8 +21,8 @@ public class Air extends Block {
             texture = null;
         }
         else {
-            Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-            pix.setColor(0, 0, 0, 0);
+            Pixmap pix = new Pixmap(World.BLOCK_SIZE, World.BLOCK_SIZE, Pixmap.Format.RGBA8888);
+            pix.setColor(0, 0, 0.1f, 1);
             pix.fill();
             texture = new Texture(pix);
         }

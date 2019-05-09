@@ -12,17 +12,24 @@ import java.lang.reflect.InvocationTargetException;
  */
 public enum Material {
 
-    AIR(0, Air.class),
+    AIR(0, Air.class, false, false, false),
     STONE(1, Stone.class);
 
 
     private final int id;
     private final Class<? extends Block> impl;
+    private final boolean solid;
+    private final boolean blocksLight;
+    private final boolean placable;
 
-    Material(int id, Class<? extends Block> impl) {
+    Material(int id, Class<? extends Block> impl) {this(id, impl, true, true, true);}
 
+    Material(int id, Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable) {
         this.id = id;
         this.impl = impl;
+        this.solid = solid;
+        this.blocksLight = blocksLight;
+        this.placable = placable;
     }
 
     /**
@@ -41,5 +48,21 @@ public enum Material {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isSolid() {
+        return solid;
+    }
+
+    public boolean blocksLight() {
+        return blocksLight;
+    }
+
+    public boolean isPlacable() {
+        return placable;
     }
 }
