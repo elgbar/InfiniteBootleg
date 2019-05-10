@@ -26,14 +26,11 @@ public class Location {
 
         if (x != location.x) { return false; }
         return y == location.y;
-
     }
 
     @Override
     public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        return result;
+        return 31 * x + y;
     }
 
     @Override

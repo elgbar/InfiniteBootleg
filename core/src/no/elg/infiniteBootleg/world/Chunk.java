@@ -20,13 +20,14 @@ import static java.util.Spliterator.*;
  */
 public class Chunk implements Iterable<Block> {
 
-    public static final int CHUNK_WIDTH = 64;
-    public static final int CHUNK_HEIGHT = 64;
+    public static final int CHUNK_WIDTH = 32;
+    public static final int CHUNK_HEIGHT = 32;
 
     private final World world;
     private final Location chunkPos;
     private final Block[][] blocks;
     private final int[] heightmap;
+    private boolean loaded; //once unloaded it no longer is valid
 
     private boolean allAir;
 
@@ -37,7 +38,7 @@ public class Chunk implements Iterable<Block> {
         blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
         heightmap = new int[CHUNK_WIDTH];
         allAir = true;
-
+        loaded = true;
         IntStream.range(0, blocks.length).forEach(x -> Arrays.setAll(blocks[x], y -> new Air(x, y, world)));
     }
 
@@ -51,14 +52,20 @@ public class Chunk implements Iterable<Block> {
      */
     @NotNull
     public Block getBlock(int x, int y) {
-        Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH));
-        Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT));
+        Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH),
+                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + x + ", " + y);
+        Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT),
+                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + x + ", " + y);
+        Preconditions.checkState(loaded, "Chunk is not loaded");
         return blocks[x][y];
     }
 
     public void setBlock(int x, int y, @NotNull Material material) {
-        Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH));
-        Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT));
+        Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH),
+                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + x + ", " + y);
+        Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT),
+                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + x + ", " + y);
+        Preconditions.checkState(loaded, "Chunk is not loaded");
 
         blocks[x][y] = material.create(x, y, world);
         checkAllAir();
@@ -80,14 +87,26 @@ public class Chunk implements Iterable<Block> {
         return allAir;
     }
 
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void unload() {
+        loaded = false;
+    }
+
     @Nullable
     public World getWorld() {
         return world;
     }
 
-    public Location getChunkPos() {
+    public Location getLocation() {
         return chunkPos;
     }
+
+//    public Texture getTexture() {
+//
+//    }
 
     @Override
     public boolean equals(Object o) {
@@ -111,12 +130,9 @@ public class Chunk implements Iterable<Block> {
     @NotNull
     @Override
     public Iterator<Block> iterator() {
-
-
         return new Iterator<Block>() {
             int x;
             int y;
-
 
             @Override
             public boolean hasNext() {

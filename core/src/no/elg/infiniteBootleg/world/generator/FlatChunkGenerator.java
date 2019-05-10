@@ -45,13 +45,15 @@ public class FlatChunkGenerator implements ChunkGenerator {
     @Override
     public Chunk generate(@Nullable World world, @NotNull Location chunkPos, @NotNull Random random) {
         Chunk chunk = new Chunk(world, chunkPos);
-//        if (chunkPos.y < 2) {
-        for (int x = 0; x < Chunk.CHUNK_WIDTH; x++) {
-            for (int y = 0; y < Chunk.CHUNK_HEIGHT; y++) {
-                if (random.nextBoolean()) { chunk.setBlock(x, y, Material.STONE); }
+        if (chunkPos.y < 0 || random.nextBoolean()) {
+            for (int x = 0; x < Chunk.CHUNK_WIDTH; x++) {
+                for (int y = 0; y < Chunk.CHUNK_HEIGHT; y++) {
+                    if (random.nextBoolean()) {
+                        chunk.setBlock(x, y, Material.STONE);
+                    }
+                }
             }
         }
-//        }
         return chunk;
     }
 }

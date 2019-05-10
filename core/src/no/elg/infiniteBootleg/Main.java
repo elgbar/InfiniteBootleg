@@ -8,16 +8,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import com.strongjoshua.console.Console;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
-import no.elg.infiniteBootleg.input.InputHandler;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 
 import java.io.File;
 
 import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
+import static no.elg.infiniteBootleg.world.World.*;
 
 public class Main extends ApplicationAdapter {
 
@@ -52,7 +53,6 @@ public class Main extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
 
         world = new World(new FlatChunkGenerator());
-        addInputProcessor(new InputHandler(world.getCamera()));
         font = new BitmapFont(true);
 
     }
@@ -65,8 +65,20 @@ public class Main extends ApplicationAdapter {
 
         world.render();
 
+
+        final Vector3 unproject = world.getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+
+        final int blockX = (int) (unproject.x / World.BLOCK_SIZE);
+        final int blockY = (int) (unproject.y / World.BLOCK_SIZE);
+
+        int[] vChunks = world.chunksInView();
+//        int chunksInView = (colEnd - colStart) + (rowEnd - vChunks[ROW_START]);
+        int chunksInView = Math.abs(vChunks[COL_END] - vChunks[COL_START]) * Math.abs(vChunks[ROW_END] - vChunks[ROW_START]);
         batch.begin();
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, 10);
+        font.draw(batch, "Pointing at block (" + blockX + ", " + blockY + ") in chunk " +
+                         world.getChunkFromWorld(blockX, blockY).getLocation(), 10, 25);
+        font.draw(batch, "Viewing " + chunksInView + " chunks", 10, 40);
         batch.end();
 
         console.draw();
@@ -80,5 +92,9 @@ public class Main extends ApplicationAdapter {
 
     public static void addInputProcessor(InputProcessor processor) {
         inputMultiplexer.addProcessor(processor);
+    }
+
+    public static InputMultiplexer getInputMultiplexer() {
+        return inputMultiplexer;
     }
 }

@@ -1,30 +1,35 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Disposable;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 /**
  * @author Elg
  */
-public class World {
+public class World extends InputAdapter implements Disposable {
 
     public final static int BLOCK_SIZE = 16;
+
+    public static final int ROW_START = 0;
+    public static final int ROW_END = 1;
+    public static final int COL_START = 2;
+    public static final int COL_END = 3;
 
     private final ChunkGenerator generator;
     private final long seed;
     private final Random random;
     private final Map<Location, Chunk> chunks;
+    //    Array<Chunk> chunks; //all loaded chunks
     private final SpriteBatch batch;
 
     private String name = "World";
@@ -32,6 +37,7 @@ public class World {
 
     private final OrthographicCamera camera;
     private final Rectangle viewBounds;
+    private final int[] chunksInView;
 
     /**
      * Generate a world with a random seed
@@ -46,15 +52,19 @@ public class World {
         this.generator = generator;
         this.seed = seed;
         random = new Random(seed);
-        chunks = new ConcurrentHashMap<>();
+        chunks = new WeakHashMap<>();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         uuid = UUID.randomUUID();
         batch = new SpriteBatch();
 
+        Main.addInputProcessor(this);
 
         this.viewBounds = new Rectangle();
+        chunksInView = new int[4];
+        updateView();
+
     }
 
     @NotNull
@@ -75,6 +85,24 @@ public class World {
         return getChunk(chunkX, chunkY);
     }
 
+    public boolean isLoadedAt(@NotNull Location chunkLoc) {
+        return chunks.containsKey(chunkLoc);
+    }
+
+    /**
+     * @param chunk
+     *
+     * @return If the chunk was unloaded
+     */
+    public boolean unload(@Nullable Chunk chunk) {
+        if (chunk == null || !chunk.isLoaded() || !isLoadedAt(chunk.getLocation())) {
+            return false;
+        }
+        chunks.remove(chunk.getLocation());
+        chunk.unload();
+        return true;
+    }
+
     @NotNull
     public Chunk getChunkFromWorld(@NotNull Location location) {
         return getChunkFromWorld(location.x, location.y);
@@ -84,54 +112,62 @@ public class World {
         return seed;
     }
 
-    private void setView() {
+    private void unloadOutOfView() {
+
+    }
+
+    public void updateView() {
+        camera.update();
         batch.setProjectionMatrix(camera.combined);
         float width = camera.viewportWidth * camera.zoom;
         float height = camera.viewportHeight * camera.zoom;
         float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
         float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
         viewBounds.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
-    }
 
-    public void render() {
-        camera.update(); //maybe not call every time we render...
-        setView();
 
-//        float centerX = camera.position.x / 2;
-//        float centerY = camera.position.y / 2;
-//        float blocksHor = centerX / BLOCK_SIZE;
-//        float blocksVer = centerY / BLOCK_SIZE;
-//        System.out.println("blocksVer = " + blocksVer);
-//        System.out.println("blocksHor = " + blocksHor);
-
-        final Vector3 unproject = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-//        final Vector3 unproject = camera.unproject(new Vector3(centerX, centerY, 0));
-
-        final int blockX = (int) (unproject.x / BLOCK_SIZE);
-        final int blockY = (int) (unproject.y / BLOCK_SIZE);
-
-//        final int maxRows =
         float chunkTextWidth = Chunk.CHUNK_WIDTH * World.BLOCK_SIZE;
         float chunkTextHeight = Chunk.CHUNK_HEIGHT * World.BLOCK_SIZE;
 
-        final int col1 = (int) Math.floor(viewBounds.x / chunkTextWidth);
-        final int col2 = (int) Math.floor((viewBounds.x + viewBounds.width + chunkTextWidth) / chunkTextWidth);
+        chunksInView[COL_START] = (int) Math.floor(viewBounds.x / chunkTextWidth);
+        chunksInView[COL_END] = (int) Math.floor((viewBounds.x + viewBounds.width + chunkTextWidth) / chunkTextWidth);
 
-        final int row1 = (int) Math.floor(viewBounds.y / chunkTextHeight);
-        final int row2 = (int) Math.floor((viewBounds.y + viewBounds.height + chunkTextHeight) / chunkTextHeight);
+        chunksInView[ROW_START] = (int) Math.floor(viewBounds.y / chunkTextHeight);
+        chunksInView[ROW_END] = (int) Math.floor((viewBounds.y + viewBounds.height + chunkTextHeight) / chunkTextHeight);
 
+//        final int colEnd = chunksInView[COL_END];
+//        final int colStart = chunksInView[COL_START];
+//        final int rowEnd = chunksInView[ROW_END];
+//        final int rowStart = chunksInView[ROW_START];
+//
+//        Array<Chunk> seenChunks = new Array<>(false, Math.abs((colEnd - colStart) + (rowEnd - rowStart)));
+//
+//        for (int row = rowStart; row < rowEnd; row++) {
+//            for (int col = colStart; col < colEnd; col++) {
+//                seenChunks.add(getChunk(col, row));
+//            }
+//        }
+//
+//        synchronized (this) {
+//            chunks.entrySet().removeIf(entry -> !seenChunks.contains(entry.getValue(), false));
+//        }
+    }
 
-//        float y = row2 * World.BLOCK_SIZE;
-//        float xStart = col1 * World.BLOCK_SIZE;
-//        float size = World.BLOCK_SIZE * camera.zoom; //size of each tile
+    public int[] chunksInView() {
+        return chunksInView;
+    }
 
+    public void render() {
+        final int colEnd = chunksInView[COL_END];
+        final int colStart = chunksInView[COL_START];
+        final int rowEnd = chunksInView[ROW_END];
+        final int rowStart = chunksInView[ROW_START];
+        final int debug = 0;
         batch.begin();
-        for (int row = row2; row >= row1; row--) {
-//            float x = xStart;
-            for (int col = col1; col < col2; col++) {
-//                System.out.println("col = " + col + " row = " + row);
+        for (int row = rowStart + debug; row < rowEnd - debug; row++) {
+            for (int col = colStart + debug; col < colEnd - debug; col++) {
                 Chunk chunk = getChunk(col, row);
-                Location chunkLoc = chunk.getChunkPos().mult(Chunk.CHUNK_WIDTH, Chunk.CHUNK_HEIGHT);
+                Location chunkLoc = chunk.getLocation().mult(Chunk.CHUNK_WIDTH, Chunk.CHUNK_HEIGHT);
 
                 for (Block block : chunk) {
                     Location blkLoc = block.getLocation();
@@ -139,34 +175,34 @@ public class World {
                     float y = (blkLoc.y + chunkLoc.y) * World.BLOCK_SIZE;
                     batch.draw(block.getTexture(), x, y, World.BLOCK_SIZE, World.BLOCK_SIZE);
                 }
+//                batch.draw();
             }
         }
         batch.end();
-
-        //the chunk we're standing in
-
-        if (Gdx.graphics.getFrameId() % (Gdx.graphics.getFramesPerSecond() + 1) / 2 == 0) {
-            System.out.println("unproject = " + unproject);
-            System.out.println("zoom = " + camera.zoom);
-            System.out.println("cam  = " + camera.position);
-            System.out.println("blockX = " + blockX);
-            System.out.println("blockY = " + blockY);
-//            System.out.println("chunk = " + chunk);
-            System.out.println("\n");
-        }
-
-//
-//        for (int i = 0; i < ; i++) {
-//
-//        }
-
-
     }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        camera.position.x -= Gdx.input.getDeltaX() * camera.zoom;
+        camera.position.y += Gdx.input.getDeltaY() * camera.zoom;
+        updateView();
+        return true;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        camera.zoom += amount * 0.05f * camera.zoom;
+        if (camera.zoom <= 0) {
+            camera.zoom = 0.04f;
+        }
+        updateView();
+        return true;
+    }
+
 
     public OrthographicCamera getCamera() {
         return camera;
     }
-
 
     public String getName() {
         return name;
@@ -174,6 +210,10 @@ public class World {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Rectangle getViewBounds() {
+        return viewBounds;
     }
 
     @Override
@@ -188,11 +228,16 @@ public class World {
 
         World world = (World) o;
         return Objects.equals(uuid, world.uuid);
-
     }
 
     @Override
     public int hashCode() {
         return uuid != null ? uuid.hashCode() : 0;
+    }
+
+    @Override
+    public void dispose() {
+        Main.getInputMultiplexer().removeProcessor(this);
+        batch.dispose();
     }
 }
