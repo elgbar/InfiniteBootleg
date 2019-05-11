@@ -170,6 +170,7 @@ public class World extends InputAdapter implements Disposable {
                 Location chunkLoc = chunk.getLocation().mult(Chunk.CHUNK_WIDTH, Chunk.CHUNK_HEIGHT);
 
                 for (Block block : chunk) {
+                    if (block == null || block.getMaterial() == Material.AIR) { continue; }
                     Location blkLoc = block.getLocation();
                     float x = (blkLoc.x + chunkLoc.x) * World.BLOCK_SIZE;
                     float y = (blkLoc.y + chunkLoc.y) * World.BLOCK_SIZE;
