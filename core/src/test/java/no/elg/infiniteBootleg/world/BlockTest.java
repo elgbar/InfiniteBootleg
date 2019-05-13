@@ -1,12 +1,13 @@
 package no.elg.infiniteBootleg.world;
 
+import no.elg.infiniteBootleg.TestGraphic;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Elg
  */
-public class BlockTest {
+public class BlockTest extends TestGraphic {
 
 
     @Test

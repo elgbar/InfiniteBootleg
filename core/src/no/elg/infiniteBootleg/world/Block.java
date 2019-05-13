@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,8 +20,10 @@ public abstract class Block {
         this.world = world;
     }
 
-    @NotNull
-    public abstract Texture getTexture();
+    @Nullable
+    public TextureRegion getTexture() {
+        return getMaterial().getTexture();
+    }
 
     @NotNull
     public abstract Material getMaterial();

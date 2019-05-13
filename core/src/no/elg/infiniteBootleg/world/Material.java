@@ -1,7 +1,9 @@
 package no.elg.infiniteBootleg.world;
 
-import no.elg.infiniteBootleg.world.blocks.Air;
-import no.elg.infiniteBootleg.world.blocks.Stone;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.blocks.GeneralBlock;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -12,8 +14,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public enum Material {
 
-    AIR(0, Air.class, false, false, false),
-    STONE(1, Stone.class);
+    AIR(0, null, false, false, false),
+    STONE(1, null);
 
 
     private final int id;
@@ -21,6 +23,7 @@ public enum Material {
     private final boolean solid;
     private final boolean blocksLight;
     private final boolean placable;
+    private final TextureRegion texture;
 
     Material(int id, Class<? extends Block> impl) {this(id, impl, true, true, true);}
 
@@ -30,6 +33,13 @@ public enum Material {
         this.solid = solid;
         this.blocksLight = blocksLight;
         this.placable = placable;
+        System.out.println("Main.RENDER_GRAPHIC = " + Main.RENDER_GRAPHIC);
+        if (Main.RENDER_GRAPHIC) {
+            this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase());
+        }
+        else {
+            texture = null;
+        }
     }
 
     /**
@@ -39,15 +49,23 @@ public enum Material {
      *
      * @return A block of this type
      */
-    @Nullable
+    @NotNull
     public Block create(int x, int y, @Nullable World world) {
+        if (impl == null) {
+            return new GeneralBlock(x, y, world, this);
+        }
         try {
             Constructor<? extends Block> constructor = impl.getDeclaredConstructor(int.class, int.class, World.class);
             return constructor.newInstance(x, y, world);
+
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
-        return null;
+    }
+
+    @Nullable
+    public TextureRegion getTexture() {
+        return texture;
     }
 
     public int getId() {

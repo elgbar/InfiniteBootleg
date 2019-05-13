@@ -1,17 +1,22 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.google.common.base.Preconditions;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Util;
-import no.elg.infiniteBootleg.world.blocks.Air;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Spliterator.*;
+import static no.elg.infiniteBootleg.world.Material.AIR;
 
 /**
  * A piece of the world
@@ -30,6 +35,8 @@ public class Chunk implements Iterable<Block> {
     private boolean loaded; //once unloaded it no longer is valid
 
     private boolean allAir;
+    private Pixmap pixmap;
+    private Texture texture;
 
     public Chunk(@Nullable World world, @NotNull Location chunkPos) {
         this.world = world;
@@ -39,7 +46,12 @@ public class Chunk implements Iterable<Block> {
         heightmap = new int[CHUNK_WIDTH];
         allAir = true;
         loaded = true;
-        IntStream.range(0, blocks.length).forEach(x -> Arrays.setAll(blocks[x], y -> new Air(x, y, world)));
+
+        if (Main.RENDER_GRAPHIC) {
+            pixmap = new Pixmap(CHUNK_WIDTH * World.BLOCK_SIZE, CHUNK_HEIGHT * World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
+            texture = new Texture(pixmap);
+            updateTexture();
+        }
     }
 
     /**
@@ -57,7 +69,7 @@ public class Chunk implements Iterable<Block> {
         Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT),
                                     "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + x + ", " + y);
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        return blocks[x][y];
+        return blocks[x][y] == null ? AIR.create(x, y, world) : blocks[x][y];
     }
 
     public void setBlock(int x, int y, @NotNull Material material) {
@@ -69,13 +81,14 @@ public class Chunk implements Iterable<Block> {
 
         blocks[x][y] = material.create(x, y, world);
         checkAllAir();
+        updateTexture();
     }
 
     /**
      * test if all the blocks in this chunk has the material air
      */
     private void checkAllAir() {
-        allAir = stream().allMatch(block -> block.getMaterial() == Material.AIR);
+        allAir = stream().allMatch(block -> block.getMaterial() == AIR);
     }
 
     @NotNull
@@ -104,9 +117,26 @@ public class Chunk implements Iterable<Block> {
         return chunkPos;
     }
 
-//    public Texture getTexture() {
-//
-//    }
+    public void updateTexture() {
+//        world.getChunkRenderer().renderChunk(this);
+        for (int x = 0; x < CHUNK_WIDTH; x++) {
+            for (int y = 0; y < CHUNK_HEIGHT; y++) {
+                Location blkLoc = blocks[x][y].getLocation();
+                int dx = blkLoc.x * World.BLOCK_SIZE;
+                int dy = blkLoc.y * World.BLOCK_SIZE;
+//                pixmap.drawPixmap(blocks[x][y].getPixmap(), dx, dy);
+            }
+        }
+    }
+
+    public Pixmap getPixmap() {
+        return pixmap;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
 
     @Override
     public boolean equals(Object o) {

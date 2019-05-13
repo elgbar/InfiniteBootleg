@@ -39,6 +39,6 @@ public class ProgramArgs {
 
 
     private static void headless(String val) {
-        Main.HEADLESS = true;
+        Main.RENDER_GRAPHIC = false;
     }
 }

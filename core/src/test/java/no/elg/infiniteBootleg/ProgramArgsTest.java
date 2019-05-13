@@ -1,26 +1,30 @@
 package no.elg.infiniteBootleg;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Elg
  */
 public class ProgramArgsTest {
 
-    @Test
-    public void headless() {
-        Main.HEADLESS = false;
-        ProgramArgs.executeArgs(new String[] {"-headless"});
-        assertTrue(Main.HEADLESS);
+    @Before
+    public void setUp() throws Exception {
+        Main.RENDER_GRAPHIC = true;
     }
 
     @Test
-    public void handlesRandomCase() {
-        Main.HEADLESS = false;
+    public void headless() {
+        ProgramArgs.executeArgs(new String[] {"-headless"});
+        assertFalse(Main.RENDER_GRAPHIC);
+    }
+
+    @Test
+    public void handlesRandomCasing() {
         ProgramArgs.executeArgs(new String[] {"-hEadlESS"});
-        assertTrue(Main.HEADLESS);
+        assertFalse(Main.RENDER_GRAPHIC);
     }
 
     @Test

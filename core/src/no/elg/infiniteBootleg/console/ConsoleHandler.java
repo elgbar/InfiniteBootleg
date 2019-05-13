@@ -17,7 +17,7 @@ public class ConsoleHandler extends GUIConsole {
     public ConsoleHandler() {
         super(VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
 //        setCommandExecutor(new CommandHandler(this));
-        Main.addInputProcessor(getInputProcessor());
+        Main.getInputMultiplexer().addProcessor(getInputProcessor());
         logToSystem = true;
         consoleTrace = true;
 
