@@ -39,23 +39,6 @@ public class ChunkTest extends TestGraphic {
     }
 
     @Test
-    public void allInitialBlocksAir() {
-        for (Block block : chunk) {
-            assertEquals(Material.AIR, block.getMaterial());
-        }
-    }
-
-    @Test
-    public void getLocalBlocks() {
-        Block[][] blocks = chunk.getBlocks();
-        for (Block block : chunk) {
-            assertNotNull(block);
-            Location pos = block.getLocation();
-            assertEquals(blocks[pos.x][pos.y], block);
-        }
-    }
-
-    @Test
     public void correctSizeOfIterable() {
         assertEquals(CHUNK_WIDTH * CHUNK_HEIGHT, chunk.stream().count());
     }

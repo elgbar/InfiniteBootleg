@@ -23,6 +23,7 @@ public class ConfigTest {
         Assert.assertEquals(123, (int) config.get("Hi"));
     }
 
+    @SuppressWarnings({"ConstantConditions", "unused"})
     @Test(expected = ClassCastException.class)
     public void throwsClassCastException() {
         config.set("Hi", "oh no");

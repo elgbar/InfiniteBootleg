@@ -1,9 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.google.common.base.Preconditions;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,8 +34,10 @@ public class Chunk implements Iterable<Block> {
     private boolean loaded; //once unloaded it no longer is valid
 
     private boolean allAir;
-    private Pixmap pixmap;
-    private Texture texture;
+    //    private Pixmap pixmap;
+//    private Texture texture;
+    private FrameBuffer fbo;
+    private TextureRegion fboRegion;
 
     public Chunk(@Nullable World world, @NotNull Location chunkPos) {
         this.world = world;
@@ -47,11 +48,16 @@ public class Chunk implements Iterable<Block> {
         allAir = true;
         loaded = true;
 
-        if (Main.RENDER_GRAPHIC) {
-            pixmap = new Pixmap(CHUNK_WIDTH * World.BLOCK_SIZE, CHUNK_HEIGHT * World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
-            texture = new Texture(pixmap);
-            updateTexture();
-        }
+//        if (Main.RENDER_GRAPHIC) {
+//            Pixmap pixmap = new Pixmap(CHUNK_WIDTH * World.BLOCK_SIZE, CHUNK_HEIGHT * World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
+//            texture = new Texture(pixmap);
+        updateTexture();
+//
+//        }
+    }
+
+    private void updateTexture() {
+        world.getRender().getChunkRenderer().queueRendering(this);
     }
 
     /**
@@ -88,7 +94,7 @@ public class Chunk implements Iterable<Block> {
      * test if all the blocks in this chunk has the material air
      */
     private void checkAllAir() {
-        allAir = stream().allMatch(block -> block.getMaterial() == AIR);
+        allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
     }
 
     @NotNull
@@ -117,26 +123,16 @@ public class Chunk implements Iterable<Block> {
         return chunkPos;
     }
 
-    public void updateTexture() {
-//        world.getChunkRenderer().renderChunk(this);
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            for (int y = 0; y < CHUNK_HEIGHT; y++) {
-                Location blkLoc = blocks[x][y].getLocation();
-                int dx = blkLoc.x * World.BLOCK_SIZE;
-                int dy = blkLoc.y * World.BLOCK_SIZE;
-//                pixmap.drawPixmap(blocks[x][y].getPixmap(), dx, dy);
-            }
-        }
+    public TextureRegion getTexture() {
+        if (isAllAir() || fbo == null) { return null; }
+        return fboRegion;
     }
 
-    public Pixmap getPixmap() {
-        return pixmap;
+    public void setFbo(FrameBuffer fbo) {
+        this.fbo = fbo;
+        fboRegion = new TextureRegion(fbo.getColorBufferTexture());
+        fboRegion.flip(false, true);
     }
-
-    public Texture getTexture() {
-        return texture;
-    }
-
 
     @Override
     public boolean equals(Object o) {

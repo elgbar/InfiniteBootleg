@@ -80,9 +80,9 @@ public class Main extends ApplicationAdapter {
         final int blockY = (int) (unproject.y / World.BLOCK_SIZE);
 
         int[] vChunks = world.getRender().getChunksInView();
-//        int getViewingChunks = (colEnd - colStart) + (rowEnd - vChunks[ROW_START]);
-        int chunksInView = Math.abs(vChunks[WorldRender.COL_END] - vChunks[WorldRender.COL_START]) *
-                           Math.abs(vChunks[WorldRender.ROW_END] - vChunks[WorldRender.ROW_START]);
+//        int getViewingChunks = (colEnd - colStart) + (rowEnd - vChunks[VERT_START]);
+        int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) *
+                           Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
         batch.begin();
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, 10);
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, 25);

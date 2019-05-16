@@ -46,6 +46,5 @@ public class WorldTest extends TestGraphic {
         assertEquals(world.getChunk(0, 0), world.getChunkFromWorld(CHUNK_WIDTH - 1, 0));
         assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_WIDTH + 1, 0));
         assertEquals(world.getChunk(2, 0), world.getChunkFromWorld(CHUNK_WIDTH * 2, 0));
-        assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(80, 45));
     }
 }
