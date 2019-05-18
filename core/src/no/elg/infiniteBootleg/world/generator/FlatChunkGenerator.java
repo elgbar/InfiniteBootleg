@@ -49,7 +49,7 @@ public class FlatChunkGenerator implements ChunkGenerator {
             for (int x = 0; x < Chunk.CHUNK_WIDTH; x++) {
                 for (int y = 0; y < Chunk.CHUNK_HEIGHT; y++) {
                     if (random.nextBoolean()) {
-                        chunk.setBlock(x, y, Material.STONE);
+                        chunk.setBlock(x, y, Material.STONE, false);
                     }
                 }
             }

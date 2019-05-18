@@ -57,29 +57,29 @@ public class ChunkTest extends TestGraphic {
 
     @Test
     public void checkAllAirModified() {
-        chunk.setBlock(0, 0, Material.AIR);
+        chunk.setBlock(0, 0, Material.AIR, false);
         assertTrue(chunk.isAllAir());
-        chunk.setBlock(0, 0, Material.STONE);
+        chunk.setBlock(0, 0, Material.STONE, false);
         assertFalse(chunk.isAllAir());
-        chunk.setBlock(0, 0, Material.AIR);
+        chunk.setBlock(0, 0, Material.AIR, false);
         assertTrue(chunk.isAllAir());
     }
 
     @Test
     public void setAndGetCorrectBlock() {
         assertEquals(Material.AIR, chunk.getBlock(0, 0).getMaterial());
-        chunk.setBlock(0, 0, Material.STONE);
+        chunk.setBlock(0, 0, Material.STONE, false);
 
         assertEquals(Material.STONE, chunk.getBlock(0, 0).getMaterial());
         assertEquals(Material.STONE, chunk.getBlock(0, 0).getMaterial());
 
-        chunk.setBlock(0, 0, Material.AIR);
+        chunk.setBlock(0, 0, Material.AIR, false);
         assertEquals(Material.AIR, chunk.getBlock(0, 0).getMaterial());
     }
 
     @Test
     public void locationMatch() {
-        chunk.setBlock(0, 0, Material.AIR);
+        chunk.setBlock(0, 0, Material.AIR, false);
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
                 Location loc = chunk.getBlock(x, y).getLocation();

@@ -68,13 +68,13 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void getCorrectBlockFromOrigin() {
-        world.getChunk(0, 0).setBlock(0, 0, Material.STONE);
+        world.getChunk(0, 0).setBlock(0, 0, Material.STONE, false);
         assertEquals(Material.STONE, world.getBlock(0, 0).getMaterial());
     }
 
     @Test
     public void getCorrectBlockFromWorldCoords() {
-        world.getChunk(-2, 5).setBlock(2, 11, Material.STONE);
+        world.getChunk(-2, 5).setBlock(2, 11, Material.STONE, false);
         assertEquals(Material.STONE, world.getBlock(-2 * CHUNK_WIDTH + 2, 5 * CHUNK_HEIGHT + 11).getMaterial());
     }
 }

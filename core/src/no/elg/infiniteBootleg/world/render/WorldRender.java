@@ -96,15 +96,6 @@ public class WorldRender implements Renderer, Disposable {
                 float dx = chunk.getLocation().x * CHUNK_TEXT_WIDTH;
                 float dy = chunk.getLocation().y * CHUNK_TEXT_HEIGHT;
                 batch.draw(chunk.getTexture(), dx, dy, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT);
-
-//                for (Block block : chunk) {
-//                    if (block == null || block.getMaterial() == Material.AIR) { continue; }
-//                    Location blkLoc = block.getLocation();
-//                    float x = (blkLoc.x + (chunk.getLocation().x * Chunk.CHUNK_WIDTH)) * World.BLOCK_SIZE;
-//                    float y = (blkLoc.y + chunk.getLocation().y * Chunk.CHUNK_HEIGHT) * World.BLOCK_SIZE;
-//                    //noinspection ConstantConditions
-//                    batch.draw(block.getTexture(), x, y, World.BLOCK_SIZE, World.BLOCK_SIZE);
-//                }
             }
         }
         batch.end();

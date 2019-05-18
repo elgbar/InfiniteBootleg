@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,6 +31,9 @@ public class Chunk implements Iterable<Block> {
     private final Location chunkPos;
     private final Block[][] blocks;
     private final int[] heightmap;
+
+    private boolean dirty; //if texture/allair needs to be updated
+    private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
 
     private boolean allAir;
@@ -46,18 +48,25 @@ public class Chunk implements Iterable<Block> {
         heightmap = new int[CHUNK_WIDTH];
         allAir = true;
         loaded = true;
-        updateTexture(false);
+
+        dirty = true;
+        prioritize = false;
     }
 
-    private void updateTexture(boolean prioritize) {
+    private void update() {
+        //test if all the blocks in this chunk has the material air
+        allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
         if (Main.renderGraphic) {
+            //noinspection ConstantConditions
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
+            prioritize = false;
             if (fbo != null) {
                 fbo.dispose();
                 fbo = null;
                 fboRegion = null;
             }
         }
+        dirty = false;
     }
 
     /**
@@ -70,14 +79,11 @@ public class Chunk implements Iterable<Block> {
      */
     @NotNull
     public Block getBlock(int localX, int localY) {
-        Preconditions.checkArgument(Util.isBetween(0, localX, CHUNK_WIDTH),
-                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + localX + ", " +
-                                    localY);
-        Preconditions.checkArgument(Util.isBetween(0, localY, CHUNK_HEIGHT),
-                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + localX + ", " +
-                                    localY);
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        return blocks[localX][localY] == null ? AIR.create(localX, localY, world) : blocks[localX][localY];
+        if (blocks[localX][localY] == null) {
+            setBlock(localX, localY, AIR, true);
+        }
+        return blocks[localX][localY];
     }
 
     /**
@@ -87,26 +93,26 @@ public class Chunk implements Iterable<Block> {
      *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
      * @param material
      *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
+     * @param update
      */
-    public void setBlock(int localX, int localY, @Nullable Material material) {
-        Preconditions.checkArgument(Util.isBetween(0, localX, CHUNK_WIDTH),
-                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was " + localX + ", " +
-                                    localY);
-        Preconditions.checkArgument(Util.isBetween(0, localY, CHUNK_HEIGHT),
-                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was " + localX + ", " +
-                                    localY);
+    public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-
         blocks[localX][localY] = material == null ? null : material.create(localX, localY, world);
-        checkAllAir();
-        updateTexture(true);
+        if (update) {
+            dirty = true;
+            prioritize = true;
+        }
     }
 
     /**
-     * test if all the blocks in this chunk has the material air
+     * Force update of this chunk's texture and invariants
+     *
+     * @param prioritize
+     *     If this chunk should be prioritized when rendering
      */
-    private void checkAllAir() {
-        allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
+    public void update(boolean prioritize) {
+        dirty = true;
+        this.prioritize = prioritize;
     }
 
     @NotNull
@@ -115,6 +121,9 @@ public class Chunk implements Iterable<Block> {
     }
 
     public boolean isAllAir() {
+        if (dirty) {
+            update();
+        }
         return allAir;
     }
 
@@ -136,7 +145,10 @@ public class Chunk implements Iterable<Block> {
     }
 
     public TextureRegion getTexture() {
-        if (isAllAir() || fbo == null) { return null; }
+        if (dirty) {
+            update();
+        }
+        if (fbo == null) { return null; }
         return fboRegion;
     }
 

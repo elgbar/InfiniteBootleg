@@ -101,7 +101,7 @@ public class World implements Disposable {
      * @param material
      *     The new material to at given location
      *
-     * @see Chunk#setBlock(int, int, Material)
+     * @see Chunk#setBlock(int, int, Material, boolean)
      */
     public void setBlock(int worldX, int worldY, @Nullable Material material) {
 
@@ -111,7 +111,7 @@ public class World implements Disposable {
         int localX = worldX - chunkX * Chunk.CHUNK_WIDTH;
         int localY = worldY - chunkY * Chunk.CHUNK_HEIGHT;
 
-        getChunk(chunkX, chunkY).setBlock(localX, localY, material);
+        getChunk(chunkX, chunkY).setBlock(localX, localY, material, true);
     }
 
 

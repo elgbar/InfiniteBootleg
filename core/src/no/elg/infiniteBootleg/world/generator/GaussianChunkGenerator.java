@@ -24,7 +24,7 @@ public class GaussianChunkGenerator implements ChunkGenerator {
         else if (chunkPos.y < 1) {
             for (int x = 0; x < CHUNK_WIDTH; x++) {
                 for (int y = 0; y < CHUNK_HEIGHT; y++) {
-                    chunk.setBlock(x, y, Material.STONE);
+                    chunk.setBlock(x, y, Material.STONE, false);
                 }
             }
             return chunk;
@@ -34,12 +34,13 @@ public class GaussianChunkGenerator implements ChunkGenerator {
             lastRight = Math.min(CHUNK_HEIGHT, Math.max(0, lastRight));
             fillUpTo(chunk, x, lastRight, Material.STONE);
         }
+        chunk.update(false);
         return chunk;
     }
 
     private void fillUpTo(Chunk chunk, int x, int y, Material mat) {
         for (int dy = 0; dy < y; dy++) {
-            chunk.setBlock(x, dy, mat);
+            chunk.setBlock(x, dy, mat, false);
         }
     }
 }
