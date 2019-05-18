@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.render;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -19,14 +20,18 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
  */
 public class ChunkRenderer implements Renderer {
 
-    private final SpriteBatch spriteBatch;
+    private final SpriteBatch batch;
     private final Queue<Chunk> renderQueue;
     private final WorldRender worldRender;
+    private final OrthographicCamera chunkCam;
 
-    public ChunkRenderer(@NotNull WorldRender worldRender, @NotNull SpriteBatch spriteBatch) {
+    public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
-        this.spriteBatch = spriteBatch;
+        this.batch = new SpriteBatch();
         this.renderQueue = new Queue<>();
+        chunkCam = new OrthographicCamera();
+        chunkCam.setToOrtho(false, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT);
+        batch.setProjectionMatrix(chunkCam.combined);
     }
 
     public void queueRendering(@NotNull Chunk chunk) {
@@ -57,10 +62,11 @@ public class ChunkRenderer implements Renderer {
             new FrameBuffer(Pixmap.Format.RGBA4444, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT, false);
 
 
-        fbo.begin();
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
-        spriteBatch.begin();
+//        batch.setProjectionMatrix(chunkCam.combined);
+        fbo.begin();
+        batch.begin();
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
                 Block block = blocks[x][y];
@@ -71,10 +77,10 @@ public class ChunkRenderer implements Renderer {
                 int dx = blkLoc.x * World.BLOCK_SIZE;
                 int dy = blkLoc.y * World.BLOCK_SIZE;
                 //noinspection ConstantConditions
-                spriteBatch.draw(block.getTexture(), dx, dy, World.BLOCK_SIZE, World.BLOCK_SIZE);
+                batch.draw(block.getTexture(), dx, dy, World.BLOCK_SIZE, World.BLOCK_SIZE);
             }
         }
-        spriteBatch.end();
+        batch.end();
         fbo.end();
         chunk.setFbo(fbo);
     }

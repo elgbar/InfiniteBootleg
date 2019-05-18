@@ -43,7 +43,7 @@ public class WorldRender implements Renderer, Disposable {
         this.world = world;
 
         batch = new SpriteBatch();
-        chunkRenderer = new ChunkRenderer(this, batch);
+        chunkRenderer = new ChunkRenderer(this);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -90,6 +90,7 @@ public class WorldRender implements Renderer, Disposable {
                     continue;
                 }
                 if (chunk.getTexture() == null) {
+                    //if it somehow failed to render the first time, make sure it is up to date now
                     chunkRenderer.queueRendering(chunk);
                     continue;
                 }
