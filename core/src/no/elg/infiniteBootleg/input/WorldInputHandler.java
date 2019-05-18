@@ -60,8 +60,8 @@ public class WorldInputHandler extends InputAdapter implements Disposable {
     @Override
     public boolean scrolled(int amount) {
         camera.zoom += amount * 0.05f * camera.zoom;
-        if (camera.zoom <= 0) {
-            camera.zoom = 0.04f;
+        if (camera.zoom < 1) {
+            camera.zoom = 1f;
         }
         worldRender.update();
         return true;
