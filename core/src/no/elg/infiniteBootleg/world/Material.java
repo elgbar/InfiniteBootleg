@@ -14,21 +14,20 @@ import java.lang.reflect.InvocationTargetException;
  */
 public enum Material {
 
-    AIR(0, null, false, false, false),
-    STONE(1, null);
+    AIR(null, false, false, false),
+    STONE(null),
+    BRICK(null),
+    ;
 
-
-    private final int id;
     private final Class<? extends Block> impl;
     private final boolean solid;
     private final boolean blocksLight;
     private final boolean placable;
     private final TextureRegion texture;
 
-    Material(int id, Class<? extends Block> impl) {this(id, impl, true, true, true);}
+    Material(Class<? extends Block> impl) {this(impl, true, true, true);}
 
-    Material(int id, Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable) {
-        this.id = id;
+    Material(Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable) {
         this.impl = impl;
         this.solid = solid;
         this.blocksLight = blocksLight;
@@ -65,10 +64,6 @@ public enum Material {
     @Nullable
     public TextureRegion getTexture() {
         return texture;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public boolean isSolid() {
