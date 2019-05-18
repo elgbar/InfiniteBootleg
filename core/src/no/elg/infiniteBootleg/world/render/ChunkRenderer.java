@@ -49,14 +49,12 @@ public class ChunkRenderer implements Renderer {
 
     @Override
     public void render() {
-//        System.out.println("There are " + renderQueue.size + " chunks waiting to be rendered");
-        if (renderQueue.isEmpty()) { return; } //nothing to render
-
-        Chunk chunk = renderQueue.remove(0);
-
-        if (!worldRender.inInView(chunk) || chunk.isAllAir()) {
-            return;
-        }
+        //get the first valid chunk to render
+        Chunk chunk;
+        do {
+            if (renderQueue.isEmpty()) { return; } //nothing to render
+            chunk = renderQueue.remove(0);
+        } while (chunk.isAllAir() || !worldRender.inInView(chunk));
 
         FrameBuffer fbo =
             new FrameBuffer(Pixmap.Format.RGBA4444, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT, false);
