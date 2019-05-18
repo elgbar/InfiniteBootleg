@@ -68,45 +68,23 @@ public class SimplexChunkGenerator implements ChunkGenerator {
 
         for (int x = 0; x < CHUNK_WIDTH; x++) {
 
-            double nx = x / 128f - 0.5 + chunkPos.x * CHUNK_WIDTH, ny = 128f - 0.5 + chunkPos.x * CHUNK_WIDTH;
+            double nx = (x + CHUNK_WIDTH * chunkPos.x) / 128f - 0.5, ny = 128f - 0.5;
             double e = (1.00 * noise(elevationSim, 1 * nx, 1 * ny) + 0.59 * noise(elevationSim, 2 * nx, 2 * ny) +
                         0.41 * noise(elevationSim, 4 * nx, 4 * ny) + 0.19 * noise(elevationSim, 8 * nx, 8 * ny) +
                         0.09 * noise(elevationSim, 16 * nx, 16 * ny) + 0.03 * noise(elevationSim, 32 * nx, 32 * ny));
             e /= (1.00 + 0.59 + 0.41 + 0.19 + 0.09 + 0.03);
             e = Math.pow(e, 0.50);
 
-//                        double m = (1.00 * noise(detailSim, 1 * nx, 1 * ny) + 0.69 * noise(detailSim, 2 * nx, 2 * ny) +
-//                        0.45 * noise(detailSim, 4 * nx, 4 * ny) + 0.28 * noise(detailSim, 8 * nx, 8 * ny) +
-//                        0.13 * noise(detailSim, 16 * nx, 16 * ny) + 0.02 * noise(detailSim, 32 * nx, 32 * ny));
-//            m /= (1.00 + 0.69 + 0.45 + 0.28 + 0.13 + 0.02);
-//
-//            System.out.println("\n\n\n\nx = " + x);
-//            System.out.println("e = " + e);
-//            System.out.println("m = " + m);
-
-            int elevation = (int) (e * 1280);
-            int elevationChunk = CoordUtil.worldToChunk(elevation);//elevation - (CHUNK_HEIGHT * chunkPos.y) - 1;
-            System.out.println("pos = " + (x + CHUNK_WIDTH * chunkPos.x) + ", " + elevationChunk);
+            int elevation = (int) (e * 256);
+            int elevationChunk = CoordUtil.worldToChunk(elevation);
+//            System.out.println("pos = " + (x + CHUNK_WIDTH * chunkPos.x) + ", " + elevationChunk);
             if (chunkPos.y == elevationChunk) {
                 fillUpTo(chunk, x, elevation - elevationChunk * CHUNK_WIDTH, Material.STONE);
             }
             else if (chunkPos.y < elevationChunk) {
                 fillUpTo(chunk, x, CHUNK_HEIGHT, Material.STONE);
             }
-//            System.out.println("elevation = " + elevation);
-//            if (elevation > CHUNK_HEIGHT * (chunkPos.y - 1)) {
-//                fillUpTo(chunk, x, CHUNK_HEIGHT, Material.STONE);
-//            }
-//            else if (elevation < CHUNK_HEIGHT * (chunkPos.y + 1)) {
-//                //DO NOTHING
-//            }
-//            else {
-//                System.out.println("easfsef");
-//                int realY = (int) (elevation - CHUNK_HEIGHT * chunkPos.y);
-//                fillUpTo(chunk, x, realY, Material.STONE);
-//            }
         }
-        chunk.update(false);
         return chunk;
     }
 
