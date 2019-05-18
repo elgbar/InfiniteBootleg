@@ -72,6 +72,49 @@ public class World implements Disposable {
         return getChunk(chunkX, chunkY);
     }
 
+    /**
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     *
+     * @return The block at the given x and y
+     *
+     * @see Chunk#getBlock(int, int)
+     */
+    public Block getBlock(int worldX, int worldY) {
+
+        int chunkX = worldX >> CHUNK_WIDTH_SHIFT;
+        int chunkY = worldY >> CHUNK_HEIGHT_SHIFT;
+
+        int localX = worldX - chunkX * Chunk.CHUNK_WIDTH;
+        int localY = worldY - chunkY * Chunk.CHUNK_HEIGHT;
+
+        return getChunk(chunkX, chunkY).getBlock(localX, localY);
+    }
+
+    /**
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     * @param material
+     *     The new material to at given location
+     *
+     * @see Chunk#setBlock(int, int, Material)
+     */
+    public void setBlock(int worldX, int worldY, @Nullable Material material) {
+
+        int chunkX = worldX >> CHUNK_WIDTH_SHIFT;
+        int chunkY = worldY >> CHUNK_HEIGHT_SHIFT;
+
+        int localX = worldX - chunkX * Chunk.CHUNK_WIDTH;
+        int localY = worldY - chunkY * Chunk.CHUNK_HEIGHT;
+
+        getChunk(chunkX, chunkY).setBlock(localX, localY, material);
+    }
+
+
     public boolean isLoadedAt(@NotNull Location chunkLoc) {
         return chunks.containsKey(chunkLoc);
     }

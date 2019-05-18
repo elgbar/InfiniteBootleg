@@ -47,4 +47,34 @@ public class WorldTest extends TestGraphic {
         assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_WIDTH + 1, 0));
         assertEquals(world.getChunk(2, 0), world.getChunkFromWorld(CHUNK_WIDTH * 2, 0));
     }
+
+    @Test
+    public void setCorrectBlockFromOrigin() {
+        world.setBlock(0, 0, Material.STONE);
+        assertEquals(Material.STONE, world.getChunk(0, 0).getBlock(0, 0).getMaterial());
+    }
+
+    @Test
+    public void setCorrectBlockFromWorldCoords() {
+        world.setBlock(CHUNK_WIDTH + 1, 3 * CHUNK_HEIGHT + 9, Material.STONE);
+        assertEquals(Material.STONE, world.getChunk(1, 3).getBlock(1, 9).getMaterial());
+    }
+
+    @Test
+    public void setCorrectBlockFromWorldCoordsNeg() {
+        world.setBlock(-CHUNK_WIDTH + 1, -3 * CHUNK_HEIGHT + 9, Material.STONE);
+        assertEquals(Material.STONE, world.getChunk(-1, -3).getBlock(1, 9).getMaterial());
+    }
+
+    @Test
+    public void getCorrectBlockFromOrigin() {
+        world.getChunk(0, 0).setBlock(0, 0, Material.STONE);
+        assertEquals(Material.STONE, world.getBlock(0, 0).getMaterial());
+    }
+
+    @Test
+    public void getCorrectBlockFromWorldCoords() {
+        world.getChunk(-2, 5).setBlock(2, 11, Material.STONE);
+        assertEquals(Material.STONE, world.getBlock(-2 * CHUNK_WIDTH + 2, 5 * CHUNK_HEIGHT + 11).getMaterial());
+    }
 }
