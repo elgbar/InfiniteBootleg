@@ -72,9 +72,8 @@ public class WorldRender implements Renderer, Disposable {
 
     @Override
     public void render() {
-        if (Gdx.graphics.getFrameId() % 2 == 0) {
-            chunkRenderer.render();
-        }
+        chunkRenderer.render();
+
         final int colEnd = chunksInView[HOR_END];
         final int colStart = chunksInView[HOR_START];
         final int rowEnd = chunksInView[VERT_END];
