@@ -13,6 +13,7 @@ import com.kotcrab.vis.ui.VisUI;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.GaussianChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -93,8 +94,10 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, 25);
         font.draw(batch, "Pointing at block (" + blockX + ", " + blockY + ") in chunk " +
                          world.getChunkFromWorld(blockX, blockY).getLocation(), 10, 40);
-        font.draw(batch, "Viewing " + chunksInView + " chunks", 10, 55);
-        font.draw(batch, "Zool level: " + world.getRender().getCamera().zoom, 10, 70);
+        font.draw(batch,
+                  "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_WIDTH * Chunk.CHUNK_WIDTH + " blocks)", 10,
+                  55);
+        font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, 70);
         batch.end();
 
         console.draw();
