@@ -46,12 +46,12 @@ public class Chunk implements Iterable<Block> {
         heightmap = new int[CHUNK_WIDTH];
         allAir = true;
         loaded = true;
-        updateTexture();
+        updateTexture(false);
     }
 
-    private void updateTexture() {
+    private void updateTexture(boolean prioritize) {
         if (Main.renderGraphic) {
-            world.getRender().getChunkRenderer().queueRendering(this);
+            world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             if (fbo != null) {
                 fbo.dispose();
                 fbo = null;
@@ -90,16 +90,16 @@ public class Chunk implements Iterable<Block> {
      */
     public void setBlock(int localX, int localY, @Nullable Material material) {
         Preconditions.checkArgument(Util.isBetween(0, localX, CHUNK_WIDTH),
-                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + localX + ", " +
+                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was " + localX + ", " +
                                     localY);
         Preconditions.checkArgument(Util.isBetween(0, localY, CHUNK_HEIGHT),
-                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + localX + ", " +
+                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was " + localX + ", " +
                                     localY);
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
         blocks[localX][localY] = material == null ? null : material.create(localX, localY, world);
         checkAllAir();
-        updateTexture();
+        updateTexture(true);
     }
 
     /**

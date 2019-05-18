@@ -91,7 +91,7 @@ public class WorldRender implements Renderer, Disposable {
                 }
                 if (chunk.getTexture() == null) {
                     //if it somehow failed to render the first time, make sure it is up to date now
-                    chunkRenderer.queueRendering(chunk);
+                    chunkRenderer.queueRendering(chunk, false);
                     continue;
                 }
                 float dx = chunk.getLocation().x * CHUNK_TEXT_WIDTH;

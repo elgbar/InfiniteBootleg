@@ -34,8 +34,11 @@ public class ChunkRenderer implements Renderer {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT));
     }
 
-    public void queueRendering(@NotNull Chunk chunk) {
-        renderQueue.add(chunk);
+    public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
+        if (prioritize) {
+            renderQueue.add(0, chunk);
+        }
+        else { renderQueue.add(chunk); }
     }
 
     @Override
