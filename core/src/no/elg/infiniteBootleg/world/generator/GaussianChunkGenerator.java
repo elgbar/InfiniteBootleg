@@ -24,7 +24,8 @@ public class GaussianChunkGenerator implements ChunkGenerator {
         else if (chunkPos.y < 1) {
             for (int x = 0; x < CHUNK_WIDTH; x++) {
                 for (int y = 0; y < CHUNK_HEIGHT; y++) {
-                    chunk.setBlock(x, y, Material.STONE, false);
+                    Material mat = random.nextBoolean() ? Material.STONE : Material.BRICK;
+                    chunk.setBlock(x, y, mat, false);
                 }
             }
             return chunk;

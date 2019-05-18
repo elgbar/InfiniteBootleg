@@ -61,10 +61,6 @@ public class Main extends ApplicationAdapter {
 
         world = new World(new GaussianChunkGenerator());
 
-        world.getRender().getCamera().zoom = 24;
-//        world.getRender().getCamera().translate(0, -Gdx.graphics.getHeight());
-        world.getRender().update();
-
         font = new BitmapFont(true);
     }
 
@@ -75,7 +71,6 @@ public class Main extends ApplicationAdapter {
         }
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        camera.update();
 
         world.getRender().render();
 
@@ -86,7 +81,7 @@ public class Main extends ApplicationAdapter {
         final int blockY = (int) (unproject.y / World.BLOCK_SIZE);
 
         int[] vChunks = world.getRender().getChunksInView();
-//        int getViewingChunks = (colEnd - colStart) + (rowEnd - vChunks[VERT_START]);
+
         int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) *
                            Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
         batch.begin();

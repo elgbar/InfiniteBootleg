@@ -2,7 +2,7 @@
 blocks.png
 format: RGBA4444
 filter: Nearest,Nearest
-repeat: xy
+repeat: none
 brick
   rotate: false
   xy: 1, 1

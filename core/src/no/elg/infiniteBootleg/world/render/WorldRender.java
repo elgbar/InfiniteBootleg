@@ -42,11 +42,13 @@ public class WorldRender implements Renderer, Disposable {
 
         this.world = world;
 
-        batch = new SpriteBatch();
         chunkRenderer = new ChunkRenderer(this);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch = new SpriteBatch();
+        batch.setProjectionMatrix(camera.combined);
+        
         this.viewBounds = new Rectangle();
         chunksInView = new int[4];
         update();
@@ -57,6 +59,7 @@ public class WorldRender implements Renderer, Disposable {
     public void update() {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+
         float width = camera.viewportWidth * camera.zoom;
         float height = camera.viewportHeight * camera.zoom;
         float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);

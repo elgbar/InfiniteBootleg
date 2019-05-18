@@ -32,12 +32,8 @@ public enum Material {
         this.solid = solid;
         this.blocksLight = blocksLight;
         this.placable = placable;
-        if (Main.renderGraphic) {
-            this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase());
-        }
-        else {
-            texture = null;
-        }
+        if (Main.renderGraphic) { this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase()); }
+        else { texture = null; }
     }
 
     /**
