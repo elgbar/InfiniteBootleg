@@ -60,11 +60,6 @@ public class Chunk implements Iterable<Block> {
             //noinspection ConstantConditions
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
-            if (fbo != null) {
-                fbo.dispose();
-                fbo = null;
-                fboRegion = null;
-            }
         }
         dirty = false;
     }
@@ -153,6 +148,11 @@ public class Chunk implements Iterable<Block> {
     }
 
     public void setFbo(FrameBuffer fbo) {
+        if (this.fbo != null) {
+            this.fbo.dispose();
+            this.fbo = null;
+            this.fboRegion = null;
+        }
         this.fbo = fbo;
         fboRegion = new TextureRegion(fbo.getColorBufferTexture());
         fboRegion.flip(false, true);
