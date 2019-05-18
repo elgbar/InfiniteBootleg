@@ -18,7 +18,7 @@ public class TestGraphic {
     // Before running any tests, initialize the application with the headless backend
     @BeforeClass
     public static void init() {
-        Main.RENDER_GRAPHIC = false;
+        Main.renderGraphic = false;
 //        application = new HeadlessApplication(mock(ApplicationListener.class));
 //        Gdx.app.setLogLevel(Application.LOG_DEBUG);
 

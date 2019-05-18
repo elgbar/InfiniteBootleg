@@ -36,7 +36,7 @@ public class WorldRender implements Renderer, Disposable {
     private final ChunkRenderer chunkRenderer;
 
     public WorldRender(@NotNull World world) {
-        if (!Main.RENDER_GRAPHIC) {
+        if (!Main.renderGraphic) {
             throw new IllegalStateException("Cannot render world as graphics are not enabled");
         }
 

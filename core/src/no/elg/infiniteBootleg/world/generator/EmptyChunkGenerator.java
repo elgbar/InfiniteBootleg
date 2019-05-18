@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 /**
+ * Generate chunks that are always air
+ *
  * @author Elg
  */
 public class EmptyChunkGenerator implements ChunkGenerator {

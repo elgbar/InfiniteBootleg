@@ -47,7 +47,7 @@ public class World implements Disposable {
         random = new Random(seed);
         chunks = new WeakHashMap<>();
 
-        if (Main.RENDER_GRAPHIC) {
+        if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
         }
@@ -109,6 +109,10 @@ public class World implements Disposable {
 
     public WorldRender getRender() {
         return render;
+    }
+
+    public WorldInputHandler getInput() {
+        return input;
     }
 
     @Override

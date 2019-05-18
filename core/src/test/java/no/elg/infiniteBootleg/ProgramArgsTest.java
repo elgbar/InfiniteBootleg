@@ -12,19 +12,19 @@ public class ProgramArgsTest {
 
     @Before
     public void setUp() throws Exception {
-        Main.RENDER_GRAPHIC = true;
+        Main.renderGraphic = true;
     }
 
     @Test
     public void headless() {
         ProgramArgs.executeArgs(new String[] {"-headless"});
-        assertFalse(Main.RENDER_GRAPHIC);
+        assertFalse(Main.renderGraphic);
     }
 
     @Test
     public void handlesRandomCasing() {
         ProgramArgs.executeArgs(new String[] {"-hEadlESS"});
-        assertFalse(Main.RENDER_GRAPHIC);
+        assertFalse(Main.renderGraphic);
     }
 
     @Test

@@ -10,8 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
-import com.strongjoshua.console.Console;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
+import no.elg.infiniteBootleg.console.ConsoleLogger;
+import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.GaussianChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -26,17 +27,18 @@ public class Main extends ApplicationAdapter {
     public static final String TEXTURES_FOLDER = "textures" + File.separatorChar;
     public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
     public static final String VERSION_FILE = "version";
+    public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
+
+    private static InputMultiplexer inputMultiplexer;
+    private static TextureAtlas textureAtlas;
+
+    public static boolean renderGraphic = true;
+    private static World world;
+    private static ConsoleHandler console;
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
-    private static InputMultiplexer inputMultiplexer;
-    private Console console;
     private BitmapFont font;
-    private static TextureAtlas textureAtlas;
-
-    public static boolean RENDER_GRAPHIC = true;
-
-    public static World world;
 
     public Main(String[] args) {
         executeArgs(args);
@@ -54,17 +56,20 @@ public class Main extends ApplicationAdapter {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         batch.setProjectionMatrix(camera.combined);
-        textureAtlas = new TextureAtlas(Gdx.files.internal(TEXTURES_BLOCK_FILE));
+        textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
         world = new World(new GaussianChunkGenerator());
+
+        world.getRender().getCamera().zoom = 24;
+//        world.getRender().getCamera().translate(0, -Gdx.graphics.getHeight());
+        world.getRender().update();
+
         font = new BitmapFont(true);
-
-
     }
 
     @Override
     public void render() {
-        if (!Main.RENDER_GRAPHIC) {
+        if (!Main.renderGraphic) {
             return;
         }
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
@@ -89,6 +94,7 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "Pointing at block (" + blockX + ", " + blockY + ") in chunk " +
                          world.getChunkFromWorld(blockX, blockY).getLocation(), 10, 40);
         font.draw(batch, "Viewing " + chunksInView + " chunks", 10, 55);
+        font.draw(batch, "Zool level: " + world.getRender().getCamera().zoom, 10, 70);
         batch.end();
 
         console.draw();
@@ -100,11 +106,20 @@ public class Main extends ApplicationAdapter {
         VisUI.dispose();
     }
 
+    @Override
+    public void resize(int width, int height) {
+        world.getInput().resize(width, height);
+    }
+
     public static TextureAtlas getTextureAtlas() {
         return textureAtlas;
     }
 
     public static InputMultiplexer getInputMultiplexer() {
         return inputMultiplexer;
+    }
+
+    public static ConsoleLogger getConsoleLogger() {
+        return console;
     }
 }

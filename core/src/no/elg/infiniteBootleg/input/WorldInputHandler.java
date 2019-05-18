@@ -43,6 +43,11 @@ public class WorldInputHandler extends InputAdapter implements Disposable {
         return true;
     }
 
+    public void resize(int width, int height) {
+        camera.setToOrtho(false, width, height);
+        worldRender.update();
+    }
+
     public World getWorld() {
         return worldRender.getWorld();
     }

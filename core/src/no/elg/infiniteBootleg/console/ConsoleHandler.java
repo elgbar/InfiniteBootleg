@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Util;
 import no.kh498.util.Reflection;
 
-public class ConsoleHandler extends GUIConsole {
+public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
 
     private Window consoleWindow;
 
@@ -42,10 +42,12 @@ public class ConsoleHandler extends GUIConsole {
         return consoleWindow.getColor().a;
     }
 
+    @Override
     public void logf(final String msg, final Object... objs) {
         logf(LogLevel.DEFAULT, msg, objs);
     }
 
+    @Override
     public void logf(final LogLevel level, final String msg, final Object... objs) {
         log(String.format(msg, objs), level);
     }

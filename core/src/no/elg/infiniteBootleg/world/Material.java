@@ -33,8 +33,7 @@ public enum Material {
         this.solid = solid;
         this.blocksLight = blocksLight;
         this.placable = placable;
-        System.out.println("Main.RENDER_GRAPHIC = " + Main.RENDER_GRAPHIC);
-        if (Main.RENDER_GRAPHIC) {
+        if (Main.renderGraphic) {
             this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase());
         }
         else {
