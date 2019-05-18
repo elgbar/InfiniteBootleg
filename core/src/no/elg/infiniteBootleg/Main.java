@@ -15,10 +15,11 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.generator.GaussianChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.SimplexChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 
 import java.io.File;
+import java.util.Random;
 
 import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
 
@@ -59,7 +60,10 @@ public class Main extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
-        world = new World(new GaussianChunkGenerator());
+        int worldSeed = new Random().nextInt();
+        world = new World(new SimplexChunkGenerator(worldSeed), worldSeed);
+
+        world.getRender().getCamera().zoom = 24;
 
         font = new BitmapFont(true);
     }
