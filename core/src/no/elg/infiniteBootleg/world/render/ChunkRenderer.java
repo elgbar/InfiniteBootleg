@@ -1,15 +1,17 @@
 package no.elg.infiniteBootleg.world.render;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.utils.Queue;
+import com.badlogic.gdx.math.Matrix4;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
+import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
@@ -21,38 +23,33 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 public class ChunkRenderer implements Renderer {
 
     private final SpriteBatch batch;
-    private final Queue<Chunk> renderQueue;
+    private final SetUniqueList<Chunk> renderQueue;
     private final WorldRender worldRender;
-    private final OrthographicCamera chunkCam;
 
     public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
         this.batch = new SpriteBatch();
-        this.renderQueue = new Queue<>();
-        chunkCam = new OrthographicCamera();
-        chunkCam.setToOrtho(false, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT);
-        batch.setProjectionMatrix(chunkCam.combined);
+        this.renderQueue = SetUniqueList.setUniqueList(new ArrayList<>());
+
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT));
     }
 
     public void queueRendering(@NotNull Chunk chunk) {
-        for (Chunk lchunk : renderQueue) {
-            if (lchunk.equals(chunk)) {
-                return;
-            }
-        }
-        renderQueue.addLast(chunk);
+        renderQueue.add(chunk);
     }
 
     @Override
     public void update() {
         //does nothing
+        //TODO maybe clear all chunk not viewed in n seconds?
     }
 
     @Override
     public void render() {
-        System.out.println("There are " + renderQueue.size + " chunks waiting to be rendered");
+//        System.out.println("There are " + renderQueue.size + " chunks waiting to be rendered");
         if (renderQueue.isEmpty()) { return; } //nothing to render
-        Chunk chunk = renderQueue.removeFirst();
+
+        Chunk chunk = renderQueue.remove(0);
 
         if (!worldRender.inInView(chunk) || chunk.isAllAir()) {
             return;

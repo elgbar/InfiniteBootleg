@@ -1,6 +1,6 @@
 
 blocks.png
-format: RGBA8888
+format: RGBA4444
 filter: Nearest,Nearest
 repeat: xy
 brick

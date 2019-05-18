@@ -16,6 +16,8 @@ import java.util.*;
 public class World implements Disposable {
 
     public final static int BLOCK_SIZE = 16;
+    public static final int CHUNK_WIDTH_SHIFT = (int) (Math.log(Chunk.CHUNK_WIDTH) / Math.log(2));
+    public static final int CHUNK_HEIGHT_SHIFT = (int) (Math.log(Chunk.CHUNK_HEIGHT) / Math.log(2));
 
     private final ChunkGenerator generator;
     private final long seed;
@@ -64,8 +66,8 @@ public class World implements Disposable {
 
     @NotNull
     public Chunk getChunkFromWorld(int worldX, int worldY) {
-        int chunkX = (int) Math.floor((float) worldX / Chunk.CHUNK_WIDTH);
-        int chunkY = (int) Math.floor((float) worldY / Chunk.CHUNK_HEIGHT);
+        int chunkX = worldX >> CHUNK_WIDTH_SHIFT;
+        int chunkY = worldY >> CHUNK_HEIGHT_SHIFT;
 
         return getChunk(chunkX, chunkY);
     }

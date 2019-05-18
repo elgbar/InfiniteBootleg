@@ -68,6 +68,7 @@ project(":core") {
         compile "com.strongjoshua:libgdx-inGameConsole:0.7.1"
         compile "org.apache.commons:commons-lang3:3.8.1"
         compile "no.kh498.util:CommonUtil:1.0.3"
+        compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
         compileOnly 'org.jetbrains:annotations:17.0.0'
 
         testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"

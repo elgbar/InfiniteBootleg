@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.google.common.base.Preconditions;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,8 +35,6 @@ public class Chunk implements Iterable<Block> {
     private boolean loaded; //once unloaded it no longer is valid
 
     private boolean allAir;
-    //    private Pixmap pixmap;
-//    private Texture texture;
     private FrameBuffer fbo;
     private TextureRegion fboRegion;
 
@@ -47,45 +46,58 @@ public class Chunk implements Iterable<Block> {
         heightmap = new int[CHUNK_WIDTH];
         allAir = true;
         loaded = true;
-
-//        if (Main.RENDER_GRAPHIC) {
-//            Pixmap pixmap = new Pixmap(CHUNK_WIDTH * World.BLOCK_SIZE, CHUNK_HEIGHT * World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
-//            texture = new Texture(pixmap);
         updateTexture();
-//
-//        }
     }
 
     private void updateTexture() {
-        world.getRender().getChunkRenderer().queueRendering(this);
+        if (Main.renderGraphic) {
+            world.getRender().getChunkRenderer().queueRendering(this);
+            if (fbo != null) {
+                fbo.dispose();
+                fbo = null;
+                fboRegion = null;
+            }
+        }
     }
 
     /**
-     * @param x
-     *     The local x
-     * @param y
-     *     The local y
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_WIDTH}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
      *
      * @return A block from the relative coordinates
      */
     @NotNull
-    public Block getBlock(int x, int y) {
-        Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH),
-                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + x + ", " + y);
-        Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT),
-                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + x + ", " + y);
+    public Block getBlock(int localX, int localY) {
+        Preconditions.checkArgument(Util.isBetween(0, localX, CHUNK_WIDTH),
+                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + localX + ", " +
+                                    localY);
+        Preconditions.checkArgument(Util.isBetween(0, localY, CHUNK_HEIGHT),
+                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + localX + ", " +
+                                    localY);
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        return blocks[x][y] == null ? AIR.create(x, y, world) : blocks[x][y];
+        return blocks[localX][localY] == null ? AIR.create(localX, localY, world) : blocks[localX][localY];
     }
 
-    public void setBlock(int x, int y, @NotNull Material material) {
-        Preconditions.checkArgument(Util.isBetween(0, x, CHUNK_WIDTH),
-                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + x + ", " + y);
-        Preconditions.checkArgument(Util.isBetween(0, y, CHUNK_HEIGHT),
-                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + x + ", " + y);
+    /**
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_WIDTH}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
+     * @param material
+     *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
+     */
+    public void setBlock(int localX, int localY, @Nullable Material material) {
+        Preconditions.checkArgument(Util.isBetween(0, localX, CHUNK_WIDTH),
+                                    "Invalid position must be between 0 and " + CHUNK_WIDTH + ", but was" + localX + ", " +
+                                    localY);
+        Preconditions.checkArgument(Util.isBetween(0, localY, CHUNK_HEIGHT),
+                                    "Invalid position must be between 0 and " + CHUNK_HEIGHT + ", but was" + localX + ", " +
+                                    localY);
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
-        blocks[x][y] = material.create(x, y, world);
+        blocks[localX][localY] = material == null ? null : material.create(localX, localY, world);
         checkAllAir();
         updateTexture();
     }

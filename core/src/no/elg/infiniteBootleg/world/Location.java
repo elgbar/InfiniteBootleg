@@ -23,9 +23,7 @@ public class Location {
         if (o == null || getClass() != o.getClass()) { return false; }
 
         Location location = (Location) o;
-
-        if (x != location.x) { return false; }
-        return y == location.y;
+        return y == location.y && x == location.x;
     }
 
     @Override
