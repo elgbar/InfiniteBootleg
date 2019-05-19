@@ -17,6 +17,8 @@ public enum Material {
     AIR(null, false, false, false),
     STONE(null),
     BRICK(null),
+    DIRT(null),
+    GRASS(null),
     ;
 
     private final Class<? extends Block> impl;

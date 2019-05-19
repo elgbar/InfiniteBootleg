@@ -20,7 +20,7 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
  */
 public enum Biome {
 
-    PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE),
+    PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE, new Tuple<>(Material.GRASS, 3), new Tuple<>(Material.DIRT, 10)),
     ANCIENT_MOUNTAINS(0.6, 0.9, 1, 256, 0.01, Material.STONE, new Tuple<>(Material.BRICK, 32)),
     ;
 
