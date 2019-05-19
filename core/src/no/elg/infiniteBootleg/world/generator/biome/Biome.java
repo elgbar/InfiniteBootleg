@@ -1,11 +1,16 @@
 package no.elg.infiniteBootleg.world.generator.biome;
 
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.generator.simplex.SimplexNoise;
+import no.elg.infiniteBootleg.world.generator.simplex.ImprovedNoise;
+import no.elg.infiniteBootleg.world.generator.simplex.OctavePerlin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
@@ -15,55 +20,97 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
  */
 public enum Biome {
 
-    PLAINS(new SimplexNoise(8, 0.85f, 123), new float[] {1.0f, 0.59f, 0.41f, 0.19f, 0.09f, 0.03f}, 0.5, 256, Material.STONE),
-    ANCIENT_MOUNTAINS(new SimplexNoise(2, 2f, 123), new float[] {1.0f, 1.0f, 0.31f, 0.16f, 0.07f, 0.04f}, 1.59, 1024,
-                      Material.BRICK),
+    PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE),
+    ANCIENT_MOUNTAINS(0.6, 0.9, 1, 256, 0.01, Material.STONE, new Tuple<>(Material.BRICK, 32)),
     ;
 
-    private final SimplexNoise noise;
-    public final float[] weights;
+    public final double y;
+    public final double z;
     public final double exponent;
-    public final int intensity;
-    private final Material filler;
+    public final double amplitude;
+    public final double frequency;
+    public final Material filler;
+    public final Material[] topSoil;
 
-    Biome(SimplexNoise noise, float[] weights, double exponent, int intensity, Material filler) {
-        this.noise = noise;
-
-        this.weights = weights;
+    Biome(double y, double z, double exponent, double amplitude, double frequency, Material filler,
+          Tuple<Material, Integer>... topSoil) {
+        this.y = y;
+        this.z = z;
         this.exponent = exponent;
-        this.intensity = intensity;
+        this.amplitude = amplitude;
+        this.frequency = frequency;
         this.filler = filler;
+        List<Material> mats = new ArrayList<>();
+        for (Tuple<Material, Integer> tuple : topSoil) {
+            for (int i = 0; i < tuple.value; i++) {
+                mats.add(tuple.key);
+            }
+        }
+        this.topSoil = mats.toArray(new Material[0]);
     }
-
-    public static double noise(SimplexNoise noise, double nx, double ny) { return noise.getNoise(nx, ny) / 2 + 0.5; }
 
     public Chunk generate(World world, Location chunkPos) {
         Chunk chunk = new Chunk(world, chunkPos);
         for (int x = 0; x < CHUNK_WIDTH; x++) {
-
-            double nx = (x + CHUNK_WIDTH * chunkPos.x) / 128f - 0.5, ny = 128f - 0.5;
-            double e = (weights[0] * noise(noise, 1 * nx, 1 * ny) + weights[1] * noise(noise, 2 * nx, 2 * ny) +
-                        weights[2] * noise(noise, 4 * nx, 4 * ny) + weights[3] * noise(noise, 8 * nx, 8 * ny) +
-                        weights[4] * noise(noise, 16 * nx, 16 * ny) + weights[5] * noise(noise, 32 * nx, 32 * ny));
-            e /= (weights[0] + weights[1] + weights[2] + weights[3] + weights[4] + weights[5]);
-            e = Math.pow(e, exponent) / 4;
-
-            int elevation = (int) (e * intensity);
-            int elevationChunk = CoordUtil.worldToChunk(elevation);
-//            System.out.println("pos = " + (x + CHUNK_WIDTH * chunkPos.x) + ", " + elevationChunk);
+            double elevation = heightAt(chunkPos.x, x, y, z, amplitude, frequency);
+            int elevationChunk = CoordUtil.worldToChunk((int) elevation);
             if (chunkPos.y == elevationChunk) {
-                fillUpTo(chunk, x, elevation - elevationChunk * CHUNK_WIDTH, filler);
+                fillUpTo(chunk, x, (int) (elevation - elevationChunk * CHUNK_WIDTH), (int) elevation);
             }
             else if (chunkPos.y < elevationChunk) {
-                fillUpTo(chunk, x, CHUNK_HEIGHT, filler);
+                fillUpTo(chunk, x, CHUNK_HEIGHT, (int) elevation);
             }
         }
         return chunk;
     }
 
-    public static void fillUpTo(Chunk chunk, int x, int y, Material mat) {
-        for (int dy = 0; dy < y; dy++) {
-            chunk.setBlock(x, dy, mat, false);
+//    public Chunk generate(World world, Location chunkPos) {
+//        return generate(world, chunkPos, y, z, amplitude, frequency, filler);
+//    }
+
+    public double heightAt(int chunkX, int localX) {
+        return heightAt(chunkX, localX, y, z, amplitude, frequency);
+    }
+
+    public Material materialAt(int height, int worldY) {
+        int delta = height - worldY;
+
+        int d = (int) ImprovedNoise.noise(delta, 0.1, 0.3, 5, 0.001);
+        if (delta - d > 0) {
+            delta -= d;
+        }
+
+        if (delta < 0) { return null; }
+        if (delta >= topSoil.length) {
+            return filler;
+        }
+        else {
+            return topSoil[delta];
+        }
+    }
+
+    public static double heightAt(int chunkX, int localX, double y, double z, double amplitude, double frequency) {
+        int lx = localX + CHUNK_WIDTH * chunkX;
+        return OctavePerlin.octaveNoise(lx * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude;
+//        return ImprovedNoise.noise(localX + CHUNK_WIDTH * chunkPos.x, y, z, amplitude, frequency);
+//        double nx = ;
+
+//        double e = (weights[0] * + weights[1] * noise(noise, 2 * nx, 2 * ny) +
+//                    weights[2] * noise(noise, 4 * nx, 4 * ny) + weights[3] * noise(noise, 8 * nx, 8 * ny) +
+//                    weights[4] * noise(noise, 16 * nx, 16 * ny) + weights[5] * noise(noise, 32 * nx, 32 * ny));
+//        e /= (weights[0] + weights[1] + weights[2] + weights[3] + weights[4] + weights[5]);
+//        return ImprovedNoise.noise(localX + CHUNK_WIDTH * chunkPos.x, y, z, amplitude, frequency);
+//        double e = noise
+//            .getOctNoise((localX + CHUNK_WIDTH * chunkPos.x), (int) (weights[0] * weights[1]), (int) (weights[2] * weights[3]));
+//        e = Math.pow(e, exponent);
+//        System.out.println("e = " + e);
+//        return (int) (e * intensity);
+    }
+
+    public void fillUpTo(Chunk chunk, int localX, int localY, int height) {
+        int chunkY = chunk.getLocation().y * CHUNK_HEIGHT;
+        for (int dy = 0; dy < localY; dy++) {
+            chunk.setBlock(localX, dy, materialAt(height, dy + chunkY), false);
         }
     }
 }
