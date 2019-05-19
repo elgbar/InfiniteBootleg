@@ -78,11 +78,10 @@ public class Main extends ApplicationAdapter {
 
         world.getRender().render();
 
-
         final Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        final int blockX = (int) (unproject.x / World.BLOCK_SIZE);
-        final int blockY = (int) (unproject.y / World.BLOCK_SIZE);
+        final int blockX = (int) Math.floor(unproject.x / World.BLOCK_SIZE);
+        final int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
 
         int[] vChunks = world.getRender().getChunksInView();
 

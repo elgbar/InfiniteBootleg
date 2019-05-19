@@ -33,8 +33,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable {
 
         final Vector3 unproject = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        final int blockX = (int) (unproject.x / World.BLOCK_SIZE);
-        final int blockY = (int) (unproject.y / World.BLOCK_SIZE);
+
+        final int blockX = (int) Math.floor(unproject.x / World.BLOCK_SIZE);
+        final int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
 
         if (button == Input.Buttons.LEFT) {
             getWorld().setBlock(blockX, blockY, null);
