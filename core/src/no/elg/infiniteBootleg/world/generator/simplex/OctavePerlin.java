@@ -62,20 +62,4 @@ public class OctavePerlin {
 //        return ImprovedNoise.noise(x, y, z, 8, 0.1);
 //    }
 
-    public static double octaveNoise(double x, double y, double z, int octaves, double persistence) {
-        double total = 0;
-        double frequency = 1;
-        double amplitude = 1;
-        double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
-        for (int i = 0; i < octaves; i++) {
-            total += ImprovedNoise.noise(x, y, z, amplitude, frequency);
-
-            maxValue += amplitude;
-
-            amplitude *= persistence;
-            frequency *= 2;
-        }
-
-        return total / maxValue;
-    }
 }

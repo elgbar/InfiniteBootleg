@@ -1,13 +1,9 @@
 package no.elg.infiniteBootleg.world.generator.biome;
 
-import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
-import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.generator.simplex.ImprovedNoise;
-import no.elg.infiniteBootleg.world.generator.simplex.OctavePerlin;
+import no.elg.infiniteBootleg.world.generator.simplex.PerlinNoise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +16,7 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
  */
 public enum Biome {
 
-    PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE, new Tuple<>(Material.GRASS, 3), new Tuple<>(Material.DIRT, 10)),
+    PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE, new Tuple<>(Material.GRASS, 1), new Tuple<>(Material.DIRT, 10)),
     ANCIENT_MOUNTAINS(0.6, 0.9, 1, 256, 0.01, Material.STONE, new Tuple<>(Material.BRICK, 32)),
     ;
 
@@ -49,33 +45,14 @@ public enum Biome {
         this.topSoil = mats.toArray(new Material[0]);
     }
 
-    public Chunk generate(World world, Location chunkPos) {
-        Chunk chunk = new Chunk(world, chunkPos);
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            double elevation = heightAt(chunkPos.x, x, y, z, amplitude, frequency);
-            int elevationChunk = CoordUtil.worldToChunk((int) elevation);
-            if (chunkPos.y == elevationChunk) {
-                fillUpTo(chunk, x, (int) (elevation - elevationChunk * CHUNK_WIDTH), (int) elevation);
-            }
-            else if (chunkPos.y < elevationChunk) {
-                fillUpTo(chunk, x, CHUNK_HEIGHT, (int) elevation);
-            }
-        }
-        return chunk;
+    public double heightAt(PerlinNoise noise, int chunkX, int localX) {
+        return heightAt(noise, chunkX, localX, y, z, amplitude, frequency);
     }
 
-//    public Chunk generate(World world, Location chunkPos) {
-//        return generate(world, chunkPos, y, z, amplitude, frequency, filler);
-//    }
+    public Material materialAt(PerlinNoise noise, int height, int worldY) {
+        int delta = height - worldY - 2;
+        int d = (int) noise.noise(delta, 0.1, 0.3, height, 0.1);
 
-    public double heightAt(int chunkX, int localX) {
-        return heightAt(chunkX, localX, y, z, amplitude, frequency);
-    }
-
-    public Material materialAt(int height, int worldY) {
-        int delta = height - worldY;
-
-        int d = (int) ImprovedNoise.noise(delta, 0.1, 0.3, 5, 0.001);
         if (delta - d > 0) {
             delta -= d;
         }
@@ -89,9 +66,10 @@ public enum Biome {
         }
     }
 
-    public static double heightAt(int chunkX, int localX, double y, double z, double amplitude, double frequency) {
+    public static double heightAt(PerlinNoise noise, int chunkX, int localX, double y, double z, double amplitude,
+                                  double frequency) {
         int lx = localX + CHUNK_WIDTH * chunkX;
-        return OctavePerlin.octaveNoise(lx * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude;
+        return noise.octaveNoise(lx * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude;
 //        return ImprovedNoise.noise(localX + CHUNK_WIDTH * chunkPos.x, y, z, amplitude, frequency);
 //        double nx = ;
 
@@ -107,10 +85,10 @@ public enum Biome {
 //        return (int) (e * intensity);
     }
 
-    public void fillUpTo(Chunk chunk, int localX, int localY, int height) {
+    public void fillUpTo(PerlinNoise noise, Chunk chunk, int localX, int localY, int height) {
         int chunkY = chunk.getLocation().y * CHUNK_HEIGHT;
         for (int dy = 0; dy < localY; dy++) {
-            chunk.setBlock(localX, dy, materialAt(height, dy + chunkY), false);
+            chunk.setBlock(localX, dy, materialAt(noise, height, dy + chunkY), false);
         }
     }
 }

@@ -1,9 +1,10 @@
 package no.elg.infiniteBootleg.world.generator.simplex;
 
-/** JAVA REFERENCE IMPLEMENTATION OF IMPROVED NOISE - COPYRIGHT 2002 KEN PERLIN. */
-public class ImprovedNoise {
+import java.util.Random;
 
-    private static final int[] p = new int[512];
+/** JAVA REFERENCE IMPLEMENTATION OF IMPROVED NOISE - COPYRIGHT 2002 KEN PERLIN. */
+public class PerlinNoise {
+
     private static final int[] permutation =
         {151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10,
             23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56,
@@ -16,13 +17,48 @@ public class ImprovedNoise {
             241, 81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45,
             127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180};
 
-    static { for (int i = 0; i < 256; i++) { p[256 + i] = p[i] = permutation[i]; } }
+    private final int[] p = new int[512];
 
-    public static double noise(double x, double y, double z, double amplitude, double frequency) {
+    public PerlinNoise(int seed) {
+        Random random = new Random(seed);
+        for (int i = 0; i < 256; i++) {
+            p[256 + i] = p[i] = permutation[i];
+        }
+        //randomize
+        for (int i = 0; i < 1000; i++) {
+            swap(p, random.nextInt(p.length), random.nextInt(p.length));
+        }
+    }
+
+    private static void swap(int[] as, int x, int y) {
+        int i = as[x];
+        as[x] = as[y];
+        as[y] = i;
+    }
+
+    public double noise(double x, double y, double z, double amplitude, double frequency) {
         return noise(x * frequency, y * frequency, z * frequency) * amplitude;
     }
 
-    public static double noise(double x, double y, double z) {
+    public double octaveNoise(double x, double y, double z, int octaves, double persistence) {
+        double total = 0;
+        double frequency = 1;
+        double amplitude = 1;
+        double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
+        for (int i = 0; i < octaves; i++) {
+            total += noise(x, y, z, amplitude, frequency);
+
+            maxValue += amplitude;
+
+            amplitude *= persistence;
+            frequency *= 2;
+        }
+
+        return total / maxValue;
+    }
+
+
+    public double noise(double x, double y, double z) {
         int X = (int) Math.floor(x) & 255,                  // FIND UNIT CUBE THAT
             Y = (int) Math.floor(y) & 255,                  // CONTAINS POINT.
             Z = (int) Math.floor(z) & 255;

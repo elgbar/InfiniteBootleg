@@ -1,11 +1,12 @@
 package no.elg.infiniteBootleg.world.generator;
 
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
-import no.elg.infiniteBootleg.world.generator.simplex.ImprovedNoise;
+import no.elg.infiniteBootleg.world.generator.simplex.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,19 +20,15 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
  */
 public class SimplexChunkGenerator implements ChunkGenerator {
 
-    //    private final OctavePerlin eelevationSim;
-//
+    private PerlinNoise noise;
+
     public SimplexChunkGenerator(int seed) {
-//        elevationSim = new octaveNoise(555, 2, seed);
+        noise = new PerlinNoise(seed);
     }
 
-    Biome currBiome = Biome.PLAINS;
-
     private double calcHeightMap(int chunkX, int x) {
-        int a = 1;
-        double biomeWeight = (ImprovedNoise.noise(chunkX * CHUNK_WIDTH + x, 0.5, 0.5, a, 0.001) + a) / 2;
-//            biomeWeight += ImprovedNoise.noise(0.5, chunkPos.x * CHUNK_WIDTH + x, 0.5, a / 4, 0.005);
-        return biomeWeight;
+        final int a = 1;
+        return (noise.noise(chunkX * CHUNK_WIDTH + x, 0.5, 0.5, a, 0.001) + a) / 2;
     }
 
     private Biome getBiome(double height) {
@@ -46,41 +43,25 @@ public class SimplexChunkGenerator implements ChunkGenerator {
     @Override
     public @NotNull Chunk generate(@Nullable World world, @NotNull Location chunkPos, @NotNull Random random) {
         Chunk chunk = new Chunk(world, chunkPos);
-//        Main.SCHEDULER.executeAsync(() -> {
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            double biomeWeight = calcHeightMap(chunkPos.x, x);
-            Biome biome = getBiome(biomeWeight);
-            double y;
+        Main.SCHEDULER.executeAsync(() -> {
+            for (int x = 0; x < CHUNK_WIDTH; x++) {
+                double biomeWeight = calcHeightMap(chunkPos.x, x);
+                Biome biome = getBiome(biomeWeight);
+                double y;
 
-            y = biome.heightAt(chunkPos.x, x) * biomeWeight;
+                y = biome.heightAt(noise, chunkPos.x, x) * biomeWeight;
 
-
-//
-//            double pWeight = Biome.PLAINS.heightAt(chunkPos, x) * biomeWeight * 2;
-//            y += pWeight;
-//            double ahWeight = Biome.ANCIENT_MOUNTAINS.heightAt(chunkPos, x) * (1 - biomeWeight);
-//            y += ahWeight;
-//            y /= 2;
-//
-//            System.out.println("pWeight = " + pWeight);
-//            System.out.println("ahWeight = " + ahWeight);
-////
-////
-//            if (pWeight <= ahWeight) {
-//                biome = Biome.ANCIENT_MOUNTAINS;
-//            }
-
-            int height = (int) y;
-            int elevationChunk = CoordUtil.worldToChunk(height);
-            if (chunkPos.y == elevationChunk) {
-                biome.fillUpTo(chunk, x, (int) (y - elevationChunk * CHUNK_WIDTH), height);
+                int height = (int) y;
+                int elevationChunk = CoordUtil.worldToChunk(height);
+                if (chunkPos.y == elevationChunk) {
+                    biome.fillUpTo(noise, chunk, x, (int) (y - elevationChunk * CHUNK_WIDTH), height);
+                }
+                else if (chunkPos.y < elevationChunk) {
+                    biome.fillUpTo(noise, chunk, x, CHUNK_HEIGHT, height);
+                }
             }
-            else if (chunkPos.y < elevationChunk) {
-                biome.fillUpTo(chunk, x, CHUNK_HEIGHT, height);
-            }
-        }
-        chunk.update(false);
-//        });
+            chunk.update(false);
+        });
         return chunk;
     }
 }
