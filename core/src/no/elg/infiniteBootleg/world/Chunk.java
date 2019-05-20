@@ -92,7 +92,27 @@ public class Chunk implements Iterable<Block> {
      */
     public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        blocks[localX][localY] = material == null ? null : material.create(localX, localY, world);
+
+        if (blocks[localX][localY] == null) {
+            if (material == null) {
+                return;
+            }
+            else {
+                blocks[localX][localY] = material.create(localX, localY, world);
+            }
+        }
+        else {
+            if (material == null) {
+                blocks[localX][localY] = null;
+            }
+            else if (blocks[localX][localY].getMaterial() == material) {
+                return;
+            }
+            else {
+                blocks[localX][localY] = material.create(localX, localY, world);
+            }
+        }
+
         if (update) {
             dirty = true;
             prioritize = true;
