@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.blocks.GeneralBlock;
+import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,10 +15,11 @@ import java.lang.reflect.InvocationTargetException;
 public enum Material {
 
     AIR(null, false, false, false),
-    STONE(null),
-    BRICK(null),
-    DIRT(null),
-    GRASS(null),
+    STONE(),
+    BRICK(),
+    DIRT(),
+    GRASS(),
+    TNT(TntBlock.class),
     ;
 
     private final Class<? extends Block> impl;
@@ -27,6 +28,8 @@ public enum Material {
     private final boolean placable;
     private final TextureRegion texture;
 
+    Material() {this(null);}
+
     Material(Class<? extends Block> impl) {this(impl, true, true, true);}
 
     Material(Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable) {
@@ -34,7 +37,10 @@ public enum Material {
         this.solid = solid;
         this.blocksLight = blocksLight;
         this.placable = placable;
-        if (Main.renderGraphic) { this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase()); }
+        if (Main.renderGraphic && !"AIR".equals(name())) {
+            this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase());
+            texture.flip(false, false);
+        }
         else { texture = null; }
     }
 
@@ -48,11 +54,12 @@ public enum Material {
     @NotNull
     public Block create(int x, int y, @Nullable World world) {
         if (impl == null) {
-            return new GeneralBlock(x, y, world, this);
+            return new Block(x, y, world, this);
         }
         try {
-            Constructor<? extends Block> constructor = impl.getDeclaredConstructor(int.class, int.class, World.class);
-            return constructor.newInstance(x, y, world);
+            Constructor<? extends Block> constructor =
+                impl.getDeclaredConstructor(int.class, int.class, World.class, Material.class);
+            return constructor.newInstance(x, y, world, this);
 
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new IllegalStateException(e);

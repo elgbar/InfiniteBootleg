@@ -3,12 +3,7 @@ package no.elg.infiniteBootleg.world.render;
 /**
  * @author Elg
  */
-public interface Renderer {
-
-    /**
-     * Update the displaying frame, might be called every frame.
-     */
-    void update();
+public interface Renderer extends Updatable {
 
     /**
      * Render the frame. Called every frame.

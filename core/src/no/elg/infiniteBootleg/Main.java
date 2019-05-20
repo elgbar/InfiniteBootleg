@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
@@ -27,7 +28,7 @@ public class Main extends ApplicationAdapter {
 
     public static final String WORLD_FOLDER = "worlds" + File.separatorChar;
     public static final String TEXTURES_FOLDER = "textures" + File.separatorChar;
-    public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
+    public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.pack";
     public static final String VERSION_FILE = "version";
     public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
 
@@ -39,7 +40,6 @@ public class Main extends ApplicationAdapter {
     private static ConsoleHandler console;
 
     private SpriteBatch batch;
-    private OrthographicCamera camera;
     private BitmapFont font;
 
     public Main(String[] args) {
@@ -48,7 +48,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
-        camera = new OrthographicCamera();
+        OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(true);
 
         batch = new SpriteBatch();
@@ -63,7 +63,7 @@ public class Main extends ApplicationAdapter {
         int worldSeed = new Random().nextInt();
         world = new World(new SimplexChunkGenerator(worldSeed), worldSeed);
 
-        world.getRender().getCamera().zoom = 24;
+//        world.getRender().getCamera().zoom = 24;
 
         font = new BitmapFont(true);
     }
@@ -76,6 +76,7 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        world.getInput().update();
         world.getRender().render();
 
         final Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
@@ -96,8 +97,14 @@ public class Main extends ApplicationAdapter {
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_WIDTH * Chunk.CHUNK_WIDTH + " blocks)", 10,
                   55);
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, 70);
-        batch.end();
 
+        TextureRegion tr = world.getInput().getSelected().getTexture();
+        if (tr != null) {
+            TextureRegion wrapper = new TextureRegion(tr);
+            wrapper.flip(false, true);
+            batch.draw(wrapper, Gdx.graphics.getWidth() - 48, 16, 32, 32);
+        }
+        batch.end();
         console.draw();
     }
 

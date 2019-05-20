@@ -9,15 +9,17 @@ import java.util.Objects;
 /**
  * @author Elg
  */
-public abstract class Block {
+public class Block {
 
+    private final Material material;
     private Location loc;
     private World world;
 
-    public Block(int x, int y, @Nullable World world) {
+    public Block(int x, int y, @Nullable World world, @NotNull Material material) {
 
         this.loc = new Location(x, y);
         this.world = world;
+        this.material = material;
     }
 
     @Nullable
@@ -26,7 +28,9 @@ public abstract class Block {
     }
 
     @NotNull
-    public abstract Material getMaterial();
+    public Material getMaterial() {
+        return material;
+    }
 
     @Nullable
     public Chunk getChunk() {
