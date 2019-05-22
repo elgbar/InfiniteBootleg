@@ -24,6 +24,9 @@ public class WorldTicker implements Disposable {
                 try {
                     //noinspection InfiniteLoopStatement
                     while (true) {
+                        if (tickId % TICKS_PER_SECOND == 0) {
+                            System.out.println("tick: " + tickId);
+                        }
                         Gdx.app.postRunnable(world::update);
                         tickId++;
 
@@ -34,7 +37,7 @@ public class WorldTicker implements Disposable {
                 }
             }
         };
-//        worldTickThread.start();
+        worldTickThread.start();
     }
 
     public long getTickId() {

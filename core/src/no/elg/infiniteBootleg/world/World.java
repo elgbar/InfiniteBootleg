@@ -212,8 +212,7 @@ public class World implements Disposable, Updatable {
                 continue;
             }
 
-            if (chunk.getLastViewedTick() > tick + WorldTicker.TICKS_PER_SECOND * 5) {
-                System.out.println("unloaded chunk " + chunk.getLocation());
+            if (tick - chunk.getLastViewedTick() > WorldTicker.TICKS_PER_SECOND * 5) {
                 unload(chunk);
                 continue;
             }
