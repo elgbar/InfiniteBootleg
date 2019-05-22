@@ -20,10 +20,15 @@ public class TntBlock extends Block implements Updatable {
     private static final TextureRegion whiteTexture;
 
     static {
+        if (Main.renderGraphic) {
         Pixmap pixmap = new Pixmap(World.BLOCK_SIZE, World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
         whiteTexture = new TextureRegion(new Texture(pixmap));
+    }
+        else {
+            whiteTexture = null;
+    }
     }
 
     private boolean white = false;

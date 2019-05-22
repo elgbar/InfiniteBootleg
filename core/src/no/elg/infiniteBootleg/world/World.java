@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
+import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,10 @@ public class World implements Disposable, Updatable {
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
+        }
+        else {
+            render = new HeadlessWorldRenderer(this);
+//            input = new WorldInputHandler(render);
         }
 
         ticker = new WorldTicker(this);

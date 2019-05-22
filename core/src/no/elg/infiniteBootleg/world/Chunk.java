@@ -59,7 +59,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         prioritize = false;
     }
 
-    private void updateTexture() {
+    public void updateTextureNow() {
         //test if all the blocks in this chunk has the material air
         allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
         if (Main.renderGraphic) {
@@ -138,7 +138,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
     public TextureRegion getTexture() {
         lastViewedTick = world.getWorldTicker().getTickId();
         if (dirty) {
-            updateTexture();
+            updateTextureNow();
         }
         if (fbo == null) { return null; }
         return fboRegion;
@@ -172,7 +172,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
     public boolean isAllAir() {
         if (dirty) {
-            updateTexture();
+            updateTextureNow();
         }
         return allAir;
     }

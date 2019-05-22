@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import no.elg.infiniteBootleg.TestGraphic;
+import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class ChunkTest extends TestGraphic {
     @Before
     public void setUp() {
         loc = new Location(0, 0);
-        chunk = new Chunk(null, loc);
+        chunk = new Chunk(new World(new EmptyChunkGenerator()), loc);
     }
 
     @Test
@@ -58,10 +59,13 @@ public class ChunkTest extends TestGraphic {
     @Test
     public void checkAllAirModified() {
         chunk.setBlock(0, 0, Material.AIR, false);
+        chunk.updateTextureNow();
         assertTrue(chunk.isAllAir());
         chunk.setBlock(0, 0, Material.STONE, false);
+        chunk.updateTextureNow();
         assertFalse(chunk.isAllAir());
         chunk.setBlock(0, 0, Material.AIR, false);
+        chunk.updateTextureNow();
         assertTrue(chunk.isAllAir());
     }
 

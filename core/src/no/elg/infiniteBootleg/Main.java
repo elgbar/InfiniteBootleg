@@ -33,15 +33,16 @@ public class Main extends ApplicationAdapter {
     public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
 
     private static InputMultiplexer inputMultiplexer;
-    private static TextureAtlas textureAtlas;
+    private TextureAtlas textureAtlas;
 
     public static boolean renderGraphic = true;
-    private static World world;
+    private World world;
 
-    private static ConsoleHandler console;
+    private ConsoleHandler console;
 
     private SpriteBatch batch;
     private BitmapFont font;
+    private static Main inst;
 
     public Main(String[] args) {
         executeArgs(args);
@@ -49,6 +50,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void create() {
+        inst = this;
         OrthographicCamera camera = new OrthographicCamera();
         camera.setToOrtho(true);
 
@@ -136,15 +138,19 @@ public class Main extends ApplicationAdapter {
         world.getInput().resize(width, height);
     }
 
-    public static TextureAtlas getTextureAtlas() {
-        return textureAtlas;
-    }
-
     public static InputMultiplexer getInputMultiplexer() {
         return inputMultiplexer;
     }
 
-    public static ConsoleLogger getConsoleLogger() {
+    public ConsoleLogger getConsoleLogger() {
         return console;
+    }
+
+    public TextureAtlas getTextureAtlas() {
+        return textureAtlas;
+    }
+
+    public static Main inst() {
+        return inst;
     }
 }

@@ -38,7 +38,7 @@ public enum Material {
         this.blocksLight = blocksLight;
         this.placable = placable;
         if (Main.renderGraphic && !"AIR".equals(name())) {
-            this.texture = Main.getTextureAtlas().findRegion(name().toLowerCase());
+            this.texture = Main.inst().getTextureAtlas().findRegion(name().toLowerCase());
             texture.flip(false, false);
         }
         else { texture = null; }
@@ -52,7 +52,7 @@ public enum Material {
      * @return A block of this type
      */
     @NotNull
-    public Block create(int x, int y, @Nullable World world) {
+    public Block create(int x, int y, @NotNull World world) {
         if (impl == null) {
             return new Block(x, y, world, this);
         }

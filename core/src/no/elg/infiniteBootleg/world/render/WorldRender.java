@@ -30,29 +30,27 @@ public class WorldRender implements Renderer, Disposable {
     public final static int CHUNK_TEXT_HEIGHT = CHUNK_HEIGHT * BLOCK_SIZE;
 
     private final World world;
-    private final SpriteBatch batch;
+    private SpriteBatch batch;
 
-    private final OrthographicCamera camera;
+    private OrthographicCamera camera;
     private final Rectangle viewBounds;
     private final int[] chunksInView;
-    private final ChunkRenderer chunkRenderer;
+    private ChunkRenderer chunkRenderer;
 
     public WorldRender(@NotNull World world) {
-        if (!Main.renderGraphic) {
-            throw new IllegalStateException("Cannot render world as graphics are not enabled");
-        }
-
-        this.world = world;
-
-        chunkRenderer = new ChunkRenderer(this);
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch = new SpriteBatch();
-        batch.setProjectionMatrix(camera.combined);
-
         this.viewBounds = new Rectangle();
         chunksInView = new int[4];
+        this.world = world;
+        if (Main.renderGraphic) {
+
+            chunkRenderer = new ChunkRenderer(this);
+
+            camera = new OrthographicCamera();
+            camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch = new SpriteBatch();
+            batch.setProjectionMatrix(camera.combined);
+
+        }
         update();
     }
 

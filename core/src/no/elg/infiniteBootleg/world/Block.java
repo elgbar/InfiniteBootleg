@@ -15,8 +15,7 @@ public class Block {
     private Location loc;
     private World world;
 
-    public Block(int x, int y, @Nullable World world, @NotNull Material material) {
-
+    public Block(int x, int y, @NotNull World world, @NotNull Material material) {
         this.loc = new Location(x, y);
         this.world = world;
         this.material = material;
@@ -32,9 +31,8 @@ public class Block {
         return material;
     }
 
-    @Nullable
+    @NotNull
     public Chunk getChunk() {
-        if (world == null) { return null; }
         return world.getChunkFromWorld(loc);
     }
 
