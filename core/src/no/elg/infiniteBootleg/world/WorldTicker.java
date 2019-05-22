@@ -37,6 +37,7 @@ public class WorldTicker implements Disposable {
                 }
             }
         };
+        worldTickThread.setDaemon(true);
         worldTickThread.start();
     }
 

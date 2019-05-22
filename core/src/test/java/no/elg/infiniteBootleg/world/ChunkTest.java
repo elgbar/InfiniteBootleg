@@ -86,7 +86,7 @@ public class ChunkTest extends TestGraphic {
         chunk.setBlock(0, 0, Material.AIR, false);
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
-                Location loc = chunk.getBlock(x, y).getLocation();
+                Location loc = chunk.getBlock(x, y).getWorldLoc();
                 assertEquals(x, loc.x);
                 assertEquals(y, loc.y);
             }

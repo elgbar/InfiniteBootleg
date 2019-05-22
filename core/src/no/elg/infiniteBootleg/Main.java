@@ -70,7 +70,7 @@ public class Main extends ApplicationAdapter {
 
         font = new BitmapFont(true);
 
-        new Thread("Sleeper Thread") {
+        Thread sleeperThread = new Thread("Sleeper Thread") {
             @Override
             public void run() {
                 try {
@@ -80,7 +80,9 @@ public class Main extends ApplicationAdapter {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        };
+        sleeperThread.setDaemon(true);
+        sleeperThread.start();
     }
 
     @Override

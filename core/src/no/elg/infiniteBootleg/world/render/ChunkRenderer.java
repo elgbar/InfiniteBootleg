@@ -75,7 +75,7 @@ public class ChunkRenderer implements Renderer {
                 if (block == null || block.getMaterial() == AIR) {
                     continue;
                 }
-                Location blkLoc = block.getLocation();
+                Location blkLoc = block.getChunkLoc();
                 int dx = blkLoc.x * BLOCK_SIZE;
                 int dy = blkLoc.y * BLOCK_SIZE;
                 //noinspection ConstantConditions

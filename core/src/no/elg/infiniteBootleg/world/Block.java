@@ -12,11 +12,19 @@ import java.util.Objects;
 public class Block {
 
     private final Material material;
-    private Location loc;
+    private Location worldLoc;
     private World world;
+    private Location chunkLoc;
 
-    public Block(int x, int y, @NotNull World world, @NotNull Material material) {
-        this.loc = new Location(x, y);
+    public Block(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
+
+        Location worldChunkLoc = chunk.getWorldLoc();
+        int worldX = worldChunkLoc.x + localX;
+        int worldY = worldChunkLoc.y + localY;
+
+        this.worldLoc = new Location(worldX, worldY);
+        chunkLoc = new Location(localX, localY);
+
         this.world = world;
         this.material = material;
     }
@@ -33,15 +41,25 @@ public class Block {
 
     @NotNull
     public Chunk getChunk() {
-        return world.getChunkFromWorld(loc);
+        return world.getChunkFromWorld(worldLoc);
     }
 
+    /**
+     * @return World this block exists in
+     */
     public World getWorld() {
         return world;
     }
 
-    public Location getLocation() {
-        return loc;
+    /**
+     * @return World location of this block
+     */
+    public Location getWorldLoc() {
+        return worldLoc;
+    }
+
+    public Location getChunkLoc() {
+        return chunkLoc;
     }
 
     @Override
@@ -51,19 +69,19 @@ public class Block {
 
         Block block = (Block) o;
 
-        if (!loc.equals(block.loc)) { return false; }
+        if (!worldLoc.equals(block.worldLoc)) { return false; }
         return Objects.equals(world, block.world);
     }
 
     @Override
     public int hashCode() {
-        int result = loc.hashCode();
+        int result = worldLoc.hashCode();
         result = 31 * result + (world != null ? world.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return getMaterial() + "-block{" + "loc=" + loc + ", world=" + world + '}';
+        return getMaterial() + "-block{" + "loc=" + worldLoc + ", world=" + world + '}';
     }
 }

@@ -105,6 +105,16 @@ public class World implements Disposable, Updatable {
     }
 
     /**
+     * @param material
+     *     The new material to at given location
+     *
+     * @see Chunk#setBlock(int, int, Material, boolean)
+     */
+    public void setBlock(@NotNull Location worldLoc, @Nullable Material material) {
+        setBlock(worldLoc.x, worldLoc.y, material);
+    }
+
+    /**
      * @param worldX
      *     The x coordinate from world view
      * @param worldY
@@ -144,8 +154,8 @@ public class World implements Disposable, Updatable {
     }
 
     @NotNull
-    public Chunk getChunkFromWorld(@NotNull Location location) {
-        return getChunkFromWorld(location.x, location.y);
+    public Chunk getChunkFromWorld(@NotNull Location worldLoc) {
+        return getChunk(CoordUtil.worldToChunk(worldLoc));
     }
 
     public long getSeed() {
@@ -177,6 +187,10 @@ public class World implements Disposable, Updatable {
     @NotNull
     public WorldTicker getWorldTicker() {
         return ticker;
+    }
+
+    public long getTick() {
+        return ticker.getTickId();
     }
 
     @Override

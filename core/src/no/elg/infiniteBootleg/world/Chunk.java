@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -100,14 +101,18 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
         Block currBlock = blocks[localX][localY];
 
+
         if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
             return;
         }
-        if (material == null) {
+        else if (material == null) {
             blocks[localX][localY] = null;
+            if (currBlock instanceof Updatable) {
+                updatableBlocks.remove(currBlock);
+            }
         }
         else {
-            Block newBlock = material.create(localX, localY, world);
+            Block newBlock = material.create(world, this, localX, localY);
             blocks[localX][localY] = newBlock;
 
             if (currBlock instanceof Updatable && !(newBlock instanceof Updatable)) {
@@ -203,8 +208,20 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         return world;
     }
 
+    /**
+     * @return Location of this chunk in chunk coordinates
+     */
     public Location getLocation() {
         return chunkPos;
+    }
+
+    /**
+     * This is the same as doing {@code CoordUtil.chunkToWorld(getWorldLoc())}
+     *
+     * @return Location of this chunk in world coordinates
+     */
+    public Location getWorldLoc() {
+        return CoordUtil.chunkToWorld(chunkPos);
     }
 
     public long getLastViewedTick() {

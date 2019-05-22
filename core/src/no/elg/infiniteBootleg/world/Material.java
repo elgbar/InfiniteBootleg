@@ -45,21 +45,27 @@ public enum Material {
     }
 
     /**
-     * @param x
-     * @param y
      * @param world
+     *     World this block this exists in
+     * @param chunk
+     * @param localX
+     *     Relative x in the chunk
+     * @param localY
+     *     Relative y in the chunk
      *
      * @return A block of this type
      */
     @NotNull
-    public Block create(int x, int y, @NotNull World world) {
+    public Block create(@NotNull World world, @NotNull Chunk chunk, int localX, int localY) {
+
+
         if (impl == null) {
-            return new Block(x, y, world, this);
+            return new Block(world, chunk, localX, localY, this);
         }
         try {
             Constructor<? extends Block> constructor =
-                impl.getDeclaredConstructor(int.class, int.class, World.class, Material.class);
-            return constructor.newInstance(x, y, world, this);
+                impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
+            return constructor.newInstance(world, chunk, localX, localY, this);
 
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new IllegalStateException(e);
