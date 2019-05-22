@@ -158,10 +158,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
     @Override
     public void update() {
-        for (Block block : this) {
-            if (block instanceof Updatable) {
-                ((Updatable) block).update();
-            }
+        for (Updatable block : updatableBlocks) {
+            block.update();
         }
     }
 
