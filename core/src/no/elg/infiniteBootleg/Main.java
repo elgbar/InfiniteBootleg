@@ -37,6 +37,7 @@ public class Main extends ApplicationAdapter {
 
     public static boolean renderGraphic = true;
     private static World world;
+
     private static ConsoleHandler console;
 
     private SpriteBatch batch;
@@ -66,6 +67,18 @@ public class Main extends ApplicationAdapter {
 //        world.getRender().getCamera().zoom = 24;
 
         font = new BitmapFont(true);
+
+        new Thread("Sleeper Thread") {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(Long.MAX_VALUE);
+                } catch (InterruptedException e) {
+                    System.err.println("sleep thread woke!");
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     @Override
@@ -111,6 +124,10 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        world.dispose();
+        textureAtlas.dispose();
+        console.dispose();
+        font.dispose();
         VisUI.dispose();
     }
 

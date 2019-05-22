@@ -2,15 +2,14 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -22,7 +21,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
  *
  * @author Elg
  */
-public class Chunk implements Iterable<Block> {
+public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
     public static final int CHUNK_WIDTH = 32;
     public static final int CHUNK_HEIGHT = 32;
@@ -32,20 +31,26 @@ public class Chunk implements Iterable<Block> {
     private final Block[][] blocks;
     private final int[] heightmap;
 
+    private final List<Updatable> updatableBlocks;
+
     private boolean dirty; //if texture/allair needs to be updated
     private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
+    private boolean canUnload;
 
+    private long lastViewedTick;
     private boolean allAir;
     private FrameBuffer fbo;
     private TextureRegion fboRegion;
 
-    public Chunk(@Nullable World world, @NotNull Location chunkPos) {
+    public Chunk(@NotNull World world, @NotNull Location chunkPos) {
         this.world = world;
         this.chunkPos = chunkPos;
 
         blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
         heightmap = new int[CHUNK_WIDTH];
+        updatableBlocks = new ArrayList<>();
+
         allAir = true;
         loaded = true;
 
@@ -53,11 +58,10 @@ public class Chunk implements Iterable<Block> {
         prioritize = false;
     }
 
-    private void update() {
+    private void updateTexture() {
         //test if all the blocks in this chunk has the material air
         allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
         if (Main.renderGraphic) {
-            //noinspection ConstantConditions
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
         }
@@ -93,23 +97,23 @@ public class Chunk implements Iterable<Block> {
     public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
-        if (blocks[localX][localY] == null) {
-            if (material == null) {
-                return;
-            }
-            else {
-                blocks[localX][localY] = material.create(localX, localY, world);
-            }
+        Block currBlock = blocks[localX][localY];
+
+        if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
+            return;
+        }
+        if (material == null) {
+            blocks[localX][localY] = null;
         }
         else {
-            if (material == null) {
-                blocks[localX][localY] = null;
+            Block newBlock = material.create(localX, localY, world);
+            blocks[localX][localY] = newBlock;
+
+            if (currBlock instanceof Updatable && !(newBlock instanceof Updatable)) {
+                updatableBlocks.remove(currBlock);
             }
-            else if (blocks[localX][localY].getMaterial() == material) {
-                return;
-            }
-            else {
-                blocks[localX][localY] = material.create(localX, localY, world);
+            else if (newBlock instanceof Updatable) {
+                updatableBlocks.add((Updatable) newBlock);
             }
         }
 
@@ -125,43 +129,15 @@ public class Chunk implements Iterable<Block> {
      * @param prioritize
      *     If this chunk should be prioritized when rendering
      */
-    public void update(boolean prioritize) {
+    public void updateTexture(boolean prioritize) {
         dirty = true;
         this.prioritize = prioritize;
     }
 
-    @NotNull
-    public Block[][] getBlocks() {
-        return blocks;
-    }
-
-    public boolean isAllAir() {
-        if (dirty) {
-            update();
-        }
-        return allAir;
-    }
-
-    public boolean isLoaded() {
-        return loaded;
-    }
-
-    public void unload() {
-        loaded = false;
-    }
-
-    @Nullable
-    public World getWorld() {
-        return world;
-    }
-
-    public Location getLocation() {
-        return chunkPos;
-    }
-
     public TextureRegion getTexture() {
+        lastViewedTick = world.getWorldTicker().getTickId();
         if (dirty) {
-            update();
+            updateTexture();
         }
         if (fbo == null) { return null; }
         return fboRegion;
@@ -176,6 +152,63 @@ public class Chunk implements Iterable<Block> {
         this.fbo = fbo;
         fboRegion = new TextureRegion(fbo.getColorBufferTexture());
         fboRegion.flip(false, true);
+    }
+
+    @Override
+    public void update() {
+        for (Block block : this) {
+            if (block instanceof Updatable) {
+                ((Updatable) block).update();
+            }
+        }
+    }
+
+    @NotNull
+    public Block[][] getBlocks() {
+        return blocks;
+    }
+
+    public boolean isAllAir() {
+        if (dirty) {
+            updateTexture();
+        }
+        return allAir;
+    }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    /**
+     * @return If the chunk was unloaded
+     */
+    public boolean unload() {
+        if (canUnload) {
+            loaded = false;
+            dispose();
+            return true;
+        }
+        return false;
+    }
+
+    public void allowChunkUnload(boolean canUnload) {
+        if (!loaded) {
+            return; //already unloaded
+        }
+        this.canUnload = canUnload;
+    }
+
+    @Nullable
+    public World getWorld() {
+        return world;
+    }
+
+    public Location getLocation() {
+        return chunkPos;
+    }
+
+    public long getLastViewedTick() {
+        return lastViewedTick;
     }
 
     @Override
@@ -229,5 +262,10 @@ public class Chunk implements Iterable<Block> {
     @Override
     public String toString() {
         return "Chunk{" + "world=" + world + ", chunkPos=" + chunkPos + '}';
+    }
+
+    @Override
+    public void dispose() {
+        fbo.dispose();
     }
 }

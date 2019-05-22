@@ -60,7 +60,7 @@ public class SimplexChunkGenerator implements ChunkGenerator {
                     biome.fillUpTo(noise, chunk, x, CHUNK_HEIGHT, height);
                 }
             }
-            chunk.update(false);
+            chunk.updateTexture(false);
         });
         return chunk;
     }

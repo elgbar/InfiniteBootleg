@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.render;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -7,7 +9,6 @@ import com.badlogic.gdx.math.Matrix4;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
-import no.elg.infiniteBootleg.world.World;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +17,9 @@ import java.util.LinkedList;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
 import static no.elg.infiniteBootleg.world.Material.AIR;
+import static no.elg.infiniteBootleg.world.World.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXT_HEIGHT;
+import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXT_WIDTH;
 
 /**
  * @author Elg
@@ -31,7 +35,9 @@ public class ChunkRenderer implements Renderer {
         this.batch = new SpriteBatch();
         this.renderQueue = SetUniqueList.setUniqueList(new LinkedList<>());
 
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT));
+//        new OrthographicCamera(CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT).combined;
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT));
+
     }
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
@@ -52,17 +58,17 @@ public class ChunkRenderer implements Renderer {
         do {
             if (renderQueue.isEmpty()) { return; } //nothing to render
             chunk = renderQueue.remove(0);
-        } while (chunk.isAllAir() || !worldRender.inInView(chunk));
+        } while (chunk.isAllAir() || !worldRender.inInView(chunk) || !chunk.isLoaded());
 
-        FrameBuffer fbo =
-            new FrameBuffer(Pixmap.Format.RGBA4444, WorldRender.CHUNK_TEXT_WIDTH, WorldRender.CHUNK_TEXT_HEIGHT, false);
+        chunk.allowChunkUnload(false);
 
+        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT, false);
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
-//        batch.setProjectionMatrix(chunkCam.combined);
         fbo.begin();
         batch.begin();
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
                 Block block = blocks[x][y];
@@ -70,14 +76,16 @@ public class ChunkRenderer implements Renderer {
                     continue;
                 }
                 Location blkLoc = block.getLocation();
-                int dx = blkLoc.x * World.BLOCK_SIZE;
-                int dy = blkLoc.y * World.BLOCK_SIZE;
+                int dx = blkLoc.x * BLOCK_SIZE;
+                int dy = blkLoc.y * BLOCK_SIZE;
                 //noinspection ConstantConditions
-                batch.draw(block.getTexture(), dx, dy, World.BLOCK_SIZE, World.BLOCK_SIZE);
+                batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
             }
         }
         batch.end();
         fbo.end();
+
         chunk.setFbo(fbo);
+        chunk.allowChunkUnload(true);
     }
 }

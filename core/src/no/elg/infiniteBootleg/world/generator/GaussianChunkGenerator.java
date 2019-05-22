@@ -35,7 +35,7 @@ public class GaussianChunkGenerator implements ChunkGenerator {
             lastRight = Math.min(CHUNK_HEIGHT, Math.max(0, lastRight));
             fillUpTo(chunk, x, lastRight, Material.STONE);
         }
-        chunk.update(false);
+        chunk.updateTexture(false);
         return chunk;
     }
 

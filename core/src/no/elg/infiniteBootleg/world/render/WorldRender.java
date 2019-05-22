@@ -11,6 +11,8 @@ import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
 import static no.elg.infiniteBootleg.world.World.BLOCK_SIZE;
 
 /**
@@ -24,8 +26,8 @@ public class WorldRender implements Renderer, Disposable {
     public static final int HOR_START = 2;
     public static final int HOR_END = 3;
 
-    public final static int CHUNK_TEXT_WIDTH = Chunk.CHUNK_WIDTH * BLOCK_SIZE;
-    public final static int CHUNK_TEXT_HEIGHT = Chunk.CHUNK_HEIGHT * BLOCK_SIZE;
+    public final static int CHUNK_TEXT_WIDTH = CHUNK_WIDTH * BLOCK_SIZE;
+    public final static int CHUNK_TEXT_HEIGHT = CHUNK_HEIGHT * BLOCK_SIZE;
 
     private final World world;
     private final SpriteBatch batch;
@@ -48,7 +50,7 @@ public class WorldRender implements Renderer, Disposable {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
-        
+
         this.viewBounds = new Rectangle();
         chunksInView = new int[4];
         update();
