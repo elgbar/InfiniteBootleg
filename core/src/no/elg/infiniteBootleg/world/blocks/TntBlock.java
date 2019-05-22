@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Material;
-import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.*;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,34 +15,56 @@ import org.jetbrains.annotations.Nullable;
  */
 public class TntBlock extends Block implements Updatable {
 
+
     private static final TextureRegion whiteTexture;
 
     static {
         if (Main.renderGraphic) {
-        Pixmap pixmap = new Pixmap(World.BLOCK_SIZE, World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        whiteTexture = new TextureRegion(new Texture(pixmap));
-    }
+            Pixmap pixmap = new Pixmap(World.BLOCK_SIZE, World.BLOCK_SIZE, Pixmap.Format.RGBA4444);
+            pixmap.setColor(Color.WHITE);
+            pixmap.fill();
+            whiteTexture = new TextureRegion(new Texture(pixmap));
+        }
         else {
             whiteTexture = null;
-    }
+        }
     }
 
-    private boolean white = false;
+    private boolean white;
+    private long tickStart;
 
-    public TntBlock(int x, int y, @Nullable World world, @NotNull Material material) {
-        super(x, y, world, material);
+    public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 5;
+    public static final int EXPLOSION_RADIUS = 24;
+
+    public TntBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
+        super(world, chunk, localX, localY, material);
+        tickStart = getWorld().getTick();
     }
+
 
     @Override
     public void update() {
-//        Main.getConsoleLogger().log("Tick @ " + getLocation());
-        if (getWorld().getWorldTicker().getTickId() % 2 == 0) {
-            white = !white;
+        if (getWorld().getTick() - tickStart > FUSE_DURATION) {
+            Main.SCHEDULER.executeSync(() -> {
+                System.out.println("EXPLODE!!");
+                getWorld().setBlock(getWorldLoc(), null);
+                Location loc = getWorldLoc();
+                for (int x = loc.x - EXPLOSION_RADIUS; x < loc.x + EXPLOSION_RADIUS; x++) {
+                    for (int y = loc.y - EXPLOSION_RADIUS; y < loc.y + EXPLOSION_RADIUS; y++) {
+                        Block b = getWorld().getBlock(x, y);
+                        if (loc.distCubed(b.getWorldLoc()) < EXPLOSION_RADIUS * EXPLOSION_RADIUS) {
+                            getWorld().setBlock(b.getWorldLoc(), null);
+                        }
+                    }
+                }
+
+            });
         }
-        if (Main.renderGraphic) {
-            getChunk().updateTexture(true);
+        if (getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND / 6) == 0) {
+            white = !white;
+            if (Main.renderGraphic) {
+                getChunk().updateTexture(true);
+            }
         }
     }
 

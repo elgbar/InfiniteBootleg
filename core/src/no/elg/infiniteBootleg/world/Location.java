@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Elg
  */
@@ -15,6 +17,14 @@ public class Location {
 
     public Location mult(int x, int y) {
         return new Location(this.x * x, this.y * y);
+    }
+
+    public long distCubed(@NotNull Location loc) {
+        return (loc.x - x) * (loc.x - x) + (loc.y - y) * (loc.y - y);
+    }
+
+    public double dist(@NotNull Location loc) {
+        return Math.sqrt(distCubed(loc));
     }
 
     @Override
