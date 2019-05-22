@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
@@ -150,6 +151,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
             this.fboRegion = null;
         }
         this.fbo = fbo;
+        fbo.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         fboRegion = new TextureRegion(fbo.getColorBufferTexture());
         fboRegion.flip(false, true);
     }
