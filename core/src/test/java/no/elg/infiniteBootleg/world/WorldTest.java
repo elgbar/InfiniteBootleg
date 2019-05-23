@@ -50,19 +50,19 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void setCorrectBlockFromOrigin() {
-        world.setBlock(0, 0, Material.STONE);
+        world.setBlock(0, 0, Material.STONE, true);
         assertEquals(Material.STONE, world.getChunk(0, 0).getBlock(0, 0).getMaterial());
     }
 
     @Test
     public void setCorrectBlockFromWorldCoords() {
-        world.setBlock(CHUNK_WIDTH + 1, 3 * CHUNK_HEIGHT + 9, Material.STONE);
+        world.setBlock(CHUNK_WIDTH + 1, 3 * CHUNK_HEIGHT + 9, Material.STONE, true);
         assertEquals(Material.STONE, world.getChunk(1, 3).getBlock(1, 9).getMaterial());
     }
 
     @Test
     public void setCorrectBlockFromWorldCoordsNeg() {
-        world.setBlock(-CHUNK_WIDTH + 1, -3 * CHUNK_HEIGHT + 9, Material.STONE);
+        world.setBlock(-CHUNK_WIDTH + 1, -3 * CHUNK_HEIGHT + 9, Material.STONE, true);
         assertEquals(Material.STONE, world.getChunk(-1, -3).getBlock(1, 9).getMaterial());
     }
 

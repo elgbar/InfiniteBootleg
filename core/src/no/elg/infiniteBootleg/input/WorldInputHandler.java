@@ -100,10 +100,10 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Rende
         final int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            getWorld().setBlock(blockX, blockY, null);
+            getWorld().setBlock(blockX, blockY, null, true);
         }
         else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-            getWorld().setBlock(blockX, blockY, selected);
+            getWorld().setBlock(blockX, blockY, selected, true);
         }
 
 //        if (vertical == 0 && horizontal == 0) { return; }

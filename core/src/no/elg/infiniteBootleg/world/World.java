@@ -107,11 +107,12 @@ public class World implements Disposable, Updatable {
     /**
      * @param material
      *     The new material to at given location
+     * @param update
      *
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
-    public void setBlock(@NotNull Location worldLoc, @Nullable Material material) {
-        setBlock(worldLoc.x, worldLoc.y, material);
+    public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material, boolean update) {
+        return setBlock(worldLoc.x, worldLoc.y, material, update);
     }
 
     /**
@@ -121,10 +122,11 @@ public class World implements Disposable, Updatable {
      *     The y coordinate from world view
      * @param material
      *     The new material to at given location
+     * @param update
      *
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
-    public void setBlock(int worldX, int worldY, @Nullable Material material) {
+    public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean update) {
 
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
@@ -132,7 +134,9 @@ public class World implements Disposable, Updatable {
         int localX = worldX - chunkX * Chunk.CHUNK_WIDTH;
         int localY = worldY - chunkY * Chunk.CHUNK_HEIGHT;
 
-        getChunk(chunkX, chunkY).setBlock(localX, localY, material, true);
+        Chunk chunk = getChunk(chunkX, chunkY);
+        chunk.setBlock(localX, localY, material, update);
+        return chunk;
     }
 
 
