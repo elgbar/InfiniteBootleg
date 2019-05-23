@@ -62,6 +62,15 @@ public class Block {
         return chunkLoc;
     }
 
+    /**
+     * @param dir
+     *
+     * @return The relative block in the given location
+     */
+    public Block getRelative(@NotNull Direction dir) {
+        return world.getBlock(worldLoc.x + dir.dx, worldLoc.y + dir.dy);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
