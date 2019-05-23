@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
@@ -88,17 +89,18 @@ public class WorldRender implements Renderer, Disposable {
         for (int y = rowStart + debug; y < rowEnd - debug; y++) {
             for (int x = colStart + debug; x < colEnd - debug; x++) {
                 Chunk chunk = world.getChunk(x, y);
+                TextureRegion textureRegion = chunk.getTexture(); //get texture here to update last viewed in chunk
                 if (chunk.isAllAir()) {
                     continue;
                 }
-                if (chunk.getTexture() == null) {
+                if (textureRegion == null) {
                     //if it somehow failed to render the first time, make sure it is up to date now
                     chunkRenderer.queueRendering(chunk, false);
                     continue;
                 }
                 float dx = chunk.getLocation().x * CHUNK_TEXT_WIDTH;
                 float dy = chunk.getLocation().y * CHUNK_TEXT_HEIGHT;
-                batch.draw(chunk.getTexture(), dx, dy, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT);
+                batch.draw(textureRegion, dx, dy, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT);
             }
         }
         batch.end();
