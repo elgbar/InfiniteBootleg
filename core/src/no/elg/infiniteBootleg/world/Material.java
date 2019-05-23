@@ -17,8 +17,8 @@ public enum Material {
     AIR(null, false, false, false, 0),
     STONE(1.5f),
     BRICK(2f),
-    DIRT(0.75f),
-    GRASS(0.70f),
+    DIRT(1f),
+    GRASS(1),
     TNT(TntBlock.class, 0.5f),
     ;
 

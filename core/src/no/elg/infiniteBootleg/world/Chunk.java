@@ -141,7 +141,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
     }
 
     public TextureRegion getTexture() {
-        lastViewedTick = world.getWorldTicker().getTickId();
+        lastViewedTick = world.getTick();
         if (dirty) {
             updateTextureNow();
         }
@@ -152,8 +152,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
     public void setFbo(FrameBuffer fbo) {
         if (this.fbo != null) {
             this.fbo.dispose();
-            this.fbo = null;
-            this.fboRegion = null;
         }
         this.fbo = fbo;
         fbo.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -242,9 +240,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
     @Override
     public int hashCode() {
-        int result = world != null ? world.hashCode() : 0;
-        result = 31 * result + chunkPos.hashCode();
-        return result;
+        return 31 * world.hashCode() + chunkPos.hashCode();
     }
 
     @NotNull
