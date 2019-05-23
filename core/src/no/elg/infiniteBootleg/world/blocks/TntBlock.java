@@ -57,7 +57,6 @@ public class TntBlock extends Block implements Updatable {
         if (!exploded && getWorld().getTick() - tickStart > FUSE_DURATION) {
             exploded = true;
             Main.SCHEDULER.executeAsync(() -> {
-                System.out.println("starting async");
                 List<Location> destroy = new ArrayList<>();
                 Location loc = getWorldLoc();
                 for (int x = loc.x - EXPLOSION_RADIUS; x < loc.x + EXPLOSION_RADIUS; x++) {
@@ -73,7 +72,6 @@ public class TntBlock extends Block implements Updatable {
                         }
                     }
                 }
-                System.out.println("done calc async");
 
                 Gdx.app.postRunnable(() -> {
                     Set<Chunk> chunks = ConcurrentHashMap.newKeySet();
