@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Elg
@@ -49,7 +50,7 @@ public class World implements Disposable, Updatable {
         this.generator = generator;
         this.seed = seed;
         random = new Random(seed);
-        chunks = new WeakHashMap<>();
+        chunks = new ConcurrentHashMap<>();
 
         if (Main.renderGraphic) {
             render = new WorldRender(this);
