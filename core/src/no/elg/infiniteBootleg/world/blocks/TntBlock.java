@@ -34,7 +34,7 @@ public class TntBlock extends Block implements Updatable {
     private long tickStart;
 
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 5;
-    public static final int EXPLOSION_RADIUS = 24;
+    public static final int EXPLOSION_RADIUS = 11;
 
     public TntBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
@@ -46,13 +46,12 @@ public class TntBlock extends Block implements Updatable {
     public void update() {
         if (getWorld().getTick() - tickStart > FUSE_DURATION) {
             Main.SCHEDULER.executeSync(() -> {
-                System.out.println("EXPLODE!!");
-                getWorld().setBlock(getWorldLoc(), null);
                 Location loc = getWorldLoc();
                 for (int x = loc.x - EXPLOSION_RADIUS; x < loc.x + EXPLOSION_RADIUS; x++) {
                     for (int y = loc.y - EXPLOSION_RADIUS; y < loc.y + EXPLOSION_RADIUS; y++) {
                         Block b = getWorld().getBlock(x, y);
-                        if (loc.distCubed(b.getWorldLoc()) < EXPLOSION_RADIUS * EXPLOSION_RADIUS) {
+                        double dist = loc.distCubed(b.getWorldLoc()) * b.getMaterial().getHardness();
+                        if (dist < EXPLOSION_RADIUS * EXPLOSION_RADIUS) {
                             getWorld().setBlock(b.getWorldLoc(), null);
                         }
                     }

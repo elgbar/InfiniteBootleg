@@ -14,29 +14,31 @@ import java.lang.reflect.InvocationTargetException;
  */
 public enum Material {
 
-    AIR(null, false, false, false),
-    STONE(),
-    BRICK(),
-    DIRT(),
-    GRASS(),
-    TNT(TntBlock.class),
+    AIR(null, false, false, false, 0),
+    STONE(1.5f),
+    BRICK(2f),
+    DIRT(0.75f),
+    GRASS(0.70f),
+    TNT(TntBlock.class, 0.5f),
     ;
 
     private final Class<? extends Block> impl;
     private final boolean solid;
     private final boolean blocksLight;
     private final boolean placable;
+    private final float hardness;
     private final TextureRegion texture;
 
-    Material() {this(null);}
+    Material(float hardness) {this(null, hardness);}
 
-    Material(Class<? extends Block> impl) {this(impl, true, true, true);}
+    Material(Class<? extends Block> impl, float hardness) {this(impl, true, true, true, hardness);}
 
-    Material(Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable) {
+    Material(Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable, float hardness) {
         this.impl = impl;
         this.solid = solid;
         this.blocksLight = blocksLight;
         this.placable = placable;
+        this.hardness = hardness;
         if (Main.renderGraphic && !"AIR".equals(name())) {
             this.texture = Main.inst().getTextureAtlas().findRegion(name().toLowerCase());
             texture.flip(false, false);
@@ -87,5 +89,9 @@ public enum Material {
 
     public boolean isPlacable() {
         return placable;
+    }
+
+    public float getHardness() {
+        return hardness;
     }
 }
