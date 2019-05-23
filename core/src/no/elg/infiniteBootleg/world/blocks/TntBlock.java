@@ -40,34 +40,45 @@ public class TntBlock extends Block implements Updatable {
 
     private boolean white;
     private boolean exploded;
-    private long tickStart;
+    private long tickLeft;
+    private double strength;
     private static Random random;
 
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
-    public static final int EXPLOSION_RADIUS = 25;
+    public static final int EXPLOSION_STRENGTH = 25; //basically max radius
+    public static final int RESISTANCE = 10;
 
     public TntBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        tickStart = getWorld().getTick();
+        tickLeft = FUSE_DURATION;
+        strength = EXPLOSION_STRENGTH;
     }
 
 
     @Override
     public void update() {
-        if (!exploded && getWorld().getTick() - tickStart > FUSE_DURATION) {
+        if (exploded) { return; }
+        if (tickLeft <= 0) {
             exploded = true;
             Main.SCHEDULER.executeAsync(() -> {
                 List<Location> destroy = new ArrayList<>();
                 Location loc = getWorldLoc();
-                for (int x = loc.x - EXPLOSION_RADIUS; x < loc.x + EXPLOSION_RADIUS; x++) {
-                    for (int y = loc.y - EXPLOSION_RADIUS; y < loc.y + EXPLOSION_RADIUS; y++) {
+                for (int x = (int) (loc.x - strength); x < loc.x + strength; x++) {
+                    for (int y = (int) (loc.y - strength); y < loc.y + strength; y++) {
                         Block b = getWorld().getBlock(x, y);
-                        float hardness = b.getMaterial().getHardness();
-                        if (b.getMaterial() == Material.AIR || hardness == 0) {
+                        Material mat = b.getMaterial();
+                        float hardness = mat.getHardness();
+                        if (b.getMaterial() == Material.AIR || hardness <= 0) {
                             continue;
                         }
-                        double dist = (loc.distCubed(b.getWorldLoc()) * hardness) * Math.abs(random.nextGaussian() + 10);
-                        if (dist < EXPLOSION_RADIUS * EXPLOSION_RADIUS) {
+                        else if (b instanceof TntBlock && b != this) {
+                            TntBlock tntb = (TntBlock) b;
+                            tntb.tickLeft = 0;
+                            tntb.strength = Math.min(EXPLOSION_STRENGTH * 10f, tntb.strength * 1.05f);
+                            continue;
+                        }
+                        double dist = loc.distCubed(b.getWorldLoc()) * hardness * Math.abs(random.nextGaussian() + RESISTANCE);
+                        if (dist < strength * strength) {
                             destroy.add(b.getWorldLoc());
                         }
                     }
@@ -92,13 +103,12 @@ public class TntBlock extends Block implements Updatable {
                 getChunk().updateTexture(true);
             }
         }
+        tickLeft--;
     }
 
     @Override
     public @Nullable TextureRegion getTexture() {
-        if (white) {
-            return whiteTexture;
-        }
+        if (white) { return whiteTexture; }
         return super.getTexture();
     }
 }
