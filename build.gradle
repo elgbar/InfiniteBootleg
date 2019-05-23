@@ -26,7 +26,7 @@ allprojects {
         roboVMVersion = '2.3.6'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
-        aiVersion = '1.8.0'
+        aiVersion = '1.8.1'
     }
 
     repositories {
@@ -71,10 +71,10 @@ project(":core") {
         compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
         compileOnly 'org.jetbrains:annotations:17.0.0'
 
-        testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        testCompile "junit:junit:4.12"
-        testCompile "org.powermock:powermock-module-junit4:1.6.4"
-        testCompile "org.powermock:powermock-api-mockito:1.6.4"
+        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        compile "junit:junit:4.12"
+        compile "org.powermock:powermock-module-junit4:1.6.4"
+        compile "org.powermock:powermock-api-mockito:1.6.4"
 
     }
 }
