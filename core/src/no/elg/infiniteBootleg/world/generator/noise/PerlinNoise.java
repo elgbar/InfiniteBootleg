@@ -23,6 +23,10 @@ public class PerlinNoise {
 
     private final int[] p = new int[512];
 
+    /**
+     * @param seed
+     *     The random seed used to swap elements around randomly
+     */
     public PerlinNoise(int seed) {
         Random random = new Random(seed);
         for (int i = 0; i < 256; i++) {
@@ -40,10 +44,22 @@ public class PerlinNoise {
         as[y] = i;
     }
 
-    public double noise(double x, double y, double z, double amplitude, double frequency) {
-        return noise(x * frequency, y * frequency, z * frequency) * amplitude;
-    }
-
+    /**
+     * <a href="https://gist.github.com/Flafla2/f0260a861be0ebdeef76">All credits for this goes to Flafla2</a>
+     *
+     * @param x
+     *     x coordinate
+     * @param y
+     *     y coordinate
+     * @param z
+     *     z coordinate
+     * @param octaves
+     *     How refined the result should be
+     * @param persistence
+     *     How different each octave is
+     *
+     * @return The perlin noise at the given location modified by the number of octaves and the persistence
+     */
     public double octaveNoise(double x, double y, double z, int octaves, double persistence) {
         double total = 0;
         double frequency = 1;
@@ -61,7 +77,35 @@ public class PerlinNoise {
         return total / maxValue;
     }
 
+    /**
+     * @param x
+     *     x coordinate
+     * @param y
+     *     y coordinate
+     * @param z
+     *     z coordinate
+     * @param amplitude
+     *     How far it goes up and down (think wave amplitude)
+     * @param frequency
+     *     How fast it goes up and down (think wave frequency)
+     *
+     * @return The perlin noise at the given location modified by the frequency and amplitude
+     */
+    public double noise(double x, double y, double z, double amplitude, double frequency) {
+        return noise(x * frequency, y * frequency, z * frequency) * amplitude;
+    }
 
+
+    /**
+     * @param x
+     *     x coordinate
+     * @param y
+     *     y coordinate
+     * @param z
+     *     z coordinate
+     *
+     * @return The perlin noise at the given location
+     */
     public double noise(double x, double y, double z) {
         // FIND UNIT CUBE THAT CONTAINS POINT.
         int X = (int) Math.floor(x) & 255, Y = (int) Math.floor(y) & 255, Z = (int) Math.floor(z) & 255;
