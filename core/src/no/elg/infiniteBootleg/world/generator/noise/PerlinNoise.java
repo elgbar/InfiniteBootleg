@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.generator.simplex;
+package no.elg.infiniteBootleg.world.generator.noise;
 
 import java.util.Random;
 

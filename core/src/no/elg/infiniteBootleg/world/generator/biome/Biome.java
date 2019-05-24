@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.generator.biome;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
-import no.elg.infiniteBootleg.world.generator.simplex.PerlinNoise;
+import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 
 import java.util.ArrayList;
 import java.util.List;

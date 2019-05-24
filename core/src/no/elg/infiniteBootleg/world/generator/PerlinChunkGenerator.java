@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
-import no.elg.infiniteBootleg.world.generator.simplex.PerlinNoise;
+import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,16 +18,16 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
 /**
  * @author Elg
  */
-public class SimplexChunkGenerator implements ChunkGenerator {
+public class PerlinChunkGenerator implements ChunkGenerator {
 
     private PerlinNoise noise;
 
-    public SimplexChunkGenerator(int seed) {
+    public PerlinChunkGenerator(int seed) {
         noise = new PerlinNoise(seed);
     }
 
     private double calcHeightMap(int chunkX, int x) {
-        final int a = 1;
+        int a = 1;
         return (noise.noise(chunkX * CHUNK_WIDTH + x, 0.5, 0.5, a, 0.001) + a) / 2;
     }
 

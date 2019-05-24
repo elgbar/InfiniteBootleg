@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.generator.SimplexChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 
 import java.io.File;
@@ -64,7 +64,7 @@ public class Main extends ApplicationAdapter {
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
         int worldSeed = new Random().nextInt();
-        world = new World(new SimplexChunkGenerator(worldSeed), worldSeed);
+        world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
 //        world.getRender().getCamera().zoom = 24;
 
@@ -82,10 +82,10 @@ public class Main extends ApplicationAdapter {
         world.getInput().update();
         world.getRender().render();
 
-        final Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        final int blockX = (int) Math.floor(unproject.x / World.BLOCK_SIZE);
-        final int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
+        int blockX = (int) Math.floor(unproject.x / World.BLOCK_SIZE);
+        int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
 
         int[] vChunks = world.getRender().getChunksInView();
 
