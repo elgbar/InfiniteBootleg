@@ -31,10 +31,10 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
     private final World world;
     private final Location chunkPos;
     private final Block[][] blocks;
-    private final int[] heightmap;
 
     private final List<Updatable> updatableBlocks;
 
+    private final boolean modified; //if the chunk has been modified since loaded
     private boolean dirty; //if texture/allair needs to be updated
     private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
@@ -45,21 +45,56 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
     private FrameBuffer fbo;
     private TextureRegion fboRegion;
 
-    public Chunk(@NotNull World world, @NotNull Location chunkPos) {
+    /**
+     * Create a new empty chunk
+     *
+     * @param world
+     *     The world this chunk exists in
+     * @param chunkPos
+     *     The position of this chunk the given world
+     */
+    public Chunk(@NotNull World world, @NotNull Location chunkPos) {this(world, chunkPos, new Block[CHUNK_WIDTH][CHUNK_HEIGHT]);}
+
+    /**
+     * @param world
+     *     The world this chunk exists in
+     * @param chunkPos
+     *     The position of this chunk the given world
+     * @param blocks
+     *     The initial blocks of this chunk (note: must be {@link #CHUNK_WIDTH}x{@link #CHUNK_HEIGHT})
+     */
+    public Chunk(@NotNull World world, @NotNull Location chunkPos, @NotNull Block[][] blocks) {
+        Preconditions.checkArgument(blocks.length == CHUNK_WIDTH);
+        Preconditions.checkArgument(blocks[0].length == CHUNK_HEIGHT);
         this.world = world;
         this.chunkPos = chunkPos;
+        this.blocks = blocks;
 
-        blocks = new Block[CHUNK_WIDTH][CHUNK_HEIGHT];
-        heightmap = new int[CHUNK_WIDTH];
         updatableBlocks = new ArrayList<>();
+
+        for (int x = 0; x < CHUNK_WIDTH; x++) {
+            for (int y = 0; y < CHUNK_HEIGHT; y++) {
+                Block block = blocks[x][y];
+
+                if (block instanceof Updatable) {
+                    updatableBlocks.add((Updatable) block);
+                }
+            }
+        }
 
         allAir = true;
         loaded = true;
 
         dirty = true;
         prioritize = false;
+        modified = false;
     }
 
+    /**
+     * Force update of texture and recalculate internal variables
+     * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link #getTexture()}
+     * called.
+     */
     public void updateTextureNow() {
         //test if all the blocks in this chunk has the material air
         allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
@@ -82,7 +117,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
     public Block getBlock(int localX, int localY) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
         if (blocks[localX][localY] == null) {
-            setBlock(localX, localY, AIR, true);
+            setBlock(localX, localY, AIR);
         }
         return blocks[localX][localY];
     }
@@ -94,7 +129,20 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
      *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
      * @param material
      *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
+     */
+    public void setBlock(int localX, int localY, @Nullable Material material) {
+        setBlock(localX, localY, material, true);
+    }
+
+    /**
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_WIDTH}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
+     * @param material
+     *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
      * @param update
+     *     If the texture of this chunk should be updated
      */
     public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
@@ -140,6 +188,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         this.prioritize = prioritize;
     }
 
+    @Nullable
     public TextureRegion getTexture() {
         lastViewedTick = world.getTick();
         if (dirty) {
@@ -149,7 +198,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         return fboRegion;
     }
 
-    public void setFbo(FrameBuffer fbo) {
+    public void setFbo(@NotNull FrameBuffer fbo) {
         if (this.fbo != null) {
             this.fbo.dispose();
         }
@@ -171,6 +220,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         return blocks;
     }
 
+    /**
+     * @return If all blocks in this chunk is air
+     */
     public boolean isAllAir() {
         if (dirty) {
             updateTextureNow();
@@ -222,6 +274,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         return CoordUtil.chunkToWorld(chunkPos);
     }
 
+    /**
+     * @return The last tick this chunk's texture was pulled
+     */
     public long getLastViewedTick() {
         return lastViewedTick;
     }

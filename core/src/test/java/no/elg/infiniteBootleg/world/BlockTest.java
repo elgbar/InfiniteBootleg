@@ -44,10 +44,10 @@ public class BlockTest extends TestGraphic {
         Block b = world.getBlock(0, 0);
         Material mat = Material.BRICK;
         for (Direction dir : Direction.values()) {
-            world.setBlock(dir.dx, dir.dy, mat, true);
+            world.setBlock(dir.dx, dir.dy, mat);
             assertEquals(mat, b.getRelative(dir).getMaterial());
         }
-        world.setBlock(0, 0, mat, true);
+        world.setBlock(0, 0, mat);
 
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {

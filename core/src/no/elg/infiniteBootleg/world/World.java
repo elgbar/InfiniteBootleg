@@ -106,9 +106,28 @@ public class World implements Disposable, Updatable {
     }
 
     /**
+     * Set a block at a given location and update the textures
+     *
+     * @param worldLoc
+     *     The location in world coordinates
+     * @param material
+     *     The new material to at given location
+     *
+     * @see Chunk#setBlock(int, int, Material, boolean)
+     */
+    public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material) {
+        return setBlock(worldLoc, material, true);
+    }
+
+    /**
+     * Set a block at a given location
+     *
+     * @param worldLoc
+     *     The location in world coordinates
      * @param material
      *     The new material to at given location
      * @param update
+     *     If the texture of the corresponding chunk should be updated
      *
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
@@ -117,6 +136,24 @@ public class World implements Disposable, Updatable {
     }
 
     /**
+     * Set a block at a given location and update the textures
+     *
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     * @param material
+     *     The new material to at given location
+     *
+     * @see Chunk#setBlock(int, int, Material, boolean)
+     */
+    public Chunk setBlock(int worldX, int worldY, @Nullable Material material) {
+        return setBlock(worldX, worldY, material, true);
+    }
+
+    /**
+     * Set a block at a given location
+     *
      * @param worldX
      *     The x coordinate from world view
      * @param worldY
@@ -124,6 +161,7 @@ public class World implements Disposable, Updatable {
      * @param material
      *     The new material to at given location
      * @param update
+     *     If the texture of the corresponding chunk should be updated
      *
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
@@ -140,7 +178,12 @@ public class World implements Disposable, Updatable {
         return chunk;
     }
 
-
+    /**
+     * @param chunkLoc
+     *     Chunk location in chunk coordinates
+     *
+     * @return If the given chunk is loaded in memory
+     */
     public boolean isLoadedAt(@NotNull Location chunkLoc) {
         return chunks.containsKey(chunkLoc);
     }
@@ -158,22 +201,38 @@ public class World implements Disposable, Updatable {
         return chunk.unload();
     }
 
+    /**
+     * @param worldLoc
+     *     The world location of this chunk
+     *
+     * @return The chunk at the given world location
+     */
     @NotNull
     public Chunk getChunkFromWorld(@NotNull Location worldLoc) {
         return getChunk(CoordUtil.worldToChunk(worldLoc));
     }
 
+    /**
+     * @return The random seed of this world
+     */
     public long getSeed() {
         return seed;
     }
 
+    /**
+     * @return The name of the world
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return Unique identification of this world
+     */
     public UUID getUuid() {
         return uuid;
     }
+
 
     public void setName(String name) {
         this.name = name;
@@ -194,6 +253,9 @@ public class World implements Disposable, Updatable {
         return ticker;
     }
 
+    /**
+     * @return The current world tick
+     */
     public long getTick() {
         return ticker.getTickId();
     }
