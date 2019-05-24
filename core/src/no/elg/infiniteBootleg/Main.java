@@ -69,20 +69,6 @@ public class Main extends ApplicationAdapter {
 //        world.getRender().getCamera().zoom = 24;
 
         font = new BitmapFont(true);
-
-        Thread sleeperThread = new Thread("Sleeper Thread") {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(Long.MAX_VALUE);
-                } catch (InterruptedException e) {
-                    System.err.println("sleep thread woke!");
-                    e.printStackTrace();
-                }
-            }
-        };
-        sleeperThread.setDaemon(true);
-        sleeperThread.start();
     }
 
     @Override
