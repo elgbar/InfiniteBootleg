@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg;
 
 import no.elg.infiniteBootleg.util.Util;
-import no.kh498.util.Reflection;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -16,13 +16,14 @@ public class ProgramArgs {
         Map<String, String> options = Util.interpreterArgs(args);
 
         for (Map.Entry<String, String> entry : options.entrySet()) {
-            Reflection.getMethod(ProgramArgs.class, entry.getKey().toLowerCase(), String.class).ifPresent(method -> {
-                try {
+            try {
+                Method method = ProgramArgs.class.getMethod(entry.getKey().toLowerCase(), String.class);
+                if (method != null) {
                     method.invoke(null, entry.getValue());
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
                 }
-            });
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 
