@@ -63,7 +63,10 @@ public class World implements Disposable, Updatable {
 
         ticker = new WorldTicker(this);
 
-        uuid = UUID.randomUUID();
+        byte[] UUIDSeed = new byte[128];
+        random.nextBytes(UUIDSeed);
+        uuid = UUID.nameUUIDFromBytes(UUIDSeed);
+        System.out.println("world uuid = " + uuid);
     }
 
     @NotNull
