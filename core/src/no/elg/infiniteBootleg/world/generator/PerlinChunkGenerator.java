@@ -23,8 +23,8 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     }
 
     private double calcHeightMap(int chunkX, int x) {
-        int a = 1;
-        return (noise.noise(chunkX * CHUNK_WIDTH + x, 0.5, 0.5, a, 0.001) + a) / 2;
+        float a = 1.25f;
+        return (noise.noise(chunkX * CHUNK_WIDTH + x, 0.5, 0.5, a, 0.001) + a) / (a * 2);
     }
 
     private Biome getBiome(double height) {
@@ -39,7 +39,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     @Override
     public @NotNull Chunk generate(@NotNull World world, @NotNull Location chunkPos) {
         Chunk chunk = new Chunk(world, chunkPos);
-        Main.SCHEDULER.executeAsync(() -> {
+//        Main.SCHEDULER.executeAsync(() -> {
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             double biomeWeight = calcHeightMap(chunkPos.x, x);
             Biome biome = getBiome(biomeWeight);
@@ -57,7 +57,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
             }
         }
         chunk.updateTexture(false);
-        });
+//        });
         return chunk;
     }
 }
