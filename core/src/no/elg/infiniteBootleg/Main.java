@@ -20,7 +20,6 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 
 import java.io.File;
-import java.util.Random;
 
 import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
 
@@ -63,12 +62,17 @@ public class Main extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
-        int worldSeed = new Random().nextInt();
+        int worldSeed = 12;//new Random().nextInt();
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
 //        world.getRender().getCamera().zoom = 24;
 
         font = new BitmapFont(true);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            world.save();
+            world.getWorldTicker().stop();
+        }));
     }
 
     @Override

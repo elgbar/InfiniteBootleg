@@ -94,4 +94,8 @@ public enum Material {
     public float getHardness() {
         return hardness;
     }
+
+    public static Material fromByte(byte b) {
+        return values()[b];
+    }
 }

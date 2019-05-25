@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import no.elg.infiniteBootleg.util.Binembly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,9 +10,9 @@ import java.util.Objects;
 /**
  * @author Elg
  */
-public class Block {
+public class Block implements Binembly {
 
-    private final Material material;
+    private Material material;
     private Location worldLoc;
     private World world;
     private Location chunkLoc;
@@ -22,7 +23,7 @@ public class Block {
         int worldX = worldChunkLoc.x + localX;
         int worldY = worldChunkLoc.y + localY;
 
-        this.worldLoc = new Location(worldX, worldY);
+        worldLoc = new Location(worldX, worldY);
         chunkLoc = new Location(localX, localY);
 
         this.world = world;
@@ -92,5 +93,15 @@ public class Block {
     @Override
     public String toString() {
         return getMaterial() + "-block{" + "loc=" + worldLoc + ", world=" + world + '}';
+    }
+
+    @Override
+    public byte[] disassemble() {
+        return new byte[] {(byte) material.ordinal()};
+    }
+
+    @Override
+    public void assemble(byte[] bytes) {
+        throw new UnsupportedOperationException("Cannot assemble blocks directly. Blocks must be assembled by a chunk");
     }
 }

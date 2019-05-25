@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
  *
  * @author Elg
  */
-public class Chunk implements Iterable<Block>, Updatable, Disposable {
+public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     public static final int CHUNK_WIDTH = 32;
     public static final int CHUNK_HEIGHT = 32;
@@ -34,7 +35,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
     private final List<Updatable> updatableBlocks;
 
-    private final boolean modified; //if the chunk has been modified since loaded
+    private boolean modified; //if the chunk has been modified since loaded
     private boolean dirty; //if texture/allair needs to be updated
     private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
@@ -149,7 +150,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
         Block currBlock = blocks[localX][localY];
 
-
         if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
             return;
         }
@@ -171,6 +171,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
             }
         }
 
+        modified = true;
         if (update) {
             dirty = true;
             prioritize = true;
@@ -238,13 +239,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
      * @return If the chunk was unloaded
      */
     public boolean unload() {
-        if (canUnload) {
-            loaded = false;
-            dispose();
-            return true;
-        }
-        return false;
+        if (!canUnload || !loaded) { return false;}
+        loaded = false;
+        canUnload = false;
+        return true;
     }
+
+//    public static Chunk load(data?){}
 
     public void allowChunkUnload(boolean canUnload) {
         if (!loaded) {
@@ -281,6 +282,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
         return lastViewedTick;
     }
 
+    /**
+     * @return If the chunk has been modified since creation
+     */
+    public boolean isModified() {
+        return modified;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
@@ -290,7 +298,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
         if (!Objects.equals(world, chunk.world)) { return false; }
         return chunkPos.equals(chunk.chunkPos);
-
     }
 
     @Override
@@ -334,6 +341,34 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable {
 
     @Override
     public void dispose() {
-        fbo.dispose();
+        if (fbo != null) {
+            fbo.dispose();
+        }
     }
+
+    @Override
+    public byte[] disassemble() {
+        byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_HEIGHT];
+        int index = 0;
+        for (Block block : this) {
+            bytes[index++] = block == null ? 0 : block.disassemble()[0];
+        }
+        return bytes;
+    }
+
+    @Override
+    public void assemble(byte[] bytes) {
+        Preconditions.checkArgument(bytes.length == CHUNK_WIDTH * CHUNK_HEIGHT, "Invalid number of bytes");
+        int index = 0;
+        for (int y = 0; y < CHUNK_HEIGHT; y++) {
+            for (int x = 0; x < CHUNK_WIDTH; x++) {
+                Material mat = Material.fromByte(bytes[index++]);
+                if (mat == AIR) {
+                    continue;
+                }
+                blocks[x][y] = new Block(world, this, x, y, mat);
+            }
+        }
+    }
+
 }
