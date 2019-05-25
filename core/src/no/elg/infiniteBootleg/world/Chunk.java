@@ -360,13 +360,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public void assemble(byte[] bytes) {
         Preconditions.checkArgument(bytes.length == CHUNK_WIDTH * CHUNK_HEIGHT, "Invalid number of bytes");
         int index = 0;
+        modified = true;
         for (int y = 0; y < CHUNK_HEIGHT; y++) {
             for (int x = 0; x < CHUNK_WIDTH; x++) {
                 Material mat = Material.fromByte(bytes[index++]);
-                if (mat == AIR) {
+                if (mat == null || mat == AIR) {
+                    blocks[x][y] = null;
                     continue;
                 }
-                blocks[x][y] = new Block(world, this, x, y, mat);
+                Block block = mat.create(world, this, x, y);
+                if (block instanceof Updatable) {
+                    updatableBlocks.add((Updatable) block);
+                }
+                blocks[x][y] = block;
             }
         }
     }
