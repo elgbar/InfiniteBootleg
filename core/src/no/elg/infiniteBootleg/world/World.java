@@ -1,9 +1,13 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Disposable;
+import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
@@ -12,6 +16,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,6 +57,10 @@ public class World implements Disposable, Updatable {
         random = new Random(seed);
         chunks = new ConcurrentHashMap<>();
 
+        byte[] UUIDSeed = new byte[128];
+        random.nextBytes(UUIDSeed);
+        uuid = UUID.nameUUIDFromBytes(UUIDSeed);
+
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
@@ -63,11 +72,7 @@ public class World implements Disposable, Updatable {
 
         ticker = new WorldTicker(this);
         chunkLoader = new ChunkLoader(this, generator);
-
-        byte[] UUIDSeed = new byte[128];
-        random.nextBytes(UUIDSeed);
-        uuid = UUID.nameUUIDFromBytes(UUIDSeed);
-        System.out.println("world uuid = " + uuid);
+        load();
     }
 
     @NotNull
@@ -291,10 +296,39 @@ public class World implements Disposable, Updatable {
         ticker.stop();
     }
 
+    public FileHandle worldFolder() {
+        return Gdx.files.external(Main.WORLD_FOLDER + uuid);
+    }
+
+    public static final String CHUNK_FOLDER = "chunks";
+
     public void save() {
         for (Chunk chunk : chunks.values()) {
             chunkLoader.save(chunk);
         }
+        FileHandle worldZip = worldFolder().parent().child(uuid + ".zip");
+        try {
+            ZipUtils.zip(worldFolder(), worldZip);
+            Main.inst().getConsoleLogger().log("World saved!");
+        } catch (IOException e) {
+            Main.inst().getConsoleLogger().log("Failed to save world due to a " + e.getClass().getSimpleName(), LogLevel.ERROR);
+            e.printStackTrace();
+            return;
+        }
+
+        worldFolder().deleteDirectory();
+    }
+
+    public void load() {
+        FileHandle worldZip = worldFolder().parent().child(uuid + ".zip");
+        System.out.println("worldZip = " + worldZip.file().getAbsolutePath());
+        if (!worldZip.exists()) {
+            System.out.println("No world save found");
+            return;
+        }
+
+        worldFolder().deleteDirectory();
+        ZipUtils.unzip(worldFolder(), worldZip);
     }
 
     @Override

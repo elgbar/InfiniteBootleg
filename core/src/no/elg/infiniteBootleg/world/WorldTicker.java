@@ -32,10 +32,11 @@ public class WorldTicker {
                                 System.out.println("tick: " + tickId);
                             }
                             //force save every 30 sec, but not first tick
-                            if (tickId > 0 && tickId % (TICKS_PER_SECOND * 30) == 0) {
-                                System.out.println("Saving world " + world.getName() + " (" + world.getUuid() + ")");
-                                Gdx.app.postRunnable(world::save);
-                            }
+                            //FIXME not currently working (not writing chunks that hasn't been modified since last times
+//                            if (tickId > 0 && tickId % (TICKS_PER_SECOND * 10) == 0) {
+//                                System.out.println("Saving world " + world.getName() + " (" + world.getUuid() + ")");
+//                                Gdx.app.postRunnable(world::save);
+//                            }
                             Gdx.app.postRunnable(world::update);
                             tickId++;
                             stuckFrame = 0;

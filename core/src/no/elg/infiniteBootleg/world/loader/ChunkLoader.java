@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.world.loader;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
@@ -35,8 +33,7 @@ public class ChunkLoader {
     }
 
     public FileHandle chunkFile(@NotNull Location chunkLoc) {
-        return Gdx.files.local(
-            Main.WORLD_FOLDER + File.separator + world.getUuid() + File.separator + chunkLoc.x + File.separator + chunkLoc.y);
+        return world.worldFolder().child(World.CHUNK_FOLDER + File.separator + chunkLoc.x + File.separator + chunkLoc.y);
     }
 
     public Chunk load(@NotNull Location chunkLoc) {

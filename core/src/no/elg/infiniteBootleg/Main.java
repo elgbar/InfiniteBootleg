@@ -25,7 +25,7 @@ import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
 
 public class Main extends ApplicationAdapter {
 
-    public static final String WORLD_FOLDER = "worlds" + File.separatorChar;
+    public static final String WORLD_FOLDER = "infiniteBootleg" + File.separatorChar + "worlds" + File.separatorChar;
     public static final String TEXTURES_FOLDER = "textures" + File.separatorChar;
     public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.pack";
     public static final String VERSION_FILE = "version";
