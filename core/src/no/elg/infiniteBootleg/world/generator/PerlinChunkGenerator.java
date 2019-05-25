@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.generator;
 
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -8,9 +7,6 @@ import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
@@ -41,26 +37,26 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     }
 
     @Override
-    public @NotNull Chunk generate(@Nullable World world, @NotNull Location chunkPos, @NotNull Random random) {
+    public @NotNull Chunk generate(@NotNull World world, @NotNull Location chunkPos) {
         Chunk chunk = new Chunk(world, chunkPos);
         Main.SCHEDULER.executeAsync(() -> {
-            for (int x = 0; x < CHUNK_WIDTH; x++) {
-                double biomeWeight = calcHeightMap(chunkPos.x, x);
-                Biome biome = getBiome(biomeWeight);
-                double y;
+        for (int x = 0; x < CHUNK_WIDTH; x++) {
+            double biomeWeight = calcHeightMap(chunkPos.x, x);
+            Biome biome = getBiome(biomeWeight);
+            double y;
 
-                y = biome.heightAt(noise, chunkPos.x, x) * biomeWeight;
+            y = biome.heightAt(noise, chunkPos.x, x) * biomeWeight;
 
-                int height = (int) y;
-                int elevationChunk = CoordUtil.worldToChunk(height);
-                if (chunkPos.y == elevationChunk) {
-                    biome.fillUpTo(noise, chunk, x, (int) (y - elevationChunk * CHUNK_WIDTH), height);
-                }
-                else if (chunkPos.y < elevationChunk) {
-                    biome.fillUpTo(noise, chunk, x, CHUNK_HEIGHT, height);
-                }
+            int height = (int) y;
+            int elevationChunk = CoordUtil.worldToChunk(height);
+            if (chunkPos.y == elevationChunk) {
+                biome.fillUpTo(noise, chunk, x, (int) (y - elevationChunk * CHUNK_WIDTH), height);
             }
-            chunk.updateTexture(false);
+            else if (chunkPos.y < elevationChunk) {
+                biome.fillUpTo(noise, chunk, x, CHUNK_HEIGHT, height);
+            }
+        }
+        chunk.updateTexture(false);
         });
         return chunk;
     }
