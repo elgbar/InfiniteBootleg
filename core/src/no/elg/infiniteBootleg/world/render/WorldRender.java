@@ -27,19 +27,19 @@ public class WorldRender implements Renderer, Disposable {
     public static final int HOR_START = 2;
     public static final int HOR_END = 3;
 
-    public final static int CHUNK_TEXT_WIDTH = CHUNK_WIDTH * BLOCK_SIZE;
-    public final static int CHUNK_TEXT_HEIGHT = CHUNK_HEIGHT * BLOCK_SIZE;
+    public final static int CHUNK_TEXTURE_WIDTH = CHUNK_WIDTH * BLOCK_SIZE;
+    public final static int CHUNK_TEXTURE_HEIGHT = CHUNK_HEIGHT * BLOCK_SIZE;
 
     private final World world;
     private SpriteBatch batch;
 
     private OrthographicCamera camera;
-    private final Rectangle viewBounds;
+    private final Rectangle viewBound;
     private final int[] chunksInView;
     private ChunkRenderer chunkRenderer;
 
     public WorldRender(@NotNull World world) {
-        this.viewBounds = new Rectangle();
+        viewBound = new Rectangle();
         chunksInView = new int[4];
         this.world = world;
         if (Main.renderGraphic) {
@@ -65,18 +65,21 @@ public class WorldRender implements Renderer, Disposable {
         float height = camera.viewportHeight * camera.zoom;
         float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
         float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
-        viewBounds.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
+        viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-        chunksInView[HOR_START] = (int) Math.floor(viewBounds.x / CHUNK_TEXT_WIDTH);
-        chunksInView[HOR_END] = (int) Math.floor((viewBounds.x + viewBounds.width + CHUNK_TEXT_WIDTH) / CHUNK_TEXT_WIDTH);
+        chunksInView[HOR_START] = (int) Math.floor(viewBound.x / CHUNK_TEXTURE_WIDTH);
+        chunksInView[HOR_END] = (int) Math.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_WIDTH) / CHUNK_TEXTURE_WIDTH);
 
-        chunksInView[VERT_START] = (int) Math.floor(viewBounds.y / CHUNK_TEXT_HEIGHT);
-        chunksInView[VERT_END] = (int) Math.floor((viewBounds.y + viewBounds.height + CHUNK_TEXT_HEIGHT) / CHUNK_TEXT_HEIGHT);
+        chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_HEIGHT);
+        chunksInView[VERT_END] = (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_HEIGHT) / CHUNK_TEXTURE_HEIGHT);
     }
 
     @Override
     public void render() {
-        chunkRenderer.render();
+        for (int i = 0; i < 10; i++) {
+            //noinspection LibGDXFlushInsideLoop
+            chunkRenderer.render();
+        }
 
         final int colEnd = chunksInView[HOR_END];
         final int colStart = chunksInView[HOR_START];
@@ -98,9 +101,9 @@ public class WorldRender implements Renderer, Disposable {
                     chunkRenderer.queueRendering(chunk, false);
                     continue;
                 }
-                float dx = chunk.getLocation().x * CHUNK_TEXT_WIDTH;
-                float dy = chunk.getLocation().y * CHUNK_TEXT_HEIGHT;
-                batch.draw(textureRegion, dx, dy, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT);
+                float dx = chunk.getLocation().x * CHUNK_TEXTURE_WIDTH;
+                float dy = chunk.getLocation().y * CHUNK_TEXTURE_HEIGHT;
+                batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_WIDTH, CHUNK_TEXTURE_HEIGHT);
             }
         }
         batch.end();
@@ -116,8 +119,8 @@ public class WorldRender implements Renderer, Disposable {
         return chunksInView;
     }
 
-    public Rectangle getViewBounds() {
-        return viewBounds;
+    public Rectangle getViewBound() {
+        return viewBound;
     }
 
     public OrthographicCamera getCamera() {

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class WorldTicker {
 
     public static final long TICKS_PER_SECOND = 30L;
-    public static final long TICKS_PER_MILLISECONDS = 1000L / TICKS_PER_SECOND;
+    public static final long MS_DELAY_BETWEEN_TICKS = 1000L / TICKS_PER_SECOND;
 
     private long tickId;
     private long frameId;
@@ -20,7 +20,7 @@ public class WorldTicker {
     private boolean running = true;
 
     public WorldTicker(@NotNull World world) {
-        System.out.println("TICKS_PER_MILLISECONDS = " + TICKS_PER_MILLISECONDS);
+        Main.inst().getConsoleLogger().logf("TPS: %d", TICKS_PER_SECOND);
         //force save every 30 sec, but not first tick
         Thread worldTickThread = new Thread("World tick thread") {
             @Override
@@ -43,14 +43,15 @@ public class WorldTicker {
                         }
                         else {
                             stuckFrame++;
-                            if (stuckFrame > TICKS_PER_SECOND * 10) {
+                            if (stuckFrame % TICKS_PER_SECOND * 10 == 0) {
                                 Main.inst().getConsoleLogger()
-                                    .log("Can't keep up! Dropped " + stuckFrame + " world updates!", LogLevel.ERROR);
+                                    .logf(LogLevel.ERROR, "Can't keep up! Failed to update world for %d ticks", stuckFrame);
+                                stuckFrame = 0;
                             }
                         }
                         frameId = Gdx.graphics.getFrameId();
 
-                        Thread.sleep(TICKS_PER_MILLISECONDS);
+                        Thread.sleep(MS_DELAY_BETWEEN_TICKS);
                     }
                 } catch (InterruptedException ignored) {
                     System.out.println("World updater interrupted");

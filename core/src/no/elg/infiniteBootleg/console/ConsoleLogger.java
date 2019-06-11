@@ -11,11 +11,6 @@ public interface ConsoleLogger {
 
     void logf(LogLevel level, String msg, Object... objs);
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.strongjoshua.console.Console#log(java.lang.String, com.strongjoshua.console.GUIConsole.LogLevel)
-     */
     void log(String msg, LogLevel level);
 
     void log(String msg);

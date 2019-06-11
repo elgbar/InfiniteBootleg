@@ -18,8 +18,8 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 import static no.elg.infiniteBootleg.world.World.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXT_HEIGHT;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXT_WIDTH;
+import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_HEIGHT;
+import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDTH;
 
 /**
  * @author Elg
@@ -32,12 +32,9 @@ public class ChunkRenderer implements Renderer {
 
     public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
-        this.batch = new SpriteBatch();
-        this.renderQueue = SetUniqueList.setUniqueList(new LinkedList<>());
-
-//        new OrthographicCamera(CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT).combined;
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT));
-
+        batch = new SpriteBatch();
+        renderQueue = SetUniqueList.setUniqueList(new LinkedList<>());
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_WIDTH, CHUNK_TEXTURE_HEIGHT));
     }
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
@@ -62,7 +59,7 @@ public class ChunkRenderer implements Renderer {
 
         chunk.allowChunkUnload(false);
 
-        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXT_WIDTH, CHUNK_TEXT_HEIGHT, false);
+        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_WIDTH, CHUNK_TEXTURE_HEIGHT, false);
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();

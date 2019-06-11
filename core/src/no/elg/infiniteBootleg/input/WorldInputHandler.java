@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 
 import static com.badlogic.gdx.Input.Keys.*;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXT_HEIGHT;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXT_WIDTH;
+import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_HEIGHT;
+import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDTH;
 
 /**
  * @author Elg
@@ -29,7 +29,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Rende
 
     public WorldInputHandler(@NotNull WorldRender world) {
         camera = world.getCamera();
-        this.worldRender = world;
+        worldRender = world;
 
         Main.getInputMultiplexer().addProcessor(this);
         selected = Material.STONE;
@@ -106,13 +106,12 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Rende
             getWorld().setBlock(blockX, blockY, selected);
         }
 
-//        if (vertical == 0 && horizontal == 0) { return; }
-        int Wvertical = Gdx.input.isKeyPressed(W) ? 1 : 0;
-        int Svertical = Gdx.input.isKeyPressed(S) ? -1 : 0;
-        int Ahorizontal = Gdx.input.isKeyPressed(A) ? 1 : 0;
-        int Dhorizontal = Gdx.input.isKeyPressed(D) ? -1 : 0;
-        camera.position.x -= Gdx.graphics.getDeltaTime() * (Ahorizontal + Dhorizontal) * CHUNK_TEXT_WIDTH * camera.zoom;
-        camera.position.y += Gdx.graphics.getDeltaTime() * (Wvertical + Svertical) * CHUNK_TEXT_HEIGHT * camera.zoom;
+        int WVertical = Gdx.input.isKeyPressed(W) ? 1 : 0;
+        int SVertical = Gdx.input.isKeyPressed(S) ? -1 : 0;
+        int AHorizontal = Gdx.input.isKeyPressed(A) ? 1 : 0;
+        int DHorizontal = Gdx.input.isKeyPressed(D) ? -1 : 0;
+        camera.position.x -= Gdx.graphics.getDeltaTime() * (AHorizontal + DHorizontal) * CHUNK_TEXTURE_WIDTH * camera.zoom;
+        camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * CHUNK_TEXTURE_HEIGHT * camera.zoom;
 
         worldRender.update();
     }
