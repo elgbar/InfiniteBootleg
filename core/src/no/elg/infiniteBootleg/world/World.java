@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.ZipUtils;
+import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
@@ -64,14 +65,14 @@ public class World implements Disposable, Updatable {
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
+            chunkLoader = new ChunkLoader(this, generator);
         }
         else {
             render = new HeadlessWorldRenderer(this);
-//            input = new WorldInputHandler(render);
+            chunkLoader = null;
         }
 
         ticker = new WorldTicker(this);
-        chunkLoader = new ChunkLoader(this, generator);
         load();
     }
 
@@ -183,7 +184,29 @@ public class World implements Disposable, Updatable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         chunk.setBlock(localX, localY, material, update);
+        if (update) {
+            updateAround(worldX, worldY);
+        }
         return chunk;
+    }
+
+    /**
+     * Set all blocks around a given block to be updated
+     *
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     */
+    public void updateAround(int worldX, int worldY) {
+        Block center = getBlock(worldX, worldY);
+        for (Direction dir : Direction.values()) {
+            Block rel = center.getRelative(dir);
+            if (rel instanceof UpdatableBlock) {
+                ((UpdatableBlock) rel).setUpdate(true);
+            }
+        }
+
     }
 
     /**
@@ -348,7 +371,6 @@ public class World implements Disposable, Updatable {
                 iterator.remove();
                 continue;
             }
-
             chunk.update();
         }
     }

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.*;
-import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Elg
  */
-public class TntBlock extends Block implements Updatable {
+public class TntBlock extends UpdatableBlock {
 
 
     private static final TextureRegion whiteTexture;
@@ -61,7 +60,7 @@ public class TntBlock extends Block implements Updatable {
         if (tickLeft <= 0) {
             exploded = true;
             Main.SCHEDULER.executeAsync(() -> {
-                List<Location> destroy = new ArrayList<>();
+                List<Block> destroyed = new ArrayList<>();
                 Location loc = getWorldLoc();
                 for (int x = (int) (loc.x - strength); x < loc.x + strength; x++) {
                     for (int y = (int) (loc.y - strength); y < loc.y + strength; y++) {
@@ -79,15 +78,17 @@ public class TntBlock extends Block implements Updatable {
                         }
                         double dist = loc.distCubed(b.getWorldLoc()) * hardness * Math.abs(random.nextGaussian() + RESISTANCE);
                         if (dist < strength * strength) {
-                            destroy.add(b.getWorldLoc());
+                            destroyed.add(b);
                         }
                     }
                 }
 
                 Gdx.app.postRunnable(() -> {
                     Set<Chunk> chunks = ConcurrentHashMap.newKeySet();
-                    for (Location location : destroy) {
-                        chunks.add(getWorld().setBlock(location, null, false));
+                    for (Block block : destroyed) {
+                        getWorld().setBlock(block.getWorldLoc(), null, false);
+                        chunks.add(block.getChunk());
+                        getWorld().updateAround(block.getWorldLoc().x, block.getWorldLoc().y);
                     }
                     for (Chunk chunk : chunks) {
                         chunk.updateTexture(false);

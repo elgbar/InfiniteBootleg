@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private final Location chunkPos;
     private final Block[][] blocks;
 
-    private final List<Updatable> updatableBlocks;
+    private final List<UpdatableBlock> updatableBlocks;
 
     private boolean modified; //if the chunk has been modified since loaded
     private boolean dirty; //if texture/allair needs to be updated
@@ -77,8 +78,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
                 Block block = blocks[x][y];
 
-                if (block instanceof Updatable) {
-                    updatableBlocks.add((Updatable) block);
+                if (block instanceof UpdatableBlock) {
+                    updatableBlocks.add((UpdatableBlock) block);
                 }
             }
         }
@@ -155,7 +156,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         }
         else if (material == null) {
             blocks[localX][localY] = null;
-            if (currBlock instanceof Updatable) {
+            if (currBlock instanceof UpdatableBlock) {
                 updatableBlocks.remove(currBlock);
             }
         }
@@ -163,11 +164,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             Block newBlock = material.create(world, this, localX, localY);
             blocks[localX][localY] = newBlock;
 
-            if (currBlock instanceof Updatable && !(newBlock instanceof Updatable)) {
+            if (currBlock instanceof UpdatableBlock && !(newBlock instanceof UpdatableBlock)) {
                 updatableBlocks.remove(currBlock);
             }
             else if (newBlock instanceof Updatable) {
-                updatableBlocks.add((Updatable) newBlock);
+                updatableBlocks.add((UpdatableBlock) newBlock);
             }
         }
 
@@ -211,8 +212,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     @Override
     public void update() {
-        for (Updatable block : updatableBlocks) {
-            block.update();
+        for (UpdatableBlock block : updatableBlocks) {
+            block.tryUpdate();
         }
     }
 
@@ -244,8 +245,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         canUnload = false;
         return true;
     }
-
-//    public static Chunk load(data?){}
 
     public void allowChunkUnload(boolean canUnload) {
         if (!loaded) {
@@ -369,8 +368,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     continue;
                 }
                 Block block = mat.create(world, this, x, y);
-                if (block instanceof Updatable) {
-                    updatableBlocks.add((Updatable) block);
+                if (block instanceof UpdatableBlock) {
+                    updatableBlocks.add((UpdatableBlock) block);
                 }
                 blocks[x][y] = block;
             }
