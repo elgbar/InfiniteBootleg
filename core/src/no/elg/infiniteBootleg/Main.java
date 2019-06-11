@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
@@ -42,6 +43,7 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private BitmapFont font;
     private static Main inst;
+    private float width;
 
     public Main(String[] args) {
         executeArgs(args);
@@ -50,8 +52,6 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         inst = this;
-        OrthographicCamera camera = new OrthographicCamera();
-        camera.setToOrtho(true);
 
         batch = new SpriteBatch();
         inputMultiplexer = new InputMultiplexer();
@@ -59,7 +59,7 @@ public class Main extends ApplicationAdapter {
         console = new ConsoleHandler();
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        batch.setProjectionMatrix(camera.combined);
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
         int worldSeed = 12;//new Random().nextInt();
@@ -67,7 +67,8 @@ public class Main extends ApplicationAdapter {
 
 //        world.getRender().getCamera().zoom = 24;
 
-        font = new BitmapFont(true);
+        font = new BitmapFont(false);
+        width = Gdx.graphics.getWidth();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             world.save();
@@ -80,6 +81,7 @@ public class Main extends ApplicationAdapter {
         if (!Main.renderGraphic) {
             return;
         }
+        int h = Gdx.graphics.getHeight();
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -96,20 +98,20 @@ public class Main extends ApplicationAdapter {
         int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) *
                            Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
         batch.begin();
-        font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, 10);
-        font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, 25);
+        font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
+        font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
         font.draw(batch, "Pointing at block (" + blockX + ", " + blockY + ") in chunk " +
-                         world.getChunkFromWorld(blockX, blockY).getLocation(), 10, 40);
+                         world.getChunkFromWorld(blockX, blockY).getLocation(), 10, h - 40);
         font.draw(batch,
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_WIDTH * Chunk.CHUNK_WIDTH + " blocks)", 10,
-                  55);
-        font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, 70);
+                  55 + h);
+        font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
 
         TextureRegion tr = world.getInput().getSelected().getTexture();
         if (tr != null) {
             TextureRegion wrapper = new TextureRegion(tr);
             wrapper.flip(false, true);
-            batch.draw(wrapper, Gdx.graphics.getWidth() - 48, 16, 32, 32);
+            batch.draw(wrapper, Gdx.graphics.getWidth() - 48, h - 48, 32, 32);
         }
         batch.end();
         console.draw();
@@ -128,6 +130,8 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         world.getInput().resize(width, height);
+        new OrthographicCamera(width, height);
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
     }
 
     public static InputMultiplexer getInputMultiplexer() {
