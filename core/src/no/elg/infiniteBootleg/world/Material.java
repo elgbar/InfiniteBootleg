@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.blocks.SandBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,7 @@ public enum Material {
     DIRT(1f),
     GRASS(0.8f),
     TNT(TntBlock.class, 0.5f),
+    SAND(SandBlock.class, 1f),
     ;
 
     private final Class<? extends Block> impl;
@@ -40,7 +42,7 @@ public enum Material {
         this.placable = placable;
         this.hardness = hardness;
         if (Main.renderGraphic && !"AIR".equals(name())) {
-            this.texture = Main.inst().getTextureAtlas().findRegion(name().toLowerCase());
+            texture = Main.inst().getTextureAtlas().findRegion(name().toLowerCase());
             texture.flip(false, false);
         }
         else { texture = null; }

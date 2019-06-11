@@ -62,6 +62,10 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Rende
             case NUMPAD_5:
                 selected = Material.values()[5];
                 break;
+            case NUM_6:
+            case NUMPAD_6:
+                selected = Material.values()[6];
+                break;
             default:
                 return false;
         }
