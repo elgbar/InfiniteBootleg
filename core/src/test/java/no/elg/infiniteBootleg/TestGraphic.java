@@ -4,12 +4,16 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
+import com.strongjoshua.console.LogLevel;
+import no.elg.infiniteBootleg.console.ConsoleLogger;
 import org.junit.BeforeClass;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class TestGraphic {
+
+    private static ConsoleLogger logger = new ConsoleTestLogger();
 
     @BeforeClass
     public static void init() {
@@ -28,5 +32,43 @@ public class TestGraphic {
         Gdx.graphics = mock(Graphics.class);
         when(Gdx.graphics.getWidth()).thenReturn(1);
         when(Gdx.graphics.getHeight()).thenReturn(1);
+        Main.inst = mock(Main.class);
+        when(Main.inst.getConsoleLogger()).thenReturn(logger);
+    }
+
+    private static class ConsoleTestLogger implements ConsoleLogger {
+
+        @Override
+        public void logf(String msg, Object... objs) {
+            System.out.printf(msg, objs);
+            System.out.println();
+        }
+
+        @Override
+        public void logf(LogLevel level, String msg, Object... objs) {
+            if (level == LogLevel.ERROR) {
+                System.err.printf(msg, objs);
+                System.out.println();
+            }
+            else {
+                System.out.printf(msg, objs);
+                System.out.println();
+            }
+        }
+
+        @Override
+        public void log(String msg, LogLevel level) {
+            if (level == LogLevel.ERROR) {
+                System.err.println(msg);
+            }
+            else {
+                System.out.println(msg);
+            }
+        }
+
+        @Override
+        public void log(String msg) {
+            System.out.println(msg);
+        }
     }
 }
