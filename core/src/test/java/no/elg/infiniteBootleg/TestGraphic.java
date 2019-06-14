@@ -40,24 +40,21 @@ public class TestGraphic {
 
         @Override
         public void logf(String msg, Object... objs) {
-            System.out.printf(msg, objs);
-            System.out.println();
+            logf(LogLevel.DEFAULT, msg, objs);
         }
 
         @Override
         public void logf(LogLevel level, String msg, Object... objs) {
             if (level == LogLevel.ERROR) {
-                System.err.printf(msg, objs);
-                System.out.println();
+                System.err.printf(msg + "%n", objs);
             }
             else {
-                System.out.printf(msg, objs);
-                System.out.println();
+                System.out.printf(msg + "%n", objs);
             }
         }
 
         @Override
-        public void log(String msg, LogLevel level) {
+        public void log(LogLevel level, String msg) {
             if (level == LogLevel.ERROR) {
                 System.err.println(msg);
             }
@@ -68,7 +65,7 @@ public class TestGraphic {
 
         @Override
         public void log(String msg) {
-            System.out.println(msg);
+            log(LogLevel.DEFAULT, msg);
         }
     }
 }

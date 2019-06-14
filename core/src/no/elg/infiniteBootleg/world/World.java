@@ -349,7 +349,7 @@ public class World implements Disposable, Updatable {
             ZipUtils.zip(worldFolder, worldZip);
             Main.inst().getConsoleLogger().log("World saved!");
         } catch (IOException e) {
-            Main.inst().getConsoleLogger().log("Failed to save world due to a " + e.getClass().getSimpleName(), LogLevel.ERROR);
+            Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to save world due to a " + e.getClass().getSimpleName());
             e.printStackTrace();
             return;
         }

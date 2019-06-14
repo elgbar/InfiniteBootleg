@@ -29,7 +29,7 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
 
         setCommandExecutor(new Commands());
 
-        log("IB Version #" + Util.getLastGitCommitID(false), LogLevel.SUCCESS);
+        log(LogLevel.SUCCESS, "IB Version #" + Util.getLastGitCommitID(false));
     }
 
     public void setAlpha(float a) {
@@ -49,7 +49,7 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
 
     @Override
     public void logf(final LogLevel level, final String msg, final Object... objs) {
-        log(String.format(msg, objs), level);
+        log(level, String.format(msg, objs));
     }
 
     /*
@@ -58,7 +58,7 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
      * @see com.strongjoshua.console.Console#log(java.lang.String, com.strongjoshua.console.GUIConsole.LogLevel)
      */
     @Override
-    public void log(String msg, LogLevel level) {
+    public void log(LogLevel level, String msg) {
         try {
             super.log(msg, level);
         } catch (Exception ex) {
@@ -69,6 +69,6 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
 
     @Override
     public void log(String msg) {
-        log(msg, LogLevel.DEFAULT);
+        log(LogLevel.DEFAULT, msg);
     }
 }
