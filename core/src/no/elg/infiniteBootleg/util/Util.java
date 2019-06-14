@@ -149,7 +149,7 @@ public class Util {
      * @return The latest commit ID in the current repo
      */
     public static String getLastGitCommitID(final boolean full) {
-        final String command = "git log --format=\"%H\" -n 1";
+        final String command = "git log --format=%H -n 1";
         final String defaultHash = "UNKNOWN";
         try {
             final Process p = Runtime.getRuntime().exec(command);
