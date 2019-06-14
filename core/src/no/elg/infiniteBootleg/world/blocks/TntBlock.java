@@ -47,7 +47,7 @@ public class TntBlock extends UpdatableBlock {
     public static final int EXPLOSION_STRENGTH = 25; //basically max radius
     public static final int RESISTANCE = 10;
 
-    public TntBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
+    public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         tickLeft = FUSE_DURATION;
         strength = EXPLOSION_STRENGTH;

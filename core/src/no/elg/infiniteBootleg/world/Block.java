@@ -8,17 +8,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 /**
+ * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location and its
+ * location within the parent chunk.
+ *
  * @author Elg
  */
 public class Block implements Binembly {
 
     private Material material;
-    private Location worldLoc;
     private World world;
+    private Chunk chunk;
+    private Location worldLoc;
     private Location chunkLoc;
 
-    public Block(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
-
+    public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         Location worldChunkLoc = chunk.getWorldLoc();
         int worldX = worldChunkLoc.x + localX;
         int worldY = worldChunkLoc.y + localY;
@@ -26,13 +29,14 @@ public class Block implements Binembly {
         worldLoc = new Location(worldX, worldY);
         chunkLoc = new Location(localX, localY);
 
-        this.world = world;
         this.material = material;
+        this.world = world;
+        this.chunk = chunk;
     }
 
     @Nullable
     public TextureRegion getTexture() {
-        return getMaterial().getTexture();
+        return getMaterial().getTextureRegion();
     }
 
     @NotNull
@@ -42,7 +46,7 @@ public class Block implements Binembly {
 
     @NotNull
     public Chunk getChunk() {
-        return world.getChunkFromWorld(worldLoc);
+        return chunk;
     }
 
     /**

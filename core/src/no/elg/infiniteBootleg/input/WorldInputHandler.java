@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.Renderer;
+import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +20,7 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDT
 /**
  * @author Elg
  */
-public class WorldInputHandler extends InputAdapter implements Disposable, Renderer {
+public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
 
     private final OrthographicCamera camera;
@@ -118,10 +118,5 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Rende
         camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * CHUNK_TEXTURE_HEIGHT * camera.zoom;
 
         worldRender.update();
-    }
-
-    @Override
-    public void render() {
-
     }
 }

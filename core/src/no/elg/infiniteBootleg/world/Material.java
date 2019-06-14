@@ -61,8 +61,6 @@ public enum Material {
      */
     @NotNull
     public Block create(@NotNull World world, @NotNull Chunk chunk, int localX, int localY) {
-
-
         if (impl == null) {
             return new Block(world, chunk, localX, localY, this);
         }
@@ -77,7 +75,7 @@ public enum Material {
     }
 
     @Nullable
-    public TextureRegion getTexture() {
+    public TextureRegion getTextureRegion() {
         return texture;
     }
 

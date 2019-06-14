@@ -54,7 +54,7 @@ public class WorldTicker {
                         Thread.sleep(MS_DELAY_BETWEEN_TICKS);
                     }
                 } catch (InterruptedException ignored) {
-                    System.out.println("World updater interrupted");
+                    Main.inst().getConsoleLogger().log("World updater interrupted");
                 }
             }
         };

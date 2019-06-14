@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -29,16 +30,21 @@ public class ChunkLoader {
      * @return If a chunk at the given location exists
      */
     public boolean savedChunk(@NotNull Location chunkLoc) {
-        return chunkFile(chunkLoc).exists();
+        FileHandle chunkFile = chunkFile(chunkLoc);
+        return chunkFile != null && chunkFile.exists();
     }
 
+    @Nullable
     public FileHandle chunkFile(@NotNull Location chunkLoc) {
-        return world.worldFolder().child(World.CHUNK_FOLDER + File.separator + chunkLoc.x + File.separator + chunkLoc.y);
+        FileHandle worldFile = world.worldFolder();
+        if (worldFile == null) { return null; }
+        return worldFile.child(World.CHUNK_FOLDER + File.separator + chunkLoc.x + File.separator + chunkLoc.y);
     }
 
     public Chunk load(@NotNull Location chunkLoc) {
         if (savedChunk(chunkLoc)) {
             Chunk chunk = new Chunk(world, chunkLoc);
+            //noinspection ConstantConditions
             chunk.assemble(chunkFile(chunkLoc).readBytes());
             return chunk;
         }
@@ -51,6 +57,7 @@ public class ChunkLoader {
         if (chunk.isModified()) {
             //only save if modified
             FileHandle fh = chunkFile(chunk.getLocation());
+            if (fh == null) { return; }
             fh.writeBytes(chunk.disassemble(), false);
         }
     }

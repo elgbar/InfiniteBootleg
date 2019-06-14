@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -15,6 +14,7 @@ import com.kotcrab.vis.ui.VisUI;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
@@ -42,8 +42,7 @@ public class Main extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private BitmapFont font;
-    private static Main inst;
-    private float width;
+    public static Main inst;
 
     public Main(String[] args) {
         executeArgs(args);
@@ -62,17 +61,14 @@ public class Main extends ApplicationAdapter {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
-        int worldSeed = 12;//new Random().nextInt();
+        int worldSeed = 1;//new Random().nextInt();
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
-//        world.getRender().getCamera().zoom = 24;
-
         font = new BitmapFont(false);
-        width = Gdx.graphics.getWidth();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            world.save();
             world.getWorldTicker().stop();
+            world.save();
         }));
     }
 
@@ -92,6 +88,7 @@ public class Main extends ApplicationAdapter {
 
         int blockX = (int) Math.floor(unproject.x / World.BLOCK_SIZE);
         int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
+        Block block = world.getBlock(blockX, blockY);
 
         int[] vChunks = world.getRender().getChunksInView();
 
@@ -100,18 +97,16 @@ public class Main extends ApplicationAdapter {
         batch.begin();
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
-        font.draw(batch, "Pointing at block (" + blockX + ", " + blockY + ") in chunk " +
+        font.draw(batch, "Pointing at " + block.getMaterial() + " (" + blockX + ", " + blockY + ") in chunk " +
                          world.getChunkFromWorld(blockX, blockY).getLocation(), 10, h - 40);
         font.draw(batch,
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_WIDTH * Chunk.CHUNK_WIDTH + " blocks)", 10,
                   55 + h);
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
 
-        TextureRegion tr = world.getInput().getSelected().getTexture();
+        TextureRegion tr = world.getInput().getSelected().getTextureRegion();
         if (tr != null) {
-            TextureRegion wrapper = new TextureRegion(tr);
-            wrapper.flip(false, true);
-            batch.draw(wrapper, Gdx.graphics.getWidth() - 48, h - 48, 32, 32);
+            batch.draw(tr, Gdx.graphics.getWidth() - 48, h - 48, 32, 32);
         }
         batch.end();
         console.draw();
@@ -130,7 +125,6 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         world.getInput().resize(width, height);
-        new OrthographicCamera(width, height);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
     }
 
@@ -147,6 +141,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public static Main inst() {
+        if (inst == null) { throw new IllegalStateException("Main instance not created"); }
         return inst;
     }
 }
