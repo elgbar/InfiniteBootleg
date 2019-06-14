@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,14 +28,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class World implements Disposable, Updatable {
 
+    public static final String CHUNK_FOLDER = "chunks";
     public final static int BLOCK_SIZE = 16;
     public static final int CHUNK_WIDTH_SHIFT = (int) (Math.log(Chunk.CHUNK_WIDTH) / Math.log(2));
     public static final int CHUNK_HEIGHT_SHIFT = (int) (Math.log(Chunk.CHUNK_HEIGHT) / Math.log(2));
+    private static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
 
     private final long seed;
     private final Random random;
     private final Map<Location, Chunk> chunks;
     private final WorldTicker ticker;
+    @NotNull
     private final ChunkLoader chunkLoader;
 
     //only exists when graphics exits
@@ -42,6 +47,7 @@ public class World implements Disposable, Updatable {
 
     private String name = "World";
     private final UUID uuid;
+    private Set<Entity> entities;
 
 
     /**
@@ -57,7 +63,7 @@ public class World implements Disposable, Updatable {
         this.seed = seed;
         random = new Random(seed);
         chunks = new ConcurrentHashMap<>();
-
+        entities = ConcurrentHashMap.newKeySet();
         byte[] UUIDSeed = new byte[128];
         random.nextBytes(UUIDSeed);
         uuid = UUID.nameUUIDFromBytes(UUIDSeed);
@@ -65,15 +71,18 @@ public class World implements Disposable, Updatable {
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
-            chunkLoader = new ChunkLoader(this, generator);
         }
         else {
             render = new HeadlessWorldRenderer(this);
-            chunkLoader = null;
         }
 
+        chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
         load();
+    }
+
+    public Entity createEntity(EntityType type) {
+        return null;
     }
 
     @NotNull
@@ -319,19 +328,25 @@ public class World implements Disposable, Updatable {
         ticker.stop();
     }
 
+    /**
+     * @return The current folder of the world or {@code null} if no disk should be used
+     */
+    @Nullable
     public FileHandle worldFolder() {
-        return Gdx.files.external(Main.WORLD_FOLDER + uuid);
+        if (Main.renderGraphic) { return Gdx.files.external(Main.WORLD_FOLDER + uuid); }
+        else { return null; }
     }
 
-    public static final String CHUNK_FOLDER = "chunks";
-
     public void save() {
+        FileHandle worldFolder = worldFolder();
+        if (worldFolder == null) { return; }
         for (Chunk chunk : chunks.values()) {
+            //FIXME only save chunks that has been changed! (doesn't do it properly now)
             chunkLoader.save(chunk);
         }
-        FileHandle worldZip = worldFolder().parent().child(uuid + ".zip");
+        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         try {
-            ZipUtils.zip(worldFolder(), worldZip);
+            ZipUtils.zip(worldFolder, worldZip);
             Main.inst().getConsoleLogger().log("World saved!");
         } catch (IOException e) {
             Main.inst().getConsoleLogger().log("Failed to save world due to a " + e.getClass().getSimpleName(), LogLevel.ERROR);
@@ -339,19 +354,21 @@ public class World implements Disposable, Updatable {
             return;
         }
 
-        worldFolder().deleteDirectory();
+        worldFolder.deleteDirectory();
     }
 
     public void load() {
-        FileHandle worldZip = worldFolder().parent().child(uuid + ".zip");
+        FileHandle worldFolder = worldFolder();
+        if (worldFolder == null) { return; }
+        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         System.out.println("worldZip = " + worldZip.file().getAbsolutePath());
         if (!worldZip.exists()) {
             System.out.println("No world save found");
             return;
         }
 
-        worldFolder().deleteDirectory();
-        ZipUtils.unzip(worldFolder(), worldZip);
+        worldFolder.deleteDirectory();
+        ZipUtils.unzip(worldFolder, worldZip);
     }
 
     @Override
@@ -366,12 +383,21 @@ public class World implements Disposable, Updatable {
                 continue;
             }
 
-            if (tick - chunk.getLastViewedTick() > WorldTicker.TICKS_PER_SECOND * 5) {
+            //Unload chunks not seen for 5 seconds
+            if (tick - chunk.getLastViewedTick() > CHUNK_UNLOAD_TIME) {
                 unload(chunk);
                 iterator.remove();
                 continue;
             }
             chunk.update();
         }
+        for (Entity entity : entities) {
+            entity.update();
+        }
+
+    }
+
+    public Set<Entity> getEntities() {
+        return entities;
     }
 }

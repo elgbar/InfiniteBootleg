@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -24,7 +25,7 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDT
 /**
  * @author Elg
  */
-public class ChunkRenderer implements Renderer {
+public class ChunkRenderer implements Renderer, Disposable {
 
     private final SpriteBatch batch;
     private final SetUniqueList<Chunk> renderQueue;
@@ -40,12 +41,6 @@ public class ChunkRenderer implements Renderer {
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
         if (prioritize) { renderQueue.add(0, chunk); }
         else { renderQueue.add(chunk); }
-    }
-
-    @Override
-    public void update() {
-        //does nothing
-        //TODO maybe clear all chunk not viewed in n seconds?
     }
 
     @Override
@@ -84,5 +79,10 @@ public class ChunkRenderer implements Renderer {
 
         chunk.setFbo(fbo);
         chunk.allowChunkUnload(true);
+    }
+
+    @Override
+    public void dispose() {
+        batch.dispose();
     }
 }

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.math.Vector2;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,6 +26,10 @@ public class Location {
 
     public double dist(@NotNull Location loc) {
         return Math.sqrt(distCubed(loc));
+    }
+
+    public Vector2 toVector2() {
+        return new Vector2(x, y);
     }
 
     @Override

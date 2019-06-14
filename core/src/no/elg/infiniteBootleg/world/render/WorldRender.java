@@ -19,8 +19,7 @@ import static no.elg.infiniteBootleg.world.World.BLOCK_SIZE;
 /**
  * @author Elg
  */
-public class WorldRender implements Renderer, Disposable {
-
+public class WorldRender implements Updatable, Renderer, Disposable {
 
     public static final int VERT_START = 0;
     public static final int VERT_END = 1;
@@ -31,6 +30,7 @@ public class WorldRender implements Renderer, Disposable {
     public final static int CHUNK_TEXTURE_HEIGHT = CHUNK_HEIGHT * BLOCK_SIZE;
 
     private final World world;
+    private EntityRenderer entityRenderer;
     private SpriteBatch batch;
 
     private OrthographicCamera camera;
@@ -45,6 +45,7 @@ public class WorldRender implements Renderer, Disposable {
         if (Main.renderGraphic) {
 
             chunkRenderer = new ChunkRenderer(this);
+            entityRenderer = new EntityRenderer(this);
 
             camera = new OrthographicCamera();
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -86,6 +87,7 @@ public class WorldRender implements Renderer, Disposable {
         final int rowEnd = chunksInView[VERT_END];
         final int rowStart = chunksInView[VERT_START];
 
+        //set to 1 to debug what chunks are rendered
         final int debug = 0;
 
         batch.begin();
@@ -106,6 +108,7 @@ public class WorldRender implements Renderer, Disposable {
                 batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_WIDTH, CHUNK_TEXTURE_HEIGHT);
             }
         }
+        entityRenderer.render();
         batch.end();
     }
 
@@ -135,8 +138,17 @@ public class WorldRender implements Renderer, Disposable {
         return chunkRenderer;
     }
 
+    public EntityRenderer getEntityRenderer() {
+        return entityRenderer;
+    }
+
+    public SpriteBatch getBatch() {
+        return batch;
+    }
+
     @Override
     public void dispose() {
         batch.dispose();
+        chunkRenderer.dispose();
     }
 }
