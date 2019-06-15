@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
@@ -158,13 +159,21 @@ public class Util {
         } catch (final Exception e) {
             savedHash = FALLBACK_VERSION;
         }
-        if ((!savedHash.equals(calcHash) || savedHash.equals(FALLBACK_VERSION))) {
-            Gdx.files.absolute(Main.VERSION_FILE).writeString(calcHash, false);
-        }
         if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
             Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to get the current version!");
+            return FALLBACK_VERSION;
         }
-        return calcHash;
+        if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
+            FileHandle versionFile = Gdx.files.absolute(Main.VERSION_FILE);
+            if (versionFile.file().canWrite()) {
+                versionFile.writeString(calcHash, false);
+            }
+            else {
+                Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to write new version to file");
+            }
+        }
+        if (calcHash.equals(FALLBACK_VERSION)) { return savedHash; }
+        else { return savedHash;}
     }
 
     /**
@@ -178,7 +187,6 @@ public class Util {
             String countStr = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
             return Integer.valueOf(countStr);
         } catch (Exception e) {
-            e.printStackTrace();
             return DEFAULT_COMMIT_COUNT;
         }
     }
@@ -197,8 +205,6 @@ public class Util {
             }
             return hash.toUpperCase();
         } catch (final Exception e) {
-
-            e.printStackTrace();
             return DEFAULT_HASH;
         }
     }
