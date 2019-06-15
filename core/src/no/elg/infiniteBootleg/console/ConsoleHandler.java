@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.console;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -29,7 +30,7 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
 
         setCommandExecutor(new Commands());
 
-        log(LogLevel.SUCCESS, "IB Version #" + Util.getLastGitCommitID(false));
+        Gdx.app.postRunnable(() -> log(LogLevel.SUCCESS, "IB Version #" + Util.getVersion()));
     }
 
     public void setAlpha(float a) {

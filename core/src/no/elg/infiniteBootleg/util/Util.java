@@ -3,14 +3,19 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.google.common.base.Preconditions;
+import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
 public class Util {
+
+    public static final String DEFAULT_HASH = "UNKNOWN";
+    public static final int DEFAULT_COMMIT_COUNT = -1;
+    public static final String VERSION_DELIMITER = "-";
+    public static final String FALLBACK_VERSION = DEFAULT_HASH + VERSION_DELIMITER + DEFAULT_COMMIT_COUNT;
 
     /**
      * Based on https://gist.github.com/steen919/8a079f4dadf88d4197bb/d732449eb74321207b4b189a3bcbf47a83c5db65
@@ -145,37 +150,56 @@ public class Util {
         return argsMap;
     }
 
+    public static String getVersion() {
+        String calcHash = getLastGitCommitID(false) + VERSION_DELIMITER + commitCount();
+        String savedHash;
+        try {
+            savedHash = Gdx.files.internal(Main.VERSION_FILE).readString();
+        } catch (final Exception e) {
+            savedHash = FALLBACK_VERSION;
+        }
+        if ((!savedHash.equals(calcHash) || savedHash.equals(FALLBACK_VERSION))) {
+            Gdx.files.absolute(Main.VERSION_FILE).writeString(calcHash, false);
+        }
+        if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
+            Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to get the current version!");
+        }
+        return calcHash;
+    }
+
+    /**
+     * @return The number of commits in this repository
+     */
+    public static int commitCount() {
+        final String countCommand = "git rev-list master --count";
+        try {
+            final Process p = Runtime.getRuntime().exec(countCommand);
+            p.waitFor();
+            String countStr = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
+            return Integer.valueOf(countStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DEFAULT_COMMIT_COUNT;
+        }
+    }
+
     /**
      * @return The latest commit ID in the current repo
      */
     public static String getLastGitCommitID(final boolean full) {
-        final String command = "git log --format=%H -n 1";
-        final String defaultHash = "UNKNOWN";
+        final String hashCommand = "git log --format=%H -n 1";
         try {
-            final Process p = Runtime.getRuntime().exec(command);
+            final Process p = Runtime.getRuntime().exec(hashCommand);
             p.waitFor();
             String hash = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-            String savedHash;
-            try {
-                savedHash = Gdx.files.internal(Main.VERSION_FILE).readString();
-            } catch (final Exception e) {
-                savedHash = defaultHash;
-            }
-            if ((!savedHash.equals(hash) || savedHash.equals(defaultHash))) {
-                Gdx.files.absolute(Main.VERSION_FILE).writeString(hash, false);
-            }
-            if (hash == null) {
-                hash = savedHash;
-            }
-
             if (!full) {
                 hash = hash.substring(0, 6);
             }
             return hash.toUpperCase();
+        } catch (final Exception e) {
 
-        } catch (final IOException | InterruptedException e) {
             e.printStackTrace();
-            return null;
+            return DEFAULT_HASH;
         }
     }
 }
