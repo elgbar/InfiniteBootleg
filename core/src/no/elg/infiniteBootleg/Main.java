@@ -61,9 +61,8 @@ public class Main extends ApplicationAdapter {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
-        int worldSeed = 1;//new Random().nextInt();
+        int worldSeed = 3;
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
-
         font = new BitmapFont(false);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

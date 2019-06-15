@@ -16,7 +16,7 @@ public class SandBlock extends UpdatableBlock {
         Block below = getRelative(Direction.SOUTH);
         if (below.getMaterial() == Material.AIR) {
             Gdx.app.postRunnable(() -> {
-                getChunk().setBlock(getChunkLoc().x, getChunkLoc().y, null);
+                getChunk().setBlock(getChunkLoc().x, getChunkLoc().y, null, true);
                 getWorld().getEntities().add(new FallingBlock(getWorld(), getWorldLoc().x, getWorldLoc().y, Material.SAND));
             });
         }

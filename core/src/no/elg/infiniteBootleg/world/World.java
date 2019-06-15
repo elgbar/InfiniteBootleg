@@ -193,9 +193,6 @@ public class World implements Disposable, Updatable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         chunk.setBlock(localX, localY, material, update);
-        if (update) {
-            updateAround(worldX, worldY);
-        }
         return chunk;
     }
 

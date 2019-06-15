@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class EntityTest extends TestGraphic {
 
@@ -67,6 +68,13 @@ public class EntityTest extends TestGraphic {
         world.setBlock(2, 2, Material.STONE);
         entity.getPosition().set(2, 3);
         assertEquals(new Location(2, 3), entity.collide(new Vector2(0, 0)));
+    }
+
+    @Test
+    public void weirdCollide() {
+        entity.getPosition().set(20, 34);
+        Vector2 vel = new Vector2(0, -0.0147704035f);
+        assertNull(entity.collide(entity.getPosition().cpy().add(vel)));
     }
 
 

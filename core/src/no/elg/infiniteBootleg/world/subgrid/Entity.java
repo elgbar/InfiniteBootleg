@@ -30,7 +30,7 @@ public abstract class Entity implements Updatable {
     private World world;
     private Vector2 position;
     private Vector2 velocity;
-    private boolean flying = false;
+    private boolean flying;
 
     private UUID uuid;
 
@@ -49,6 +49,7 @@ public abstract class Entity implements Updatable {
         drag = DEFAULT_DRAG;
         jumpForce = DEFAULT_DRAG;
         bresenham = new Bresenham2();
+        flying = false;
     }
 
     public abstract TextureRegion getTextureRegion();

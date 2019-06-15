@@ -29,12 +29,11 @@ public class FallingBlock extends Entity {
 
     @Nullable
     @Override
-    public Location collide(Vector2 end) {
+    public Location collide(@NotNull Vector2 end) {
         Location loc = super.collide(end);
         if (loc != null) {
-            System.out.println("coll @ " + loc);
             Gdx.app.postRunnable(() -> {
-                getWorld().setBlock(loc.x, loc.y, material);
+                getWorld().setBlock(loc.x, loc.y, material, true);
                 getWorld().getEntities().remove(this);
             });
             return loc;

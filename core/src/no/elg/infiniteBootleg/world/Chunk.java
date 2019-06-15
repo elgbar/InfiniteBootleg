@@ -34,7 +34,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private final Location chunkPos;
     private final Block[][] blocks;
 
-    private final List<UpdatableBlock> updatableBlocks;
+    private final Set<UpdatableBlock> updatableBlocks;
 
     private boolean modified; //if the chunk has been modified since loaded
     private boolean dirty; //if texture/allair needs to be updated
@@ -72,7 +72,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         this.chunkPos = chunkPos;
         this.blocks = blocks;
 
-        updatableBlocks = new ArrayList<>();
+        updatableBlocks = new HashSet<>();
 
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
@@ -119,7 +119,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public Block getBlock(int localX, int localY) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
         if (blocks[localX][localY] == null) {
-            setBlock(localX, localY, AIR);
+            setBlock(localX, localY, AIR, false);
         }
         return blocks[localX][localY];
     }
@@ -167,8 +167,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             if (currBlock instanceof UpdatableBlock && !(newBlock instanceof UpdatableBlock)) {
                 updatableBlocks.remove(currBlock);
             }
-            else if (newBlock instanceof Updatable) {
+            if (newBlock instanceof UpdatableBlock) {
                 updatableBlocks.add((UpdatableBlock) newBlock);
+                ((UpdatableBlock) newBlock).update();
             }
         }
 
@@ -176,6 +177,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if (update) {
             dirty = true;
             prioritize = true;
+            if (getWorld() != null) {
+                getWorld().updateAround(getWorldLoc().x, getWorldLoc().y);
+            }
         }
     }
 
