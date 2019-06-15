@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.subgrid;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.sun.istack.internal.NotNull;
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
@@ -73,7 +72,7 @@ public class EntityTest extends TestGraphic {
 
     private static class EntityImpl extends Entity {
 
-        private EntityImpl(@NotNull World world, int x, int y) {
+        private EntityImpl(World world, int x, int y) {
             super(world, x, y);
         }
 

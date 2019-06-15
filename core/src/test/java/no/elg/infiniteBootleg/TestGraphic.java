@@ -32,6 +32,7 @@ public class TestGraphic {
         Gdx.graphics = mock(Graphics.class);
         when(Gdx.graphics.getWidth()).thenReturn(1);
         when(Gdx.graphics.getHeight()).thenReturn(1);
+
         Main.inst = mock(Main.class);
         when(Main.inst.getConsoleLogger()).thenReturn(logger);
     }
