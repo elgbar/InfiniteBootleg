@@ -126,6 +126,7 @@ public class Main extends ApplicationAdapter {
     public void resize(int width, int height) {
         world.getInput().resize(width, height);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
+        console.refresh();
     }
 
     public static InputMultiplexer getInputMultiplexer() {
