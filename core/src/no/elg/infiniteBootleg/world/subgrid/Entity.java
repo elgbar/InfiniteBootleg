@@ -19,8 +19,8 @@ import java.util.UUID;
  */
 public abstract class Entity implements Updatable {
 
-    public static final float DEFAULT_GRAVITY = -0.81f;
-    public static final float DEFAULT_DRAG = 0.97f;
+    public static final float DEFAULT_GRAVITY = -5f;
+    public static final float DEFAULT_DRAG = 0.99f;
     public static final float DEFAULT_JUMP_FORCE = 2f;
     private float gravity;
     private float drag;
@@ -60,9 +60,8 @@ public abstract class Entity implements Updatable {
      * @return The last valid location between the current and the given position, if no collision {@code null}
      */
     @Nullable
-    public Location collide(Vector2 end) {
+    public Location collide(@NotNull Vector2 end) {
         Array<GridPoint2> grid = bresenham.line((int) position.x, (int) position.y, (int) end.x, (int) end.y);
-
         for (GridPoint2 point : new Array.ArrayIterable<>(grid)) {
             if (world.getBlock(point.x, point.y - 1).getMaterial().isSolid()) {
                 return new Location(point.x, point.y);
@@ -74,19 +73,19 @@ public abstract class Entity implements Updatable {
     @Override
     public void update() {
         float delta = Gdx.graphics.getDeltaTime();
+        Vector2 newPos = position.cpy().add(velocity.x * delta, velocity.y * delta);
         if (!velocity.isZero()) {
-            Vector2 newPos = new Vector2(position.x * delta, position.y * delta);
             Location collisionPos = collide(newPos);
             if (collisionPos != null) {
                 velocity.setZero();
                 position = collisionPos.toVector2();
             }
             else {
-                position.add(velocity.x, velocity.y);
+                position = newPos;
             }
         }
         if (!flying) {
-            velocity.add(0, gravity * delta);
+            velocity.add(0, gravity);
             velocity.x *= drag;
             velocity.y *= drag;
         }
