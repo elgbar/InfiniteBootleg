@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -9,23 +7,18 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Elg
  */
-public class ProgramArgsTest {
+public class ProgramArgsTest extends TestGraphic {
 
-    @Before
-    public void setUp() throws Exception {
-        Main.renderGraphic = true;
-    }
-
-    @Ignore
     @Test
     public void headless() {
+        Main.renderGraphic = true;
         ProgramArgs.executeArgs(new String[] {"-headless"});
         assertFalse(Main.renderGraphic);
     }
 
-    @Ignore
     @Test
     public void handlesRandomCasing() {
+        Main.renderGraphic = true;
         ProgramArgs.executeArgs(new String[] {"-hEadlESS"});
         assertFalse(Main.renderGraphic);
     }

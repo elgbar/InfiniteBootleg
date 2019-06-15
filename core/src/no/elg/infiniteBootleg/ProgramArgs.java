@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg;
 
+import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.util.Util;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,13 +18,14 @@ public class ProgramArgs {
 
         for (Map.Entry<String, String> entry : options.entrySet()) {
             try {
-                Method method = ProgramArgs.class.getMethod(entry.getKey().toLowerCase(), String.class);
+                Method method = ProgramArgs.class.getDeclaredMethod(entry.getKey().toLowerCase(), String.class);
                 if (method != null) {
                     method.invoke(null, entry.getValue());
                 }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+                else {
+                    Main.inst().getConsoleLogger().logf(LogLevel.ERROR, "Unknown argument '%s'", entry.getKey());
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignore) { }
         }
     }
 

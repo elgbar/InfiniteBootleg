@@ -126,7 +126,7 @@ public class Util {
 
         for (final String arg : args) {
             if (!arg.startsWith("-")) {
-                System.err.printf("Unknown argument '%s'", arg);
+                Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
             }
             else {
                 //we only care about the first equals sign, the rest is a part of the value
@@ -146,8 +146,6 @@ public class Util {
                 }
             }
         }
-//        System.out.println("argsMap.keySet() = " + argsMap.keySet());
-//        System.out.println("argsMap.values() = " + argsMap.values());
         return argsMap;
     }
 
