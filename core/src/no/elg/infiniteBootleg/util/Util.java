@@ -160,20 +160,18 @@ public class Util {
             savedHash = FALLBACK_VERSION;
         }
         if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
-            Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to get the current version!");
+            Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to get the current version");
             return FALLBACK_VERSION;
         }
         if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
             FileHandle versionFile = Gdx.files.absolute(Main.VERSION_FILE);
-            if (versionFile.file().canWrite()) {
+            try {
                 versionFile.writeString(calcHash, false);
-            }
-            else {
+            } catch (Exception ignore) {
                 Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to write new version to file");
             }
         }
-        if (calcHash.equals(FALLBACK_VERSION)) { return savedHash; }
-        else { return savedHash;}
+        return calcHash.equals(FALLBACK_VERSION) ? savedHash : calcHash;
     }
 
     /**
