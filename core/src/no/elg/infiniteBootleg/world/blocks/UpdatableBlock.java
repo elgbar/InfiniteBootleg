@@ -15,8 +15,12 @@ public abstract class UpdatableBlock extends Block implements Updatable {
         super(world, chunk, localX, localY, material);
     }
 
+    /**
+     * Update if the update flag is set to true
+     */
     public void tryUpdate() {
         if (update) {
+            update = false;
             update();
         }
     }

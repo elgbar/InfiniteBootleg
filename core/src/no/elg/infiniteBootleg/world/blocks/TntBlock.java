@@ -57,6 +57,7 @@ public class TntBlock extends UpdatableBlock {
     @Override
     public void update() {
         if (exploded) { return; }
+        setUpdate(true); //continue to update this block till it explodes
         if (tickLeft <= 0) {
             exploded = true;
             Main.SCHEDULER.executeAsync(() -> {
