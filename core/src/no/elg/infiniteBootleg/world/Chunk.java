@@ -178,7 +178,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             dirty = true;
             prioritize = true;
             if (getWorld() != null) {
-                getWorld().updateAround(getWorldLoc().x, getWorldLoc().y);
+                getWorld().updateAround(getWorldLoc(localX, localY));
             }
         }
     }
@@ -277,13 +277,26 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * This is the same as doing {@code CoordUtil.chunkToWorld(getWorldLoc())}
+     * This is the same as doing {@code CoordUtil.chunkToWorld(getLocation())}
      *
      * @return Location of this chunk in world coordinates
      */
     @NotNull
     public Location getWorldLoc() {
         return CoordUtil.chunkToWorld(chunkPos);
+    }
+
+    /**
+     * @param localX
+     *     The local chunk x coordinate
+     * @param localY
+     *     The local chunk y coordinate
+     *
+     * @return The world coordinate from the local position
+     */
+    @NotNull
+    public Location getWorldLoc(int localX, int localY) {
+        return new Location(CoordUtil.chunkToWorld(chunkPos.x) + localX, CoordUtil.chunkToWorld(chunkPos.y) + localY);
     }
 
     /**

@@ -199,12 +199,23 @@ public class World implements Disposable, Updatable {
     /**
      * Set all blocks around a given block to be updated
      *
+     * @param worldLoc
+     *     The coordinates to updates around (but not included)
+     */
+    public void updateAround(@NotNull Location worldLoc) {
+        updateAround(worldLoc.x, worldLoc.y);
+    }
+
+    /**
+     * Set all blocks around a given block to be updated
+     *
      * @param worldX
      *     The x coordinate from world view
      * @param worldY
      *     The y coordinate from world view
      */
     public void updateAround(int worldX, int worldY) {
+        System.out.println("update around");
         Block center = getBlock(worldX, worldY);
         for (Direction dir : Direction.values()) {
             Block rel = center.getRelative(dir);
