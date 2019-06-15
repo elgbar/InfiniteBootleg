@@ -99,13 +99,14 @@ public class Block implements Binembly {
         return getMaterial() + "-block{" + "loc=" + worldLoc + ", world=" + world + '}';
     }
 
+    @NotNull
     @Override
     public byte[] disassemble() {
         return new byte[] {(byte) material.ordinal()};
     }
 
     @Override
-    public void assemble(byte[] bytes) {
+    public void assemble(@NotNull byte[] bytes) {
         throw new UnsupportedOperationException("Cannot assemble blocks directly. Blocks must be assembled by a chunk");
     }
 }

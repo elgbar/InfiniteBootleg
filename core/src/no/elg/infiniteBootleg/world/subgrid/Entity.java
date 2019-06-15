@@ -12,6 +12,8 @@ import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 /**
  * An entity that can move between the main world grid. The position of each entity is recorded in world coordinates.
  */
@@ -30,12 +32,15 @@ public abstract class Entity implements Updatable {
     private Vector2 velocity;
     private boolean flying = false;
 
+    private UUID uuid;
+
 
     public Entity(@NotNull World world, int x, int y) {
         this(world, new Vector2(x, y));
     }
 
     private Entity(@NotNull World world, @NotNull Vector2 position) {
+        uuid = UUID.randomUUID();
         world.getEntities().add(this);
         this.world = world;
         this.position = position;
@@ -130,5 +135,22 @@ public abstract class Entity implements Updatable {
 
     public World getWorld() {
         return world;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        Entity entity = (Entity) o;
+        return uuid.equals(entity.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
     }
 }

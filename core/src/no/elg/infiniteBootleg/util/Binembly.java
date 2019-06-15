@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.util;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Elg
  */
@@ -8,11 +10,11 @@ public interface Binembly {
     /**
      * @return This object as bytes
      */
-    byte[] disassemble();
+    @NotNull byte[] disassemble();
 
     /**
      * Assemble the given bytes to restore an object
      */
-    void assemble(byte[] bytes);
+    void assemble(@NotNull byte[] bytes);
 
 }

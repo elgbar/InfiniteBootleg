@@ -200,6 +200,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         return fboRegion;
     }
 
+    /**
+     * Update the framebuffer object of this chunk
+     *
+     * @param fbo
+     *     The new fbo
+     */
     public void setFbo(@NotNull FrameBuffer fbo) {
         if (this.fbo != null) {
             this.fbo.dispose();
@@ -261,6 +267,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     /**
      * @return Location of this chunk in chunk coordinates
      */
+    @NotNull
     public Location getLocation() {
         return chunkPos;
     }
@@ -270,6 +277,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *
      * @return Location of this chunk in world coordinates
      */
+    @NotNull
     public Location getWorldLoc() {
         return CoordUtil.chunkToWorld(chunkPos);
     }
@@ -316,6 +324,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 return y < CHUNK_HEIGHT - 1 || x < CHUNK_WIDTH;
             }
 
+            @Nullable
             @Override
             public Block next() {
                 if (x == CHUNK_WIDTH) {
@@ -345,6 +354,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         }
     }
 
+    @NotNull
     @Override
     public byte[] disassemble() {
         byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_HEIGHT];
@@ -356,7 +366,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     @Override
-    public void assemble(byte[] bytes) {
+    public void assemble(@NotNull byte[] bytes) {
         Preconditions.checkArgument(bytes.length == CHUNK_WIDTH * CHUNK_HEIGHT, "Invalid number of bytes");
         int index = 0;
         modified = true;
