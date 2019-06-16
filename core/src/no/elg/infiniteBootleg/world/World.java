@@ -215,7 +215,6 @@ public class World implements Disposable, Updatable {
      *     The y coordinate from world view
      */
     public void updateAround(int worldX, int worldY) {
-        System.out.println("update around");
         Block center = getBlock(worldX, worldY);
         for (Direction dir : Direction.values()) {
             Block rel = center.getRelative(dir);
@@ -223,7 +222,6 @@ public class World implements Disposable, Updatable {
                 ((UpdatableBlock) rel).setUpdate(true);
             }
         }
-
     }
 
     /**
