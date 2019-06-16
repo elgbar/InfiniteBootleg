@@ -100,7 +100,7 @@ public class Main extends ApplicationAdapter {
                          world.getChunkFromWorld(blockX, blockY).getLocation(), 10, h - 40);
         font.draw(batch,
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_WIDTH * Chunk.CHUNK_WIDTH + " blocks)", 10,
-                  55 + h);
+                  h - 55);
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
 
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
