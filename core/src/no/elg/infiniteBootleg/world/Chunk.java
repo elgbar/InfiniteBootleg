@@ -180,8 +180,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
         }
 
-        modified = true;
         if (update) {
+            modified = true;
             dirty = true;
             prioritize = true;
             if (getWorld() != null) {
