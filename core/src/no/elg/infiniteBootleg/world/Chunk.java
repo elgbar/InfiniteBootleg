@@ -341,21 +341,20 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 return y < CHUNK_HEIGHT - 1 || x < CHUNK_WIDTH;
             }
 
-            @Nullable
             @Override
             public Block next() {
                 if (x == CHUNK_WIDTH) {
                     x = 0;
                     y++;
                 }
-                return blocks[x++][y];
+                return getBlock(x++, y);
             }
         };
     }
 
     public Stream<Block> stream() {
         Spliterator<Block> spliterator =
-            Spliterators.spliterator(iterator(), CHUNK_WIDTH * CHUNK_HEIGHT, SIZED | DISTINCT | NONNULL);
+            Spliterators.spliterator(iterator(), CHUNK_WIDTH * CHUNK_HEIGHT, SIZED | DISTINCT | NONNULL | ORDERED);
         return StreamSupport.stream(spliterator, false);
     }
 
