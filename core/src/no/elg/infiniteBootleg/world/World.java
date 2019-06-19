@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,11 +34,10 @@ public class World implements Disposable, Updatable {
     private static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
 
     private final long seed;
-    private final Random random;
     private final Map<Location, Chunk> chunks;
     private final WorldTicker ticker;
-    @NotNull
     private final ChunkLoader chunkLoader;
+    private FileHandle worldFile;
 
     //only exists when graphics exits
     private WorldInputHandler input;
@@ -61,7 +59,7 @@ public class World implements Disposable, Updatable {
 
     public World(@NotNull ChunkGenerator generator, long seed) {
         this.seed = seed;
-        random = new Random(seed);
+        Random random = new Random(seed);
         chunks = new ConcurrentHashMap<>();
         entities = ConcurrentHashMap.newKeySet();
         byte[] UUIDSeed = new byte[128];
@@ -81,10 +79,6 @@ public class World implements Disposable, Updatable {
         load();
     }
 
-    public Entity createEntity(EntityType type) {
-        return null;
-    }
-
     @NotNull
     public Chunk getChunk(int chunkX, int chunkY) {
         return getChunk(new Location(chunkX, chunkY));
@@ -92,7 +86,12 @@ public class World implements Disposable, Updatable {
 
     @NotNull
     public Chunk getChunk(@NotNull Location chunkLoc) {
-        return chunks.computeIfAbsent(chunkLoc, chunkLoader::load);
+        Chunk chunk = chunks.get(chunkLoc);
+        if (chunk == null) {
+            chunk = chunkLoader.load(chunkLoc);
+            chunks.put(chunkLoc, chunk);
+        }
+        return chunk;
     }
 
     @NotNull
@@ -184,7 +183,6 @@ public class World implements Disposable, Updatable {
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
     public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean update) {
-
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -339,8 +337,15 @@ public class World implements Disposable, Updatable {
      */
     @Nullable
     public FileHandle worldFolder() {
-        if (Main.renderGraphic) { return Gdx.files.external(Main.WORLD_FOLDER + uuid); }
-        else { return null; }
+        if (Main.renderGraphic) {
+            if (worldFile == null) {
+                worldFile = Gdx.files.external(Main.WORLD_FOLDER + uuid);
+            }
+            return worldFile;
+        }
+        else {
+            return null;
+        }
     }
 
     public void save() {
@@ -400,7 +405,6 @@ public class World implements Disposable, Updatable {
         for (Entity entity : entities) {
             entity.update();
         }
-
     }
 
     public Set<Entity> getEntities() {

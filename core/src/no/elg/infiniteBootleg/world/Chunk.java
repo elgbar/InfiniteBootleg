@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -13,6 +14,7 @@ import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -46,6 +48,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private boolean allAir;
     private FrameBuffer fbo;
     private TextureRegion fboRegion;
+    private FileHandle chunkFile;
 
     /**
      * Create a new empty chunk
@@ -368,6 +371,21 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if (fbo != null) {
             fbo.dispose();
         }
+    }
+
+    @Nullable
+    public FileHandle getChunkFile() {
+        if (chunkFile == null) {
+            chunkFile = geChunkFile(world, chunkPos);
+        }
+        return chunkFile;
+    }
+
+    @Nullable
+    public static FileHandle geChunkFile(@NotNull World world, @NotNull Location chunkPos) {
+        FileHandle worldFile = world.worldFolder();
+        if (worldFile == null) { return null; }
+        return worldFile.child(World.CHUNK_FOLDER + File.separator + chunkPos.x + File.separator + chunkPos.y);
     }
 
     @NotNull
