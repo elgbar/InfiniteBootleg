@@ -14,7 +14,7 @@ public class FallingBlock extends Entity {
     private final Material material;
     private final TextureRegion region;
 
-    public FallingBlock(@NotNull World world, int x, int y, @NotNull Material material) {
+    public FallingBlock(@NotNull World world, float x, float y, @NotNull Material material) {
         super(world, x, y);
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());

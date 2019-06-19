@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Immutable 2D vector in integer space
+ *
  * @author Elg
  */
 public class Location {

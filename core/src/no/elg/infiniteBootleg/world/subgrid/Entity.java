@@ -35,7 +35,7 @@ public abstract class Entity implements Updatable {
     private UUID uuid;
 
 
-    public Entity(@NotNull World world, int x, int y) {
+    public Entity(@NotNull World world, float x, float y) {
         this(world, new Vector2(x, y));
     }
 
@@ -62,7 +62,8 @@ public abstract class Entity implements Updatable {
      */
     @Nullable
     public Location collide(@NotNull Vector2 end) {
-        Array<GridPoint2> grid = bresenham.line((int) position.x, (int) position.y, (int) end.x, (int) end.y);
+        Array<GridPoint2> grid =
+            bresenham.line(Math.round(position.x), Math.round(position.y), Math.round(end.x), Math.round(end.y));
         for (GridPoint2 point : new Array.ArrayIterable<>(grid)) {
             if (world.getBlock(point.x, point.y - 1).getMaterial().isSolid()) {
                 return new Location(point.x, point.y);

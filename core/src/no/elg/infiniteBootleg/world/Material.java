@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public enum Material {
 
-    AIR(null, false, false, false, 0),
+    AIR(null, false, false, false, 0f),
     STONE(1.5f),
     BRICK(2f),
     DIRT(1f),
@@ -31,11 +31,27 @@ public enum Material {
     private final float hardness;
     private final TextureRegion texture;
 
-    Material(float hardness) {this(null, hardness);}
+    Material(float hardness) {
+        this(null, hardness);
+    }
 
-    Material(Class<? extends Block> impl, float hardness) {this(impl, true, true, true, hardness);}
+    Material(@Nullable Class<? extends Block> impl, float hardness) {
+        this(impl, true, true, true, hardness);
+    }
 
-    Material(Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable, float hardness) {
+    /**
+     * @param impl
+     *     The implementation a block of this material must have
+     * @param solid
+     *     If objects can pass through this material
+     * @param blocksLight
+     *     If this material will block light
+     * @param placable
+     *     If a block of this material can be placed by a player
+     * @param hardness
+     *     How hard it is to remove this a block of this material
+     */
+    Material(@Nullable Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable, float hardness) {
         this.impl = impl;
         this.solid = solid;
         this.blocksLight = blocksLight;
