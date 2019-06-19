@@ -77,8 +77,17 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
     @Override
     public void render() {
-        for (int i = 0; i < 10; i++) {
-            //noinspection LibGDXFlushInsideLoop
+        chunkRenderer.render();
+        if (Gdx.graphics.getDeltaTime() < 0.05) {
+            //only render more chunks when the computer isn't struggling with the rendering
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
             chunkRenderer.render();
         }
 

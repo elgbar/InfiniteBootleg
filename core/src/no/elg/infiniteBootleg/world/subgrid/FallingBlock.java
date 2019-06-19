@@ -19,7 +19,6 @@ public class FallingBlock extends Entity {
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
         region.flip(true, false);
-        setFlying(false);
     }
 
     @Override
