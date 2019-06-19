@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.util;
 
 import no.elg.infiniteBootleg.world.Location;
 
-import static no.elg.infiniteBootleg.world.World.CHUNK_WIDTH_SHIFT;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE_SHIFT;
 
 /**
  * Translate between world and chunk coordinates
@@ -20,10 +20,10 @@ public class CoordUtil {
     }
 
     public static int worldToChunk(int worldCoord) {
-        return worldCoord >> CHUNK_WIDTH_SHIFT;
+        return worldCoord >> CHUNK_SIZE_SHIFT;
     }
 
     public static int chunkToWorld(int chunkCoord) {
-        return chunkCoord << CHUNK_WIDTH_SHIFT;
+        return chunkCoord << CHUNK_SIZE_SHIFT;
     }
 }

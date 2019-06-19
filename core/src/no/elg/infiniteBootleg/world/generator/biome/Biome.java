@@ -8,8 +8,8 @@ import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import java.util.ArrayList;
 import java.util.List;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg
@@ -68,25 +68,25 @@ public enum Biome {
 
     public static double heightAt(PerlinNoise noise, int chunkX, int localX, double y, double z, double amplitude,
                                   double frequency) {
-        int lx = localX + CHUNK_WIDTH * chunkX;
+        int lx = localX + CHUNK_SIZE * chunkX;
         return noise.octaveNoise(lx * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude;
-//        return ImprovedNoise.noise(localX + CHUNK_WIDTH * chunkPos.x, y, z, amplitude, frequency);
+//        return ImprovedNoise.noise(localX + CHUNK_SIZE * chunkPos.x, y, z, amplitude, frequency);
 //        double nx = ;
 
 //        double e = (weights[0] * + weights[1] * noise(noise, 2 * nx, 2 * ny) +
 //                    weights[2] * noise(noise, 4 * nx, 4 * ny) + weights[3] * noise(noise, 8 * nx, 8 * ny) +
 //                    weights[4] * noise(noise, 16 * nx, 16 * ny) + weights[5] * noise(noise, 32 * nx, 32 * ny));
 //        e /= (weights[0] + weights[1] + weights[2] + weights[3] + weights[4] + weights[5]);
-//        return ImprovedNoise.noise(localX + CHUNK_WIDTH * chunkPos.x, y, z, amplitude, frequency);
+//        return ImprovedNoise.noise(localX + CHUNK_SIZE * chunkPos.x, y, z, amplitude, frequency);
 //        double e = noise
-//            .getOctNoise((localX + CHUNK_WIDTH * chunkPos.x), (int) (weights[0] * weights[1]), (int) (weights[2] * weights[3]));
+//            .getOctNoise((localX + CHUNK_SIZE * chunkPos.x), (int) (weights[0] * weights[1]), (int) (weights[2] * weights[3]));
 //        e = Math.pow(e, exponent);
 //        System.out.println("e = " + e);
 //        return (int) (e * intensity);
     }
 
     public void fillUpTo(PerlinNoise noise, Chunk chunk, int localX, int localY, int height) {
-        int chunkY = chunk.getLocation().y * CHUNK_HEIGHT;
+        int chunkY = chunk.getLocation().y * CHUNK_SIZE;
         for (int dy = 0; dy < localY; dy++) {
             chunk.setBlock(localX, dy, materialAt(noise, height, dy + chunkY), false);
         }

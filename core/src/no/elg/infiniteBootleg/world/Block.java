@@ -15,6 +15,8 @@ import java.util.Objects;
  */
 public class Block implements Binembly {
 
+    public final static int BLOCK_SIZE = 16;
+
     private Material material;
     private World world;
     private Chunk chunk;

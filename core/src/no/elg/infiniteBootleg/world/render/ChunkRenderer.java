@@ -15,10 +15,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
-import static no.elg.infiniteBootleg.world.World.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_HEIGHT;
 import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDTH;
 
@@ -61,8 +61,8 @@ public class ChunkRenderer implements Renderer, Disposable {
         fbo.begin();
         batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            for (int y = 0; y < CHUNK_HEIGHT; y++) {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
                 Block block = blocks[x][y];
                 if (block == null || block.getMaterial() == AIR) {
                     continue;

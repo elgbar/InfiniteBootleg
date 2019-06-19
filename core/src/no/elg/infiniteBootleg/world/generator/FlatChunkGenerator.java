@@ -16,8 +16,8 @@ public class FlatChunkGenerator implements ChunkGenerator {
     public Chunk generate(@NotNull World world, @NotNull Location chunkPos) {
         Chunk chunk = new Chunk(world, chunkPos);
         if (chunkPos.y < 0) {
-            for (int x = 0; x < Chunk.CHUNK_WIDTH; x++) {
-                for (int y = 0; y < Chunk.CHUNK_HEIGHT; y++) {
+            for (int x = 0; x < Chunk.CHUNK_SIZE; x++) {
+                for (int y = 0; y < Chunk.CHUNK_SIZE; y++) {
                     chunk.setBlock(x, y, Material.STONE, false);
                 }
             }

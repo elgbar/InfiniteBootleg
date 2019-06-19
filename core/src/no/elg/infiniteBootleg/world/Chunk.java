@@ -29,8 +29,10 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
  */
 public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
-    public static final int CHUNK_WIDTH = 32;
-    public static final int CHUNK_HEIGHT = 32;
+    public static final int CHUNK_SIZE = 32;
+    public static final int CHUNK_SIZE_SHIFT = (int) (Math.log(CHUNK_SIZE) / Math.log(2));
+    public static final String CHUNK_FOLDER = "chunks";
+    public static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
 
     private final World world;
     private final Location chunkPos;
@@ -58,7 +60,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @param chunkPos
      *     The position of this chunk the given world
      */
-    public Chunk(@NotNull World world, @NotNull Location chunkPos) {this(world, chunkPos, new Block[CHUNK_WIDTH][CHUNK_HEIGHT]);}
+    public Chunk(@NotNull World world, @NotNull Location chunkPos) {
+        this(world, chunkPos, new Block[CHUNK_SIZE][CHUNK_SIZE]);
+    }
 
     /**
      * @param world
@@ -66,19 +70,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @param chunkPos
      *     The position of this chunk the given world
      * @param blocks
-     *     The initial blocks of this chunk (note: must be {@link #CHUNK_WIDTH}x{@link #CHUNK_HEIGHT})
+     *     The initial blocks of this chunk (note: must be {@link #CHUNK_SIZE}x{@link #CHUNK_SIZE})
      */
     public Chunk(@NotNull World world, @NotNull Location chunkPos, @NotNull Block[][] blocks) {
-        Preconditions.checkArgument(blocks.length == CHUNK_WIDTH);
-        Preconditions.checkArgument(blocks[0].length == CHUNK_HEIGHT);
+        Preconditions.checkArgument(blocks.length == CHUNK_SIZE);
+        Preconditions.checkArgument(blocks[0].length == CHUNK_SIZE);
         this.world = world;
         this.chunkPos = chunkPos;
         this.blocks = blocks;
 
         updatableBlocks = new HashSet<>();
 
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            for (int y = 0; y < CHUNK_HEIGHT; y++) {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
                 Block block = blocks[x][y];
 
                 if (block instanceof UpdatableBlock) {
@@ -112,9 +116,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     /**
      * @param localX
-     *     The local x ie a value between 0 and {@link #CHUNK_WIDTH}
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
      * @param localY
-     *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
      *
      * @return A block from the relative coordinates
      */
@@ -129,9 +133,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     /**
      * @param localX
-     *     The local x ie a value between 0 and {@link #CHUNK_WIDTH}
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
      * @param localY
-     *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
      * @param material
      *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
      */
@@ -141,9 +145,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     /**
      * @param localX
-     *     The local x ie a value between 0 and {@link #CHUNK_WIDTH}
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
      * @param localY
-     *     The local y ie a value between 0 and {@link #CHUNK_HEIGHT}
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
      * @param material
      *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
      * @param update
@@ -341,12 +345,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
             @Override
             public boolean hasNext() {
-                return y < CHUNK_HEIGHT - 1 || x < CHUNK_WIDTH;
+                return y < CHUNK_SIZE - 1 || x < CHUNK_SIZE;
             }
 
             @Override
             public Block next() {
-                if (x == CHUNK_WIDTH) {
+                if (x == CHUNK_SIZE) {
                     x = 0;
                     y++;
                 }
@@ -357,7 +361,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     public Stream<Block> stream() {
         Spliterator<Block> spliterator =
-            Spliterators.spliterator(iterator(), CHUNK_WIDTH * CHUNK_HEIGHT, SIZED | DISTINCT | NONNULL | ORDERED);
+            Spliterators.spliterator(iterator(), CHUNK_SIZE * CHUNK_SIZE, SIZED | DISTINCT | NONNULL | ORDERED);
         return StreamSupport.stream(spliterator, false);
     }
 
@@ -385,13 +389,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public static FileHandle geChunkFile(@NotNull World world, @NotNull Location chunkPos) {
         FileHandle worldFile = world.worldFolder();
         if (worldFile == null) { return null; }
-        return worldFile.child(World.CHUNK_FOLDER + File.separator + chunkPos.x + File.separator + chunkPos.y);
+        return worldFile.child(CHUNK_FOLDER + File.separator + chunkPos.x + File.separator + chunkPos.y);
     }
 
     @NotNull
     @Override
     public byte[] disassemble() {
-        byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_HEIGHT];
+        byte[] bytes = new byte[CHUNK_SIZE * CHUNK_SIZE];
         int index = 0;
         for (Block block : this) {
             bytes[index++] = block == null ? 0 : block.disassemble()[0];
@@ -401,11 +405,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     @Override
     public void assemble(@NotNull byte[] bytes) {
-        Preconditions.checkArgument(bytes.length == CHUNK_WIDTH * CHUNK_HEIGHT, "Invalid number of bytes");
+        Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE, "Invalid number of bytes");
         int index = 0;
         modified = true;
-        for (int y = 0; y < CHUNK_HEIGHT; y++) {
-            for (int x = 0; x < CHUNK_WIDTH; x++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+            for (int x = 0; x < CHUNK_SIZE; x++) {
                 Material mat = Material.fromByte(bytes[index++]);
                 if (mat == null || mat == AIR) {
                     blocks[x][y] = null;

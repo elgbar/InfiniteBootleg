@@ -85,8 +85,8 @@ public class Main extends ApplicationAdapter {
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        int blockX = (int) Math.floor(unproject.x / World.BLOCK_SIZE);
-        int blockY = (int) Math.floor(unproject.y / World.BLOCK_SIZE);
+        int blockX = (int) Math.floor(unproject.x / Block.BLOCK_SIZE);
+        int blockY = (int) Math.floor(unproject.y / Block.BLOCK_SIZE);
         Block block = world.getBlock(blockX, blockY);
 
         int[] vChunks = world.getRender().getChunksInView();
@@ -99,7 +99,7 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "Pointing at " + block.getMaterial() + " (" + blockX + ", " + blockY + ") in chunk " +
                          world.getChunkFromWorld(blockX, blockY).getLocation(), 10, h - 40);
         font.draw(batch,
-                  "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_WIDTH * Chunk.CHUNK_WIDTH + " blocks)", 10,
+                  "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
                   h - 55);
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
 

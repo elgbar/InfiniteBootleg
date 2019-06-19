@@ -8,8 +8,8 @@ import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg
@@ -24,7 +24,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
 
     private double calcHeightMap(int chunkX, int x) {
         float a = 1.25f;
-        return (noise.noise(chunkX * CHUNK_WIDTH + x, 0.5, 0.5, a, 0.001) + a) / (a * 2);
+        return (noise.noise(chunkX * CHUNK_SIZE + x, 0.5, 0.5, a, 0.001) + a) / (a * 2);
     }
 
     private Biome getBiome(double height) {
@@ -40,7 +40,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     public @NotNull Chunk generate(@NotNull World world, @NotNull Location chunkPos) {
         Chunk chunk = new Chunk(world, chunkPos);
 //        Main.SCHEDULER.executeAsync(() -> {
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
             double biomeWeight = calcHeightMap(chunkPos.x, x);
             Biome biome = getBiome(biomeWeight);
             double y;
@@ -50,10 +50,10 @@ public class PerlinChunkGenerator implements ChunkGenerator {
             int height = (int) y;
             int elevationChunk = CoordUtil.worldToChunk(height);
             if (chunkPos.y == elevationChunk) {
-                biome.fillUpTo(noise, chunk, x, (int) (y - elevationChunk * CHUNK_WIDTH), height);
+                biome.fillUpTo(noise, chunk, x, (int) (y - elevationChunk * CHUNK_SIZE), height);
             }
             else if (chunkPos.y < elevationChunk) {
-                biome.fillUpTo(noise, chunk, x, CHUNK_HEIGHT, height);
+                biome.fillUpTo(noise, chunk, x, CHUNK_SIZE, height);
             }
         }
         chunk.updateTexture(false);

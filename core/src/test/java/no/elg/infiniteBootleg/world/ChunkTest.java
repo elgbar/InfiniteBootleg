@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static org.junit.Assert.*;
 
 /**
@@ -31,17 +31,17 @@ public class ChunkTest extends TestGraphic {
 
     @Test
     public void invalidBlocksWidth() {
-        assertEquals(CHUNK_WIDTH, chunk.getBlocks().length);
+        assertEquals(CHUNK_SIZE, chunk.getBlocks().length);
     }
 
     @Test
     public void invalidBlocksHeight() {
-        assertEquals(CHUNK_HEIGHT, chunk.getBlocks()[0].length);
+        assertEquals(CHUNK_SIZE, chunk.getBlocks()[0].length);
     }
 
     @Test
     public void correctSizeOfIterable() {
-        assertEquals(CHUNK_WIDTH * CHUNK_HEIGHT, chunk.stream().count());
+        assertEquals(CHUNK_SIZE * CHUNK_SIZE, chunk.stream().count());
     }
 
     @Test
@@ -84,8 +84,8 @@ public class ChunkTest extends TestGraphic {
     @Test
     public void locationMatch() {
         chunk.setBlock(0, 0, Material.AIR, false);
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            for (int y = 0; y < CHUNK_HEIGHT; y++) {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
                 Location loc = chunk.getBlock(x, y).getWorldLoc();
                 assertEquals(x, loc.x);
                 assertEquals(y, loc.y);

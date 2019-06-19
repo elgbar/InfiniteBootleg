@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,6 @@ public class Player extends LivingEntity {
     public void update() {
         super.update();
         Vector3 camPos = getWorld().getRender().getCamera().position;
-        getPosition().set(camPos.x / World.BLOCK_SIZE, camPos.y / World.BLOCK_SIZE);
+        getPosition().set(camPos.x / Block.BLOCK_SIZE, camPos.y / Block.BLOCK_SIZE);
     }
 }

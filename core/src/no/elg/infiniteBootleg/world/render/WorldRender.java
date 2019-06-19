@@ -12,9 +12,9 @@ import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_HEIGHT;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_WIDTH;
-import static no.elg.infiniteBootleg.world.World.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg
@@ -26,8 +26,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
     public static final int HOR_START = 2;
     public static final int HOR_END = 3;
 
-    public final static int CHUNK_TEXTURE_WIDTH = CHUNK_WIDTH * BLOCK_SIZE;
-    public final static int CHUNK_TEXTURE_HEIGHT = CHUNK_HEIGHT * BLOCK_SIZE;
+    public final static int CHUNK_TEXTURE_WIDTH = CHUNK_SIZE * BLOCK_SIZE;
+    public final static int CHUNK_TEXTURE_HEIGHT = CHUNK_SIZE * BLOCK_SIZE;
 
     private final World world;
     private EntityRenderer entityRenderer;

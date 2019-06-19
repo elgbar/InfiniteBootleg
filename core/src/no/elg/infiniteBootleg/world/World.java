@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,12 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Elg
  */
 public class World implements Disposable, Updatable {
-
-    public static final String CHUNK_FOLDER = "chunks";
-    public final static int BLOCK_SIZE = 16;
-    public static final int CHUNK_WIDTH_SHIFT = (int) (Math.log(Chunk.CHUNK_WIDTH) / Math.log(2));
-    public static final int CHUNK_HEIGHT_SHIFT = (int) (Math.log(Chunk.CHUNK_HEIGHT) / Math.log(2));
-    private static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
 
     private final long seed;
     private final Map<Location, Chunk> chunks;
@@ -78,7 +71,6 @@ public class World implements Disposable, Updatable {
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
         load();
-        entities.add(new Player(this, 0, 0));
     }
 
     @NotNull
@@ -118,8 +110,8 @@ public class World implements Disposable, Updatable {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
-        int localX = worldX - chunkX * Chunk.CHUNK_WIDTH;
-        int localY = worldY - chunkY * Chunk.CHUNK_HEIGHT;
+        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
         return getChunk(chunkX, chunkY).getBlock(localX, localY);
     }
@@ -188,8 +180,8 @@ public class World implements Disposable, Updatable {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
-        int localX = worldX - chunkX * Chunk.CHUNK_WIDTH;
-        int localY = worldY - chunkY * Chunk.CHUNK_HEIGHT;
+        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
         Chunk chunk = getChunk(chunkX, chunkY);
         chunk.setBlock(localX, localY, material, update);
@@ -397,7 +389,7 @@ public class World implements Disposable, Updatable {
             }
 
             //Unload chunks not seen for 5 seconds
-            if (tick - chunk.getLastViewedTick() > CHUNK_UNLOAD_TIME) {
+            if (tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
                 unload(chunk);
                 iterator.remove();
                 continue;
