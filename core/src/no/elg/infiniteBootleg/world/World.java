@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,6 +78,7 @@ public class World implements Disposable, Updatable {
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
         load();
+        entities.add(new Player(this, 0, 0));
     }
 
     @NotNull
