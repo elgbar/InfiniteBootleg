@@ -23,13 +23,16 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import java.io.File;
 
 import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Main extends ApplicationAdapter {
 
-    public static final String WORLD_FOLDER = "infiniteBootleg" + File.separatorChar + "worlds" + File.separatorChar;
+    public static final String EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar;
+    public static final String WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar;
     public static final String TEXTURES_FOLDER = "textures" + File.separatorChar;
     public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.pack";
     public static final String VERSION_FILE = "version";
+
     public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
 
     private static InputMultiplexer inputMultiplexer;
@@ -85,8 +88,8 @@ public class Main extends ApplicationAdapter {
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        int blockX = (int) Math.floor(unproject.x / Block.BLOCK_SIZE);
-        int blockY = (int) Math.floor(unproject.y / Block.BLOCK_SIZE);
+        int blockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
+        int blockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
         Block block = world.getBlock(blockX, blockY);
 
         int[] vChunks = world.getRender().getChunksInView();
@@ -105,7 +108,7 @@ public class Main extends ApplicationAdapter {
 
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
         if (tr != null) {
-            batch.draw(tr, Gdx.graphics.getWidth() - 48, h - 48, 32, 32);
+            batch.draw(tr, Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3, BLOCK_SIZE * 2, BLOCK_SIZE * 2);
         }
         batch.end();
         console.draw();
