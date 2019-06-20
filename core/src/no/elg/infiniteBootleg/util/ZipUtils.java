@@ -16,9 +16,13 @@ import java.util.zip.ZipOutputStream;
 public class ZipUtils {
 
     public static void zip(@NotNull FileHandle directory, @NotNull FileHandle zipFile) throws IOException {
+
         URI base = directory.file().toURI();
         Deque<FileHandle> queue = new LinkedList<>();
         queue.push(directory);
+        if (!zipFile.exists()) {
+            zipFile.parent().mkdirs();
+        }
         OutputStream out = new FileOutputStream(zipFile.file());
         Closeable res = out;
         try {
