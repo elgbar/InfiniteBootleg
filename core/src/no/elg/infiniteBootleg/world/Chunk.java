@@ -197,6 +197,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void updateTexture(boolean prioritize) {
         dirty = true;
+        modified = true;
         this.prioritize = prioritize;
     }
 
