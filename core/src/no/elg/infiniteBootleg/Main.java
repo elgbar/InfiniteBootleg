@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
 
 import java.io.File;
 
@@ -105,6 +106,12 @@ public class Main extends ApplicationAdapter {
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
                   h - 55);
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
+        Entity player = world.getEntities().iterator().next();
+
+        String pos = String
+            .format("p: (%.4f,%.4f) v: (%.4f,%.4f)", player.getPosition().x, player.getPosition().y, player.getVelocity().x,
+                    player.getVelocity().y);
+        font.draw(batch, "player " + pos, 10, h - 85);
 
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
         if (tr != null) {

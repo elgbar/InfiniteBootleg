@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +19,7 @@ public class FallingBlock extends Entity {
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
         region.flip(true, false);
+        setDrag(0);
     }
 
     @Override
@@ -28,15 +29,23 @@ public class FallingBlock extends Entity {
 
     @Nullable
     @Override
-    public Location collide(float dx, float dy) {
-        Location loc = super.collide(dx, dy);
-        if (loc != null) {
+    public Direction collide(float dx, float dy) {
+        Direction dir = super.collide(dx, dy);
+        if (dir != null) {
             Gdx.app.postRunnable(() -> {
-                getWorld().setBlock(loc.x, loc.y, material, true);
-                getWorld().getEntities().remove(this);
+                int newX = (int) getPosition().x;
+                int newY = (int) (getPosition().y + (Math.signum(getPosition().y) == -1 ? -1 : 0));
+
+                if (getWorld().isAir(newX, newY)) {
+                    getWorld().setBlock(newX, newY, material, true);
+                    getWorld().getEntities().remove(this);
+                }
+                else {
+                    getPosition().add(0, 1);
+                }
             });
         }
-        return loc;
+        return dir;
     }
 
     @Override

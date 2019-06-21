@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+
 /**
  * @author Elg
  */
@@ -186,6 +188,30 @@ public class World implements Disposable, Updatable {
         Chunk chunk = getChunk(chunkX, chunkY);
         chunk.setBlock(localX, localY, material, update);
         return chunk;
+    }
+
+    /**
+     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt create
+     * and store a new air block at the given location
+     *
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     *
+     * @return If the block at the given location is air.
+     */
+    public boolean isAir(int worldX, int worldY) {
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+        Block b = getChunk(chunkX, chunkY).getBlocks()[localX][localY];
+        //noinspection ConstantConditions b *can* be null
+        return b == null || b.getMaterial() == Material.AIR;
     }
 
     /**
@@ -403,5 +429,30 @@ public class World implements Disposable, Updatable {
 
     public Set<Entity> getEntities() {
         return entities;
+    }
+
+    /**
+     * @param worldX
+     *     The x component of the world coordinate
+     * @param worldY
+     *     The y component of the world coordinate
+     * @param width
+     *     The absolute width (ie this will be divided by {@link Block#BLOCK_SIZE})
+     * @param height
+     *     The absolute height (ie this will be divided by {@link Block#BLOCK_SIZE})
+     *
+     * @return If anything at the given coordinate with the given width will collide with any blocks in this world
+     */
+    public boolean willCollide(float worldX, float worldY, float width, float height) {
+        int dx = (int) Math.floor(worldX), maxX = (int) Math.floor(worldX + width / BLOCK_SIZE);
+        int dy0 = (int) Math.floor(worldY), maxY = (int) Math.floor(worldY + height / BLOCK_SIZE);
+        for (; dx <= maxX; dx++) {
+            for (int dy = dy0; dy <= maxY; dy++) {
+                if (getBlock(dx, dy).getMaterial().isSolid()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
