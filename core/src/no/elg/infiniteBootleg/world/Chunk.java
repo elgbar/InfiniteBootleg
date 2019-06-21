@@ -84,7 +84,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 Block block = blocks[x][y];
-
                 if (block instanceof UpdatableBlock) {
                     updatableBlocks.add((UpdatableBlock) block);
                 }
@@ -201,6 +200,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         this.prioritize = prioritize;
     }
 
+    /**
+     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
+     *
+     * @return The texture of this chunk
+     */
     @Nullable
     public TextureRegion getTexture() {
         lastViewedTick = world.getTick();
@@ -234,12 +238,16 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         }
     }
 
-    @NotNull
+    /**
+     * @return The backing array of the chunk, might contain null elements
+     */
     public Block[][] getBlocks() {
         return blocks;
     }
 
     /**
+     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
+     *
      * @return If all blocks in this chunk is air
      */
     public boolean isAllAir() {
@@ -254,6 +262,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
+     * Mark this chunk as unloaded, it will no longer be able to be updated
+     *
      * @return If the chunk was unloaded
      */
     public boolean unload() {
