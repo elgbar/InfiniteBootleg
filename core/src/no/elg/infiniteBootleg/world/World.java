@@ -69,7 +69,6 @@ public class World implements Disposable, Updatable {
 
             Player p = new Player(this);
             entities.add(p);
-
         }
         else {
             render = new HeadlessWorldRenderer(this);
@@ -396,7 +395,7 @@ public class World implements Disposable, Updatable {
         FileHandle worldFolder = worldFolder();
         if (worldFolder == null) { return; }
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        System.out.println("worldZip = " + worldZip.file().getAbsolutePath());
+        Main.inst.getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
         if (!worldZip.exists()) {
             System.out.println("No world save found");
             return;
