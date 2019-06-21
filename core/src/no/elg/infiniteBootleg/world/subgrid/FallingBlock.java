@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -28,15 +28,24 @@ public class FallingBlock extends Entity {
 
     @Nullable
     @Override
-    public Location collide(@NotNull Vector2 end) {
-        Location loc = super.collide(end);
+    public Location collide(float dx, float dy) {
+        Location loc = super.collide(dx, dy);
         if (loc != null) {
             Gdx.app.postRunnable(() -> {
                 getWorld().setBlock(loc.x, loc.y, material, true);
                 getWorld().getEntities().remove(this);
             });
-            return loc;
         }
-        return null;
+        return loc;
+    }
+
+    @Override
+    public float getWidth() {
+        return Block.BLOCK_SIZE - 1;
+    }
+
+    @Override
+    public float getHeight() {
+        return Block.BLOCK_SIZE - 1;
     }
 }
