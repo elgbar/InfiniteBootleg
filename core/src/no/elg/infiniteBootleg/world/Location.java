@@ -18,7 +18,7 @@ public class Location {
         this.y = y;
     }
 
-    public Location mult(int x, int y) {
+    public Location scl(int x, int y) {
         return new Location(this.x * x, this.y * y);
     }
 

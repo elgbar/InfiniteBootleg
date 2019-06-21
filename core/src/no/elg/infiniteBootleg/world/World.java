@@ -215,7 +215,6 @@ public class World implements Disposable, Updatable {
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
         Block b = getChunk(chunkX, chunkY).getBlocks()[localX][localY];
-        //noinspection ConstantConditions b *can* be null
         return b == null || b.getMaterial() == Material.AIR;
     }
 
