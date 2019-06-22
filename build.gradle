@@ -1,6 +1,15 @@
+import java.nio.charset.StandardCharsets
+
+static def getGitVersion() {
+    def file = new File("./core/assets/version")
+    if (!file.exists() || !file.canRead()) {
+        System.err.println("Failed to read version from file " + file.absolutePath)
+        return "UNKNOWN"
+    }
+    return file.readLines(StandardCharsets.UTF_8.toString())[0]
+}
+
 buildscript {
-
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -9,17 +18,13 @@ buildscript {
         jcenter()
         google()
     }
-    dependencies {
-
-
-    }
 }
 
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '1.0'
+    version = getGitVersion()
     ext {
         appName = "InfiniteBootleg"
         gdxVersion = '1.9.9'
@@ -42,15 +47,13 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java"
-
-
+    
     dependencies {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-
     }
 }
 
@@ -78,8 +81,4 @@ project(":core") {
         compile "org.powermock:powermock-api-mockito:1.6.4"
 
     }
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }
