@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg

@@ -21,4 +21,9 @@ public class HeadlessWorldRenderer extends WorldRender {
     public void update() {
 
     }
+
+    @Override
+    public void dispose() {
+
+    }
 }

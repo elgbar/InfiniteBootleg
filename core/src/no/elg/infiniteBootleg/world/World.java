@@ -351,8 +351,8 @@ public class World implements Disposable, Updatable {
     @Override
     public void dispose() {
         render.dispose();
-        input.dispose();
         ticker.stop();
+        if (input != null) { input.dispose(); }
     }
 
     /**
@@ -375,7 +375,6 @@ public class World implements Disposable, Updatable {
         FileHandle worldFolder = worldFolder();
         if (worldFolder == null) { return; }
         for (Chunk chunk : chunks.values()) {
-            //FIXME only save chunks that has been changed! (doesn't do it properly now)
             chunkLoader.save(chunk);
         }
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
@@ -397,7 +396,7 @@ public class World implements Disposable, Updatable {
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         Main.inst.getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
         if (!worldZip.exists()) {
-            System.out.println("No world save found");
+            Main.inst().getConsoleLogger().log("No world save found");
             return;
         }
 
