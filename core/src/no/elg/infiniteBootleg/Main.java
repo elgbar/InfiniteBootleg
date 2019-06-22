@@ -39,7 +39,21 @@ public class Main extends ApplicationAdapter {
     private static InputMultiplexer inputMultiplexer;
     private TextureAtlas textureAtlas;
 
+    /**
+     * If worlds should be loaded from disk
+     */
+    public static boolean loadWorldFromDisk = true;
+
+    /**
+     * If graphics should be rendered
+     */
     public static boolean renderGraphic = true;
+
+    /**
+     * Seed of the world loaded
+     */
+    public static int worldSeed = 5;
+
     private World world;
 
     private ConsoleHandler console;
@@ -47,25 +61,27 @@ public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private BitmapFont font;
     public static Main inst;
+    private String[] args;
 
     public Main(String[] args) {
-        executeArgs(args);
+        this.args = args;
     }
 
     @Override
     public void create() {
         inst = this;
 
-        batch = new SpriteBatch();
         inputMultiplexer = new InputMultiplexer();
         VisUI.load();
         console = new ConsoleHandler();
         Gdx.input.setInputProcessor(inputMultiplexer);
 
+        executeArgs(args);
+
+        batch = new SpriteBatch();
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
-        int worldSeed = 5;
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
         font = new BitmapFont(false);
 

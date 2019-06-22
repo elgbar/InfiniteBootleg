@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -14,6 +15,19 @@ public class ProgramArgsTest extends TestGraphic {
         Main.renderGraphic = true;
         ProgramArgs.executeArgs(new String[] {"-headless"});
         assertFalse(Main.renderGraphic);
+    }
+
+    @Test
+    public void noLoad() {
+        Main.loadWorldFromDisk = true;
+        ProgramArgs.executeArgs(new String[] {"-no_load"});
+        assertFalse(Main.loadWorldFromDisk);
+    }
+
+    @Test
+    public void worldSeed() {
+        ProgramArgs.executeArgs(new String[] {"-world_seed=test123"});
+        assertEquals("test123".hashCode(), Main.worldSeed);
     }
 
     @Test

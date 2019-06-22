@@ -13,6 +13,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class ProgramArgs {
 
+
     public static void executeArgs(String[] args) {
         Map<String, String> options = Util.interpreterArgs(args);
 
@@ -25,7 +26,9 @@ public class ProgramArgs {
                 else {
                     Main.inst().getConsoleLogger().logf(LogLevel.ERROR, "Unknown argument '%s'", entry.getKey());
                 }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignore) { }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -38,10 +41,41 @@ public class ProgramArgs {
      * - It must have String as its one and only argument
      * - The name of the method must be lowercase
      *
+     * - If any errors occur do NOT throw an exception, rather print out an error on std err
+     *
      */
 
 
+    /**
+     * Do not render the graphics
+     */
     private static void headless(String val) {
         Main.renderGraphic = false;
+        Main.inst().getConsoleLogger().log("Graphics are disabled");
+    }
+
+    /**
+     * Do not load the worlds from disk
+     */
+    private static void no_load(String val) {
+        Main.loadWorldFromDisk = false;
+        Main.inst().getConsoleLogger().log("Worlds will not be loaded/saved from disk");
+    }
+
+    /**
+     * Change the default world seed of the default world loaded
+     *
+     * @param val
+     *     The world seed
+     */
+    public static void world_seed(String val) {
+        if (val == null) {
+            Main.inst().getConsoleLogger()
+                .log(LogLevel.ERROR, "The seed must be provided when using world_Seed " + "argument.\nExample: -world_seed=test");
+
+            return;
+        }
+        Main.worldSeed = val.hashCode();
+        Main.inst().getConsoleLogger().logf("World seed set to '%s'", val);
     }
 }

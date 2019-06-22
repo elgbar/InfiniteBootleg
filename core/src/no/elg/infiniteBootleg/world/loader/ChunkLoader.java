@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.loader;
 
 import com.badlogic.gdx.files.FileHandle;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
@@ -27,6 +28,7 @@ public class ChunkLoader {
      * @return If a chunk at the given location exists
      */
     public boolean savedChunk(@NotNull Location chunkLoc) {
+        if (!Main.loadWorldFromDisk) { return false; }
         FileHandle chunkFile = Chunk.geChunkFile(world, chunkLoc);
         return chunkFile != null && chunkFile.exists();
     }

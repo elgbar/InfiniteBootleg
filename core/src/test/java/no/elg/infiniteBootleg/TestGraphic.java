@@ -18,6 +18,8 @@ public class TestGraphic {
     @BeforeClass
     public static void init() {
         Main.renderGraphic = false;
+        Main.loadWorldFromDisk = false; //ensure no loading from disk (to be able to duplicate tests)
+
         Gdx.gl20 = mock(GL20.class);
         Gdx.gl = Gdx.gl20;
 
