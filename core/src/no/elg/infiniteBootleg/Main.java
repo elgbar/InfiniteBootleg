@@ -52,7 +52,7 @@ public class Main extends ApplicationAdapter {
     /**
      * Seed of the world loaded
      */
-    public static int worldSeed = 5;
+    public static int worldSeed = 0;
 
     private World world;
 
@@ -89,16 +89,24 @@ public class Main extends ApplicationAdapter {
             world.getWorldTicker().stop();
             world.save();
         }));
+
+        if (!renderGraphic) {
+            console.setVisible(true);
+            console.setSizePercent(100, 100);
+        }
     }
 
     @Override
     public void render() {
-        if (!Main.renderGraphic) {
-            return;
-        }
-        int h = Gdx.graphics.getHeight();
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if (!renderGraphic) {
+            console.draw();
+            return;
+        }
+
+
+        int h = Gdx.graphics.getHeight();
 
         world.getInput().update();
         world.getRender().render();
