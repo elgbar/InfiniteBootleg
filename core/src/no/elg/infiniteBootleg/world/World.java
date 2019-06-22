@@ -372,6 +372,9 @@ public class World implements Disposable, Updatable {
     }
 
     public void save() {
+        if (!Main.loadWorldFromDisk) {
+            return;
+        }
         FileHandle worldFolder = worldFolder();
         if (worldFolder == null) { return; }
         for (Chunk chunk : chunks.values()) {
@@ -391,6 +394,9 @@ public class World implements Disposable, Updatable {
     }
 
     public void load() {
+        if (!Main.loadWorldFromDisk) {
+            return;
+        }
         FileHandle worldFolder = worldFolder();
         if (worldFolder == null) { return; }
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
