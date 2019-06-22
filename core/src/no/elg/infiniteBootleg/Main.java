@@ -133,7 +133,9 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        world.getInput().resize(width, height);
+        if (world.getInput() != null) {
+            world.getInput().resize(width, height);
+        }
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
         console.refresh();
     }

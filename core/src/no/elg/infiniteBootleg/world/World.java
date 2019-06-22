@@ -312,7 +312,7 @@ public class World implements Disposable, Updatable {
         return render;
     }
 
-    @NotNull
+    @Nullable
     public WorldInputHandler getInput() {
         return input;
     }
