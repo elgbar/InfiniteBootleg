@@ -24,6 +24,6 @@ public class Torch extends Block {
     public void dispose() {
         super.dispose();
         //FIXME use a cache for lights
-        light.dispose();
+        light.remove();
     }
 }
