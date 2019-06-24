@@ -71,10 +71,9 @@ public class WorldRender implements Updatable, Renderer, Disposable {
             RayHandler.setGammaCorrection(true);
             rayHandler = new RayHandler(box2dWorld);
             rayHandler.setBlur(false);
-            rayHandler.setCulling(false);
-//            rayHandler.setShadows(false);
 
             skylight = new DirectionalLight(rayHandler, 12800, new Color(0, 0, 0, 1), 270);
+            skylight.setSoft(false);
         }
         update();
     }
