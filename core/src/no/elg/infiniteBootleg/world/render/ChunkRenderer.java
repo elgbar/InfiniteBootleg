@@ -17,10 +17,8 @@ import java.util.LinkedList;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_HEIGHT;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDTH;
 
 /**
  * @author Elg
@@ -35,7 +33,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         this.worldRender = worldRender;
         batch = new SpriteBatch();
         renderQueue = SetUniqueList.setUniqueList(new LinkedList<>());
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_WIDTH, CHUNK_TEXTURE_HEIGHT));
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
     }
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
@@ -54,7 +52,7 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         chunk.allowChunkUnload(false);
 
-        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_WIDTH, CHUNK_TEXTURE_HEIGHT, false);
+        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, false);
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
@@ -67,7 +65,7 @@ public class ChunkRenderer implements Renderer, Disposable {
                 if (block == null || block.getMaterial() == AIR) {
                     continue;
                 }
-                Location blkLoc = block.getChunkLoc();
+                Location blkLoc = block.getLocalChunkLoc();
                 int dx = blkLoc.x * BLOCK_SIZE;
                 int dy = blkLoc.y * BLOCK_SIZE;
                 //noinspection ConstantConditions

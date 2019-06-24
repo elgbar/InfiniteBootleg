@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.blocks.SandBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
+import no.elg.infiniteBootleg.world.blocks.Torch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,8 @@ public enum Material {
     GRASS(0.8f),
     TNT(TntBlock.class, 0.5f),
     SAND(SandBlock.class, 1f),
+    TORCH(Torch.class, 0.1f),
+    GLASS(null, true, false, true, 0.1f),
     ;
 
     private final Class<? extends Block> impl;

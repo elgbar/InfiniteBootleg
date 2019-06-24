@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.render;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,10 +17,11 @@ public class EntityRenderer implements Renderer {
 
     @Override
     public void render() {
+        Batch batch = worldRender.getBatch();
         for (Entity entity : worldRender.getWorld().getEntities()) {
-//            System.out.println("Drawing entity at " + entity.getPosition().toString() + " velocity: " + entity.getVelocity());
-            worldRender.getBatch()
-                       .draw(entity.getTextureRegion(), entity.getPosition().x * BLOCK_SIZE, entity.getPosition().y * BLOCK_SIZE);
+            float x = entity.getPosition().x * BLOCK_SIZE - BLOCK_SIZE / 2f;
+            float y = entity.getPosition().y * BLOCK_SIZE - BLOCK_SIZE / 2f;
+            batch.draw(entity.getTextureRegion(), x, y);
         }
     }
 }

@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -63,6 +64,10 @@ public class Main extends ApplicationAdapter {
     public static Main inst;
     private String[] args;
 
+
+    private Location mouseBlockLoc;
+
+
     public Main(String[] args) {
         this.args = args;
     }
@@ -105,9 +110,7 @@ public class Main extends ApplicationAdapter {
             return;
         }
 
-
-        int h = Gdx.graphics.getHeight();
-
+        //noinspection ConstantConditions
         world.getInput().update();
         world.getRender().render();
 
@@ -115,12 +118,14 @@ public class Main extends ApplicationAdapter {
 
         int blockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
         int blockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
+        mouseBlockLoc = new Location(blockX, blockY);
         Block block = world.getBlock(blockX, blockY);
 
         int[] vChunks = world.getRender().getChunksInView();
 
         int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) *
                            Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
+        int h = Gdx.graphics.getHeight();
         batch.begin();
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
@@ -132,9 +137,7 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
         Entity player = world.getEntities().iterator().next();
 
-        String pos = String
-            .format("p: (%.4f,%.4f) v: (%.4f,%.4f)", player.getPosition().x, player.getPosition().y, player.getVelocity().x,
-                    player.getVelocity().y);
+        String pos = String.format("p: (%.4f,%.4f) v: (%.4f,%.4f)", player.getPosition().x, player.getPosition().y, 0f, 0f);
         font.draw(batch, "player " + pos, 10, h - 85);
 
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
@@ -176,8 +179,21 @@ public class Main extends ApplicationAdapter {
         return textureAtlas;
     }
 
+
+    public Location getMouseBlockPos() {
+        return mouseBlockLoc;
+    }
+
     public static Main inst() {
         if (inst == null) { throw new IllegalStateException("Main instance not created"); }
         return inst;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public ConsoleHandler getConsole() {
+        return console;
     }
 }

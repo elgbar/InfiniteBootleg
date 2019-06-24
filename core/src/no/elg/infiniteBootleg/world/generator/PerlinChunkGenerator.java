@@ -9,9 +9,10 @@ import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
+ * TODO RESEARCH BILINEAR INTERPOLATION
+ *
  * @author Elg
  */
 public class PerlinChunkGenerator implements ChunkGenerator {

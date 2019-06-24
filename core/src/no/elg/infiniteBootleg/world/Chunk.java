@@ -4,6 +4,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
@@ -20,6 +23,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Spliterator.*;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
 /**
@@ -30,6 +34,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     public static final int CHUNK_SIZE = 32;
+    public final static int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
     public static final int CHUNK_SIZE_SHIFT = (int) (Math.log(CHUNK_SIZE) / Math.log(2));
     public static final String CHUNK_FOLDER = "chunks";
     public static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
@@ -38,6 +43,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private final Location chunkPos;
     private final Block[][] blocks;
 
+    private final Set<Body> bodies;
     private final Set<UpdatableBlock> updatableBlocks;
 
     private boolean modified; //if the chunk has been modified since loaded
@@ -51,6 +57,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private FrameBuffer fbo;
     private TextureRegion fboRegion;
     private FileHandle chunkFile;
+    private Body box2dBody;
+    private boolean allBlockLight;
 
     /**
      * Create a new empty chunk
@@ -80,6 +88,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         this.blocks = blocks;
 
         updatableBlocks = new HashSet<>();
+        bodies = new HashSet<>();
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -104,13 +113,57 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * called.
      */
     public void updateTextureNow() {
+        dirty = false;
         //test if all the blocks in this chunk has the material air
-        allAir = stream().allMatch(block -> block == null || block.getMaterial() == AIR);
+        allAir = stream().allMatch(block -> block.getMaterial() == AIR);
+        allBlockLight = stream().allMatch(block -> block.getMaterial().blocksLight());
         if (Main.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
+
+            //recalculate the shape of the chunk (box2d)
+
+            if (getWorld() == null) {
+                return;
+            }
+            for (Body body : bodies) {
+                getWorld().getRender().getBox2dWorld().destroyBody(body);
+            }
+            bodies.clear();
+
+
+//            if (allBlockLight) {
+//                BodyDef groundBodyDef = new BodyDef();
+//                groundBodyDef.position.set(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
+//                Body box2dBody = getWorld().getRender().getBox2dWorld().createBody(groundBodyDef);
+//                PolygonShape groundBox = new PolygonShape();
+//                groundBox.setAsBox(CHUNK_SIZE, CHUNK_SIZE);
+//                box2dBody.createFixture(groundBox, 0.0f);
+//                groundBox.dispose();
+//                bodies.add(box2dBody);
+//            }
+//            else {
+            for (Block[] bs : blocks) {
+                for (Block b : bs) {
+                    if (b == null || !b.getMaterial().blocksLight()) {
+                        continue;
+                    }
+                    bodies.add(createBlockSquare(b.getLocalChunkLoc().x, b.getLocalChunkLoc().y));
+                }
+            }
+//            }
         }
-        dirty = false;
+    }
+
+    private Body createBlockSquare(int localX, int localY) {
+        BodyDef groundBodyDef = new BodyDef();
+        groundBodyDef.position.set(chunkPos.x * CHUNK_SIZE + localX, chunkPos.y * CHUNK_SIZE + localY);
+        Body body = getWorld().getRender().getBox2dWorld().createBody(groundBodyDef);
+        PolygonShape groundBox = new PolygonShape();
+        groundBox.setAsBox(0.5f, 0.5f);
+        body.createFixture(groundBox, 0.0f);
+        groundBox.dispose();
+        return body;
     }
 
     /**
@@ -416,7 +469,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     @Override
     public void assemble(@NotNull byte[] bytes) {
-        Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE, "Invalid number of bytes");
+        Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE,
+                                    "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + bytes.length);
         int index = 0;
         modified = true;
         for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -434,5 +488,4 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
         }
     }
-
 }

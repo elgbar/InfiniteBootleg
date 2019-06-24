@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 public enum EntityType {
 
     FALLING_BLOCK(FallingBlock.class),
-    ;
+    PLAYER(Player.class);
 
     private Class<? extends Entity> impl;
 

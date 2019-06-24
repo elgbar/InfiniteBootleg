@@ -8,6 +8,8 @@ import com.strongjoshua.console.LogLevel;
 public interface ConsoleLogger {
 
     /**
+     * Log a level with {@link LogLevel#DEFAULT} loglevel
+     *
      * @param msg
      *     The message to log
      * @param objs
@@ -30,6 +32,8 @@ public interface ConsoleLogger {
     void logf(LogLevel level, String msg, Object... objs);
 
     /**
+     * Log a level with {@link LogLevel#DEFAULT} loglevel
+     *
      * @param msg
      *     The message to log
      */

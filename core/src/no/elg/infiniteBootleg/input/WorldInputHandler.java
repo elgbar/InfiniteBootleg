@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
@@ -15,8 +16,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 
 import static com.badlogic.gdx.Input.Keys.*;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_HEIGHT;
-import static no.elg.infiniteBootleg.world.render.WorldRender.CHUNK_TEXTURE_WIDTH;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 
 /**
  * @author Elg
@@ -42,6 +42,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public boolean keyDown(int keycode) {
+        if (Main.inst().getConsole().isVisible()) {
+            return false;
+        }
         switch (keycode) {
             case NUM_1:
             case NUMPAD_1:
@@ -67,6 +70,22 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             case NUMPAD_6:
                 selected = Material.values()[6];
                 break;
+            case NUM_7:
+            case NUMPAD_7:
+                selected = Material.values()[7];
+                break;
+            case NUM_8:
+            case NUMPAD_8:
+                selected = Material.values()[8];
+                break;
+//            case NUM_9:
+//            case NUMPAD_9:
+//                selected = Material.values()[9];
+//                break;
+//            case NUM_0:
+//            case NUMPAD_0:0
+//                selected = Material.values()[0];
+//                break;
             default:
                 return false;
         }
@@ -75,6 +94,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public boolean scrolled(int amount) {
+        if (Main.inst().getConsole().isVisible()) {
+            return false;
+        }
         camera.zoom += amount * 0.05f * camera.zoom;
         if (camera.zoom < 0.25) {
             camera.zoom = 0.25f;
@@ -99,6 +121,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public void update() {
+        if (Main.inst().getConsole().isVisible()) {
+            return;
+        }
         final Vector3 unproject = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
         final int blockX = (int) Math.floor(unproject.x / Block.BLOCK_SIZE);
@@ -115,8 +140,8 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         int SVertical = Gdx.input.isKeyPressed(S) ? -1 : 0;
         int AHorizontal = Gdx.input.isKeyPressed(A) ? 1 : 0;
         int DHorizontal = Gdx.input.isKeyPressed(D) ? -1 : 0;
-        camera.position.x -= Gdx.graphics.getDeltaTime() * (AHorizontal + DHorizontal) * CHUNK_TEXTURE_WIDTH * camera.zoom;
-        camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * CHUNK_TEXTURE_HEIGHT * camera.zoom;
+        camera.position.x -= Gdx.graphics.getDeltaTime() * (AHorizontal + DHorizontal) * CHUNK_TEXTURE_SIZE * camera.zoom;
+        camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * Chunk.CHUNK_TEXTURE_SIZE * camera.zoom;
 
         worldRender.update();
     }

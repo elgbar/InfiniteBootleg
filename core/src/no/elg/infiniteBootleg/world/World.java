@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
@@ -56,11 +57,12 @@ public class World implements Disposable, Updatable {
 
     public World(@NotNull ChunkGenerator generator, long seed) {
         this.seed = seed;
-        Random random = new Random(seed);
+        MathUtils.random.setSeed(seed);
         chunks = new ConcurrentHashMap<>();
         entities = ConcurrentHashMap.newKeySet();
+
         byte[] UUIDSeed = new byte[128];
-        random.nextBytes(UUIDSeed);
+        MathUtils.random.nextBytes(UUIDSeed);
         uuid = UUID.nameUUIDFromBytes(UUIDSeed);
 
         if (Main.renderGraphic) {

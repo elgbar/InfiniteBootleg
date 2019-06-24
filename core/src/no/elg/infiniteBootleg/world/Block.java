@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.util.Binembly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +14,7 @@ import java.util.Objects;
  *
  * @author Elg
  */
-public class Block implements Binembly {
+public class Block implements Binembly, Disposable {
 
     public final static int BLOCK_SIZE = 16;
 
@@ -21,7 +22,7 @@ public class Block implements Binembly {
     private World world;
     private Chunk chunk;
     private Location worldLoc;
-    private Location chunkLoc;
+    private Location localChunkLoc;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         Location worldChunkLoc = chunk.getWorldLoc();
@@ -29,7 +30,7 @@ public class Block implements Binembly {
         int worldY = worldChunkLoc.y + localY;
 
         worldLoc = new Location(worldX, worldY);
-        chunkLoc = new Location(localX, localY);
+        localChunkLoc = new Location(localX, localY);
 
         this.material = material;
         this.world = world;
@@ -65,8 +66,8 @@ public class Block implements Binembly {
         return worldLoc;
     }
 
-    public Location getChunkLoc() {
-        return chunkLoc;
+    public Location getLocalChunkLoc() {
+        return localChunkLoc;
     }
 
     /**
@@ -110,5 +111,10 @@ public class Block implements Binembly {
     @Override
     public void assemble(@NotNull byte[] bytes) {
         throw new UnsupportedOperationException("Cannot assemble blocks directly. Blocks must be assembled by a chunk");
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

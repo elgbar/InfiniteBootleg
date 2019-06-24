@@ -17,8 +17,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class WorldTicker {
 
-    public static final long TICKS_PER_SECOND = 30L;
+    public static final long TICKS_PER_SECOND = 60L;
     public static final long MS_DELAY_BETWEEN_TICKS = 1000L / TICKS_PER_SECOND;
+    public static final float SECONDS_DELAY_BETWEEN_TICKS = 1f / TICKS_PER_SECOND;
 
     private long tickId;
     private long frameId;

@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.console;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -28,9 +27,8 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
             e.printStackTrace();
         }
 
-        setCommandExecutor(new Commands());
-
-        Gdx.app.postRunnable(() -> log(LogLevel.SUCCESS, "IB Version #" + Util.getVersion()));
+        setCommandExecutor(new Commands(this));
+        log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
     }
 
     public void setAlpha(float a) {
@@ -53,10 +51,8 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
         log(level, String.format(msg, objs));
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.strongjoshua.console.Console#log(java.lang.String, com.strongjoshua.console.GUIConsole.LogLevel)
+    /**
+     * @see com.strongjoshua.console.Console#log(String, LogLevel)
      */
     @Override
     public void log(LogLevel level, String msg) {
@@ -67,6 +63,7 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
                               ex.getClass().getSimpleName(), ex.getMessage());
         }
     }
+
 
     @Override
     public void log(String msg) {
