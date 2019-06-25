@@ -31,7 +31,7 @@ public class Player extends LivingEntity {
     public void update() {
         if (Gdx.input.isKeyPressed(Input.Keys.T)) {
             //teleport the player to the (last) location of the mouse
-            getBody().setTransform(Main.inst().getMouseBlockPos().x, Main.inst().getMouseBlockPos().y, 0);
+            getBody().setTransform(Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(), 0);
             getBody().setAngularVelocity(0);
             getBody().setLinearVelocity(0, 0);
         }

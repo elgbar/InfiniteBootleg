@@ -4,10 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -124,10 +122,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         if (Main.inst().getConsole().isVisible()) {
             return;
         }
-        final Vector3 unproject = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        final int blockX = (int) Math.floor(unproject.x / Block.BLOCK_SIZE);
-        final int blockY = (int) Math.floor(unproject.y / Block.BLOCK_SIZE);
+        final int blockX = Main.inst().getMouseBlockX();
+        final int blockY = Main.inst().getMouseBlockY();
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             getWorld().setBlock(blockX, blockY, null);

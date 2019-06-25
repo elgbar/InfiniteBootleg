@@ -16,7 +16,6 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -65,7 +64,8 @@ public class Main extends ApplicationAdapter {
     private String[] args;
 
 
-    private Location mouseBlockLoc;
+    private int mouseBlockX;
+    private int mouseBlockY;
 
 
     public Main(String[] args) {
@@ -116,10 +116,9 @@ public class Main extends ApplicationAdapter {
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        int blockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
-        int blockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
-        mouseBlockLoc = new Location(blockX, blockY);
-        Block block = world.getBlock(blockX, blockY);
+        mouseBlockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
+        mouseBlockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
+        Block block = world.getBlock(mouseBlockX, mouseBlockY);
 
         int[] vChunks = world.getRender().getChunksInView();
 
@@ -129,8 +128,8 @@ public class Main extends ApplicationAdapter {
         batch.begin();
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
-        font.draw(batch, "Pointing at " + block.getMaterial() + " (" + blockX + ", " + blockY + ") in chunk " +
-                         world.getChunkFromWorld(blockX, blockY).getLocation(), 10, h - 40);
+        font.draw(batch, "Pointing at " + block.getMaterial() + " (" + mouseBlockX + ", " + mouseBlockY + ") in chunk " +
+                         world.getChunkFromWorld(mouseBlockX, mouseBlockY).getLocation(), 10, h - 40);
         font.draw(batch,
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
                   h - 55);
@@ -179,9 +178,12 @@ public class Main extends ApplicationAdapter {
         return textureAtlas;
     }
 
+    public int getMouseBlockX() {
+        return mouseBlockX;
+    }
 
-    public Location getMouseBlockPos() {
-        return mouseBlockLoc;
+    public int getMouseBlockY() {
+        return mouseBlockY;
     }
 
     public static Main inst() {
