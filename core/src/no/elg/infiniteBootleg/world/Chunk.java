@@ -132,6 +132,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             BodyDef bodyDef = new BodyDef();
             bodyDef.position.set(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
             box2dBody = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
+            box2dBody.setAwake(false);
 
             EdgeShape edgeShape = new EdgeShape();
 
@@ -330,6 +331,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if (!canUnload || !loaded) { return false;}
         loaded = false;
         canUnload = false;
+        if (getWorld() != null && box2dBody != null) {
+            getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
+        }
+
+        for (Block[] blocks : blocks) {
+            for (Block block : blocks) {
+                if (block != null) {
+                    block.dispose();
+                }
+            }
+        }
+
+
         return true;
     }
 
