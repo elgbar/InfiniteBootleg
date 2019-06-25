@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
@@ -43,7 +43,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private final Location chunkPos;
     private final Block[][] blocks;
 
-    private final Set<Body> bodies;
     private final Set<UpdatableBlock> updatableBlocks;
 
     private boolean modified; //if the chunk has been modified since loaded
@@ -88,7 +87,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         this.blocks = blocks;
 
         updatableBlocks = new HashSet<>();
-        bodies = new HashSet<>();
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -123,47 +121,50 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
             //recalculate the shape of the chunk (box2d)
 
-            if (getWorld() == null) {
+            if (getWorld() == null || allAir) {
                 return;
             }
-            for (Body body : bodies) {
-                getWorld().getRender().getBox2dWorld().destroyBody(body);
+
+            if (box2dBody != null) {
+                getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
             }
-            bodies.clear();
 
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.position.set(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
+            box2dBody = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
 
-//            if (allBlockLight) {
-//                BodyDef groundBodyDef = new BodyDef();
-//                groundBodyDef.position.set(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
-//                Body box2dBody = getWorld().getRender().getBox2dWorld().createBody(groundBodyDef);
-//                PolygonShape groundBox = new PolygonShape();
-//                groundBox.setAsBox(CHUNK_SIZE, CHUNK_SIZE);
-//                box2dBody.createFixture(groundBox, 0.0f);
-//                groundBox.dispose();
-//                bodies.add(box2dBody);
-//            }
-//            else {
-            for (Block[] bs : blocks) {
-                for (Block b : bs) {
+            EdgeShape edgeShape = new EdgeShape();
+
+            for (int x = 0; x < CHUNK_SIZE; x++) {
+                for (int y = 0; y < CHUNK_SIZE; y++) {
+                    Block b = blocks[x][y];
                     if (b == null || !b.getMaterial().blocksLight()) {
                         continue;
                     }
-                    bodies.add(createBlockSquare(b.getLocalChunkLoc().x, b.getLocalChunkLoc().y));
+
+                    int worldX = b.getLocalChunkLoc().x;
+                    int worldY = b.getLocalChunkLoc().y;
+
+                    if (!b.getRelative(Direction.NORTH).getMaterial().blocksLight()) {
+                        edgeShape.set(worldX, worldY + 1, worldX + 1, worldY + 1);
+                        box2dBody.createFixture(edgeShape, 0);
+                    }
+                    if (!b.getRelative(Direction.EAST).getMaterial().blocksLight()) {
+                        edgeShape.set(worldX + 1, worldY, worldX + 1, worldY + 1);
+                        box2dBody.createFixture(edgeShape, 0);
+                    }
+                    if (!b.getRelative(Direction.SOUTH).getMaterial().blocksLight()) {
+                        edgeShape.set(worldX, worldY, worldX + 1, worldY);
+                        box2dBody.createFixture(edgeShape, 0);
+                    }
+                    if (!b.getRelative(Direction.WEST).getMaterial().blocksLight()) {
+                        edgeShape.set(worldX, worldY, worldX, worldY + 1);
+                        box2dBody.createFixture(edgeShape, 0);
+                    }
                 }
             }
-//            }
+            edgeShape.dispose();
         }
-    }
-
-    private Body createBlockSquare(int localX, int localY) {
-        BodyDef groundBodyDef = new BodyDef();
-        groundBodyDef.position.set(chunkPos.x * CHUNK_SIZE + localX, chunkPos.y * CHUNK_SIZE + localY);
-        Body body = getWorld().getRender().getBox2dWorld().createBody(groundBodyDef);
-        PolygonShape groundBox = new PolygonShape();
-        groundBox.setAsBox(0.5f, 0.5f);
-        body.createFixture(groundBox, 0.0f);
-        groundBox.dispose();
-        return body;
     }
 
     /**
@@ -213,7 +214,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
             return;
         }
-        else if (material == null) {
+
+        if (currBlock != null) {
+            currBlock.dispose();
+        }
+
+        if (material == null) {
             blocks[localX][localY] = null;
             if (currBlock instanceof UpdatableBlock) {
                 updatableBlocks.remove(currBlock);

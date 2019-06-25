@@ -141,8 +141,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
                     continue;
                 }
 
-                float dx = chunk.getLocation().x * CHUNK_TEXTURE_SIZE - BLOCK_SIZE / 2f;
-                float dy = chunk.getLocation().y * CHUNK_TEXTURE_SIZE - BLOCK_SIZE / 2f;
+                float dx = chunk.getLocation().x * CHUNK_TEXTURE_SIZE;
+                float dy = chunk.getLocation().y * CHUNK_TEXTURE_SIZE;
 
                 batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
             }
