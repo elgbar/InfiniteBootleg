@@ -5,6 +5,7 @@ import box2dLight.RayHandler;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.Chunk;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,4 +37,12 @@ public class Commands extends CommandExecutor {
         logger.log("Shadows are now " + status);
     }
 
+    public void reloadTextures() {
+        for (Chunk chunk : Main.inst().getWorld().getLoadedChunks()) {
+            chunk.updateTextureNow();
+        }
+
+    }
+
 }
+

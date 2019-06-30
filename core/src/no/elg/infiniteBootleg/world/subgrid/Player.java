@@ -36,18 +36,18 @@ public class Player extends LivingEntity {
             getBody().setLinearVelocity(0, 0);
         }
         else {
-//            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-//                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
-//            }
-//            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-//                getVelocity().add(0, -getAcceleration());
-//            }
-//            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-//                getVelocity().add(-getAcceleration(), 0);
-//            }
-//            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-//                getVelocity().add(getAcceleration(), 0);
-//            }
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+            }
         }
     }
 

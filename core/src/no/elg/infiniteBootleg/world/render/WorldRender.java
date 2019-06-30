@@ -13,14 +13,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
-import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.WorldTicker;
+import no.elg.infiniteBootleg.world.*;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
 import org.jetbrains.annotations.NotNull;
 
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 
 /**
@@ -63,7 +59,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
             batch = new SpriteBatch();
             batch.setProjectionMatrix(camera.combined);
 
-            box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, 0), true);
+            box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
 
             debugRenderer = new Box2DDebugRenderer();
 
@@ -98,9 +94,9 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
         box2dWorld.step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
 
-        Matrix4 m4 = camera.combined.cpy().scl(BLOCK_SIZE);
-        rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
-        rayHandler.update();
+//        Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
+//        rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
+//        rayHandler.update();
     }
 
     @Override
@@ -124,6 +120,11 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         final int rowEnd = chunksInView[VERT_END];
         final int rowStart = chunksInView[VERT_START];
 
+//        System.out.println("rowStart = " + rowStart);
+//        System.out.println("rowEnd = " + rowEnd);
+//        System.out.println("colStart = " + colStart);
+//        System.out.println("colEnd = " + colEnd);
+
         //set to 1 to debug what chunks are rendered
         final int debug = 0;
 
@@ -134,10 +135,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
                 if (chunk.isAllAir()) {
                     continue;
                 }
-                TextureRegion textureRegion = chunk.getTexture(); //get texture here to update last viewed in chunk
+                TextureRegion textureRegion = chunk.getTextureRegion(); //get texture here to update last viewed in chunk
                 if (textureRegion == null) {
-                    //if it somehow failed to render the first time, make sure it is up to date now
-                    chunkRenderer.queueRendering(chunk, false);
                     continue;
                 }
 
@@ -149,13 +148,13 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         }
         entityRenderer.render();
         batch.end();
-        rayHandler.render();
+//        rayHandler.render();
 
-        Matrix4 m4 = camera.combined.cpy().scl(BLOCK_SIZE);
+        Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
         debugRenderer.render(box2dWorld, m4);
     }
 
-    public boolean inInView(@NotNull Chunk chunk) {
+    public boolean isInView(@NotNull Chunk chunk) {
         Location pos = chunk.getLocation();
         return pos.x >= chunksInView[HOR_START] && pos.x < chunksInView[HOR_END] && pos.y >= chunksInView[VERT_START] &&
                pos.y < chunksInView[VERT_END];

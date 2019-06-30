@@ -69,8 +69,7 @@ public class World implements Disposable, Updatable {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
 
-            Player p = new Player(this);
-            entities.add(p);
+            new Player(this);
         }
         else {
             render = new HeadlessWorldRenderer(this);
@@ -93,6 +92,7 @@ public class World implements Disposable, Updatable {
             chunk = chunkLoader.load(chunkLoc);
             chunks.put(chunkLoc, chunk);
         }
+//        System.out.println("chunk.isLoaded() = " + chunk.isLoaded());
         return chunk;
     }
 
@@ -113,6 +113,7 @@ public class World implements Disposable, Updatable {
      *
      * @see Chunk#getBlock(int, int)
      */
+    @NotNull
     public Block getBlock(int worldX, int worldY) {
 
         int chunkX = CoordUtil.worldToChunk(worldX);
@@ -122,6 +123,25 @@ public class World implements Disposable, Updatable {
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
         return getChunk(chunkX, chunkY).getBlock(localX, localY);
+    }
+
+    /**
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     *
+     * @return The block at the given location, Air can either be null or a block with material {@link Material#AIR}
+     */
+    @Nullable
+    public Block getRawBlock(int worldX, int worldY) {
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+        return getChunk(chunkX, chunkY).getBlocks()[localX][localY];
     }
 
     /**
@@ -225,19 +245,19 @@ public class World implements Disposable, Updatable {
      * @param worldLoc
      *     The coordinates to updates around (but not included)
      */
-    public void updateAround(@NotNull Location worldLoc) {
-        updateAround(worldLoc.x, worldLoc.y);
+    public void updateBlocksAround(@NotNull Location worldLoc) {
+        updateBlocksAround(worldLoc.x, worldLoc.y);
     }
 
     /**
-     * Set all blocks around a given block to be updated
+     * Set all blocks around a given block to be updated. Given location not included
      *
      * @param worldX
      *     The x coordinate from world view
      * @param worldY
      *     The y coordinate from world view
      */
-    public void updateAround(int worldX, int worldY) {
+    public void updateBlocksAround(int worldX, int worldY) {
         Block center = getBlock(worldX, worldY);
         for (Direction dir : Direction.values()) {
             Block rel = center.getRelative(dir);
@@ -248,12 +268,17 @@ public class World implements Disposable, Updatable {
     }
 
     /**
+     * @return If the given chunk is loaded in memory
+     */
+    public boolean isChunkLoaded(int chunkX, int chunkY) {return isChunkLoaded(new Location(chunkX, chunkY));}
+
+    /**
      * @param chunkLoc
      *     Chunk location in chunk coordinates
      *
      * @return If the given chunk is loaded in memory
      */
-    public boolean isLoadedAt(@NotNull Location chunkLoc) {
+    public boolean isChunkLoaded(@NotNull Location chunkLoc) {
         return chunks.containsKey(chunkLoc);
     }
 
@@ -264,7 +289,7 @@ public class World implements Disposable, Updatable {
      * @return If the chunk was unloaded
      */
     public boolean unload(@Nullable Chunk chunk) {
-        if (chunk == null || !chunk.isLoaded() || !isLoadedAt(chunk.getLocation())) {
+        if (chunk == null || !chunk.isLoaded() || !isChunkLoaded(chunk.getLocation())) {
             return false;
         }
         chunk.dispose();
@@ -420,12 +445,23 @@ public class World implements Disposable, Updatable {
 
             //clean up dead chunks
             if (!chunk.isLoaded()) {
+                Main.inst().getConsoleLogger().log("Chunk unloaded, but not removed from chunks");
                 iterator.remove();
                 continue;
             }
 
+
+//            System.out.println("chunks.size() = " + chunks.size());
+
+//            System.out.println("delta last view @ " + chunk.getLocation() + " (all air? " + chunk.isAllAir() + "): " +
+//                               (tick - chunk.getLastViewedTick()));
+
+//            System.out.println("chunk.isAllAir() (" + chunk.getLocation() + ") = " + chunk.isAllAir());
+
             //Unload chunks not seen for 5 seconds
-            if (tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
+            if (chunk.allowUnload() && !getRender().isInView(chunk) &&
+                tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
+                System.out.println("unloaded chunk " + chunk.getLocation());
                 unload(chunk);
                 iterator.remove();
                 continue;
@@ -437,8 +473,36 @@ public class World implements Disposable, Updatable {
         }
     }
 
+    /**
+     * @return unmodifiable view of the current entities
+     */
     public Set<Entity> getEntities() {
-        return entities;
+        return Collections.unmodifiableSet(entities);
+    }
+
+    /**
+     * Add the given entity to entities in the world.
+     * <b>NOTE</b> this is automatically done when creating a new entity instance. Do not use this method
+     *
+     * @param entity
+     *     The entity to add
+     */
+    public void addEntity(@NotNull Entity entity) {
+        entities.add(entity);
+    }
+
+    /**
+     * Remove and disposes the given entity
+     *
+     * @param entity
+     */
+    public void removeEntity(@NotNull Entity entity) {
+        entities.remove(entity);
+        entity.dispose();
+    }
+
+    public Collection<Chunk> getLoadedChunks() {
+        return chunks.values();
     }
 
     /**

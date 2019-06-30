@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Disposable;
+import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
@@ -14,35 +17,33 @@ import java.util.UUID;
 /**
  * An entity that can move between the main world grid. The position of each entity is recorded in world coordinates.
  */
-public abstract class Entity implements Updatable {
+public abstract class Entity implements Updatable, Disposable {
 
-    private final Body body;
+    private Body body;
     private final World world;
 
     private boolean flying;
 
     private UUID uuid;
 
-
-    public Entity(@NotNull World world, float x, float y) {
-        this(world, new Vector2(x, y));
-    }
-
-    private Entity(@NotNull World world, @NotNull Vector2 position) {
+    public Entity(@NotNull World world, float worldX, float worldY) {
         uuid = UUID.randomUUID();
-        world.getEntities().add(this);
         this.world = world;
         flying = false;
 
+        world.addEntity(this);
+
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(position.x, position.y);
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(worldX, worldY);
         body = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
         body.setFixedRotation(true);
 
         PolygonShape box = new PolygonShape();
-        box.setAsBox(0.5f, 0.5f);
+        box.setAsBox(getBox2dWidth() / 2, getBox2dHeight() / 2);
         body.createFixture(box, 1.0f);
         box.dispose();
+
     }
 
     @Override
@@ -56,17 +57,37 @@ public abstract class Entity implements Updatable {
     public abstract TextureRegion getTextureRegion();
 
     /**
-     * @return The width of this entity
+     * One unit is {@link Block#BLOCK_SIZE}
+     *
+     * @return The width of this entity in blockss
      */
     public abstract float getWidth();
 
+    public float getBox2dWidth() {
+        return getWidth() / Block.BLOCK_SIZE;
+    }
+
     /**
-     * @return The height of this entity
+     * One unit is {@link Block#BLOCK_SIZE}
+     *
+     * @return The height of this entity in blocks
      */
     public abstract float getHeight();
 
+    public float getBox2dHeight() {
+        return getHeight() / Block.BLOCK_SIZE;
+    }
+
     public Vector2 getPosition() {
         return body.getPosition();
+    }
+
+    /**
+     * @return The current block position of this entity
+     */
+    public Location getBlockPosition() {
+        Vector2 pos = getPosition();
+        return new Location((int) Math.floor(pos.x), (int) Math.floor(pos.y));
     }
 
     public Body getBody() {
@@ -87,6 +108,11 @@ public abstract class Entity implements Updatable {
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    @Override
+    public void dispose() {
+        getWorld().getRender().getBox2dWorld().destroyBody(body);
     }
 
     @Override

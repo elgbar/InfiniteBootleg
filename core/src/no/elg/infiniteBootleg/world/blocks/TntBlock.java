@@ -16,6 +16,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static no.elg.infiniteBootleg.world.Material.AIR;
+
 /**
  * @author Elg
  */
@@ -65,10 +67,10 @@ public class TntBlock extends UpdatableBlock {
                 Location loc = getWorldLoc();
                 for (int x = (int) (loc.x - strength); x < loc.x + strength; x++) {
                     for (int y = (int) (loc.y - strength); y < loc.y + strength; y++) {
-                        Block b = getWorld().getBlock(x, y);
-                        Material mat = b.getMaterial();
+                        Block b = getWorld().getRawBlock(x, y);
+                        Material mat = b == null ? AIR : b.getMaterial();
                         float hardness = mat.getHardness();
-                        if (b.getMaterial() == Material.AIR || hardness <= 0) {
+                        if (mat == AIR || hardness <= 0) {
                             continue;
                         }
                         else if (b instanceof TntBlock && b != this) {
@@ -89,7 +91,7 @@ public class TntBlock extends UpdatableBlock {
                     for (Block block : destroyed) {
                         getWorld().setBlock(block.getWorldLoc(), null, false);
                         chunks.add(block.getChunk());
-                        getWorld().updateAround(block.getWorldLoc().x, block.getWorldLoc().y);
+                        getWorld().updateBlocksAround(block.getWorldLoc().x, block.getWorldLoc().y);
                     }
                     for (Chunk chunk : chunks) {
                         chunk.updateTexture(false);

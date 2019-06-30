@@ -34,6 +34,10 @@ public class Location {
         return new Vector2(x, y);
     }
 
+    public Location relative(@NotNull Direction dir) {
+        return new Location(x + dir.dx, y + dir.dy);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

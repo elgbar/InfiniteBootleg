@@ -49,7 +49,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private boolean dirty; //if texture/allair needs to be updated
     private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
-    private boolean canUnload;
+    private boolean allowUnload;
 
     private long lastViewedTick;
     private boolean allAir;
@@ -57,7 +57,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private TextureRegion fboRegion;
     private FileHandle chunkFile;
     private Body box2dBody;
-    private boolean allBlockLight;
 
     /**
      * Create a new empty chunk
@@ -99,6 +98,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
         allAir = true;
         loaded = true;
+        allowUnload = true;
 
         dirty = true;
         prioritize = false;
@@ -107,27 +107,28 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     /**
      * Force update of texture and recalculate internal variables
-     * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link #getTexture()}
+     * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link
+     * #getTextureRegion()}
      * called.
      */
     public void updateTextureNow() {
         dirty = false;
         //test if all the blocks in this chunk has the material air
         allAir = stream().allMatch(block -> block.getMaterial() == AIR);
-        allBlockLight = stream().allMatch(block -> block.getMaterial().blocksLight());
+//        allBlockLight = stream().allMatch(block -> block.getMaterial().blocksLight());
         if (Main.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
 
-            //recalculate the shape of the chunk (box2d)
-
-            if (getWorld() == null || allAir) {
-                return;
-            }
-
             if (box2dBody != null) {
                 getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
             }
+            if (allAir) {
+                return;
+            }
+
+            //recalculate the shape of the chunk (box2d)
+
 
             BodyDef bodyDef = new BodyDef();
             bodyDef.position.set(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
@@ -146,19 +147,24 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     int worldX = b.getLocalChunkLoc().x;
                     int worldY = b.getLocalChunkLoc().y;
 
-                    if (!b.getRelative(Direction.NORTH).getMaterial().blocksLight()) {
+                    Block bNorth = b.getRelative(Direction.NORTH, false);
+                    Block bEast = b.getRelative(Direction.EAST, false);
+                    Block bSouth = b.getRelative(Direction.SOUTH, false);
+                    Block bWest = b.getRelative(Direction.WEST, false);
+
+                    if (bNorth != null && !bNorth.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY + 1, worldX + 1, worldY + 1);
                         box2dBody.createFixture(edgeShape, 0);
                     }
-                    if (!b.getRelative(Direction.EAST).getMaterial().blocksLight()) {
+                    if (bEast != null && !bEast.getMaterial().blocksLight()) {
                         edgeShape.set(worldX + 1, worldY, worldX + 1, worldY + 1);
                         box2dBody.createFixture(edgeShape, 0);
                     }
-                    if (!b.getRelative(Direction.SOUTH).getMaterial().blocksLight()) {
+                    if (bSouth != null && !bSouth.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY, worldX + 1, worldY);
                         box2dBody.createFixture(edgeShape, 0);
                     }
-                    if (!b.getRelative(Direction.WEST).getMaterial().blocksLight()) {
+                    if (bWest != null && !bWest.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY, worldX, worldY + 1);
                         box2dBody.createFixture(edgeShape, 0);
                     }
@@ -244,7 +250,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             dirty = true;
             prioritize = true;
             if (getWorld() != null) {
-                getWorld().updateAround(getWorldLoc(localX, localY));
+                getWorld().updateBlocksAround(getWorldLoc(localX, localY));
             }
         }
     }
@@ -267,12 +273,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @return The texture of this chunk
      */
     @Nullable
-    public TextureRegion getTexture() {
+    public TextureRegion getTextureRegion() {
         lastViewedTick = world.getTick();
         if (dirty) {
             updateTextureNow();
         }
-        if (fbo == null) { return null; }
         return fboRegion;
     }
 
@@ -323,14 +328,16 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * Mark this chunk as unloaded, it will no longer be able to be updated
+     * Mark this chunk as unloaded, it will no longer be able to be updated.
+     * <p>
+     * <b>Note:</b> Internal use only, use {@link World#unload(Chunk)} to unload a chunk
      *
      * @return If the chunk was unloaded
      */
-    public boolean unload() {
-        if (!canUnload || !loaded) { return false;}
+    boolean unload() {
+        if (!allowUnload || !loaded) { return false;}
         loaded = false;
-        canUnload = false;
+        allowUnload = false;
         if (getWorld() != null && box2dBody != null) {
             getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
         }
@@ -347,14 +354,20 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         return true;
     }
 
-    public void allowChunkUnload(boolean canUnload) {
+    /**
+     * If {@code allowUnload} is {@code false} this chunk cannot be unloaded
+     *
+     * @param allowUnload
+     *     If the chunk can be unloaded or not
+     */
+    public void setAllowUnload(boolean allowUnload) {
         if (!loaded) {
             return; //already unloaded
         }
-        this.canUnload = canUnload;
+        this.allowUnload = allowUnload;
     }
 
-    @Nullable
+    @NotNull
     public World getWorld() {
         return world;
     }
@@ -383,7 +396,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @param localY
      *     The local chunk y coordinate
      *
-     * @return The world coordinate from the local position
+     * @return The world coordinate from the local position as offset
      */
     @NotNull
     public Location getWorldLoc(int localX, int localY) {
@@ -391,6 +404,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
+     * f
+     *
      * @return The last tick this chunk's texture was pulled
      */
     public long getLastViewedTick() {
@@ -507,5 +522,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 blocks[x][y] = block;
             }
         }
+    }
+
+    public boolean allowUnload() {
+        return allowUnload;
     }
 }

@@ -44,18 +44,19 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             double biomeWeight = calcHeightMap(chunkPos.x, x);
             Biome biome = getBiome(biomeWeight);
-            double y;
 
-            y = biome.heightAt(noise, chunkPos.x, x) * biomeWeight;
+            double y = biome.heightAt(noise, chunkPos.x, x) * biomeWeight;
+            int worldY = (int) Math.floor(y);
+            int chunkY = CoordUtil.worldToChunk(worldY);
 
-            int height = (int) y;
-            int elevationChunk = CoordUtil.worldToChunk(height);
-            if (chunkPos.y == elevationChunk) {
-                biome.fillUpTo(noise, chunk, x, (int) (y - elevationChunk * CHUNK_SIZE), height);
+            if (chunkPos.y == chunkY) {
+                biome.fillUpTo(noise, chunk, x, (int) (y - chunkY * CHUNK_SIZE), worldY);
+//                chunk.setAllowUnload(false);
             }
-            else if (chunkPos.y < elevationChunk) {
-                biome.fillUpTo(noise, chunk, x, CHUNK_SIZE, height);
+            else if (chunkPos.y < chunkY) {
+                biome.fillUpTo(noise, chunk, x, CHUNK_SIZE, worldY);
             }
+
         }
         chunk.updateTexture(false);
 //        });

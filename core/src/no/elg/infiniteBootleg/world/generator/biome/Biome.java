@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg
@@ -28,6 +27,7 @@ public enum Biome {
     public final Material filler;
     public final Material[] topSoil;
 
+    @SafeVarargs
     Biome(double y, double z, double exponent, double amplitude, double frequency, Material filler,
           Tuple<Material, Integer>... topSoil) {
         this.y = y;
@@ -66,8 +66,8 @@ public enum Biome {
         }
     }
 
-    public static double heightAt(PerlinNoise noise, int chunkX, int localX, double y, double z, double amplitude,
-                                  double frequency) {
+    private static double heightAt(PerlinNoise noise, int chunkX, int localX, double y, double z, double amplitude,
+                                   double frequency) {
         int lx = localX + CHUNK_SIZE * chunkX;
         return noise.octaveNoise(lx * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude;
 //        return ImprovedNoise.noise(localX + CHUNK_SIZE * chunkPos.x, y, z, amplitude, frequency);

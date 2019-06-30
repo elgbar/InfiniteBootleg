@@ -32,6 +32,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
         batch = new SpriteBatch();
+        //use linked list for fast adding to end and beginning
         renderQueue = SetUniqueList.setUniqueList(new LinkedList<>());
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
     }
@@ -48,11 +49,9 @@ public class ChunkRenderer implements Renderer, Disposable {
         do {
             if (renderQueue.isEmpty()) { return; } //nothing to render
             chunk = renderQueue.remove(0);
-        } while (chunk.isAllAir() || !worldRender.inInView(chunk) || !chunk.isLoaded());
+        } while (chunk.isAllAir() || !worldRender.isInView(chunk) || !chunk.isLoaded());
 
-        chunk.allowChunkUnload(false);
-
-        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, false);
+        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
@@ -76,7 +75,6 @@ public class ChunkRenderer implements Renderer, Disposable {
         fbo.end();
 
         chunk.setFbo(fbo);
-        chunk.allowChunkUnload(true);
     }
 
     @Override

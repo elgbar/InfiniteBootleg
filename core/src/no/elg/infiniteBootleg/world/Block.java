@@ -72,10 +72,31 @@ public class Block implements Binembly, Disposable {
 
     /**
      * @param dir
+     *     The relative direction
      *
      * @return The relative block in the given location
      */
+    @NotNull
     public Block getRelative(@NotNull Direction dir) {
+        //noinspection ConstantConditions method will never return null when loadchunk is true
+        return getRelative(dir, true);
+    }
+
+    /**
+     * <b>NOTE:</b> this method can only return {@code null} if {@code loadChunk} is {@code false}
+     *
+     * @param dir
+     *     The relative direction
+     * @param loadChunk
+     *     If the chunk should be loaded if isn't already
+     *
+     * @return The relative block in the given location
+     */
+    @Nullable
+    public Block getRelative(@NotNull Direction dir, boolean loadChunk) {
+        if (!loadChunk && !world.isChunkLoaded(getChunk().getLocation().relative(dir))) {
+            return null;
+        }
         return world.getBlock(worldLoc.x + dir.dx, worldLoc.y + dir.dy);
     }
 
