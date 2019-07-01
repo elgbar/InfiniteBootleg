@@ -27,7 +27,7 @@ public enum Material {
     GLASS(null, true, false, true, 0.1f),
     ;
 
-    private final Class<? extends Block> impl;
+    private final Constructor<? extends Block> constructor;
     private final boolean solid;
     private final boolean blocksLight;
     private final boolean placable;
@@ -55,7 +55,17 @@ public enum Material {
      *     How hard it is to remove this a block of this material
      */
     Material(@Nullable Class<? extends Block> impl, boolean solid, boolean blocksLight, boolean placable, float hardness) {
-        this.impl = impl;
+        if (impl != null) {
+            try {
+                constructor = impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() +
+                                                " with the arguments World, Chunk, int, int, Material");
+            }
+        }
+        else {
+            constructor = null;
+        }
         this.solid = solid;
         this.blocksLight = blocksLight;
         this.placable = placable;
@@ -83,15 +93,12 @@ public enum Material {
      */
     @NotNull
     public Block create(@NotNull World world, @NotNull Chunk chunk, int localX, int localY) {
-        if (impl == null) {
+        if (constructor == null) {
             return new Block(world, chunk, localX, localY, this);
         }
         try {
-            Constructor<? extends Block> constructor =
-                impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
             return constructor.newInstance(world, chunk, localX, localY, this);
-
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException(e);
         }
     }
