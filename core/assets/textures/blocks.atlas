@@ -1,60 +1,61 @@
 
 blocks.png
+size: 256,32
 format: RGBA4444
 filter: Nearest,Nearest
-repeat: none
+repeat: xy
 brick
   rotate: false
-  xy: 1, 1
+  xy: 2, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 dirt
   rotate: false
-  xy: 19, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-grass
-  rotate: false
-  xy: 37, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-stone
-  rotate: false
-  xy: 55, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tnt
-  rotate: false
-  xy: 73, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-sand
-  rotate: false
-  xy: 12, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-torch
-  rotate: false
-  xy: 26, 1
+  xy: 38, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass
   rotate: false
-  xy: 62, 1
+  xy: 128, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+grass
+  rotate: false
+  xy: 74, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+sand
+  rotate: false
+  xy: 20, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+stone
+  rotate: false
+  xy: 56, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+tnt
+  rotate: false
+  xy: 92, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+torch
+  rotate: false
+  xy: 110, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
