@@ -35,7 +35,7 @@ public abstract class Entity implements Updatable, Disposable {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(worldX, worldY);
+        bodyDef.position.set(worldX + getBox2dWidth() / 2, worldY);
         body = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
         body.setFixedRotation(true);
 
