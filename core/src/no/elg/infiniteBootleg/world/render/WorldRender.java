@@ -43,6 +43,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
     private DirectionalLight skylight;
 
+    public static boolean debugBox2d = true;
+
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
         chunksInView = new int[4];
@@ -152,9 +154,10 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         entityRenderer.render();
         batch.end();
         rayHandler.render();
-
-        Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
-        debugRenderer.render(box2dWorld, m4);
+        if (debugBox2d) {
+            Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
+            debugRenderer.render(box2dWorld, m4);
+        }
     }
 
     /**
