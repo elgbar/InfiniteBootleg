@@ -18,6 +18,8 @@ public class Torch extends Block {
         light =
             new PointLight(world.getRender().getRayHandler(), 32, new Color(0f, 0f, 0f, 1), 5, getWorldLoc().x, getWorldLoc().y);
         light.setStaticLight(true);
+        light.setSoft(false);
+//        light.setContactFilter(World.LIGHT_FILTER);
     }
 
     @Override

@@ -23,7 +23,7 @@ public enum Material {
     GRASS(0.8f),
     TNT(TntBlock.class, 0.5f),
     SAND(SandBlock.class, 1f),
-    TORCH(Torch.class, 0.1f),
+    TORCH(Torch.class, false, false, true, 0.1f),
     GLASS(null, true, false, true, 0.1f),
     ;
 
