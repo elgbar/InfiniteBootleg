@@ -155,19 +155,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
                     if (bNorth == null || !bNorth.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY + 1, worldX + 1, worldY + 1);
-                        box2dBody.createFixture(edgeShape, 0).setFilterData(World.GROUND_FILTER);
+                        box2dBody.createFixture(edgeShape, 0);
                     }
                     if (bEast == null || !bEast.getMaterial().blocksLight()) {
                         edgeShape.set(worldX + 1, worldY, worldX + 1, worldY + 1);
-                        box2dBody.createFixture(edgeShape, 0).setFilterData(World.GROUND_FILTER);
+                        box2dBody.createFixture(edgeShape, 0);
                     }
                     if (bSouth == null || !bSouth.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY, worldX + 1, worldY);
-                        box2dBody.createFixture(edgeShape, 0).setFilterData(World.GROUND_FILTER);
+                        box2dBody.createFixture(edgeShape, 0);
                     }
                     if (bWest == null || !bWest.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY, worldX, worldY + 1);
-                        box2dBody.createFixture(edgeShape, 0).setFilterData(World.GROUND_FILTER);
+                        box2dBody.createFixture(edgeShape, 0);
                     }
                 }
             }

@@ -32,21 +32,19 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
  */
 public class World implements Disposable, Updatable {
 
-    public static final short LIGHT_CATEGORY = 0b0010;
-    public static final short GROUND_CATEGORY = 0b0100;
-    public static final short ENTITY_CATEGORY = 0b1000;
+    public static final short GROUND_CATEGORY = 0b001;
+    public static final short LIGHT_CATEGORY = 0b010;
+    public static final short ENTITY_CATEGORY = 0b100;
 
-    public static final Filter ENTITY_FILTER = new Filter();
-    public static final Filter GROUND_FILTER = new Filter();
-    public static final Filter LIGHT_FILTER = new Filter();
+    public static final Filter ENTITY_FILTER;
+    public static final Filter LIGHT_FILTER;
 
     static {
-        GROUND_FILTER.categoryBits = GROUND_CATEGORY;
-        GROUND_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHT_CATEGORY;
-
+        ENTITY_FILTER = new Filter();
         ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
         ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
+        LIGHT_FILTER = new Filter();
         LIGHT_FILTER.categoryBits = LIGHT_CATEGORY;
         LIGHT_FILTER.maskBits = GROUND_CATEGORY;
     }
