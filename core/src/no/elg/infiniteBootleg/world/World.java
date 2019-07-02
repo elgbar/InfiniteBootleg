@@ -451,6 +451,9 @@ public class World implements Disposable, Updatable {
 
     @Override
     public void update() {
+
+        getRender().updatePhysics();
+
         long tick = getWorldTicker().getTickId();
         for (Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
             Chunk chunk = iterator.next();

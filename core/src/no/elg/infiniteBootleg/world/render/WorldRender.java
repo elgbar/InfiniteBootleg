@@ -75,6 +75,11 @@ public class WorldRender implements Updatable, Renderer, Disposable {
     }
 
 
+    public void updatePhysics() {
+        getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
+        rayHandler.update();
+    }
+
     @Override
     public void update() {
         camera.update();
@@ -92,11 +97,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
         chunksInView[VERT_END] = (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE);
 
-        box2dWorld.step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
-
-//        Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
-//        rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
-//        rayHandler.update();
+        Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
+        rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
     }
 
     @Override
@@ -148,7 +150,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         }
         entityRenderer.render();
         batch.end();
-//        rayHandler.render();
+        rayHandler.render();
 
         Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
         debugRenderer.render(box2dWorld, m4);
