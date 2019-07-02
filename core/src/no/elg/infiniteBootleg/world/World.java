@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Disposable;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
@@ -30,6 +31,25 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
  * @author Elg
  */
 public class World implements Disposable, Updatable {
+
+    public static final short LIGHT_CATEGORY = 0b0010;
+    public static final short GROUND_CATEGORY = 0b0100;
+    public static final short ENTITY_CATEGORY = 0b1000;
+
+    public static final Filter ENTITY_FILTER = new Filter();
+    public static final Filter GROUND_FILTER = new Filter();
+    public static final Filter LIGHT_FILTER = new Filter();
+
+    static {
+        GROUND_FILTER.categoryBits = GROUND_CATEGORY;
+        GROUND_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHT_CATEGORY;
+
+        ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
+        ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+
+        LIGHT_FILTER.categoryBits = LIGHT_CATEGORY;
+        LIGHT_FILTER.maskBits = GROUND_CATEGORY;
+    }
 
     private final long seed;
     private final Map<Location, Chunk> chunks;

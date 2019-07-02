@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.world.Block;
@@ -19,11 +20,10 @@ import java.util.UUID;
  */
 public abstract class Entity implements Updatable, Disposable {
 
-    private Body body;
+
     private final World world;
-
+    private Body body;
     private boolean flying;
-
     private UUID uuid;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
@@ -38,10 +38,12 @@ public abstract class Entity implements Updatable, Disposable {
         bodyDef.position.set(worldX + getBox2dWidth() / 2, worldY);
         body = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
         body.setFixedRotation(true);
+        body.setAwake(true);
 
         PolygonShape box = new PolygonShape();
         box.setAsBox(getBox2dWidth() / 2, getBox2dHeight() / 2);
-        body.createFixture(box, 1.0f);
+        Fixture fix = body.createFixture(box, 1.0f);
+        fix.setFilterData(World.ENTITY_FILTER);
         box.dispose();
 
     }

@@ -70,6 +70,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
             skylight = new DirectionalLight(rayHandler, 12800, new Color(0, 0, 0, 1), 270);
             skylight.setSoft(false);
+            skylight.setContactFilter(World.LIGHT_FILTER);
         }
         update();
     }
