@@ -12,12 +12,14 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Player extends LivingEntity {
 
+
+    public static final float VERTICAL_IMPULSE = 2.5f;
+    public static final float HORIZONTAL_IMPULSE = 2.5f;
     private final TextureRegion region;
 
     public Player(@NotNull World world) {
         super(world, world.getRender().getCamera().position.x / BLOCK_SIZE,
               world.getRender().getCamera().position.y / BLOCK_SIZE);
-        setFlying(true);
         region = new TextureRegion(Material.GRASS.getTextureRegion());
         region.flip(true, false);
     }
@@ -29,35 +31,41 @@ public class Player extends LivingEntity {
 
     @Override
     public void update() {
+        if (Main.inst().getConsole().isVisible()) {
+            return;
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.T)) {
             //teleport the player to the (last) location of the mouse
-            getBody().setTransform(Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(), 0);
+            getBody().setTransform(Main.inst().getMouseBlockX() + getBox2dWidth() / 2,
+                                   Main.inst().getMouseBlockY() + getBox2dHeight() / 2, 0);
             getBody().setAngularVelocity(0);
             getBody().setLinearVelocity(0, 0);
+            getBody().setAwake(true);
         }
         else {
+            //TODO if shift is held, the impulse should be multiplied with 2
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+                getBody().applyLinearImpulse(0, VERTICAL_IMPULSE, getPosition().x, getPosition().y, true);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+                getBody().applyLinearImpulse(0, -VERTICAL_IMPULSE, getPosition().x, getPosition().y, true);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+                getBody().applyLinearImpulse(-HORIZONTAL_IMPULSE, 0, getPosition().x, getPosition().y, true);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                getBody().applyLinearImpulse(0, 5 * BLOCK_SIZE, getPosition().x, getPosition().y, true);
+                getBody().applyLinearImpulse(HORIZONTAL_IMPULSE, 0, getPosition().x, getPosition().y, true);
             }
         }
     }
 
     @Override
     public float getWidth() {
-        return BLOCK_SIZE - 0.1f;
+        return BLOCK_SIZE - 1f;
     }
 
     @Override
     public float getHeight() {
-        return BLOCK_SIZE - 0.1f;
+        return BLOCK_SIZE - 1f;
     }
 }

@@ -49,7 +49,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         do {
             if (renderQueue.isEmpty()) { return; } //nothing to render
             chunk = renderQueue.remove(0);
-        } while (chunk.isAllAir() || !worldRender.isInView(chunk) || !chunk.isLoaded());
+        } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
 
         FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
 

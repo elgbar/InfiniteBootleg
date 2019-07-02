@@ -6,6 +6,7 @@ import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -41,7 +42,11 @@ public class Commands extends CommandExecutor {
         for (Chunk chunk : Main.inst().getWorld().getLoadedChunks()) {
             chunk.updateTextureNow();
         }
+    }
 
+    public void fly() {
+        Entity player = Main.inst().getWorld().getEntities().iterator().next(); //assume this is the player
+        player.setFlying(!player.isFlying());
     }
 
 }

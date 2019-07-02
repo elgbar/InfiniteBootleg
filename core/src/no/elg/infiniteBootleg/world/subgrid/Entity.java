@@ -102,6 +102,13 @@ public abstract class Entity implements Updatable, Disposable {
 
     public void setFlying(boolean flying) {
         this.flying = flying;
+        if (flying) {
+            getBody().setLinearVelocity(0, 0);
+            getBody().setType(BodyDef.BodyType.StaticBody);
+        }
+        else {
+            getBody().setType(BodyDef.BodyType.DynamicBody);
+        }
     }
 
     public World getWorld() {

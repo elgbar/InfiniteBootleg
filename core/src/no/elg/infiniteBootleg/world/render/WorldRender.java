@@ -118,10 +118,10 @@ public class WorldRender implements Updatable, Renderer, Disposable {
             chunkRenderer.render();
         }
 
-        final int colEnd = chunksInView[HOR_END];
-        final int colStart = chunksInView[HOR_START];
-        final int rowEnd = chunksInView[VERT_END];
-        final int rowStart = chunksInView[VERT_START];
+        int colEnd = chunksInView[HOR_END];
+        int colStart = chunksInView[HOR_START];
+        int rowEnd = chunksInView[VERT_END];
+        int rowStart = chunksInView[VERT_START];
 
 //        System.out.println("rowStart = " + rowStart);
 //        System.out.println("rowEnd = " + rowEnd);
@@ -129,7 +129,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 //        System.out.println("colEnd = " + colEnd);
 
         //set to 1 to debug what chunks are rendered
-        final int debug = 0;
+        int debug = 0;
 
         batch.begin();
         for (int y = rowStart + debug; y < rowEnd - debug; y++) {
@@ -157,10 +157,16 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         debugRenderer.render(box2dWorld, m4);
     }
 
-    public boolean isInView(@NotNull Chunk chunk) {
+    /**
+     * @param chunk
+     *     The chunk to check
+     *
+     * @return {@code true} if the given chunk is outside the view of the camera
+     */
+    public boolean isOutOfView(@NotNull Chunk chunk) {
         Location pos = chunk.getLocation();
-        return pos.x >= chunksInView[HOR_START] && pos.x < chunksInView[HOR_END] && pos.y >= chunksInView[VERT_START] &&
-               pos.y < chunksInView[VERT_END];
+        return pos.x < chunksInView[HOR_START] || pos.x >= chunksInView[HOR_END] || pos.y < chunksInView[VERT_START] ||
+               pos.y >= chunksInView[VERT_END];
     }
 
     public int[] getChunksInView() {

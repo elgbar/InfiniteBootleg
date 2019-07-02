@@ -134,7 +134,7 @@ public class Main extends ApplicationAdapter {
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
                   h - 55);
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
-        Entity player = world.getEntities().iterator().next();
+        Entity player = world.getEntities().iterator().next(); //assume this is the player
 
         String pos = String.format("p: (%.4f,%.4f) v: (%.4f,%.4f)", player.getPosition().x, player.getPosition().y, 0f, 0f);
         font.draw(batch, "player " + pos, 10, h - 85);
