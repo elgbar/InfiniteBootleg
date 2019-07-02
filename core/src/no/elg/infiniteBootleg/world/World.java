@@ -221,6 +221,18 @@ public class World implements Disposable, Updatable {
      * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt create
      * and store a new air block at the given location
      *
+     * @param worldLoc
+     *     The world location to check
+     *
+     * @return If the block at the given location is air.
+     */
+    public boolean isAir(@NotNull Location worldLoc) {return isAir(worldLoc.x, worldLoc.y);}
+
+    /**
+     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt create
+     * and store a new air block at the given location
+     *
      * @param worldX
      *     The x coordinate from world view
      * @param worldY

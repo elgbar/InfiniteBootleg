@@ -148,24 +148,24 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     int worldX = b.getLocalChunkLoc().x;
                     int worldY = b.getLocalChunkLoc().y;
 
-                    Block bNorth = b.getRelative(Direction.NORTH, false);
-                    Block bEast = b.getRelative(Direction.EAST, false);
-                    Block bSouth = b.getRelative(Direction.SOUTH, false);
-                    Block bWest = b.getRelative(Direction.WEST, false);
+                    Block bNorth = b.getRawRelative(Direction.NORTH);
+                    Block bEast = b.getRawRelative(Direction.EAST);
+                    Block bSouth = b.getRawRelative(Direction.SOUTH);
+                    Block bWest = b.getRawRelative(Direction.WEST);
 
-                    if (bNorth != null && !bNorth.getMaterial().blocksLight()) {
+                    if (bNorth == null || !bNorth.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY + 1, worldX + 1, worldY + 1);
                         box2dBody.createFixture(edgeShape, 0);
                     }
-                    if (bEast != null && !bEast.getMaterial().blocksLight()) {
+                    if (bEast == null || !bEast.getMaterial().blocksLight()) {
                         edgeShape.set(worldX + 1, worldY, worldX + 1, worldY + 1);
                         box2dBody.createFixture(edgeShape, 0);
                     }
-                    if (bSouth != null && !bSouth.getMaterial().blocksLight()) {
+                    if (bSouth == null || !bSouth.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY, worldX + 1, worldY);
                         box2dBody.createFixture(edgeShape, 0);
                     }
-                    if (bWest != null && !bWest.getMaterial().blocksLight()) {
+                    if (bWest == null || !bWest.getMaterial().blocksLight()) {
                         edgeShape.set(worldX, worldY, worldX, worldY + 1);
                         box2dBody.createFixture(edgeShape, 0);
                     }
@@ -250,9 +250,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             modified = true;
             dirty = true;
             prioritize = true;
-            if (getWorld() != null) {
-                getWorld().updateBlocksAround(getWorldLoc(localX, localY));
-            }
+            getWorld().updateBlocksAround(getWorldLoc(localX, localY));
         }
     }
 

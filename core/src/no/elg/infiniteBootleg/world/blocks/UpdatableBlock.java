@@ -19,7 +19,7 @@ public abstract class UpdatableBlock extends Block implements Updatable {
      * Update if the update flag is set to true
      */
     public void tryUpdate() {
-        if (update) {
+        if (shouldUpdate()) {
             update = false;
             update();
         }
