@@ -122,6 +122,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
             if (box2dBody != null) {
                 getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
+                box2dBody = null;
             }
             if (allAir) {
                 return;
@@ -338,8 +339,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if (!allowUnload || !loaded) { return false;}
         loaded = false;
         allowUnload = false;
-        if (getWorld() != null && box2dBody != null) {
+        if (box2dBody != null) {
             getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
+            box2dBody = null;
         }
 
         for (Block[] blocks : blocks) {

@@ -112,7 +112,10 @@ public abstract class Entity implements Updatable, Disposable {
 
     @Override
     public void dispose() {
-        getWorld().getRender().getBox2dWorld().destroyBody(body);
+        if (body != null) {
+            getWorld().getRender().getBox2dWorld().destroyBody(body);
+            body = null;
+        }
     }
 
     @Override
