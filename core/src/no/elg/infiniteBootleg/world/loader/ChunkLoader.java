@@ -66,4 +66,8 @@ public class ChunkLoader {
             fh.writeBytes(chunk.disassemble(), false);
         }
     }
+
+    public ChunkGenerator getGenerator() {
+        return generator;
+    }
 }

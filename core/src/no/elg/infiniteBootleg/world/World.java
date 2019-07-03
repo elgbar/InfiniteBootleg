@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-
 /**
  * @author Elg
  */
@@ -538,28 +536,7 @@ public class World implements Disposable, Updatable {
         return chunks.values();
     }
 
-    /**
-     * @param worldX
-     *     The x component of the world coordinate
-     * @param worldY
-     *     The y component of the world coordinate
-     * @param width
-     *     The absolute width (ie this will be divided by {@link Block#BLOCK_SIZE})
-     * @param height
-     *     The absolute height (ie this will be divided by {@link Block#BLOCK_SIZE})
-     *
-     * @return If anything at the given coordinate with the given width will collide with any blocks in this world
-     */
-    public boolean willCollide(float worldX, float worldY, float width, float height) {
-        int dx = (int) Math.floor(worldX), maxX = (int) Math.floor(worldX + width / BLOCK_SIZE);
-        int dy0 = (int) Math.floor(worldY), maxY = (int) Math.floor(worldY + height / BLOCK_SIZE);
-        for (; dx <= maxX; dx++) {
-            for (int dy = dy0; dy <= maxY; dy++) {
-                if (getBlock(dx, dy).getMaterial().isSolid()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    public ChunkLoader getChunkLoader() {
+        return chunkLoader;
     }
 }

@@ -129,7 +129,8 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
         font.draw(batch, "Pointing at " + block.getMaterial() + " (" + mouseBlockX + ", " + mouseBlockY + ") in chunk " +
-                         world.getChunkFromWorld(mouseBlockX, mouseBlockY).getLocation(), 10, h - 40);
+                         world.getChunkFromWorld(mouseBlockX, mouseBlockY).getLocation() + " (" +
+                         world.getChunkLoader().getGenerator().getBiome(mouseBlockX) + ")", 10, h - 40);
         font.draw(batch,
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
                   h - 55);

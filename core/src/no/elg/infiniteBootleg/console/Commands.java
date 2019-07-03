@@ -15,7 +15,6 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.debugBox2d;
 /**
  * @author Elg
  */
-@SuppressWarnings("unused")
 public class Commands extends CommandExecutor {
 
     private ConsoleLogger logger;
@@ -76,7 +75,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
     public void debugBox2d() {
         debugBox2d = !debugBox2d;
-        logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (debugBox2d ? "ON" : "OFF"));
+        logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (debugBox2d ? "enabled" : "disabled"));
     }
 
 }
