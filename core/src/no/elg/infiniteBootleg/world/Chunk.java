@@ -138,6 +138,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
             EdgeShape edgeShape = new EdgeShape();
 
+            //TODO remove body if there is no air anywhere.
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     Block b = blocks[x][y];
@@ -242,7 +243,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
             if (newBlock instanceof UpdatableBlock) {
                 updatableBlocks.add((UpdatableBlock) newBlock);
-                ((UpdatableBlock) newBlock).update();
+                if (update) {
+                    ((UpdatableBlock) newBlock).update();
+                }
             }
         }
 

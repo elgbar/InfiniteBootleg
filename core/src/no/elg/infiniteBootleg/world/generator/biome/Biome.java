@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.generator.biome;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
+import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 
 import java.util.ArrayList;
@@ -15,28 +16,32 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
  */
 public enum Biome {
 
-    PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.GRASS, 1),
+    PLAINS(0.1, 0.9, 1, 64, 0.009, 0, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.GRASS, 1),
            new Tuple<>(Material.DIRT, 10)),
-    MOUNTAINS(0.6, 0.9, 1, 256, 0.01, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.GRASS, 1),
-              new Tuple<>(Material.DIRT, 10)),
-    DESERT(0.1, 0.9, 0.9, 32, 0.005, Material.STONE, new Tuple<>(Material.SAND, 12));
+    MOUNTAINS(100, 0.9, 1, 356, 0.005, 100, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.GRASS, 1),
+              new Tuple<>(Material.DIRT, 6)),
+    DESERT(0.1, 0.9, 0.9, 32, 0.005, 0, Material.STONE, new Tuple<>(Material.SAND, 12));
 
     public final double y;
     public final double z;
     public final double exponent;
     public final double amplitude;
     public final double frequency;
+    private final int offset;
     public final Material filler;
     public final Material[] topSoil;
 
+    public static final int AVERAGE_RADIUS = 5;
+
     @SafeVarargs
-    Biome(double y, double z, double exponent, double amplitude, double frequency, Material filler,
+    Biome(double y, double z, double exponent, double amplitude, double frequency, int offset, Material filler,
           Tuple<Material, Integer>... topSoil) {
         this.y = y;
         this.z = z;
         this.exponent = exponent;
         this.amplitude = amplitude;
         this.frequency = frequency;
+        this.offset = offset;
         this.filler = filler;
         List<Material> mats = new ArrayList<>();
         for (Tuple<Material, Integer> tuple : topSoil) {
@@ -45,10 +50,6 @@ public enum Biome {
             }
         }
         this.topSoil = mats.toArray(new Material[0]);
-    }
-
-    public double heightAt(PerlinNoise noise, int chunkX, int localX) {
-        return heightAt(noise, chunkX, localX, y, z, amplitude, frequency);
     }
 
     public Material materialAt(PerlinNoise noise, int height, int worldY) {
@@ -68,10 +69,31 @@ public enum Biome {
         }
     }
 
-    private static double heightAt(PerlinNoise noise, int chunkX, int localX, double y, double z, double amplitude,
-                                   double frequency) {
-        int lx = localX + CHUNK_SIZE * chunkX;
-        return noise.octaveNoise(lx * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude;
+    public int avgHeightAt(PerlinChunkGenerator pcg, int worldX) {
+        if (worldX == 375) {
+            System.out.println("375");
+        }
+        int y = 0;
+        for (int dx = -AVERAGE_RADIUS; dx <= AVERAGE_RADIUS; dx++) {
+            if (dx != 0) {
+                Biome biome = pcg.getBiome(worldX + dx);
+                y += biome.rawHeightAt(pcg.getNoise(), worldX);
+            }
+            else {
+                y += rawHeightAt(pcg.getNoise(), worldX);
+            }
+        }
+        return Math.abs((int) Math.floor(y / (AVERAGE_RADIUS * 2 + 1)));
+    }
+
+    public double rawHeightAt(PerlinNoise noise, int worldX) {
+        return rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset);
+    }
+
+    private static double rawHeightAt(PerlinNoise noise, int worldX, double y, double z, double amplitude, double frequency,
+                                      int offset) {
+//        int lx = localX + CHUNK_SIZE * chunkX;
+        return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude + offset;
 //        return ImprovedNoise.noise(localX + CHUNK_SIZE * chunkPos.x, y, z, amplitude, frequency);
 //        double nx = ;
 

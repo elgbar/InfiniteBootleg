@@ -23,14 +23,16 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         noise = new PerlinNoise(seed);
     }
 
-    private double calcHeightMap(int chunkX, int x) {
+    @Override
+    public @NotNull Biome getBiome(int worldX) {
         float a = 1.25f;
-        return (noise.noise(chunkX * CHUNK_SIZE + x, 0.5, 0.5, a, 0.001) + a) / (a * 2);
-    }
+        double height = (noise.noise(worldX, 0.5, 0.5, a, 0.001) + a) / (a * 2);
 
-    private Biome getBiome(double height) {
-        if (height > 0.5) {
-            return Biome.ANCIENT_MOUNTAINS;
+        if (height > 0.7) {
+            return Biome.MOUNTAINS;
+        }
+        else if (height > 0.5) {
+            return Biome.DESERT;
         }
         else {
             return Biome.PLAINS;
@@ -42,16 +44,15 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         Chunk chunk = new Chunk(world, chunkPos);
 //        Main.SCHEDULER.executeAsync(() -> {
         for (int x = 0; x < CHUNK_SIZE; x++) {
-            double biomeWeight = calcHeightMap(chunkPos.x, x);
-            Biome biome = getBiome(biomeWeight);
+            int worldX = chunkPos.x * CHUNK_SIZE + x;
+            Biome biome = getBiome(worldX);
 
-            double y = biome.heightAt(noise, chunkPos.x, x) * biomeWeight;
-            int worldY = (int) Math.floor(y);
+            int worldY = biome.avgHeightAt(this, worldX);
+
             int chunkY = CoordUtil.worldToChunk(worldY);
 
             if (chunkPos.y == chunkY) {
-                biome.fillUpTo(noise, chunk, x, (int) (y - chunkY * CHUNK_SIZE), worldY);
-//                chunk.setAllowUnload(false);
+                biome.fillUpTo(noise, chunk, x, worldY - chunkY * CHUNK_SIZE, worldY);
             }
             else if (chunkPos.y < chunkY) {
                 biome.fillUpTo(noise, chunk, x, CHUNK_SIZE, worldY);
@@ -61,5 +62,9 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         chunk.updateTexture(false);
 //        });
         return chunk;
+    }
+
+    public PerlinNoise getNoise() {
+        return noise;
     }
 }
