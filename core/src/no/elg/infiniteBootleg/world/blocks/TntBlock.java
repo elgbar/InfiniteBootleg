@@ -73,14 +73,12 @@ public class TntBlock extends UpdatableBlock {
                         if (mat == AIR || hardness <= 0) {
                             continue;
                         }
-                        else if (b instanceof TntBlock && b != this) {
-                            TntBlock tntb = (TntBlock) b;
-                            tntb.tickLeft = 0;
-                            tntb.strength = Math.min(EXPLOSION_STRENGTH * 10f, tntb.strength * 1.05f);
-                            continue;
-                        }
                         double dist = loc.distCubed(b.getWorldLoc()) * hardness * Math.abs(random.nextGaussian() + RESISTANCE);
                         if (dist < strength * strength) {
+                            if (b instanceof TntBlock && b != this) {
+                                TntBlock tntb = (TntBlock) b;
+                                tntb.exploded = true;
+                            }
                             destroyed.add(b);
                         }
                     }
