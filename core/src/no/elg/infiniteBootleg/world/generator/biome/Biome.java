@@ -17,8 +17,9 @@ public enum Biome {
 
     PLAINS(0.1, 0.9, 1, 64, 0.009, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.GRASS, 1),
            new Tuple<>(Material.DIRT, 10)),
-    ANCIENT_MOUNTAINS(0.6, 0.9, 1, 256, 0.01, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.BRICK, 32)),
-    ;
+    MOUNTAINS(0.6, 0.9, 1, 256, 0.01, Material.STONE, new Tuple<>(Material.TORCH, 1), new Tuple<>(Material.GRASS, 1),
+              new Tuple<>(Material.DIRT, 10)),
+    DESERT(0.1, 0.9, 0.9, 32, 0.005, Material.STONE, new Tuple<>(Material.SAND, 12));
 
     public final double y;
     public final double z;
