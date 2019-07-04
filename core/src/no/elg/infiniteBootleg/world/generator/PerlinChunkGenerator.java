@@ -43,8 +43,8 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     public @NotNull Chunk generate(@NotNull World world, @NotNull Location chunkPos) {
         Chunk chunk = new Chunk(world, chunkPos);
 //        Main.SCHEDULER.executeAsync(() -> {
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            int worldX = chunkPos.x * CHUNK_SIZE + x;
+        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+            int worldX = chunkPos.x * CHUNK_SIZE + localX;
             Biome biome = getBiome(worldX);
 
             int worldY = biome.avgHeightAt(this, worldX);
@@ -52,10 +52,10 @@ public class PerlinChunkGenerator implements ChunkGenerator {
             int chunkY = CoordUtil.worldToChunk(worldY);
 
             if (chunkPos.y == chunkY) {
-                biome.fillUpTo(noise, chunk, x, worldY - chunkY * CHUNK_SIZE, worldY);
+                biome.fillUpTo(noise, chunk, localX, worldY - chunkY * CHUNK_SIZE, worldY);
             }
             else if (chunkPos.y < chunkY) {
-                biome.fillUpTo(noise, chunk, x, CHUNK_SIZE, worldY);
+                biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, worldY);
             }
 
         }
