@@ -1,7 +1,9 @@
 package no.elg.infiniteBootleg;
 
+import box2dLight.RayHandler;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.util.Util;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -77,5 +79,24 @@ public class ProgramArgs {
         }
         Main.worldSeed = val.hashCode();
         Main.inst().getConsoleLogger().logf("World seed set to '%s'", val);
+    }
+
+    /**
+     * Disable box2dlights
+     */
+    public static void no_lights(String val) {
+        Main.inst().getConsoleLogger().log("Lights are disabled. To dynamically enable this use command 'lights true'");
+        Main.SCHEDULER.executeSync(() -> {
+            RayHandler rayHandler = Main.inst().getWorld().getRender().getRayHandler();
+            rayHandler.setShadows(false);
+        });
+    }
+
+    /**
+     * Enable debug rendering (ie box2d)
+     */
+    public static void debug(String val) {
+        Main.inst().getConsoleLogger().log("Debug view is enabled. To disable this at runtime use command 'debugBox2d'");
+        WorldRender.debugBox2d = true;
     }
 }

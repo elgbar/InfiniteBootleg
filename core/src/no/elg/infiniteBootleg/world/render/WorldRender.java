@@ -43,7 +43,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
     private DirectionalLight skylight;
 
-    public static boolean debugBox2d = true;
+    public static boolean debugBox2d;
 
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
