@@ -490,7 +490,7 @@ public class World implements Disposable, Updatable {
 //            System.out.println("chunk.isAllAir() (" + chunk.getLocation() + ") = " + chunk.isAllAir());
 
             //Unload chunks not seen for 5 seconds
-            if (chunk.allowUnload() && getRender().isOutOfView(chunk) &&
+            if (chunk.isAllowingUnloading() && getRender().isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
                 System.out.println("unloaded chunk " + chunk.getLocation());
                 unload(chunk);

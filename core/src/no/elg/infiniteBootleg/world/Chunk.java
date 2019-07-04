@@ -358,7 +358,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * If {@code allowUnload} is {@code false} this chunk cannot be unloaded
+     * If {@code isAllowingUnloading} is {@code false} this chunk cannot be unloaded
      *
      * @param allowUnload
      *     If the chunk can be unloaded or not
@@ -368,6 +368,10 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             return; //already unloaded
         }
         this.allowUnload = allowUnload;
+    }
+
+    public boolean isAllowingUnloading() {
+        return allowUnload;
     }
 
     @NotNull
@@ -486,13 +490,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     @Nullable
     public FileHandle getChunkFile() {
         if (chunkFile == null) {
-            chunkFile = geChunkFile(world, chunkPos);
+            chunkFile = getChunkFile(world, chunkPos);
         }
         return chunkFile;
     }
 
     @Nullable
-    public static FileHandle geChunkFile(@NotNull World world, @NotNull Location chunkPos) {
+    public static FileHandle getChunkFile(@NotNull World world, @NotNull Location chunkPos) {
         FileHandle worldFile = world.worldFolder();
         if (worldFile == null) { return null; }
         return worldFile.child(CHUNK_FOLDER + File.separator + chunkPos.x + File.separator + chunkPos.y);
@@ -529,9 +533,5 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 blocks[x][y] = block;
             }
         }
-    }
-
-    public boolean allowUnload() {
-        return allowUnload;
     }
 }

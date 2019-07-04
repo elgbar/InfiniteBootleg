@@ -34,7 +34,7 @@ public class ChunkLoader {
      */
     public boolean existsOnDisk(@NotNull Location chunkLoc) {
         if (!Main.loadWorldFromDisk) { return false; }
-        FileHandle chunkFile = Chunk.geChunkFile(world, chunkLoc);
+        FileHandle chunkFile = Chunk.getChunkFile(world, chunkLoc);
         return chunkFile != null && chunkFile.exists();
     }
 

@@ -7,10 +7,9 @@ import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.render.WorldRender.debugBox2d;
 
 /**
  * @author Elg
@@ -74,8 +73,8 @@ public class Commands extends CommandExecutor {
 
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
     public void debugBox2d() {
-        debugBox2d = !debugBox2d;
-        logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (debugBox2d ? "enabled" : "disabled"));
+        WorldRender.debugBox2d = !WorldRender.debugBox2d;
+        logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
 
 }
