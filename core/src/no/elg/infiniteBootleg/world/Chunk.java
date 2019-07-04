@@ -111,12 +111,15 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link
      * #getTextureRegion()}
      * called.
+     *
+     * @param recalcNeighbors
      */
-    public void updateTextureNow() {
+    public void updateTextureNow(boolean recalcNeighbors) {
         dirty = false;
+
         //test if all the blocks in this chunk has the material air
         allAir = stream().allMatch(block -> block.getMaterial() == AIR);
-//        allBlockLight = stream().allMatch(block -> block.getMaterial().blocksLight());
+
         if (Main.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
@@ -139,20 +142,24 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
             EdgeShape edgeShape = new EdgeShape();
 
-            //TODO remove body if there is no air anywhere.
-            for (int x = 0; x < CHUNK_SIZE; x++) {
-                for (int y = 0; y < CHUNK_SIZE; y++) {
-                    Block b = blocks[x][y];
+            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                    Block b = blocks[localX][localY];
                     if (b == null || !b.getMaterial().blocksLight()) {
                         continue;
                     }
 
-                    int worldX = b.getLocalChunkLoc().x;
-                    int worldY = b.getLocalChunkLoc().y;
-
                     //represent the direction to look and if no solid block there how to create a fixture at that location (ie
                     // two relative vectors)
                     // the value of the tuple is as follows dxStart, dyStart, dxEnd, dyEnd
+                    // this can be visually represented with a cube:
+                    //
+                    // (0,1)---(1,1)
+                    //   |       |
+                    //   |       |
+                    //   |       |
+                    // (0,0)---(1,0)
+                    //
                     // where 'd' stands for delta
                     // x/y is if this is the x or component of the coordinate
                     // end/start is if this is the start or end vector
@@ -168,7 +175,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                         Block rel = b.getRawRelative(tuple.key);
                         if (rel == null || !rel.getMaterial().blocksLight()) {
                             byte[] ds = tuple.value;
-                            edgeShape.set(worldX + ds[0], worldY + ds[1], worldX + ds[2], worldY + ds[3]);
+                            edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
                             box2dBody.createFixture(edgeShape, 0);
                         }
                     }
@@ -272,7 +279,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
+     * Might cause a call to {@link #updateTextureNow(boolean)} if the chunk is marked as dirty
      *
      * @return The texture of this chunk
      */
@@ -280,7 +287,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public TextureRegion getTextureRegion() {
         lastViewedTick = world.getTick();
         if (dirty) {
-            updateTextureNow();
+            updateTextureNow(true);
         }
         return fboRegion;
     }
@@ -301,6 +308,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         fboRegion.flip(false, true);
     }
 
+    /**
+     * Update all updatable blocks in this chunk
+     */
     @Override
     public void update() {
         for (UpdatableBlock block : updatableBlocks) {
@@ -316,13 +326,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
+     * Might cause a call to {@link #updateTextureNow(boolean)} if the chunk is marked as dirty
      *
      * @return If all blocks in this chunk is air
      */
     public boolean isAllAir() {
         if (dirty) {
-            updateTextureNow();
+            updateTextureNow(true);
         }
         return allAir;
     }

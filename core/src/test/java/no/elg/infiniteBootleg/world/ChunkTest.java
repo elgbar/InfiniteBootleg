@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static org.junit.Assert.*;
 
 /**

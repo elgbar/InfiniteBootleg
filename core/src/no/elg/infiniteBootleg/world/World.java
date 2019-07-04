@@ -476,19 +476,10 @@ public class World implements Disposable, Updatable {
 
             //clean up dead chunks
             if (!chunk.isLoaded()) {
-                Main.inst().getConsoleLogger().log("Chunk unloaded, but not removed from chunks");
+//                Main.inst().getConsoleLogger().log("Chunk unloaded, but not removed from chunks");
                 iterator.remove();
                 continue;
             }
-
-
-//            System.out.println("chunks.size() = " + chunks.size());
-
-//            System.out.println("delta last view @ " + chunk.getLocation() + " (all air? " + chunk.isAllAir() + "): " +
-//                               (tick - chunk.getLastViewedTick()));
-
-//            System.out.println("chunk.isAllAir() (" + chunk.getLocation() + ") = " + chunk.isAllAir());
-
             //Unload chunks not seen for 5 seconds
             if (chunk.isAllowingUnloading() && getRender().isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {

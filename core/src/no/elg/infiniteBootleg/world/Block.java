@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.util.Binembly;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,15 +23,11 @@ public class Block implements Binembly, Disposable {
     private World world;
     private Chunk chunk;
     private Location worldLoc;
-    private Location localChunkLoc;
+    private Location localLoc;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
-        Location worldChunkLoc = chunk.getWorldLoc();
-        int worldX = worldChunkLoc.x + localX;
-        int worldY = worldChunkLoc.y + localY;
-
-        worldLoc = new Location(worldX, worldY);
-        localChunkLoc = new Location(localX, localY);
+        worldLoc = CoordUtil.chunkToWorld(chunk.getLocation(), localX, localY);
+        localLoc = new Location(localX, localY);
 
         this.material = material;
         this.world = world;
@@ -66,8 +63,11 @@ public class Block implements Binembly, Disposable {
         return worldLoc;
     }
 
-    public Location getLocalChunkLoc() {
-        return localChunkLoc;
+    /**
+     * @return The offset/local position of this block within its chunk
+     */
+    public Location getLocalLoc() {
+        return localLoc;
     }
 
     /**
@@ -107,10 +107,11 @@ public class Block implements Binembly, Disposable {
         return Objects.equals(world, block.world);
     }
 
+
     @Override
     public int hashCode() {
-        int result = worldLoc.hashCode();
-        result = 31 * result + (world != null ? world.hashCode() : 0);
+        int result = material.hashCode();
+        result = 31 * result + worldLoc.hashCode();
         return result;
     }
 

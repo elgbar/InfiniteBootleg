@@ -16,6 +16,8 @@ public enum Direction {
     public final int dx;
     public final int dy;
 
+    public static final Direction[] CARDINAL = {NORTH, EAST, SOUTH, WEST};
+
     Direction(int dx, int dy) {
         this.dx = dx;
         this.dy = dy;

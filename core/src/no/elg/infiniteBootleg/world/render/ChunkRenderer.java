@@ -64,7 +64,7 @@ public class ChunkRenderer implements Renderer, Disposable {
                 if (block == null || block.getMaterial() == AIR) {
                     continue;
                 }
-                Location blkLoc = block.getLocalChunkLoc();
+                Location blkLoc = block.getLocalLoc();
                 int dx = blkLoc.x * BLOCK_SIZE;
                 int dy = blkLoc.y * BLOCK_SIZE;
                 //noinspection ConstantConditions
