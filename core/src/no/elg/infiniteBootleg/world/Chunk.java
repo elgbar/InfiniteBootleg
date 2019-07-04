@@ -387,6 +387,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * This is the same as doing {@code CoordUtil.chunkToWorld(getLocation())}
      *
      * @return Location of this chunk in world coordinates
+     *
+     * @see CoordUtil#chunkToWorld(Location)
      */
     @NotNull
     public Location getWorldLoc() {
@@ -400,10 +402,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *     The local chunk y coordinate
      *
      * @return The world coordinate from the local position as offset
+     *
+     * @see CoordUtil#chunkToWorld(Location, int, int)
      */
     @NotNull
     public Location getWorldLoc(int localX, int localY) {
-        return new Location(CoordUtil.chunkToWorld(chunkPos.x) + localX, CoordUtil.chunkToWorld(chunkPos.y) + localY);
+        return CoordUtil.chunkToWorld(chunkPos, localX, localY);
     }
 
     /**
