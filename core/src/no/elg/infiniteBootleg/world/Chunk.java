@@ -182,6 +182,16 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 }
             }
             edgeShape.dispose();
+
+            if (recalcNeighbors) {
+                for (Direction direction : Direction.CARDINAL) {
+                    Location relChunk = getLocation().relative(direction);
+                    if (getWorld().isChunkLoaded(relChunk)) {
+                        getWorld().getChunk(relChunk).updateTextureNow(false);
+                    }
+                }
+            }
+
         }
     }
 
