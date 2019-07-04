@@ -13,8 +13,8 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 public class Player extends LivingEntity {
 
 
-    public static final float VERTICAL_IMPULSE = 2.5f;
-    public static final float HORIZONTAL_IMPULSE = 2.5f;
+    public static final float VERTICAL_IMPULSE = 1f;
+    public static final float HORIZONTAL_IMPULSE = 1f;
     private final TextureRegion region;
 
     public Player(@NotNull World world) {
@@ -61,11 +61,11 @@ public class Player extends LivingEntity {
 
     @Override
     public float getWidth() {
-        return BLOCK_SIZE - 1f;
+        return BLOCK_SIZE;
     }
 
     @Override
     public float getHeight() {
-        return BLOCK_SIZE - 1f;
+        return BLOCK_SIZE;
     }
 }
