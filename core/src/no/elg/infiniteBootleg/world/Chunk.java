@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
@@ -149,26 +150,21 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     int worldX = b.getLocalChunkLoc().x;
                     int worldY = b.getLocalChunkLoc().y;
 
-                    Block bNorth = b.getRawRelative(Direction.NORTH);
-                    Block bEast = b.getRawRelative(Direction.EAST);
-                    Block bSouth = b.getRawRelative(Direction.SOUTH);
-                    Block bWest = b.getRawRelative(Direction.WEST);
+                    //noinspection unchecked
+                    Tuple<Direction, int[]>[] ts = new Tuple[4];
+                    ts[0] = new Tuple<>(Direction.NORTH, new int[] {0, 1, 1, 1});
+                    ts[1] = new Tuple<>(Direction.EAST, new int[] {1, 0, 1, 1});
+                    ts[2] = new Tuple<>(Direction.SOUTH, new int[] {0, 0, 1, 0});
+                    ts[3] = new Tuple<>(Direction.WEST, new int[] {0, 0, 0, 1});
 
-                    if (bNorth == null || !bNorth.getMaterial().blocksLight()) {
-                        edgeShape.set(worldX, worldY + 1, worldX + 1, worldY + 1);
-                        box2dBody.createFixture(edgeShape, 0);
-                    }
-                    if (bEast == null || !bEast.getMaterial().blocksLight()) {
-                        edgeShape.set(worldX + 1, worldY, worldX + 1, worldY + 1);
-                        box2dBody.createFixture(edgeShape, 0);
-                    }
-                    if (bSouth == null || !bSouth.getMaterial().blocksLight()) {
-                        edgeShape.set(worldX, worldY, worldX + 1, worldY);
-                        box2dBody.createFixture(edgeShape, 0);
-                    }
-                    if (bWest == null || !bWest.getMaterial().blocksLight()) {
-                        edgeShape.set(worldX, worldY, worldX, worldY + 1);
-                        box2dBody.createFixture(edgeShape, 0);
+
+                    for (Tuple<Direction, int[]> tuple : ts) {
+                        Block rel = b.getRawRelative(tuple.key);
+                        if (rel == null || !rel.getMaterial().blocksLight()) {
+                            int[] ds = tuple.value;
+                            edgeShape.set(worldX + ds[0], worldY + ds[1], worldX + ds[2], worldY + ds[3]);
+                            box2dBody.createFixture(edgeShape, 0);
+                        }
                     }
                 }
             }
