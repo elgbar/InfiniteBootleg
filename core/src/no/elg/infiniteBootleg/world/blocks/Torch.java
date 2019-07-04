@@ -15,8 +15,8 @@ public class Torch extends Block {
 
     public Torch(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        light =
-            new PointLight(world.getRender().getRayHandler(), 32, new Color(0f, 0f, 0f, 1), 5, getWorldLoc().x, getWorldLoc().y);
+        light = new PointLight(world.getRender().getRayHandler(), 32, new Color(0f, 0f, 0f, 1), 5, getWorldLoc().x + 0.5f,
+                               getWorldLoc().y + 0.5f);
         light.setStaticLight(true);
 //        light.setContactFilter(World.LIGHT_FILTER);
     }
