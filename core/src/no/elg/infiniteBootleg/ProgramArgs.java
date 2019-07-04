@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg;
 
-import box2dLight.RayHandler;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -86,10 +85,7 @@ public class ProgramArgs {
      */
     public static void no_lights(String val) {
         Main.inst().getConsoleLogger().log("Lights are disabled. To dynamically enable this use command 'lights true'");
-        Main.SCHEDULER.executeSync(() -> {
-            RayHandler rayHandler = Main.inst().getWorld().getRender().getRayHandler();
-            rayHandler.setShadows(false);
-        });
+        WorldRender.lights = false;
     }
 
     /**

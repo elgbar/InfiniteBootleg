@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.console;
 
 import box2dLight.DirectionalLight;
-import box2dLight.RayHandler;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
@@ -37,8 +36,8 @@ public class Commands extends CommandExecutor {
 
     @ConsoleDoc(description = "Disable/enable lights", paramDescriptions = "status")
     public void lights(boolean status) {
-        RayHandler rayHandler = Main.inst().getWorld().getRender().getRayHandler();
-        rayHandler.setShadows(status);
+        WorldRender.lights = status;
+        if (status) { Main.inst().getWorld().getRender().update(); }
         logger.log(LogLevel.SUCCESS, "Lighting is now " + (status ? "enabled" : "disabled"));
     }
 

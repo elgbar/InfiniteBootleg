@@ -44,6 +44,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
     private DirectionalLight skylight;
 
     public static boolean debugBox2d;
+    public static boolean lights;
 
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
@@ -80,7 +81,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
     public void updatePhysics() {
         getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
-        rayHandler.update();
+        if (lights) { rayHandler.update(); }
     }
 
     @Override
@@ -100,8 +101,10 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
         chunksInView[VERT_END] = (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE);
 
-        Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
-        rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
+        if (lights) {
+            Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
+            rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
+        }
     }
 
     @Override
@@ -153,7 +156,9 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         }
         entityRenderer.render();
         batch.end();
-        rayHandler.render();
+        if (lights) {
+            rayHandler.render();
+        }
         if (debugBox2d) {
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
             debugRenderer.render(box2dWorld, m4);
