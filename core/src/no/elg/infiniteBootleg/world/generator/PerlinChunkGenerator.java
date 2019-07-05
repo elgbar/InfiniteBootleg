@@ -47,7 +47,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
             int worldX = chunkPos.x * CHUNK_SIZE + localX;
             Biome biome = getBiome(worldX);
 
-            int worldY = biome.avgHeightAt(this, worldX);
+            int worldY = biome.heightAt(this, worldX);
 
             int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -57,7 +57,6 @@ public class PerlinChunkGenerator implements ChunkGenerator {
             else if (chunkPos.y < chunkY) {
                 biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, worldY);
             }
-
         }
         chunk.updateTexture(false);
 //        });
