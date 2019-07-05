@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.world.blocks;
 
-import box2dLight.Light;
 import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Pool;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
@@ -11,20 +13,50 @@ import org.jetbrains.annotations.NotNull;
 
 public class Torch extends Block {
 
-    private Light light;
+    public static StaticPointLightPool lightPool = new StaticPointLightPool();
+
+    private PointLight light;
 
     public Torch(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        light = new PointLight(world.getRender().getRayHandler(), 32, new Color(0f, 0f, 0f, 1), 5, getWorldLoc().x + 0.5f,
-                               getWorldLoc().y + 0.5f);
-        light.setStaticLight(true);
-//        light.setContactFilter(World.LIGHT_FILTER);
+        light = lightPool.obtain();
+        light.setPosition(getWorldLoc().x + 0.5f, getWorldLoc().y + 0.5f);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        //FIXME use a cache for lights
-        light.remove();
+        lightPool.free(light);
+    }
+
+    private static class StaticPointLightPool extends Pool<PointLight> {
+
+        private final RayHandler rayHandler;
+
+        public static final int POINT_LIGHT_RAYS = 32;
+        public static final int POINT_LIGHT_DISTANCE = 5;
+
+        public StaticPointLightPool() {
+            rayHandler = Main.inst().getWorld().getRender().getRayHandler();
+        }
+
+        @Override
+        public PointLight obtain() {
+            PointLight light = super.obtain();
+            light.setActive(true);
+            return light;
+        }
+
+        @Override
+        protected PointLight newObject() {
+            PointLight light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.BLACK, POINT_LIGHT_DISTANCE, 0, 0);
+            light.setStaticLight(true);
+            return light;
+        }
+
+        @Override
+        protected void reset(PointLight object) {
+            object.setActive(false);
+        }
     }
 }
