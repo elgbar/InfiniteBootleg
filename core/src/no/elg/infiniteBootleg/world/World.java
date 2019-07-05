@@ -288,9 +288,8 @@ public class World implements Disposable, Updatable {
      *     The y coordinate from world view
      */
     public void updateBlocksAround(int worldX, int worldY) {
-        Block center = getBlock(worldX, worldY);
         for (Direction dir : Direction.CARDINAL) {
-            Block rel = center.getRawRelative(dir);
+            Block rel = getRawBlock(worldX + dir.dx, worldY + dir.dy);
             if (rel instanceof UpdatableBlock) {
                 ((UpdatableBlock) rel).setUpdate(true);
             }
