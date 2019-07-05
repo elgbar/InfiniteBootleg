@@ -44,6 +44,10 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return false;
         }
         switch (keycode) {
+            case NUM_0:
+            case NUMPAD_0:
+                selected = Material.values()[0];
+                break;
             case NUM_1:
             case NUMPAD_1:
                 selected = Material.values()[1];
@@ -123,8 +127,8 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return;
         }
 
-        final int blockX = Main.inst().getMouseBlockX();
-        final int blockY = Main.inst().getMouseBlockY();
+        int blockX = Main.inst().getMouseBlockX();
+        int blockY = Main.inst().getMouseBlockY();
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             getWorld().setBlock(blockX, blockY, null);
