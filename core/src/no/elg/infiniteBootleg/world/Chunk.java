@@ -248,8 +248,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-
         Block currBlock = blocks[localX][localY];
+
+        //air should behave as if it was null
+        if (material == AIR) {
+            material = null;
+        }
 
         if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
             return;
