@@ -118,7 +118,18 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         dirty = false;
 
         //test if all the blocks in this chunk has the material air
-        allAir = stream().allMatch(block -> block.getMaterial() == AIR);
+
+        allAir = true;
+        outer:
+        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+            for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                Block b = blocks[localX][localY];
+                if (b != null && b.getMaterial() != AIR) {
+                    allAir = false;
+                    break outer;
+                }
+            }
+        }
 
         if (Main.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
@@ -184,6 +195,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             edgeShape.dispose();
 
             if (recalcNeighbors) {
+                //TODO Try to optimize this (ie select what directions to recalculate)
                 for (Direction direction : Direction.CARDINAL) {
                     Location relChunk = getLocation().relative(direction);
                     if (getWorld().isChunkLoaded(relChunk)) {
