@@ -34,11 +34,11 @@ public class Commands extends CommandExecutor {
         }
     }
 
-    @ConsoleDoc(description = "Disable/enable lights", paramDescriptions = "status")
-    public void lights(boolean status) {
-        WorldRender.lights = status;
-        if (status) { Main.inst().getWorld().getRender().update(); }
-        logger.log(LogLevel.SUCCESS, "Lighting is now " + (status ? "enabled" : "disabled"));
+    @ConsoleDoc(description = "Toggle rendering of lights")
+    public void lights() {
+        WorldRender.lights = !WorldRender.lights;
+        if (WorldRender.lights) { Main.inst().getWorld().getRender().update(); }
+        logger.log(LogLevel.SUCCESS, "Lighting is now " + (WorldRender.lights ? "enabled" : "disabled"));
     }
 
     @ConsoleDoc(description = "Reloads chunks internal state, its texture and Box2D body ")
