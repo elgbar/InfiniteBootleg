@@ -280,7 +280,7 @@ public class World implements Disposable, Updatable {
     }
 
     /**
-     * Set all blocks around a given block to be updated. Given location not included
+     * Set all blocks in all cardinal directions around a given block to be updated. Given location not included
      *
      * @param worldX
      *     The x coordinate from world view
@@ -289,8 +289,8 @@ public class World implements Disposable, Updatable {
      */
     public void updateBlocksAround(int worldX, int worldY) {
         Block center = getBlock(worldX, worldY);
-        for (Direction dir : Direction.values()) {
-            Block rel = center.getRelative(dir);
+        for (Direction dir : Direction.CARDINAL) {
+            Block rel = center.getRawRelative(dir);
             if (rel instanceof UpdatableBlock) {
                 ((UpdatableBlock) rel).setUpdate(true);
             }
