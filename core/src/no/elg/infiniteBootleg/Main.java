@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -118,19 +119,27 @@ public class Main extends ApplicationAdapter {
 
         mouseBlockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
         mouseBlockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
-        Block block = world.getBlock(mouseBlockX, mouseBlockY);
+        Block block = world.getRawBlock(mouseBlockX, mouseBlockY);
 
         int[] vChunks = world.getRender().getChunksInView();
 
         int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) *
                            Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
         int h = Gdx.graphics.getHeight();
+
+        Chunk pointChunk = world.getChunkFromWorld(mouseBlockX, mouseBlockY);
+        String pointing = String.format("Pointing at %s (%d, %d) (exists? %b) in chunk %s (type: %s just air? %b)",//
+                                        block != null ? block.getMaterial() : Material.AIR, //
+                                        mouseBlockX, mouseBlockY, //
+                                        block != null, //
+                                        pointChunk.getLocation(),  //
+                                        world.getChunkLoader().getGenerator().getBiome(mouseBlockX), //
+                                        pointChunk.isAllAir());
+
         batch.begin();
         font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
         font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
-        font.draw(batch, "Pointing at " + block.getMaterial() + " (" + mouseBlockX + ", " + mouseBlockY + ") in chunk " +
-                         world.getChunkFromWorld(mouseBlockX, mouseBlockY).getLocation() + " (" +
-                         world.getChunkLoader().getGenerator().getBiome(mouseBlockX) + ")", 10, h - 40);
+        font.draw(batch, pointing, 10, h - 40);
         font.draw(batch,
                   "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
                   h - 55);
