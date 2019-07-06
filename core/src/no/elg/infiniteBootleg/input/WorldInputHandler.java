@@ -6,7 +6,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 
 import static com.badlogic.gdx.Input.Keys.*;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 
 /**
  * @author Elg
@@ -137,12 +136,14 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             getWorld().setBlock(blockX, blockY, selected);
         }
 
+        int CAM_SPEED = 100 * Block.BLOCK_SIZE;
+
         int WVertical = Gdx.input.isKeyPressed(W) ? 1 : 0;
         int SVertical = Gdx.input.isKeyPressed(S) ? -1 : 0;
         int AHorizontal = Gdx.input.isKeyPressed(A) ? 1 : 0;
         int DHorizontal = Gdx.input.isKeyPressed(D) ? -1 : 0;
-        camera.position.x -= Gdx.graphics.getDeltaTime() * (AHorizontal + DHorizontal) * CHUNK_TEXTURE_SIZE * camera.zoom;
-        camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * Chunk.CHUNK_TEXTURE_SIZE * camera.zoom;
+        camera.position.x -= Gdx.graphics.getDeltaTime() * (AHorizontal + DHorizontal) * CAM_SPEED * camera.zoom;
+        camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * CAM_SPEED * camera.zoom;
 
         worldRender.update();
     }
