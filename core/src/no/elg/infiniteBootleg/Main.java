@@ -111,14 +111,14 @@ public class Main extends ApplicationAdapter {
             return;
         }
 
+        Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        mouseBlockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
+        mouseBlockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
+
         //noinspection ConstantConditions
         world.getInput().update();
         world.getRender().render();
 
-        Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-
-        mouseBlockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
-        mouseBlockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
         Block block = world.getRawBlock(mouseBlockX, mouseBlockY);
 
         int[] vChunks = world.getRender().getChunksInView();
@@ -154,6 +154,7 @@ public class Main extends ApplicationAdapter {
             batch.draw(tr, Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3, BLOCK_SIZE * 2, BLOCK_SIZE * 2);
         }
         batch.end();
+
         console.draw();
     }
 
