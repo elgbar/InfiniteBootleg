@@ -18,7 +18,7 @@ public enum Biome {
     MOUNTAINS(100, 0.9, 1, 356, 0.005, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
     DESERT(0.1, 0.9, 0.9, 32, 0.005, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
 
-    public static final int INTERPOLATION_RADIUS = 10;
+    public static final int INTERPOLATION_RADIUS = 25;
 
     private final double y;
     private final double z;
@@ -72,6 +72,8 @@ public enum Biome {
         for (int dx = -INTERPOLATION_RADIUS; dx <= INTERPOLATION_RADIUS; dx++) {
             if (dx != 0) {
                 Biome biome = pcg.getBiome(worldX + dx);
+                //NOTE it is not a bug that the worldX does not have dx added to it
+                //well it was, but it looks better (ie more random) when the dx is not here
                 y += biome.rawHeightAt(pcg.getNoise(), worldX);
             }
             else {
