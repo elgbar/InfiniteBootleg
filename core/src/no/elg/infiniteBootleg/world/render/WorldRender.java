@@ -62,6 +62,12 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
             camera = new OrthographicCamera();
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+            Main.SCHEDULER.executeSync(() -> {
+                camera.position.x = 0;
+                camera.position.y = 0;
+            });
+
             batch = new SpriteBatch();
             batch.setProjectionMatrix(camera.combined);
 
