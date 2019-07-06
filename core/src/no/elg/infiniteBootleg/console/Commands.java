@@ -5,6 +5,7 @@ import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -74,6 +75,15 @@ public class Commands extends CommandExecutor {
     public void debugBox2d() {
         WorldRender.debugBox2d = !WorldRender.debugBox2d;
         logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
+    }
+
+    @ConsoleDoc(description = "Teleport to given world coordinate",
+                paramDescriptions = {"World x coordinate", "World y coordinate"})
+    public void tp(int worldX, int worldY) {
+        WorldRender render = Main.inst().getWorld().getRender();
+        render.getCamera().position.x = worldX * Block.BLOCK_SIZE;
+        render.getCamera().position.y = worldY * Block.BLOCK_SIZE;
+        render.update();
     }
 
 }
