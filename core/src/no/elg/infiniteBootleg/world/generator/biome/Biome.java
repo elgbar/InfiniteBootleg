@@ -8,8 +8,6 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
-import static no.elg.infiniteBootleg.world.Material.TORCH;
-
 /**
  * @author Elg
  */
@@ -17,7 +15,7 @@ public enum Biome {
 
 
     PLAINS(0.1, 0.9, 1, 64, 0.009, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
-    MOUNTAINS(100, 0.9, 1, 356, 0.005, 100, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
+    MOUNTAINS(100, 0.9, 1, 356, 0.005, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
     DESERT(0.1, 0.9, 0.9, 32, 0.005, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
 
     public static final int INTERPOLATION_RADIUS = 10;
@@ -60,9 +58,7 @@ public enum Biome {
     }
 
     public Material materialAt(@NotNull PerlinNoise noise, int height, int worldX, int worldY) {
-        int delta = height - worldY - 2; //-2 to place the torches, TODO replace - 2 with -1 when better lighting is in place
-
-        if (delta == -1) { return TORCH; }
+        int delta = height - worldY - 1;
         if (delta == 0) { return topmostBlock; }
 
         delta += (int) Math.abs(Math.floor(rawHeightAt(noise, worldX, y, z, 10, 0.05, 0)));
