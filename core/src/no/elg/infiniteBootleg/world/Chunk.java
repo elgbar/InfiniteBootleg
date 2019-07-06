@@ -61,6 +61,31 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private FileHandle chunkFile;
     private Body box2dBody;
 
+    private final static Tuple<Direction, byte[]>[] ts;
+
+    static {
+        //represent the direction to look and if no solid block there how to create a fixture at that location (ie
+        // two relative vectors)
+        // the value of the tuple is as follows dxStart, dyStart, dxEnd, dyEnd
+        // this can be visually represented with a cube:
+        //
+        // (0,1)---(1,1)
+        //   |       |
+        //   |       |
+        //   |       |
+        // (0,0)---(1,0)
+        //
+        // where 'd' stands for delta
+        // x/y is if this is the x or component of the coordinate
+        // end/start is if this is the start or end vector
+        //noinspection unchecked
+        ts = new Tuple[4];
+        ts[0] = new Tuple<>(Direction.NORTH, new byte[] {0, 1, 1, 1});
+        ts[1] = new Tuple<>(Direction.EAST, new byte[] {1, 0, 1, 1});
+        ts[2] = new Tuple<>(Direction.SOUTH, new byte[] {0, 0, 1, 0});
+        ts[3] = new Tuple<>(Direction.WEST, new byte[] {0, 0, 0, 1});
+    }
+
     /**
      * Create a new empty chunk
      *
@@ -167,30 +192,14 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                         continue;
                     }
 
-                    //represent the direction to look and if no solid block there how to create a fixture at that location (ie
-                    // two relative vectors)
-                    // the value of the tuple is as follows dxStart, dyStart, dxEnd, dyEnd
-                    // this can be visually represented with a cube:
-                    //
-                    // (0,1)---(1,1)
-                    //   |       |
-                    //   |       |
-                    //   |       |
-                    // (0,0)---(1,0)
-                    //
-                    // where 'd' stands for delta
-                    // x/y is if this is the x or component of the coordinate
-                    // end/start is if this is the start or end vector
-                    //noinspection unchecked
-                    Tuple<Direction, byte[]>[] ts = new Tuple[4];
-                    ts[0] = new Tuple<>(Direction.NORTH, new byte[] {0, 1, 1, 1});
-                    ts[1] = new Tuple<>(Direction.EAST, new byte[] {1, 0, 1, 1});
-                    ts[2] = new Tuple<>(Direction.SOUTH, new byte[] {0, 0, 1, 0});
-                    ts[3] = new Tuple<>(Direction.WEST, new byte[] {0, 0, 0, 1});
-
-
+                    if (chunkX == 1 && chunkY == 0) {
+                        System.out.println("---\n" + b + "\n\n");
+                    }
                     for (Tuple<Direction, byte[]> tuple : ts) {
                         Block rel = b.getRawRelative(tuple.key);
+                        if (rel != null) {
+                            System.out.println("dir " + tuple.key + " rel = " + rel);
+                        }
                         if (rel == null || !rel.getMaterial().blocksLight()) {
                             byte[] ds = tuple.value;
                             edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
@@ -256,11 +265,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
         Block currBlock = blocks[localX][localY];
-
-        //air should behave as if it was null
-        if (material == AIR) {
-            material = null;
-        }
 
         if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
             return;
