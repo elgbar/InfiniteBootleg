@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.util;
 
-import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +75,7 @@ public class CoordUtil {
      */
     @Contract(pure = true)
     public static int chunkToWorld(int chunkCoord) {
-        return chunkToWorld(chunkCoord, 0);
+        return chunkCoord << CHUNK_SIZE_SHIFT;
     }
 
     /**
@@ -91,7 +90,7 @@ public class CoordUtil {
      */
     @Contract(pure = true)
     public static int chunkToWorld(int chunkCoord, int offset) {
-        return (chunkCoord << CHUNK_SIZE_SHIFT) + offset;
+        return chunkToWorld(chunkCoord) + offset;
     }
 
     /**
@@ -104,6 +103,6 @@ public class CoordUtil {
      */
     @Contract(pure = true)
     public static int calculateOffset(int worldCoord) {
-        return worldCoord % Chunk.CHUNK_SIZE;
+        return worldCoord - chunkToWorld(worldToChunk(worldCoord));
     }
 }
