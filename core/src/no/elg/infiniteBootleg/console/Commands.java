@@ -86,5 +86,14 @@ public class Commands extends CommandExecutor {
         render.update();
     }
 
+    @ConsoleDoc(description = "The quality of the light. To disable light use command 'light'",
+                paramDescriptions = "Quality of light, between 0 and 4")
+    public void lightQuality(int quality) {
+        if (quality > 4) { quality = 4; }
+        else if (quality < 0) { quality = 0; }
+        Main.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
+
+    }
+
 }
 
