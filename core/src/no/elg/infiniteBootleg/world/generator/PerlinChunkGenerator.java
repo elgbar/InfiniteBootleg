@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
- * TODO RESEARCH BILINEAR INTERPOLATION
- *
  * @author Elg
  */
 public class PerlinChunkGenerator implements ChunkGenerator {
@@ -36,6 +34,11 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         else {
             return Biome.PLAINS;
         }
+    }
+
+    @Override
+    public int getHeight(int worldX) {
+        return getBiome(worldX).heightAt(this, worldX);
     }
 
     @Override

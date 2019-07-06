@@ -18,6 +18,11 @@ public class EmptyChunkGenerator implements ChunkGenerator {
     }
 
     @Override
+    public int getHeight(int worldX) {
+        return 0;
+    }
+
+    @Override
     public @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY) {
         return new Chunk(world, chunkX, chunkY);
     }

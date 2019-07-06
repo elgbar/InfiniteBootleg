@@ -16,6 +16,11 @@ public class FlatChunkGenerator implements ChunkGenerator {
         return Biome.PLAINS;
     }
 
+    @Override
+    public int getHeight(int worldX) {
+        return 0;
+    }
+
     @NotNull
     @Override
     public Chunk generate(@NotNull World world, int chunkX, int chunkY) {
