@@ -17,6 +17,7 @@ public class CoordUtilTest {
         assertEquals(new Location(4, -1231), CoordUtil.worldToChunk(new Location(4 * CHUNK_SIZE, -1231 * CHUNK_SIZE)));
         assertEquals(new Location(0, 0), CoordUtil.worldToChunk(new Location(CHUNK_SIZE - 1, CHUNK_SIZE - 1)));
         assertEquals(new Location(0, 0), CoordUtil.worldToChunk(new Location(1, 1)));
+        assertEquals(1, CoordUtil.worldToChunk(CHUNK_SIZE));
     }
 
     @Test
@@ -24,6 +25,12 @@ public class CoordUtilTest {
         assertEquals(new Location(CHUNK_SIZE, CHUNK_SIZE), CoordUtil.chunkToWorld(new Location(1, 1)));
         assertEquals(new Location(2 * CHUNK_SIZE, -2 * CHUNK_SIZE), CoordUtil.chunkToWorld(new Location(2, -2)));
         assertEquals(new Location(0, 0), CoordUtil.chunkToWorld(new Location(0, 0)));
+        assertEquals(0, CoordUtil.chunkToWorld(0));
+        assertEquals(CHUNK_SIZE, CoordUtil.chunkToWorld(1));
+        assertEquals(2 * CHUNK_SIZE, CoordUtil.chunkToWorld(2));
+
+        assertEquals(11, CoordUtil.chunkToWorld(0, 11));
+        assertEquals(11 + CHUNK_SIZE, CoordUtil.chunkToWorld(1, 11));
     }
 
     @Test
