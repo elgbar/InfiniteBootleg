@@ -31,6 +31,7 @@ public class Player extends LivingEntity {
 
     @Override
     public void update() {
+        super.update();
         if (Main.inst().getConsole().isVisible()) {
             return;
         }

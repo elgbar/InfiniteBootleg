@@ -25,6 +25,7 @@ public abstract class Entity implements Updatable, Disposable {
     private Body body;
     private boolean flying;
     private UUID uuid;
+    private Vector2 posCache;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
         uuid = UUID.randomUUID();
@@ -46,11 +47,13 @@ public abstract class Entity implements Updatable, Disposable {
         fix.setFilterData(World.ENTITY_FILTER);
         box.dispose();
 
+        update();
+
     }
 
     @Override
     public void update() {
-
+        posCache = getBody().getPosition();
     }
 
     /**
@@ -81,7 +84,7 @@ public abstract class Entity implements Updatable, Disposable {
     }
 
     public Vector2 getPosition() {
-        return body.getPosition();
+        return posCache;
     }
 
     /**
