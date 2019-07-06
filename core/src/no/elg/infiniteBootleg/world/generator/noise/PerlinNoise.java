@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.generator.noise;
 
+import com.badlogic.gdx.math.RandomXS128;
+
 import java.util.Random;
 
 /**
@@ -28,7 +30,7 @@ public class PerlinNoise {
      *     The random seed used to swap elements around randomly
      */
     public PerlinNoise(int seed) {
-        Random random = new Random(seed);
+        Random random = new RandomXS128(seed);
         for (int i = 0; i < 256; i++) {
             p[256 + i] = p[i] = permutation[i];
         }

@@ -5,12 +5,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
@@ -32,14 +36,12 @@ public class TntBlock extends UpdatableBlock {
         else {
             whiteTexture = null;
         }
-        random = new Random(221);
     }
 
     private boolean white;
     private boolean exploded;
     private long tickLeft;
     private double strength;
-    private static Random random;
 
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
     public static final int EXPLOSION_STRENGTH = 25; //basically max radius
@@ -70,7 +72,7 @@ public class TntBlock extends UpdatableBlock {
                             continue;
                         }
                         double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness *
-                                      Math.abs(random.nextGaussian() + RESISTANCE);
+                                      Math.abs(MathUtils.random.nextGaussian() + RESISTANCE);
                         if (dist < strength * strength) {
                             if (b instanceof TntBlock && b != this) {
                                 TntBlock tntb = (TntBlock) b;

@@ -3,8 +3,12 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.Pool;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
@@ -22,8 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Elg
@@ -48,7 +53,7 @@ public class World implements Disposable, Updatable {
     }
 
     private final long seed;
-    private final Map<Location, Chunk> chunks;
+    private final ObjectMap<Location, Chunk> chunks;
     private final WorldTicker ticker;
     private final ChunkLoader chunkLoader;
     private final TopBlockTracker topBlocks;
@@ -60,7 +65,7 @@ public class World implements Disposable, Updatable {
 
     private String name = "World";
     private final UUID uuid;
-    private Set<Entity> entities;
+    private ObjectSet<Entity> entities;
 
 
     /**
@@ -69,14 +74,14 @@ public class World implements Disposable, Updatable {
      * @param generator
      */
     public World(@NotNull ChunkGenerator generator) {
-        this(generator, new Random().nextLong());
+        this(generator, MathUtils.random(Long.MAX_VALUE));
     }
 
     public World(@NotNull ChunkGenerator generator, long seed) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
-        chunks = new ConcurrentHashMap<>();
-        entities = ConcurrentHashMap.newKeySet();
+        chunks = new ObjectMap<>();
+        entities = new ObjectSet<>();
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
@@ -461,7 +466,8 @@ public class World implements Disposable, Updatable {
         getRender().updatePhysics();
 
         long tick = getWorldTicker().getTickId();
-        for (Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
+        for (//noinspection LibGDXUnsafeIterator
+            Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
             Chunk chunk = iterator.next();
 
             //clean up dead chunks
@@ -473,13 +479,14 @@ public class World implements Disposable, Updatable {
             //Unload chunks not seen for 5 seconds
             if (chunk.isAllowingUnloading() && getRender().isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
-                System.out.println("unloaded chunk " + chunk.toString());
+//                System.out.println("unloaded chunk " + chunk.toString());
                 unload(chunk);
                 iterator.remove();
                 continue;
             }
             chunk.update();
         }
+        //noinspection LibGDXUnsafeIterator
         for (Entity entity : entities) {
             entity.update();
         }
@@ -488,8 +495,8 @@ public class World implements Disposable, Updatable {
     /**
      * @return unmodifiable view of the current entities
      */
-    public Set<Entity> getEntities() {
-        return Collections.unmodifiableSet(entities);
+    public ObjectSet<Entity> getEntities() {
+        return entities;
     }
 
     /**
@@ -517,11 +524,21 @@ public class World implements Disposable, Updatable {
         entity.dispose();
     }
 
-    public Collection<Chunk> getLoadedChunks() {
+    public ObjectMap.Values<Chunk> getLoadedChunks() {
         return chunks.values();
     }
 
     public ChunkLoader getChunkLoader() {
         return chunkLoader;
+    }
+
+    private static final class VecPool extends Pool<Vector2> {
+
+        static VecPool vecPool = new VecPool();
+
+        @Override
+        protected Vector2 newObject() {
+            return new Vector2();
+        }
     }
 }
