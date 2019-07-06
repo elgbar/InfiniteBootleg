@@ -44,7 +44,7 @@ public final class PointLightPool extends Pool<PointLight> {
 
     @Override
     protected PointLight newObject() {
-        PointLight light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, 0, 0);
+        PointLight light = new PointLight(rayHandler, POINT_LIGHT_RAYS, new Color(1, 1, 0.9f, 1), POINT_LIGHT_DISTANCE, 0, 0);
         light.setStaticLight(true);
         light.setXray(true);
         return light;
