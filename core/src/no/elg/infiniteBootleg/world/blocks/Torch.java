@@ -13,30 +13,32 @@ import org.jetbrains.annotations.NotNull;
 
 public class Torch extends Block {
 
-    public static StaticPointLightPool lightPool = new StaticPointLightPool();
-
     private PointLight light;
 
     public Torch(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        light = lightPool.obtain();
-        light.setPosition(getWorldLoc().x + 0.5f, getWorldLoc().y + 0.5f);
+        if (Main.renderGraphic) {
+            light = StaticPointLightPool.lightPool.obtain();
+            light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+        }
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        lightPool.free(light);
+        StaticPointLightPool.lightPool.free(light);
     }
 
-    private static class StaticPointLightPool extends Pool<PointLight> {
+    private static final class StaticPointLightPool extends Pool<PointLight> {
+
+        public static StaticPointLightPool lightPool = new StaticPointLightPool();
 
         private final RayHandler rayHandler;
 
         public static final int POINT_LIGHT_RAYS = 32;
         public static final int POINT_LIGHT_DISTANCE = 5;
 
-        public StaticPointLightPool() {
+        private StaticPointLightPool() {
             rayHandler = Main.inst().getWorld().getRender().getRayHandler();
         }
 

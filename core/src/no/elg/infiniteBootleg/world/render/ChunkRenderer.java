@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
@@ -64,9 +63,8 @@ public class ChunkRenderer implements Renderer, Disposable {
                 if (block == null || block.getMaterial() == AIR) {
                     continue;
                 }
-                Location blkLoc = block.getLocalLoc();
-                int dx = blkLoc.x * BLOCK_SIZE;
-                int dy = blkLoc.y * BLOCK_SIZE;
+                int dx = block.getLocalX() * BLOCK_SIZE;
+                int dy = block.getLocalY() * BLOCK_SIZE;
                 //noinspection ConstantConditions
                 batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
             }

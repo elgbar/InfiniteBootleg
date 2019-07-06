@@ -3,11 +3,8 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.util.Binembly;
-import no.elg.infiniteBootleg.util.CoordUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 /**
  * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location and its
@@ -22,12 +19,18 @@ public class Block implements Binembly, Disposable {
     private Material material;
     private World world;
     private Chunk chunk;
-    private Location worldLoc;
-    private Location localLoc;
+
+    protected int worldX;
+    protected int worldY;
+
+    private int localX;
+    private int localY;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
-        worldLoc = CoordUtil.chunkToWorld(chunk.getLocation(), localX, localY);
-        localLoc = new Location(localX, localY);
+        this.localX = localX;
+        this.localY = localY;
+        worldX = chunk.getWorldX(localX);
+        worldY = chunk.getWorldY(localY);
 
         this.material = material;
         this.world = world;
@@ -56,18 +59,33 @@ public class Block implements Binembly, Disposable {
         return world;
     }
 
+
     /**
      * @return World location of this block
      */
-    public Location getWorldLoc() {
-        return worldLoc;
+    public int getWorldX() {
+        return worldX;
+    }
+
+    /**
+     * @return World location of this block
+     */
+    public int getWorldY() {
+        return worldY;
     }
 
     /**
      * @return The offset/local position of this block within its chunk
      */
-    public Location getLocalLoc() {
-        return localLoc;
+    public int getLocalX() {
+        return localX;
+    }
+
+    /**
+     * @return The offset/local position of this block within its chunk
+     */
+    public int getLocalY() {
+        return localY;
     }
 
     /**
@@ -80,7 +98,7 @@ public class Block implements Binembly, Disposable {
      */
     @NotNull
     public Block getRelative(@NotNull Direction dir) {
-        return world.getBlock(worldLoc.x + dir.dx, worldLoc.y + dir.dy);
+        return world.getBlock(worldX + dir.dx, worldY + dir.dy);
     }
 
     /**
@@ -93,31 +111,7 @@ public class Block implements Binembly, Disposable {
      */
     @Nullable
     public Block getRawRelative(@NotNull Direction dir) {
-        return world.getRawBlock(worldLoc.x + dir.dx, worldLoc.y + dir.dy);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-
-        Block block = (Block) o;
-
-        if (!worldLoc.equals(block.worldLoc)) { return false; }
-        return Objects.equals(world, block.world);
-    }
-
-
-    @Override
-    public int hashCode() {
-        int result = material.hashCode();
-        result = 31 * result + worldLoc.hashCode();
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return getMaterial() + "-block{" + "loc=" + worldLoc + ", world=" + world + '}';
+        return world.getRawBlock(worldX + dir.dx, worldY + dir.dy);
     }
 
     @NotNull
@@ -134,5 +128,32 @@ public class Block implements Binembly, Disposable {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+
+        Block block = (Block) o;
+
+        if (worldX != block.worldX) { return false; }
+        if (worldY != block.worldY) { return false; }
+        if (material != block.material) { return false; }
+        return world.equals(block.world);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = world.hashCode();
+        result = 31 * result + worldX;
+        result = 31 * result + worldY;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" + "material=" + material + ", world=" + world + ", chunk=" + chunk + ", worldX=" + worldX + ", worldY=" +
+               worldY + ", localX=" + localX + ", localY=" + localY + '}';
     }
 }

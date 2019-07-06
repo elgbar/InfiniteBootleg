@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.generator;
 
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
@@ -40,21 +39,21 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     }
 
     @Override
-    public @NotNull Chunk generate(@NotNull World world, @NotNull Location chunkPos) {
-        Chunk chunk = new Chunk(world, chunkPos);
+    public @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY) {
+        Chunk chunk = new Chunk(world, chunkX, chunkY);
 //        Main.SCHEDULER.executeAsync(() -> {
         for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-            int worldX = chunkPos.x * CHUNK_SIZE + localX;
+            int worldX = CoordUtil.chunkToWorld(chunkX, localX);
             Biome biome = getBiome(worldX);
 
             int worldY = biome.heightAt(this, worldX);
 
-            int chunkY = CoordUtil.worldToChunk(worldY);
+            int genChunkY = CoordUtil.worldToChunk(worldY);
 
-            if (chunkPos.y == chunkY) {
-                biome.fillUpTo(noise, chunk, localX, worldY - chunkY * CHUNK_SIZE, worldY);
+            if (chunkY == genChunkY) {
+                biome.fillUpTo(noise, chunk, localX, worldY - genChunkY * CHUNK_SIZE, worldY);
             }
-            else if (chunkPos.y < chunkY) {
+            else if (chunkY < genChunkY) {
                 biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, worldY);
             }
         }

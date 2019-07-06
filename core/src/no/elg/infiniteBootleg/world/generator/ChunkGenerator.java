@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.generator;
 
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import org.jetbrains.annotations.NotNull;
@@ -24,10 +23,12 @@ public interface ChunkGenerator {
     /**
      * @param world
      *     The world to generate the chunk in
-     * @param chunkPos
-     *     Location of chunk in world to generate
+     * @param chunkX
+     *     X coordinate of chunk in world to generate
+     * @param chunkY
+     *     Y coordinate of chunk in world to generate
      *
      * @return A chunk at the given offset in the given world
      */
-    @NotNull Chunk generate(@NotNull World world, @NotNull Location chunkPos);
+    @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY);
 }

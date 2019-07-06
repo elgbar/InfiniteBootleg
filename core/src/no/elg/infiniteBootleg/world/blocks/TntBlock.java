@@ -10,11 +10,7 @@ import no.elg.infiniteBootleg.world.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
@@ -64,16 +60,17 @@ public class TntBlock extends UpdatableBlock {
             exploded = true;
             Main.SCHEDULER.executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
-                Location loc = getWorldLoc();
-                for (int x = (int) (loc.x - strength); x < loc.x + strength; x++) {
-                    for (int y = (int) (loc.y - strength); y < loc.y + strength; y++) {
+
+                for (int x = (int) Math.floor(worldX - strength); x < worldX + strength; x++) {
+                    for (int y = (int) Math.floor(worldY - strength); y < worldY + strength; y++) {
                         Block b = getWorld().getRawBlock(x, y);
                         Material mat = b == null ? AIR : b.getMaterial();
                         float hardness = mat.getHardness();
-                        if (mat == AIR || hardness <= 0) {
+                        if (mat == AIR || hardness < 0) {
                             continue;
                         }
-                        double dist = loc.distCubed(b.getWorldLoc()) * hardness * Math.abs(random.nextGaussian() + RESISTANCE);
+                        double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness *
+                                      Math.abs(random.nextGaussian() + RESISTANCE);
                         if (dist < strength * strength) {
                             if (b instanceof TntBlock && b != this) {
                                 TntBlock tntb = (TntBlock) b;
@@ -85,11 +82,11 @@ public class TntBlock extends UpdatableBlock {
                 }
 
                 Gdx.app.postRunnable(() -> {
-                    Set<Chunk> chunks = ConcurrentHashMap.newKeySet();
+                    Set<Chunk> chunks = new HashSet<>();
                     for (Block block : destroyed) {
-                        getWorld().setBlock(block.getWorldLoc(), null, false);
+                        getWorld().setBlock(block.getWorldX(), block.getWorldY(), null, false);
                         chunks.add(block.getChunk());
-                        getWorld().updateBlocksAround(block.getWorldLoc().x, block.getWorldLoc().y);
+                        getWorld().updateBlocksAround(block.getWorldX(), block.getWorldY());
                     }
                     for (Chunk chunk : chunks) {
                         chunk.updateTexture(false);

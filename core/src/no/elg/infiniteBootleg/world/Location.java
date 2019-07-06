@@ -18,12 +18,20 @@ public class Location {
         this.y = y;
     }
 
+    public static Location relative(int x, int y, @NotNull Direction dir) {
+        return new Location(x + dir.dx, y + dir.dy);
+    }
+
     public Location scl(int x, int y) {
         return new Location(this.x * x, this.y * y);
     }
 
     public long distCubed(@NotNull Location loc) {
-        return (loc.x - x) * (loc.x - x) + (loc.y - y) * (loc.y - y);
+        return distCubed(x, y, loc.x, loc.y);
+    }
+
+    public static long distCubed(int x1, int y1, int x2, int y2) {
+        return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
     }
 
     public double dist(@NotNull Location loc) {

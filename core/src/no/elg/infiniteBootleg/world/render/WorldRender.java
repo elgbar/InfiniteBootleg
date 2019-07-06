@@ -13,7 +13,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.*;
+import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.WorldTicker;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -145,11 +148,12 @@ public class WorldRender implements Updatable, Renderer, Disposable {
                 }
                 TextureRegion textureRegion = chunk.getTextureRegion(); //get texture here to update last viewed in chunk
                 if (textureRegion == null) {
+                    chunkRenderer.queueRendering(chunk, false);
                     continue;
                 }
 
-                float dx = chunk.getLocation().x * CHUNK_TEXTURE_SIZE;
-                float dy = chunk.getLocation().y * CHUNK_TEXTURE_SIZE;
+                float dx = chunk.getChunkX() * CHUNK_TEXTURE_SIZE;
+                float dy = chunk.getChunkY() * CHUNK_TEXTURE_SIZE;
 
                 batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
             }
@@ -172,9 +176,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
      * @return {@code true} if the given chunk is outside the view of the camera
      */
     public boolean isOutOfView(@NotNull Chunk chunk) {
-        Location pos = chunk.getLocation();
-        return pos.x < chunksInView[HOR_START] || pos.x >= chunksInView[HOR_END] || pos.y < chunksInView[VERT_START] ||
-               pos.y >= chunksInView[VERT_END];
+        return chunk.getChunkX() < chunksInView[HOR_START] || chunk.getChunkX() >= chunksInView[HOR_END] ||
+               chunk.getChunkY() < chunksInView[VERT_START] || chunk.getChunkY() >= chunksInView[VERT_END];
     }
 
     public int[] getChunksInView() {

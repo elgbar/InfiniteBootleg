@@ -128,11 +128,11 @@ public class Main extends ApplicationAdapter {
         int h = Gdx.graphics.getHeight();
 
         Chunk pointChunk = world.getChunkFromWorld(mouseBlockX, mouseBlockY);
-        String pointing = String.format("Pointing at %s (%d, %d) (exists? %b) in chunk %s (type: %s just air? %b)",//
+        String pointing = String.format("Pointing at %s (%d, %d) (exists? %b) in chunk (%d, %d) (type: %s just air? %b)",//
                                         block != null ? block.getMaterial() : Material.AIR, //
                                         mouseBlockX, mouseBlockY, //
                                         block != null, //
-                                        pointChunk.getLocation(),  //
+                                        pointChunk.getChunkX(), pointChunk.getChunkY(), //
                                         world.getChunkLoader().getGenerator().getBiome(mouseBlockX), //
                                         pointChunk.isAllAir());
 

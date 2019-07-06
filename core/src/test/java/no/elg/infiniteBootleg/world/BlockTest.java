@@ -22,14 +22,15 @@ public class BlockTest extends TestGraphic {
     @Test
     public void correctType() {
         for (Material mat : Material.values()) {
-            Block b = mat.create(world, new Chunk(world, new Location(0, 0)), 0, 0);
+            Block b = mat.create(world, new Chunk(world, 0, 0), 0, 0);
             assertEquals(mat, b.getMaterial());
         }
     }
 
     @Test
     public void correctCoordinated() {
-        assertEquals(world.getBlock(-1, -1).getWorldLoc(), new Location(-1, -1));
+        assertEquals(-1, world.getBlock(-1, 0).getWorldX());
+        assertEquals(-1, world.getBlock(-2, -1).getWorldY());
     }
 
     @Test
@@ -54,6 +55,5 @@ public class BlockTest extends TestGraphic {
                 assertEquals(mat, world.getBlock(x, y).getMaterial());
             }
         }
-
     }
 }

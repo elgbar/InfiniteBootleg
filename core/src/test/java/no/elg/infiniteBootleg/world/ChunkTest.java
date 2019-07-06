@@ -20,12 +20,10 @@ import static org.junit.Assert.*;
 public class ChunkTest extends TestGraphic {
 
     private Chunk chunk;
-    private Location loc;
 
     @Before
     public void setUp() {
-        loc = new Location(0, 0);
-        chunk = new Chunk(new World(new EmptyChunkGenerator()), loc);
+        chunk = new Chunk(new World(new EmptyChunkGenerator()), 0, 0);
     }
 
     @Test
@@ -58,13 +56,13 @@ public class ChunkTest extends TestGraphic {
     @Test
     public void checkAllAirModified() {
         chunk.setBlock(0, 0, Material.AIR, false);
-        chunk.updateTextureNow();
+        chunk.updateTextureNow(false);
         assertTrue(chunk.isAllAir());
         chunk.setBlock(0, 0, Material.STONE, false);
-        chunk.updateTextureNow();
+        chunk.updateTextureNow(false);
         assertFalse(chunk.isAllAir());
         chunk.setBlock(0, 0, Material.AIR, false);
-        chunk.updateTextureNow();
+        chunk.updateTextureNow(false);
         assertTrue(chunk.isAllAir());
     }
 
@@ -85,9 +83,9 @@ public class ChunkTest extends TestGraphic {
         chunk.setBlock(0, 0, Material.AIR, false);
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
-                Location loc = chunk.getBlock(x, y).getWorldLoc();
-                assertEquals(x, loc.x);
-                assertEquals(y, loc.y);
+                Block b = chunk.getBlock(x, y);
+                assertEquals(x, b.getWorldX());
+                assertEquals(y, b.getWorldY());
             }
         }
     }

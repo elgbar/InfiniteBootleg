@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world.generator.biome;
 import com.badlogic.gdx.utils.Array;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
@@ -91,9 +90,8 @@ public enum Biome {
     }
 
     public void fillUpTo(@NotNull PerlinNoise noise, @NotNull Chunk chunk, int localX, int localY, int height) {
-        Location chunkLoc = chunk.getWorldLoc();
         for (int dy = 0; dy < localY; dy++) {
-            chunk.setBlock(localX, dy, materialAt(noise, height, chunkLoc.x + localX, chunkLoc.y + dy), false);
+            chunk.setBlock(localX, dy, materialAt(noise, height, chunk.getWorldX() + localX, chunk.getWorldY() + dy), false);
         }
     }
 }

@@ -41,8 +41,10 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
 
     private final World world;
-    private final Location chunkPos;
     private final Block[][] blocks;
+
+    private final int chunkX;
+    private final int chunkY;
 
     private final Set<UpdatableBlock> updatableBlocks;
 
@@ -64,27 +66,33 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *
      * @param world
      *     The world this chunk exists in
-     * @param chunkPos
-     *     The position of this chunk the given world
+     * @param chunkX
+     *     The position x of this chunk the given world
+     * @param chunkY
+     *     The position y of this chunk the given world
      */
-    public Chunk(@NotNull World world, @NotNull Location chunkPos) {
-        this(world, chunkPos, new Block[CHUNK_SIZE][CHUNK_SIZE]);
+    public Chunk(@NotNull World world, int chunkX, int chunkY) {
+        this(world, chunkX, chunkY, new Block[CHUNK_SIZE][CHUNK_SIZE]);
     }
 
     /**
      * @param world
      *     The world this chunk exists in
-     * @param chunkPos
-     *     The position of this chunk the given world
+     * @param chunkX
+     *     The position x of this chunk the given world
+     * @param chunkY
+     *     The position y of this chunk the given world
      * @param blocks
      *     The initial blocks of this chunk (note: must be {@link #CHUNK_SIZE}x{@link #CHUNK_SIZE})
      */
-    public Chunk(@NotNull World world, @NotNull Location chunkPos, @NotNull Block[][] blocks) {
+    public Chunk(@NotNull World world, int chunkX, int chunkY, @NotNull Block[][] blocks) {
         Preconditions.checkArgument(blocks.length == CHUNK_SIZE);
         Preconditions.checkArgument(blocks[0].length == CHUNK_SIZE);
         this.world = world;
-        this.chunkPos = chunkPos;
         this.blocks = blocks;
+        this.chunkX = chunkX;
+        this.chunkY = chunkY;
+
 
         updatableBlocks = new HashSet<>();
 
@@ -145,9 +153,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
             //recalculate the shape of the chunk (box2d)
 
-
             BodyDef bodyDef = new BodyDef();
-            bodyDef.position.set(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE);
+            bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
             box2dBody = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
             box2dBody.setAwake(false);
 
@@ -197,7 +204,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             if (recalcNeighbors) {
                 //TODO Try to optimize this (ie select what directions to recalculate)
                 for (Direction direction : Direction.CARDINAL) {
-                    Location relChunk = getLocation().relative(direction);
+                    Location relChunk = Location.relative(chunkX, chunkY, direction);
                     if (getWorld().isChunkLoaded(relChunk)) {
                         getWorld().getChunk(relChunk).updateTextureNow(false);
                     }
@@ -288,7 +295,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             modified = true;
             dirty = true;
             prioritize = true;
-            getWorld().updateBlocksAround(getWorldLoc(localX, localY));
+            getWorld().updateBlocksAround(getWorldX(localX), getWorldY(localY));
         }
     }
 
@@ -417,12 +424,21 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         return world;
     }
 
+    public int getChunkX() {
+        return chunkX;
+    }
+
+    public int getChunkY() {
+        return chunkY;
+    }
+
     /**
-     * @return Location of this chunk in chunk coordinates
+     * @return Location of this chunk in world coordinates
+     *
+     * @see CoordUtil#chunkToWorld(Location)
      */
-    @NotNull
-    public Location getLocation() {
-        return chunkPos;
+    public int getWorldX() {
+        return CoordUtil.chunkToWorld(chunkX);
     }
 
     /**
@@ -432,24 +448,32 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *
      * @see CoordUtil#chunkToWorld(Location)
      */
-    @NotNull
-    public Location getWorldLoc() {
-        return CoordUtil.chunkToWorld(chunkPos);
+    public int getWorldY() {
+        return CoordUtil.chunkToWorld(chunkY);
     }
 
     /**
      * @param localX
      *     The local chunk x coordinate
+     *
+     * @return The world coordinate from the local position as offset
+     *
+     * @see CoordUtil#chunkToWorld(int, int)
+     */
+    public int getWorldX(int localX) {
+        return CoordUtil.chunkToWorld(chunkX, localX);
+    }
+
+    /**
      * @param localY
      *     The local chunk y coordinate
      *
      * @return The world coordinate from the local position as offset
      *
-     * @see CoordUtil#chunkToWorld(Location, int, int)
+     * @see CoordUtil#chunkToWorld(int, int)
      */
-    @NotNull
-    public Location getWorldLoc(int localX, int localY) {
-        return CoordUtil.chunkToWorld(chunkPos, localX, localY);
+    public int getWorldY(int localY) {
+        return CoordUtil.chunkToWorld(chunkX, localY);
     }
 
     /**
@@ -466,22 +490,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public boolean isModified() {
         return modified;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-
-        Chunk chunk = (Chunk) o;
-
-        if (!Objects.equals(world, chunk.world)) { return false; }
-        return chunkPos.equals(chunk.chunkPos);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * world.hashCode() + chunkPos.hashCode();
     }
 
     @NotNull
@@ -514,11 +522,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     @Override
-    public String toString() {
-        return "Chunk{" + "world=" + world + ", chunkPos=" + chunkPos + '}';
-    }
-
-    @Override
     public void dispose() {
         if (fbo != null) {
             fbo.dispose();
@@ -528,16 +531,16 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     @Nullable
     public FileHandle getChunkFile() {
         if (chunkFile == null) {
-            chunkFile = getChunkFile(world, chunkPos);
+            chunkFile = getChunkFile(world, chunkX, chunkY);
         }
         return chunkFile;
     }
 
     @Nullable
-    public static FileHandle getChunkFile(@NotNull World world, @NotNull Location chunkPos) {
+    public static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
         FileHandle worldFile = world.worldFolder();
         if (worldFile == null) { return null; }
-        return worldFile.child(CHUNK_FOLDER + File.separator + chunkPos.x + File.separator + chunkPos.y);
+        return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY);
     }
 
     @NotNull
@@ -571,5 +574,31 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 blocks[x][y] = block;
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+
+        Chunk chunk = (Chunk) o;
+
+        if (chunkX != chunk.chunkX) { return false; }
+        if (chunkY != chunk.chunkY) { return false; }
+        if (loaded != chunk.loaded) { return false; }
+        return world.equals(chunk.world);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = world.hashCode();
+        result = 31 * result + chunkX;
+        result = 31 * result + chunkY;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Chunk{" + "world=" + world + ", chunkX=" + chunkX + ", chunkY=" + chunkY + ", loaded=" + loaded + '}';
     }
 }

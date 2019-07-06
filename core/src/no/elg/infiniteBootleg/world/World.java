@@ -107,10 +107,9 @@ public class World implements Disposable, Updatable {
     public Chunk getChunk(@NotNull Location chunkLoc) {
         Chunk chunk = chunks.get(chunkLoc);
         if (chunk == null) {
-            chunk = chunkLoader.load(chunkLoc);
+            chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
             chunks.put(chunkLoc, chunk);
         }
-//        System.out.println("chunk.isLoaded() = " + chunk.isLoaded());
         return chunk;
     }
 
@@ -270,16 +269,6 @@ public class World implements Disposable, Updatable {
     }
 
     /**
-     * Set all blocks around a given block to be updated
-     *
-     * @param worldLoc
-     *     The coordinates to updates around (but not included)
-     */
-    public void updateBlocksAround(@NotNull Location worldLoc) {
-        updateBlocksAround(worldLoc.x, worldLoc.y);
-    }
-
-    /**
      * Set all blocks in all cardinal directions around a given block to be updated. Given location not included
      *
      * @param worldX
@@ -318,7 +307,7 @@ public class World implements Disposable, Updatable {
      * @return If the chunk was unloaded
      */
     public boolean unload(@Nullable Chunk chunk) {
-        if (chunk == null || !chunk.isLoaded() || !isChunkLoaded(chunk.getLocation())) {
+        if (chunk == null || !chunk.isLoaded() || !isChunkLoaded(chunk.getChunkX(), chunk.getChunkY())) {
             return false;
         }
         chunk.dispose();
@@ -484,7 +473,7 @@ public class World implements Disposable, Updatable {
             //Unload chunks not seen for 5 seconds
             if (chunk.isAllowingUnloading() && getRender().isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
-                System.out.println("unloaded chunk " + chunk.getLocation());
+                System.out.println("unloaded chunk " + chunk.toString());
                 unload(chunk);
                 iterator.remove();
                 continue;

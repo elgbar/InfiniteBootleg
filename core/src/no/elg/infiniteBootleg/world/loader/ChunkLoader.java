@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world.loader;
 import com.badlogic.gdx.files.FileHandle;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
@@ -27,34 +26,38 @@ public class ChunkLoader {
     }
 
     /**
-     * @param chunkLoc
-     *     The location of the chunk
+     * @param chunkX
+     *     The y coordinate of the chunk (in chunk view)
+     * @param chunkY
+     *     The x coordinate of the chunk (in chunk view)
      *
      * @return If a chunk at the given location exists
      */
-    public boolean existsOnDisk(@NotNull Location chunkLoc) {
+    public boolean existsOnDisk(int chunkX, int chunkY) {
         if (!Main.loadWorldFromDisk) { return false; }
-        FileHandle chunkFile = Chunk.getChunkFile(world, chunkLoc);
+        FileHandle chunkFile = Chunk.getChunkFile(world, chunkX, chunkY);
         return chunkFile != null && chunkFile.exists();
     }
 
     /**
      * Load the chunk at the given chunk location
      *
-     * @param chunkLoc
-     *     The location of the chunk (in chunk view)
+     * @param chunkX
+     *     The y coordinate of the chunk (in chunk view)
+     * @param chunkY
+     *     The x coordinate of the chunk (in chunk view)
      *
      * @return The loaded chunk
      */
-    public Chunk load(@NotNull Location chunkLoc) {
-        if (existsOnDisk(chunkLoc)) {
-            Chunk chunk = new Chunk(world, chunkLoc);
+    public Chunk load(int chunkX, int chunkY) {
+        if (existsOnDisk(chunkX, chunkY)) {
+            Chunk chunk = new Chunk(world, chunkX, chunkY);
             //noinspection ConstantConditions checked in existsOnDisk
             chunk.assemble(chunk.getChunkFile().readBytes());
             return chunk;
         }
         else {
-            return generator.generate(world, chunkLoc);
+            return generator.generate(world, chunkX, chunkY);
         }
     }
 
