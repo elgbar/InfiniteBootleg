@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.util.Binembly;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,6 +112,10 @@ public class Block implements Binembly, Disposable {
      */
     @Nullable
     public Block getRawRelative(@NotNull Direction dir) {
+        if (CoordUtil.worldToChunk(worldX + dir.dx) == chunk.getChunkX() && //
+            CoordUtil.worldToChunk(worldY + dir.dy) == chunk.getChunkY()) {
+            return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
+        }
         return world.getRawBlock(worldX + dir.dx, worldY + dir.dy);
     }
 
