@@ -473,7 +473,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @see CoordUtil#chunkToWorld(int, int)
      */
     public int getWorldY(int localY) {
-        return CoordUtil.chunkToWorld(chunkX, localY);
+        return CoordUtil.chunkToWorld(chunkY, localY);
     }
 
     /**
