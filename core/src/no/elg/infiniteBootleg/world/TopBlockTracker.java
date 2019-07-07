@@ -1,8 +1,11 @@
 package no.elg.infiniteBootleg.world;
 
+import box2dLight.PointLight;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.IntSet;
+import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.PointLightPool;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,75 +16,62 @@ import org.jetbrains.annotations.NotNull;
 public class TopBlockTracker {
 
     private final World world;
-    private final IntIntMap topBlocks; //Key: world x | Value: chunk y of the top block
-    private final IntMap<IntSet> chunksLocs; //Key: chunk x | Value: All local x's with this chunk as top loc
+    private final IntIntMap topBlocks; //Key: world x | Value: world y of the top block
+    private final IntMap<Array<PointLight>> lightMap; //Key: world x | Value: The light(s) at this location
 
     public TopBlockTracker(@NotNull World world) {
         this.world = world;
         topBlocks = new IntIntMap();
-        chunksLocs = new IntMap<>();
-    }
-
-    public void setTopBlock(int worldX, int worldY) {
-//        int chunkX = CoordUtil.worldToChunk(worldX);
-//        int chunkY = CoordUtil.worldToChunk(worldY);
-//        if (topBlocks.containsKey(worldX)) {
-//            IntSet cs = chunksLocs.get(chunkX);
-//            cs.remove(worldX);
-//            if (cs.isEmpty()) {
-//                chunksLocs.remove(worldX);
-//                world.getChunk(chunkX, topBlocks.get(worldX, 0)).setAllowUnload(true);
-//                System.out.printf("Chunk (%d,%d) is no longer top chunk for world x: %d%n", chunkX, chunkY, worldX);
-//            }
-//        }
-//        world.getChunk(chunkX, chunkY).setAllowUnload(false);
-//        topBlocks.put(worldX, chunkY);
-//        System.out.printf("New top chunk for world x '%d' is Chunk (%d,%d)%n", worldX, chunkX, chunkY);
+        lightMap = new IntMap<>(Chunk.CHUNK_SIZE);
     }
 
     /**
-     * Update the top block of the given world coordinate. If there are no loaded chunks (or all chunks are air) then the top
-     * block will not be updated
-     *
      * @param worldX
+     *     The x coordinate in world view
+     * @param worldY
+     *     The potential new top world block
      */
-    public void update(int worldX) {
+    public void update(int worldX, int worldY) {
+        int knownY = topBlocks.get(worldX, Integer.MIN_VALUE);
+        if (worldY == knownY) {
+            return;
+        }
+        else if (worldX < knownY) {
+            for (int newWorldY = knownY; newWorldY > worldY; newWorldY--) {
+                Block rel = world.getBlock(worldX, newWorldY);
+                if (rel.getMaterial().blocksLight()) {
+                    updateLight(worldX, knownY, newWorldY);
+                    return;
+                }
+            }
+        }
+        updateLight(worldX, knownY, worldY);
+    }
 
+    private void updateLight(int worldX, int oldWorldY, int newWorldY) {
+        if (Main.renderGraphic) {
+            Array<PointLight> lights = lightMap.get(worldX);
+            if (lights != null) {
+                //clean up old lights
+                for (PointLight light : lights) {
+                    PointLightPool.inst.free(light);
+                }
+                lightMap.clear(Math.abs(oldWorldY - newWorldY));
+            }
+            else {
+                lights = new Array<>();
+                lightMap.put(worldX, lights);
+            }
 
-//        int chunkX = CoordUtil.worldToChunk(worldX);
-//
-//
-//        int vertTop = world.getRender().getChunksInView()[WorldRender.VERT_END];
-//        int vertBottom = world.getRender().getChunksInView()[WorldRender.VERT_START];
-//
-//        int horzLeft = world.getRender().getChunksInView()[WorldRender.VERT_START];
-//        int horzRight = world.getRender().getChunksInView()[WorldRender.VERT_END];
-//
-//        //The given world world
-//        if (horzLeft < chunkX || horzRight > chunkX) {
-//            return;
-//        }
-//
-//        //TODO compute with current top chunk
-////        Chunk currChunk = topBlocks.get(worldX);
-////        if (currChunk != null && !currChunk.isAllAir()) {
-////
-////        }
-//
-//        Integer maxY = null;
-//        outer:
-//        for (int chunkY = vertTop - 1; chunkY >= vertBottom; chunkY--) {
-//            for (int localY = chunkY; localY < Chunk.CHUNK_SIZE; localY++) {
-//                int worldY = CoordUtil.chunkToWorld(chunkY, localY);
-//                if (world.isAir(worldX, worldY + 1) && !world.isAir(worldX, worldY + 1)) {
-//                    maxY = chunkY;
-//                    break outer;
-//                }
-//            }
-//
-//        }
-//        if (maxY == null) {
-//
-//        }
+            if (oldWorldY != Integer.MIN_VALUE) {
+                //create new lights
+                for (int y = oldWorldY; y < newWorldY; y++) {
+//                    PointLight light = PointLightPool.inst.obtain();
+//                    light.setPosition(worldX, y);
+//                    lights.add(light);
+                }
+            }
+        }
+        topBlocks.put(worldX, worldX);
     }
 }
