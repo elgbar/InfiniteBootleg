@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +32,7 @@ public abstract class Entity implements Updatable, Disposable {
         flying = false;
 
         world.addEntity(this);
+
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -64,7 +64,7 @@ public abstract class Entity implements Updatable, Disposable {
     /**
      * One unit is {@link Block#BLOCK_SIZE}
      *
-     * @return The width of this entity in blockss
+     * @return The width of this entity in blocks
      */
     public abstract float getWidth();
 
@@ -87,12 +87,12 @@ public abstract class Entity implements Updatable, Disposable {
         return posCache;
     }
 
-    /**
-     * @return The current block position of this entity
-     */
-    public Location getBlockPosition() {
-        Vector2 pos = getPosition();
-        return new Location((int) Math.floor(pos.x), (int) Math.floor(pos.y));
+    public int getBlockX() {
+        return (int) Math.floor(posCache.x);
+    }
+
+    public int getBlockY() {
+        return (int) Math.floor(posCache.y);
     }
 
     public Body getBody() {

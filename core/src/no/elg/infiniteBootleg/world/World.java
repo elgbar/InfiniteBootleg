@@ -45,7 +45,7 @@ public class World implements Disposable, Updatable {
     static {
         ENTITY_FILTER = new Filter();
         ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-        ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+        ENTITY_FILTER.maskBits = GROUND_CATEGORY;
 
         LIGHT_FILTER = new Filter();
         LIGHT_FILTER.categoryBits = LIGHT_CATEGORY;
@@ -293,7 +293,9 @@ public class World implements Disposable, Updatable {
     /**
      * @return If the given chunk is loaded in memory
      */
-    public boolean isChunkLoaded(int chunkX, int chunkY) {return isChunkLoaded(new Location(chunkX, chunkY));}
+    public boolean isChunkLoaded(int chunkX, int chunkY) {
+        return isChunkLoaded(new Location(chunkX, chunkY));
+    }
 
     /**
      * @param chunkLoc
