@@ -81,7 +81,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
             rayHandler = new RayHandler(box2dWorld);
             rayHandler.setBlurNum(0);
 
-            skylight = new DirectionalLight(rayHandler, 12800, Color.WHITE, 280);
+            skylight = new DirectionalLight(rayHandler, 12800, Color.WHITE, -90);
             skylight.setContactFilter(World.LIGHT_FILTER);
         }
         update();

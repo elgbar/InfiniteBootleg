@@ -14,15 +14,14 @@ import org.jetbrains.annotations.NotNull;
 public enum Biome {
 
 
-    PLAINS(0.1, 0.9, 1, 64, 0.009, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
-    MOUNTAINS(100, 0.9, 1, 356, 0.005, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
-    DESERT(0.1, 0.9, 0.9, 32, 0.005, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
+    PLAINS(0.1, 0.9, 64, 0.009, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
+    MOUNTAINS(100, 0.9, 356, 0.005, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
+    DESERT(0.1, 0.9, 32, 0.005, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
 
     public static final int INTERPOLATION_RADIUS = 25;
 
     private final double y;
     private final double z;
-    private final double exponent;
     private final double amplitude;
     private final double frequency;
     private final int offset;
@@ -31,11 +30,10 @@ public enum Biome {
     private final Material[] topBlocks;
 
     @SafeVarargs
-    Biome(double y, double z, double exponent, double amplitude, double frequency, int offset, @NotNull Material filler,
+    Biome(double y, double z, double amplitude, double frequency, int offset, @NotNull Material filler,
           @NotNull Material topmostBlock, @NotNull Tuple<Material, Integer>... topBlocks) {
         this.y = y;
         this.z = z;
-        this.exponent = exponent;
         this.amplitude = amplitude;
         this.frequency = frequency;
         this.offset = offset;

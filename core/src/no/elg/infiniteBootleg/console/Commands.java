@@ -94,8 +94,8 @@ public class Commands extends CommandExecutor {
         Main.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
     }
 
-    @ConsoleDoc(description = "The direction of the skylight", paramDescriptions = "A number between 0 and 180")
-    public void lightDirection(int dir) {
+    @ConsoleDoc(description = "The direction of the skylight", paramDescriptions = "A float between 0 and 180")
+    public void lightDirection(float dir) {
         if (dir < 0) {
             logger.log(LogLevel.ERROR, "Direction can not be less than 0");
             return;
