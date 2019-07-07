@@ -92,7 +92,19 @@ public class Commands extends CommandExecutor {
         if (quality > 4) { quality = 4; }
         else if (quality < 0) { quality = 0; }
         Main.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
+    }
 
+    @ConsoleDoc(description = "The direction of the skylight", paramDescriptions = "A number between 0 and 180")
+    public void lightDirection(int dir) {
+        if (dir < 0) {
+            logger.log(LogLevel.ERROR, "Direction can not be less than 0");
+            return;
+        }
+        else if (dir > 180) {
+            logger.log(LogLevel.ERROR, "Direction can not be greater than or equal to 180");
+            return;
+        }
+        Main.inst().getWorld().getRender().getSkylight().setDirection(-dir);
     }
 
 }
