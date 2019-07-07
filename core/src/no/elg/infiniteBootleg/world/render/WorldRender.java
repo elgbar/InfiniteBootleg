@@ -79,7 +79,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
             rayHandler = new RayHandler(box2dWorld);
-            rayHandler.setBlurNum(0);
+            rayHandler.setBlurNum(1);
 
             skylight = new DirectionalLight(rayHandler, 12800, Color.WHITE, -90);
             skylight.setContactFilter(World.LIGHT_FILTER);
