@@ -146,7 +146,8 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
         Entity player = world.getEntities().iterator().next(); //assume this is the player
 
-        String pos = String.format("p: (%.4f,%.4f) v: (%.4f,%.4f)", player.getPosition().x, player.getPosition().y, 0f, 0f);
+        String pos = String.format("p: (%.2f,%.2f) v: (%.2f,%.2f)", player.getPosition().x, player.getPosition().y,
+                                   player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
         font.draw(batch, "player " + pos, 10, h - 85);
 
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();

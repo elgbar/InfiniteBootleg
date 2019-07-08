@@ -4,13 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Contact;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class FallingBlock extends Entity implements ContactHandler {
 
@@ -24,6 +25,8 @@ public class FallingBlock extends Entity implements ContactHandler {
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
         region.flip(true, false);
+        region.setRegionWidth(getWidth());
+        region.setRegionHeight(getHeight());
     }
 
 
@@ -62,12 +65,12 @@ public class FallingBlock extends Entity implements ContactHandler {
     }
 
     @Override
-    public float getWidth() {
-        return Block.BLOCK_SIZE - 1;
+    public int getWidth() {
+        return BLOCK_SIZE - 1;
     }
 
     @Override
-    public float getHeight() {
-        return Block.BLOCK_SIZE - 1;
+    public int getHeight() {
+        return BLOCK_SIZE - 1;
     }
 }

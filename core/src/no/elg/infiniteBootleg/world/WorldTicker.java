@@ -29,7 +29,7 @@ public class WorldTicker {
     private long stuckFrames;
 
     public WorldTicker(@NotNull World world) {
-        Main.inst().getConsoleLogger().logf("TPS: %d", TICKS_PER_SECOND);
+        Main.inst().getConsoleLogger().log("TPS: " + TICKS_PER_SECOND);
         worldTickThread = new PauseableThread(() -> {
             try {
                 if (frameId != Gdx.graphics.getFrameId()) {

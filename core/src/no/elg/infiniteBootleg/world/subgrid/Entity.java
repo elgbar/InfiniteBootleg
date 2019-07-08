@@ -41,14 +41,18 @@ public abstract class Entity implements Updatable, Disposable {
         body.setFixedRotation(true);
         body.setAwake(true);
 
-        PolygonShape box = new PolygonShape();
-        box.setAsBox(getBox2dWidth() / 2, getBox2dHeight() / 2);
-        Fixture fix = body.createFixture(box, 1.0f);
-        fix.setFilterData(World.ENTITY_FILTER);
-        box.dispose();
+        createFixture();
 
         update();
 
+    }
+
+    protected void createFixture() {
+        PolygonShape box = new PolygonShape();
+        box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
+        Fixture fix = body.createFixture(box, 1.0f);
+        fix.setFilterData(World.ENTITY_FILTER);
+        box.dispose();
     }
 
     @Override
@@ -66,21 +70,21 @@ public abstract class Entity implements Updatable, Disposable {
      *
      * @return The width of this entity in blocks
      */
-    public abstract float getWidth();
-
-    public float getBox2dWidth() {
-        return getWidth() / Block.BLOCK_SIZE;
-    }
+    public abstract int getWidth();
 
     /**
      * One unit is {@link Block#BLOCK_SIZE}
      *
      * @return The height of this entity in blocks
      */
-    public abstract float getHeight();
+    public abstract int getHeight();
 
-    public float getBox2dHeight() {
-        return getHeight() / Block.BLOCK_SIZE;
+    public float getHalfBox2dWidth() {
+        return getWidth() / (Block.BLOCK_SIZE * 2f);
+    }
+
+    public float getHalfBox2dHeight() {
+        return getHeight() / (Block.BLOCK_SIZE * 2f);
     }
 
     public Vector2 getPosition() {

@@ -18,10 +18,11 @@ public class Player extends LivingEntity {
     private final TextureRegion region;
 
     public Player(@NotNull World world) {
-        super(world, world.getRender().getCamera().position.x / BLOCK_SIZE,
-              world.getRender().getCamera().position.y / BLOCK_SIZE);
+        super(world, 0, 0);
         region = new TextureRegion(Material.GRASS.getTextureRegion());
         region.flip(true, false);
+        region.setRegionWidth(getWidth());
+        region.setRegionHeight(getHeight());
     }
 
     @Override
@@ -37,8 +38,8 @@ public class Player extends LivingEntity {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.T)) {
             //teleport the player to the (last) location of the mouse
-            getBody().setTransform(Main.inst().getMouseBlockX() + getBox2dWidth() / 2,
-                                   Main.inst().getMouseBlockY() + getBox2dHeight() / 2, 0);
+            getBody().setTransform(Main.inst().getMouseBlockX() + getHalfBox2dWidth(),
+                                   Main.inst().getMouseBlockY() + getHalfBox2dHeight(), 0);
             getBody().setAngularVelocity(0);
             getBody().setLinearVelocity(0, 0);
             getBody().setAwake(true);
@@ -61,12 +62,12 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public float getWidth() {
-        return BLOCK_SIZE;
+    public int getWidth() {
+        return BLOCK_SIZE - 2;
     }
 
     @Override
-    public float getHeight() {
-        return BLOCK_SIZE;
+    public int getHeight() {
+        return BLOCK_SIZE - 2;
     }
 }
