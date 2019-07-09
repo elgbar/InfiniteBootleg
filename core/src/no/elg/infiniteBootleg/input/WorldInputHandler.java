@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Resizable;
@@ -109,7 +110,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public void resize(int width, int height) {
+        Vector3 old = camera.position.cpy();
         camera.setToOrtho(false, width, height);
+        camera.position.set(old);
         worldRender.update();
     }
 
