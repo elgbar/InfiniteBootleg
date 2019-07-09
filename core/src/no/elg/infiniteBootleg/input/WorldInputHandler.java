@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -18,7 +19,7 @@ import static com.badlogic.gdx.Input.Keys.*;
 /**
  * @author Elg
  */
-public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
+public class WorldInputHandler extends InputAdapter implements Disposable, Updatable, Resizable {
 
 
     private final OrthographicCamera camera;
@@ -106,6 +107,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         return true;
     }
 
+    @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
         worldRender.update();
