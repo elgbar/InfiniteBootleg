@@ -59,13 +59,15 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         int h = Gdx.graphics.getHeight();
 
         Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
-        String pointing = String.format("Pointing at %s (%d, %d) (exists? %b) in chunk (%d, %d) (type: %s just air? %b)",//
-                                        block != null ? block.getMaterial() : Material.AIR, //
-                                        main.getMouseBlockX(), main.getMouseBlockY(), //
-                                        block != null, //
-                                        pointChunk.getChunkX(), pointChunk.getChunkY(), //
-                                        world.getChunkLoader().getGenerator().getBiome(main.getMouseBlockX()), //
-                                        pointChunk.isAllAir());
+        String pointing =
+            String.format("Pointing at %s (%d, %d) (exists? %b) in chunk (%d, %d) (type: %s just air? %b can unload? %b)",//
+                          block != null ? block.getMaterial() : Material.AIR, //
+                          main.getMouseBlockX(), main.getMouseBlockY(), //
+                          block != null, //
+                          pointChunk.getChunkX(), pointChunk.getChunkY(), //
+                          world.getChunkLoader().getGenerator().getBiome(main.getMouseBlockX()), //
+                          pointChunk.isAllAir(), pointChunk.isAllowingUnloading() //
+                         );
 
         batch.begin();
         if (modus == HUDModus.NORMAL) {
