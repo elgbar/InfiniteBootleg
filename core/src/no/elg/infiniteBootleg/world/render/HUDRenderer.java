@@ -22,11 +22,21 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 public class HUDRenderer implements Renderer, Disposable, Resizable {
 
 
+    /**
+     * How much information to show
+     */
+    public enum HUDModus {
+        NORMAL,
+        MINIMAL,
+        NONE
+    }
+
     private SpriteBatch batch;
     private BitmapFont font;
+    private HUDModus modus;
 
     public HUDRenderer() {
-
+        modus = HUDModus.NORMAL;
         batch = new SpriteBatch();
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         font = new BitmapFont(false);
@@ -34,6 +44,10 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
 
     @Override
     public void render() {
+        if (modus == HUDModus.NONE) {
+            return;
+        }
+
         World world = Main.inst().getWorld();
         Main main = Main.inst();
         Block block = world.getRawBlock(main.getMouseBlockX(), main.getMouseBlockY());
@@ -54,19 +68,21 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                         pointChunk.isAllAir());
 
         batch.begin();
-        font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, h - 10);
-        font.draw(batch, "Delta time: " + Gdx.graphics.getDeltaTime(), 10, h - 25);
-        font.draw(batch, pointing, 10, h - 40);
-        font.draw(batch,
-                  "Viewing " + chunksInView + " chunks (" + chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + " blocks)", 10,
-                  h - 55);
-        font.draw(batch, "Zoom: " + world.getRender().getCamera().zoom, 10, h - 70);
-        Entity player = world.getEntities().iterator().next(); //assume this is the player
+        if (modus == HUDModus.NORMAL) {
 
-        String pos = String.format("p: (%.2f,%.2f) v: (%.2f,%.2f)", player.getPosition().x, player.getPosition().y,
-                                   player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
-        font.draw(batch, "player " + pos, 10, h - 85);
+            font.draw(batch,
+                      String.format("FPS: %4d delta: %.5f", Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime()), 10,
+                      h - 10);
+            font.draw(batch, pointing, 10, h - 40);
+            font.draw(batch, String.format("Viewing %d chunks (%d blocks) with zoom: %.3f", chunksInView,
+                                           chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
+                                           world.getRender().getCamera().zoom), 10, h - 55);
+            Entity player = world.getEntities().iterator().next(); //assume this is the player
 
+            String pos = String.format("p: (%.2f,%.2f) v: (%.2f,%.2f)", player.getPosition().x, player.getPosition().y,
+                                       player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
+            font.draw(batch, pos, 10, h - 70);
+        }
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
         if (tr != null) {
             batch.draw(tr, Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3, BLOCK_SIZE * 2, BLOCK_SIZE * 2);
@@ -83,5 +99,13 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
     @Override
     public void resize(int width, int height) {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
+    }
+
+    public HUDModus getModus() {
+        return modus;
+    }
+
+    public void setModus(HUDModus modus) {
+        this.modus = modus;
     }
 }
