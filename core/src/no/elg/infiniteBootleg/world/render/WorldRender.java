@@ -85,6 +85,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
             RayHandler.useDiffuseLight(true);
             rayHandler = new RayHandler(box2dWorld);
             rayHandler.setBlurNum(1);
+            rayHandler.setAmbientLight(0.02f, 0.02f, 0.02f, 1);
 
             skylight = new DirectionalLight(rayHandler, 12800, Color.WHITE, -90);
             skylight.setContactFilter(World.LIGHT_FILTER);
