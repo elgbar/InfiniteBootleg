@@ -193,7 +193,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     }
                     for (Tuple<Direction, byte[]> tuple : ts) {
                         Block rel = b.getRawRelative(tuple.key);
-                        if (rel == null || !rel.getMaterial().blocksLight()) {
+                        if (rel == null || !rel.getMaterial().blocksLight() || (localY == 0 && tuple.key == Direction.NORTH)) {
                             byte[] ds = tuple.value;
                             edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
                             box2dBody.createFixture(edgeShape, 0);

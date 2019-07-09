@@ -108,7 +108,9 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         chunksInView[HOR_END] = (int) Math.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE);
 
         chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
-        chunksInView[VERT_END] = (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE);
+
+        //add one to make sure we are always in darkness underground
+        chunksInView[VERT_END] = (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
 
         if (lights) {
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
