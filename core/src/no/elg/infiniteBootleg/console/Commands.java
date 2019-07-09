@@ -116,7 +116,7 @@ public class Commands extends CommandExecutor {
     }
 
     @ConsoleDoc(description = "The direction of the skylight", paramDescriptions = "A float between 0 and 180")
-    public void lightDirection(float dir) {
+    public void lightDir(float dir) {
         if (dir < 0) {
             logger.log(LogLevel.ERROR, "Direction can not be less than 0");
             return;
@@ -136,6 +136,13 @@ public class Commands extends CommandExecutor {
         } catch (IllegalArgumentException e) {
             logger.log(LogLevel.ERROR, "Unknown HUD modus '" + modusName + "'");
         }
+    }
+
+    @ConsoleDoc(description = "Change the zoom level of the world camera",
+                paramDescriptions = "The new zoom level, min is " + WorldRender.MIN_ZOOM)
+    public void zoom(float zoom) {
+        Main.inst().getWorld().getRender().getCamera().zoom = Math.max(zoom, WorldRender.MIN_ZOOM);
+        Main.inst().getWorld().getRender().update();
     }
 
 }
