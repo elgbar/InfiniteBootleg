@@ -122,15 +122,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
         updatableBlocks = Collections.synchronizedSet(new HashSet<>());
 
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                Block block = blocks[x][y];
-                if (block instanceof UpdatableBlock) {
-                    updatableBlocks.add((UpdatableBlock) block);
-                }
-            }
-        }
-
         allAir = false;
         loaded = true;
         allowUnload = true;
@@ -613,5 +604,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void finishLoading() {
         initializing = false;
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                Block block = blocks[x][y];
+                if (block instanceof UpdatableBlock) {
+                    updatableBlocks.add((UpdatableBlock) block);
+                }
+            }
+        }
     }
 }
