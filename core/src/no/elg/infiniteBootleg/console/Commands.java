@@ -7,6 +7,7 @@ import com.strongjoshua.console.annotation.ConsoleDoc;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.render.HUDRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -105,6 +106,16 @@ public class Commands extends CommandExecutor {
             return;
         }
         Main.inst().getWorld().getRender().getSkylight().setDirection(-dir);
+    }
+
+    @ConsoleDoc(description = "Set how much information to give", paramDescriptions = "normal (default), minimal or none")
+    public void hud(String modusName) {
+        try {
+            HUDRenderer.HUDModus modus = HUDRenderer.HUDModus.valueOf(modusName.toUpperCase());
+            Main.inst().getHud().setModus(modus);
+        } catch (IllegalArgumentException e) {
+            logger.log(LogLevel.ERROR, "Unknown HUD modus '" + modusName + "'");
+        }
     }
 
 }

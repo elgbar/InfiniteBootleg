@@ -161,4 +161,8 @@ public class Main extends ApplicationAdapter {
     public ConsoleHandler getConsole() {
         return console;
     }
+
+    public HUDRenderer getHud() {
+        return hud;
+    }
 }
