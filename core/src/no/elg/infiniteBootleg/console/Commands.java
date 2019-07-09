@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.console;
 
 import box2dLight.DirectionalLight;
+import com.badlogic.gdx.graphics.Color;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
@@ -10,6 +11,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,13 +25,31 @@ public class Commands extends CommandExecutor {
         this.logger = logger;
     }
 
-    @ConsoleDoc(description = "Set the color of the sky! Params are expected to be between 0 and 1",
+    @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1",
                 paramDescriptions = {"red", "green", "blue", "alpha"})
-    public void setSkyColor(float r, float g, float b, float a) {
+    public void skyColor(float r, float g, float b, float a) {
         if (Main.renderGraphic) {
             DirectionalLight skylight = Main.inst().getWorld().getRender().getSkylight();
             skylight.setColor(r, g, b, a);
             logger.log("Sky color changed to " + skylight.getColor());
+        }
+        else {
+            logger.log(LogLevel.ERROR, "Cannot change the color of the sky as graphics are not enabled");
+        }
+    }
+
+    @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
+    public void skyColor(String colorName) {
+        if (Main.renderGraphic) {
+            DirectionalLight skylight = Main.inst().getWorld().getRender().getSkylight();
+            try {
+                Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
+                skylight.setColor(color);
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
+                logger.logf(LogLevel.ERROR, "Unknown color '%s'", colorName);
+                return;
+            }
+            logger.log("Sky color changed to " + colorName.toLowerCase());
         }
         else {
             logger.log(LogLevel.ERROR, "Cannot change the color of the sky as graphics are not enabled");
