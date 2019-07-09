@@ -62,11 +62,11 @@ public class PerlinNoise {
      *
      * @return The perlin noise at the given location modified by the number of octaves and the persistence
      */
-    public double octaveNoise(double x, double y, double z, int octaves, double persistence) {
-        double total = 0;
-        double frequency = 1;
-        double amplitude = 1;
-        double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
+    public float octaveNoise(float x, float y, float z, int octaves, float persistence) {
+        float total = 0;
+        float frequency = 1;
+        float amplitude = 1;
+        float maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
         for (int i = 0; i < octaves; i++) {
             total += noise(x, y, z, amplitude, frequency);
 
@@ -93,7 +93,7 @@ public class PerlinNoise {
      *
      * @return The perlin noise at the given location modified by the frequency and amplitude
      */
-    public double noise(double x, double y, double z, double amplitude, double frequency) {
+    public float noise(float x, float y, float z, float amplitude, float frequency) {
         return noise(x * frequency, y * frequency, z * frequency) * amplitude;
     }
 
@@ -108,7 +108,7 @@ public class PerlinNoise {
      *
      * @return The perlin noise at the given location
      */
-    public double noise(double x, double y, double z) {
+    public float noise(float x, float y, float z) {
         // FIND UNIT CUBE THAT CONTAINS POINT.
         int X = (int) Math.floor(x) & 255, Y = (int) Math.floor(y) & 255, Z = (int) Math.floor(z) & 255;
         // FIND RELATIVE X,Y,Z OF POINT IN CUBE.
@@ -116,7 +116,7 @@ public class PerlinNoise {
         y -= Math.floor(y);
         z -= Math.floor(z);
         // COMPUTE FADE CURVES FOR EACH OF X,Y,Z.
-        double u = fade(x), v = fade(y), w = fade(z);
+        float u = fade(x), v = fade(y), w = fade(z);
         // HASH COORDINATES OF THE 8 CUBE CORNERS,
         int A = p[X] + Y, AA = p[A] + Z, AB = p[A + 1] + Z, B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z;
         // AND ADD BLENDED RESULTS FROM 8 CORNERS OF CUBE
@@ -133,15 +133,15 @@ public class PerlinNoise {
         //@formatter:on
     }
 
-    private static double fade(double t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+    private static float fade(float t) { return t * t * t * (t * (t * 6 - 15) + 10); }
 
-    private static double lerp(double t, double a, double b) { return a + t * (b - a); }
+    private static float lerp(float t, float a, float b) { return a + t * (b - a); }
 
-    private static double grad(int hash, double x, double y, double z) {
+    private static float grad(int hash, float x, float y, float z) {
         // CONVERT LO 4 BITS OF HASH CODE INTO 12 GRADIENT DIRECTIONS.
         int h = hash & 15;
-        double u = h < 8 ? x : y;
-        double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        float u = h < 8 ? x : y;
+        float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 }

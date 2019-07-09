@@ -14,23 +14,23 @@ import org.jetbrains.annotations.NotNull;
 public enum Biome {
 
 
-    PLAINS(0.1, 0.9, 64, 0.009, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
-    MOUNTAINS(100, 0.9, 356, 0.005, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
-    DESERT(0.1, 0.9, 32, 0.005, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
+    PLAINS(0.1f, 0.9f, 64, 0.009f, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
+    MOUNTAINS(100f, 0.9f, 356, 0.005f, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
+    DESERT(0.1f, 0.9f, 32, 0.005f, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
 
     public static final int INTERPOLATION_RADIUS = 25;
 
-    private final double y;
-    private final double z;
-    private final double amplitude;
-    private final double frequency;
+    private final float y;
+    private final float z;
+    private final float amplitude;
+    private final float frequency;
     private final int offset;
     private final Material filler;
     private final Material topmostBlock;
     private final Material[] topBlocks;
 
     @SafeVarargs
-    Biome(double y, double z, double amplitude, double frequency, int offset, @NotNull Material filler,
+    Biome(float y, float z, float amplitude, float frequency, int offset, @NotNull Material filler,
           @NotNull Material topmostBlock, @NotNull Tuple<Material, Integer>... topBlocks) {
         this.y = y;
         this.z = z;
@@ -50,16 +50,16 @@ public enum Biome {
         this.topBlocks = mats.toArray();
     }
 
-    public static double rawHeightAt(@NotNull PerlinNoise noise, int worldX, double y, double z, double amplitude,
-                                     double frequency, int offset) {
-        return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude + offset;
+    public static float rawHeightAt(@NotNull PerlinNoise noise, int worldX, float y, float z, float amplitude, float frequency,
+                                    int offset) {
+        return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5f) * amplitude + offset;
     }
 
     public Material materialAt(@NotNull PerlinNoise noise, int height, int worldX, int worldY) {
         int delta = height - worldY - 1;
         if (delta == 0) { return topmostBlock; }
 
-        delta += (int) Math.abs(Math.floor(rawHeightAt(noise, worldX, y, z, 10, 0.05, 0)));
+        delta += (int) Math.abs(Math.floor(rawHeightAt(noise, worldX, y, z, 10, 0.05f, 0)));
 
         if (delta >= topBlocks.length) { return filler; }
         return topBlocks[delta];

@@ -16,6 +16,9 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
  */
 public class PerlinChunkGenerator implements ChunkGenerator {
 
+    private static final float CAVE_CREATION_THRESHOLD = 0.95f; //noise values above this value will be cave (ie air)
+    private static final float WORM_SIZE_AMPLITUDE = 0.15f; //how much the size of the caves(worms) changes
+    private static final float WORM_SIZE_FREQUENCY = 0.01f; //how fast the size of the caves(worms) changes
     private final PerlinNoise noise;
     private final FastNoise noise2;
 
@@ -38,7 +41,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     public @NotNull Biome getBiome(int worldX) {
 
         float a = 1.25f;
-        double height = (noise.noise(worldX, 0.5, 0.5, a, 0.001) + a) / (a * 2);
+        float height = (noise.noise(worldX, 0.5f, 0.5f, a, 0.001f) + a) / (a * 2);
 
         if (height > 0.7) {
             return Biome.MOUNTAINS;
@@ -80,12 +83,10 @@ public class PerlinChunkGenerator implements ChunkGenerator {
             for (int localY = 0; localY < CHUNK_SIZE; localY++) {
                 int worldY = worldChunkY + localY;
 
-                double wormSize = 1 + Math.abs(noise.noise(worldX, worldY, 1, 0.15f, 0.01f));
-//                System.out.println("y -> wormSize = " + worldY + " -> " + wormSize);
-
-                double x = noise2.GetNoise(worldX, worldY) / wormSize;
-//                System.out.println("n:y" + x + ":" + worldY);
-                if (x > 0.95) {
+                //calculate the size of the worm
+                float wormSize = 1 + Math.abs(noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
+                float x = noise2.GetNoise(worldX, worldY) / wormSize;
+                if (x > CAVE_CREATION_THRESHOLD) {
                     chunk.setBlock(localX, localY, x > 0.99 && chunkY < genChunkY ? Material.TORCH : null, false);
                 }
             }
