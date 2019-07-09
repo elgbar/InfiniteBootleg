@@ -1,7 +1,7 @@
 import java.nio.charset.StandardCharsets
 
-static def getGitVersion() {
-    def file = new File("./core/assets/version")
+def getGitVersion() {
+    def file = new File(project.projectDir, "core/assets/version")
     if (!file.exists() || !file.canRead()) {
         System.err.println("Failed to read version from file " + file.absolutePath)
         return "UNKNOWN"
@@ -47,7 +47,7 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "java"
-    
+
     dependencies {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
