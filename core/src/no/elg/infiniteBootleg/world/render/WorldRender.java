@@ -62,6 +62,7 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
             camera = new OrthographicCamera();
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            camera.zoom = 1.5f;
 
             Main.SCHEDULER.executeSync(() -> {
                 camera.position.x = 0;
