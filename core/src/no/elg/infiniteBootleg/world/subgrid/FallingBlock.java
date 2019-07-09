@@ -26,8 +26,6 @@ public class FallingBlock extends Entity implements ContactHandler {
         super(world, worldX, worldY);
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
-        region.setRegionWidth(getWidth());
-        region.setRegionHeight(getHeight());
     }
 
     @Override

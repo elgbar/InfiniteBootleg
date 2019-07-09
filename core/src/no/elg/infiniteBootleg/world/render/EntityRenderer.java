@@ -19,9 +19,9 @@ public class EntityRenderer implements Renderer {
     public void render() {
         Batch batch = worldRender.getBatch();
         for (Entity entity : worldRender.getWorld().getEntities()) {
-            float x = entity.getPosition().x * BLOCK_SIZE - entity.getHeight() / 2f;
-            float y = entity.getPosition().y * BLOCK_SIZE - entity.getWidth() / 2f;
-            batch.draw(entity.getTextureRegion(), x, y);
+            float x = (entity.getPosition().x - entity.getHalfBox2dWidth()) * BLOCK_SIZE;
+            float y = (entity.getPosition().y - entity.getHalfBox2dHeight()) * BLOCK_SIZE;
+            batch.draw(entity.getTextureRegion(), x, y, entity.getWidth(), entity.getHeight());
         }
     }
 }

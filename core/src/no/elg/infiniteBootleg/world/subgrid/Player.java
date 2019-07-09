@@ -20,8 +20,6 @@ public class Player extends LivingEntity {
     public Player(@NotNull World world) {
         super(world, 0, 0);
         region = new TextureRegion(Material.BRICK.getTextureRegion());
-        region.setRegionWidth(getWidth());
-        region.setRegionHeight(getHeight());
     }
 
     @Override
@@ -62,11 +60,11 @@ public class Player extends LivingEntity {
 
     @Override
     public int getWidth() {
-        return BLOCK_SIZE - 2;
+        return BLOCK_SIZE - 3;
     }
 
     @Override
     public int getHeight() {
-        return BLOCK_SIZE - 2;
+        return 2 * BLOCK_SIZE - 1;
     }
 }
