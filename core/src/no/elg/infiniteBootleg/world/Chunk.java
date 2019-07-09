@@ -53,6 +53,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
     private boolean allowUnload;
+    private boolean initializing;
 
     private long lastViewedTick;
     private boolean allAir;
@@ -119,7 +120,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         this.chunkY = chunkY;
 
 
-        updatableBlocks = new HashSet<>();
+        updatableBlocks = Collections.synchronizedSet(new HashSet<>());
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -130,13 +131,14 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
         }
 
-        allAir = true;
+        allAir = false;
         loaded = true;
         allowUnload = true;
 
         dirty = true;
         prioritize = false;
         modified = false;
+        initializing = true;
     }
 
     /**
@@ -144,10 +146,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link
      * #getTextureRegion()}
      * called.
-     *
-     * @param recalcNeighbors
      */
-    public void updateTextureNow(boolean recalcNeighbors) {
+    public void updateTextureNow() {
+        if (initializing) { return; }
         dirty = false;
 
         //test if all the blocks in this chunk has the material air
@@ -161,60 +162,66 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     allAir = false;
                     break outer;
                 }
+
             }
         }
-
         if (Main.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
-
-            if (box2dBody != null) {
-                getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
-                box2dBody = null;
-            }
-            if (allAir) {
-                return;
-            }
-
-            //recalculate the shape of the chunk (box2d)
-
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
-            box2dBody = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
-            box2dBody.setAwake(false);
-
-            EdgeShape edgeShape = new EdgeShape();
-
-            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                    Block b = blocks[localX][localY];
-                    if (b == null || !b.getMaterial().blocksLight()) {
-                        continue;
-                    }
-                    for (Tuple<Direction, byte[]> tuple : ts) {
-                        Block rel = b.getRawRelative(tuple.key);
-                        if (rel == null || !rel.getMaterial().blocksLight() || (localY == 0 && tuple.key == Direction.NORTH)) {
-                            byte[] ds = tuple.value;
-                            edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
-                            box2dBody.createFixture(edgeShape, 0);
-                        }
-                    }
-                }
-            }
-            edgeShape.dispose();
-
-            if (recalcNeighbors) {
-                //TODO Try to optimize this (ie select what directions to recalculate)
-                for (Direction direction : Direction.CARDINAL) {
-                    Location relChunk = Location.relative(chunkX, chunkY, direction);
-                    if (getWorld().isChunkLoaded(relChunk)) {
-                        getWorld().getChunk(relChunk).updateTextureNow(false);
-                    }
-                }
-            }
-
         }
     }
+
+    public void updateFixture(boolean recalculateNeighbors) {
+        if (box2dBody != null) {
+            Body cpy = box2dBody;
+            box2dBody = null;
+            getWorld().getRender().getBox2dWorld().destroyBody(cpy);
+
+        }
+        if (allAir) {
+            return;
+        }
+
+        //recalculate the shape of the chunk (box2d)
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
+        box2dBody = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
+        box2dBody.setAwake(false);
+        box2dBody.setFixedRotation(true);
+
+        EdgeShape edgeShape = new EdgeShape();
+
+
+        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+            for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                Block b = blocks[localX][localY];
+                if (b == null || !b.getMaterial().blocksLight()) {
+                    continue;
+                }
+                for (Tuple<Direction, byte[]> tuple : ts) {
+                    Block rel = b.getRawRelative(tuple.key);
+                    if (rel == null || !rel.getMaterial().blocksLight() || tuple.key == Direction.NORTH && localY == 0) {
+                        byte[] ds = tuple.value;
+                        edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
+                        box2dBody.createFixture(edgeShape, 0);
+                    }
+                }
+            }
+        }
+        edgeShape.dispose();
+
+        if (recalculateNeighbors) {
+            //TODO Try to optimize this (ie select what directions to recalculate)
+            for (Direction direction : Direction.CARDINAL) {
+                Location relChunk = Location.relative(chunkX, chunkY, direction);
+                if (getWorld().isChunkLoaded(relChunk)) {
+                    getWorld().getChunk(relChunk).updateFixture(false);
+                }
+            }
+        }
+    }
+
 
     /**
      * @param localX
@@ -309,7 +316,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * Might cause a call to {@link #updateTextureNow(boolean)} if the chunk is marked as dirty
+     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
      *
      * @return The texture of this chunk
      */
@@ -317,7 +324,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public TextureRegion getTextureRegion() {
         lastViewedTick = world.getTick();
         if (dirty) {
-            updateTextureNow(true);
+            updateTextureNow();
         }
         return fboRegion;
     }
@@ -343,8 +350,10 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     @Override
     public void update() {
-        for (UpdatableBlock block : updatableBlocks) {
-            block.tryUpdate();
+        synchronized (updatableBlocks) {
+            for (UpdatableBlock block : updatableBlocks) {
+                block.tryUpdate();
+            }
         }
     }
 
@@ -356,13 +365,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * Might cause a call to {@link #updateTextureNow(boolean)} if the chunk is marked as dirty
+     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
      *
      * @return If all blocks in this chunk is air
      */
     public boolean isAllAir() {
         if (dirty) {
-            updateTextureNow(true);
+            updateTextureNow();
         }
         return allAir;
     }
@@ -597,5 +606,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     @Override
     public String toString() {
         return "Chunk{" + "world=" + world + ", chunkX=" + chunkX + ", chunkY=" + chunkY + ", loaded=" + loaded + '}';
+    }
+
+    /**
+     * Allow textures to be loaded
+     */
+    public void finishLoading() {
+        initializing = false;
     }
 }

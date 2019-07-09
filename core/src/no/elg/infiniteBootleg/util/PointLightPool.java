@@ -2,9 +2,12 @@ package no.elg.infiniteBootleg.util;
 
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.render.WorldRender;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A pool for static xray point lights
@@ -38,15 +41,25 @@ public final class PointLightPool extends Pool<PointLight> {
             updateRayHandler = false;
         }
         PointLight light = super.obtain();
-        light.setActive(true);
+        if (light == null) {
+            Gdx.app.log("PointLightPool", "obtain returned null light");
+            light = newObject();
+        }
+        synchronized (WorldRender.LIGHT_LOCK) {
+            light.setActive(true);
+        }
         return light;
     }
 
     @Override
     protected PointLight newObject() {
-        PointLight light = new PointLight(rayHandler, POINT_LIGHT_RAYS, new Color(1, 1, 0.9f, 1), POINT_LIGHT_DISTANCE, 0, 0);
+        PointLight light;
+        synchronized (WorldRender.LIGHT_LOCK) {
+            light = new PointLight(rayHandler, POINT_LIGHT_RAYS, new Color(1, 1, 0.9f, 1), POINT_LIGHT_DISTANCE, 0, 0);
+        }
         light.setStaticLight(true);
         light.setXray(true);
+        light.setSoft(false);
         return light;
     }
 
@@ -59,8 +72,10 @@ public final class PointLightPool extends Pool<PointLight> {
     }
 
     @Override
-    protected void reset(PointLight light) {
+    protected void reset(@NotNull PointLight light) {
         //FIXME reset rayhandler for those lights who has a different one than this
-        light.setActive(false);
+        synchronized (WorldRender.LIGHT_LOCK) {
+            light.setActive(false);
+        }
     }
 }

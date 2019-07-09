@@ -6,7 +6,7 @@ package no.elg.infiniteBootleg.world.render;
 public interface Updatable {
 
     /**
-     * Update the state, called every frame
+     * Update the state, might be called every frame
      */
     void update();
 }

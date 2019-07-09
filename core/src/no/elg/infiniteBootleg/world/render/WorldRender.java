@@ -51,6 +51,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
     public static boolean debugBox2d;
     public static boolean lights = true;
 
+    public final static Object LIGHT_LOCK = new Object();
+
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
         chunksInView = new int[4];
@@ -93,7 +95,14 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
     public void updatePhysics() {
         getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
-        if (lights) { rayHandler.update(); }
+//        Main.SCHEDULER.executeAsync(() -> {
+        if (lights) {
+            synchronized (LIGHT_LOCK) {
+                rayHandler.update();
+            }
+
+        }
+//        });
     }
 
     @Override
@@ -173,7 +182,9 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         entityRenderer.render();
         batch.end();
         if (lights) {
-            rayHandler.render();
+            synchronized (LIGHT_LOCK) {
+                rayHandler.render();
+            }
         }
         if (debugBox2d) {
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);

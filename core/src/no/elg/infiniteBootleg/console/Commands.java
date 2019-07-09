@@ -66,7 +66,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Reloads chunks internal state, its texture and Box2D body ")
     public void reload() {
         for (Chunk chunk : Main.inst().getWorld().getLoadedChunks()) {
-            chunk.updateTextureNow(false);
+            chunk.updateTextureNow();
         }
         logger.log(LogLevel.SUCCESS, "All textures of loaded chunks updated");
     }
