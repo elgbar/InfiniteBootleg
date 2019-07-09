@@ -62,7 +62,6 @@ public class World implements Disposable, Updatable {
     private final ObjectMap<Location, Chunk> chunks;
     private final WorldTicker ticker;
     private final ChunkLoader chunkLoader;
-    private final TopBlockTracker topBlocks;
     private FileHandle worldFile;
 
     //only exists when graphics exits
@@ -105,7 +104,6 @@ public class World implements Disposable, Updatable {
 
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
-        topBlocks = new TopBlockTracker(this);
         load();
     }
 
@@ -516,10 +514,6 @@ public class World implements Disposable, Updatable {
      */
     public void addEntity(@NotNull Entity entity) {
         entities.add(entity);
-    }
-
-    public TopBlockTracker getTopBlocks() {
-        return topBlocks;
     }
 
     /**
