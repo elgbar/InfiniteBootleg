@@ -112,7 +112,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
 
         if (lights) {
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
-            rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
+            rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
+                                         camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
         }
     }
 
