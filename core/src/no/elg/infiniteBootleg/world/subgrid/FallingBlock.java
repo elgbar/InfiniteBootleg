@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.world.subgrid;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -24,11 +26,18 @@ public class FallingBlock extends Entity implements ContactHandler {
         super(world, worldX, worldY);
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
-        region.flip(true, false);
         region.setRegionWidth(getWidth());
         region.setRegionHeight(getHeight());
     }
 
+    @Override
+    protected void createFixture() {
+        PolygonShape box = new PolygonShape();
+        box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
+        Fixture fix = getBody().createFixture(box, 1.0f);
+        fix.setFilterData(World.FALLING_BLOCK_FILTER);
+        box.dispose();
+    }
 
     @Override
     public void update() {
@@ -53,6 +62,9 @@ public class FallingBlock extends Entity implements ContactHandler {
                 if (getWorld().isAir(newX, newY)) {
                     getWorld().setBlock(newX, newY, material, true);
                 }
+//                else{
+//                    //TODO drop as an item
+//                }
                 getWorld().removeEntity(this);
             });
         }
