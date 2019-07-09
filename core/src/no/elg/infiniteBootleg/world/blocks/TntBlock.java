@@ -62,7 +62,8 @@ public class TntBlock extends UpdatableBlock {
             exploded = true;
             Main.SCHEDULER.executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
-
+                int worldX = getWorldX();
+                int worldY = getWorldY();
                 for (int x = (int) Math.floor(worldX - strength); x < worldX + strength; x++) {
                     for (int y = (int) Math.floor(worldY - strength); y < worldY + strength; y++) {
                         Block b = getWorld().getRawBlock(x, y);

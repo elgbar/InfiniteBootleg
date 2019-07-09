@@ -21,17 +21,12 @@ public class Block implements Binembly, Disposable {
     private World world;
     private Chunk chunk;
 
-    protected int worldX;
-    protected int worldY;
-
     private int localX;
     private int localY;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         this.localX = localX;
         this.localY = localY;
-        worldX = chunk.getWorldX(localX);
-        worldY = chunk.getWorldY(localY);
 
         this.material = material;
         this.world = world;
@@ -65,14 +60,14 @@ public class Block implements Binembly, Disposable {
      * @return World location of this block
      */
     public int getWorldX() {
-        return worldX;
+        return chunk.getWorldX(localX);
     }
 
     /**
      * @return World location of this block
      */
     public int getWorldY() {
-        return worldY;
+        return chunk.getWorldY(localY);
     }
 
     /**
@@ -99,7 +94,7 @@ public class Block implements Binembly, Disposable {
      */
     @NotNull
     public Block getRelative(@NotNull Direction dir) {
-        return world.getBlock(worldX + dir.dx, worldY + dir.dy);
+        return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy);
     }
 
     /**
@@ -112,11 +107,13 @@ public class Block implements Binembly, Disposable {
      */
     @Nullable
     public Block getRawRelative(@NotNull Direction dir) {
-        if (CoordUtil.worldToChunk(worldX + dir.dx) == chunk.getChunkX() && //
-            CoordUtil.worldToChunk(worldY + dir.dy) == chunk.getChunkY()) {
+        int newWorldX = getWorldX() + dir.dx;
+        int newWorldY = getWorldY() + dir.dy;
+        if (CoordUtil.worldToChunk(newWorldX) == chunk.getChunkX() && //
+            CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
             return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
         }
-        return world.getRawBlock(worldX + dir.dx, worldY + dir.dy);
+        return world.getRawBlock(newWorldX, newWorldY);
     }
 
     @NotNull
@@ -142,23 +139,26 @@ public class Block implements Binembly, Disposable {
 
         Block block = (Block) o;
 
-        if (worldX != block.worldX) { return false; }
-        if (worldY != block.worldY) { return false; }
+        if (localX != block.localX) { return false; }
+        if (localY != block.localY) { return false; }
         if (material != block.material) { return false; }
-        return world.equals(block.world);
+        if (!world.equals(block.world)) { return false; }
+        return chunk.equals(block.chunk);
     }
 
     @Override
     public int hashCode() {
-        int result = world.hashCode();
-        result = 31 * result + worldX;
-        result = 31 * result + worldY;
+        int result = material.hashCode();
+        result = 31 * result + world.hashCode();
+        result = 31 * result + chunk.hashCode();
+        result = 31 * result + localX;
+        result = 31 * result + localY;
         return result;
     }
 
     @Override
     public String toString() {
-        return "Block{" + "material=" + material + ", world=" + world + ", chunk=" + chunk + ", worldX=" + worldX + ", worldY=" +
-               worldY + ", localX=" + localX + ", localY=" + localY + '}';
+        return "Block{" + "material=" + material + ", world=" + world + ", chunk=" + chunk + ", localX=" + localX + ", localY=" +
+               localY + '}';
     }
 }
