@@ -101,8 +101,8 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return false;
         }
         camera.zoom += amount * 0.05f * camera.zoom;
-        if (camera.zoom < 0.25) {
-            camera.zoom = 0.25f;
+        if (camera.zoom < WorldRender.MIN_ZOOM) {
+            camera.zoom = WorldRender.MIN_ZOOM;
         }
         worldRender.update();
         return true;

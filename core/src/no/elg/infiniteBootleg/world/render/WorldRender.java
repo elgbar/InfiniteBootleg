@@ -32,6 +32,8 @@ public class WorldRender implements Updatable, Renderer, Disposable {
     public static final int HOR_START = 2;
     public static final int HOR_END = 3;
 
+    public static final float MIN_ZOOM = 0.25f;
+
     private final World world;
     private com.badlogic.gdx.physics.box2d.World box2dWorld;
     private RayHandler rayHandler;
