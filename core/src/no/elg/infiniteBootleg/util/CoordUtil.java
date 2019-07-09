@@ -102,7 +102,7 @@ public class CoordUtil {
      * @return The local  coordinate given coordinate have in chunk view
      */
     @Contract(pure = true)
-    public static int calculateOffset(int worldCoord) {
+    public static int chunkOffset(int worldCoord) {
         return worldCoord - chunkToWorld(worldToChunk(worldCoord));
     }
 }

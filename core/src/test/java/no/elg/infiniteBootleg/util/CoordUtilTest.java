@@ -36,15 +36,15 @@ public class CoordUtilTest {
     @Test
     public void calculateOffset() {
         for (int i = 0; i < CHUNK_SIZE; i++) {
-            assertEquals("i:" + i, i, CoordUtil.calculateOffset(i));
+            assertEquals("i:" + i, i, CoordUtil.chunkOffset(i));
         }
         for (int i = -CHUNK_SIZE; i < 0; i++) {
-            assertEquals("i:" + i, i + CHUNK_SIZE, CoordUtil.calculateOffset(i));
+            assertEquals("i:" + i, i + CHUNK_SIZE, CoordUtil.chunkOffset(i));
         }
-        assertEquals(0, CoordUtil.calculateOffset(CHUNK_SIZE));
-        assertEquals(1, CoordUtil.calculateOffset(CHUNK_SIZE + 1));
-        assertEquals(CHUNK_SIZE - 2, CoordUtil.calculateOffset(-2));
-        assertEquals(CHUNK_SIZE - 1, CoordUtil.calculateOffset(CHUNK_SIZE + CHUNK_SIZE - 1));
+        assertEquals(0, CoordUtil.chunkOffset(CHUNK_SIZE));
+        assertEquals(1, CoordUtil.chunkOffset(CHUNK_SIZE + 1));
+        assertEquals(CHUNK_SIZE - 2, CoordUtil.chunkOffset(-2));
+        assertEquals(CHUNK_SIZE - 1, CoordUtil.chunkOffset(CHUNK_SIZE + CHUNK_SIZE - 1));
     }
 
     @Test
