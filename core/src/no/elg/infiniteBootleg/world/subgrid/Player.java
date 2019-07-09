@@ -19,8 +19,7 @@ public class Player extends LivingEntity {
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
-        region = new TextureRegion(Material.GRASS.getTextureRegion());
-        region.flip(true, false);
+        region = new TextureRegion(Material.BRICK.getTextureRegion());
         region.setRegionWidth(getWidth());
         region.setRegionHeight(getHeight());
     }
