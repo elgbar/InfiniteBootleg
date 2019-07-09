@@ -65,6 +65,6 @@ public class Player extends LivingEntity {
 
     @Override
     public int getHeight() {
-        return 2 * BLOCK_SIZE - 1;
+        return 2 * BLOCK_SIZE - BLOCK_SIZE / 2;
     }
 }
