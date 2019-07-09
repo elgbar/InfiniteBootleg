@@ -478,14 +478,12 @@ public class World implements Disposable, Updatable {
 
             //clean up dead chunks
             if (!chunk.isLoaded()) {
-//                Main.inst().getConsoleLogger().log("Chunk unloaded, but not removed from chunks");
                 iterator.remove();
                 continue;
             }
             //Unload chunks not seen for 5 seconds
             if (chunk.isAllowingUnloading() && getRender().isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
-//                System.out.println("unloaded chunk " + chunk.toString());
                 unload(chunk);
                 iterator.remove();
                 continue;
