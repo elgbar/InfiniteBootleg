@@ -30,24 +30,25 @@ public abstract class Entity implements Updatable, Disposable {
         uuid = UUID.randomUUID();
         this.world = world;
         flying = false;
-
         world.addEntity(this);
 
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(worldX + 0.5f, worldY + 0.5f);
-        body = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
-        body.setFixedRotation(true);
-        body.setAwake(true);
-
-        createFixture();
-
+        body = createBody(worldX, worldY);
+        createFixture(body);
         update();
-
     }
 
-    protected void createFixture() {
+    @NotNull
+    protected Body createBody(float worldX, float worldY) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(worldX, worldY);
+        Body body = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
+        body.setFixedRotation(true);
+        body.setAwake(true);
+        return body;
+    }
+
+    protected void createFixture(@NotNull Body body) {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = body.createFixture(box, 1.0f);

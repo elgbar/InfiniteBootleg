@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
+import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 
 public enum EntityType {

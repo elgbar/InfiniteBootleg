@@ -1,13 +1,15 @@
-package no.elg.infiniteBootleg.world.subgrid;
+package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,7 @@ public class FallingBlock extends Entity implements ContactHandler {
     }
 
     @Override
-    protected void createFixture() {
+    protected void createFixture(@NotNull Body body) {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = getBody().createFixture(box, 1.0f);
@@ -51,7 +53,7 @@ public class FallingBlock extends Entity implements ContactHandler {
 
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact, @Nullable Object data) {
-        if (!crashed && type == ContactType.BEGIN_CONTACT && contact.getFixtureB().getBody() == getBody()) {
+        if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
             Gdx.app.postRunnable(() -> {
                 int newX = getBlockX();

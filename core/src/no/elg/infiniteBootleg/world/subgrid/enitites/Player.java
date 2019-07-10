@@ -1,11 +1,14 @@
-package no.elg.infiniteBootleg.world.subgrid;
+package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
@@ -19,7 +22,17 @@ public class Player extends LivingEntity {
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
-        region = new TextureRegion(Material.BRICK.getTextureRegion());
+        region = new TextureRegion(Main.inst().getEntityAtlas().findRegion("door_open"));
+    }
+
+    @Override
+    protected void createFixture(@NotNull Body body) {
+        PolygonShape box = new PolygonShape();
+        box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
+        Fixture fix = body.createFixture(box, 1.0f);
+        fix.setFilterData(World.ENTITY_FILTER);
+        fix.setFriction(3);
+        box.dispose();
     }
 
     @Override
