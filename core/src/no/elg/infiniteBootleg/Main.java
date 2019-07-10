@@ -30,7 +30,7 @@ public class Main extends ApplicationAdapter {
     public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
 
     private static InputMultiplexer inputMultiplexer;
-    private TextureAtlas textureAtlas;
+    private TextureAtlas blockAtlas;
 
     /**
      * If worlds should be loaded from disk
@@ -74,7 +74,7 @@ public class Main extends ApplicationAdapter {
 
         executeArgs(args);
 
-        textureAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
+        blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
 
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
@@ -115,7 +115,7 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         hud.dispose();
         world.dispose();
-        textureAtlas.dispose();
+        blockAtlas.dispose();
         console.dispose();
         VisUI.dispose();
     }
@@ -135,8 +135,8 @@ public class Main extends ApplicationAdapter {
         return console;
     }
 
-    public TextureAtlas getTextureAtlas() {
-        return textureAtlas;
+    public TextureAtlas getBlockAtlas() {
+        return blockAtlas;
     }
 
     public int getMouseBlockX() {

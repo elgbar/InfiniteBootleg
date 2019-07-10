@@ -71,7 +71,7 @@ public enum Material {
         this.placable = placable;
         this.hardness = hardness;
         if (Main.renderGraphic && !"AIR".equals(name())) {
-            texture = Main.inst().getTextureAtlas().findRegion(name().toLowerCase());
+            texture = Main.inst().getBlockAtlas().findRegion(name().toLowerCase());
             if (texture == null) {
                 throw new NullPointerException("Failed to find a texture for " + name());
             }

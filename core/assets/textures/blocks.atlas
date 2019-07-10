@@ -1,61 +1,61 @@
 
 blocks.png
-size: 256,32
+size: 72,36
 format: RGBA4444
 filter: Nearest,Nearest
 repeat: xy
 brick
   rotate: false
-  xy: 2, 2
+  xy: 1, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 dirt
   rotate: false
-  xy: 38, 2
+  xy: 19, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 glass
   rotate: false
-  xy: 128, 2
+  xy: 55, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 grass
   rotate: false
-  xy: 74, 2
+  xy: 37, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 sand
   rotate: false
-  xy: 20, 2
+  xy: 1, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 stone
   rotate: false
-  xy: 56, 2
+  xy: 37, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 tnt
   rotate: false
-  xy: 92, 2
+  xy: 55, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 torch
   rotate: false
-  xy: 110, 2
+  xy: 19, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
