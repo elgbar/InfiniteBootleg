@@ -34,6 +34,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public static final int HOR_END = 3;
 
     public static final float MIN_ZOOM = 0.25f;
+    public static final int MAX_DEG_SKYLIGHT = -45;
+    public static final int MIN_DEG_SKYLIGHT = -135;
+    public static final int STRAIGHT_DOWN_SKYLIGHT = -90;
 
     private final World world;
     private com.badlogic.gdx.physics.box2d.World box2dWorld;
@@ -48,9 +51,11 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private Box2DDebugRenderer debugRenderer;
 
     private DirectionalLight skylight;
+    private int skyDir;
 
-    public static boolean debugBox2d;
     public static boolean lights = true;
+    public static boolean debugBox2d;
+    public static boolean dayTicking;
 
     public final static Object LIGHT_LOCK = new Object();
 
@@ -82,9 +87,12 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             RayHandler.useDiffuseLight(true);
             rayHandler = new RayHandler(box2dWorld);
             rayHandler.setBlurNum(1);
-            rayHandler.setAmbientLight(0.02f, 0.02f, 0.02f, 1);
+            rayHandler.setAmbientLight(0.025f, 0.025f, 0.025f, 1);
 
-            skylight = new DirectionalLight(rayHandler, 12800, Color.WHITE, -90);
+            skyDir = STRAIGHT_DOWN_SKYLIGHT;
+
+            //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
+            skylight = new DirectionalLight(rayHandler, 7500, Color.WHITE, skyDir);
             skylight.setContactFilter(World.LIGHT_FILTER);
         }
         update();
@@ -92,15 +100,23 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
 
     public void updatePhysics() {
+        if (dayTicking && getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND * 5) == 0) {
+            if (skyDir == MAX_DEG_SKYLIGHT) {
+                skyDir = MIN_DEG_SKYLIGHT;
+            }
+            skylight.setDirection(++skyDir);
+        }
+
         getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
 //        Main.SCHEDULER.executeAsync(() -> {
         if (lights) {
             synchronized (LIGHT_LOCK) {
                 rayHandler.update();
             }
-
         }
 //        });
+
+
     }
 
     @Override
