@@ -25,12 +25,14 @@ public class Main extends ApplicationAdapter {
     public static final String WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar;
     public static final String TEXTURES_FOLDER = "textures" + File.separatorChar;
     public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
+    public static final String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
     public static final String VERSION_FILE = "version";
 
     public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
 
     private static InputMultiplexer inputMultiplexer;
     private TextureAtlas blockAtlas;
+    private TextureAtlas entityAtlas;
 
     /**
      * If worlds should be loaded from disk
@@ -75,6 +77,7 @@ public class Main extends ApplicationAdapter {
         executeArgs(args);
 
         blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
+        entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
 
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
@@ -116,6 +119,7 @@ public class Main extends ApplicationAdapter {
         hud.dispose();
         world.dispose();
         blockAtlas.dispose();
+        entityAtlas.dispose();
         console.dispose();
         VisUI.dispose();
     }
@@ -137,6 +141,10 @@ public class Main extends ApplicationAdapter {
 
     public TextureAtlas getBlockAtlas() {
         return blockAtlas;
+    }
+
+    public TextureAtlas getEntityAtlas() {
+        return entityAtlas;
     }
 
     public int getMouseBlockX() {

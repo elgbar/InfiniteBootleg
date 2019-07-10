@@ -1,0 +1,20 @@
+
+entities.png
+size: 36,34
+format: RGBA4444
+filter: Nearest,Nearest
+repeat: xy
+door_closed
+  rotate: false
+  xy: 1, 1
+  size: 16, 32
+  orig: 16, 32
+  offset: 0, 0
+  index: -1
+door_open
+  rotate: false
+  xy: 19, 1
+  size: 16, 32
+  orig: 16, 32
+  offset: 0, 0
+  index: -1

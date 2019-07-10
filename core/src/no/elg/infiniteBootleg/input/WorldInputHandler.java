@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Door;
 import org.jetbrains.annotations.NotNull;
 
 import static com.badlogic.gdx.Input.Keys.*;
@@ -22,6 +23,7 @@ import static com.badlogic.gdx.Input.Keys.*;
  */
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable, Resizable {
 
+    private final static int CAM_SPEED = 100 * Block.BLOCK_SIZE;
 
     private final OrthographicCamera camera;
     private final WorldRender worldRender;
@@ -141,7 +143,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             getWorld().setBlock(blockX, blockY, selected);
         }
 
-        int CAM_SPEED = 100 * Block.BLOCK_SIZE;
+        if (Gdx.input.isKeyJustPressed(H)) {
+            new Door(getWorld(), blockX, blockY);
+        }
 
         int WVertical = Gdx.input.isKeyPressed(W) ? 1 : 0;
         int SVertical = Gdx.input.isKeyPressed(S) ? -1 : 0;
