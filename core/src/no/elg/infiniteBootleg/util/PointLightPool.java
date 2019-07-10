@@ -2,12 +2,10 @@ package no.elg.infiniteBootleg.util;
 
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A pool for static xray point lights
@@ -19,36 +17,17 @@ public final class PointLightPool extends Pool<PointLight> {
     public static final PointLightPool inst = new PointLightPool();
 
     private RayHandler rayHandler;
-    private boolean updateRayHandler = true;
 
     public static final int POINT_LIGHT_RAYS = 32;
     public static final int POINT_LIGHT_DISTANCE = 10;
 
-    private PointLightPool() {}
-
-    /**
-     * Clear the pool and use the new rayhandler
-     */
-    public void updateRayHandler() {
-        clear();
-        updateRayHandler = true;
+    private PointLightPool() {
+        rayHandler = Main.inst().getWorld().getRender().getRayHandler();
     }
 
     @Override
     public PointLight obtain() {
-        if (updateRayHandler) {
-            rayHandler = Main.inst().getWorld().getRender().getRayHandler();
-            updateRayHandler = false;
-        }
-        PointLight light = super.obtain();
-        if (light == null) {
-            Gdx.app.log("PointLightPool", "obtain returned null light");
-            light = newObject();
-        }
-        synchronized (WorldRender.LIGHT_LOCK) {
-            light.setActive(true);
-        }
-        return light;
+        return newObject();
     }
 
     @Override
@@ -64,18 +43,9 @@ public final class PointLightPool extends Pool<PointLight> {
     }
 
     @Override
-    public void clear() {
-        for (int i = 0, free = getFree(); i < free; ++i) {
-            obtain().remove(true);
-        }
-        super.clear();
-    }
-
-    @Override
-    protected void reset(@NotNull PointLight light) {
-        //FIXME reset rayhandler for those lights who has a different one than this
+    public void free(PointLight light) {
         synchronized (WorldRender.LIGHT_LOCK) {
-            light.setActive(false);
+            light.remove();
         }
     }
 }
