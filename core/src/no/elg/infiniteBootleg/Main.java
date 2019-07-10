@@ -122,9 +122,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        if (world.getInput() != null) {
-            world.getInput().resize(width, height);
-        }
+        world.resize(width, height);
         hud.resize(width, height);
         console.refresh();
     }

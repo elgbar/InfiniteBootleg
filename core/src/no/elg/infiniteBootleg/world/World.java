@@ -13,6 +13,7 @@ import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -33,7 +34,7 @@ import java.util.UUID;
 /**
  * @author Elg
  */
-public class World implements Disposable, Updatable {
+public class World implements Disposable, Updatable, Resizable {
 
     public static final short GROUND_CATEGORY = 0x1;
     public static final short LIGHTS_CATEGORY = 0x2;
@@ -534,6 +535,12 @@ public class World implements Disposable, Updatable {
 
     public ChunkLoader getChunkLoader() {
         return chunkLoader;
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        render.resize(width, height);
+        input.resize(width, height);
     }
 
     private static final class VecPool extends Pool<Vector2> {

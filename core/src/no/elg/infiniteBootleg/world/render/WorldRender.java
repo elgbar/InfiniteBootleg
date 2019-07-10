@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
@@ -25,7 +26,7 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 /**
  * @author Elg
  */
-public class WorldRender implements Updatable, Renderer, Disposable {
+public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public static final int VERT_START = 0;
     public static final int VERT_END = 1;
@@ -241,5 +242,10 @@ public class WorldRender implements Updatable, Renderer, Disposable {
         batch.dispose();
         chunkRenderer.dispose();
         rayHandler.dispose();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        rayHandler.resizeFBO(width / 4, height / 4);
     }
 }
