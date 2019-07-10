@@ -38,7 +38,6 @@ public class World implements Disposable, Updatable {
     public static final short GROUND_CATEGORY = 0x1;
     public static final short LIGHTS_CATEGORY = 0x2;
     public static final short ENTITY_CATEGORY = 0x4;
-    public static final short FALLING_BLOCK_CATEGORY = 0x8;
 
     public static final Filter FALLING_BLOCK_FILTER;
     public static final Filter ENTITY_FILTER;
@@ -47,14 +46,14 @@ public class World implements Disposable, Updatable {
     static {
         ENTITY_FILTER = new Filter();
         ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-        ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | FALLING_BLOCK_CATEGORY;
+        ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
         LIGHT_FILTER = new Filter();
         LIGHT_FILTER.categoryBits = LIGHTS_CATEGORY;
-        LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | FALLING_BLOCK_CATEGORY;
+        LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
         FALLING_BLOCK_FILTER = new Filter();
-        FALLING_BLOCK_FILTER.categoryBits = FALLING_BLOCK_CATEGORY;
+        FALLING_BLOCK_FILTER.categoryBits = GROUND_CATEGORY;
         FALLING_BLOCK_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
     }
 
