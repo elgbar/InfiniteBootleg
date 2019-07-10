@@ -198,7 +198,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                         edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
                         Fixture fix = box2dBody.createFixture(edgeShape, 0);
                         if (!b.getMaterial().blocksLight()) {
-                            fix.setFilterData(World.SOLID_SEE_THROUGH_FILTER);
+                            fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
                         }
                     }
                 }

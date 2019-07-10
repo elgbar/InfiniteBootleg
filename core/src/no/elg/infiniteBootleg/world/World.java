@@ -22,7 +22,7 @@ import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.Player;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +41,7 @@ public class World implements Disposable, Updatable, Resizable {
     public static final short ENTITY_CATEGORY = 0x4;
 
     public static final Filter FALLING_BLOCK_FILTER;
-    public static final Filter SOLID_SEE_THROUGH_FILTER;
+    public static final Filter SOLID_TRANSPARENT_FILTER;
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
@@ -58,9 +58,9 @@ public class World implements Disposable, Updatable, Resizable {
         FALLING_BLOCK_FILTER.categoryBits = GROUND_CATEGORY;
         FALLING_BLOCK_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
 
-        SOLID_SEE_THROUGH_FILTER = new Filter();
-        SOLID_SEE_THROUGH_FILTER.categoryBits = GROUND_CATEGORY;
-        SOLID_SEE_THROUGH_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+        SOLID_TRANSPARENT_FILTER = new Filter();
+        SOLID_TRANSPARENT_FILTER.categoryBits = GROUND_CATEGORY;
+        SOLID_TRANSPARENT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
     }
 
     private final long seed;
