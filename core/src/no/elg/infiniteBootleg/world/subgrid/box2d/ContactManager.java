@@ -19,7 +19,7 @@ public class ContactManager implements ContactListener {
     @Override
     public void beginContact(Contact contact) {
         for (Entity entity : world.getEntities()) {
-            if (entity instanceof ContactHandler) {
+            if (entity instanceof ContactHandler && contact.getFixtureB().getBody() == entity.getBody()) {
                 ((ContactHandler) entity).contact(ContactType.BEGIN_CONTACT, contact, null);
             }
         }
@@ -29,7 +29,7 @@ public class ContactManager implements ContactListener {
     @Override
     public void endContact(Contact contact) {
         for (Entity entity : world.getEntities()) {
-            if (entity instanceof ContactHandler) {
+            if (entity instanceof ContactHandler && contact.getFixtureB().getBody() == entity.getBody()) {
                 ((ContactHandler) entity).contact(ContactType.END_CONTACT, contact, null);
             }
         }
@@ -38,7 +38,7 @@ public class ContactManager implements ContactListener {
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
         for (Entity entity : world.getEntities()) {
-            if (entity instanceof ContactHandler) {
+            if (entity instanceof ContactHandler && contact.getFixtureB().getBody() == entity.getBody()) {
                 ((ContactHandler) entity).contact(ContactType.PRE_SOLVE, contact, oldManifold);
             }
         }
@@ -47,7 +47,7 @@ public class ContactManager implements ContactListener {
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
         for (Entity entity : world.getEntities()) {
-            if (entity instanceof ContactHandler) {
+            if (entity instanceof ContactHandler && contact.getFixtureB().getBody() == entity.getBody()) {
                 ((ContactHandler) entity).contact(ContactType.POST_SOLVE, contact, impulse);
             }
         }
