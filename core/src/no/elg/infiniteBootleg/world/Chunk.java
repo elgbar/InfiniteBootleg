@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
@@ -187,15 +188,18 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         for (int localX = 0; localX < CHUNK_SIZE; localX++) {
             for (int localY = 0; localY < CHUNK_SIZE; localY++) {
                 Block b = blocks[localX][localY];
-                if (b == null || !b.getMaterial().blocksLight()) {
+                if (b == null || !b.getMaterial().isSolid()) {
                     continue;
                 }
                 for (Tuple<Direction, byte[]> tuple : ts) {
                     Block rel = b.getRawRelative(tuple.key);
-                    if (rel == null || !rel.getMaterial().blocksLight() || tuple.key == Direction.NORTH && localY == 0) {
+                    if (rel == null || !rel.getMaterial().isSolid() || tuple.key == Direction.NORTH && localY == 0) {
                         byte[] ds = tuple.value;
                         edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
-                        box2dBody.createFixture(edgeShape, 0);
+                        Fixture fix = box2dBody.createFixture(edgeShape, 0);
+                        if (!b.getMaterial().blocksLight()) {
+                            fix.setFilterData(World.SOLID_SEE_THROUGH_FILTER);
+                        }
                     }
                 }
             }
