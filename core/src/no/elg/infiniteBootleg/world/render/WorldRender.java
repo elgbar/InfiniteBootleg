@@ -166,11 +166,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         int rowEnd = chunksInView[VERT_END];
         int rowStart = chunksInView[VERT_START];
 
-//        System.out.println("rowStart = " + rowStart);
-//        System.out.println("rowEnd = " + rowEnd);
-//        System.out.println("colStart = " + colStart);
-//        System.out.println("colEnd = " + colEnd);
-
         //set to 1 to debug what chunks are rendered
         int debug = 0;
 

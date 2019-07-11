@@ -32,7 +32,7 @@ public class CancellableThreadScheduler {
      * Cancel all future and running tasks
      */
     public void cancelTasks() {
-        for (final ScheduledFuture sf : tasks) {
+        for (ScheduledFuture sf : tasks) {
             sf.cancel(true);
         }
     }
@@ -60,7 +60,7 @@ public class CancellableThreadScheduler {
      * @param runnable
      *     What to do
      */
-    public void executeAsync(final Runnable runnable) {
+    public void executeAsync(Runnable runnable) {
         tasks.add(executorService.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS));
     }
 
@@ -70,7 +70,7 @@ public class CancellableThreadScheduler {
      * @param runnable
      *     What to do
      */
-    public void executeSync(final Runnable runnable) {
+    public void executeSync(Runnable runnable) {
         tasks.add(executorService.schedule(() -> Gdx.app.postRunnable(runnable), 0, TimeUnit.NANOSECONDS));
     }
 
@@ -82,7 +82,7 @@ public class CancellableThreadScheduler {
      * @param ms
      *     How many milliseconds to wait before running the task
      */
-    public void scheduleAsync(final Runnable runnable, final long ms) {
+    public void scheduleAsync(Runnable runnable, long ms) {
         tasks.add(executorService.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS));
     }
 
@@ -95,7 +95,7 @@ public class CancellableThreadScheduler {
      * @param ms
      *     How many milliseconds to wait before running the task
      */
-    public void scheduleSync(final Runnable runnable, final long ms) {
+    public void scheduleSync(Runnable runnable, long ms) {
         tasks.add(executorService.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS));
     }
 
