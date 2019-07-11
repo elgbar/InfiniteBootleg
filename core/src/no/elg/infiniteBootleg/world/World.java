@@ -97,6 +97,9 @@ public class World implements Disposable, Updatable, Resizable {
         MathUtils.random.nextBytes(UUIDSeed);
         uuid = UUID.nameUUIDFromBytes(UUIDSeed);
 
+        chunkLoader = new ChunkLoader(this, generator);
+        ticker = new WorldTicker(this);
+
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
@@ -106,9 +109,6 @@ public class World implements Disposable, Updatable, Resizable {
         else {
             render = new HeadlessWorldRenderer(this);
         }
-
-        chunkLoader = new ChunkLoader(this, generator);
-        ticker = new WorldTicker(this);
         load();
     }
 
@@ -322,13 +322,13 @@ public class World implements Disposable, Updatable, Resizable {
      *
      * @return If the chunk was unloaded
      */
-    public boolean unload(@Nullable Chunk chunk) {
+    public void unload(@Nullable Chunk chunk) {
         if (chunk == null || !chunk.isLoaded() || !isChunkLoaded(chunk.getChunkX(), chunk.getChunkY())) {
-            return false;
+            return;
         }
         chunk.dispose();
         chunkLoader.save(chunk);
-        return chunk.unload();
+        chunk.unload();
     }
 
     /**

@@ -16,7 +16,6 @@ public class Torch extends Block {
     public Torch(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         if (Main.renderGraphic) {
-
             light = PointLightPool.inst.obtain();
             light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
         }
@@ -24,7 +23,6 @@ public class Torch extends Block {
 
     @Override
     public void dispose() {
-        super.dispose();
         PointLightPool.inst.free(light);
     }
 }

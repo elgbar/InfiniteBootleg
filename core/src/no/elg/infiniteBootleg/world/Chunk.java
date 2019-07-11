@@ -379,11 +379,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * Mark this chunk as unloaded, it will no longer be able to be updated.
      * <p>
      * <b>Note:</b> Internal use only, use {@link World#unload(Chunk)} to unload a chunk
-     *
-     * @return If the chunk was unloaded
      */
-    boolean unload() {
-        if (!allowUnload || !loaded) { return false;}
+    void unload() {
+        if (!allowUnload || !loaded) { return;}
         loaded = false;
         allowUnload = false;
         if (box2dBody != null) {
@@ -398,9 +396,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 }
             }
         }
-
-
-        return true;
     }
 
     /**
