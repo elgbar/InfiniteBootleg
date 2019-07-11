@@ -48,7 +48,7 @@ public class CancellableThreadScheduler {
             } catch (Exception e) {
                 Gdx.app.postRunnable(() -> {
                     Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Exception caught on secondary thread");
-                    throw e; //throw any errors onto the main thread so it can be seen
+                    e.printStackTrace();
                 });
             }
         };
