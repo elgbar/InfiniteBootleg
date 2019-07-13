@@ -101,7 +101,7 @@ public class Commands extends CommandExecutor {
     }
 
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
-    public void debugBox2d() {
+    public void debug() {
         WorldRender.debugBox2d = !WorldRender.debugBox2d;
         logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
