@@ -15,6 +15,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Player extends LivingEntity {
 
+    public static final String PLAYER_REGION_NAME = "player";
 
     public static final float VERTICAL_IMPULSE = 1f;
     public static final float HORIZONTAL_IMPULSE = 1f;
@@ -22,7 +23,7 @@ public class Player extends LivingEntity {
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
-        region = new TextureRegion(Main.inst().getEntityAtlas().findRegion("door_open"));
+        region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
     }
 
     @Override
