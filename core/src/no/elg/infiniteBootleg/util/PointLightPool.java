@@ -18,7 +18,7 @@ public final class PointLightPool extends Pool<PointLight> {
 
     private RayHandler rayHandler;
 
-    public static final int POINT_LIGHT_RAYS = 32;
+    public static final int POINT_LIGHT_RAYS = 8;
     public static final int POINT_LIGHT_DISTANCE = 10;
 
     private PointLightPool() {
