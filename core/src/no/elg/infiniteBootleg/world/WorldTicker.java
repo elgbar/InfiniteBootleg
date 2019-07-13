@@ -86,4 +86,8 @@ public class WorldTicker {
     public void resume() {
         worldTickThread.onResume();
     }
+
+    public boolean isPaused() {
+        return worldTickThread.isPaused();
+    }
 }

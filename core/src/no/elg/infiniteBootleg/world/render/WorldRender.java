@@ -124,20 +124,23 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
-        float width = camera.viewportWidth * camera.zoom;
-        float height = camera.viewportHeight * camera.zoom;
+        if (!getWorld().getWorldTicker().isPaused()) {
+            float width = camera.viewportWidth * camera.zoom;
+            float height = camera.viewportHeight * camera.zoom;
 
-        float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
-        float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
-        viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
+            float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
+            float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
+            viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-        chunksInView[HOR_START] = (int) Math.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
-        chunksInView[HOR_END] = (int) Math.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+            chunksInView[HOR_START] = (int) Math.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
+            chunksInView[HOR_END] =
+                (int) Math.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
 
-        chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
-        //add one to make sure we are always in darkness underground
-        chunksInView[VERT_END] = (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
-
+            chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
+            //add one to make sure we are always in darkness underground
+            chunksInView[VERT_END] =
+                (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+        }
         if (lights) {
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
             rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
