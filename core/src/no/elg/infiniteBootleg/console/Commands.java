@@ -8,6 +8,7 @@ import com.strongjoshua.console.annotation.ConsoleDoc;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -63,12 +64,19 @@ public class Commands extends CommandExecutor {
         logger.log(LogLevel.SUCCESS, "Lighting is now " + (WorldRender.lights ? "enabled" : "disabled"));
     }
 
-    @ConsoleDoc(description = "Reloads chunks internal state, its texture and Box2D body ")
-    public void reload() {
-        for (Chunk chunk : Main.inst().getWorld().getLoadedChunks()) {
-            chunk.updateTextureNow();
+    @ConsoleDoc(description = "Unload all chunks who are currently viewed, given isAllowingUnloading being true")
+    public void reload() {reload(false);}
+
+    @ConsoleDoc(description = "Unload all chunks who are currently viewed",
+                paramDescriptions = "force unload even if unloading is prohibited")
+    public void reload(boolean force) {
+        World world = Main.inst().getWorld();
+        for (Chunk chunk : world.getLoadedChunks()) {
+            if (force || chunk.isAllowingUnloading()) {
+                world.unload(chunk);
+            }
         }
-        logger.log(LogLevel.SUCCESS, "All textures of loaded chunks updated");
+        logger.log(LogLevel.SUCCESS, "All chunks have been reloaded");
     }
 
     @ConsoleDoc(description = "Toggle flight for player")
