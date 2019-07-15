@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -132,14 +133,14 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
             viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-            chunksInView[HOR_START] = (int) Math.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
+            chunksInView[HOR_START] = MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
             chunksInView[HOR_END] =
-                (int) Math.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
 
-            chunksInView[VERT_START] = (int) Math.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
+            chunksInView[VERT_START] = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
             //add one to make sure we are always in darkness underground
             chunksInView[VERT_END] =
-                (int) Math.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);

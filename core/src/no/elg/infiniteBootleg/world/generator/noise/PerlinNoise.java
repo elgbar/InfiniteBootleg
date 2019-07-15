@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.generator.noise;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 
 import java.util.Random;
@@ -110,7 +111,7 @@ public class PerlinNoise {
      */
     public float noise(float x, float y, float z) {
         // FIND UNIT CUBE THAT CONTAINS POINT.
-        int X = (int) Math.floor(x) & 255, Y = (int) Math.floor(y) & 255, Z = (int) Math.floor(z) & 255;
+        int X = MathUtils.floor(x) & 255, Y = MathUtils.floor(y) & 255, Z = MathUtils.floor(z) & 255;
         // FIND RELATIVE X,Y,Z OF POINT IN CUBE.
         x -= Math.floor(x);
         y -= Math.floor(y);

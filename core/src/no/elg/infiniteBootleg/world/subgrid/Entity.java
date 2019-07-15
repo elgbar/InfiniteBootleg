@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -18,7 +19,6 @@ import java.util.UUID;
  * An entity that can move between the main world grid. The position of each entity is recorded in world coordinates.
  */
 public abstract class Entity implements Updatable, Disposable {
-
 
     private final World world;
     private Body body;
@@ -69,14 +69,14 @@ public abstract class Entity implements Updatable, Disposable {
     /**
      * One unit is {@link Block#BLOCK_SIZE}
      *
-     * @return The width of this entity in blocks
+     * @return The width of this entity in world view
      */
     public abstract int getWidth();
 
     /**
      * One unit is {@link Block#BLOCK_SIZE}
      *
-     * @return The height of this entity in blocks
+     * @return The height of this entity in world view
      */
     public abstract int getHeight();
 
@@ -93,11 +93,11 @@ public abstract class Entity implements Updatable, Disposable {
     }
 
     public int getBlockX() {
-        return (int) Math.floor(posCache.x);
+        return MathUtils.floor(posCache.x);
     }
 
     public int getBlockY() {
-        return (int) Math.floor(posCache.y);
+        return MathUtils.floor(posCache.y);
     }
 
     public Body getBody() {

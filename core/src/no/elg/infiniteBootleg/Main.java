@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
@@ -103,8 +104,8 @@ public class Main extends ApplicationAdapter {
         }
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        mouseBlockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
-        mouseBlockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
+        mouseBlockX = MathUtils.floor(unproject.x / BLOCK_SIZE);
+        mouseBlockY = MathUtils.floor(unproject.y / BLOCK_SIZE);
 
         //noinspection ConstantConditions
         world.getInput().update();

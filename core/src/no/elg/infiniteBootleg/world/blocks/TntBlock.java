@@ -41,7 +41,7 @@ public class TntBlock extends UpdatableBlock {
     private boolean white;
     private boolean exploded;
     private long tickLeft;
-    private double strength;
+    private float strength;
 
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
     public static final int EXPLOSION_STRENGTH = 25; //basically max radius
@@ -64,8 +64,8 @@ public class TntBlock extends UpdatableBlock {
                 List<Block> destroyed = new ArrayList<>();
                 int worldX = getWorldX();
                 int worldY = getWorldY();
-                for (int x = (int) Math.floor(worldX - strength); x < worldX + strength; x++) {
-                    for (int y = (int) Math.floor(worldY - strength); y < worldY + strength; y++) {
+                for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
+                    for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
                         Block b = getWorld().getRawBlock(x, y);
                         Material mat = b == null ? AIR : b.getMaterial();
                         float hardness = mat.getHardness();
