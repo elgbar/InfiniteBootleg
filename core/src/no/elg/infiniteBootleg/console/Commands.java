@@ -82,7 +82,7 @@ public class Commands extends CommandExecutor {
     public void fly() {
         Entity player = Main.inst().getWorld().getEntities().iterator().next(); //assume this is the player
         player.setFlying(!player.isFlying());
-        logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not") + " flying");
+        logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") + "flying");
     }
 
     @ConsoleDoc(description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +

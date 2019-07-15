@@ -120,7 +120,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
-
         updatableBlocks = Collections.synchronizedSet(new HashSet<>());
 
         allAir = false;
@@ -154,7 +153,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     allAir = false;
                     break outer;
                 }
-
             }
         }
         if (Main.renderGraphic) {
@@ -164,10 +162,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     public void updateFixture(boolean recalculateNeighbors) {
+
         if (box2dBody != null) {
             Body cpy = box2dBody;
             box2dBody = null;
-            getWorld().getRender().getBox2dWorld().destroyBody(cpy);
+            world.getRender().getBox2dWorld().destroyBody(cpy);
 
         }
         if (allAir) {
@@ -178,7 +177,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
-        box2dBody = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
+        box2dBody = world.getRender().getBox2dWorld().createBody(bodyDef);
         box2dBody.setAwake(false);
         box2dBody.setFixedRotation(true);
 
@@ -217,8 +216,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             //TODO Try to optimize this (ie select what directions to recalculate)
             for (Direction direction : Direction.CARDINAL) {
                 Location relChunk = Location.relative(chunkX, chunkY, direction);
-                if (getWorld().isChunkLoaded(relChunk)) {
-                    getWorld().getChunk(relChunk).updateFixture(false);
+                if (world.isChunkLoaded(relChunk)) {
+                    world.getChunk(relChunk).updateFixture(false);
                 }
             }
         }
