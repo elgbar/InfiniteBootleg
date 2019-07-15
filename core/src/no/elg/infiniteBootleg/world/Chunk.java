@@ -546,7 +546,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE,
                                     "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + bytes.length);
         int index = 0;
-        modified = true;
         for (int y = 0; y < CHUNK_SIZE; y++) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 Material mat = Material.fromByte(bytes[index++]);
@@ -561,6 +560,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 blocks[x][y] = block;
             }
         }
+        initializing = false;
     }
 
     @Override
@@ -593,7 +593,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * Allow textures to be loaded
      */
     public void finishLoading() {
-        initializing = false;
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 Block block = blocks[x][y];
@@ -602,5 +601,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 }
             }
         }
+        initializing = false;
     }
 }
