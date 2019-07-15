@@ -376,29 +376,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
-     * Mark this chunk as unloaded, it will no longer be able to be updated.
-     * <p>
-     * <b>Note:</b> Internal use only, use {@link World#unload(Chunk)} to unload a chunk
-     */
-    void unload() {
-        if (!allowUnload || !loaded) { return;}
-        loaded = false;
-        allowUnload = false;
-        if (box2dBody != null) {
-            getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
-            box2dBody = null;
-        }
-
-        for (Block[] blocks : blocks) {
-            for (Block block : blocks) {
-                if (block != null) {
-                    block.dispose();
-                }
-            }
-        }
-    }
-
-    /**
      * If {@code isAllowingUnloading} is {@code false} this chunk cannot be unloaded
      *
      * @param allowUnload
@@ -521,6 +498,20 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public void dispose() {
         if (fbo != null) {
             fbo.dispose();
+        }
+        loaded = false;
+        allowUnload = false;
+        if (box2dBody != null) {
+            getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
+            box2dBody = null;
+        }
+
+        for (Block[] blocks : blocks) {
+            for (Block block : blocks) {
+                if (block != null) {
+                    block.dispose();
+                }
+            }
         }
     }
 

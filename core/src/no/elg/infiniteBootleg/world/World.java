@@ -323,12 +323,10 @@ public class World implements Disposable, Updatable, Resizable {
      * @return If the chunk was unloaded
      */
     public void unload(@Nullable Chunk chunk) {
-        if (chunk == null || !chunk.isLoaded() || !isChunkLoaded(chunk.getChunkX(), chunk.getChunkY())) {
-            return;
+        if (chunk != null && chunk.isLoaded() && chunk.isAllowingUnloading()) {
+            chunkLoader.save(chunk);
+            chunk.dispose();
         }
-        chunk.dispose();
-        chunkLoader.save(chunk);
-        chunk.unload();
     }
 
     /**
