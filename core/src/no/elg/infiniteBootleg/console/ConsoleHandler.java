@@ -3,52 +3,60 @@ package no.elg.infiniteBootleg.console;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.utils.Disposable;
 import com.kotcrab.vis.ui.VisUI;
+import com.strongjoshua.console.Console;
 import com.strongjoshua.console.GUIConsole;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.util.Util;
+import no.elg.infiniteBootleg.util.Resizable;
 import no.kh498.util.Reflection;
 
-public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
+public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
+    private Console console;
     private Window consoleWindow;
 
     public ConsoleHandler() {
-        super(VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
-//        setCommandExecutor(new CommandHandler(this));
-        Main.getInputMultiplexer().addProcessor(getInputProcessor());
-        logToSystem = true;
-        consoleTrace = true;
-
-        try {
-            consoleWindow = (Window) Reflection.getSuperField(this, "consoleWindow");
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+        if (Main.renderGraphic) {
+            console = new GUIConsole(VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
+            console.setLoggingToSystem(true);
+            Main.getInputMultiplexer().addProcessor(console.getInputProcessor());
+            try {
+                consoleWindow = (Window) Reflection.getField(console, "consoleWindow");
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            console = new StdConsole();
         }
 
-        setCommandExecutor(new Commands(this));
-        log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
+        console.setConsoleStackTrace(true);
+        console.setCommandExecutor(new Commands(this));
     }
 
     public void setAlpha(float a) {
+        if (!Main.renderGraphic) {
+            log(LogLevel.ERROR, "Cannot change alpha value of console when in headless mode");
+            return;
+        }
         Color color = consoleWindow.getColor();
         color.a = a;
         consoleWindow.setColor(color);
+
     }
 
     public float getAlpha() {
-        return consoleWindow.getColor().a;
+        return Main.renderGraphic ? consoleWindow.getColor().a : 1;
     }
 
-    @Override
-    public void logf(final String msg, final Object... objs) {
-        logf(LogLevel.DEFAULT, msg, objs);
+    public boolean isVisible() {
+        return console.isVisible();
     }
 
-    @Override
-    public void logf(final LogLevel level, final String msg, final Object... objs) {
-        log(level, String.format(msg, objs));
+    public void draw() {
+        console.draw();
     }
 
     /**
@@ -57,16 +65,20 @@ public class ConsoleHandler extends GUIConsole implements ConsoleLogger {
     @Override
     public void log(LogLevel level, String msg) {
         try {
-            super.log(msg, level);
+            console.log(msg, level);
         } catch (Exception ex) {
             System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg, level.toString(),
                               ex.getClass().getSimpleName(), ex.getMessage());
         }
     }
 
+    @Override
+    public void dispose() {
+        console.dispose();
+    }
 
     @Override
-    public void log(String msg) {
-        log(LogLevel.DEFAULT, msg);
+    public void resize(int width, int height) {
+        console.refresh();
     }
 }

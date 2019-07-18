@@ -8,16 +8,17 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
+import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
+import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
 
 import java.io.File;
 
-import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Main extends ApplicationAdapter {
@@ -55,53 +56,42 @@ public class Main extends ApplicationAdapter {
     private HUDRenderer hud;
 
     public static Main inst;
-    private String[] args;
 
 
     private int mouseBlockX;
     private int mouseBlockY;
 
-
-    public Main(String[] args) {
-        this.args = args;
-    }
-
     @Override
     public void create() {
         inst = this;
 
+        if (renderGraphic) {
+            VisUI.load();
+            hud = new HUDRenderer();
+
+            blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
+            entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
+        }
+
         inputMultiplexer = new InputMultiplexer();
-        VisUI.load();
-        console = new ConsoleHandler();
         Gdx.input.setInputProcessor(inputMultiplexer);
+        console = new ConsoleHandler();
+        console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
 
-        executeArgs(args);
-
-        blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
-        entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
 
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            world.getWorldTicker().stop();
             world.save();
+            dispose();
         }));
-
-        if (!renderGraphic) {
-            console.setVisible(true);
-            console.setSizePercent(100, 100);
-        }
-        hud = new HUDRenderer();
     }
 
     @Override
     public void render() {
+        if (!renderGraphic) { return; }
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        if (!renderGraphic) {
-            console.draw();
-            return;
-        }
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
         mouseBlockX = MathUtils.floor(unproject.x / BLOCK_SIZE);
@@ -115,21 +105,27 @@ public class Main extends ApplicationAdapter {
         console.draw();
     }
 
+
     @Override
     public void dispose() {
-        hud.dispose();
+        if (renderGraphic) {
+            hud.dispose();
+            blockAtlas.dispose();
+            entityAtlas.dispose();
+            VisUI.dispose();
+        }
         world.dispose();
-        blockAtlas.dispose();
-        entityAtlas.dispose();
         console.dispose();
-        VisUI.dispose();
+        SCHEDULER.shutdown();
     }
 
     @Override
     public void resize(int width, int height) {
-        world.resize(width, height);
-        hud.resize(width, height);
-        console.refresh();
+        if (renderGraphic) {
+            world.resize(width, height);
+            hud.resize(width, height);
+            console.resize(width, height);
+        }
     }
 
     public static InputMultiplexer getInputMultiplexer() {

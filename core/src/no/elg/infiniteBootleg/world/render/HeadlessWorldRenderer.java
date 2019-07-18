@@ -23,7 +23,17 @@ public class HeadlessWorldRenderer extends WorldRender {
     }
 
     @Override
+    public void updatePhysics() {
+
+    }
+
+    @Override
     public void dispose() {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
 
     }
 }

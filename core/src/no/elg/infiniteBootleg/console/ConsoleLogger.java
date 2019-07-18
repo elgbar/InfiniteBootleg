@@ -17,7 +17,9 @@ public interface ConsoleLogger {
      *
      * @see String#format(String, Object...)
      */
-    void logf(String msg, Object... objs);
+    default void logf(String msg, Object... objs) {
+        logf(LogLevel.DEFAULT, msg, objs);
+    }
 
     /**
      * @param level
@@ -29,7 +31,9 @@ public interface ConsoleLogger {
      *
      * @see String#format(String, Object...)
      */
-    void logf(LogLevel level, String msg, Object... objs);
+    default void logf(LogLevel level, String msg, Object... objs) {
+        log(level, String.format(msg, objs));
+    }
 
     /**
      * Log a level with {@link LogLevel#DEFAULT} loglevel
@@ -37,7 +41,9 @@ public interface ConsoleLogger {
      * @param msg
      *     The message to log
      */
-    void log(String msg);
+    default void log(String msg) {
+        log(LogLevel.DEFAULT, msg);
+    }
 
     /**
      * @param level
