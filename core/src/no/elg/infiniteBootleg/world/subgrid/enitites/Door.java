@@ -23,20 +23,19 @@ public class Door extends Entity implements ContactHandler {
     private TextureRegion openDoorRegion;
     private TextureRegion closedDoorRegion;
 
-    private boolean open;
+    private int open;
 
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
         openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
         closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
-
-        open = false;
+        open = 0;
     }
 
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact, @Nullable Object data) {
-        if (type == ContactType.BEGIN_CONTACT) { open = true; }
-        if (type == ContactType.END_CONTACT) { open = false; }
+        if (type == ContactType.BEGIN_CONTACT) { open++; }
+        if (type == ContactType.END_CONTACT) { open--; }
     }
 
     @NotNull
@@ -59,7 +58,7 @@ public class Door extends Entity implements ContactHandler {
 
     @Override
     public TextureRegion getTextureRegion() {
-        return open ? openDoorRegion : closedDoorRegion;
+        return open == 0 ? openDoorRegion : closedDoorRegion;
     }
 
     @Override
