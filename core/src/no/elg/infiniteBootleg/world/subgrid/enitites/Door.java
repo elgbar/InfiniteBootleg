@@ -27,8 +27,10 @@ public class Door extends Entity implements ContactHandler {
 
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
-        openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
-        closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
+        if (Main.renderGraphic) {
+            openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
+            closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
+        }
         open = 0;
     }
 

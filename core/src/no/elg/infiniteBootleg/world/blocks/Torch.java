@@ -23,6 +23,6 @@ public class Torch extends Block {
 
     @Override
     public void dispose() {
-        PointLightPool.inst.free(light);
+        if (light != null) { PointLightPool.inst.free(light); }
     }
 }

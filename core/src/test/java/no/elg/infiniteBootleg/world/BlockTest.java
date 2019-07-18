@@ -20,9 +20,12 @@ public class BlockTest extends TestGraphic {
     }
 
     @Test
-    public void correctType() {
+    public void correctBlockType() {
         for (Material mat : Material.values()) {
-            Block b = mat.createBlock(world, new Chunk(world, 0, 0), 0, 0);
+            if (mat.isEntity()) { continue; }
+            Chunk c = new Chunk(world, 0, 0);
+            c.finishLoading();
+            Block b = mat.createBlock(world, c, 0, 0);
             assertEquals(mat, b.getMaterial());
         }
     }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
@@ -32,8 +33,10 @@ public abstract class Entity implements Updatable, Disposable {
         flying = false;
         world.addEntity(this);
 
-        body = createBody(worldX, worldY);
-        createFixture(body);
+        if (Main.renderGraphic) {
+            body = createBody(worldX, worldY);
+            createFixture(body);
+        }
         update();
     }
 
@@ -58,7 +61,7 @@ public abstract class Entity implements Updatable, Disposable {
 
     @Override
     public void update() {
-        posCache = getBody().getPosition();
+        if (Main.renderGraphic) { posCache = getBody().getPosition(); }
     }
 
     /**

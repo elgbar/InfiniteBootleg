@@ -24,6 +24,7 @@ public class ChunkTest extends TestGraphic {
     @Before
     public void setUp() {
         chunk = new Chunk(new World(new EmptyChunkGenerator()), 0, 0);
+        chunk.finishLoading();
     }
 
     @Test
