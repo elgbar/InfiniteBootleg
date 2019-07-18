@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Door;
 import org.jetbrains.annotations.NotNull;
 
 import static com.badlogic.gdx.Input.Keys.*;
@@ -83,14 +82,10 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             case NUMPAD_8:
                 selected = Material.values()[8];
                 break;
-//            case NUM_9:
-//            case NUMPAD_9:
-//                selected = Material.values()[9];
-//                break;
-//            case NUM_0:
-//            case NUMPAD_0:0
-//                selected = Material.values()[0];
-//                break;
+            case NUM_9:
+            case NUMPAD_9:
+                selected = Material.values()[9];
+                break;
             default:
                 return false;
         }
@@ -133,27 +128,27 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return;
         }
 
+        boolean update = false;
+
         int blockX = Main.inst().getMouseBlockX();
         int blockY = Main.inst().getMouseBlockY();
-
+        World world = getWorld();
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            getWorld().setBlock(blockX, blockY, null);
+            world.setBlock(blockX, blockY, null);
+            update = true;
         }
         else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Q)) {
-            getWorld().setBlock(blockX, blockY, selected);
+            selected.create(world, blockX, blockY);
+            update = true;
         }
 
-        if (Gdx.input.isKeyJustPressed(H)) {
-            new Door(getWorld(), blockX, blockY);
+        int vertical = Gdx.input.isKeyPressed(W) ? 1 : Gdx.input.isKeyPressed(S) ? -1 : 0;
+        int horizontal = Gdx.input.isKeyPressed(A) ? 1 : Gdx.input.isKeyPressed(D) ? -1 : 0;
+        camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAM_SPEED * camera.zoom;
+        camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAM_SPEED * camera.zoom;
+
+        if (update || vertical != 0 || horizontal != 0) {
+            worldRender.update();
         }
-
-        int WVertical = Gdx.input.isKeyPressed(W) ? 1 : 0;
-        int SVertical = Gdx.input.isKeyPressed(S) ? -1 : 0;
-        int AHorizontal = Gdx.input.isKeyPressed(A) ? 1 : 0;
-        int DHorizontal = Gdx.input.isKeyPressed(D) ? -1 : 0;
-        camera.position.x -= Gdx.graphics.getDeltaTime() * (AHorizontal + DHorizontal) * CAM_SPEED * camera.zoom;
-        camera.position.y += Gdx.graphics.getDeltaTime() * (WVertical + SVertical) * CAM_SPEED * camera.zoom;
-
-        worldRender.update();
     }
 }

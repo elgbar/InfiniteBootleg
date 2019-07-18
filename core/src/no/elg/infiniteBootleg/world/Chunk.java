@@ -282,7 +282,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
         }
         else {
-            Block newBlock = material.create(world, this, localX, localY);
+            Block newBlock = material.createBlock(world, this, localX, localY);
             blocks[localX][localY] = newBlock;
 
             if (currBlock instanceof UpdatableBlock && !(newBlock instanceof UpdatableBlock)) {
@@ -300,7 +300,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             modified = true;
             dirty = true;
             prioritize = true;
-            getWorld().updateBlocksAround(getWorldX(localX), getWorldY(localY));
+            world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
         }
     }
 
@@ -559,7 +559,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     blocks[x][y] = null;
                     continue;
                 }
-                Block block = mat.create(world, this, x, y);
+                Block block = mat.createBlock(world, this, x, y);
                 if (block instanceof UpdatableBlock) {
                     updatableBlocks.add((UpdatableBlock) block);
                 }

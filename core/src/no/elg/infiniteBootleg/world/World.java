@@ -3,12 +3,10 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Pool;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
@@ -32,6 +30,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
+ * Different kind of views
+ *
+ * <ul>
+ * <li>Chunk view: One unit in chunk view is {@link Chunk#CHUNK_SIZE} times larger than a unit in world view</li>
+ * <li>World view: One unit in world view is {@link Block#BLOCK_SIZE} times larger than a unit in Box2D view</li>
+ * <li>Box2D view: 1 (ie base unit)</li>
+ * </ul>
+ *
  * @author Elg
  */
 public class World implements Disposable, Updatable, Resizable {
@@ -46,18 +52,22 @@ public class World implements Disposable, Updatable, Resizable {
     public static final Filter LIGHT_FILTER;
 
     static {
+        //base filter for entities
         ENTITY_FILTER = new Filter();
         ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
         ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
+        //skylight
         LIGHT_FILTER = new Filter();
         LIGHT_FILTER.categoryBits = LIGHTS_CATEGORY;
         LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
+        //for falling blocks
         FALLING_BLOCK_FILTER = new Filter();
         FALLING_BLOCK_FILTER.categoryBits = GROUND_CATEGORY;
         FALLING_BLOCK_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
 
+        //ie glass
         SOLID_TRANSPARENT_FILTER = new Filter();
         SOLID_TRANSPARENT_FILTER.categoryBits = GROUND_CATEGORY;
         SOLID_TRANSPARENT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
@@ -169,8 +179,8 @@ public class World implements Disposable, Updatable, Resizable {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
-        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
-        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+        int localX = CoordUtil.chunkOffset(worldX);
+        int localY = CoordUtil.chunkOffset(worldY);
 
         return getChunk(chunkX, chunkY).getBlocks()[localX][localY];
     }
@@ -249,7 +259,8 @@ public class World implements Disposable, Updatable, Resizable {
 
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt create
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt
+     * createBlock
      * and store a new air block at the given location
      *
      * @param worldLoc
@@ -261,7 +272,8 @@ public class World implements Disposable, Updatable, Resizable {
 
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt create
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt
+     * createBlock
      * and store a new air block at the given location
      *
      * @param worldX
@@ -537,17 +549,9 @@ public class World implements Disposable, Updatable, Resizable {
 
     @Override
     public void resize(int width, int height) {
-        render.resize(width, height);
-        input.resize(width, height);
-    }
-
-    private static final class VecPool extends Pool<Vector2> {
-
-        static VecPool vecPool = new VecPool();
-
-        @Override
-        protected Vector2 newObject() {
-            return new Vector2();
+        if (Main.renderGraphic) {
+            render.resize(width, height);
+            input.resize(width, height);
         }
     }
 }

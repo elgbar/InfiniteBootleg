@@ -93,7 +93,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
                     float x = noise2.GetNoise(worldX, worldY) / wormSize;
                     if (x > CAVE_CREATION_THRESHOLD) {
                         Material mat = x > 0.99 && chunkY < genChunkY ? Material.TORCH : null;
-                        Block b = mat == null ? null : mat.create(world, chunk, localX, localY);
+                        Block b = mat == null ? null : mat.createBlock(world, chunk, localX, localY);
                         chunk.getBlocks()[localX][localY] = b;
                     }
                 }

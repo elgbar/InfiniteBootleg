@@ -22,7 +22,7 @@ public class BlockTest extends TestGraphic {
     @Test
     public void correctType() {
         for (Material mat : Material.values()) {
-            Block b = mat.create(world, new Chunk(world, 0, 0), 0, 0);
+            Block b = mat.createBlock(world, new Chunk(world, 0, 0), 0, 0);
             assertEquals(mat, b.getMaterial());
         }
     }

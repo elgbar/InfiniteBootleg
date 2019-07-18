@@ -56,7 +56,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public static boolean lights = true;
     public static boolean debugBox2d;
-    public static boolean dayTicking;
+    public static boolean dayTicking = true;
 
     public final static Object LIGHT_LOCK = new Object();
 
@@ -95,8 +95,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
             skylight = new DirectionalLight(rayHandler, 7500, Color.WHITE, skyDir);
             skylight.setContactFilter(World.LIGHT_FILTER);
+            skylight.setStaticLight(true);
         }
-        update();
+        Main.SCHEDULER.scheduleSync(this::update, 100L);
     }
 
 
@@ -143,6 +144,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
+            skylight.setStaticLight(true);
             Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
             rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
                                          camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);

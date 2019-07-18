@@ -91,7 +91,7 @@ public enum Biome {
         Block[] blocks = chunk.getBlocks()[localX];
         for (int dy = 0; dy < localY; dy++) {
             Material mat = materialAt(noise, height, chunk.getWorldX() + localX, chunk.getWorldY() + dy);
-            blocks[dy] = mat.create(chunk.getWorld(), chunk, localX, dy);
+            blocks[dy] = mat.createBlock(chunk.getWorld(), chunk, localX, dy);
         }
     }
 }

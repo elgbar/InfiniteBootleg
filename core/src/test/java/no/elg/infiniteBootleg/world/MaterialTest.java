@@ -13,8 +13,8 @@ public class MaterialTest extends TestGraphic {
     public void create() {
         World world = new World(new FlatChunkGenerator());
         for (Material material : Material.values()) {
-            System.out.println("Trying to create " + material);
-            material.create(world, new Chunk(world, 0, 0), 0, 0);
+            System.out.println("Trying to createBlock " + material);
+            material.createBlock(world, new Chunk(world, 0, 0), 0, 0);
             System.out.println("Created " + material);
         }
     }
