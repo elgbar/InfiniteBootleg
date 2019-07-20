@@ -3,9 +3,7 @@ package no.elg.infiniteBootleg.world.generator;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.FastNoise;
-import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
@@ -92,9 +90,9 @@ public class PerlinChunkGenerator implements ChunkGenerator {
                     float wormSize = 1 + Math.abs(noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
                     float x = noise2.GetNoise(worldX, worldY) / wormSize;
                     if (x > CAVE_CREATION_THRESHOLD) {
-                        Material mat = x > 0.99 && chunkY < genChunkY ? Material.TORCH : null;
-                        Block b = mat == null ? null : mat.createBlock(world, chunk, localX, localY);
-                        chunk.getBlocks()[localX][localY] = b;
+//                        Material mat = x > 0.99 && chunkY < genChunkY ? Material.TORCH : null;
+//                        Block b = mat == null ? null : mat.createBlock(world, chunk, localX, localY);
+                        chunk.getBlocks()[localX][localY] = null;
                     }
                 }
             }
