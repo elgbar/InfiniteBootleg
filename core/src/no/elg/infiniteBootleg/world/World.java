@@ -530,6 +530,40 @@ public class World implements Disposable, Updatable, Resizable {
     }
 
     /**
+     * @param worldX
+     *     The x coordinate in world view
+     * @param worldY
+     *     The y coordinate in world view
+     *
+     * @return The first entity found within the given coordinates
+     */
+    @Nullable
+    public Entity getEntity(float worldX, float worldY) {
+        for (Entity entity : entities) {
+            Vector2 pos = entity.getPosition();
+            if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
+                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    public Array<Entity> getEntities(float worldX, float worldY) {
+        Array<Entity> entities = new Array<>(false, 5);
+        for (Entity entity : this.entities) {
+            Vector2 pos = entity.getPosition();
+            if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
+                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
+
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+
+    /**
      * Remove and disposes the given entity
      *
      * @param entity

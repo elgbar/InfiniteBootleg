@@ -60,6 +60,8 @@ public class Main extends ApplicationAdapter {
 
     private int mouseBlockX;
     private int mouseBlockY;
+    private float mouseX;
+    private float mouseY;
 
     @Override
     public void create() {
@@ -93,8 +95,11 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        mouseBlockX = MathUtils.floor(unproject.x / BLOCK_SIZE);
-        mouseBlockY = MathUtils.floor(unproject.y / BLOCK_SIZE);
+        mouseX = unproject.x / BLOCK_SIZE;
+        mouseY = unproject.y / BLOCK_SIZE;
+
+        mouseBlockX = MathUtils.floor(mouseX);
+        mouseBlockY = MathUtils.floor(mouseY);
 
         //noinspection ConstantConditions
         world.getInput().update();
@@ -148,6 +153,14 @@ public class Main extends ApplicationAdapter {
 
     public int getMouseBlockY() {
         return mouseBlockY;
+    }
+
+    public float getMouseX() {
+        return mouseX;
+    }
+
+    public float getMouseY() {
+        return mouseY;
     }
 
     public static Main inst() {

@@ -84,6 +84,9 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
             String pos = String.format("p: (%.2f,%.2f) v: (%.2f,%.2f)", player.getPosition().x, player.getPosition().y,
                                        player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
             font.draw(batch, pos, 10, h - 70);
+            font.draw(batch, "Ents at mouse = " + world.getEntities(Main.inst().getMouseX(), Main.inst().getMouseY()), 10,
+                      h - 85);
+            font.draw(batch, "Ent at mouse = " + world.getEntity(Main.inst().getMouseX(), Main.inst().getMouseY()), 10, h - 100);
         }
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
         if (tr != null) {
