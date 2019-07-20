@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
@@ -53,7 +52,7 @@ public class FallingBlock extends Entity implements ContactHandler {
     }
 
     @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact, @Nullable Object data) {
+    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
 

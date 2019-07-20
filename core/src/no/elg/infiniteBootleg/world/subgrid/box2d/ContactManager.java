@@ -20,7 +20,7 @@ public class ContactManager implements ContactListener {
     public void beginContact(Contact contact) {
         for (Entity entity : world.getEntities()) {
             if (entity instanceof ContactHandler && contact.getFixtureB().getBody() == entity.getBody()) {
-                ((ContactHandler) entity).contact(ContactType.BEGIN_CONTACT, contact, null);
+                ((ContactHandler) entity).contact(ContactType.BEGIN_CONTACT, contact);
             }
         }
     }
@@ -29,7 +29,7 @@ public class ContactManager implements ContactListener {
     public void endContact(Contact contact) {
         for (Entity entity : world.getEntities()) {
             if (entity instanceof ContactHandler && contact.getFixtureB().getBody() == entity.getBody()) {
-                ((ContactHandler) entity).contact(ContactType.END_CONTACT, contact, null);
+                ((ContactHandler) entity).contact(ContactType.END_CONTACT, contact);
             }
 
         }
