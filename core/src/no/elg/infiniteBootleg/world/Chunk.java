@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -162,65 +163,74 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     public void updateFixture(boolean recalculateNeighbors) {
-
-        if (box2dBody != null) {
-            Body cpy = box2dBody;
-            box2dBody = null;
-            world.getRender().getBox2dWorld().destroyBody(cpy);
-
-        }
-        if (allAir) {
-            return;
-        }
-
-        //recalculate the shape of the chunk (box2d)
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
-        box2dBody = world.getRender().getBox2dWorld().createBody(bodyDef);
-        box2dBody.setAwake(false);
-        box2dBody.setFixedRotation(true);
-
-        EdgeShape edgeShape = new EdgeShape();
-
-
-        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-            for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                Block b = blocks[localX][localY];
-                if (b == null || !b.getMaterial().isSolid()) {
-                    continue;
+        Main.SCHEDULER.executeAsync(() -> {
+            if (box2dBody != null) {
+                Body cpy = box2dBody;
+                box2dBody = null;
+                synchronized (WorldRender.BOX2D_LOCK) {
+                    world.getRender().getBox2dWorld().destroyBody(cpy);
                 }
-                for (Tuple<Direction, byte[]> tuple : ts) {
-                    Direction dir = tuple.key;
-                    if (!world.isChunkLoaded(CoordUtil.worldToChunk(b.getWorldX() + dir.dx),
-                                             CoordUtil.worldToChunk(b.getWorldY() + dir.dy))) {
+            }
+            if (allAir) {
+                return;
+            }
+
+            //recalculate the shape of the chunk (box2d)
+
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
+            bodyDef.fixedRotation = true;
+            bodyDef.awake = true;
+            synchronized (WorldRender.BOX2D_LOCK) {
+                box2dBody = world.getRender().getBox2dWorld().createBody(bodyDef);
+            }
+
+            EdgeShape edgeShape = new EdgeShape();
+
+
+            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                    Block b = blocks[localX][localY];
+                    if (b == null || !b.getMaterial().isSolid()) {
                         continue;
                     }
+                    for (Tuple<Direction, byte[]> tuple : ts) {
+                        Direction dir = tuple.key;
+                        //FIXME only check the chunk if the local coordinates are outside this chunk
+                        if (!world.isChunkLoaded(CoordUtil.worldToChunk(b.getWorldX() + dir.dx),
+                                                 CoordUtil.worldToChunk(b.getWorldY() + dir.dy))) {
+                            continue;
+                        }
 
 
-                    Block rel = b.getRawRelative(dir);
-                    if (rel == null || !rel.getMaterial().isSolid() || dir == Direction.NORTH && localY == 0) {
-                        byte[] ds = tuple.value;
-                        edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
-                        Fixture fix = box2dBody.createFixture(edgeShape, 0);
-                        if (!b.getMaterial().blocksLight()) {
-                            fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
+                        Block rel = b.getRawRelative(dir);
+                        if (rel == null || !rel.getMaterial().isSolid() || dir == Direction.NORTH && localY == 0) {
+                            byte[] ds = tuple.value;
+                            edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
+                            Fixture fix;
+                            synchronized (WorldRender.BOX2D_LOCK) {
+                                fix = box2dBody.createFixture(edgeShape, 0);
+                                if (!b.getMaterial().blocksLight()) {
+                                    fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
-        edgeShape.dispose();
+            edgeShape.dispose();
 
-        if (recalculateNeighbors) {
-            //TODO Try to optimize this (ie select what directions to recalculate)
-            for (Direction direction : Direction.CARDINAL) {
-                Location relChunk = Location.relative(chunkX, chunkY, direction);
-                if (world.isChunkLoaded(relChunk)) {
-                    world.getChunk(relChunk).updateFixture(false);
+            getWorld().getRender().updateLights();
+            if (recalculateNeighbors) {
+                //TODO Try to optimize this (ie select what directions to recalculate)
+                for (Direction direction : Direction.CARDINAL) {
+                    Location relChunk = Location.relative(chunkX, chunkY, direction);
+                    if (world.isChunkLoaded(relChunk)) {
+                        world.getChunk(relChunk).updateFixture(false);
+                    }
                 }
             }
-        }
+        });
     }
 
 
@@ -242,6 +252,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
+     * Set a block and update all blocks around it
+     *
      * @param localX
      *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
      * @param localY
@@ -251,6 +263,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void setBlock(int localX, int localY, @Nullable Material material) {
         setBlock(localX, localY, material, true);
+    }
+
+
+    public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
+        Block block = material == null ? null : material.createBlock(world, this, localX, localY);
+        setBlock(localX, localY, block, update);
     }
 
     /**
@@ -263,11 +281,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @param update
      *     If the texture of this chunk should be updated
      */
-    public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
+    public void setBlock(int localX, int localY, @Nullable Block newBlock, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
         Block currBlock = blocks[localX][localY];
 
-        if ((currBlock == null && material == null) || (currBlock != null && currBlock.getMaterial() == material)) {
+        if ((currBlock == null && newBlock == null) ||
+            (currBlock != null && newBlock != null && currBlock.getMaterial() == newBlock.getMaterial())) {
+            if (newBlock != null) { newBlock.dispose(); }
             return;
         }
 
@@ -275,14 +295,13 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             currBlock.dispose();
         }
 
-        if (material == null) {
+        if (newBlock == null) {
             blocks[localX][localY] = null;
             if (currBlock instanceof UpdatableBlock) {
                 updatableBlocks.remove(currBlock);
             }
         }
         else {
-            Block newBlock = material.createBlock(world, this, localX, localY);
             blocks[localX][localY] = newBlock;
 
             if (currBlock instanceof UpdatableBlock && !(newBlock instanceof UpdatableBlock)) {
@@ -508,7 +527,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         loaded = false;
         allowUnload = false;
         if (box2dBody != null) {
-            getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
+            synchronized (WorldRender.BOX2D_LOCK) {
+                getWorld().getRender().getBox2dWorld().destroyBody(box2dBody);
+            }
             box2dBody = null;
         }
 

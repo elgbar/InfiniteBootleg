@@ -78,12 +78,11 @@ public class Main extends ApplicationAdapter {
         console = new ConsoleHandler();
         console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
 
-
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             world.save();
-            dispose();
+            SCHEDULER.shutdown(); // we want make sure this thread is dead
         }));
     }
 
@@ -116,7 +115,6 @@ public class Main extends ApplicationAdapter {
         }
         world.dispose();
         console.dispose();
-        SCHEDULER.shutdown();
     }
 
     @Override

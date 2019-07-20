@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -34,8 +35,10 @@ public abstract class Entity implements Updatable, Disposable {
         world.addEntity(this);
 
         if (Main.renderGraphic) {
-            body = createBody(worldX, worldY);
-            createFixture(body);
+            synchronized (WorldRender.BOX2D_LOCK) {
+                body = createBody(worldX, worldY);
+                createFixture(body);
+            }
         }
         update();
     }
@@ -61,7 +64,9 @@ public abstract class Entity implements Updatable, Disposable {
 
     @Override
     public void update() {
-        if (Main.renderGraphic) { posCache = getBody().getPosition(); }
+        if (Main.renderGraphic) {
+            posCache = body.getPosition();
+        }
     }
 
     /**
@@ -113,12 +118,14 @@ public abstract class Entity implements Updatable, Disposable {
 
     public void setFlying(boolean flying) {
         this.flying = flying;
-        if (flying) {
-            getBody().setLinearVelocity(0, 0);
-            getBody().setType(BodyDef.BodyType.StaticBody);
-        }
-        else {
-            getBody().setType(BodyDef.BodyType.DynamicBody);
+        synchronized (WorldRender.BOX2D_LOCK) {
+            if (flying) {
+                body.setLinearVelocity(0, 0);
+                body.setType(BodyDef.BodyType.StaticBody);
+            }
+            else {
+                body.setType(BodyDef.BodyType.DynamicBody);
+            }
         }
     }
 
@@ -133,7 +140,9 @@ public abstract class Entity implements Updatable, Disposable {
     @Override
     public void dispose() {
         if (body != null) {
-            getWorld().getRender().getBox2dWorld().destroyBody(body);
+            synchronized (WorldRender.BOX2D_LOCK) {
+                getWorld().getRender().getBox2dWorld().destroyBody(body);
+            }
             body = null;
         }
     }

@@ -55,10 +55,12 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private int skyDir;
 
     public static boolean lights = true;
-    public static boolean debugBox2d;
-    public static boolean dayTicking = true;
+    public static boolean debugBox2d = false;
+    public static boolean dayTicking = false;
 
     public final static Object LIGHT_LOCK = new Object();
+    public final static Object BOX2D_LOCK = new Object();
+    private Matrix4 m4;
 
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
@@ -96,8 +98,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             skylight = new DirectionalLight(rayHandler, 7500, Color.WHITE, skyDir);
             skylight.setContactFilter(World.LIGHT_FILTER);
             skylight.setStaticLight(true);
+
         }
-        Main.SCHEDULER.scheduleSync(this::update, 100L);
+        Main.SCHEDULER.scheduleSync(this::update, 200L);
     }
 
 
@@ -109,16 +112,21 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             skylight.setDirection(++skyDir);
         }
 
-        getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
-//        Main.SCHEDULER.executeAsync(() -> {
+        synchronized (BOX2D_LOCK) {
+            getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
+
+        }
+        updateLights();
+    }
+
+    public void updateLights() {
         if (lights) {
-            synchronized (LIGHT_LOCK) {
-                rayHandler.update();
+            synchronized (BOX2D_LOCK) {
+                synchronized (LIGHT_LOCK) {
+                    rayHandler.update();
+                }
             }
         }
-//        });
-
-
     }
 
     @Override
@@ -144,12 +152,13 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
+            m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
             skylight.setStaticLight(true);
-            Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
             rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
                                          camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
         }
     }
+
 
     @Override
     public void render() {
@@ -190,8 +199,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
                 float dx = chunk.getChunkX() * CHUNK_TEXTURE_SIZE;
                 float dy = chunk.getChunkY() * CHUNK_TEXTURE_SIZE;
-
                 batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
+
             }
         }
         entityRenderer.render();
@@ -202,8 +211,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             }
         }
         if (debugBox2d) {
-            Matrix4 m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
-            debugRenderer.render(box2dWorld, m4);
+            synchronized (BOX2D_LOCK) {
+                debugRenderer.render(box2dWorld, m4);
+            }
         }
     }
 

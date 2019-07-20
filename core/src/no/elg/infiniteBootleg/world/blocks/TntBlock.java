@@ -87,7 +87,7 @@ public class TntBlock extends UpdatableBlock {
                 Gdx.app.postRunnable(() -> {
                     Set<Chunk> chunks = new HashSet<>();
                     for (Block block : destroyed) {
-                        getWorld().setBlock(block.getWorldX(), block.getWorldY(), null, false);
+                        getWorld().setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
                         chunks.add(block.getChunk());
                         getWorld().updateBlocksAround(block.getWorldX(), block.getWorldY());
                     }

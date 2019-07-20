@@ -3,15 +3,16 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
+import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -25,9 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Different kind of views
@@ -74,7 +74,7 @@ public class World implements Disposable, Updatable, Resizable {
     }
 
     private final long seed;
-    private final ObjectMap<Location, Chunk> chunks;
+    private final Map<Location, Chunk> chunks;
     private final WorldTicker ticker;
     private final ChunkLoader chunkLoader;
     private FileHandle worldFile;
@@ -85,7 +85,7 @@ public class World implements Disposable, Updatable, Resizable {
 
     private String name = "World";
     private final UUID uuid;
-    private ObjectSet<Entity> entities;
+    private Set<Entity> entities;
 
 
     /**
@@ -100,8 +100,8 @@ public class World implements Disposable, Updatable, Resizable {
     public World(@NotNull ChunkGenerator generator, long seed) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
-        chunks = new ObjectMap<>();
-        entities = new ObjectSet<>();
+        chunks = new ConcurrentHashMap<>();
+        entities = ConcurrentHashMap.newKeySet();
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
@@ -514,7 +514,7 @@ public class World implements Disposable, Updatable, Resizable {
     /**
      * @return unmodifiable view of the current entities
      */
-    public ObjectSet<Entity> getEntities() {
+    public Set<Entity> getEntities() {
         return entities;
     }
 
@@ -539,7 +539,7 @@ public class World implements Disposable, Updatable, Resizable {
         entity.dispose();
     }
 
-    public ObjectMap.Values<Chunk> getLoadedChunks() {
+    public Collection<Chunk> getLoadedChunks() {
         return chunks.values();
     }
 

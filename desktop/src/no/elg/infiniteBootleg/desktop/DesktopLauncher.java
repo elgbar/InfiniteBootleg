@@ -23,6 +23,7 @@ public class DesktopLauncher {
             config.backgroundFPS = 10;
             config.samples = 16;
             config.title = "Infinite Terraria";
+            config.useHDPI = true;
             new LwjglApplication(new Main(), config);
         }
         else {
