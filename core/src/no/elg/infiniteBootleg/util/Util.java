@@ -73,6 +73,10 @@ public class Util {
         else { return val.compareTo(max) < 0; }
     }
 
+    public static boolean isBetween(float min, float val, float max) {
+        return val >= min && val < max;
+    }
+
 
     /**
      * <a href="https://stackoverflow.com/questions/1670862/obtaining-a-powerset-of-a-set-in-java#1670871">original
