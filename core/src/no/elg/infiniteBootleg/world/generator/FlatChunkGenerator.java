@@ -32,7 +32,7 @@ public class FlatChunkGenerator implements ChunkGenerator {
                 }
             }
         }
-        chunk.updateTexture(false);
+        chunk.finishLoading();
         return chunk;
     }
 }

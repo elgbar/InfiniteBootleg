@@ -1,7 +1,9 @@
-package no.elg.infiniteBootleg.console;
+package no.elg.infiniteBootleg.console.consoles;
 
 import com.strongjoshua.console.HeadlessConsole;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.console.ConsoleHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,25 +14,25 @@ import java.io.InputStreamReader;
  */
 public class StdConsole extends HeadlessConsole implements Runnable {
 
-    private BufferedReader in;
-    private Thread thread;
+    private final ConsoleHandler consoleHandler;
     private boolean running;
 
-    public StdConsole() {
+    public StdConsole(@NotNull ConsoleHandler consoleHandler) {
+        this.consoleHandler = consoleHandler;
         running = true;
 
-        thread = new Thread(this, "Headless Console Reader Thread");
+        Thread thread = new Thread(this, "Headless Console Reader Thread");
         thread.setDaemon(true);
         thread.start();
     }
 
     @Override
     public void run() {
-        in = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         while (running) {
             try {
                 String read = in.readLine();
-                Main.SCHEDULER.executeSync(() -> execCommand(read));
+                Main.SCHEDULER.executeSync(() -> consoleHandler.execCommand(read));
             } catch (IOException e) {
                 e.printStackTrace();
             }

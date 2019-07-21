@@ -24,6 +24,8 @@ public class EmptyChunkGenerator implements ChunkGenerator {
 
     @Override
     public @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY) {
-        return new Chunk(world, chunkX, chunkY);
+        Chunk c = new Chunk(world, chunkX, chunkY);
+        c.finishLoading();
+        return c;
     }
 }
