@@ -5,6 +5,7 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.utils.PauseableThread;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,6 +53,9 @@ public class WorldTicker implements Runnable {
 //                                Gdx.app.postRunnable(world::save);
 //                            }
                 Gdx.app.postRunnable(world::update);
+                if (tickId % Updatable.UPDATE_RARE_RATE == 0) {
+                    Gdx.app.postRunnable(world::updateRare);
+                }
                 tickId++;
                 stuckFrames = 0;
                 frameId = Gdx.graphics.getFrameId();

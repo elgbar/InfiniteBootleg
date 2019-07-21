@@ -377,7 +377,16 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public void update() {
         synchronized (updatableBlocks) {
             for (UpdatableBlock block : updatableBlocks) {
-                block.tryUpdate();
+                block.tryUpdate(false);
+            }
+        }
+    }
+
+    @Override
+    public void updateRare() {
+        synchronized (updatableBlocks) {
+            for (UpdatableBlock block : updatableBlocks) {
+                block.tryUpdate(true);
             }
         }
     }

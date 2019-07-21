@@ -40,8 +40,7 @@ public class FallingBlock extends Entity implements ContactHandler {
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void updateRare() {
         //Unload this entity if it entered an unloaded chunk
         //TODO do not _remove_ this entity, just save it to the unloaded chunk
         int chunkX = CoordUtil.worldToChunk(getBlockX());

@@ -517,13 +517,22 @@ public class World implements Disposable, Updatable, Resizable {
     }
 
     @Override
+    public void updateRare() {
+        for (Chunk chunk : chunks.values()) {
+            chunk.updateRare();
+        }
+        for (Entity entity : entities) {
+            entity.updateRare();
+        }
+    }
+
+    @Override
     public void update() {
 
         getRender().updatePhysics();
 
         long tick = getWorldTicker().getTickId();
-        for (//noinspection LibGDXUnsafeIterator
-            Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
+        for (Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
             Chunk chunk = iterator.next();
 
             //clean up dead chunks
