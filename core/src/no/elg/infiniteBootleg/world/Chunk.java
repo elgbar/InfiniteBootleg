@@ -221,6 +221,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             edgeShape.dispose();
 
             getWorld().getRender().updateLights();
+
             if (recalculateNeighbors) {
                 //TODO Try to optimize this (ie select what directions to recalculate)
                 for (Direction direction : Direction.CARDINAL) {
@@ -276,18 +277,22 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
      * @param localY
      *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
-     * @param material
-     *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
      * @param update
      *     If the texture of this chunk should be updated
      */
-    public void setBlock(int localX, int localY, @Nullable Block newBlock, boolean update) {
+    public void setBlock(int localX, int localY, @Nullable Block block, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
+
+        if (block != null) {
+            Preconditions.checkArgument(block.getLocalX() == localX);
+            Preconditions.checkArgument(block.getLocalY() == localY);
+            Preconditions.checkArgument(block.getChunk() == this);
+        }
         Block currBlock = blocks[localX][localY];
 
-        if ((currBlock == null && newBlock == null) ||
-            (currBlock != null && newBlock != null && currBlock.getMaterial() == newBlock.getMaterial())) {
-            if (newBlock != null) { newBlock.dispose(); }
+        if ((currBlock == null && block == null) ||
+            (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
+            if (block != null) { block.dispose(); }
             return;
         }
 
@@ -295,22 +300,22 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             currBlock.dispose();
         }
 
-        if (newBlock == null) {
+        if (block == null) {
             blocks[localX][localY] = null;
             if (currBlock instanceof UpdatableBlock) {
                 updatableBlocks.remove(currBlock);
             }
         }
         else {
-            blocks[localX][localY] = newBlock;
+            blocks[localX][localY] = block;
 
-            if (currBlock instanceof UpdatableBlock && !(newBlock instanceof UpdatableBlock)) {
+            if (currBlock instanceof UpdatableBlock && !(block instanceof UpdatableBlock)) {
                 updatableBlocks.remove(currBlock);
             }
-            if (newBlock instanceof UpdatableBlock) {
-                updatableBlocks.add((UpdatableBlock) newBlock);
+            if (block instanceof UpdatableBlock) {
+                updatableBlocks.add((UpdatableBlock) block);
                 if (update) {
-                    ((UpdatableBlock) newBlock).update();
+                    ((UpdatableBlock) block).update();
                 }
             }
         }

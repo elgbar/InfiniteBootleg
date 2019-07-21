@@ -258,6 +258,41 @@ public class World implements Disposable, Updatable, Resizable {
     }
 
     /**
+     * Set a block at a given location
+     *
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     * @param block
+     *     The block at the given location
+     * @param update
+     *     If the texture of the corresponding chunk should be updated
+     */
+    public void setBlock(int worldX, int worldY, @Nullable Block block, boolean update) {
+
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = CoordUtil.chunkOffset(worldX);
+        int localY = CoordUtil.chunkOffset(worldY);
+
+        Chunk chunk = getChunk(chunkX, chunkY);
+        chunk.setBlock(localX, localY, block, update);
+    }
+
+    public void removeBlock(int worldX, int worldY, boolean update) {
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = CoordUtil.chunkOffset(worldX);
+        int localY = CoordUtil.chunkOffset(worldY);
+
+        Chunk chunk = getChunk(chunkX, chunkY);
+        chunk.setBlock(localX, localY, (Block) null, update);
+    }
+
+    /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
      * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt
      * createBlock
