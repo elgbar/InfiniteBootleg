@@ -78,6 +78,7 @@ public class Main extends ApplicationAdapter {
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
         console = new ConsoleHandler();
+        console.setAlpha(0.85f);
         console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
 
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
