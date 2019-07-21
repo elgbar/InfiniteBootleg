@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
@@ -35,7 +34,7 @@ public class Door extends Entity implements ContactHandler {
     }
 
     @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact, @Nullable Object data) {
+    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (type == ContactType.BEGIN_CONTACT) { open++; }
         if (type == ContactType.END_CONTACT) { open--; }
     }
@@ -52,7 +51,7 @@ public class Door extends Entity implements ContactHandler {
     protected void createFixture(@NotNull Body body) {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
-        Fixture fix = getBody().createFixture(box, 0.0f);
+        Fixture fix = body.createFixture(box, 0.0f);
         fix.setFilterData(World.ENTITY_FILTER);
         fix.setSensor(true);
         box.dispose();

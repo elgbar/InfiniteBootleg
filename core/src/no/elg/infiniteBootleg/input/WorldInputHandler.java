@@ -134,7 +134,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         int blockY = Main.inst().getMouseBlockY();
         World world = getWorld();
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            world.setBlock(blockX, blockY, null);
+            world.removeBlock(blockX, blockY, true);
             update = true;
         }
         else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Q)) {
