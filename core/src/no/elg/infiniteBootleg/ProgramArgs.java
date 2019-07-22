@@ -1,7 +1,9 @@
 package no.elg.infiniteBootleg;
 
+import com.badlogic.gdx.utils.Disposable;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
+import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 
@@ -13,14 +15,17 @@ import java.util.Map;
  * @author Elg
  */
 @SuppressWarnings("unused")
-public class ProgramArgs implements ConsoleLogger {
+public class ProgramArgs implements ConsoleLogger, Disposable {
 
+    private CancellableThreadScheduler scheduler;
 
     public static void executeArgs(String[] args) {
-        new ProgramArgs(args);
+        ProgramArgs pa = new ProgramArgs(args);
+        pa.scheduler.scheduleSync(pa::dispose, 50);
     }
 
-    public ProgramArgs(String[] args) {
+    private ProgramArgs(String[] args) {
+        scheduler = new CancellableThreadScheduler(1);
         Map<String, String> options = Util.interpreterArgs(args);
 
         for (Map.Entry<String, String> entry : options.entrySet()) {
@@ -36,6 +41,12 @@ public class ProgramArgs implements ConsoleLogger {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    @Override
+    public void log(LogLevel level, String msg) {
+        scheduler.scheduleAsync(() -> Main.inst().getConsoleLogger().log(level, msg), 2);
     }
 
 
@@ -100,8 +111,27 @@ public class ProgramArgs implements ConsoleLogger {
         WorldRender.debugBox2d = true;
     }
 
+    public boolean threads(String val) {
+        if (val == null) {
+            log(LogLevel.ERROR, "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
+            return false;
+        }
+        try {
+            int threads = Integer.valueOf(val);
+            if (threads < 0) {
+                log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
+                return false;
+            }
+            Main.schedulerThreads = threads;
+            return true;
+        } catch (NumberFormatException e) {
+            log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
+            return false;
+        }
+    }
+
     @Override
-    public void log(LogLevel level, String msg) {
-        Main.SCHEDULER.executeSync(() -> Main.inst().getConsoleLogger().log(level, msg));
+    public void dispose() {
+        scheduler.shutdown();
     }
 }

@@ -1,16 +1,12 @@
 package no.elg.infiniteBootleg.util;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Run (cancellable) tasks on another thread
@@ -21,11 +17,17 @@ public class CancellableThreadScheduler {
 
     private final ScheduledExecutorService executorService;
     private final Set<ScheduledFuture> tasks;
+    private final int threads;
 
-    public CancellableThreadScheduler() {
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        tasks = Collections.newSetFromMap(new WeakHashMap<>());
-
+    public CancellableThreadScheduler(int threads) {
+        this.threads = threads;
+        if (threads <= 1) {
+            executorService = Executors.newSingleThreadScheduledExecutor();
+        }
+        else {
+            executorService = Executors.newScheduledThreadPool(threads);
+        }
+        tasks = ConcurrentHashMap.newKeySet();
     }
 
     /**
@@ -61,14 +63,22 @@ public class CancellableThreadScheduler {
      *     What to do
      */
     public void executeAsync(Runnable runnable) {
+        if (threads <= 0) {
+            executeSync(runnable);
+            return;
+        }
         tasks.add(executorService.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS));
     }
 
     /**
-     * Execute a task as soon as possible
+     * Post the given runnable as fast as possible (though not as fast as calling {@link Application#postRunnable(Runnable)})
+     * <p>
+     * This is NOT the same as doing {@code Gdx.app.postRunnable(runnable)}
      *
      * @param runnable
      *     What to do
+     *
+     * @see Application#postRunnable(Runnable)
      */
     public void executeSync(Runnable runnable) {
         tasks.add(executorService.schedule(() -> Gdx.app.postRunnable(runnable), 0, TimeUnit.NANOSECONDS));
@@ -83,6 +93,10 @@ public class CancellableThreadScheduler {
      *     How many milliseconds to wait before running the task
      */
     public void scheduleAsync(Runnable runnable, long ms) {
+        if (threads <= 0) {
+            executeSync(runnable);
+            return;
+        }
         tasks.add(executorService.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS));
     }
 

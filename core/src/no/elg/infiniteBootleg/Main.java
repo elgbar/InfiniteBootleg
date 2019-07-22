@@ -30,11 +30,10 @@ public class Main extends ApplicationAdapter {
     public static final String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
     public static final String VERSION_FILE = "version";
 
-    public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
-
     private static InputMultiplexer inputMultiplexer;
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
+    private CancellableThreadScheduler scheduler;
 
     /**
      * If worlds should be loaded from disk
@@ -51,6 +50,8 @@ public class Main extends ApplicationAdapter {
      */
     public static int worldSeed = 0;
 
+    public static int schedulerThreads = 3;
+
     private World world;
     private ConsoleHandler console;
     private HUDRenderer hud;
@@ -66,6 +67,8 @@ public class Main extends ApplicationAdapter {
     @Override
     public void create() {
         inst = this;
+
+        scheduler = new CancellableThreadScheduler(schedulerThreads);
 
         if (renderGraphic) {
             VisUI.load();
@@ -85,7 +88,7 @@ public class Main extends ApplicationAdapter {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             world.save();
-            SCHEDULER.shutdown(); // we want make sure this thread is dead
+            scheduler.shutdown(); // we want make sure this thread is dead
         }));
     }
 
@@ -179,5 +182,9 @@ public class Main extends ApplicationAdapter {
 
     public HUDRenderer getHud() {
         return hud;
+    }
+
+    public CancellableThreadScheduler getScheduler() {
+        return scheduler;
     }
 }

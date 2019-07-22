@@ -100,7 +100,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             skylight.setStaticLight(true);
 
         }
-        Main.SCHEDULER.scheduleSync(this::update, 200L);
+        Main.inst().getScheduler().scheduleSync(this::update, 200L);
     }
 
 

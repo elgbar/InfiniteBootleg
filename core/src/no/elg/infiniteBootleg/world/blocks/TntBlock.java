@@ -60,7 +60,7 @@ public class TntBlock extends UpdatableBlock {
         setUpdate(true); //continue to update this block till it explodes
         if (tickLeft <= 0) {
             exploded = true;
-            Main.SCHEDULER.executeAsync(() -> {
+            Main.inst().getScheduler().executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
                 int worldX = getWorldX();
                 int worldY = getWorldY();

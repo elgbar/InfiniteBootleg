@@ -65,7 +65,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
 
         Chunk chunk = new Chunk(world, chunkX, chunkY);
 
-        Main.SCHEDULER.executeAsync(() -> {
+        Main.inst().getScheduler().executeAsync(() -> {
             for (int localX = 0; localX < CHUNK_SIZE; localX++) {
                 int worldX = CoordUtil.chunkToWorld(chunkX, localX);
                 Biome biome = getBiome(worldX);

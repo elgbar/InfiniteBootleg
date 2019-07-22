@@ -163,7 +163,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     public void updateFixture(boolean recalculateNeighbors) {
-        Main.SCHEDULER.executeAsync(() -> {
+        Main.inst().getScheduler().executeAsync(() -> {
+            synchronized (this) {
+                if (!dirtyBody) { return; }
+                dirtyBody = false;
+            }
+
             if (box2dBody != null) {
                 Body cpy = box2dBody;
                 box2dBody = null;
@@ -220,7 +225,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
             edgeShape.dispose();
 
-            getWorld().getRender().updateLights();
+            Gdx.app.postRunnable(() -> getWorld().getRender().update());
 
             if (recalculateNeighbors) {
                 //TODO Try to optimize this (ie select what directions to recalculate)

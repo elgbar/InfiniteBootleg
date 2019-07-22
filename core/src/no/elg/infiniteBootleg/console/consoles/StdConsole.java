@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.console.consoles;
 
+import com.badlogic.gdx.Gdx;
 import com.strongjoshua.console.HeadlessConsole;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +32,7 @@ public class StdConsole extends HeadlessConsole implements Runnable {
         while (running) {
             try {
                 String read = in.readLine();
-                Main.SCHEDULER.executeSync(() -> consoleHandler.execCommand(read));
+                Gdx.app.postRunnable(() -> consoleHandler.execCommand(read));
             } catch (IOException e) {
                 e.printStackTrace();
             }
