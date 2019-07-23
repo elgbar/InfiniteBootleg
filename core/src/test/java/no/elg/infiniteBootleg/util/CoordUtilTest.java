@@ -53,7 +53,8 @@ public class CoordUtilTest {
         assertEquals(CoordUtil.chunkToWorld(new Location(2, -2)), CoordUtil.chunkToWorld(new Location(2, -2), 0, 0));
         assertEquals(CoordUtil.chunkToWorld(new Location(0, 0)), CoordUtil.chunkToWorld(new Location(0, 0), 0, 0));
         assertEquals(new Location(3, 2), CoordUtil.chunkToWorld(new Location(0, 0), 3, 2));
-        assertEquals(new Location(3 * CHUNK_SIZE + 3, -CHUNK_SIZE + 2), CoordUtil.chunkToWorld(new Location(3, -1), 3, 2));
+        assertEquals(new Location(3 * CHUNK_SIZE + 3, -CHUNK_SIZE + 2),
+                     CoordUtil.chunkToWorld(new Location(3, -1), 3, 2));
     }
 
     @Test
@@ -63,5 +64,12 @@ public class CoordUtilTest {
         assertFalse(Util.isBetween(1010, -1, 9999));
         assertFalse(Util.isBetween(1010, 99999, 9999));
         assertTrue(Util.isBetween(1010, 2000, 9999));
+    }
+
+    @Test
+    public void hasSuperClass() {
+        assertTrue(Util.hasSuperClass(Object.class, Object.class));
+        assertFalse(Util.hasSuperClass(Object.class, String.class));
+        assertTrue(Util.hasSuperClass(String.class, Object.class));
     }
 }
