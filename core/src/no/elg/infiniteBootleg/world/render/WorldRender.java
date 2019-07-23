@@ -100,7 +100,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             skylight.setStaticLight(true);
 
         }
-        Main.inst().getScheduler().scheduleSync(this::update, 200L);
     }
 
 
@@ -189,7 +188,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 if (chunk.isAllAir()) {
                     continue;
                 }
-                TextureRegion textureRegion = chunk.getTextureRegion(); //get texture here to update last viewed in chunk
+                TextureRegion textureRegion =
+                    chunk.getTextureRegion(); //get texture here to update last viewed in chunk
                 if (textureRegion == null) {
                     chunkRenderer.queueRendering(chunk, false);
                     continue;

@@ -99,7 +99,9 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
                               " entity updates and chunks update")
     public void resume() {
-        Main.inst().getWorld().getWorldTicker().resume();
+        World world = Main.inst().getWorld();
+        world.getWorldTicker().resume();
+        world.getRender().update();
         logger.log(LogLevel.SUCCESS, "World is now resumed");
     }
 
