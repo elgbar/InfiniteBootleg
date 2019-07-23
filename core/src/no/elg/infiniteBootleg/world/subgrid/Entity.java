@@ -62,6 +62,20 @@ public abstract class Entity implements Updatable, Disposable {
         box.dispose();
     }
 
+    public Array<Block> touchingBlock() {
+        Array<Block> blocks = new Array<>(Block.class);
+        int x = MathUtils.floor(posCache.x);
+        float maxX = posCache.x + getHalfBox2dWidth() * 2;
+        for (; x < maxX; x++) {
+            float minY = posCache.y + getHalfBox2dHeight() * 2;
+            int y = MathUtils.floor(posCache.y);
+            for (int yy = 0; y - yy < minY; yy--) {
+                blocks.add(world.getBlock(x, y + yy));
+            }
+        }
+        return blocks;
+    }
+
     @Override
     public void update() {
         if (Main.renderGraphic) {
