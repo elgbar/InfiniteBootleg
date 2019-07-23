@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +47,7 @@ public class World implements Disposable, Updatable, Resizable {
     public static final short LIGHTS_CATEGORY = 0x2;
     public static final short ENTITY_CATEGORY = 0x4;
 
-    public static final Filter FALLING_BLOCK_FILTER;
+    public static final Filter BLOCK_ENTITY_FILTER;
     public static final Filter SOLID_TRANSPARENT_FILTER;
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
@@ -63,9 +64,9 @@ public class World implements Disposable, Updatable, Resizable {
         LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
         //for falling blocks
-        FALLING_BLOCK_FILTER = new Filter();
-        FALLING_BLOCK_FILTER.categoryBits = GROUND_CATEGORY;
-        FALLING_BLOCK_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
+        BLOCK_ENTITY_FILTER = new Filter();
+        BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
+        BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
 
         //ie glass
         SOLID_TRANSPARENT_FILTER = new Filter();
@@ -281,7 +282,17 @@ public class World implements Disposable, Updatable, Resizable {
         chunk.setBlock(localX, localY, block, update);
     }
 
-    public void removeBlock(int worldX, int worldY, boolean update) {
+    /**
+     * Remove anything that is at the given location be it a {@link Block} or {@link MaterialEntity}
+     *
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     * @param update
+     *     If the texture of the corresponding chunk should be updated
+     */
+    public void remove(int worldX, int worldY, boolean update) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -290,11 +301,20 @@ public class World implements Disposable, Updatable, Resizable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         chunk.setBlock(localX, localY, (Block) null, update);
+        //noinspection LibGDXUnsafeIterator
+        for (Entity entity : getEntities(worldX, worldY)) {
+            if (entity instanceof MaterialEntity) {
+                removeEntity(entity);
+            }
+        }
+
     }
 
     /**
-     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt
+     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
+     * than a
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method
+     * migt
      * createBlock
      * and store a new air block at the given location
      *
@@ -306,8 +326,10 @@ public class World implements Disposable, Updatable, Resizable {
     public boolean isAir(@NotNull Location worldLoc) {return isAir(worldLoc.x, worldLoc.y);}
 
     /**
-     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method migt
+     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
+     * than a
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method
+     * migt
      * createBlock
      * and store a new air block at the given location
      *
@@ -491,7 +513,8 @@ public class World implements Disposable, Updatable, Resizable {
             ZipUtils.zip(worldFolder, worldZip);
             Main.inst().getConsoleLogger().log("World saved!");
         } catch (IOException e) {
-            Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to save world due to a " + e.getClass().getSimpleName());
+            Main.inst().getConsoleLogger()
+                .log(LogLevel.ERROR, "Failed to save world due to a " + e.getClass().getSimpleName());
             e.printStackTrace();
             return;
         }

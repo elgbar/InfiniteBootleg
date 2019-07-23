@@ -35,7 +35,7 @@ public class FallingBlock extends Entity implements ContactHandler {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = body.createFixture(box, 1.0f);
-        fix.setFilterData(World.FALLING_BLOCK_FILTER);
+        fix.setFilterData(World.BLOCK_ENTITY_FILTER);
         box.dispose();
     }
 
@@ -52,6 +52,7 @@ public class FallingBlock extends Entity implements ContactHandler {
 
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
 
@@ -60,7 +61,7 @@ public class FallingBlock extends Entity implements ContactHandler {
                 int newX = getBlockX();
                 int newY = getBlockY();
 
-                if (world.isAir(newX, newY)) {
+                if (world.isAir(newX, newY) || world.getRawBlock(newX, newY).getMaterial().isEntity()) {
                     world.setBlock(newX, newY, material, true);
                 }
 //                else{

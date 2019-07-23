@@ -7,9 +7,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectSet;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -33,6 +37,12 @@ public abstract class Entity implements Updatable, Disposable {
         this.world = world;
         flying = false;
         world.addEntity(this);
+        posCache = new Vector2(worldX, worldY);
+
+        if (!validate()) {
+            world.removeEntity(this);
+            return;
+        }
 
         if (Main.renderGraphic) {
             synchronized (WorldRender.BOX2D_LOCK) {
@@ -40,6 +50,7 @@ public abstract class Entity implements Updatable, Disposable {
                 createFixture(body);
             }
         }
+
         update();
     }
 
@@ -62,6 +73,19 @@ public abstract class Entity implements Updatable, Disposable {
         box.dispose();
     }
 
+    /**
+     * @return If the given location is valid
+     */
+    protected boolean validate() {
+        //noinspection LibGDXUnsafeIterator
+        for (Block block : touchingBlock()) {
+            if (block.getMaterial() != Material.AIR) {
+                return false;
+            }
+        }
+        return touchingEntities().isEmpty();
+    }
+
     public Array<Block> touchingBlock() {
         Array<Block> blocks = new Array<>(Block.class);
         int x = MathUtils.floor(posCache.x);
@@ -74,6 +98,24 @@ public abstract class Entity implements Updatable, Disposable {
             }
         }
         return blocks;
+    }
+
+    public ObjectSet<Entity> touchingEntities() {
+        ObjectSet<Entity> entities = new ObjectSet<>();
+
+//        Array<Entity> entities = new Array<>(false, 5);
+        for (Entity entity : world.getEntities()) {
+            if (entity == this) { continue; }
+            Vector2 pos = entity.getPosition();
+            boolean bx =
+                Util.isBetween(pos.x - entity.getHalfBox2dWidth(), posCache.x, pos.x + entity.getHalfBox2dWidth());
+            boolean by =
+                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), posCache.y, pos.y + entity.getHalfBox2dHeight());
+            if (bx && by) {
+                entities.add(entity);
+            }
+        }
+        return entities;
     }
 
     @Override

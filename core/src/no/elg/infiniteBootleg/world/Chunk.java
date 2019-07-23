@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -52,6 +53,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     private boolean modified; //if the chunk has been modified since loaded
     private boolean dirty; //if texture/allair needs to be updated
+    private boolean dirtyBody; //if it needs a wash
     private boolean prioritize; //if this chunk should be prioritized to be updated
     private boolean loaded; //once unloaded it no longer is valid
     private boolean allowUnload;
@@ -142,9 +144,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public void updateTextureNow() {
         if (initializing) { return; }
         dirty = false;
+        synchronized (this) {
+            dirtyBody = true;
+        }
 
         //test if all the blocks in this chunk has the material air
-
         allAir = true;
         outer:
         for (int localX = 0; localX < CHUNK_SIZE; localX++) {
@@ -169,13 +173,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 dirtyBody = false;
             }
 
-            if (box2dBody != null) {
-                Body cpy = box2dBody;
-                box2dBody = null;
-                synchronized (WorldRender.BOX2D_LOCK) {
-                    world.getRender().getBox2dWorld().destroyBody(cpy);
-                }
-            }
             if (allAir) {
                 return;
             }
@@ -186,43 +183,55 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             bodyDef.position.set(chunkX * CHUNK_SIZE, chunkY * CHUNK_SIZE);
             bodyDef.fixedRotation = true;
             bodyDef.awake = true;
+            Body tmpBody;
             synchronized (WorldRender.BOX2D_LOCK) {
-                box2dBody = world.getRender().getBox2dWorld().createBody(bodyDef);
+                tmpBody = world.getRender().getBox2dWorld().createBody(bodyDef);
             }
 
             EdgeShape edgeShape = new EdgeShape();
 
-
-            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                    Block b = blocks[localX][localY];
-                    if (b == null || !b.getMaterial().isSolid()) {
-                        continue;
-                    }
-                    for (Tuple<Direction, byte[]> tuple : ts) {
-                        Direction dir = tuple.key;
-                        //FIXME only check the chunk if the local coordinates are outside this chunk
-                        if (!world.isChunkLoaded(CoordUtil.worldToChunk(b.getWorldX() + dir.dx),
-                                                 CoordUtil.worldToChunk(b.getWorldY() + dir.dy))) {
+            synchronized (WorldRender.BOX2D_LOCK) {
+                for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+                    for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                        Block b = blocks[localX][localY];
+                        if (b == null || !b.getMaterial().isSolid()) {
                             continue;
                         }
+                        for (Tuple<Direction, byte[]> tuple : ts) {
+                            Direction dir = tuple.key;
+                            //FIXME only check the chunk if the local coordinates are outside this chunk
+                            if (!world.isChunkLoaded(CoordUtil.worldToChunk(b.getWorldX() + dir.dx),
+                                                     CoordUtil.worldToChunk(b.getWorldY() + dir.dy))) {
+                                continue;
+                            }
 
 
-                        Block rel = b.getRawRelative(dir);
-                        if (rel == null || !rel.getMaterial().isSolid() || dir == Direction.NORTH && localY == 0) {
-                            byte[] ds = tuple.value;
-                            edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
-                            Fixture fix;
-                            synchronized (WorldRender.BOX2D_LOCK) {
-                                fix = box2dBody.createFixture(edgeShape, 0);
+                            Block rel = b.getRawRelative(dir);
+                            if (rel == null || !rel.getMaterial().isSolid() ||
+                                dir == Direction.NORTH && localY == CHUNK_SIZE - 1) {
+                                byte[] ds = tuple.value;
+                                edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
+                                Fixture fix;
+                                fix = tmpBody.createFixture(edgeShape, 0);
                                 if (!b.getMaterial().blocksLight()) {
                                     fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
                                 }
+
                             }
                         }
                     }
                 }
             }
+
+
+            if (box2dBody != null) {
+                Body cpy = box2dBody;
+                synchronized (WorldRender.BOX2D_LOCK) {
+                    world.getRender().getBox2dWorld().destroyBody(cpy);
+                }
+            }
+            box2dBody = tmpBody;
+
             edgeShape.dispose();
 
             Gdx.app.postRunnable(() -> getWorld().getRender().update());

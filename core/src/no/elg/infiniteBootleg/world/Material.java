@@ -4,10 +4,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.items.ItemType;
+import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.SandBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import no.elg.infiniteBootleg.world.blocks.Torch;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Door;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,12 +60,17 @@ public enum Material {
      *     If a block of this material can be placed by a player
      * @param hardness
      */
-    Material(@Nullable Class<?> impl, ItemType itemType, boolean solid, boolean blocksLight, boolean placable, float hardness) {
+    Material(@Nullable Class<?> impl, ItemType itemType, boolean solid, boolean blocksLight, boolean placable,
+             float hardness) {
         this.itemType = itemType;
         if (impl != null) {
             if (itemType == ItemType.BLOCK) {
+                Preconditions.checkArgument(Util.hasSuperClass(impl, Block.class),
+                                            name() + " does not have " + Block.class.getSimpleName() +
+                                            " as a super class");
                 try {
-                    constructor = impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
+                    constructor =
+                        impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
 
                 } catch (NoSuchMethodException e) {
                     throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() +
@@ -72,11 +78,14 @@ public enum Material {
                 }
             }
             else if (itemType == ItemType.ENTITY) {
+                Preconditions.checkArgument(Util.hasSuperClass(impl, MaterialEntity.class),
+                                            name() + " does not have " + MaterialEntity.class.getSimpleName() +
+                                            " as a super class");
                 try {
                     constructor = impl.getConstructor(World.class, float.class, float.class);
                 } catch (NoSuchMethodException e) {
-                    throw new IllegalStateException(
-                        "There is no constructor of " + impl.getSimpleName() + " with the arguments World, float, float");
+                    throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() +
+                                                    " with the arguments World, float, float");
                 }
             }
             else {
@@ -125,11 +134,10 @@ public enum Material {
     }
 
     @NotNull
-    public Entity createEntity(@NotNull World world, float worldX, float worldY) {
+    public MaterialEntity createEntity(@NotNull World world, float worldX, float worldY) {
         Preconditions.checkArgument(itemType == ItemType.ENTITY);
-
         try {
-            return (Entity) constructor.newInstance(world, worldX, worldY);
+            return (MaterialEntity) constructor.newInstance(world, worldX, worldY);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException(e);
         }
@@ -140,7 +148,7 @@ public enum Material {
         if (isBlock()) {
             return world.setBlock(worldX, worldY, this);
         }
-        else if (itemType == ItemType.ENTITY) {
+        if (itemType == ItemType.ENTITY) {
             return createEntity(world, worldX, worldY);
         }
         throw new IllegalStateException("This material (" + name() + ") is neither a block nor an entity");

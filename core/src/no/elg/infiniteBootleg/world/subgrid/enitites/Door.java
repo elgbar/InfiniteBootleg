@@ -3,8 +3,9 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 /**
  * @author Elg
  */
-public class Door extends Entity implements ContactHandler {
+public class Door extends MaterialEntity implements ContactHandler {
 
     public static final String OPEN_DOOR_REGION_NAME = "door_open";
     public static final String CLOSED_DOOR_REGION_NAME = "door_closed";
@@ -34,10 +35,16 @@ public class Door extends Entity implements ContactHandler {
     }
 
     @Override
+    public Material getMaterial() {
+        return Material.DOOR;
+    }
+
+    @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (type == ContactType.BEGIN_CONTACT) { open++; }
         if (type == ContactType.END_CONTACT) { open--; }
     }
+
 
     @NotNull
     @Override
@@ -52,7 +59,7 @@ public class Door extends Entity implements ContactHandler {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = body.createFixture(box, 0.0f);
-        fix.setFilterData(World.ENTITY_FILTER);
+        fix.setFilterData(World.BLOCK_ENTITY_FILTER);
         fix.setSensor(true);
         box.dispose();
     }
