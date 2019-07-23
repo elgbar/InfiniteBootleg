@@ -158,7 +158,7 @@ public class Block implements Binembly, Disposable {
 
     @Override
     public String toString() {
-        return "Block{" + "material=" + material + ", world=" + world + ", chunk=" + chunk + ", localX=" + localX + ", localY=" +
-               localY + '}';
+        return "Block{" + "material=" + material + ", chunk=" + chunk + ", worldX=" + getWorldX() + ", worldY=" + getWorldY() +
+               '}';
     }
 }

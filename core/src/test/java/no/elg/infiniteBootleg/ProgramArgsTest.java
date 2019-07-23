@@ -50,5 +50,6 @@ public class ProgramArgsTest extends TestGraphic {
         assertFalse(pa.threads("-32"));
         assertFalse(pa.threads("aaa"));
         assertFalse(pa.threads(""));
+        pa.dispose();
     }
 }

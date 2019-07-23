@@ -51,6 +51,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private ChunkRenderer chunkRenderer;
     private Box2DDebugRenderer debugRenderer;
 
+    private Matrix4 m4;
     private DirectionalLight skylight;
     private int skyDir;
 
@@ -60,7 +61,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public final static Object LIGHT_LOCK = new Object();
     public final static Object BOX2D_LOCK = new Object();
-    private Matrix4 m4;
 
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
@@ -115,18 +115,17 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         synchronized (BOX2D_LOCK) {
             getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
 
-        }
-        updateLights();
-    }
-
-    public void updateLights() {
-        if (lights) {
-            synchronized (BOX2D_LOCK) {
+            if (lights) {
                 synchronized (LIGHT_LOCK) {
                     rayHandler.update();
                 }
             }
         }
+    }
+
+    @Override
+    public void updateRare() {
+        update();
     }
 
     @Override
@@ -175,7 +174,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             chunkRenderer.render();
             chunkRenderer.render();
         }
-
         int colEnd = chunksInView[HOR_END];
         int colStart = chunksInView[HOR_START];
         int rowEnd = chunksInView[VERT_END];

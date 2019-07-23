@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,11 @@ public class EntityTest extends TestGraphic {
     @Before
     public void before() {
         world = Main.inst().getWorld();
+    }
+
+    @After
+    public void after() {
+        world.getEntities().clear();
     }
 
     @Test
@@ -123,10 +129,66 @@ public class EntityTest extends TestGraphic {
         Assert.assertArrayEquals(expectedBlocks, actualBlocks);
     }
 
+
+    @Test
+    public void touchingEntitiesNone() {
+        Entity ent = new EntityImpl(0, 0);
+        Assert.assertTrue(ent.touchingEntities().isEmpty());
+    }
+
+    @Test
+    public void touchingEntitiesSameLoc() {
+        Entity ent = new EntityImpl(0, 0);
+        Entity ent2 = new EntityImpl(0, 0);
+        Assert.assertEquals(1, ent.touchingEntities().size);
+        Assert.assertEquals(1, ent2.touchingEntities().size);
+        Assert.assertTrue(ent.touchingEntities().contains(ent2));
+        Assert.assertTrue(ent2.touchingEntities().contains(ent));
+    }
+
+    @Test
+    public void touchingEntitiesDiffLoc() {
+        Entity ent = new EntityImpl(0, 0);
+        Entity ent2 = new EntityImpl(1, 0);
+        Assert.assertTrue(ent.touchingEntities().isEmpty());
+        Assert.assertTrue(ent2.touchingEntities().isEmpty());
+    }
+
+    @Test
+    public void touchingEntitiesOverlapX() {
+        Entity ent = new EntityImpl(0, 0);
+        Entity ent2 = new EntityImpl(0.5f, 0);
+        Assert.assertEquals(1, ent.touchingEntities().size);
+        Assert.assertEquals(1, ent2.touchingEntities().size);
+        Assert.assertTrue(ent.touchingEntities().contains(ent2));
+        Assert.assertTrue(ent2.touchingEntities().contains(ent));
+    }
+
+    @Test
+    public void touchingEntitiesOverlapY() {
+        Entity ent = new EntityImpl(0, 0);
+        Entity ent2 = new EntityImpl(0f, 0.5f);
+        Assert.assertEquals(1, ent.touchingEntities().size);
+        Assert.assertTrue(ent.touchingEntities().contains(ent2));
+        Assert.assertTrue(ent2.touchingEntities().contains(ent));
+    }
+
+    @Test
+    public void touchingEntitiesOverlap() {
+        Entity ent = new EntityImpl(0, 0, 2, 2);
+        Entity ent2 = new EntityImpl(0f, 0.5f);
+        Assert.assertEquals(1, ent.touchingEntities().size);
+        Assert.assertEquals(1, ent2.touchingEntities().size);
+        Assert.assertTrue(ent.touchingEntities().contains(ent2));
+        Assert.assertTrue(ent2.touchingEntities().contains(ent));
+    }
+
     private static class EntityImpl extends Entity {
 
         private final int width;
         private final int height;
+
+        public EntityImpl(float worldX, float worldY) {this(worldX, worldY, 1, 1);}
 
         public EntityImpl(float worldX, float worldY, int width, int height) {
             super(Main.inst().getWorld(), worldX, worldY);

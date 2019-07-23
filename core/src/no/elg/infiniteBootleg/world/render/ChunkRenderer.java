@@ -75,6 +75,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         fbo.end();
 
         chunk.setFbo(fbo);
+        worldRender.update();
     }
 
     @Override

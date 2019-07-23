@@ -547,6 +547,7 @@ public class World implements Disposable, Updatable, Resizable {
         for (Entity entity : entities) {
             entity.updateRare();
         }
+        getRender().updateRare();
     }
 
     @Override

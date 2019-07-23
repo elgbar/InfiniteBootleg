@@ -24,7 +24,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         pa.scheduler.scheduleSync(pa::dispose, 50);
     }
 
-    private ProgramArgs(String[] args) {
+    public ProgramArgs(String[] args) {
         scheduler = new CancellableThreadScheduler(1);
         Map<String, String> options = Util.interpreterArgs(args);
 
