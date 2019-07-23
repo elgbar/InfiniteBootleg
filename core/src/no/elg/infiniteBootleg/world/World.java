@@ -630,6 +630,21 @@ public class World implements Disposable, Updatable, Resizable {
         return entities;
     }
 
+    public Material getMaterial(int worldX, int worldY) {
+        Block block = getRawBlock(worldX, worldY);
+        if (block == null) {
+            //noinspection LibGDXUnsafeIterator
+            for (Entity entity : getEntities(worldX, worldY)) {
+                if (entity instanceof MaterialEntity) {
+                    return ((MaterialEntity) entity).getMaterial();
+                }
+            }
+
+            return Material.AIR;
+        }
+        return block.getMaterial();
+    }
+
 
     /**
      * Remove and disposes the given entity
