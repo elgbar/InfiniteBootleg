@@ -17,12 +17,12 @@ public class Block implements Binembly, Disposable {
 
     public final static int BLOCK_SIZE = 16;
 
-    private Material material;
-    private World world;
-    private Chunk chunk;
+    private final Material material;
+    private final World world;
+    private final Chunk chunk;
 
-    private int localX;
-    private int localY;
+    private final int localX;
+    private final int localY;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         this.localX = localX;
