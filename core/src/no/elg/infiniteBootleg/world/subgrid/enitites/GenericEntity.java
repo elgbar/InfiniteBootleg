@@ -1,7 +1,9 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -32,6 +34,7 @@ public class GenericEntity extends Entity implements Removable {
             getBody().destroyFixture(fixture);
         }
         createFixture(getBody());
+        setFilter(filter);
     }
 
     @Override

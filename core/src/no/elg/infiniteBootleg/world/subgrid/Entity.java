@@ -36,6 +36,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     private UUID uuid;
     private Vector2 posCache;
     private boolean onGround;
+    private Filter filter;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
         this(world, worldX, worldY, true);
@@ -47,6 +48,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         flying = false;
         world.addEntity(this);
         posCache = new Vector2(worldX, worldY);
+        filter = World.ENTITY_FILTER;
         if (center) {
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
         }
@@ -124,7 +126,10 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         ObjectSet<Entity> entities = new ObjectSet<>();
 
         for (Entity entity : world.getEntities()) {
-            if (entity == this) { continue; }
+            if (entity == this || (getFilter().maskBits & entity.getFilter().categoryBits) == 0 ||
+                (entity.getFilter().maskBits & getFilter().categoryBits) == 0) {
+                continue;
+            }
             Vector2 pos = entity.getPosition();
             boolean bx =
                 Util.isBetween(pos.x - entity.getHalfBox2dWidth(), posCache.x, pos.x + entity.getHalfBox2dWidth());
@@ -246,6 +251,19 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
 
     public String simpleName() {
         return getClass().getSimpleName();
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
+        if (body != null) {
+            for (Fixture fixture : getBody().getFixtureList()) {
+                fixture.setFilterData(filter);
+            }
+        }
     }
 
     @Override
