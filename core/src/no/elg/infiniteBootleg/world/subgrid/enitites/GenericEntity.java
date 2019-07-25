@@ -1,8 +1,7 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.*;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -14,7 +13,16 @@ public class GenericEntity extends Entity implements Removable {
     private final int width;
     private final int height;
 
+    public GenericEntity(@NotNull World world, float worldX, float worldY) {
+        this(world, worldX, worldY, 1, 1);
+    }
+
     public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height) {
+        this(world, worldX, worldY, width, height, World.ENTITY_FILTER);
+    }
+
+    public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height,
+                         @NotNull Filter filter) {
         super(world, worldX, worldY);
         this.width = width * Block.BLOCK_SIZE;
         this.height = height * Block.BLOCK_SIZE;
