@@ -98,10 +98,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             skylight = new DirectionalLight(rayHandler, 7500, Color.WHITE, skyDir);
             skylight.setContactFilter(World.LIGHT_FILTER);
             skylight.setStaticLight(true);
-
         }
     }
-
 
     public void updatePhysics() {
         if (dayTicking && getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND * 5) == 0) {
@@ -131,6 +129,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public void update() {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+        m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
 
         if (!getWorld().getWorldTicker().isPaused()) {
             float width = camera.viewportWidth * camera.zoom;
@@ -150,7 +149,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
-            m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
             skylight.setStaticLight(true);
             rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
                                          camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
