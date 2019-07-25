@@ -45,13 +45,12 @@ public class Door extends MaterialEntity implements ContactHandler {
         if (type == ContactType.END_CONTACT) { open--; }
     }
 
-
     @NotNull
     @Override
-    protected Body createBody(float worldX, float worldY) {
-        Body body = super.createBody(worldX + getHalfBox2dWidth(), worldY);
-        body.setType(BodyDef.BodyType.StaticBody);
-        return body;
+    protected BodyDef createBodyDef(float worldX, float worldY) {
+        BodyDef def = super.createBodyDef(worldX, worldY);
+        def.type = BodyDef.BodyType.StaticBody;
+        return def;
     }
 
     @Override

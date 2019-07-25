@@ -167,5 +167,19 @@ public class Commands extends CommandExecutor {
         Main.inst().getWorld().getRender().update();
     }
 
+    @ClientsideOnly
+    public void paint() {
+        Player player = Main.inst().getWorld().getPlayers().iterator().next();
+        //noinspection LibGDXUnsafeIterator
+        for (Block block : player.touchingBlocks()) {
+            block.setBlock(Material.TORCH);
+            System.out.println("block.toString() = " + block.toString());
+        }
+    }
+
+    public void ent(float worldX, float worldY, int width, int height) {
+        logger.logf("Created an entity at (% 7.2f,% 7.2f) with width %d and height %d", worldX, worldY, width, height);
+        new GenericEntity(Main.inst().getWorld(), worldX, worldY, width, height);
+    }
 }
 

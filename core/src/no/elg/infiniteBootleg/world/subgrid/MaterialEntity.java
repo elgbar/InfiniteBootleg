@@ -11,4 +11,9 @@ public abstract class MaterialEntity extends Entity implements Removable {
     }
 
     public abstract Material getMaterial();
+
+    @Override
+    public String toString() {
+        return "MaterialEntity{" + "material='" + getMaterial() + '\'' + "} " + super.toString();
+    }
 }

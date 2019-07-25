@@ -124,6 +124,31 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         return entities;
     }
 
+
+    @Override
+    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+        if (contact.getFixtureA().getFilterData().categoryBits == World.GROUND_CATEGORY) {
+            if (type == ContactType.BEGIN_CONTACT) {
+                //newest pos is needed to accurately check if this is on ground
+                updatePos();
+                //y pos - getHalfBox2dHeight is middle
+                int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - GROUND_CHECK_OFFSET);
+                if (world.isAir(getBlockX(), y)) { return; }
+                onGround = true;
+            }
+            else if (type == ContactType.END_CONTACT) {
+                onGround = false;
+            }
+        }
+    }
+
+    /**
+     * Update the cached position
+     */
+    private void updatePos() {
+        posCache = body.getPosition();
+    }
+
     @Override
     public void update() {
         if (Main.renderGraphic) {
@@ -159,16 +184,17 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         return getHeight() / (Block.BLOCK_SIZE * 2f);
     }
 
+    @NotNull
     public Vector2 getPosition() {
         return posCache;
     }
 
     public int getBlockX() {
-        return MathUtils.floor(posCache.x);
+        return MathUtils.floor(posCache.x - getHalfBox2dWidth());
     }
 
     public int getBlockY() {
-        return MathUtils.floor(posCache.y);
+        return MathUtils.floor(posCache.y - getHalfBox2dHeight());
     }
 
     public Body getBody() {
@@ -184,10 +210,11 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         synchronized (WorldRender.BOX2D_LOCK) {
             if (flying) {
                 body.setLinearVelocity(0, 0);
-                body.setType(BodyDef.BodyType.StaticBody);
+                body.setGravityScale(0);
             }
             else {
-                body.setType(BodyDef.BodyType.DynamicBody);
+                body.setGravityScale(1);
+                body.setAwake(true);
             }
         }
     }
@@ -198,6 +225,14 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    public String simpleName() {
+        return getClass().getSimpleName();
     }
 
     @Override
@@ -213,7 +248,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!(o instanceof Entity)) { return false; }
         Entity entity = (Entity) o;
         return uuid.equals(entity.uuid);
     }
@@ -221,5 +256,10 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     @Override
     public int hashCode() {
         return uuid.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Entity{" + "uuid=" + uuid + '}';
     }
 }
