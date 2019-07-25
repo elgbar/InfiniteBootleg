@@ -68,7 +68,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      */
     private void headless(String val) {
         Main.renderGraphic = false;
-        log("Graphics are disabled");
+        log("Graphics is disabled");
     }
 
     /**
@@ -76,7 +76,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      */
     private void no_load(String val) {
         Main.loadWorldFromDisk = false;
-        log("Worlds will not be loaded/saved from disk");
+        log("Worlds will not be loaded/saved from/to disk");
     }
 
     /**
@@ -87,7 +87,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      */
     public void world_seed(String val) {
         if (val == null) {
-            log(LogLevel.ERROR, "The seed must be provided when using world_Seed " + "argument.\nExample: -world_seed=test");
+            log(LogLevel.ERROR,
+                "The seed must be provided when using world_Seed " + "argument.\nExample: -world_seed=test");
 
             return;
         }
@@ -107,13 +108,14 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * Enable debug rendering (ie box2d)
      */
     public void debug(String val) {
-        log("Debug view is enabled. To disable this at runtime use command 'debugBox2d'");
+        log("Debug view is enabled. To disable this at runtime use command 'debug'");
         WorldRender.debugBox2d = true;
     }
 
     public boolean threads(String val) {
         if (val == null) {
-            log(LogLevel.ERROR, "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
+            log(LogLevel.ERROR,
+                "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
             return false;
         }
         try {

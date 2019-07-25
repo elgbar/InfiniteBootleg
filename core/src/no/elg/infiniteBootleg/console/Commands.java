@@ -8,10 +8,13 @@ import com.strongjoshua.console.annotation.ConsoleDoc;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,15 +92,17 @@ public class Commands extends CommandExecutor {
         logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") + "flying");
     }
 
-    @ConsoleDoc(description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
-                              " entity updates and chunks update")
+    @ConsoleDoc(description =
+                    "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
+                    " entity updates and chunks update")
     public void pause() {
         Main.inst().getWorld().getWorldTicker().pause();
         logger.log(LogLevel.SUCCESS, "World is now paused");
     }
 
-    @ConsoleDoc(description = "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
-                              " entity updates and chunks update")
+    @ConsoleDoc(description =
+                    "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
+                    " entity updates and chunks update")
     public void resume() {
         World world = Main.inst().getWorld();
         world.getWorldTicker().resume();
@@ -109,7 +114,8 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
     public void debug() {
         WorldRender.debugBox2d = !WorldRender.debugBox2d;
-        logger.log(LogLevel.SUCCESS, "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
+        logger.log(LogLevel.SUCCESS,
+                   "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
 
     @ClientsideOnly
@@ -149,7 +155,8 @@ public class Commands extends CommandExecutor {
     }
 
     @ClientsideOnly
-    @ConsoleDoc(description = "Set how much information to give", paramDescriptions = "normal (default), minimal or none")
+    @ConsoleDoc(description = "Set how much information to give",
+                paramDescriptions = "normal (default), minimal or none")
     public void hud(String modusName) {
         try {
             HUDRenderer.HUDModus modus = HUDRenderer.HUDModus.valueOf(modusName.toUpperCase());

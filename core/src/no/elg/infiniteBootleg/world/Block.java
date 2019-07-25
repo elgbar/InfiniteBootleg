@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location and its
+ * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location
+ * and its
  * location within the parent chunk.
  *
  * @author Elg
@@ -166,7 +167,7 @@ public class Block implements Binembly, Disposable {
 
     @Override
     public String toString() {
-        return "Block{" + "material=" + material + ", chunk=" + chunk + ", worldX=" + getWorldX() + ", worldY=" + getWorldY() +
-               '}';
+        return "Block{" + "material=" + material + ", chunk=" + chunk + ", worldX=" + getWorldX() + ", worldY=" +
+               getWorldY() + '}';
     }
 }
