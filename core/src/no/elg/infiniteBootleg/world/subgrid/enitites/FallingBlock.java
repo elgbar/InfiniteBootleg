@@ -25,7 +25,7 @@ public class FallingBlock extends Entity implements ContactHandler {
     private boolean crashed;
 
     public FallingBlock(@NotNull World world, float worldX, float worldY, @NotNull Material material) {
-        super(world, worldX, worldY);
+        super(world, worldX + 0.5f, worldY + 0.5f, false);
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
     }
@@ -52,7 +52,6 @@ public class FallingBlock extends Entity implements ContactHandler {
 
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact) {
-
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
 

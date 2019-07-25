@@ -38,21 +38,29 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     private boolean onGround;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
+        this(world, worldX, worldY, true);
+    }
+
+    public Entity(@NotNull World world, float worldX, float worldY, boolean center) {
         uuid = UUID.randomUUID();
         this.world = world;
         flying = false;
         world.addEntity(this);
         posCache = new Vector2(worldX, worldY);
+        if (center) {
+            posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
+        }
 
         if (isInvalidSpawn()) {
             Main.inst().getConsoleLogger()
-                .logf("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", simpleName(), worldX, worldY);
+                .logf("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", simpleName(), posCache.x,
+                      posCache.y);
             world.removeEntity(this);
             return;
         }
 
         if (Main.renderGraphic) {
-            BodyDef def = createBodyDef(worldX + getHalfBox2dWidth(), worldY + getHalfBox2dHeight());
+            BodyDef def = createBodyDef(posCache.x, posCache.y);
             synchronized (WorldRender.BOX2D_LOCK) {
                 body = getWorld().getRender().getBox2dWorld().createBody(def);
                 createFixture(body);
@@ -110,6 +118,9 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         return blocks;
     }
 
+    /**
+     * @return A set of all other entities (excluding this) this entity is touching
+     */
     public ObjectSet<Entity> touchingEntities() {
         ObjectSet<Entity> entities = new ObjectSet<>();
 
@@ -193,11 +204,11 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     }
 
     public int getBlockX() {
-        return MathUtils.floor(posCache.x - getHalfBox2dWidth());
+        return MathUtils.floor(posCache.x);
     }
 
     public int getBlockY() {
-        return MathUtils.floor(posCache.y - getHalfBox2dHeight());
+        return MathUtils.floor(posCache.y);
     }
 
     public Body getBody() {

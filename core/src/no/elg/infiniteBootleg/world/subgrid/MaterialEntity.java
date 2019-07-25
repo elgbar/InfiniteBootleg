@@ -6,8 +6,13 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MaterialEntity extends Entity implements Removable {
 
+
     public MaterialEntity(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
+    }
+
+    public MaterialEntity(@NotNull World world, float worldX, float worldY, boolean center) {
+        super(world, worldX, worldY, center);
     }
 
     public abstract Material getMaterial();
