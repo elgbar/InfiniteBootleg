@@ -22,7 +22,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
  * @author Elg
  */
 public class HUDRenderer implements Renderer, Disposable, Resizable {
-    
+
     /**
      * How much information to show
      */
@@ -86,17 +86,28 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                              chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
                                              world.getRender().getCamera().zoom);
 
-            String pos = String.format("p: (%.2f,%.2f) v: (%.2f,%.2f)", player.getPosition().x, player.getPosition().y,
-                                       player.getBody().getLinearVelocity().x, player.getBody().getLinearVelocity().y);
+            String pos = String.format("p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x,
+                                       player.getPosition().y, player.getBody().getLinearVelocity().x,
+                                       player.getBody().getLinearVelocity().y, //
+                                       player.isOnGround(), player.isFlying()//
+                                      );
 
-            String ents = "Ents at mouse = " + world.getEntities(Main.inst().getMouseX(), Main.inst().getMouseY());
+            String nl = "\n    ";
+            StringBuilder ents = new StringBuilder("E = ");
+            //noinspection LibGDXUnsafeIterator
+            for (Entity entity : world.getEntities(Main.inst().getMouseX(), Main.inst().getMouseY())) {
+                ents.append(entity.simpleName()).append(nl);
+            }
+            int index = ents.lastIndexOf(nl);
+            if (index != -1) { ents.deleteCharAt(index); }
+
 
             font.draw(batch, fps, 10, h - 10);
             font.draw(batch, pointing, 10, h - 30);
             font.draw(batch, chunk, 10, h - 50);
             font.draw(batch, viewChunk, 10, h - 70);
             font.draw(batch, pos, 10, h - 90);
-            font.draw(batch, ents, 10, h - 110);
+            font.draw(batch, ents.toString().trim(), 10, h - 110);
         }
         //noinspection ConstantConditions
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
