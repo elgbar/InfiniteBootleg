@@ -13,13 +13,14 @@ public class SandBlock extends UpdatableBlock {
 
     @Override
     public void update() {
-        Gdx.app.postRunnable(() -> {
-            Location south = Location.relative(getWorldX(), getWorldY(), Direction.SOUTH);
-            if (getWorld().isAir(south) && getWorld().getEntity(south.x, south.y) == null) {
-                getChunk().setBlock(getLocalX(), getLocalY(), (Block) null, true);
-                new FallingBlock(getWorld(), getWorldX() + 0.5f, getWorldY() + 0.5f, Material.SAND);
-            }
-        });
-
+        Location south = Location.relative(getWorldX(), getWorldY(), Direction.SOUTH);
+        if (getWorld().isAir(south)) {
+            Gdx.app.postRunnable(() -> {
+                if (getChunk().isLoaded()) {
+                    getChunk().setBlock(getLocalX(), getLocalY(), (Block) null, true);
+                    new FallingBlock(getWorld(), getWorldX(), getWorldY(), Material.SAND);
+                }
+            });
+        }
     }
 }

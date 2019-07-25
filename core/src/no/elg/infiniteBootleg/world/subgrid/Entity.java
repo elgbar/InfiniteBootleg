@@ -3,10 +3,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -17,20 +14,28 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
+import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 /**
- * An entity that can move between the main world grid. The position of each entity is recorded in world coordinates.
+ * An entity that can move between the main world grid.
+ * <p>
+ * The position of each entity is recorded in world coordinates and is centered in the middle of the entity.
  */
-public abstract class Entity implements Updatable, Disposable {
+public abstract class Entity implements Updatable, Disposable, ContactHandler {
+
+    private static final float GROUND_CHECK_OFFSET = 0.25f;
 
     private final World world;
     private Body body;
-    private boolean flying;
+    private boolean flying; //ignore world gravity
     private UUID uuid;
     private Vector2 posCache;
+    private boolean onGround;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
         uuid = UUID.randomUUID();
@@ -40,13 +45,16 @@ public abstract class Entity implements Updatable, Disposable {
         posCache = new Vector2(worldX, worldY);
 
         if (!validate()) {
+            Main.inst().getConsoleLogger()
+                .logf("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", simpleName(), worldX, worldY);
             world.removeEntity(this);
             return;
         }
 
         if (Main.renderGraphic) {
+            BodyDef def = createBodyDef(worldX + getHalfBox2dWidth(), worldY + getHalfBox2dHeight());
             synchronized (WorldRender.BOX2D_LOCK) {
-                body = createBody(worldX, worldY);
+                body = getWorld().getRender().getBox2dWorld().createBody(def);
                 createFixture(body);
             }
         }
@@ -55,14 +63,13 @@ public abstract class Entity implements Updatable, Disposable {
     }
 
     @NotNull
-    protected Body createBody(float worldX, float worldY) {
+    protected BodyDef createBodyDef(float worldX, float worldY) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(worldX, worldY);
-        Body body = getWorld().getRender().getBox2dWorld().createBody(bodyDef);
-        body.setFixedRotation(true);
-        body.setAwake(true);
-        return body;
+        bodyDef.awake = true;
+        bodyDef.fixedRotation = true;
+        return bodyDef;
     }
 
     protected void createFixture(@NotNull Body body) {
@@ -78,7 +85,7 @@ public abstract class Entity implements Updatable, Disposable {
      */
     protected boolean validate() {
         //noinspection LibGDXUnsafeIterator
-        for (Block block : touchingBlock()) {
+        for (Block block : touchingBlocks()) {
             if (block.getMaterial() != Material.AIR) {
                 return false;
             }
@@ -86,15 +93,15 @@ public abstract class Entity implements Updatable, Disposable {
         return touchingEntities().isEmpty();
     }
 
-    public Array<Block> touchingBlock() {
+    public Array<Block> touchingBlocks() {
         Array<Block> blocks = new Array<>(Block.class);
-        int x = MathUtils.floor(posCache.x);
-        float maxX = posCache.x + getHalfBox2dWidth() * 2;
+        int x = MathUtils.floor(posCache.x - getHalfBox2dWidth());
+        float maxX = posCache.x + getHalfBox2dWidth();
         for (; x < maxX; x++) {
-            float minY = posCache.y + getHalfBox2dHeight() * 2;
-            int y = MathUtils.floor(posCache.y);
-            for (int yy = 0; y - yy < minY; yy--) {
-                blocks.add(world.getBlock(x, y + yy));
+            int y = MathUtils.floor(posCache.y - getHalfBox2dHeight());
+            float maxY = posCache.y + getHalfBox2dHeight();
+            for (; y < maxY; y++) {
+                blocks.add(world.getBlock(x, y));
             }
         }
         return blocks;
@@ -103,7 +110,6 @@ public abstract class Entity implements Updatable, Disposable {
     public ObjectSet<Entity> touchingEntities() {
         ObjectSet<Entity> entities = new ObjectSet<>();
 
-//        Array<Entity> entities = new Array<>(false, 5);
         for (Entity entity : world.getEntities()) {
             if (entity == this) { continue; }
             Vector2 pos = entity.getPosition();
@@ -121,7 +127,7 @@ public abstract class Entity implements Updatable, Disposable {
     @Override
     public void update() {
         if (Main.renderGraphic) {
-            posCache = body.getPosition();
+            updatePos();
         }
     }
 

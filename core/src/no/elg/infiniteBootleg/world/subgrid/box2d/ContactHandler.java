@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 public interface ContactHandler {
 
     /**
+     * {@link Contact#getFixtureB()} is this entity
+     * {@link Contact#getFixtureA()} is the a object collided with
+     *
      * @param type
      *     The type of contact
      * @param contact
