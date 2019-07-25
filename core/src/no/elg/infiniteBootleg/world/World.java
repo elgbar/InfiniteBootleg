@@ -303,11 +303,11 @@ public class World implements Disposable, Updatable, Resizable {
         chunk.setBlock(localX, localY, (Block) null, update);
         //noinspection LibGDXUnsafeIterator
         for (Entity entity : getEntities(worldX, worldY)) {
-            if (entity instanceof MaterialEntity) {
+            if (entity instanceof Removable) {
+                ((Removable) entity).onRemove();
                 removeEntity(entity);
             }
         }
-
     }
 
     /**
