@@ -59,13 +59,12 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
             return;
         }
 
-        if (Main.renderGraphic) {
-            BodyDef def = createBodyDef(posCache.x, posCache.y);
-            synchronized (WorldRender.BOX2D_LOCK) {
-                body = getWorld().getRender().getBox2dWorld().createBody(def);
-                createFixture(body);
-            }
+        BodyDef def = createBodyDef(posCache.x, posCache.y);
+        synchronized (WorldRender.BOX2D_LOCK) {
+            body = world.getBox2dWorld().createBody(def);
+            createFixture(body);
         }
+
 
         update();
     }
@@ -253,7 +252,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     public void dispose() {
         if (body != null) {
             synchronized (WorldRender.BOX2D_LOCK) {
-                getWorld().getRender().getBox2dWorld().destroyBody(body);
+                world.getBox2dWorld().destroyBody(body);
             }
             body = null;
         }

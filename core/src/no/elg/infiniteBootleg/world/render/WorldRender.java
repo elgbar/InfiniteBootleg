@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
@@ -18,8 +17,6 @@ import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.WorldTicker;
-import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
 import org.jetbrains.annotations.NotNull;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
@@ -35,12 +32,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public static final int HOR_END = 3;
 
     public static final float MIN_ZOOM = 0.25f;
-    public static final int MAX_DEG_SKYLIGHT = -45;
-    public static final int MIN_DEG_SKYLIGHT = -135;
-    public static final int STRAIGHT_DOWN_SKYLIGHT = -90;
 
-    private final World world;
-    private com.badlogic.gdx.physics.box2d.World box2dWorld;
+    public final World world;
     private RayHandler rayHandler;
     private EntityRenderer entityRenderer;
     private SpriteBatch batch;
@@ -53,11 +46,11 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     private Matrix4 m4;
     private DirectionalLight skylight;
-    private int skyDir;
 
     public static boolean lights = true;
     public static boolean debugBox2d = false;
-    public static boolean dayTicking = false;
+
+    private int skyDir;
 
     public final static Object LIGHT_LOCK = new Object();
     public final static Object BOX2D_LOCK = new Object();
@@ -81,42 +74,21 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             batch = new SpriteBatch();
             batch.setProjectionMatrix(camera.combined);
 
-            box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
-
             debugRenderer = new Box2DDebugRenderer();
 
-            box2dWorld.setContactListener(new ContactManager(getWorld()));
+
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
-            rayHandler = new RayHandler(box2dWorld);
+            rayHandler = new RayHandler(world.getBox2dWorld());
             rayHandler.setBlurNum(1);
             rayHandler.setAmbientLight(0.025f, 0.025f, 0.025f, 1);
 
-            skyDir = STRAIGHT_DOWN_SKYLIGHT;
+            skyDir = World.STRAIGHT_DOWN_SKYLIGHT;
 
             //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
             skylight = new DirectionalLight(rayHandler, 7500, Color.WHITE, skyDir);
             skylight.setContactFilter(World.LIGHT_FILTER);
             skylight.setStaticLight(true);
-        }
-    }
-
-    public void updatePhysics() {
-        if (dayTicking && getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND * 5) == 0) {
-            if (skyDir == MAX_DEG_SKYLIGHT) {
-                skyDir = MIN_DEG_SKYLIGHT;
-            }
-            skylight.setDirection(++skyDir);
-        }
-
-        synchronized (BOX2D_LOCK) {
-            getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
-
-            if (lights) {
-                synchronized (LIGHT_LOCK) {
-                    rayHandler.update();
-                }
-            }
         }
     }
 
@@ -208,7 +180,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
         if (debugBox2d) {
             synchronized (BOX2D_LOCK) {
-                debugRenderer.render(box2dWorld, m4);
+                debugRenderer.render(world.getBox2dWorld(), m4);
             }
         }
     }
@@ -246,10 +218,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public SpriteBatch getBatch() {
         return batch;
-    }
-
-    public com.badlogic.gdx.physics.box2d.World getBox2dWorld() {
-        return box2dWorld;
     }
 
     public RayHandler getRayHandler() {

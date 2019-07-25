@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
+import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +54,10 @@ public class World implements Disposable, Updatable, Resizable {
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
+    public static final int MAX_DEG_SKYLIGHT = -45;
+    public static final int MIN_DEG_SKYLIGHT = -135;
+    public static final int STRAIGHT_DOWN_SKYLIGHT = -90;
+
     static {
         //base filter for entities
         ENTITY_FILTER = new Filter();
@@ -75,20 +80,25 @@ public class World implements Disposable, Updatable, Resizable {
         SOLID_TRANSPARENT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
     }
 
+    public static boolean dayTicking = true;
+
+    private final UUID uuid;
     private final long seed;
     private final Map<Location, Chunk> chunks;
     private final WorldTicker ticker;
     private final ChunkLoader chunkLoader;
+    private final com.badlogic.gdx.physics.box2d.World box2dWorld;
     private FileHandle worldFile;
 
     //only exists when graphics exits
     private WorldInputHandler input;
     private WorldRender render;
 
-    private String name = "World";
-    private final UUID uuid;
     private Set<Entity> entities; //all entities in this world (inc players)
     private Set<Player> players; //all player in this world
+
+    private String name = "World";
+    private int time;
 
 
     /**
@@ -106,6 +116,7 @@ public class World implements Disposable, Updatable, Resizable {
         chunks = new ConcurrentHashMap<>();
         entities = ConcurrentHashMap.newKeySet();
         players = ConcurrentHashMap.newKeySet();
+        time = STRAIGHT_DOWN_SKYLIGHT;
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
@@ -114,11 +125,16 @@ public class World implements Disposable, Updatable, Resizable {
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
 
+
+        box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
+        box2dWorld.setContactListener(new ContactManager(this));
+
+
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
 
-            new Player(this);
+            Gdx.app.postRunnable(() -> new Player(this));
         }
         else {
             render = new HeadlessWorldRenderer(this);
@@ -556,7 +572,7 @@ public class World implements Disposable, Updatable, Resizable {
     @Override
     public void update() {
 
-        getRender().updatePhysics();
+        updatePhysics();
 
         long tick = getWorldTicker().getTickId();
         for (Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
@@ -691,6 +707,32 @@ public class World implements Disposable, Updatable, Resizable {
         if (Main.renderGraphic) {
             render.resize(width, height);
             input.resize(width, height);
+        }
+    }
+
+    public com.badlogic.gdx.physics.box2d.World getBox2dWorld() {
+        return box2dWorld;
+    }
+
+    public void updatePhysics() {
+        if (dayTicking && getTick() % (WorldTicker.TICKS_PER_SECOND * 5) == 0) {
+            if (time > MAX_DEG_SKYLIGHT) {
+                time = MIN_DEG_SKYLIGHT;
+            }
+            else if (time < MIN_DEG_SKYLIGHT) {
+                time = MIN_DEG_SKYLIGHT;
+            }
+            getRender().getSkylight().setDirection(++time);
+        }
+
+        synchronized (WorldRender.BOX2D_LOCK) {
+            getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
+
+            if (Main.renderGraphic && WorldRender.lights) {
+                synchronized (WorldRender.LIGHT_LOCK) {
+                    getRender().getRayHandler().update();
+                }
+            }
         }
     }
 }
