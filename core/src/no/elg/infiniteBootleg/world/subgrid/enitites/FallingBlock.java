@@ -60,7 +60,7 @@ public class FallingBlock extends Entity implements ContactHandler {
                 int newX = getBlockX();
                 int newY = getBlockY();
 
-                if (world.isAir(newX, newY) || world.getRawBlock(newX, newY).getMaterial().isEntity()) {
+                if (world.isAir(newX, newY) || world.getMaterial(newX, newY).isEntity()) {
                     world.setBlock(newX, newY, material, true);
                 }
 //                else{

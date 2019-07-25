@@ -640,6 +640,15 @@ public class World implements Disposable, Updatable, Resizable {
         return entities;
     }
 
+    /**
+     * @param worldX
+     *     The x coordinate in world view
+     * @param worldY
+     *     The y coordinate in world view
+     *
+     * @return The material at the given location
+     */
+    @NotNull
     public Material getMaterial(int worldX, int worldY) {
         Block block = getRawBlock(worldX, worldY);
         if (block == null) {

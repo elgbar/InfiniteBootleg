@@ -184,6 +184,8 @@ public class Commands extends CommandExecutor {
         }
     }
 
+    @ConsoleDoc(description = "Spawn a generic static entity at the given location with the given width and height",
+                paramDescriptions = {"worldX", "worldY", "width", "height"})
     public void ent(float worldX, float worldY, int width, int height) {
         logger.logf("Created an entity at (% 7.2f,% 7.2f) with width %d and height %d", worldX, worldY, width, height);
         new GenericEntity(Main.inst().getWorld(), worldX, worldY, width, height);
