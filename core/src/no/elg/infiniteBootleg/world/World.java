@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
+import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,7 +87,8 @@ public class World implements Disposable, Updatable, Resizable {
 
     private String name = "World";
     private final UUID uuid;
-    private Set<Entity> entities;
+    private Set<Entity> entities; //all entities in this world (inc players)
+    private Set<Player> players; //all player in this world
 
 
     /**
@@ -103,6 +105,7 @@ public class World implements Disposable, Updatable, Resizable {
         MathUtils.random.setSeed(seed);
         chunks = new ConcurrentHashMap<>();
         entities = ConcurrentHashMap.newKeySet();
+        players = ConcurrentHashMap.newKeySet();
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
@@ -580,10 +583,14 @@ public class World implements Disposable, Updatable, Resizable {
     }
 
     /**
-     * @return unmodifiable view of the current entities
+     * @return the current entities
      */
     public Set<Entity> getEntities() {
         return entities;
+    }
+
+    public Set<Player> getPlayers() {
+        return players;
     }
 
     /**
@@ -595,6 +602,9 @@ public class World implements Disposable, Updatable, Resizable {
      */
     public void addEntity(@NotNull Entity entity) {
         entities.add(entity);
+        if (entity instanceof Player) {
+            players.add((Player) entity);
+        }
     }
 
     /**
@@ -653,6 +663,9 @@ public class World implements Disposable, Updatable, Resizable {
      */
     public void removeEntity(@NotNull Entity entity) {
         entities.remove(entity);
+        if (entity instanceof Player) {
+            players.remove(entity);
+        }
         entity.dispose();
     }
 

@@ -84,7 +84,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Toggle flight for player")
     public void fly() {
-        Entity player = Main.inst().getWorld().getEntities().iterator().next(); //assume this is the player
+        Entity player = Main.inst().getWorld().getPlayers().iterator().next(); //assume this is the player
         player.setFlying(!player.isFlying());
         logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") + "flying");
     }

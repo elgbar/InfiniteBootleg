@@ -68,7 +68,7 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
 
             Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
-            Entity player = world.getEntities().iterator().next(); //assume this is the player
+            Entity player = world.getPlayers().iterator().next();
 
             String fps =
                 String.format("FPS: %4d delta: %.5f", Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime());
