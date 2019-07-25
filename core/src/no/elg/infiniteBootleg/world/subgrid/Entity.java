@@ -134,6 +134,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     /**
      * @return The texture of this entity
      */
+    @Nullable
     public abstract TextureRegion getTextureRegion();
 
     /**
