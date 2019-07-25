@@ -34,8 +34,8 @@ public class GenericEntity extends Entity implements Removable {
     }
 
     @Override
-    protected boolean validate() {
-        return true;
+    protected boolean isInvalidSpawn() {
+        return false;
     }
 
     @Override

@@ -44,7 +44,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         world.addEntity(this);
         posCache = new Vector2(worldX, worldY);
 
-        if (!validate()) {
+        if (isInvalidSpawn()) {
             Main.inst().getConsoleLogger()
                 .logf("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", simpleName(), worldX, worldY);
             world.removeEntity(this);
@@ -81,18 +81,21 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     }
 
     /**
-     * @return If the given location is valid
+     * @return If the given location is invalid
      */
-    protected boolean validate() {
+    protected boolean isInvalidSpawn() {
         //noinspection LibGDXUnsafeIterator
         for (Block block : touchingBlocks()) {
             if (block.getMaterial() != Material.AIR) {
-                return false;
+                return true;
             }
         }
-        return touchingEntities().isEmpty();
+        return !touchingEntities().isEmpty();
     }
 
+    /**
+     * @return A list of all the blocks this entity is touching
+     */
     public Array<Block> touchingBlocks() {
         Array<Block> blocks = new Array<>(Block.class);
         int x = MathUtils.floor(posCache.x - getHalfBox2dWidth());

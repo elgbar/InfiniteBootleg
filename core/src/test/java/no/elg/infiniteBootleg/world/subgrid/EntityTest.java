@@ -213,8 +213,8 @@ public class EntityTest extends TestGraphic {
         }
 
         @Override
-        protected boolean validate() {
-            return true;
+        protected boolean isInvalidSpawn() {
+            return false;
         }
 
         @Override
