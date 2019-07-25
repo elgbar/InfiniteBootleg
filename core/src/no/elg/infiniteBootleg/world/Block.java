@@ -116,6 +116,14 @@ public class Block implements Binembly, Disposable {
         return world.getRawBlock(newWorldX, newWorldY);
     }
 
+    public Block setBlock(@NotNull Material material) {
+        return setBlock(material, true);
+    }
+
+    public Block setBlock(@NotNull Material material, boolean update) {
+        return chunk.setBlock(localX, localY, material, update);
+    }
+
     @NotNull
     @Override
     public byte[] disassemble() {

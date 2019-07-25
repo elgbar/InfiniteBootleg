@@ -143,8 +143,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void updateTextureNow() {
         if (initializing) { return; }
-        dirty = false;
         synchronized (this) {
+            dirty = false;
             dirtyBody = true;
         }
 
@@ -166,6 +166,11 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         }
     }
 
+    /**
+     * Update the box2d fixture of this block
+     *
+     * @param recalculateNeighbors
+     */
     public void updateFixture(boolean recalculateNeighbors) {
         Main.inst().getScheduler().executeAsync(() -> {
             synchronized (this) {
@@ -260,10 +265,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     @NotNull
     public Block getBlock(int localX, int localY) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        if (blocks[localX][localY] == null) {
-            setBlock(localX, localY, AIR, false);
+        Block block = blocks[localX][localY];
+        if (block == null) {
+            block = setBlock(localX, localY, AIR, false);
         }
-        return blocks[localX][localY];
+        //noinspection ConstantConditions block will not be null when material is not null
+        return block;
     }
 
     /**
@@ -274,16 +281,32 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @param localY
      *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
      * @param material
-     *     The material to place, if {@code null} it will effectively be {@link Material#AIR}
+     *     The material of the new block
+     *
+     * @return The new block, only {@code null} if {@code material} parameter is {@code null}
      */
-    public void setBlock(int localX, int localY, @Nullable Material material) {
-        setBlock(localX, localY, material, true);
+    @Nullable
+    public Block setBlock(int localX, int localY, @Nullable Material material) {
+        return setBlock(localX, localY, material, true);
     }
 
 
-    public void setBlock(int localX, int localY, @Nullable Material material, boolean update) {
+    /**
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param material
+     *     The material of the new block
+     * @param update
+     *     If the texture of this chunk should be updated
+     *
+     * @return The new block, only {@code null} if {@code material} parameter is {@code null}
+     */
+    @Nullable
+    public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Block block = material == null ? null : material.createBlock(world, this, localX, localY);
-        setBlock(localX, localY, block, update);
+        return setBlock(localX, localY, block, update);
     }
 
     /**
@@ -291,10 +314,15 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
      * @param localY
      *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param block
+     *     The new block
      * @param update
      *     If the texture of this chunk should be updated
+     *
+     * @return The given block, equal to the {@code block} parameter
      */
-    public void setBlock(int localX, int localY, @Nullable Block block, boolean update) {
+    @Nullable
+    public Block setBlock(int localX, int localY, @Nullable Block block, boolean update) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
         if (block != null) {
@@ -307,7 +335,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if ((currBlock == null && block == null) ||
             (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
             if (block != null) { block.dispose(); }
-            return;
+            return null;
         }
 
         if (currBlock != null) {
@@ -335,11 +363,14 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         }
 
         if (update) {
-            modified = true;
-            dirty = true;
-            prioritize = true;
+            synchronized (this) {
+                modified = true;
+                dirty = true;
+                prioritize = true;
+            }
             world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
         }
+        return block;
     }
 
     /**
