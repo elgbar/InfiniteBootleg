@@ -179,10 +179,12 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     @Override
     public void log(LogLevel level, String msg) {
         try {
-            console.log(msg, level);
+            synchronized (this) {
+                console.log(msg, level);
+            }
         } catch (Exception ex) {
-            System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg, level.toString(),
-                              ex.getClass().getSimpleName(), ex.getMessage());
+            System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg,
+                              level.toString(), ex.getClass().getSimpleName(), ex.getMessage());
         }
     }
 
