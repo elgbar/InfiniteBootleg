@@ -125,6 +125,13 @@ public class Block implements Binembly, Disposable {
         return chunk.setBlock(localX, localY, material, update);
     }
 
+    /**
+     * Remove this block from the world
+     */
+    public void destroy() {
+        chunk.setBlock(localX, localY, (Block) null, true);
+    }
+
     @NotNull
     @Override
     public byte[] disassemble() {

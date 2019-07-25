@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks;
 
 import com.badlogic.gdx.Gdx;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.*;
 import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +18,10 @@ public class SandBlock extends UpdatableBlock {
         if (getWorld().isAir(south)) {
             Gdx.app.postRunnable(() -> {
                 if (getChunk().isLoaded()) {
-                    getChunk().setBlock(getLocalX(), getLocalY(), (Block) null, true);
-                    new FallingBlock(getWorld(), getWorldX(), getWorldY(), Material.SAND);
+                    destroy();
+                    Main.inst().getScheduler().scheduleSync(() -> {
+                        new FallingBlock(getWorld(), getWorldX(), getWorldY(), Material.SAND);
+                    }, 10L);
                 }
             });
         }
