@@ -179,6 +179,12 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
 
             if (allAir) {
+                if (box2dBody != null) {
+                    Body cpy = box2dBody;
+                    synchronized (WorldRender.BOX2D_LOCK) {
+                        world.getBox2dWorld().destroyBody(cpy);
+                    }
+                }
                 return;
             }
 
