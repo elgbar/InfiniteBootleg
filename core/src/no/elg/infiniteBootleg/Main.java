@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -86,7 +87,8 @@ public class Main extends ApplicationAdapter {
         console = new ConsoleHandler();
         console.setAlpha(0.85f);
         console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
-
+        Gdx.app.setApplicationLogger(console);
+        Gdx.app.setLogLevel(Application.LOG_DEBUG);
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

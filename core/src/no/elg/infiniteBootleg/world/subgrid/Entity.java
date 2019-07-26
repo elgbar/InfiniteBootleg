@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -54,19 +55,18 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         }
 
         if (isInvalidSpawn()) {
-            Main.inst().getConsoleLogger()
-                .logf("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", simpleName(), posCache.x,
-                      posCache.y);
+            Gdx.app.debug("Entity", //
+                          String.format("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", //
+                                        simpleName(), posCache.x, posCache.y));
             world.removeEntity(this);
             return;
         }
 
-        BodyDef def = createBodyDef(posCache.x, posCache.y);
         synchronized (WorldRender.BOX2D_LOCK) {
+            BodyDef def = createBodyDef(posCache.x, posCache.y);
             body = world.getBox2dWorld().createBody(def);
             createFixture(body);
         }
-
 
         update();
     }
@@ -76,7 +76,6 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(worldX, worldY);
-        bodyDef.awake = true;
         bodyDef.fixedRotation = true;
         return bodyDef;
     }
