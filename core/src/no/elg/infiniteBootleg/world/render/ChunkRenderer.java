@@ -59,16 +59,18 @@ public class ChunkRenderer implements Renderer, Disposable {
         fbo.begin();
         batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                Block block = blocks[x][y];
-                if (block == null || block.getMaterial() == AIR) {
-                    continue;
+        synchronized (chunk) {
+            for (int x = 0; x < CHUNK_SIZE; x++) {
+                for (int y = 0; y < CHUNK_SIZE; y++) {
+                    Block block = blocks[x][y];
+                    if (block == null || block.getMaterial() == AIR) {
+                        continue;
+                    }
+                    int dx = block.getLocalX() * BLOCK_SIZE;
+                    int dy = block.getLocalY() * BLOCK_SIZE;
+                    //noinspection ConstantConditions
+                    batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
                 }
-                int dx = block.getLocalX() * BLOCK_SIZE;
-                int dy = block.getLocalY() * BLOCK_SIZE;
-                //noinspection ConstantConditions
-                batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
             }
         }
         batch.end();
