@@ -36,7 +36,8 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     private boolean flying; //ignore world gravity
     private UUID uuid;
     private Vector2 posCache;
-    private boolean onGround;
+    private Vector2 velCache;
+    private int groundContacts;
     private Filter filter;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
@@ -49,7 +50,9 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         flying = false;
         world.addEntity(this);
         posCache = new Vector2(worldX, worldY);
+        velCache = Vector2.Zero;
         filter = World.ENTITY_FILTER;
+
         if (center) {
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
         }
@@ -151,19 +154,24 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
                 //y pos - getHalfBox2dHeight is middle
                 int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - GROUND_CHECK_OFFSET);
                 if (world.isAir(getBlockX(), y)) { return; }
-                onGround = true;
+                groundContacts++;
             }
             else if (type == ContactType.END_CONTACT) {
-                onGround = false;
+                groundContacts--;
+                if (groundContacts < 0) { groundContacts = 0; }
             }
         }
     }
 
     /**
-     * Update the cached position
+     * Update the cached position and velocity
      */
     private void updatePos() {
-        posCache = body.getPosition();
+        if (body == null) { return; }
+        synchronized (WorldRender.BOX2D_LOCK) {
+            posCache = body.getPosition();
+            velCache = body.getLinearVelocity();
+        }
     }
 
     @Override
@@ -206,6 +214,11 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         return posCache;
     }
 
+    @NotNull
+    public Vector2 getVelocity() {
+        return velCache;
+    }
+
     public int getBlockX() {
         return MathUtils.floor(posCache.x);
     }
@@ -245,7 +258,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     }
 
     public boolean isOnGround() {
-        return onGround;
+        return groundContacts > 0;
     }
 
     public String simpleName() {
@@ -259,8 +272,10 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     public void setFilter(Filter filter) {
         this.filter = filter;
         if (body != null) {
-            for (Fixture fixture : getBody().getFixtureList()) {
-                fixture.setFilterData(filter);
+            synchronized (WorldRender.BOX2D_LOCK) {
+                for (Fixture fixture : getBody().getFixtureList()) {
+                    fixture.setFilterData(filter);
+                }
             }
         }
     }
@@ -290,6 +305,6 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
 
     @Override
     public String toString() {
-        return "Entity{" + "uuid=" + uuid + '}';
+        return "Entity{uuid=" + uuid + '}';
     }
 }
