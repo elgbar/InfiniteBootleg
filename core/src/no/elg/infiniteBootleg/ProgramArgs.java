@@ -21,7 +21,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
     public static void executeArgs(String[] args) {
         ProgramArgs pa = new ProgramArgs(args);
-        pa.scheduler.scheduleSync(pa::dispose, 50);
+        pa.scheduler.scheduleSync(pa::dispose, 500);
     }
 
     public ProgramArgs(String[] args) {
@@ -49,6 +49,10 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         scheduler.scheduleAsync(() -> Main.inst().getConsoleLogger().log(level, msg), 2);
     }
 
+    @Override
+    public void dispose() {
+        scheduler.shutdown();
+    }
 
     /*
      * Below this comment all arguments are computed.
@@ -58,7 +62,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * - It must have String as its one and only argument
      * - The name of the method must be lowercase
      *
-     * - If any errors occur do NOT throw an exception, rather print out an error on std err
+     * - If any errors occur do NOT throw an exception, rather print error with the logger
      *
      */
 
@@ -85,7 +89,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * @param val
      *     The world seed
      */
-    public void world_seed(String val) {
+    private void world_seed(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
                 "The seed must be provided when using world_Seed " + "argument.\nExample: -world_seed=test");
@@ -99,7 +103,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Disable Box2DLights
      */
-    public void no_lights(String val) {
+    private void no_lights(String val) {
         log("Lights are disabled. To dynamically enable this use command 'lights true'");
         WorldRender.lights = false;
     }
@@ -107,12 +111,12 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Enable debug rendering (ie box2d)
      */
-    public void debug(String val) {
+    private void debug(String val) {
         log("Debug view is enabled. To disable this at runtime use command 'debug'");
         WorldRender.debugBox2d = true;
     }
 
-    public boolean threads(String val) {
+    private boolean threads(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
                 "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
@@ -130,10 +134,5 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
             log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
             return false;
         }
-    }
-
-    @Override
-    public void dispose() {
-        scheduler.shutdown();
     }
 }
