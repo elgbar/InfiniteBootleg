@@ -1,38 +1,43 @@
 package no.elg.infiniteBootleg;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
+import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
+import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
 
 import java.io.File;
 
-import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Main extends ApplicationAdapter {
 
     public static final String EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar;
     public static final String WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar;
+
     public static final String TEXTURES_FOLDER = "textures" + File.separatorChar;
+    public static final String FONTS_FOLDER = "fonts" + File.separatorChar;
+
     public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
     public static final String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
     public static final String VERSION_FILE = "version";
 
-    public static final CancellableThreadScheduler SCHEDULER = new CancellableThreadScheduler();
-
     private static InputMultiplexer inputMultiplexer;
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
+    private CancellableThreadScheduler scheduler;
 
     /**
      * If worlds should be loaded from disk
@@ -49,62 +54,61 @@ public class Main extends ApplicationAdapter {
      */
     public static int worldSeed = 0;
 
+    public static int schedulerThreads = 3;
+
     private World world;
     private ConsoleHandler console;
     private HUDRenderer hud;
 
     public static Main inst;
-    private String[] args;
 
 
     private int mouseBlockX;
     private int mouseBlockY;
-
-
-    public Main(String[] args) {
-        this.args = args;
-    }
+    private float mouseX;
+    private float mouseY;
 
     @Override
     public void create() {
         inst = this;
 
+        scheduler = new CancellableThreadScheduler(schedulerThreads);
+
+        if (renderGraphic) {
+            VisUI.load();
+            hud = new HUDRenderer();
+
+            blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
+            entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
+        }
+
         inputMultiplexer = new InputMultiplexer();
-        VisUI.load();
-        console = new ConsoleHandler();
         Gdx.input.setInputProcessor(inputMultiplexer);
-
-        executeArgs(args);
-
-        blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
-        entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
-
+        console = new ConsoleHandler();
+        console.setAlpha(0.85f);
+        console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
+        Gdx.app.setApplicationLogger(console);
+        Gdx.app.setLogLevel(Application.LOG_DEBUG);
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            world.getWorldTicker().stop();
             world.save();
+            scheduler.shutdown(); // we want make sure this thread is dead
         }));
-
-        if (!renderGraphic) {
-            console.setVisible(true);
-            console.setSizePercent(100, 100);
-        }
-        hud = new HUDRenderer();
     }
 
     @Override
     public void render() {
+        if (!renderGraphic) { return; }
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        if (!renderGraphic) {
-            console.draw();
-            return;
-        }
 
         Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        mouseBlockX = (int) Math.floor(unproject.x / BLOCK_SIZE);
-        mouseBlockY = (int) Math.floor(unproject.y / BLOCK_SIZE);
+        mouseX = unproject.x / BLOCK_SIZE;
+        mouseY = unproject.y / BLOCK_SIZE;
+
+        mouseBlockX = MathUtils.floor(mouseX);
+        mouseBlockY = MathUtils.floor(mouseY);
 
         //noinspection ConstantConditions
         world.getInput().update();
@@ -114,21 +118,26 @@ public class Main extends ApplicationAdapter {
         console.draw();
     }
 
+
     @Override
     public void dispose() {
-        hud.dispose();
+        if (renderGraphic) {
+            hud.dispose();
+            blockAtlas.dispose();
+            entityAtlas.dispose();
+            VisUI.dispose();
+        }
         world.dispose();
-        blockAtlas.dispose();
-        entityAtlas.dispose();
         console.dispose();
-        VisUI.dispose();
     }
 
     @Override
     public void resize(int width, int height) {
-        world.resize(width, height);
-        hud.resize(width, height);
-        console.refresh();
+        if (renderGraphic) {
+            world.resize(width, height);
+            hud.resize(width, height);
+            console.resize(width, height);
+        }
     }
 
     public static InputMultiplexer getInputMultiplexer() {
@@ -155,6 +164,14 @@ public class Main extends ApplicationAdapter {
         return mouseBlockY;
     }
 
+    public float getMouseX() {
+        return mouseX;
+    }
+
+    public float getMouseY() {
+        return mouseY;
+    }
+
     public static Main inst() {
         if (inst == null) { throw new IllegalStateException("Main instance not created"); }
         return inst;
@@ -170,5 +187,9 @@ public class Main extends ApplicationAdapter {
 
     public HUDRenderer getHud() {
         return hud;
+    }
+
+    public CancellableThreadScheduler getScheduler() {
+        return scheduler;
     }
 }

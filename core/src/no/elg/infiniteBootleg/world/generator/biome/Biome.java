@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.generator.biome;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.Block;
@@ -79,7 +80,7 @@ public enum Biome {
                 y += rawHeightAt(pcg.getNoise(), worldX);
             }
         }
-        return Math.abs((int) Math.floor(y / (INTERPOLATION_RADIUS * 2 + 1)));
+        return Math.abs(MathUtils.floor(y / (INTERPOLATION_RADIUS * 2 + 1)));
     }
 
     public double rawHeightAt(@NotNull PerlinNoise noise, int worldX) {
@@ -90,7 +91,7 @@ public enum Biome {
         Block[] blocks = chunk.getBlocks()[localX];
         for (int dy = 0; dy < localY; dy++) {
             Material mat = materialAt(noise, height, chunk.getWorldX() + localX, chunk.getWorldY() + dy);
-            blocks[dy] = mat.create(chunk.getWorld(), chunk, localX, dy);
+            blocks[dy] = mat.createBlock(chunk.getWorld(), chunk, localX, dy);
         }
     }
 }

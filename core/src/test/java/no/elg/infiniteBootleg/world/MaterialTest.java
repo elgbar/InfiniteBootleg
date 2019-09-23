@@ -14,7 +14,7 @@ public class MaterialTest extends TestGraphic {
         World world = new World(new FlatChunkGenerator());
         for (Material material : Material.values()) {
             System.out.println("Trying to create " + material);
-            material.create(world, new Chunk(world, 0, 0), 0, 0);
+            material.create(world, 0, 0);
             System.out.println("Created " + material);
         }
     }

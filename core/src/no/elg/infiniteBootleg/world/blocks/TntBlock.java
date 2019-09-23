@@ -41,7 +41,7 @@ public class TntBlock extends UpdatableBlock {
     private boolean white;
     private boolean exploded;
     private long tickLeft;
-    private double strength;
+    private float strength;
 
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
     public static final int EXPLOSION_STRENGTH = 25; //basically max radius
@@ -60,12 +60,12 @@ public class TntBlock extends UpdatableBlock {
         setUpdate(true); //continue to update this block till it explodes
         if (tickLeft <= 0) {
             exploded = true;
-            Main.SCHEDULER.executeAsync(() -> {
+            Main.inst().getScheduler().executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
                 int worldX = getWorldX();
                 int worldY = getWorldY();
-                for (int x = (int) Math.floor(worldX - strength); x < worldX + strength; x++) {
-                    for (int y = (int) Math.floor(worldY - strength); y < worldY + strength; y++) {
+                for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
+                    for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
                         Block b = getWorld().getRawBlock(x, y);
                         Material mat = b == null ? AIR : b.getMaterial();
                         float hardness = mat.getHardness();
@@ -87,7 +87,7 @@ public class TntBlock extends UpdatableBlock {
                 Gdx.app.postRunnable(() -> {
                     Set<Chunk> chunks = new HashSet<>();
                     for (Block block : destroyed) {
-                        getWorld().setBlock(block.getWorldX(), block.getWorldY(), null, false);
+                        getWorld().setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
                         chunks.add(block.getChunk());
                         getWorld().updateBlocksAround(block.getWorldX(), block.getWorldY());
                     }

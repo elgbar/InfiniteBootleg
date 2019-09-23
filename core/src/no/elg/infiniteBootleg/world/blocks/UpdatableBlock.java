@@ -17,11 +17,19 @@ public abstract class UpdatableBlock extends Block implements Updatable {
 
     /**
      * Update if the update flag is set to true
+     *
+     * @param rare
+     *     If the the rare update should be called instead of the normal update
      */
-    public void tryUpdate() {
+    public void tryUpdate(boolean rare) {
         if (shouldUpdate()) {
             update = false;
-            update();
+            if (rare) {
+                updateRare();
+            }
+            else {
+                update();
+            }
         }
     }
 

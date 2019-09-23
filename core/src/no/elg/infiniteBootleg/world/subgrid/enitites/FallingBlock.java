@@ -9,11 +9,11 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
@@ -25,7 +25,7 @@ public class FallingBlock extends Entity implements ContactHandler {
     private boolean crashed;
 
     public FallingBlock(@NotNull World world, float worldX, float worldY, @NotNull Material material) {
-        super(world, worldX, worldY);
+        super(world, worldX + 0.5f, worldY + 0.5f, false);
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
     }
@@ -34,14 +34,13 @@ public class FallingBlock extends Entity implements ContactHandler {
     protected void createFixture(@NotNull Body body) {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
-        Fixture fix = getBody().createFixture(box, 1.0f);
-        fix.setFilterData(World.FALLING_BLOCK_FILTER);
+        Fixture fix = body.createFixture(box, 1.0f);
+        fix.setFilterData(World.BLOCK_ENTITY_FILTER);
         box.dispose();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void updateRare() {
         //Unload this entity if it entered an unloaded chunk
         //TODO do not _remove_ this entity, just save it to the unloaded chunk
         int chunkX = CoordUtil.worldToChunk(getBlockX());
@@ -52,20 +51,25 @@ public class FallingBlock extends Entity implements ContactHandler {
     }
 
     @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact, @Nullable Object data) {
+    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
+
             Gdx.app.postRunnable(() -> {
+                World world = getWorld();
                 int newX = getBlockX();
                 int newY = getBlockY();
 
-                if (getWorld().isAir(newX, newY)) {
-                    getWorld().setBlock(newX, newY, material, true);
+                if (world.isAir(newX, newY) || world.getMaterial(newX, newY).isEntity()) {
+                    world.setBlock(newX, newY, material, true);
                 }
 //                else{
 //                    //TODO drop as an item
 //                }
-                getWorld().removeEntity(this);
+
+                synchronized (WorldRender.BOX2D_LOCK) {
+                    world.removeEntity(this);
+                }
             });
         }
     }

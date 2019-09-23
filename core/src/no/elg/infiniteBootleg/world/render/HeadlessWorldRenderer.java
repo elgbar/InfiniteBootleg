@@ -26,4 +26,9 @@ public class HeadlessWorldRenderer extends WorldRender {
     public void dispose() {
 
     }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
 }

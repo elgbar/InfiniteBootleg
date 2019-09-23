@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location and its
+ * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location
+ * and its
  * location within the parent chunk.
  *
  * @author Elg
@@ -17,12 +18,12 @@ public class Block implements Binembly, Disposable {
 
     public final static int BLOCK_SIZE = 16;
 
-    private Material material;
-    private World world;
-    private Chunk chunk;
+    private final Material material;
+    private final World world;
+    private final Chunk chunk;
 
-    private int localX;
-    private int localY;
+    private final int localX;
+    private final int localY;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         this.localX = localX;
@@ -116,6 +117,21 @@ public class Block implements Binembly, Disposable {
         return world.getRawBlock(newWorldX, newWorldY);
     }
 
+    public Block setBlock(@NotNull Material material) {
+        return setBlock(material, true);
+    }
+
+    public Block setBlock(@NotNull Material material, boolean update) {
+        return chunk.setBlock(localX, localY, material, update);
+    }
+
+    /**
+     * Remove this block from the world
+     */
+    public void destroy() {
+        chunk.setBlock(localX, localY, (Block) null, true);
+    }
+
     @NotNull
     @Override
     public byte[] disassemble() {
@@ -158,7 +174,7 @@ public class Block implements Binembly, Disposable {
 
     @Override
     public String toString() {
-        return "Block{" + "material=" + material + ", world=" + world + ", chunk=" + chunk + ", localX=" + localX + ", localY=" +
-               localY + '}';
+        return "Block{" + "material=" + material + ", chunk=" + chunk + ", worldX=" + getWorldX() + ", worldY=" +
+               getWorldY() + '}';
     }
 }

@@ -60,3 +60,10 @@ torch
   orig: 16, 16
   offset: 0, 0
   index: -1
+door
+  rotate: false
+  xy: 10, 10
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
