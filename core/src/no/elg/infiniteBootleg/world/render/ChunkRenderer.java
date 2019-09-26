@@ -52,7 +52,7 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
 
-        chunk.updateFixture(true);
+        chunk.getChunkBody().updateFixture(true);
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
