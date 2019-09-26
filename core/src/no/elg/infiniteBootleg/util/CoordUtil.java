@@ -1,10 +1,12 @@
 package no.elg.infiniteBootleg.util;
 
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE_SHIFT;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+
 
 /**
  * Translate between world(block) and chunk coordinates
@@ -61,7 +63,7 @@ public class CoordUtil {
      */
     @Contract(pure = true)
     public static int worldToChunk(int worldCoord) {
-        return worldCoord >> CHUNK_SIZE_SHIFT;
+        return worldCoord >> Chunk.CHUNK_SIZE_SHIFT;
     }
 
 
@@ -75,7 +77,7 @@ public class CoordUtil {
      */
     @Contract(pure = true)
     public static int chunkToWorld(int chunkCoord) {
-        return chunkCoord << CHUNK_SIZE_SHIFT;
+        return chunkCoord << Chunk.CHUNK_SIZE_SHIFT;
     }
 
     /**
@@ -104,5 +106,18 @@ public class CoordUtil {
     @Contract(pure = true)
     public static int chunkOffset(int worldCoord) {
         return worldCoord - chunkToWorld(worldToChunk(worldCoord));
+    }
+
+    /**
+     * @param localX
+     *     The chunk local x coordinate
+     * @param localY
+     *     The chunk local y coordinate
+     *
+     * @return If given x and y are both between 0 (inclusive) and {@link Chunk#CHUNK_SIZE} (exclusive)
+     */
+    @Contract(pure = true)
+    public static boolean isInsideChunk(int localX, int localY) {
+        return localX >= 0 && localX < CHUNK_SIZE && localY >= 0 && localY < CHUNK_SIZE;
     }
 }

@@ -57,19 +57,20 @@ public class CoordUtilTest {
                      CoordUtil.chunkToWorld(new Location(3, -1), 3, 2));
     }
 
-    @Test
-    public void isBetweenFloat() {
-        assertTrue(Util.isBetween(0, 0, 1));
-        assertFalse(Util.isBetween(0, 1, 1));
-        assertFalse(Util.isBetween(1010, -1, 9999));
-        assertFalse(Util.isBetween(1010, 99999, 9999));
-        assertTrue(Util.isBetween(1010, 2000, 9999));
-    }
 
     @Test
-    public void hasSuperClass() {
-        assertTrue(Util.hasSuperClass(Object.class, Object.class));
-        assertFalse(Util.hasSuperClass(Object.class, String.class));
-        assertTrue(Util.hasSuperClass(String.class, Object.class));
+    public void isInsideChunk() {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                assertTrue(CoordUtil.isInsideChunk(x, y));
+            }
+        }
+
+        assertFalse(CoordUtil.isInsideChunk(-1, -1));
+        assertFalse(CoordUtil.isInsideChunk(-1, 0));
+        assertFalse(CoordUtil.isInsideChunk(0, -1));
+        assertFalse(CoordUtil.isInsideChunk(CHUNK_SIZE, CHUNK_SIZE));
+        assertFalse(CoordUtil.isInsideChunk(CHUNK_SIZE, 0));
+        assertFalse(CoordUtil.isInsideChunk(0, CHUNK_SIZE));
     }
 }
