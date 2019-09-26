@@ -137,8 +137,14 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "The quality of the light. To disable light use command 'light'",
                 paramDescriptions = "Quality of light, between 0 and 4")
     public void lightQuality(int quality) {
-        if (quality > 4) { quality = 4; }
-        else if (quality < 0) { quality = 0; }
+        if (quality > 4) {
+            logger.error("WARN", "Quality given is greater than the maximum. It has been set to 4");
+            quality = 4;
+        }
+        else if (quality < 0) {
+            logger.error("WARN", "Quality given is a negative number. It has been set to 0");
+            quality = 0;
+        }
         Main.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
     }
 
