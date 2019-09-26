@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg;
 
 import com.badlogic.gdx.utils.Disposable;
 import com.strongjoshua.console.LogLevel;
+import no.elg.infiniteBootleg.args.Argument;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
@@ -70,6 +71,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Do not render the graphics
      */
+    @Argument("Disable rendering of graphics.")
     private void headless(String val) {
         Main.renderGraphic = false;
         log("Graphics is disabled");
@@ -78,6 +80,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Do not load the worlds from disk
      */
+    @Argument("The world will not be loaded from disk")
     private void no_load(String val) {
         Main.loadWorldFromDisk = false;
         log("Worlds will not be loaded/saved from/to disk");
@@ -89,6 +92,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * @param val
      *     The world seed
      */
+    @Argument("Set the default world seed, a value must be specified. Example: -world_seed=test")
     private void world_seed(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
@@ -103,6 +107,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Disable Box2DLights
      */
+
+    @Argument("Disable rendering of lights")
     private void no_lights(String val) {
         log("Lights are disabled. To dynamically enable this use command 'lights true'");
         WorldRender.lights = false;
@@ -111,12 +117,14 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Enable debug rendering (ie box2d)
      */
+    @Argument("Enable debugging including debug rendering for box2d")
     private void debug(String val) {
         log("Debug view is enabled. To disable this at runtime use command 'debug'");
         WorldRender.debugBox2d = true;
         Main.debug = true;
     }
 
+    @Argument("Specify the number of secondary threads. Must be an integer greater than or equal to 0")
     public boolean threads(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
@@ -135,5 +143,17 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
             log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
             return false;
         }
+    }
+
+    @Argument("Print out available arguments and exit")
+    public void help(String val) {
+        System.out.println("List of program arguments:");
+        for (Method method : ProgramArgs.class.getDeclaredMethods()) {
+            Argument arg = method.getAnnotation(Argument.class);
+            if (arg != null) {
+                System.out.println(" -" + method.getName() + " : " + arg.value());
+            }
+        }
+        System.exit(0);
     }
 }
