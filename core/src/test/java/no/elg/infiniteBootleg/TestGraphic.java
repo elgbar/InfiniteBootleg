@@ -9,9 +9,10 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.junit.BeforeClass;
+import org.mockito.Mockito;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
 
 public class TestGraphic {
 
@@ -22,25 +23,25 @@ public class TestGraphic {
         Main.renderGraphic = false;
         Main.loadWorldFromDisk = false; //ensure no loading from disk (to be able to duplicate tests)
 
-        Gdx.gl20 = mock(GL20.class);
+        Gdx.gl20 = Mockito.mock(GL20.class);
         Gdx.gl = Gdx.gl20;
 
         //run postRunnable at once
-        Gdx.app = mock(Application.class);
+        Gdx.app = Mockito.mock(Application.class);
         doAnswer(invocation -> {
-            invocation.getArgumentAt(0, Runnable.class).run();
+            invocation.getArgument(0, Runnable.class).run();
             return null;
         }).when(Gdx.app).postRunnable(any(Runnable.class));
 
 
-        Gdx.graphics = mock(Graphics.class);
-        when(Gdx.graphics.getWidth()).thenReturn(1);
-        when(Gdx.graphics.getHeight()).thenReturn(1);
+        Gdx.graphics = Mockito.mock(Graphics.class);
+        Mockito.when(Gdx.graphics.getWidth()).thenReturn(1);
+        Mockito.when(Gdx.graphics.getHeight()).thenReturn(1);
 
-        Main.inst = mock(Main.class);
-        when(Main.inst.getConsoleLogger()).thenReturn(logger);
+        Main.inst = Mockito.mock(Main.class);
+        Mockito.when(Main.inst.getConsoleLogger()).thenReturn(logger);
         World world = new World(new EmptyChunkGenerator());
-        when(Main.inst.getWorld()).thenReturn(world);
+        Mockito.when(Main.inst.getWorld()).thenReturn(world);
     }
 
     private static class ConsoleTestLogger implements ConsoleLogger {
