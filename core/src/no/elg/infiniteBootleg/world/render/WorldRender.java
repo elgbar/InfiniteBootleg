@@ -112,13 +112,13 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
             chunksInView[HOR_START] = MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
-            chunksInView[HOR_END] =
-                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+            chunksInView[HOR_END] = MathUtils.floor(
+                (viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
 
             chunksInView[VERT_START] = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
             //add one to make sure we are always in darkness underground
-            chunksInView[VERT_END] =
-                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+            chunksInView[VERT_END] = MathUtils.floor(
+                (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
             skylight.setStaticLight(true);
@@ -178,7 +178,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 rayHandler.render();
             }
         }
-        if (debugBox2d) {
+        if (debugBox2d && Main.debug) {
             synchronized (BOX2D_LOCK) {
                 debugRenderer.render(world.getBox2dWorld(), m4);
             }

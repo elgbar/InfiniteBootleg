@@ -115,6 +115,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
     public void debug() {
         WorldRender.debugBox2d = !WorldRender.debugBox2d;
+        Main.debug = true;
         logger.log(LogLevel.SUCCESS,
                    "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
@@ -181,7 +182,6 @@ public class Commands extends CommandExecutor {
         //noinspection LibGDXUnsafeIterator
         for (Block block : player.touchingBlocks()) {
             block.setBlock(Material.TORCH);
-            System.out.println("block.toString() = " + block.toString());
         }
     }
 

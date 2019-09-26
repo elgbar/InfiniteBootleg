@@ -100,7 +100,6 @@ public class World implements Disposable, Updatable, Resizable {
     private String name = "World";
     private int time;
 
-
     /**
      * Generate a world with a random seed
      *
@@ -124,7 +123,6 @@ public class World implements Disposable, Updatable, Resizable {
 
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
-
 
         box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
         box2dWorld.setContactListener(new ContactManager(this));
@@ -532,8 +530,8 @@ public class World implements Disposable, Updatable, Resizable {
             ZipUtils.zip(worldFolder, worldZip);
             Main.inst().getConsoleLogger().log("World saved!");
         } catch (IOException e) {
-            Main.inst().getConsoleLogger()
-                .log(LogLevel.ERROR, "Failed to save world due to a " + e.getClass().getSimpleName());
+            Main.inst().getConsoleLogger().log(LogLevel.ERROR,
+                                               "Failed to save world due to a " + e.getClass().getSimpleName());
             e.printStackTrace();
             return;
         }

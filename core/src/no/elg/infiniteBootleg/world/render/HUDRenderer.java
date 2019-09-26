@@ -27,8 +27,8 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
      * How much information to show
      */
     public enum HUDModus {
+        DEBUG,
         NORMAL,
-        MINIMAL,
         NONE
     }
 
@@ -37,12 +37,15 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
     private HUDModus modus;
 
     public HUDRenderer() {
-        modus = HUDModus.NORMAL;
+        modus = Main.debug ? HUDModus.DEBUG : HUDModus.NORMAL;
         batch = new SpriteBatch();
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
-        final FreeTypeFontGenerator generator =
-            new FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
+        System.out.println("ubuntu+" + Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf").file()
+                                                .getAbsolutePath());
+
+        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
+            Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
         final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
         parameter.minFilter = Texture.TextureFilter.Linear;
@@ -59,19 +62,19 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         int h = Gdx.graphics.getHeight();
 
         batch.begin();
-        if (modus == HUDModus.NORMAL) {
+        if (modus == HUDModus.DEBUG) {
             Block block = world.getRawBlock(main.getMouseBlockX(), main.getMouseBlockY());
 
             int[] vChunks = world.getRender().getChunksInView();
 
-            int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) *
-                               Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
+            int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) * Math.abs(
+                vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
 
             Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
             Entity player = world.getPlayers().iterator().next();
 
-            String fps =
-                String.format("FPS: %4d delta: %.5f", Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime());
+            String fps = String.format("FPS: %4d delta: %.5f", Gdx.graphics.getFramesPerSecond(),
+                                       Gdx.graphics.getDeltaTime());
             String pointing = String.format("Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b",
                                             block != null ? block.getMaterial() : Material.AIR, //
                                             main.getMouseX(), main.getMouseY(), //
@@ -112,8 +115,8 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         //noinspection ConstantConditions
         TextureRegion tr = world.getInput().getSelected().getTextureRegion();
         if (tr != null) {
-            batch
-                .draw(tr, Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3, BLOCK_SIZE * 2, BLOCK_SIZE * 2);
+            batch.draw(tr, Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3, BLOCK_SIZE * 2,
+                       BLOCK_SIZE * 2);
         }
         batch.end();
     }

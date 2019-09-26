@@ -54,6 +54,11 @@ public class Main extends ApplicationAdapter {
      */
     public static int worldSeed = 0;
 
+    /**
+     * If general debug variable. Use this and-ed with your specific debug variable
+     */
+    public static boolean debug = false;
+
     public static int schedulerThreads = 3;
 
     private World world;
@@ -74,21 +79,25 @@ public class Main extends ApplicationAdapter {
 
         scheduler = new CancellableThreadScheduler(schedulerThreads);
 
+        inputMultiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
         if (renderGraphic) {
             VisUI.load();
+        }
+        console = new ConsoleHandler();
+        console.setAlpha(0.85f);
+        console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
+        Gdx.app.setApplicationLogger(console);
+        Gdx.app.setLogLevel(debug ? Application.LOG_DEBUG : Application.LOG_INFO);
+
+        if (renderGraphic) {
             hud = new HUDRenderer();
 
             blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
             entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
         }
 
-        inputMultiplexer = new InputMultiplexer();
-        Gdx.input.setInputProcessor(inputMultiplexer);
-        console = new ConsoleHandler();
-        console.setAlpha(0.85f);
-        console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
-        Gdx.app.setApplicationLogger(console);
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
         world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

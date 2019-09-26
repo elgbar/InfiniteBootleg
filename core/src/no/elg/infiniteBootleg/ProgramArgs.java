@@ -114,16 +114,17 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     private void debug(String val) {
         log("Debug view is enabled. To disable this at runtime use command 'debug'");
         WorldRender.debugBox2d = true;
+        Main.debug = true;
     }
 
-    private boolean threads(String val) {
+    public boolean threads(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
                 "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
             return false;
         }
         try {
-            int threads = Integer.valueOf(val);
+            int threads = Integer.parseInt(val);
             if (threads < 0) {
                 log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
                 return false;
