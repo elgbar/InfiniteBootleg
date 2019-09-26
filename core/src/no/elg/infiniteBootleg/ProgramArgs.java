@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -148,10 +149,18 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     @Argument("Print out available arguments and exit")
     public void help(String val) {
         System.out.println("List of program arguments:");
+
+        //find the maximum length of the argument methods
+        int maxNameSize = Arrays.stream(ProgramArgs.class.getDeclaredMethods()).
+            filter(m -> m.isAnnotationPresent(Argument.class)).
+            //
+                mapToInt(m -> m.getName().length()).
+                max().orElse(0);
+
         for (Method method : ProgramArgs.class.getDeclaredMethods()) {
             Argument arg = method.getAnnotation(Argument.class);
             if (arg != null) {
-                System.out.println(" -" + method.getName() + " : " + arg.value());
+                System.out.printf(" -%-" + maxNameSize + "s  %s%n", method.getName(), arg.value());
             }
         }
         System.exit(0);
