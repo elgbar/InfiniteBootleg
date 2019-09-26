@@ -48,7 +48,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
     //if this chunk should be prioritized to be updated
     private final AtomicBoolean dirty; //if texture/allair needs to be updated
-    private final AtomicBoolean dirtyBody; //if it needs a wash
     private final AtomicBoolean prioritize;
     private boolean modified; //if the chunk has been modified since loaded
     private boolean loaded; //once unloaded it no longer is valid
@@ -99,7 +98,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
         dirty = new AtomicBoolean(true);
         prioritize = new AtomicBoolean(false);
-        dirtyBody = new AtomicBoolean(false);
 
         allAir = false;
         loaded = true;
@@ -118,7 +116,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     public void updateTextureNow() {
         if (initializing) { return; }
         dirty.set(false);
-        dirtyBody.set(true);
 
         //test if all the blocks in this chunk has the material air
         allAir = true;
@@ -235,17 +232,23 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         if (block == null) {
             blocks[localX][localY] = null;
             if (currBlock instanceof UpdatableBlock) {
-                updatableBlocks.remove(currBlock);
+                synchronized (updatableBlocks) {
+                    updatableBlocks.remove(currBlock);
+                }
             }
         }
         else {
             blocks[localX][localY] = block;
 
             if (currBlock instanceof UpdatableBlock && !(block instanceof UpdatableBlock)) {
-                updatableBlocks.remove(currBlock);
+                synchronized (updatableBlocks) {
+                    updatableBlocks.remove(currBlock);
+                }
             }
             if (block instanceof UpdatableBlock) {
-                updatableBlocks.add((UpdatableBlock) block);
+                synchronized (updatableBlocks) {
+                    updatableBlocks.add((UpdatableBlock) block);
+                }
                 if (update) {
                     ((UpdatableBlock) block).update();
                 }
@@ -309,15 +312,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     @Override
     public void update() {
-        for (UpdatableBlock block : updatableBlocks) {
-            block.tryUpdate(false);
+        synchronized (updatableBlocks) {
+            for (UpdatableBlock block : updatableBlocks) {
+                block.tryUpdate(false);
+            }
         }
     }
 
     @Override
     public void updateRare() {
-        for (UpdatableBlock block : updatableBlocks) {
-            block.tryUpdate(true);
+        synchronized (updatableBlocks) {
+            for (UpdatableBlock block : updatableBlocks) {
+                block.tryUpdate(true);
+            }
         }
     }
 
@@ -513,13 +520,18 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void finishLoading() {
         synchronized (this) {
+            HashSet<UpdatableBlock> updateBlocks = new HashSet<>();
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     Block block = blocks[x][y];
                     if (block instanceof UpdatableBlock) {
-                        updatableBlocks.add((UpdatableBlock) block);
+                        updateBlocks.add((UpdatableBlock) block);
                     }
                 }
+            }
+
+            synchronized (updatableBlocks) {
+                updatableBlocks.addAll(updateBlocks);
             }
         }
         initializing = false;
@@ -545,6 +557,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                                     bytes.length);
         int index = 0;
         synchronized (this) {
+            HashSet<UpdatableBlock> updateBlocks = new HashSet<>();
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
                     Material mat = Material.fromByte(bytes[index++]);
@@ -554,11 +567,15 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                     }
                     Block block = mat.createBlock(world, this, x, y);
                     if (block instanceof UpdatableBlock) {
-                        updatableBlocks.add((UpdatableBlock) block);
+                        updateBlocks.add((UpdatableBlock) block);
                     }
                     blocks[x][y] = block;
                 }
             }
+            synchronized (updatableBlocks) {
+                updatableBlocks.addAll(updateBlocks);
+            }
+
         }
         initializing = false;
     }
