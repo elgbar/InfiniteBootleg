@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.HUDRenderer;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
@@ -85,6 +86,14 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             case NUM_9:
             case NUMPAD_9:
                 selected = Material.values()[9];
+                break;
+            case F3:
+                if (Main.inst().getHud().getModus() == HUDRenderer.HUDModus.DEBUG) {
+                    Main.inst().getHud().setModus(HUDRenderer.HUDModus.NORMAL);
+                }
+                else {
+                    Main.inst().getHud().setModus(HUDRenderer.HUDModus.DEBUG);
+                }
                 break;
             default:
                 return false;

@@ -17,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -47,8 +46,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     private final Set<UpdatableBlock> updatableBlocks;
 
     //if this chunk should be prioritized to be updated
-    private final AtomicBoolean dirty; //if texture/allair needs to be updated
-    private final AtomicBoolean prioritize;
+    private boolean dirty; //if texture/allair needs to be updated
+    private boolean prioritize;
     private boolean modified; //if the chunk has been modified since loaded
     private boolean loaded; //once unloaded it no longer is valid
     private boolean allowUnload;
@@ -96,8 +95,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
         updatableBlocks = Collections.synchronizedSet(new HashSet<>());
         chunkBody = new ChunkBody(this);
 
-        dirty = new AtomicBoolean(true);
-        prioritize = new AtomicBoolean(false);
+        dirty = true;
+        prioritize = false;
 
         allAir = false;
         loaded = true;
@@ -115,7 +114,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      */
     public void updateTextureNow() {
         if (initializing) { return; }
-        dirty.set(false);
+        dirty = false;
 
         //test if all the blocks in this chunk has the material air
         allAir = true;
@@ -132,8 +131,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
             }
         }
         if (Main.renderGraphic) {
-            world.getRender().getChunkRenderer().queueRendering(this, prioritize.get());
-            prioritize.set(false);
+            world.getRender().getChunkRenderer().queueRendering(this, prioritize);
+            prioritize = false;
         }
     }
 
@@ -257,8 +256,8 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
 
         if (update) {
             modified = true;
-            dirty.set(true);
-            prioritize.set(true);
+            dirty = true;
+            prioritize = true;
 
             world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
         }
@@ -272,9 +271,9 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      *     If this chunk should be prioritized when rendering
      */
     public void updateTexture(boolean prioritize) {
-        dirty.set(true);
+        dirty = true;
         modified = true;
-        this.prioritize.set(prioritize);
+        this.prioritize = prioritize;
     }
 
     /**
@@ -285,7 +284,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     @Nullable
     public TextureRegion getTextureRegion() {
         lastViewedTick = world.getTick();
-        if (dirty.get()) {
+        if (dirty) {
             updateTextureNow();
         }
         return fboRegion;
@@ -345,7 +344,7 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * @return If all blocks in this chunk is air
      */
     public boolean isAllAir() {
-        if (dirty.get()) {
+        if (dirty) {
             updateTextureNow();
         }
         return allAir;

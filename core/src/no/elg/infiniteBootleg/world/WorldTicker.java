@@ -9,7 +9,8 @@ import no.elg.infiniteBootleg.world.render.Updatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A helper class that calls the world's {@link World#update()} method periodically. By default it will call it every {@link
+ * A helper class that calls the world's {@link World#update()} method periodically. By default it will call it every
+ * {@link
  * #MS_DELAY_BETWEEN_TICKS}.
  * <p>
  * The world ticker will not update the world if {@link Graphics#getFrameId()} is the same as it was last tick
@@ -32,7 +33,7 @@ public class WorldTicker implements Runnable {
 
     public WorldTicker(@NotNull World world) {
         this.world = world;
-        Main.inst().getConsoleLogger().log("TPS: " + TICKS_PER_SECOND);
+        Main.inst().getConsoleLogger().log("Starting world ticking thread with TPS = " + TICKS_PER_SECOND);
         worldTickThread = new PauseableThread(this);
         worldTickThread.setName("World tick thread");
         worldTickThread.setDaemon(true);
@@ -63,8 +64,9 @@ public class WorldTicker implements Runnable {
             else {
                 stuckFrames++;
                 if (stuckFrames == TICKS_PER_SECOND || stuckFrames % (TICKS_PER_SECOND * 10) == 0) {
-                    Main.inst().getConsoleLogger()
-                        .logf(LogLevel.ERROR, "Can't keep up! Failed to update world for %d ticks", stuckFrames);
+                    Main.inst().getConsoleLogger().logf(LogLevel.ERROR,
+                                                        "Can't keep up! Failed to update world for %d ticks",
+                                                        stuckFrames);
                 }
             }
             Thread.sleep(MS_DELAY_BETWEEN_TICKS);

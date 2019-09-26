@@ -81,7 +81,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             RayHandler.useDiffuseLight(true);
             rayHandler = new RayHandler(world.getBox2dWorld());
             rayHandler.setBlurNum(1);
-            rayHandler.setAmbientLight(0.025f, 0.025f, 0.025f, 1);
+            float ambient = 0.026f;
+            rayHandler.setAmbientLight(ambient, ambient, ambient, 1);
 
             skyDir = World.STRAIGHT_DOWN_SKYLIGHT;
 
@@ -93,9 +94,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     }
 
     @Override
-    public void updateRare() {
-        update();
-    }
+    public void updateRare() {}
 
     @Override
     public void update() {

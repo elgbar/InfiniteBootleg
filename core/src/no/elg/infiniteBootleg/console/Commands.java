@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
+import com.strongjoshua.console.annotation.HiddenCommand;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -182,6 +183,7 @@ public class Commands extends CommandExecutor {
         Main.inst().getWorld().getRender().update();
     }
 
+    @HiddenCommand
     @ClientsideOnly
     public void paint() {
         Player player = Main.inst().getWorld().getPlayers().iterator().next();
