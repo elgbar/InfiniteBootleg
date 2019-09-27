@@ -515,6 +515,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
     }
 
     /**
+     * @return {@code true} if all the {@link Direction#CARDINAL} neighbors are loaded
+     */
+    public boolean isNeighborsLoaded() {
+        for (Direction direction : Direction.CARDINAL) {
+            Location relChunk = Location.relative(chunkX, chunkY, direction);
+            if (!world.isChunkLoaded(relChunk)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Allow textures to be loaded
      */
     public void finishLoading() {
