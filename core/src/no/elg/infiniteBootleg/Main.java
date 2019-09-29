@@ -67,7 +67,6 @@ public class Main extends ApplicationAdapter {
 
     public static Main inst;
 
-
     private int mouseBlockX;
     private int mouseBlockY;
     private float mouseX;

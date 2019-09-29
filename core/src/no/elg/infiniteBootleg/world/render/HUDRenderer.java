@@ -90,8 +90,7 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                              world.getRender().getCamera().zoom);
 
             String pos = String.format("p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x,
-                                       player.getPosition().y, player.getBody().getLinearVelocity().x,
-                                       player.getBody().getLinearVelocity().y, //
+                                       player.getPosition().y, player.getVelocity().x, player.getVelocity().y, //
                                        player.isOnGround(), player.isFlying()//
                                       );
 

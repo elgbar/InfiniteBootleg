@@ -71,7 +71,8 @@ public class CancellableThreadScheduler {
     }
 
     /**
-     * Post the given runnable as fast as possible (though not as fast as calling {@link Application#postRunnable(Runnable)})
+     * Post the given runnable as fast as possible (though not as fast as calling {@link
+     * Application#postRunnable(Runnable)})
      * <p>
      * This is NOT the same as doing {@code Gdx.app.postRunnable(runnable)}
      *
@@ -81,7 +82,7 @@ public class CancellableThreadScheduler {
      * @see Application#postRunnable(Runnable)
      */
     public void executeSync(Runnable runnable) {
-        tasks.add(executorService.schedule(() -> Gdx.app.postRunnable(runnable), 0, TimeUnit.NANOSECONDS));
+        Gdx.app.postRunnable(runnable);
     }
 
     /**

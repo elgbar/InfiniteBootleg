@@ -185,7 +185,7 @@ public class Util {
             final Process p = Runtime.getRuntime().exec(countCommand);
             p.waitFor();
             String countStr = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-            return Integer.valueOf(countStr);
+            return Integer.parseInt(countStr);
         } catch (Exception e) {
             return DEFAULT_COMMIT_COUNT;
         }
