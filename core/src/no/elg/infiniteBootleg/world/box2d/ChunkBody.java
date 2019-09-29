@@ -68,7 +68,7 @@ public class ChunkBody implements Disposable {
     public void updateFixture(boolean recalculateNeighbors) {
         if (chunk.isAllAir()) {
             chunk.getWorld().getWorldBody().destroyBody(box2dBody);
-                synchronized (WorldRender.BOX2D_LOCK) {
+            box2dBody = null;
             return;
         }
 
