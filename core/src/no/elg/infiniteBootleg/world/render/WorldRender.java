@@ -79,7 +79,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
-            rayHandler = new RayHandler(world.getBox2dWorld());
+            rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld());
             rayHandler.setBlurNum(1);
             float ambient = 0.026f;
             rayHandler.setAmbientLight(ambient, ambient, ambient, 1);
@@ -126,7 +126,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
     }
 
-
     @Override
     public void render() {
         chunkRenderer.render();
@@ -167,19 +166,20 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 float dx = chunk.getChunkX() * CHUNK_TEXTURE_SIZE;
                 float dy = chunk.getChunkY() * CHUNK_TEXTURE_SIZE;
                 batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
-
             }
         }
         entityRenderer.render();
         batch.end();
         if (lights) {
             synchronized (LIGHT_LOCK) {
-                rayHandler.render();
+                synchronized (BOX2D_LOCK) {
+                    rayHandler.render();
+                }
             }
         }
         if (debugBox2d && Main.debug) {
             synchronized (BOX2D_LOCK) {
-                debugRenderer.render(world.getBox2dWorld(), m4);
+                debugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
             }
         }
     }

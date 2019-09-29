@@ -67,7 +67,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
 
         synchronized (WorldRender.BOX2D_LOCK) {
             BodyDef def = createBodyDef(posCache.x, posCache.y);
-            body = world.getBox2dWorld().createBody(def);
+            body = world.getWorldBody().createBody(def);
             createFixture(body);
         }
 
@@ -133,10 +133,10 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
                 continue;
             }
             Vector2 pos = entity.getPosition();
-            boolean bx =
-                Util.isBetween(pos.x - entity.getHalfBox2dWidth(), posCache.x, pos.x + entity.getHalfBox2dWidth());
-            boolean by =
-                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), posCache.y, pos.y + entity.getHalfBox2dHeight());
+            boolean bx = Util.isBetween(pos.x - entity.getHalfBox2dWidth(), posCache.x,
+                                        pos.x + entity.getHalfBox2dWidth());
+            boolean by = Util.isBetween(pos.y - entity.getHalfBox2dHeight(), posCache.y,
+                                        pos.y + entity.getHalfBox2dHeight());
             if (bx && by) {
                 entities.add(entity);
             }
@@ -273,7 +273,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         this.filter = filter;
         if (body != null) {
             synchronized (WorldRender.BOX2D_LOCK) {
-                for (Fixture fixture : getBody().getFixtureList()) {
+                for (Fixture fixture : body.getFixtureList()) {
                     fixture.setFilterData(filter);
                 }
             }
@@ -282,12 +282,8 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
 
     @Override
     public void dispose() {
-        if (body != null) {
-            synchronized (WorldRender.BOX2D_LOCK) {
-                world.getBox2dWorld().destroyBody(body);
-            }
-            body = null;
-        }
+        world.getWorldBody().destroyBody(body);
+        body = null;
     }
 
     @Override

@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,22 +28,18 @@ public abstract class AirResistanceEntity extends Entity {
         super(world, worldX, worldY);
     }
 
-    private float getSpeed() {
-        return getBody().getLinearVelocity().len();
-    }
-
     @Override
     public void update() {
         super.update();
 
 
-        float speed = getSpeed();
+        float speed = getVelocity().len();
 
         float a = 1.0f;
         float cd = DRAG_COEFFICIENT_CUBE;
         float v = (float) Math.pow(speed, 2);
         float dragForce = 0.5f * FLUID_DENSITY_OF_AIR * v * cd * a;
-        float dragAngle = getBody().getLinearVelocity().angle();
+        float dragAngle = getVelocity().angle();
         Vector2 appliedDrag = new Vector2(dragForce, 0);
         appliedDrag.setAngle(dragAngle);
         appliedDrag.scl(-1);
@@ -54,7 +51,8 @@ public abstract class AirResistanceEntity extends Entity {
             return;
         }
 //        System.out.println("appliedDrag = " + appliedDrag);
-        getBody().applyForceToCenter(appliedDrag, true);
-
+        synchronized (WorldRender.BOX2D_LOCK) {
+            getBody().applyForceToCenter(appliedDrag, true);
+        }
     }
 }

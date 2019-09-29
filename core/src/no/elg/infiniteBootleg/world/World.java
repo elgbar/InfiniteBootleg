@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
@@ -23,7 +24,6 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
-import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +48,7 @@ public class World implements Disposable, Updatable, Resizable {
     public static final short GROUND_CATEGORY = 0x1;
     public static final short LIGHTS_CATEGORY = 0x2;
     public static final short ENTITY_CATEGORY = 0x4;
+    public static final short GROUND_ENTITY_CATEGORY = 0x8;
 
     public static final Filter BLOCK_ENTITY_FILTER;
     public static final Filter SOLID_TRANSPARENT_FILTER;
@@ -87,12 +88,12 @@ public class World implements Disposable, Updatable, Resizable {
     private final Map<Location, Chunk> chunks;
     private final WorldTicker ticker;
     private final ChunkLoader chunkLoader;
-    private final com.badlogic.gdx.physics.box2d.World box2dWorld;
     private FileHandle worldFile;
 
     //only exists when graphics exits
     private WorldInputHandler input;
     private WorldRender render;
+    private WorldBody worldBody;
 
     private Set<Entity> entities; //all entities in this world (inc players)
     private Set<Player> players; //all player in this world
@@ -123,10 +124,7 @@ public class World implements Disposable, Updatable, Resizable {
 
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
-
-        box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
-        box2dWorld.setContactListener(new ContactManager(this));
-
+        worldBody = new WorldBody(this);
 
         if (Main.renderGraphic) {
             render = new WorldRender(this);
@@ -708,10 +706,6 @@ public class World implements Disposable, Updatable, Resizable {
         }
     }
 
-    public com.badlogic.gdx.physics.box2d.World getBox2dWorld() {
-        return box2dWorld;
-    }
-
     public void updatePhysics() {
         if (dayTicking && getTick() % (WorldTicker.TICKS_PER_SECOND * 5) == 0) {
             if (time > MAX_DEG_SKYLIGHT) {
@@ -723,14 +717,18 @@ public class World implements Disposable, Updatable, Resizable {
             getRender().getSkylight().setDirection(++time);
         }
 
-        synchronized (WorldRender.BOX2D_LOCK) {
-            getBox2dWorld().step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 6, 2);
+        worldBody.update();
 
+        synchronized (WorldRender.BOX2D_LOCK) {
             if (Main.renderGraphic && WorldRender.lights) {
                 synchronized (WorldRender.LIGHT_LOCK) {
                     getRender().getRayHandler().update();
                 }
             }
         }
+    }
+
+    public WorldBody getWorldBody() {
+        return worldBody;
     }
 }
