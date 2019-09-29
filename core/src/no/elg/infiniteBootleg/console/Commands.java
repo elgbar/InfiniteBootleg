@@ -199,5 +199,17 @@ public class Commands extends CommandExecutor {
         logger.logf("Created an entity at (% 7.2f,% 7.2f) with width %d and height %d", worldX, worldY, width, height);
         new GenericEntity(Main.inst().getWorld(), worldX, worldY, width, height);
     }
+
+    @ConsoleDoc(description = "Kill all non-player entities")
+    public void killall(boolean players) {
+        World world = Main.inst().getWorld();
+        for (Entity entity : world.getEntities()) {
+            if (!(entity instanceof Player)) {
+                continue;
+            }
+            world.removeEntity(entity);
+        }
+
+    }
 }
 
