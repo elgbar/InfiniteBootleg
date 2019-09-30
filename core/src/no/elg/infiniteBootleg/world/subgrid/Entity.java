@@ -102,6 +102,22 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return !touchingEntities().isEmpty();
     }
 
+    public void teleport(float x, float y, boolean validate) {
+        synchronized (WorldRender.BOX2D_LOCK) {
+            body.setTransform(x, y, 0);
+            body.setAngularVelocity(0);
+            body.setLinearVelocity(0, 0);
+            body.setAwake(true);
+
+            if (validate && isInvalidSpawn()) {
+                Main.inst().getConsoleLogger().error("Entity", String
+                    .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), x, y,
+                            posCache.x, posCache.y));
+                body.setTransform(posCache, 0);
+            }
+        }
+    }
+
     /**
      * @return A list of all the blocks this entity is touching
      */
