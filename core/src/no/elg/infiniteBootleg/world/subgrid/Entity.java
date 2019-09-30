@@ -5,13 +5,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -57,7 +55,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
         }
 
-        if (isInvalidSpawn()) {
+        if (isInvalidLocation(posCache.x, posCache.y)) {
             Gdx.app.debug("Entity", //
                           String.format("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", //
                                         simpleName(), posCache.x, posCache.y));
@@ -90,44 +88,55 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     /**
-     * @return If the given location is invalid
+     * @param worldX
+     *     The x world coordinate to check
+     * @param worldY
+     *     The y world coordinate to check
+     *
+     * @return {@code true} if the entity is allowed to be at the given location
      */
-    protected boolean isInvalidSpawn() {
-        //noinspection LibGDXUnsafeIterator
-        for (Block block : touchingBlocks()) {
-            if (block.getMaterial() != Material.AIR) {
-                return true;
-            }
-        }
-        return !touchingEntities().isEmpty();
+    public boolean isInvalidLocation(float worldX, float worldY) {
+        return !wouldOnlyTouchAir(worldX, worldY) || !touchingEntities(worldX, worldY).isEmpty();
     }
 
-    public void teleport(float x, float y, boolean validate) {
+    public void teleport(float worldX, float worldY, boolean validate) {
+        if (validate && isInvalidLocation(worldX, worldY)) {
+            Main.inst().getConsoleLogger().error("Entity", String
+                .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX,
+                        worldY, posCache.x, posCache.y));
+            return;
+        }
+
         synchronized (WorldRender.BOX2D_LOCK) {
-            body.setTransform(x, y, 0);
+            body.setTransform(worldX, worldY, 0);
             body.setAngularVelocity(0);
             body.setLinearVelocity(0, 0);
             body.setAwake(true);
-
-            if (validate && isInvalidSpawn()) {
-                Main.inst().getConsoleLogger().error("Entity", String
-                    .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), x, y,
-                            posCache.x, posCache.y));
-                body.setTransform(posCache, 0);
-            }
         }
     }
 
     /**
-     * @return A list of all the blocks this entity is touching
+     * @return An unordered collection of all the blocks this entity is currently touching
      */
-    public Array<Block> touchingBlocks() {
-        Array<Block> blocks = new Array<>(Block.class);
-        int x = MathUtils.floor(posCache.x - getHalfBox2dWidth());
-        float maxX = posCache.x + getHalfBox2dWidth();
+    public ObjectSet<Block> touchingBlocks() {
+        return touchingBlocks(posCache.x, posCache.y);
+    }
+
+    /**
+     * @param worldX
+     *     World x coordinate to pretend the player is at
+     * @param worldY
+     *     World y coordinate to pretend the player is at
+     *
+     * @return An unordered collection of all the blocks this entity would be touching if it was located here
+     */
+    public ObjectSet<Block> touchingBlocks(float worldX, float worldY) {
+        ObjectSet<Block> blocks = new ObjectSet<>();
+        int x = MathUtils.floor(worldX - getHalfBox2dWidth());
+        float maxX = worldX + getHalfBox2dWidth();
         for (; x < maxX; x++) {
-            int y = MathUtils.floor(posCache.y - getHalfBox2dHeight());
-            float maxY = posCache.y + getHalfBox2dHeight();
+            int y = MathUtils.floor(worldY - getHalfBox2dHeight());
+            float maxY = worldY + getHalfBox2dHeight();
             for (; y < maxY; y++) {
                 blocks.add(world.getBlock(x, y));
             }
@@ -136,20 +145,57 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     /**
+     * @param worldX
+     *     World x coordinate to pretend the player is at
+     * @param worldY
+     *     World y coordinate to pretend the player is at
+     *
+     * @return {@code True} if the player would only touch air if stood at the given location
+     */
+    public boolean wouldOnlyTouchAir(float worldX, float worldY) {
+        int x = MathUtils.floor(worldX - getHalfBox2dWidth());
+        float maxX = worldX + getHalfBox2dWidth();
+        for (; x < maxX; x++) {
+            int y = MathUtils.floor(worldY - getHalfBox2dHeight());
+            float maxY = worldY + getHalfBox2dHeight();
+            for (; y < maxY; y++) {
+                if (!world.isAir(x, y)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * @return A set of all other entities (excluding this) this entity is touching
      */
     public ObjectSet<Entity> touchingEntities() {
+        return touchingEntities(posCache.x, posCache.y);
+    }
+
+    /**
+     * @param worldX
+     *     World x coordinate to pretend the player is at
+     * @param worldY
+     *     World y coordinate to pretend the player is at
+     *
+     * @return A set of all entites this entity would collide with if it was at the given location
+     */
+    public ObjectSet<Entity> touchingEntities(float worldX, float worldY) {
         ObjectSet<Entity> entities = new ObjectSet<>();
 
         for (Entity entity : world.getEntities()) {
+            //ignore entities we do not collide with and self
             if (entity == this || (getFilter().maskBits & entity.getFilter().categoryBits) == 0 ||
                 (entity.getFilter().maskBits & getFilter().categoryBits) == 0) {
                 continue;
             }
+
             Vector2 pos = entity.getPosition();
-            boolean bx = Util.isBetween(pos.x - entity.getHalfBox2dWidth(), posCache.x,
+            boolean bx = Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, //
                                         pos.x + entity.getHalfBox2dWidth());
-            boolean by = Util.isBetween(pos.y - entity.getHalfBox2dHeight(), posCache.y,
+            boolean by = Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY,
                                         pos.y + entity.getHalfBox2dHeight());
             if (bx && by) {
                 entities.add(entity);

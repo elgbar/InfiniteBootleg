@@ -45,11 +45,6 @@ public class GenericEntity extends Entity implements Removable {
     }
 
     @Override
-    protected boolean isInvalidSpawn() {
-        return false;
-    }
-
-    @Override
     public TextureRegion getTextureRegion() {
         return null;
     }
