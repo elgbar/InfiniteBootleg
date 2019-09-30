@@ -50,6 +50,7 @@ project(":desktop") {
 
     dependencies {
         compile project(":core")
+
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
@@ -76,12 +77,7 @@ project(":core") {
         compileOnly 'org.jetbrains:annotations:17.0.0'
 
         compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        testCompile "org.mockito:mockito-core:2.+"
+        compile "org.mockito:mockito-core:2.+"
         testCompile "junit:junit:4.12"
-//        testCompile "org.powermock:powermock-module-junit4:$powermockVersion"
-//        testCompile "org.powermock:powermock-api-mockito:$powermockVersion"
-
-        testCompile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        testCompile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     }
 }
