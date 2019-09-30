@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
@@ -234,5 +235,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     @Override
     public void resize(int width, int height) {
         rayHandler.resizeFBO(width / 4, height / 4);
+        Vector3 old = camera.position.cpy();
+        camera.setToOrtho(false, width, height);
+        camera.position.set(old);
+        update();
     }
 }

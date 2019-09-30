@@ -703,7 +703,6 @@ public class World implements Disposable, Ticking, Resizable {
     public void resize(int width, int height) {
         if (Main.renderGraphic) {
             render.resize(width, height);
-            input.resize(width, height);
         }
     }
 
