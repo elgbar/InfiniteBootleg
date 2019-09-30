@@ -17,6 +17,9 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
+import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -128,6 +131,9 @@ public class Main extends ApplicationAdapter {
 
         //noinspection ConstantConditions
         world.getInput().update();
+        for (LivingEntity entity : world.getLivingEntities()) {
+            entity.getControls().update();
+        }
         world.getRender().render();
 
         hud.render();
@@ -191,6 +197,16 @@ public class Main extends ApplicationAdapter {
     public static Main inst() {
         if (inst == null) { throw new IllegalStateException("Main instance not created"); }
         return inst;
+    }
+
+    @Nullable
+    public Player getPlayer() {
+        for (LivingEntity entity : world.getLivingEntities()) {
+            if (entity instanceof Player) {
+                return (Player) entity;
+            }
+        }
+        return null;
     }
 
     public World getWorld() {

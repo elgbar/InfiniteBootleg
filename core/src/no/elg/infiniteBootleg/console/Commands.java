@@ -89,7 +89,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Toggle flight for player")
     public void fly() {
-        Entity player = Main.inst().getWorld().getPlayers().iterator().next(); //assume this is the player
+        Entity player = Main.inst().getWorld().getLivingEntities().iterator().next(); //assume this is the player
         player.setFlying(!player.isFlying());
         logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") + "flying");
     }
@@ -186,7 +186,11 @@ public class Commands extends CommandExecutor {
     @HiddenCommand
     @ClientsideOnly
     public void paint() {
-        Player player = Main.inst().getWorld().getPlayers().iterator().next();
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("PLR", "Failed to find any players");
+            return;
+        }
         //noinspection LibGDXUnsafeIterator
         for (Block block : player.touchingBlocks()) {
             block.setBlock(Material.TORCH);

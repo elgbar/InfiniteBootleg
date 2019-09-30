@@ -45,7 +45,6 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         }
     }
 
-
     @Override
     public void log(LogLevel level, String msg) {
         scheduler.scheduleAsync(() -> Main.inst().getConsoleLogger().log(level, msg), 2);

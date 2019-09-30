@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
@@ -15,6 +14,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
@@ -58,6 +58,7 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         World world = main.getWorld();
         int h = Gdx.graphics.getHeight();
 
+        LivingEntity player = world.getLivingEntities().iterator().next();
         batch.begin();
         if (modus == HUDModus.DEBUG) {
             Block block = world.getRawBlock(main.getMouseBlockX(), main.getMouseBlockY());
@@ -68,7 +69,6 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                 vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
 
             Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
-            Entity player = world.getPlayers().iterator().next();
 
             String fps = String.format("FPS: %4d delta: %.5f", Gdx.graphics.getFramesPerSecond(),
                                        Gdx.graphics.getDeltaTime());
@@ -108,11 +108,10 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
             font.draw(batch, pos, 10, h - 90);
             font.draw(batch, ents.toString().trim(), 10, h - 110);
         }
-        //noinspection ConstantConditions
-        TextureRegion tr = world.getInput().getSelected().getTextureRegion();
-        if (tr != null) {
-            batch.draw(tr, Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3, BLOCK_SIZE * 2,
-                       BLOCK_SIZE * 2);
+        Material sel = player.getControls().getSelected();
+        if (sel != null && sel.getTextureRegion() != null) {
+            batch.draw(sel.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3,
+                       BLOCK_SIZE * 2, BLOCK_SIZE * 2);
         }
         batch.end();
     }

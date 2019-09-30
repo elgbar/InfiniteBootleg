@@ -1,10 +1,12 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
+import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.AirResistanceEntity;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LivingEntity extends AirResistanceEntity {
+public abstract class LivingEntity extends AirResistanceEntity implements Updatable {
 
     public static final int DEFAULT_HEALTH = 10;
     public static final String DEFAULT_NAME = "LivingEntity";
@@ -32,6 +34,17 @@ public abstract class LivingEntity extends AirResistanceEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public void update() {
+        getControls().update();
+    }
+
+    /**
+     * @return How this entity should be controlled
+     */
+    @NotNull
+    public abstract EntityControls getControls();
 
     @Override
     public String toString() {
