@@ -41,9 +41,6 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         batch = new SpriteBatch();
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
-        System.out.println("ubuntu+" + Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf").file()
-                                                .getAbsolutePath());
-
         final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
             Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
         final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();

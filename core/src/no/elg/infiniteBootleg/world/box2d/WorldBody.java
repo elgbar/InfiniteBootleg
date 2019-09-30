@@ -1,10 +1,8 @@
 package no.elg.infiniteBootleg.world.box2d;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.WorldTicker;
 import no.elg.infiniteBootleg.world.render.Updatable;
@@ -20,38 +18,18 @@ import org.jetbrains.annotations.Nullable;
  */
 public class WorldBody implements Updatable {
 
-    private final World world;
     private final com.badlogic.gdx.physics.box2d.World box2dWorld;
 
-    long lastFrame = -1;
-    int createdCurrFrame = 0;
-    int destroyedCurrFrame = 0;
-
-    public WorldBody(World world) {
-        this.world = world;
-
+    public WorldBody(@NotNull World world) {
         synchronized (WorldRender.BOX2D_LOCK) {
             box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
             box2dWorld.setContactListener(new ContactManager(world));
         }
     }
 
-    private void checkFrame() {
-        if (lastFrame != Gdx.graphics.getFrameId()) {
-            Main.inst().getConsoleLogger().debug("B2", String
-                .format("Created %2d and destroyed %2d bodies on frame %d", createdCurrFrame, destroyedCurrFrame,
-                        lastFrame));
-            lastFrame = Gdx.graphics.getFrameId();
-            createdCurrFrame = 0;
-            destroyedCurrFrame = 0;
-        }
-    }
-
     @NotNull
     public Body createBody(@NotNull BodyDef def) {
         synchronized (WorldRender.BOX2D_LOCK) {
-            checkFrame();
-            createdCurrFrame++;
             return box2dWorld.createBody(def);
         }
     }
@@ -61,8 +39,6 @@ public class WorldBody implements Updatable {
             return;
         }
         synchronized (WorldRender.BOX2D_LOCK) {
-            checkFrame();
-            destroyedCurrFrame++;
             box2dWorld.destroyBody(body);
         }
     }
