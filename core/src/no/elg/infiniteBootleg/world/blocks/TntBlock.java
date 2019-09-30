@@ -53,11 +53,14 @@ public class TntBlock extends UpdatableBlock {
         strength = EXPLOSION_STRENGTH;
     }
 
+    @Override
+    public boolean shouldUpdate() {
+        return !exploded;
+    }
 
     @Override
     public void tick() {
         if (exploded) { return; }
-        setUpdate(true); //continue to update this block till it explodes
         if (tickLeft <= 0) {
             exploded = true;
             Main.inst().getScheduler().executeAsync(() -> {
