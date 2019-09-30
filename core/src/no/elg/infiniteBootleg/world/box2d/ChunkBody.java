@@ -28,7 +28,6 @@ public class ChunkBody implements Disposable {
     //make there is only one delayed check for this chunk
     private boolean unsureFixture;
 
-
     private final static Tuple<Direction, byte[]>[] EDGE_DEF;
 
     static {
@@ -67,8 +66,10 @@ public class ChunkBody implements Disposable {
      */
     public void updateFixture(boolean recalculateNeighbors) {
         if (chunk.isAllAir()) {
-            chunk.getWorld().getWorldBody().destroyBody(box2dBody);
-            box2dBody = null;
+            synchronized (this) {
+                chunk.getWorld().getWorldBody().destroyBody(box2dBody);
+                box2dBody = null;
+            }
             return;
         }
 
@@ -82,49 +83,47 @@ public class ChunkBody implements Disposable {
         Body tmpBody = chunk.getWorld().getWorldBody().createBody(bodyDef);
 
         EdgeShape edgeShape = new EdgeShape();
-//        synchronized (WorldRender.BOX2D_LOCK) {
-        synchronized (this) {
-            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                    @NotNull Block b = chunk.getRawBlock(localX, localY);
 
-                    if (b == null || !b.getMaterial().isSolid()) {
+        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+            for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                @NotNull Block b = chunk.getRawBlock(localX, localY);
+
+                if (b == null || !b.getMaterial().isSolid()) {
+                    continue;
+                }
+
+                int worldX = CoordUtil.chunkToWorld(chunk.getChunkX(), localX);
+                int worldY = CoordUtil.chunkToWorld(chunk.getChunkY(), localY);
+
+                for (Tuple<Direction, byte[]> tuple : EDGE_DEF) {
+                    Direction dir = tuple.key;
+
+                    //FIXME only check the chunk if the local coordinates are outside this chunk
+                    if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && //
+                        !chunk.getWorld().isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx),
+                                                        CoordUtil.worldToChunk(worldY + dir.dy))) {
                         continue;
                     }
 
-                    int worldX = CoordUtil.chunkToWorld(chunk.getChunkX(), localX);
-                    int worldY = CoordUtil.chunkToWorld(chunk.getChunkY(), localY);
+                    Block rel;
+                    if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
+                        rel = chunk.getRawBlock(localX + dir.dx, localY + dir.dy);
+                    }
+                    else {
+                        Chunk relChunk = chunk.getWorld().getChunkFromWorld(worldX + dir.dx, worldY + dir.dy);
+                        int relOffsetX = CoordUtil.chunkOffset(worldX + dir.dx);
+                        int relOffsetY = CoordUtil.chunkOffset(worldY + dir.dy);
+                        rel = relChunk.getBlocks()[relOffsetX][relOffsetY];
+                    }
+                    if (rel == null || !rel.getMaterial().isSolid() ||
+                        (dir == Direction.NORTH && localY == CHUNK_SIZE - 1)) {
+                        byte[] ds = tuple.value;
+                        edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
 
-                    for (Tuple<Direction, byte[]> tuple : EDGE_DEF) {
-                        Direction dir = tuple.key;
-
-                        //FIXME only check the chunk if the local coordinates are outside this chunk
-                        if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && //
-                            !chunk.getWorld().isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx),
-                                                            CoordUtil.worldToChunk(worldY + dir.dy))) {
-                            continue;
-                        }
-
-                        Block rel;
-                        if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
-                            rel = chunk.getRawBlock(localX + dir.dx, localY + dir.dy);
-                        }
-                        else {
-                            Chunk relChunk = chunk.getWorld().getChunkFromWorld(worldX + dir.dx, worldY + dir.dy);
-                            int relOffsetX = CoordUtil.chunkOffset(worldX + dir.dx);
-                            int relOffsetY = CoordUtil.chunkOffset(worldY + dir.dy);
-                            rel = relChunk.getBlocks()[relOffsetX][relOffsetY];
-                        }
-                        if (rel == null || !rel.getMaterial().isSolid() ||
-                            (dir == Direction.NORTH && localY == CHUNK_SIZE - 1)) {
-                            byte[] ds = tuple.value;
-                            edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
-
-                            synchronized (WorldRender.BOX2D_LOCK) {
-                                Fixture fix = tmpBody.createFixture(edgeShape, 0);
-                                if (!b.getMaterial().blocksLight()) {
-                                    fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
-                                }
+                        synchronized (WorldRender.BOX2D_LOCK) {
+                            Fixture fix = tmpBody.createFixture(edgeShape, 0);
+                            if (!b.getMaterial().blocksLight()) {
+                                fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
                             }
                         }
                     }
@@ -133,8 +132,10 @@ public class ChunkBody implements Disposable {
         }
         edgeShape.dispose();
 
-        chunk.getWorld().getWorldBody().destroyBody(box2dBody);
-        box2dBody = tmpBody;
+        synchronized (this) {
+            chunk.getWorld().getWorldBody().destroyBody(box2dBody);
+            box2dBody = tmpBody;
+        }
 
         Gdx.app.postRunnable(() -> chunk.getWorld().getRender().update());
 
@@ -165,7 +166,7 @@ public class ChunkBody implements Disposable {
             return;
         }
         unsureFixture = true;
-        Main.inst().getScheduler().scheduleSync(() -> {
+        Main.inst().getScheduler().scheduleAsync(() -> {
             unsureFixture = false;
             if (chunk.isNeighborsLoaded()) {
                 updateFixture(false);
@@ -177,10 +178,8 @@ public class ChunkBody implements Disposable {
     }
 
     @Override
-    public void dispose() {
-        if (box2dBody != null) {
-            chunk.getWorld().getWorldBody().destroyBody(box2dBody);
-            box2dBody = null;
-        }
+    public synchronized void dispose() {
+        chunk.getWorld().getWorldBody().destroyBody(box2dBody);
+        box2dBody = null;
     }
 }
