@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
-import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Elg
  */
-public class World implements Disposable, Updatable, Resizable {
+public class World implements Disposable, Ticking, Resizable {
 
     public static final short GROUND_CATEGORY = 0x1;
     public static final short LIGHTS_CATEGORY = 0x2;
@@ -555,18 +555,17 @@ public class World implements Disposable, Updatable, Resizable {
     }
 
     @Override
-    public void updateRare() {
+    public void tickRare() {
         for (Chunk chunk : chunks.values()) {
-            chunk.updateRare();
+            chunk.tickRare();
         }
         for (Entity entity : entities) {
-            entity.updateRare();
+            entity.tickRare();
         }
-        getRender().updateRare();
     }
 
     @Override
-    public void update() {
+    public void tick() {
 
         updatePhysics();
 
@@ -586,11 +585,11 @@ public class World implements Disposable, Updatable, Resizable {
                 iterator.remove();
                 continue;
             }
-            chunk.update();
+            chunk.tick();
         }
         //noinspection LibGDXUnsafeIterator
         for (Entity entity : entities) {
-            entity.update();
+            entity.tick();
         }
     }
 

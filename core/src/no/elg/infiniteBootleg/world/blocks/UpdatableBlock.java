@@ -4,10 +4,10 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class UpdatableBlock extends Block implements Updatable {
+public abstract class UpdatableBlock extends Block implements Ticking {
 
     private boolean update;
 
@@ -21,14 +21,14 @@ public abstract class UpdatableBlock extends Block implements Updatable {
      * @param rare
      *     If the the rare update should be called instead of the normal update
      */
-    public void tryUpdate(boolean rare) {
+    public void tryTick(boolean rare) {
         if (shouldUpdate()) {
             update = false;
             if (rare) {
-                updateRare();
+                tickRare();
             }
             else {
-                update();
+                tick();
             }
         }
     }

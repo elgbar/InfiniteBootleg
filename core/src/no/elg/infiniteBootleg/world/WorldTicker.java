@@ -5,7 +5,7 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.utils.PauseableThread;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -53,9 +53,9 @@ public class WorldTicker implements Runnable {
 //                                System.out.println("Saving world " + world.getName() + " (" + world.getUuid() + ")");
 //                                Gdx.app.postRunnable(world::save);
 //                            }
-                Gdx.app.postRunnable(world::update);
-                if (tickId % Updatable.UPDATE_RARE_RATE == 0) {
-                    Gdx.app.postRunnable(world::updateRare);
+                Gdx.app.postRunnable(world::tick);
+                if (tickId % Ticking.TICK_RARE_RATE == 0) {
+                    Gdx.app.postRunnable(world::tickRare);
                 }
                 tickId++;
                 stuckFrames = 0;
@@ -83,7 +83,7 @@ public class WorldTicker implements Runnable {
     }
 
     /**
-     * Stop this world ticker, world's {@link World#update()} method will no longer be called
+     * Stop this world ticker, world's {@link World#tick()} method will no longer be called
      */
     public void stop() {
         worldTickThread.stopThread();

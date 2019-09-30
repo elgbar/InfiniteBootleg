@@ -39,7 +39,7 @@ public class FallingBlock extends Entity {
     }
 
     @Override
-    public void updateRare() {
+    public void tickRare() {
         //Unload this entity if it entered an unloaded chunk
         //TODO do not _remove_ this entity, just save it to the unloaded chunk
         int chunkX = CoordUtil.worldToChunk(getBlockX());

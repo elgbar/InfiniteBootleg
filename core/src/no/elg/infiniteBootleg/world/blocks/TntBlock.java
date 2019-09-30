@@ -55,7 +55,7 @@ public class TntBlock extends UpdatableBlock {
 
 
     @Override
-    public void update() {
+    public void tick() {
         if (exploded) { return; }
         setUpdate(true); //continue to update this block till it explodes
         if (tickLeft <= 0) {

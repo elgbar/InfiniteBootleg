@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
@@ -27,7 +27,7 @@ import java.util.UUID;
  * <p>
  * The position of each entity is recorded in world coordinates and is centered in the middle of the entity.
  */
-public abstract class Entity implements Updatable, Disposable, ContactHandler {
+public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     private static final float GROUND_CHECK_OFFSET = 0.25f;
 
@@ -50,7 +50,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
         flying = false;
         world.addEntity(this);
         posCache = new Vector2(worldX, worldY);
-        velCache = Vector2.Zero;
+        velCache = new Vector2();
         filter = World.ENTITY_FILTER;
 
         if (center) {
@@ -70,8 +70,6 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
             body = world.getWorldBody().createBody(def);
             createFixture(body);
         }
-
-        update();
     }
 
     @NotNull
@@ -175,7 +173,7 @@ public abstract class Entity implements Updatable, Disposable, ContactHandler {
     }
 
     @Override
-    public void update() {
+    public void tick() {
         if (Main.renderGraphic) {
             updatePos();
         }

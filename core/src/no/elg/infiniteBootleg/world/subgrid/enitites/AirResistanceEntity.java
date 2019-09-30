@@ -29,9 +29,8 @@ public abstract class AirResistanceEntity extends Entity {
     }
 
     @Override
-    public void update() {
-        super.update();
-
+    public void tick() {
+        super.tick();
 
         float speed = getVelocity().len();
 

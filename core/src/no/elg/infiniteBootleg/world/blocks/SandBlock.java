@@ -13,7 +13,7 @@ public class SandBlock extends UpdatableBlock {
     }
 
     @Override
-    public void update() {
+    public void tick() {
         Location south = Location.relative(getWorldX(), getWorldY(), Direction.SOUTH);
         if (getWorld().isAir(south)) {
             Gdx.app.postRunnable(() -> {

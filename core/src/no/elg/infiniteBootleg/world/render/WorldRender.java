@@ -94,9 +94,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     }
 
     @Override
-    public void updateRare() {}
-
-    @Override
     public void update() {
         camera.update();
         batch.setProjectionMatrix(camera.combined);

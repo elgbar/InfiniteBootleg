@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
-import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
  *
  * @author Elg
  */
-public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
+public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
     public static final int CHUNK_SIZE = 32;
     public final static int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
@@ -248,9 +248,6 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
                 synchronized (updatableBlocks) {
                     updatableBlocks.add((UpdatableBlock) block);
                 }
-                if (update) {
-                    ((UpdatableBlock) block).update();
-                }
             }
         }
 
@@ -310,19 +307,19 @@ public class Chunk implements Iterable<Block>, Updatable, Disposable, Binembly {
      * Update all updatable blocks in this chunk
      */
     @Override
-    public void update() {
+    public void tick() {
         synchronized (updatableBlocks) {
             for (UpdatableBlock block : updatableBlocks) {
-                block.tryUpdate(false);
+                block.tryTick(false);
             }
         }
     }
 
     @Override
-    public void updateRare() {
+    public void tickRare() {
         synchronized (updatableBlocks) {
             for (UpdatableBlock block : updatableBlocks) {
-                block.tryUpdate(true);
+                block.tryTick(true);
             }
         }
     }

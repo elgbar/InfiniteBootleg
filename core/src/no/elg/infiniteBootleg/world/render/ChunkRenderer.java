@@ -52,14 +52,15 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
 
-        chunk.getChunkBody().updateFixture(true);
+        final Chunk finalChunk = chunk;
+        Main.inst().getScheduler().executeAsync(() -> finalChunk.getChunkBody().updateFixture(true));
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
         fbo.begin();
         batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        synchronized (chunk) {
+        synchronized (finalChunk) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     Block block = blocks[x][y];
