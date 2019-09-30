@@ -7,12 +7,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
@@ -32,23 +35,28 @@ public class ChunkRenderer implements Renderer, Disposable {
         this.worldRender = worldRender;
         batch = new SpriteBatch();
         //use linked list for fast adding to end and beginning
-        renderQueue = SetUniqueList.setUniqueList(new LinkedList<>());
+        List<Chunk> chunkList = Collections.synchronizedList(new LinkedList<>());
+        renderQueue = SetUniqueList.setUniqueList(chunkList);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
     }
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
-        if (prioritize) { renderQueue.add(0, chunk); }
-        else { renderQueue.add(chunk); }
+        synchronized (renderQueue) {
+            if (prioritize) { renderQueue.add(0, chunk); }
+            else { renderQueue.add(chunk); }
+        }
     }
 
     @Override
     public void render() {
         //get the first valid chunk to render
         Chunk chunk;
-        do {
-            if (renderQueue.isEmpty()) { return; } //nothing to render
-            chunk = renderQueue.remove(0);
-        } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
+        synchronized (renderQueue) {
+            do {
+                if (renderQueue.isEmpty()) { return; } //nothing to render
+                chunk = renderQueue.remove(0);
+            } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
+        }
 
         FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
 
