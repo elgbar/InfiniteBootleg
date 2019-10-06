@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.WorldTicker;
-import no.elg.infiniteBootleg.world.render.Updatable;
+import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class WorldBody implements Updatable {
+public class WorldBody implements Ticking {
 
     private final com.badlogic.gdx.physics.box2d.World box2dWorld;
 
@@ -43,8 +43,9 @@ public class WorldBody implements Updatable {
         }
     }
 
+
     @Override
-    public void update() {
+    public void tick() {
         synchronized (WorldRender.BOX2D_LOCK) {
             box2dWorld.step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 8, 3);
         }

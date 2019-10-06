@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
@@ -127,6 +128,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
+        worldBody = new WorldBody(this);
 
         if (Main.renderGraphic) {
             render = new WorldRender(this);
@@ -137,7 +139,7 @@ public class World implements Disposable, Ticking, Resizable {
         else {
             render = new HeadlessWorldRenderer(this);
         }
-        worldBody = new WorldBody(this);
+
         load();
     }
 
@@ -558,6 +560,18 @@ public class World implements Disposable, Ticking, Resizable {
 
     @Override
     public void tickRare() {
+
+        //update light direction
+        if (dayTicking) {
+            if (time > MAX_DEG_SKYLIGHT) {
+                time = MIN_DEG_SKYLIGHT;
+            }
+            else if (time < MIN_DEG_SKYLIGHT) {
+                time = MIN_DEG_SKYLIGHT;
+            }
+            getRender().getSkylight().setDirection(++time);
+        }
+
         for (Chunk chunk : chunks.values()) {
             chunk.tickRare();
         }
@@ -568,9 +582,19 @@ public class World implements Disposable, Ticking, Resizable {
 
     @Override
     public void tick() {
+        //tick all box2d elements
+        worldBody.tick();
 
-        updatePhysics();
+        //update lights
+        synchronized (WorldRender.BOX2D_LOCK) {
+            if (Main.renderGraphic && WorldRender.lights) {
+                synchronized (WorldRender.LIGHT_LOCK) {
+                    getRender().getRayHandler().update();
+                }
+            }
+        }
 
+        //tick all chunks and blocks in chunks
         long tick = getWorldTicker().getTickId();
         for (Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
             Chunk chunk = iterator.next();
@@ -589,6 +613,8 @@ public class World implements Disposable, Ticking, Resizable {
             }
             chunk.tick();
         }
+
+        //tick all entities
         for (Entity entity : entities) {
             entity.tick();
         }
@@ -664,7 +690,6 @@ public class World implements Disposable, Ticking, Resizable {
     public Material getMaterial(int worldX, int worldY) {
         Block block = getRawBlock(worldX, worldY);
         if (block == null) {
-            //noinspection LibGDXUnsafeIterator
             for (Entity entity : getEntities(worldX, worldY)) {
                 if (entity instanceof MaterialEntity) {
                     return ((MaterialEntity) entity).getMaterial();
@@ -702,28 +727,6 @@ public class World implements Disposable, Ticking, Resizable {
     public void resize(int width, int height) {
         if (Main.renderGraphic) {
             render.resize(width, height);
-        }
-    }
-
-    public void updatePhysics() {
-        if (dayTicking && getTick() % (WorldTicker.TICKS_PER_SECOND * 5) == 0) {
-            if (time > MAX_DEG_SKYLIGHT) {
-                time = MIN_DEG_SKYLIGHT;
-            }
-            else if (time < MIN_DEG_SKYLIGHT) {
-                time = MIN_DEG_SKYLIGHT;
-            }
-            getRender().getSkylight().setDirection(++time);
-        }
-
-        worldBody.update();
-
-        synchronized (WorldRender.BOX2D_LOCK) {
-            if (Main.renderGraphic && WorldRender.lights) {
-                synchronized (WorldRender.LIGHT_LOCK) {
-                    getRender().getRayHandler().update();
-                }
-            }
         }
     }
 
