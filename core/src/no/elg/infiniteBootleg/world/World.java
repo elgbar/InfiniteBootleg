@@ -94,7 +94,8 @@ public class World implements Disposable, Ticking, Resizable {
     //only exists when graphics exits
     private WorldInputHandler input;
     private WorldRender render;
-    private WorldBody worldBody;
+    @NotNull
+    private final WorldBody worldBody;
 
     private Set<Entity> entities; //all entities in this world (including living entities)
     private Set<LivingEntity> livingEntities; //all player in this world
@@ -126,7 +127,6 @@ public class World implements Disposable, Ticking, Resizable {
 
         chunkLoader = new ChunkLoader(this, generator);
         ticker = new WorldTicker(this);
-        worldBody = new WorldBody(this);
 
         if (Main.renderGraphic) {
             render = new WorldRender(this);
@@ -137,6 +137,7 @@ public class World implements Disposable, Ticking, Resizable {
         else {
             render = new HeadlessWorldRenderer(this);
         }
+        worldBody = new WorldBody(this);
         load();
     }
 
@@ -318,7 +319,6 @@ public class World implements Disposable, Ticking, Resizable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         chunk.setBlock(localX, localY, (Block) null, update);
-        //noinspection LibGDXUnsafeIterator
         for (Entity entity : getEntities(worldX, worldY)) {
             if (entity instanceof Removable) {
                 ((Removable) entity).onRemove();
@@ -589,7 +589,6 @@ public class World implements Disposable, Ticking, Resizable {
             }
             chunk.tick();
         }
-        //noinspection LibGDXUnsafeIterator
         for (Entity entity : entities) {
             entity.tick();
         }
@@ -728,6 +727,7 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    @NotNull
     public WorldBody getWorldBody() {
         return worldBody;
     }

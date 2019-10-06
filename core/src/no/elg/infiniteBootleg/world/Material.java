@@ -69,8 +69,8 @@ public enum Material {
                                             name() + " does not have " + Block.class.getSimpleName() +
                                             " as a super class");
                 try {
-                    constructor =
-                        impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
+                    constructor = impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class,
+                                                              Material.class);
 
                 } catch (NoSuchMethodException e) {
                     throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() +
@@ -139,7 +139,9 @@ public enum Material {
         try {
             return (MaterialEntity) constructor.newInstance(world, worldX, worldY);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(String.format(
+                "Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX,
+                worldY), e);
         }
     }
 

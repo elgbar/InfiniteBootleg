@@ -55,12 +55,18 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
         }
 
-        if (isInvalidLocation(posCache.x, posCache.y)) {
-            Gdx.app.debug("Entity", //
-                          String.format("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", //
-                                        simpleName(), posCache.x, posCache.y));
-            world.removeEntity(this);
-            return;
+        //teleport entity upwards till we find a valid location
+        boolean print = true;
+        //make sure we're not stuck in a infinite loop if the given height is zero
+        float checkStep = getHalfBox2dHeight() != 0 ? getHalfBox2dHeight() : 0.1f;
+        while (isInvalidLocation(posCache.x, posCache.y)) {
+            if (print) {
+                Gdx.app.debug("Entity", //
+                              String.format("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", //
+                                            simpleName(), posCache.x, posCache.y));
+                print = false;
+            }
+            posCache.y += checkStep;
         }
 
         synchronized (WorldRender.BOX2D_LOCK) {
@@ -112,6 +118,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             body.setAngularVelocity(0);
             body.setLinearVelocity(0, 0);
             body.setAwake(true);
+            posCache.x = worldX;
+            posCache.y = worldY;
         }
     }
 
@@ -193,9 +201,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             }
 
             Vector2 pos = entity.getPosition();
-            boolean bx = Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, //
+            //exclude equality of lower bond
+            boolean bx = Util.isBetween((pos.x + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dWidth(), worldX,
                                         pos.x + entity.getHalfBox2dWidth());
-            boolean by = Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY,
+            boolean by = Util.isBetween((pos.y + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dHeight(), worldY,
                                         pos.y + entity.getHalfBox2dHeight());
             if (bx && by) {
                 entities.add(entity);
@@ -269,20 +278,32 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return getHeight() / (Block.BLOCK_SIZE * 2f);
     }
 
+    /**
+     * @return Position of this entity last tick, changing this have no impact of the body of this entity
+     */
     @NotNull
     public Vector2 getPosition() {
-        return posCache;
+        return posCache.cpy();
     }
 
+    /**
+     * @return Velocity of this entity last tick, changing this have no impact of the body of this entity
+     */
     @NotNull
     public Vector2 getVelocity() {
-        return velCache;
+        return velCache.cpy();
     }
 
+    /**
+     * @return Block x-coordinate of this entity
+     */
     public int getBlockX() {
         return MathUtils.floor(posCache.x);
     }
 
+    /**
+     * @return Block y-coordinate of this entity
+     */
     public int getBlockY() {
         return MathUtils.floor(posCache.y);
     }
@@ -329,6 +350,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return filter;
     }
 
+    /**
+     * Set the type of filter for this entities fixtures
+     *
+     * @param filter
+     *     The type of filter to set
+     */
     public void setFilter(Filter filter) {
         this.filter = filter;
         if (body != null) {
