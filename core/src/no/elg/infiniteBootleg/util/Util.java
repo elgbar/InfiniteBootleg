@@ -73,6 +73,16 @@ public class Util {
         else { return val.compareTo(max) < 0; }
     }
 
+    /**
+     * @param min
+     *     The minimum value to check (inclusive)
+     * @param val
+     *     The value to verify is between {@code min} and {@code max}
+     * @param max
+     *     The maximum value to check (exclusive)
+     *
+     * @return if {@code val} is between {@code min} (inclusive) and {@code max} (exclusive)
+     */
     public static boolean isBetween(float min, float val, float max) {
         return val >= min && val < max;
     }

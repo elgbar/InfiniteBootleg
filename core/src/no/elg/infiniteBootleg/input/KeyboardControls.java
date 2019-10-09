@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -25,6 +26,7 @@ public class KeyboardControls extends AbstractEntityControls {
     private Material selected;
     //if objects can be placed on non-air blocks
     public boolean replacePlacement = false;
+    private float brushSize = 1;
 
     public KeyboardControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
         super(worldRender, entity);
@@ -40,16 +42,34 @@ public class KeyboardControls extends AbstractEntityControls {
         boolean update = false;
         int blockX = Main.inst().getMouseBlockX();
         int blockY = Main.inst().getMouseBlockY();
+
+        float rawX = Main.inst().getMouseX();
+        float rawY = Main.inst().getMouseY();
         World world = getWorldRender().getWorld();
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            world.remove(blockX, blockY, true);
+
+            if (brushSize <= 1) {
+                world.remove(blockX, blockY, true);
+            }
+            else {
+                for (Block block : world.getBlocksWithin(rawX, rawY, brushSize, true)) {
+                    world.remove(block.getWorldX(), block.getWorldY(), true);
+                }
+            }
             update = true;
         }
         else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Q)) {
 
             if (replacePlacement || world.isAir(blockX, blockY)) {
-                selected.create(world, blockX, blockY);
+                if (brushSize <= 1) {
+                    selected.create(world, blockX, blockY);
+                }
+                else {
+                    for (Block block : world.getBlocksWithin(rawX, rawY, brushSize, true)) {
+                        selected.create(world, block.getWorldX(), block.getWorldY());
+                    }
+                }
                 update = true;
             }
         }
@@ -161,5 +181,15 @@ public class KeyboardControls extends AbstractEntityControls {
     @Override
     public void setSelected(@Nullable Material selected) {
         this.selected = selected;
+    }
+
+    @Override
+    public float getBrushSize() {
+        return brushSize;
+    }
+
+    @Override
+    public void setBrushSize(float brushSize) {
+        this.brushSize = brushSize;
     }
 }

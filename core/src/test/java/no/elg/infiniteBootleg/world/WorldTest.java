@@ -137,7 +137,6 @@ public class WorldTest extends TestGraphic {
             Spliterators.spliteratorUnknownSize(blocks.iterator(), Spliterator.ORDERED), false).map(
             block -> new Location(block.getWorldX(), block.getWorldY())).collect(Collectors.toSet());
 
-
         Set<Block> expected = new HashSet<>();
         expected.add(world.getBlock(0, 0, false));
         for (Direction dir : Direction.CARDINAL) {

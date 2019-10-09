@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface EntityControls extends InputProcessor, Updatable, Disposable {
 
+
     /**
      * @return The living entity to control
      */
@@ -28,4 +29,8 @@ public interface EntityControls extends InputProcessor, Updatable, Disposable {
      *     The new selected material
      */
     void setSelected(@Nullable Material selected);
+
+    float getBrushSize();
+
+    void setBrushSize(float brushSize);
 }

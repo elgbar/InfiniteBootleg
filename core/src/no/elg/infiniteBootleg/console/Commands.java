@@ -191,7 +191,6 @@ public class Commands extends CommandExecutor {
             logger.error("PLR", "Failed to find any players");
             return;
         }
-        //noinspection LibGDXUnsafeIterator
         for (Block block : player.touchingBlocks()) {
             block.setBlock(Material.TORCH);
         }
@@ -213,7 +212,18 @@ public class Commands extends CommandExecutor {
             }
             world.removeEntity(entity);
         }
+    }
 
+    @ClientsideOnly
+    @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = "New brush size, positive integer")
+    public void brush(float size) {
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("PLR", "Failed to find any players");
+            return;
+        }
+        Main.inst().getPlayer().getControls().setBrushSize(size);
+        logger.log(LogLevel.SUCCESS, "Brush size for player is now " + size);
     }
 }
 
