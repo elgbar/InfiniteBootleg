@@ -83,4 +83,69 @@ public class WorldTest extends TestGraphic {
         world.getChunk(-2, 5).setBlock(2, 11, Material.STONE);
         assertEquals(Material.STONE, world.getBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11, false).getMaterial());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void BlockWithinNegativeRadiusFails() {
+        world.getBlocksWithin(0, 0, -1, false);
+    }
+
+    @Test
+    public void BlockAtOriginWithZeroRadiusReturnsEmptySet() {
+        ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 0, false);
+        assertTrue(blocks.isEmpty());
+    }
+
+    @Test
+    public void BlockAtBlockOriginWithZeroRadiusReturnsOriginBlock() {
+        ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 0, false);
+        ObjectSet<Block> expected = new ObjectSet<>();
+        expected.add(world.getBlock(0, 0, false));
+        assertEquals(expected, blocks);
+    }
+
+    @Test
+    public void BlockWithinOneReturnsGivenCoords() {
+        ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 1, false);
+
+        ObjectSet<Block> expected = new ObjectSet<>();
+        expected.add(world.getBlock(0, 0, false));
+        expected.add(world.getBlock(-1, 0, false));
+        expected.add(world.getBlock(0, -1, false));
+        expected.add(world.getBlock(-1, -1, false));
+
+        assertEquals(expected, blocks);
+    }
+
+    @Test
+    public void BlockWithin1_5ReturnsGivenCoords() {
+        ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1.5f, false);
+
+        ObjectSet<Block> expected = new ObjectSet<>();
+        expected.add(world.getBlock(0, 0, false));
+        for (Direction dir : Direction.values()) {
+            expected.add(world.getBlock(dir.dx, dir.dy, false));
+        }
+
+        assertEquals(expected, blocks);
+    }
+
+    @Test
+    public void BlockWithinOneOffsetPoint5() {
+        ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1, false);
+        //convert set to the locations of the blocks
+        Set<Location> bal = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(blocks.iterator(), Spliterator.ORDERED), false).map(
+            block -> new Location(block.getWorldX(), block.getWorldY())).collect(Collectors.toSet());
+
+
+        Set<Block> expected = new HashSet<>();
+        expected.add(world.getBlock(0, 0, false));
+        for (Direction dir : Direction.CARDINAL) {
+            expected.add(world.getBlock(dir.dx, dir.dy, false));
+        }
+        Set<Location> larr = expected.stream().map(block -> new Location(block.getWorldX(), block.getWorldY())).collect(
+            Collectors.toSet());
+
+        assertEquals(larr, bal);
+    }
 }

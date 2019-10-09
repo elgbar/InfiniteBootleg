@@ -632,6 +632,52 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    public ObjectSet<Block> getBlocksAABB(float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
+        ObjectSet<Block> blocks = new ObjectSet<>();
+        int x = MathUtils.floor(worldX - offsetX);
+        float maxX = worldX + offsetX;
+        for (; x <= maxX; x++) {
+            int y = MathUtils.floor(worldY - offsetY);
+            float maxY = worldY + offsetY;
+            for (; y <= maxY; y++) {
+                Block b = getBlock(x, y, raw);
+                if (b == null) {
+                    continue;
+                }
+                blocks.add(b);
+            }
+        }
+        return blocks;
+    }
+
+    /**
+     * @param worldX
+     *     X center (center of each block
+     * @param worldY
+     *     Y center
+     * @param radius
+     *     Radius to be equal or less from center
+     * @param raw
+     *     If blocks should be generated, if false this will return no null blocks
+     *
+     * @return Set of blocks within the given radius
+     */
+    @NotNull
+    public ObjectSet<Block> getBlocksWithin(float worldX, float worldY, float radius, boolean raw) {
+        Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number");
+        ObjectSet<Block> blocks = new ObjectSet<>();
+        float radiusSquare = radius * radius;
+        for (Block block : getBlocksAABB(worldX, worldY, radius, radius, raw)) {
+            if (Math.abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f)) <=
+                radiusSquare) {
+                blocks.add(block);
+            }
+        }
+
+        return blocks;
+    }
+
+
     /**
      * @param worldX
      *     The x coordinate in world view
