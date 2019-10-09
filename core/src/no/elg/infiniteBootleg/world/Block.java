@@ -91,11 +91,11 @@ public class Block implements Binembly, Disposable {
      *
      * @return The relative block in the given location
      *
-     * @see World#getBlock(int, int)
+     * @see World#getBlock(int, int, boolean)
      */
     @NotNull
     public Block getRelative(@NotNull Direction dir) {
-        return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy);
+        return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
     }
 
     /**
@@ -104,7 +104,7 @@ public class Block implements Binembly, Disposable {
      *
      * @return The relative raw block in the given location
      *
-     * @see World#getRawBlock(int, int)
+     * @see World#getBlock(int, int, boolean)
      */
     @Nullable
     public Block getRawRelative(@NotNull Direction dir) {
@@ -114,7 +114,7 @@ public class Block implements Binembly, Disposable {
             CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
             return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
         }
-        return world.getRawBlock(newWorldX, newWorldY);
+        return world.getBlock(newWorldX, newWorldY, true);
     }
 
     public Block setBlock(@NotNull Material material) {

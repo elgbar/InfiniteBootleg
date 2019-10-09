@@ -69,7 +69,7 @@ public class TntBlock extends UpdatableBlock {
                 int worldY = getWorldY();
                 for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
                     for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
-                        Block b = getWorld().getRawBlock(x, y);
+                        Block b = getWorld().getBlock(x, y, true);
                         Material mat = b == null ? AIR : b.getMaterial();
                         float hardness = mat.getHardness();
                         if (mat == AIR || hardness < 0) {

@@ -1,14 +1,20 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.utils.ObjectSet;
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author Elg
@@ -69,12 +75,12 @@ public class WorldTest extends TestGraphic {
     @Test
     public void getCorrectBlockFromOrigin() {
         world.getChunk(0, 0).setBlock(0, 0, Material.STONE);
-        assertEquals(Material.STONE, world.getBlock(0, 0).getMaterial());
+        assertEquals(Material.STONE, world.getBlock(0, 0, false).getMaterial());
     }
 
     @Test
     public void getCorrectBlockFromWorldCoords() {
         world.getChunk(-2, 5).setBlock(2, 11, Material.STONE);
-        assertEquals(Material.STONE, world.getBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11).getMaterial());
+        assertEquals(Material.STONE, world.getBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11, false).getMaterial());
     }
 }

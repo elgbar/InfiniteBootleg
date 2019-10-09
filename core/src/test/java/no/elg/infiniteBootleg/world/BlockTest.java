@@ -32,20 +32,20 @@ public class BlockTest extends TestGraphic {
 
     @Test
     public void correctCoordinated() {
-        assertEquals(-1, world.getBlock(-1, 0).getWorldX());
-        assertEquals(-1, world.getBlock(-2, -1).getWorldY());
+        assertEquals(-1, world.getBlock(-1, 0, false).getWorldX());
+        assertEquals(-1, world.getBlock(-2, -1, false).getWorldY());
     }
 
     @Test
     public void getCorrectChunk() {
-        Block block = world.getBlock(-1, -1);
+        Block block = world.getBlock(-1, -1, false);
         assertEquals(world.getChunkFromWorld(-1, -1), block.getChunk());
         assertEquals(world.getChunk(-1, -1), block.getChunk());
     }
 
     @Test
     public void getRelativeBlock() {
-        Block b = world.getBlock(0, 0);
+        Block b = world.getBlock(0, 0, false);
         Material mat = Material.BRICK;
         for (Direction dir : Direction.values()) {
             world.setBlock(dir.dx, dir.dy, mat);
@@ -55,7 +55,7 @@ public class BlockTest extends TestGraphic {
 
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                assertEquals(mat, world.getBlock(x, y).getMaterial());
+                assertEquals(mat, world.getBlock(x, y, false).getMaterial());
             }
         }
     }

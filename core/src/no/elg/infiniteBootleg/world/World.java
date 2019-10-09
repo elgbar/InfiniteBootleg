@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
@@ -27,6 +28,7 @@ import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -170,40 +172,23 @@ public class World implements Disposable, Ticking, Resizable {
      *     The x coordinate from world view
      * @param worldY
      *     The y coordinate from world view
+     * @param raw
      *
      * @return The block at the given x and y
      *
      * @see Chunk#getBlock(int, int)
      */
-    @NotNull
-    public Block getBlock(int worldX, int worldY) {
-
+    @Nullable
+    @Contract("_, _, false -> !null")
+    public Block getBlock(int worldX, int worldY, boolean raw) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
         int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-        return getChunk(chunkX, chunkY).getBlock(localX, localY);
-    }
-
-    /**
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     *
-     * @return The block at the given location, Air can either be null or a block with material {@link Material#AIR}
-     */
-    @Nullable
-    public Block getRawBlock(int worldX, int worldY) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = CoordUtil.chunkOffset(worldX);
-        int localY = CoordUtil.chunkOffset(worldY);
-
-        return getChunk(chunkX, chunkY).getBlocks()[localX][localY];
+        if (raw) { return getChunk(chunkX, chunkY).getBlocks()[localX][localY]; }
+        else { return getChunk(chunkX, chunkY).getBlock(localX, localY); }
     }
 
     /**
@@ -332,7 +317,8 @@ public class World implements Disposable, Ticking, Resizable {
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
      * than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int, boolean)}
+     * method
      * migt
      * createBlock
      * and store a new air block at the given location
@@ -347,7 +333,8 @@ public class World implements Disposable, Ticking, Resizable {
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
      * than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int)} method
+     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int, boolean)}
+     * method
      * migt
      * createBlock
      * and store a new air block at the given location
@@ -380,7 +367,7 @@ public class World implements Disposable, Ticking, Resizable {
      */
     public void updateBlocksAround(int worldX, int worldY) {
         for (Direction dir : Direction.CARDINAL) {
-            Block rel = getRawBlock(worldX + dir.dx, worldY + dir.dy);
+            Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
             if (rel instanceof UpdatableBlock) {
                 ((UpdatableBlock) rel).setUpdate(true);
             }
@@ -688,7 +675,7 @@ public class World implements Disposable, Ticking, Resizable {
      */
     @NotNull
     public Material getMaterial(int worldX, int worldY) {
-        Block block = getRawBlock(worldX, worldY);
+        Block block = getBlock(worldX, worldY, true);
         if (block == null) {
             for (Entity entity : getEntities(worldX, worldY)) {
                 if (entity instanceof MaterialEntity) {

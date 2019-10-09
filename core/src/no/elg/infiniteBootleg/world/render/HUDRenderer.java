@@ -45,6 +45,7 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
             Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
         final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 20;
+
         parameter.minFilter = Texture.TextureFilter.Linear;
         font = generator.generateFont(parameter);
     }
@@ -61,7 +62,7 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         LivingEntity player = world.getLivingEntities().iterator().next();
         batch.begin();
         if (modus == HUDModus.DEBUG) {
-            Block block = world.getRawBlock(main.getMouseBlockX(), main.getMouseBlockY());
+            Block block = world.getBlock(main.getMouseBlockX(), main.getMouseBlockY(), true);
 
             int[] vChunks = world.getRender().getChunksInView();
 

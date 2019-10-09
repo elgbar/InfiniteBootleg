@@ -146,7 +146,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             int y = MathUtils.floor(worldY - getHalfBox2dHeight());
             float maxY = worldY + getHalfBox2dHeight();
             for (; y < maxY; y++) {
-                blocks.add(world.getBlock(x, y));
+                blocks.add(world.getBlock(x, y, false));
             }
         }
         return blocks;
