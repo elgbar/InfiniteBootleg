@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.subgrid.box2d;
+package no.elg.infiniteBootleg.world.subgrid.contact;
 
 public enum ContactType {
 

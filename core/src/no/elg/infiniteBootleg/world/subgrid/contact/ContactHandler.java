@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.subgrid.box2d;
+package no.elg.infiniteBootleg.world.subgrid.contact;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactListener;

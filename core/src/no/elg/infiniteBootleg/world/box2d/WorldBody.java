@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.WorldTicker;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.box2d.ContactManager;
+import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

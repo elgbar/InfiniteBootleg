@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
+import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;

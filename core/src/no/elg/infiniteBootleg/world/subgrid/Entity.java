@@ -13,8 +13,8 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.box2d.ContactHandler;
-import no.elg.infiniteBootleg.world.subgrid.box2d.ContactType;
+import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
+import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
