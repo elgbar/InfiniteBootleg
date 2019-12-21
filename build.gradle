@@ -74,7 +74,7 @@ project(":core") {
         implementation 'com.google.guava:guava:25.0-jre'
         implementation "com.strongjoshua:libgdx-inGameConsole:0.7.1"
         implementation "org.apache.commons:commons-lang3:3.8.1"
-        implementation "no.kh498.util:CommonUtil:1.0.3"
+        implementation "no.kh498.util:CommonUtil:1.0.4"
         implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
         implementation "org.mockito:mockito-core:2.+"
