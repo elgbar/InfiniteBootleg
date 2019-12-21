@@ -75,9 +75,13 @@ public class Main extends ApplicationAdapter {
     private float mouseX;
     private float mouseY;
 
+    public Main() {
+        inst = this;
+        console = new ConsoleHandler(false);
+    }
+
     @Override
     public void create() {
-        inst = this;
 
         scheduler = new CancellableThreadScheduler(schedulerThreads);
 
@@ -87,6 +91,7 @@ public class Main extends ApplicationAdapter {
         if (renderGraphic) {
             VisUI.load();
         }
+
         console = new ConsoleHandler();
         console.setAlpha(0.85f);
         console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
@@ -97,6 +102,7 @@ public class Main extends ApplicationAdapter {
                     "  T to teleport player to current mouse pos\n" + //
                     "  Apostrophe (') to open console (type help for help)");
         console.log("You can also start the program with arguments for '-help' as arg to see all possible options");
+
 
         Gdx.app.setApplicationLogger(console);
         Gdx.app.setLogLevel(debug ? Application.LOG_DEBUG : Application.LOG_INFO);

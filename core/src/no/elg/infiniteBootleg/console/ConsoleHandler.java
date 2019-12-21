@@ -17,18 +17,23 @@ import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
 import no.elg.infiniteBootleg.console.consoles.StdConsole;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.kh498.util.Reflection;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
+    private final boolean inGameConsole;
     private Console console;
     private Window consoleWindow;
     private CommandExecutor exec;
 
-    public ConsoleHandler() {
-        if (Main.renderGraphic) {
+    public ConsoleHandler() {this(Main.renderGraphic);}
+
+    public ConsoleHandler(boolean inGameConsole) {
+        this.inGameConsole = inGameConsole;
+        if (inGameConsole) {
             console = new CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
             console.setLoggingToSystem(true);
             Main.getInputMultiplexer().addProcessor(console.getInputProcessor());
@@ -48,14 +53,14 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     }
 
     public void setAlpha(float a) {
-        if (!Main.renderGraphic) {
-            return;
+        if (inGameConsole) {
+            consoleWindow.getColor().a = a;
         }
-        consoleWindow.getColor().a = a;
+
     }
 
     public float getAlpha() {
-        return Main.renderGraphic ? consoleWindow.getColor().a : 1;
+        return inGameConsole ? consoleWindow.getColor().a : 1;
     }
 
     public boolean isVisible() {
@@ -70,7 +75,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         return method.isAnnotationPresent(ClientsideOnly.class);
     }
 
-    public boolean execCommand(String command) {
+    public boolean execCommand(@NotNull String command) {
         if (console.isDisabled()) { return false; }
 
         log(LogLevel.COMMAND, command);

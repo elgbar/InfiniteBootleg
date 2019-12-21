@@ -16,4 +16,9 @@ public @interface Argument {
      * @return Help string
      */
     String value();
+
+    /**
+     * @return Single char alias
+     */
+    char alt() default '\0';
 }

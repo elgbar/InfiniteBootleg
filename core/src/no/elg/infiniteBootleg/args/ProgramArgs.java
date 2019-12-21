@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.args;
 
 import com.badlogic.gdx.utils.Disposable;
+import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
@@ -21,12 +22,9 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
     private CancellableThreadScheduler scheduler;
 
-    public static void executeArgs(String[] args) {
-        ProgramArgs pa = new ProgramArgs(args);
-        pa.scheduler.scheduleSync(pa::dispose, 500);
-    }
-
     public ProgramArgs(String[] args) {
+        Preconditions.checkNotNull(Main.inst(), "Main not initiated");
+        Preconditions.checkNotNull(Main.inst().getConsoleLogger(), "The console logger should not be null");
         scheduler = new CancellableThreadScheduler(1);
         Map<String, String> options = Util.interpreterArgs(args);
 
@@ -43,6 +41,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                 e.printStackTrace();
             }
         }
+        scheduler.scheduleSync(this::dispose, 500);
     }
 
     @Override

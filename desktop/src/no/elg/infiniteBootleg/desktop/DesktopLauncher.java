@@ -4,14 +4,15 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import no.elg.infiniteBootleg.Main;
-
-import static no.elg.infiniteBootleg.args.ProgramArgs.executeArgs;
+import no.elg.infiniteBootleg.args.ProgramArgs;
 
 public class DesktopLauncher {
 
     public static void main(String[] args) {
 
-        executeArgs(args);
+        Main main = new Main();
+
+        new ProgramArgs(args);
 
         if (Main.renderGraphic) {
 
@@ -24,10 +25,10 @@ public class DesktopLauncher {
             config.samples = 16;
             config.title = "Infinite Terraria";
             config.useHDPI = true;
-            new LwjglApplication(new Main(), config);
+            new LwjglApplication(main, config);
         }
         else {
-            new HeadlessApplication(new Main(), null);
+            new HeadlessApplication(main, null);
         }
     }
 }
