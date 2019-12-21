@@ -101,13 +101,6 @@ nb-configuration.xml
 /local.properties
 .gradle/
 gradle-app.setting
-/build/
-/android/build/
-/core/build/
-/desktop/build/
-/html/build/
-/ios/build/
-/ios-moe/build/
 
 ## OS Specific
 .DS_Store
@@ -133,3 +126,11 @@ core/assets/worlds/
 version
 
 \.directory
+
+!.idea/
+.idea/gradle.xml
+.idea/misc.xml
+.idea/jarRepositories.xml
+.idea/saveactions_settings.xml
+.idea/vcs.xml
+.idea/workspace.xml
