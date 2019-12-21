@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 public class TestGraphic {
 
@@ -35,13 +36,14 @@ public class TestGraphic {
 
 
         Gdx.graphics = Mockito.mock(Graphics.class);
-        Mockito.when(Gdx.graphics.getWidth()).thenReturn(1);
-        Mockito.when(Gdx.graphics.getHeight()).thenReturn(1);
+        when(Gdx.graphics.getFrameId()).thenReturn(0L);
+        when(Gdx.graphics.getWidth()).thenReturn(1);
+        when(Gdx.graphics.getHeight()).thenReturn(1);
 
         Main.inst = Mockito.mock(Main.class);
-        Mockito.when(Main.inst.getConsoleLogger()).thenReturn(logger);
+        when(Main.inst.getConsoleLogger()).thenReturn(logger);
         World world = new World(new EmptyChunkGenerator());
-        Mockito.when(Main.inst.getWorld()).thenReturn(world);
+        when(Main.inst.getWorld()).thenReturn(world);
     }
 
     private static class ConsoleTestLogger implements ConsoleLogger {
@@ -52,7 +54,7 @@ public class TestGraphic {
                 System.err.println(msg);
             }
             else {
-                System.out.println(msg);
+                System.out.println("[" + (level != null ? level.toString() : "???") + "] " + msg);
             }
         }
     }
