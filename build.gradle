@@ -28,7 +28,7 @@ allprojects {
         appName = "InfiniteBootleg"
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.6'
-        box2DLightsVersion = '1.4'
+        box2DLightsVersion = '1.5'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.1'
         powermockVersion = '2.0.2'
@@ -76,10 +76,11 @@ project(":core") {
         implementation "org.apache.commons:commons-lang3:3.8.1"
         implementation "no.kh498.util:CommonUtil:1.0.3"
         implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
-        compileOnly 'org.jetbrains:annotations:17.0.0'
 
         implementation "org.mockito:mockito-core:2.+"
         implementation "junit:junit:4.12"
+
+        compileOnly 'org.jetbrains:annotations:18.0.0'
         testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     }
 }
