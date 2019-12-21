@@ -78,8 +78,8 @@ project(":core") {
         implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
         compileOnly 'org.jetbrains:annotations:17.0.0'
 
-        testImplementation "org.mockito:mockito-core:2.+"
-        testImplementation "junit:junit:4.12"
+        implementation "org.mockito:mockito-core:2.+"
+        implementation "junit:junit:4.12"
         testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     }
 }
