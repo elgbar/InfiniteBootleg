@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import no.elg.infiniteBootleg.Main;
 
-import static no.elg.infiniteBootleg.ProgramArgs.executeArgs;
+import static no.elg.infiniteBootleg.args.ProgramArgs.executeArgs;
 
 public class DesktopLauncher {
 

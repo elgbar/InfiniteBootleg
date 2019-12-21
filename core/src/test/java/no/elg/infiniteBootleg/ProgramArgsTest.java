@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg;
 
+import no.elg.infiniteBootleg.args.ProgramArgs;
 import org.junit.Assert;
 import org.junit.Test;
 

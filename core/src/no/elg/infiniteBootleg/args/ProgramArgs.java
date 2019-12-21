@@ -1,8 +1,8 @@
-package no.elg.infiniteBootleg;
+package no.elg.infiniteBootleg.args;
 
 import com.badlogic.gdx.utils.Disposable;
 import com.strongjoshua.console.LogLevel;
-import no.elg.infiniteBootleg.args.Argument;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
