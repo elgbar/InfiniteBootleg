@@ -80,7 +80,7 @@ project(":core") {
         implementation "org.mockito:mockito-core:2.+"
         implementation "junit:junit:4.12"
 
-        compileOnly 'org.jetbrains:annotations:18.0.0'
+        implementation 'org.jetbrains:annotations:18.0.0'
         testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     }
 }

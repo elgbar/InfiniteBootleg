@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -72,7 +73,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     }
 
     @Override
-    public void log(LogLevel level, String msg) {
+    public void log(@NotNull LogLevel level, @NotNull String msg) {
         scheduler.scheduleAsync(() -> Main.inst().getConsoleLogger().log(level, msg), 2);
     }
 

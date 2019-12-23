@@ -8,10 +8,11 @@ import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
+import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.mockito.Mockito;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -49,12 +50,12 @@ public class TestGraphic {
     private static class ConsoleTestLogger implements ConsoleLogger {
 
         @Override
-        public void log(LogLevel level, String msg) {
+        public void log(@NotNull LogLevel level, @NotNull String msg) {
             if (level == LogLevel.ERROR) {
-                System.err.println(msg);
+                System.err.println("[ERR]" + msg);
             }
             else {
-                System.out.println("[" + (level != null ? level.toString() : "???") + "] " + msg);
+                System.out.println("[" + level.toString() + "] " + msg);
             }
         }
     }

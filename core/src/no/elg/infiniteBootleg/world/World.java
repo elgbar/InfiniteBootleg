@@ -576,7 +576,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         //update lights
         synchronized (WorldRender.BOX2D_LOCK) {
-            if (Main.renderGraphic && WorldRender.lights) {
+            if (Main.renderGraphic && WorldRender.lights && ticker.getTickId() % 2 == 0) {
                 synchronized (WorldRender.LIGHT_LOCK) {
                     getRender().getRayHandler().update();
                 }

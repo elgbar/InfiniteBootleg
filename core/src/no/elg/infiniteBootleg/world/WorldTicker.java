@@ -9,9 +9,8 @@ import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A helper class that calls the world's {@link World#update()} method periodically. By default it will call it every
- * {@link
- * #MS_DELAY_BETWEEN_TICKS}.
+ * A helper class that calls the world's {@link World#tick()} and {@link World#tickRare()} method periodically. By
+ * default it will call it every {@link #MS_DELAY_BETWEEN_TICKS}.
  * <p>
  * The world ticker will not update the world if {@link Graphics#getFrameId()} is the same as it was last tick
  * (as can be caused by fps lag), and will warn when too many world ticks have been skipped.

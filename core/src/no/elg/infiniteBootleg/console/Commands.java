@@ -132,6 +132,7 @@ public class Commands extends CommandExecutor {
         render.getCamera().position.x = worldX * Block.BLOCK_SIZE;
         render.getCamera().position.y = worldY * Block.BLOCK_SIZE;
         render.update();
+        logger.logf(LogLevel.SUCCESS, "Teleported to (% d,% d)", worldX, worldY);
     }
 
     @ClientsideOnly
@@ -139,18 +140,20 @@ public class Commands extends CommandExecutor {
                 paramDescriptions = "Quality of light, between 0 and 4")
     public void lightQuality(int quality) {
         if (quality > 4) {
-            logger.error("WARN", "Quality given is greater than the maximum. It has been set to 4");
+            logger.warn("Quality given is greater than the maximum. It has been set to 4");
             quality = 4;
         }
         else if (quality < 0) {
-            logger.error("WARN", "Quality given is a negative number. It has been set to 0");
+            logger.warn("Quality given is a negative number. It has been set to 0");
             quality = 0;
         }
         Main.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
+        logger.success("Light quality is now " + quality);
     }
 
     @ClientsideOnly
-    @ConsoleDoc(description = "The direction of the skylight", paramDescriptions = "A float between 0 and 180")
+    @ConsoleDoc(description = "The direction of the skylight",
+                paramDescriptions = "A floating point number between 0 and 180")
     public void lightDir(float dir) {
         if (dir < 0) {
             logger.log(LogLevel.ERROR, "Direction can not be less than 0");
@@ -161,11 +164,11 @@ public class Commands extends CommandExecutor {
             return;
         }
         Main.inst().getWorld().getRender().getSkylight().setDirection(-dir);
+        logger.success("Skylight is now pointing in direction " + dir);
     }
 
     @ClientsideOnly
-    @ConsoleDoc(description = "Set how much information to give",
-                paramDescriptions = "normal (default), minimal or none")
+    @ConsoleDoc(description = "Set how much information to show", paramDescriptions = "normal (default), debug or none")
     public void hud(String modusName) {
         try {
             HUDRenderer.HUDModus modus = HUDRenderer.HUDModus.valueOf(modusName.toUpperCase());
@@ -179,8 +182,14 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Change the zoom level of the world camera",
                 paramDescriptions = "The new zoom level, min is " + WorldRender.MIN_ZOOM)
     public void zoom(float zoom) {
-        Main.inst().getWorld().getRender().getCamera().zoom = Math.max(zoom, WorldRender.MIN_ZOOM);
-        Main.inst().getWorld().getRender().update();
+        if (zoom < WorldRender.MIN_ZOOM) {
+            logger.warn("Given zoom level (%.3f) is less than the minimum % .3f", zoom, WorldRender.MIN_ZOOM);
+            zoom = WorldRender.MIN_ZOOM;
+        }
+        WorldRender render = Main.inst().getWorld().getRender();
+        render.getCamera().zoom = Math.max(zoom, WorldRender.MIN_ZOOM);
+        render.update();
+        logger.success("Zoom level is now " + zoom);
     }
 
     @HiddenCommand

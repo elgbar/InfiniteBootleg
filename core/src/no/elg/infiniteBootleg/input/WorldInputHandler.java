@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
+import no.elg.infiniteBootleg.world.render.HUDRenderer.HUDModus;
 import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,7 @@ import static com.badlogic.gdx.Input.Keys.*;
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
     private final static int CAM_SPEED = 100 * Block.BLOCK_SIZE;
+    public static final float SCROLL_SPEED = 0.05f;
 
     private final WorldRender worldRender;
 
@@ -35,11 +37,12 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         }
         switch (keycode) {
             case F3:
-                if (Main.inst().getHud().getModus() == HUDRenderer.HUDModus.DEBUG) {
-                    Main.inst().getHud().setModus(HUDRenderer.HUDModus.NORMAL);
+                HUDRenderer hud = Main.inst().getHud();
+                if (hud.getModus() == HUDModus.DEBUG) {
+                    hud.setModus(HUDModus.NORMAL);
                 }
                 else {
-                    Main.inst().getHud().setModus(HUDRenderer.HUDModus.DEBUG);
+                    hud.setModus(HUDModus.DEBUG);
                 }
                 break;
             default:
@@ -54,7 +57,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return false;
         }
         OrthographicCamera camera = worldRender.getCamera();
-        camera.zoom += amount * 0.05f * camera.zoom;
+        camera.zoom += amount * SCROLL_SPEED * camera.zoom;
         if (camera.zoom < WorldRender.MIN_ZOOM) {
             camera.zoom = WorldRender.MIN_ZOOM;
         }

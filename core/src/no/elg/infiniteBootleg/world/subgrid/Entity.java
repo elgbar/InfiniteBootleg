@@ -138,6 +138,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      *
      * @return An unordered collection of all the blocks this entity would be touching if it was located here
      */
+    @NotNull
     public ObjectSet<Block> touchingBlocks(float worldX, float worldY) {
         ObjectSet<Block> blocks = new ObjectSet<>();
         int x = MathUtils.floor(worldX - getHalfBox2dWidth());
