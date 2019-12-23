@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.io.File;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
@@ -89,7 +90,12 @@ public class Main extends ApplicationAdapter {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (renderGraphic) {
-            VisUI.load();
+            if (Toolkit.getDefaultToolkit().getScreenSize().width > 1920) {
+                VisUI.load(VisUI.SkinScale.X2);
+            }
+            else {
+                VisUI.load(VisUI.SkinScale.X1);
+            }
         }
 
         console = new ConsoleHandler();
