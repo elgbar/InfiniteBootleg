@@ -26,7 +26,9 @@ task debug(dependsOn: classes, type: JavaExec) {
 task dist(type: Jar) {
     from files(sourceSets.main.output.getClassesDirs()[0])
     from files(sourceSets.main.output.resourcesDir)
-    from { configurations.compile.collect { zipTree(it) } }
+
+    project.configurations.getByName("implementation").setCanBeResolved(true)
+    from { configurations.implementation.collect { zipTree(it) } }
     from files(project.assetsDir);
     archiveBaseName = appName + "-desktop"
     manifest {
