@@ -1,14 +1,19 @@
 package no.elg.infiniteBootleg.util;
 
+import no.elg.infiniteBootleg.TestGraphic;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Elg
  */
-public class UtilTest {
+public class UtilTest extends TestGraphic {
 
     @Test
     public void isBetweenFloat() {
@@ -24,5 +29,72 @@ public class UtilTest {
         assertTrue(Util.hasSuperClass(Object.class, Object.class));
         assertFalse(Util.hasSuperClass(Object.class, String.class));
         assertTrue(Util.hasSuperClass(String.class, Object.class));
+    }
+
+    @Test
+    public void interpretArgsDiscardsLeadingDashesWhenNoVal() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"--test"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("test", true), null);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void interpretArgsDiscardsLeadingDashesWhenVal() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"--test=aaa"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("test", true), "aaa");
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void interpretArgsDiscardsLeadingDashesWhenAltWithoutVal() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"-t"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("t", false), null);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void interpretArgsDiscardsLeadingDashesWhenAltWithVal() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"-t=2ad"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("t", false), "2ad");
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void interpretArgsGroupsSingleArgsRemovesDuplicates() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"-tt"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("t", false), null);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void interpretArgsGroupsSingleArgsHandleDuplicatesWithArgs() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"-tt=2ad"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("t", false), "2ad");
+        assertEquals(expected, actual);
+    }
+
+
+    @Test
+    public void interpretArgsGroupsSingleArgsNoVals() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"-Tt"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("T", false), null);
+        expected.put(new ImmutablePair<>("t", false), null);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void interpretArgsGroupsSingleArgs() {
+        Map<Pair<String, Boolean>, String> actual = Util.interpreterArgs(new String[] {"-Tt=2ad"});
+        Map<Pair<String, Boolean>, String> expected = new HashMap<>();
+        expected.put(new ImmutablePair<>("T", false), null);
+        expected.put(new ImmutablePair<>("t", false), "2ad");
+        assertEquals(expected, actual);
     }
 }

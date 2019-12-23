@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -120,23 +123,42 @@ public class Util {
      *
      * @return The title case version of the given string
      */
-    public static String toTitleCase(final String string) {
+    public static String toTitleCase(final String string) {return toTitleCase(true, string);}
+
+    /**
+     * @param string
+     *     The string to convert to title case
+     *
+     * @return The title case version of the given string
+     */
+    public static String toTitleCase(boolean capFirst, final String string) {
         final StringBuilder sb = new StringBuilder();
 
         final String ACTIONABLE_DELIMITERS = " '-/";
-        boolean capNext = true;
+        boolean capNext = capFirst;
 
         for (char c : string.toCharArray()) {
             c = (capNext) ? Character.toTitleCase(c) : Character.toLowerCase(c);
             sb.append(c);
-            capNext = ACTIONABLE_DELIMITERS.indexOf((int) c) >= 0;
+            capNext = ACTIONABLE_DELIMITERS.indexOf(c) >= 0;
         }
 
         return sb.toString();
     }
 
-    public static Map<String, String> interpreterArgs(final String[] args) {
-        final HashMap<String, String> argsMap = new HashMap<>();
+    /**
+     * The key in the map is a pair of the character given before a equal sign (=) or end of string and a boolean that
+     * is {@code true } if the key started with two dash (-) as prefix. The value of is a String containing the
+     * substring from after (not including the first) equal sign to the end of the string.
+     *
+     * @param args
+     *     The system args to interpret
+     *
+     * @return A Map of the interpreted args
+     */
+    @NotNull
+    public static Map<Pair<String, Boolean>, String> interpreterArgs(final String[] args) {
+        final HashMap<Pair<String, Boolean>, String> argsMap = new HashMap<>();
 
         for (final String arg : args) {
             if (!arg.startsWith("-")) {
@@ -146,17 +168,31 @@ public class Util {
                 //we only care about the first equals sign, the rest is a part of the value
                 final int equal = arg.indexOf('=');
 
-                //if there is no equal sign there is no value
-                if (equal == -1) {
-                    //do not include the dash
-                    argsMap.put(arg.substring(1), null);
+                boolean doubleDash = arg.startsWith("--");
+                int cutoff = doubleDash ? 2 : 1;
+
+                List<String> inArgs = new ArrayList<>();
+                String key = equal == -1 ? arg.substring(cutoff) : arg.substring(cutoff, equal);
+                if (doubleDash) {
+                    inArgs.add(key);
                 }
                 else {
-                    //find the key and value from the index of the first equal sign, but do not include it in the
-                    // key or value
-                    final String key = arg.substring(1, equal);
-                    final String val = arg.substring(equal + 1);
-                    argsMap.put(key, val);
+                    //If this is a single dash (ie switch) then each char before the equal is a switch on its own
+                    for (char c : key.toCharArray()) {
+                        inArgs.add(String.valueOf(c));
+                    }
+                }
+
+                for (int i = 0, size = inArgs.size(); i < size; i++) {
+                    String inArg = inArgs.get(i);
+                    //if there is no equal sign there is no value
+                    String val = null;
+                    if (equal != -1 && i >= size - 1) {
+                        //find the key and value from the index of the first equal sign, but do not include it in the
+                        // key or value
+                        val = arg.substring(equal + 1);
+                    }
+                    argsMap.put(new ImmutablePair<>(inArg, doubleDash), val);
                 }
             }
         }

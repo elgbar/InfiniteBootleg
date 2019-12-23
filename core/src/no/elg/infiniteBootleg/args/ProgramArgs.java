@@ -8,9 +8,11 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -26,11 +28,36 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         Preconditions.checkNotNull(Main.inst(), "Main not initiated");
         Preconditions.checkNotNull(Main.inst().getConsoleLogger(), "The console logger should not be null");
         scheduler = new CancellableThreadScheduler(1);
-        Map<String, String> options = Util.interpreterArgs(args);
+        Map<Pair<String, Boolean>, String> options = Util.interpreterArgs(args);
 
-        for (Map.Entry<String, String> entry : options.entrySet()) {
+        for (Map.Entry<Pair<String, Boolean>, String> entry : options.entrySet()) {
+            Pair<String, Boolean> key = entry.getKey();
+
+            String name = null;
+            if (key.getValue()) {
+                name = Util.toTitleCase(false, key.getKey().toLowerCase().replace('_', ' ').replace('-', ' ')).replace(
+                    " ", "");
+            }
+            else {
+                char altKey = key.getKey().charAt(0);
+                //we need to find the correct method name, as this is an alt
+                for (Method method : ProgramArgs.class.getDeclaredMethods()) {
+                    Argument a = method.getAnnotation(Argument.class);
+                    if (a != null && a.alt() == altKey) {
+                        name = method.getName();
+                        break;
+                    }
+                }
+                if (name == null) {
+                    Main.inst().getConsoleLogger().logf(LogLevel.ERROR,
+                                                        "Failed to find a valid argument with with the alt '%s'",
+                                                        altKey);
+                    continue;
+                }
+            }
+
             try {
-                Method method = ProgramArgs.class.getDeclaredMethod(entry.getKey().toLowerCase(), String.class);
+                Method method = ProgramArgs.class.getDeclaredMethod(name, String.class);
                 if (method != null) {
                     method.invoke(this, entry.getValue());
                 }
@@ -70,7 +97,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Do not render the graphics
      */
-    @Argument("Disable rendering of graphics.")
+    @Argument(value = "Disable rendering of graphics.", alt = 'h')
     private void headless(String val) {
         Main.renderGraphic = false;
         log("Graphics is disabled");
@@ -79,8 +106,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Do not load the worlds from disk
      */
-    @Argument("The world will not be loaded from disk")
-    private void no_load(String val) {
+    @Argument(value = "The world will not be loaded from disk", alt = 'l')
+    private void noLoad(String val) {
         Main.loadWorldFromDisk = false;
         log("Worlds will not be loaded/saved from/to disk");
     }
@@ -91,8 +118,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * @param val
      *     The world seed
      */
-    @Argument("Set the default world seed, a value must be specified. Example: -world_seed=test")
-    private void world_seed(String val) {
+    @Argument(value = "Set the default world seed, a value must be specified. Example: --world_seed=test", alt = 's')
+    private void worldSeed(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
                 "The seed must be provided when using world_Seed " + "argument.\nExample: -world_seed=test");
@@ -107,8 +134,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * Disable Box2DLights
      */
 
-    @Argument("Disable rendering of lights")
-    private void no_lights(String val) {
+    @Argument(value = "Disable rendering of lights", alt = 'L')
+    private void noLights(String val) {
         log("Lights are disabled. To dynamically enable this use command 'lights true'");
         WorldRender.lights = false;
     }
@@ -116,14 +143,15 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     /**
      * Enable debug rendering (ie box2d)
      */
-    @Argument("Enable debugging including debug rendering for box2d")
+    @Argument(value = "Enable debugging including debug rendering for box2d", alt = 'd')
     private void debug(String val) {
         log("Debug view is enabled. To disable this at runtime use command 'debug'");
         WorldRender.debugBox2d = true;
         Main.debug = true;
     }
 
-    @Argument("Specify the number of secondary threads. Must be an integer greater than or equal to 0")
+    @Argument(value = "Specify the number of secondary threads. Must be an integer greater than or equal to 0",
+              alt = 't')
     public boolean threads(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
@@ -144,21 +172,24 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         }
     }
 
-    @Argument("Print out available arguments and exit")
+    @Argument(value = "Print out available arguments and exit", alt = '?')
     public void help(String val) {
         System.out.println("List of program arguments:");
 
         //find the maximum length of the argument methods
+        //@formatter:off
         int maxNameSize = Arrays.stream(ProgramArgs.class.getDeclaredMethods()).
             filter(m -> m.isAnnotationPresent(Argument.class)).
-            //
-                mapToInt(m -> m.getName().length()).
-                max().orElse(0);
+            mapToInt(m -> m.getName().length()).
+            max().orElse(0);
+        //@formatter:on
 
         for (Method method : ProgramArgs.class.getDeclaredMethods()) {
             Argument arg = method.getAnnotation(Argument.class);
             if (arg != null) {
-                System.out.printf(" -%-" + maxNameSize + "s  %s%n", method.getName(), arg.value());
+                String singleFlag = arg.alt() != '\0' ? "-" + arg.alt() : "  ";
+                System.out.printf(MessageFormat.format(" --%-{0}s %s  %s%n", maxNameSize), method.getName(), singleFlag,
+                                  arg.value());
             }
         }
         System.exit(0);
