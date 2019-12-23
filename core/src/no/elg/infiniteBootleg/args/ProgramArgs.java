@@ -122,7 +122,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     private void worldSeed(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
-                "The seed must be provided when using world_Seed " + "argument.\nExample: -world_seed=test");
+                "The seed must be provided when using world_Seed argument.\nExample: --world_seed=test");
 
             return;
         }

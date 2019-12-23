@@ -101,7 +101,8 @@ public class Main extends ApplicationAdapter {
                     "  arrow-keys to control the player\n" +//
                     "  T to teleport player to current mouse pos\n" + //
                     "  Apostrophe (') to open console (type help for help)");
-        console.log("You can also start the program with arguments for '-help' as arg to see all possible options");
+        console.log(
+            "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options");
 
 
         Gdx.app.setApplicationLogger(console);
