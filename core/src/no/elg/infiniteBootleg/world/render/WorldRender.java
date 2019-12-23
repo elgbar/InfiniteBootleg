@@ -33,6 +33,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public static final int HOR_END = 3;
 
     public static final float MIN_ZOOM = 0.25f;
+    public static final float AMBIENT_LIGHT = 0.026f;
 
     public final World world;
     private RayHandler rayHandler;
@@ -82,13 +83,12 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             RayHandler.useDiffuseLight(true);
             rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld());
             rayHandler.setBlurNum(1);
-            float ambient = 0.026f;
-            rayHandler.setAmbientLight(ambient, ambient, ambient, 1);
+            rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1);
 
             skyDir = World.STRAIGHT_DOWN_SKYLIGHT;
 
             //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
-            skylight = new DirectionalLight(rayHandler, 7500, Color.WHITE, skyDir);
+            skylight = new DirectionalLight(rayHandler, 75000, Color.WHITE, skyDir);
             skylight.setContactFilter(World.LIGHT_FILTER);
             skylight.setStaticLight(true);
             skylight.setSoftnessLength(World.SKYLIGHT_SHADOW_LENGTH); //restore lights 1.4 functionality

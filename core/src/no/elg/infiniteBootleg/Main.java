@@ -65,6 +65,8 @@ public class Main extends ApplicationAdapter {
 
     public static int schedulerThreads = 3;
 
+    public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 1920 ? 2 : 1;
+
     private World world;
     private ConsoleHandler console;
     private HUDRenderer hud;
@@ -90,7 +92,7 @@ public class Main extends ApplicationAdapter {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (renderGraphic) {
-            if (Toolkit.getDefaultToolkit().getScreenSize().width > 1920) {
+            if (SCALE > 1) {
                 VisUI.load(VisUI.SkinScale.X2);
             }
             else {

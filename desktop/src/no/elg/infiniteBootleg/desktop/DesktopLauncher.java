@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.args.ProgramArgs;
 
-import java.awt.*;
+import static no.elg.infiniteBootleg.Main.SCALE;
 
 public class DesktopLauncher {
 
@@ -14,12 +14,13 @@ public class DesktopLauncher {
 
         Main main = new Main();
 
+
         new ProgramArgs(args);
 
         if (Main.renderGraphic) {
 
             LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-            if (Toolkit.getDefaultToolkit().getScreenSize().width > 1920) {
+            if (SCALE > 1) {
                 config.width = 1920;
                 config.height = 1080;
             }

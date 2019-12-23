@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 
+import static no.elg.infiniteBootleg.Main.SCALE;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 /**
@@ -36,6 +37,10 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
     private BitmapFont font;
     private HUDModus modus;
 
+    public static final int FONT_SIZE = 20;
+
+    private final int spacing;
+
     public HUDRenderer() {
         modus = Main.debug ? HUDModus.DEBUG : HUDModus.NORMAL;
         batch = new SpriteBatch();
@@ -44,10 +49,12 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
             Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
         final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 20;
+        parameter.size = FONT_SIZE * SCALE;
 
         parameter.minFilter = Texture.TextureFilter.Linear;
         font = generator.generateFont(parameter);
+
+        spacing = (FONT_SIZE * SCALE) / 2;
     }
 
     @Override
@@ -102,17 +109,17 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
             if (index != -1) { ents.deleteCharAt(index); }
 
 
-            font.draw(batch, fps, 10, h - 10);
-            font.draw(batch, pointing, 10, h - 30);
-            font.draw(batch, chunk, 10, h - 50);
-            font.draw(batch, viewChunk, 10, h - 70);
-            font.draw(batch, pos, 10, h - 90);
-            font.draw(batch, ents.toString().trim(), 10, h - 110);
+            font.draw(batch, fps, spacing, h - spacing);
+            font.draw(batch, pointing, spacing, h - spacing * 3);
+            font.draw(batch, chunk, spacing, h - spacing * 5);
+            font.draw(batch, viewChunk, spacing, h - spacing * 7);
+            font.draw(batch, pos, spacing, h - spacing * 9);
+            font.draw(batch, ents.toString().trim(), spacing, h - spacing * 11);
         }
         Material sel = player.getControls().getSelected();
         if (sel != null && sel.getTextureRegion() != null) {
-            batch.draw(sel.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3, h - BLOCK_SIZE * 3,
-                       BLOCK_SIZE * 2, BLOCK_SIZE * 2);
+            batch.draw(sel.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3 * SCALE,
+                       h - BLOCK_SIZE * 3 * SCALE, BLOCK_SIZE * 2 * SCALE, BLOCK_SIZE * 2 * SCALE);
         }
         batch.end();
     }
