@@ -134,3 +134,7 @@ version
 .idea/saveactions_settings.xml
 .idea/vcs.xml
 .idea/workspace.xml
+
+.idea/uiDesigner.xml
+
+.idea/inspectionProfiles/Project_Default.xml
