@@ -32,6 +32,7 @@ allprojects {
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.1'
         powermockVersion = '2.0.2'
+        visVersion = '1.4.4'
     }
 
     repositories {
@@ -70,7 +71,7 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
 
-        implementation "com.kotcrab.vis:vis-ui:1.4.4"
+        implementation "com.kotcrab.vis:vis-ui:$visVersion"
         implementation 'com.google.guava:guava:25.0-jre'
         implementation "com.strongjoshua:libgdx-inGameConsole:0.7.1"
         implementation "org.apache.commons:commons-lang3:3.8.1"
