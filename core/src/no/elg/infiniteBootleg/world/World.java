@@ -63,6 +63,8 @@ public class World implements Disposable, Ticking, Resizable {
     public static final int MIN_DEG_SKYLIGHT = -135;
     public static final int STRAIGHT_DOWN_SKYLIGHT = -90;
 
+    public static final int SKYLIGHT_SHADOW_LENGTH = 2;
+
     static {
         //base filter for entities
         ENTITY_FILTER = new Filter();
