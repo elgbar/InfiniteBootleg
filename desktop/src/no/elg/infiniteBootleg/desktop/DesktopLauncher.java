@@ -6,6 +6,8 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.args.ProgramArgs;
 
+import java.awt.*;
+
 public class DesktopLauncher {
 
     public static void main(String[] args) {
@@ -17,8 +19,14 @@ public class DesktopLauncher {
         if (Main.renderGraphic) {
 
             LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-            config.width = 1280;
-            config.height = 720;
+            if (Toolkit.getDefaultToolkit().getScreenSize().width > 1920) {
+                config.width = 1920;
+                config.height = 1080;
+            }
+            else {
+                config.width = 1280;
+                config.height = 720;
+            }
             config.vSyncEnabled = false;
             config.foregroundFPS = 9999;
             config.backgroundFPS = 10;
