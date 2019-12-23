@@ -21,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
@@ -71,7 +74,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         console.draw();
     }
 
-    private boolean isClientsideOnly(Method method) {
+    private boolean isClientsideOnly(@NotNull Method method) {
         return method.isAnnotationPresent(ClientsideOnly.class);
     }
 
@@ -89,6 +92,13 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         }
 
         Method[] methods = ClassReflection.getMethods(exec.getClass());
+
+
+        List<String> potentialMethods = Arrays.stream(methods).filter(
+            m -> m.getName().toLowerCase().startsWith(methodName.toLowerCase())).map(
+            m -> m.getName() + " " + Arrays.stream(m.getParameterTypes()).map(Class::getSimpleName)
+                                           .collect(Collectors.joining(" "))).collect(Collectors.toList());
+
         Array<Integer> possible = new Array<>(false, 8);
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
@@ -99,7 +109,10 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         }
 
         if (possible.size <= 0) {
-            log(LogLevel.ERROR, "Unknown command");
+            log(LogLevel.ERROR, "Unknown command. Perhaps you meant");
+            for (String methodSig : potentialMethods) {
+                log(LogLevel.ERROR, methodSig);
+            }
             return false;
         }
 
@@ -174,7 +187,15 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
             }
         }
 
-        log(LogLevel.ERROR, "Bad parameters. Check your code.");
+        if (potentialMethods.isEmpty()) {
+            log(LogLevel.ERROR, "Bad parameters. Check your code.");
+        }
+        else {
+            log(LogLevel.ERROR, "Unknown parameters. Did you perhaps mean?");
+            for (String method : potentialMethods) {
+                log(LogLevel.ERROR, method);
+            }
+        }
         return false;
     }
 
@@ -182,7 +203,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
      * @see com.strongjoshua.console.Console#log(String, LogLevel)
      */
     @Override
-    public void log(LogLevel level, String msg) {
+    public void log(@NotNull LogLevel level, @NotNull String msg) {
         try {
             synchronized (this) {
                 console.log(msg, level);
