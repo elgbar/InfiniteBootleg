@@ -623,18 +623,22 @@ public class World implements Disposable, Ticking, Resizable {
         //update light direction
         if (dayTicking) {
             time -= WorldTicker.SECONDS_DELAY_BETWEEN_TICKS * timeScale;
-            wr.getSkylight().setDirection(time);
+            if (normalizedTime() >= 180) {
+                wr.getSkylight().setDirection(time);
+            }
+        }
+        if (getTick() % WorldTicker.TICKS_PER_SECOND / 20 == 0) {
+            float brightness = getSkyBrightness(time);
+            if (brightness > 0) {
+                wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
+            }
+            else { wr.getSkylight().setColor(Color.BLACK); }
         }
 
         //update lights
-        if (Main.renderGraphic && WorldRender.lights && ticker.getTickId() % 3 == 0) {
+        if (Main.renderGraphic && WorldRender.lights) {
             synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
-                    float brightness = getSkyBrightness(time);
-                    if (brightness > 0) {
-                        wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
-                    }
-                    else { wr.getSkylight().setColor(Color.BLACK); }
                     wr.getRayHandler().update();
                 }
             }
