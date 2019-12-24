@@ -589,14 +589,7 @@ public class World implements Disposable, Ticking, Resizable {
      * @return A brightness value between 0 and 1 (both inclusive)
      */
     public float getSkyBrightness(float time) {
-        float dir;
-        if (time >= 0) {
-            dir = time % 360;
-        }
-        else {
-            int mult = (int) (-time / 360) + 1;
-            dir = mult * 360 + time;
-        }
+        float dir = Util.normalizedDir(time);
         float gray = 0;
 
         if (dir <= 180) {
@@ -615,6 +608,10 @@ public class World implements Disposable, Ticking, Resizable {
             gray = 1; //white
         }
         return gray;
+    }
+
+    public float normalizedTime() {
+        return Util.normalizedDir(time);
     }
 
     @Override

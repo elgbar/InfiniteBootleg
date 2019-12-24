@@ -97,4 +97,17 @@ public class UtilTest extends TestGraphic {
         expected.put(new ImmutablePair<>("t", false), "2ad");
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void normalizeDirNegative() {
+        assertEquals(270, Util.normalizedDir(-90), 0);
+        assertEquals(180, Util.normalizedDir(-180), 0);
+    }
+
+    @Test
+    public void normalizeDirPositive() {
+        assertEquals(0, Util.normalizedDir(360), 0);
+        assertEquals(90, Util.normalizedDir(90 + 360), 0);
+        assertEquals(359, Util.normalizedDir(359 + 360), 0);
+    }
 }

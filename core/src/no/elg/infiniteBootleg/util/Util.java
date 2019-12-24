@@ -260,4 +260,21 @@ public class Util {
         if (impl == Object.class) { return false; }
         return hasSuperClass(impl.getSuperclass(), aClass);
     }
+
+    /**
+     * @param orgDir
+     *     The original direction
+     *
+     * @return The direction normalized within 0 (inclusive) to 360 (exclusive)
+     */
+    public static float normalizedDir(float orgDir) {
+        if (orgDir >= 360) {
+            return orgDir % 360;
+        }
+        else if (orgDir < 0) {
+            int mult = (int) (-orgDir / 360) + 1;
+            return mult * 360 + orgDir;
+        }
+        return orgDir; //is within [0,360)
+    }
 }
