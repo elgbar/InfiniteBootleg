@@ -60,17 +60,17 @@ public class World implements Disposable, Ticking, Resizable {
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
-    public static final int DAWN_TIME = 0;
-    public static final int MIDDAY_TIME = -90;
-    public static final int DUSK_TIME = -180;
-    public static final int MIDNIGHT_TIME = -270;
-
     public static final int SKYLIGHT_SHADOW_LENGTH = 2;
     /**
      * How many degrees the time light should have before triggering sunset/sunrise. This will happen from {@code
      * -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
      */
     public static final float TWILIGHT_DEGREES = 20;
+
+    public static final float SUNRISE_TIME = 0;
+    public static final float MIDDAY_TIME = -90;
+    public static final float SUNSET_TIME = -180 + TWILIGHT_DEGREES;
+    public static final float MIDNIGHT_TIME = -270;
 
     static {
         //base filter for entities
