@@ -73,8 +73,8 @@ public class CommandsTest extends TestGraphic {
     }
 
     @Test
-    public void lightDir() {
-        assertTrue(cmds.execCommand("lightDir 45"));
+    public void time() {
+        assertTrue(cmds.execCommand("time 45"));
     }
 
     @Test

@@ -237,7 +237,7 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void skyColorAtStartOfDuskIsWhite() {
-        assertEquals(1, world.getSkyBrightness(180 + World.TWILIGHT_DEGREES), 0);
+        assertEquals(1, world.getSkyBrightness(World.SUNSET_TIME), 0);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void skyColorDuskIsGray() {
-        assertEquals(0, world.getSkyBrightness(World.SUNSET_TIME), 0);
+        assertEquals(0, world.getSkyBrightness(180), 0);
     }
 
     @Test
