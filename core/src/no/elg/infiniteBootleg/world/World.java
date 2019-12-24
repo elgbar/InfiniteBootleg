@@ -70,7 +70,7 @@ public class World implements Disposable, Ticking, Resizable {
      * How many degrees the time light should have before triggering sunset/sunrise. This will happen from {@code
      * -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
      */
-    public static final float TWILIGHT_DEGREES = 15;
+    public static final float TWILIGHT_DEGREES = 20;
 
     static {
         //base filter for entities
