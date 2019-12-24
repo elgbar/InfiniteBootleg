@@ -98,6 +98,8 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                        player.getPosition().y, player.getVelocity().x, player.getVelocity().y, //
                                        player.isOnGround(), player.isFlying()//
                                       );
+            String sky = String.format("time: %.2f scale: %.2f skycolor: %s", world.getTime(), world.getTimeScale(),
+                                       world.getSkyColor());
 
             String nl = "\n    ";
             StringBuilder ents = new StringBuilder("E = ");
@@ -114,7 +116,8 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
             font.draw(batch, chunk, spacing, h - spacing * 5);
             font.draw(batch, viewChunk, spacing, h - spacing * 7);
             font.draw(batch, pos, spacing, h - spacing * 9);
-            font.draw(batch, ents.toString().trim(), spacing, h - spacing * 11);
+            font.draw(batch, sky, spacing, h - spacing * 11);
+            font.draw(batch, ents.toString().trim(), spacing, h - spacing * 13);
         }
         Material sel = player.getControls().getSelected();
         if (sel != null && sel.getTextureRegion() != null) {
