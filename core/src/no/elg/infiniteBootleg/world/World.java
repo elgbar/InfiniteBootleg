@@ -115,7 +115,8 @@ public class World implements Disposable, Ticking, Resizable {
     private String name = "World";
     private float time;
     private float timeScale = 1;
-    private final Color baseColor = new Color(Color.BLACK);
+    private final Color baseColor = new Color(Color.WHITE);
+    private final Color tmpColor = new Color();
 
     /**
      * Generate a world with a random seed
@@ -566,6 +567,8 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    public float getSkyColor() {return getSkyColor(time);}
+
     public float getSkyColor(float time) {
         float dir;
         if (time >= 0) {
@@ -575,9 +578,6 @@ public class World implements Disposable, Ticking, Resizable {
             int mult = (int) (-time / 360) + 1;
             dir = mult * 360 + time;
         }
-
-//        float dir = (float) Math.sinh(MathUtils.sinDeg(time)); //dir is will always be between 0 and 360
-        System.out.println("dir = " + dir);
         float gray = 0;
 
         if (dir <= 180) {
@@ -586,16 +586,10 @@ public class World implements Disposable, Ticking, Resizable {
         else if (dir == 0) {
             gray = 0.5f;
         }
-//        else if (dir > 0 && dir < World.TWILIGHT_DEGREES) {
-//            gray = 1 - (dir / (World.TWILIGHT_DEGREES));
-//        }
         else if (dir > 360 - World.TWILIGHT_DEGREES && dir < 360) {
             gray = (360 - dir) / (World.TWILIGHT_DEGREES);
         }
-        else if (
-//            (dir >= 180 - World.TWILIGHT_DEGREES && dir <= 180)
-//                 ||
-            (dir >= 180 && dir <= 180 + World.TWILIGHT_DEGREES)) {
+        else if (dir >= 180 && dir <= 180 + World.TWILIGHT_DEGREES) {
             gray = ((dir - 180) / (World.TWILIGHT_DEGREES));
         }
         else if (dir > 180) {
@@ -620,8 +614,8 @@ public class World implements Disposable, Ticking, Resizable {
         if (Main.renderGraphic && WorldRender.lights && ticker.getTickId() % 3 == 0) {
             synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
-                    float brightness = getSkyColor(time);
-                    wr.getSkylight().setColor(brightness, brightness, brightness, 1);
+                    float brightness = 1 / getSkyColor(time);
+                    wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
                     wr.getRayHandler().update();
                 }
             }
