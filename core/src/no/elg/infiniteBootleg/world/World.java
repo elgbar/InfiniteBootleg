@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -59,11 +60,17 @@ public class World implements Disposable, Ticking, Resizable {
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
-    public static final int MAX_DEG_SKYLIGHT = -45;
-    public static final int MIN_DEG_SKYLIGHT = -135;
-    public static final int STRAIGHT_DOWN_SKYLIGHT = -90;
+    public static final int DAWN_TIME = 0;
+    public static final int MIDDAY_TIME = -90;
+    public static final int DUSK_TIME = -180;
+    public static final int MIDNIGHT_TIME = -270;
 
     public static final int SKYLIGHT_SHADOW_LENGTH = 2;
+    /**
+     * How many degrees the time light should have before triggering sunset/sunrise. This will happen from {@code
+     * -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
+     */
+    public static final float TWILIGHT_DEGREES = 15;
 
     static {
         //base filter for entities
@@ -106,7 +113,9 @@ public class World implements Disposable, Ticking, Resizable {
     private Set<LivingEntity> livingEntities; //all player in this world
 
     private String name = "World";
-    private int time;
+    private float time;
+    private float timeScale = 1;
+    private final Color baseColor = new Color(Color.BLACK);
 
     /**
      * Generate a world with a random seed
@@ -124,7 +133,7 @@ public class World implements Disposable, Ticking, Resizable {
         entities = ConcurrentHashMap.newKeySet();
         livingEntities = ConcurrentHashMap.newKeySet();
         livingEntities = ConcurrentHashMap.newKeySet();
-        time = STRAIGHT_DOWN_SKYLIGHT;
+        time = MIDDAY_TIME;
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
@@ -549,18 +558,6 @@ public class World implements Disposable, Ticking, Resizable {
 
     @Override
     public void tickRare() {
-
-        //update light direction
-        if (dayTicking) {
-            if (time > MAX_DEG_SKYLIGHT) {
-                time = MIN_DEG_SKYLIGHT;
-            }
-            else if (time < MIN_DEG_SKYLIGHT) {
-                time = MIN_DEG_SKYLIGHT;
-            }
-            getRender().getSkylight().setDirection(++time);
-        }
-
         for (Chunk chunk : chunks.values()) {
             chunk.tickRare();
         }
@@ -569,16 +566,63 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    public float getSkyColor(float time) {
+        float dir;
+        if (time >= 0) {
+            dir = time % 360;
+        }
+        else {
+            int mult = (int) (-time / 360) + 1;
+            dir = mult * 360 + time;
+        }
+
+//        float dir = (float) Math.sinh(MathUtils.sinDeg(time)); //dir is will always be between 0 and 360
+        System.out.println("dir = " + dir);
+        float gray = 0;
+
+        if (dir <= 180) {
+            return 0;
+        }
+        else if (dir == 0) {
+            gray = 0.5f;
+        }
+//        else if (dir > 0 && dir < World.TWILIGHT_DEGREES) {
+//            gray = 1 - (dir / (World.TWILIGHT_DEGREES));
+//        }
+        else if (dir > 360 - World.TWILIGHT_DEGREES && dir < 360) {
+            gray = (360 - dir) / (World.TWILIGHT_DEGREES);
+        }
+        else if (
+//            (dir >= 180 - World.TWILIGHT_DEGREES && dir <= 180)
+//                 ||
+            (dir >= 180 && dir <= 180 + World.TWILIGHT_DEGREES)) {
+            gray = ((dir - 180) / (World.TWILIGHT_DEGREES));
+        }
+        else if (dir > 180) {
+            gray = 1; //white
+        }
+        return gray;
+    }
+
     @Override
     public void tick() {
         //tick all box2d elements
         worldBody.tick();
+        WorldRender wr = getRender();
+
+        //update light direction
+        if (dayTicking) {
+            time -= WorldTicker.SECONDS_DELAY_BETWEEN_TICKS * timeScale;
+            wr.getSkylight().setDirection(time);
+        }
 
         //update lights
-        synchronized (WorldRender.BOX2D_LOCK) {
-            if (Main.renderGraphic && WorldRender.lights && ticker.getTickId() % 2 == 0) {
+        if (Main.renderGraphic && WorldRender.lights && ticker.getTickId() % 3 == 0) {
+            synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
-                    getRender().getRayHandler().update();
+                    float brightness = getSkyColor(time);
+                    wr.getSkylight().setColor(brightness, brightness, brightness, 1);
+                    wr.getRayHandler().update();
                 }
             }
         }
@@ -594,7 +638,7 @@ public class World implements Disposable, Ticking, Resizable {
                 continue;
             }
             //Unload chunks not seen for 5 seconds
-            if (chunk.isAllowingUnloading() && getRender().isOutOfView(chunk) &&
+            if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
                 unload(chunk);
                 iterator.remove();
@@ -730,7 +774,6 @@ public class World implements Disposable, Ticking, Resizable {
                     return ((MaterialEntity) entity).getMaterial();
                 }
             }
-
             return Material.AIR;
         }
         return block.getMaterial();
@@ -768,5 +811,25 @@ public class World implements Disposable, Ticking, Resizable {
     @NotNull
     public WorldBody getWorldBody() {
         return worldBody;
+    }
+
+    public float getTimeScale() {
+        return timeScale;
+    }
+
+    public void setTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+    }
+
+    public float getTime() {
+        return time;
+    }
+
+    public void setTime(float time) {
+        this.time = time;
+    }
+
+    public Color getBaseColor() {
+        return baseColor;
     }
 }

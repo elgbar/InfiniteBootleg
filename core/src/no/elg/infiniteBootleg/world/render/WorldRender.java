@@ -52,8 +52,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public static boolean lights = true;
     public static boolean debugBox2d = false;
 
-    private int skyDir;
-
     public final static Object LIGHT_LOCK = new Object();
     public final static Object BOX2D_LOCK = new Object();
 
@@ -78,17 +76,14 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
             debugRenderer = new Box2DDebugRenderer();
 
-
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
             rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld());
-            rayHandler.setBlurNum(1);
+            rayHandler.setBlurNum(3);
             rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1);
 
-            skyDir = World.STRAIGHT_DOWN_SKYLIGHT;
-
             //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
-            skylight = new DirectionalLight(rayHandler, 75000, Color.WHITE, skyDir);
+            skylight = new DirectionalLight(rayHandler, 75000, Color.WHITE, World.MIDDAY_TIME);
             skylight.setContactFilter(World.LIGHT_FILTER);
             skylight.setStaticLight(true);
             skylight.setSoftnessLength(World.SKYLIGHT_SHADOW_LENGTH); //restore lights 1.4 functionality
@@ -119,7 +114,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
-            skylight.setStaticLight(true);
             rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
                                          camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
         }
@@ -225,6 +219,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public DirectionalLight getSkylight() {
         return skylight;
     }
+
 
     @Override
     public void dispose() {

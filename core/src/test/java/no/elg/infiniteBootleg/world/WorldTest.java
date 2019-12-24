@@ -1,10 +1,14 @@
 package no.elg.infiniteBootleg.world;
 
+import box2dLight.DirectionalLight;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectSet;
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +19,9 @@ import java.util.stream.StreamSupport;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Elg
@@ -27,7 +34,21 @@ public class WorldTest extends TestGraphic {
     @Before
     public void setUp() {
         loc = new Location(0, 0);
-        world = new World(new EmptyChunkGenerator());
+        world = Mockito.spy(new World(new EmptyChunkGenerator()));
+
+        WorldRender wr = mock(WorldRender.class);
+        when(world.getRender()).thenReturn(wr);
+
+        DirectionalLight dl = mock(DirectionalLight.class);
+        when(wr.getSkylight()).thenReturn(dl);
+
+        final Color color = new Color(Color.WHITE);
+
+        when(dl.getColor()).thenReturn(color);
+
+        Mockito.doAnswer(i -> color.set(i.getArgument(0))).when(dl).setColor(any(Color.class));
+        Mockito.doAnswer(i -> color.set(i.getArgument(0), i.getArgument(1), i.getArgument(2), i.getArgument(3))).when(
+            dl).setColor(any(Float.class), any(Float.class), any(Float.class), any(Float.class));
     }
 
     @Test
@@ -146,5 +167,96 @@ public class WorldTest extends TestGraphic {
             Collectors.toSet());
 
         assertEquals(larr, bal);
+    }
+
+    @Test
+    public void skyColorForMiddayIsWhite() {
+        assertEquals(1, world.getSkyColor(World.MIDDAY_TIME), 0);
+    }
+
+    @Test
+    public void skyColorForMiddayIsWhiteNextDay() {
+        assertEquals(1, world.getSkyColor(World.MIDDAY_TIME + 360), 0);
+    }
+
+    @Test
+    public void skyColorForMiddayIsWhitePrevDay() {
+        assertEquals(1, world.getSkyColor(World.MIDDAY_TIME - 360), 0);
+    }
+
+    @Test
+    public void skyColorForMidnightIsBlack() {
+        assertEquals(0, world.getSkyColor(World.MIDNIGHT_TIME), 0);
+    }
+
+    @Test
+    public void skyColorForMidnightIsBlackNextDay() {
+        assertEquals(0, world.getSkyColor(World.MIDNIGHT_TIME + 360), 0);
+    }
+
+    @Test
+    public void skyColorForMidnightIsBlackPrevDay() {
+        assertEquals(0, world.getSkyColor(World.MIDNIGHT_TIME - 360), 0);
+    }
+
+
+    //////////
+    // dawn //
+    //////////
+
+    @Test
+    public void skyColorAtStartOfDawnIsBlack() {
+        assertEquals(0, world.getSkyColor(World.TWILIGHT_DEGREES), 0);
+    }
+
+    @Test
+    public void skyColorDuringStartOfDawnIsHalfGrayHalfBlack() {
+        assertEquals(0, world.getSkyColor((World.TWILIGHT_DEGREES / 2)), 0);
+    }
+
+    @Test
+    public void skyColorDawnIsGray() {
+        assertEquals(0, world.getSkyColor(World.DAWN_TIME), 0);
+    }
+
+    @Test
+    public void skyColorDuringEndOfDawnIsHalfGrayHalfWhite() {
+        assertEquals(0.5f, world.getSkyColor(-World.TWILIGHT_DEGREES / 2), 0);
+    }
+
+    @Test
+    public void skyColorAtEndOfDawnIsWhite() {
+        assertEquals(1, world.getSkyColor(-World.TWILIGHT_DEGREES), 0);
+    }
+
+
+    //////////
+    // dusk //
+    //////////
+
+
+    @Test
+    public void skyColorAtStartOfDuskIsWhite() {
+        assertEquals(1, world.getSkyColor(180 + World.TWILIGHT_DEGREES), 0);
+    }
+
+    @Test
+    public void skyColorDuringStartOfDuskIsHalfGrayHalfWhite() {
+        assertEquals(0.5f, world.getSkyColor(180 + World.TWILIGHT_DEGREES / 2), 0);
+    }
+
+    @Test
+    public void skyColorDuskIsGray() {
+        assertEquals(0, world.getSkyColor(World.DUSK_TIME), 0);
+    }
+
+    @Test
+    public void skyColorDuringEndOfDuskIsHalfGrayHalfBlack() {
+        assertEquals(0, world.getSkyColor(180 - World.TWILIGHT_DEGREES / 2), 0);
+    }
+
+    @Test
+    public void skyColorAtEndOfDuskIBlack() {
+        assertEquals(0, world.getSkyColor(180 - World.TWILIGHT_DEGREES), 0);
     }
 }

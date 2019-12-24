@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.world.WorldTicker;
 public interface Ticking {
 
     /**
-     * How many ticks between each rare update
+     * How many ticks between each rare update. Currently each rare tick is the same as one second
      */
     long TICK_RARE_RATE = WorldTicker.TICKS_PER_SECOND;
 

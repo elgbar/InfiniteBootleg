@@ -44,15 +44,14 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
     public void skyColor(String colorName) {
         if (Main.renderGraphic) {
-            DirectionalLight skylight = Main.inst().getWorld().getRender().getSkylight();
+            Color skylight = Main.inst().getWorld().getBaseColor();
             try {
                 Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
-                skylight.setColor(color);
+                skylight.set(color);
+                logger.log("Sky color changed to " + colorName.toLowerCase());
             } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
                 logger.logf(LogLevel.ERROR, "Unknown color '%s'", colorName);
-                return;
             }
-            logger.log("Sky color changed to " + colorName.toLowerCase());
         }
         else {
             logger.log(LogLevel.ERROR, "Cannot change the color of the sky as graphics are not enabled");
@@ -152,22 +151,6 @@ public class Commands extends CommandExecutor {
     }
 
     @ClientsideOnly
-    @ConsoleDoc(description = "The direction of the skylight",
-                paramDescriptions = "A floating point number between 0 and 180")
-    public void lightDir(float dir) {
-        if (dir < 0) {
-            logger.log(LogLevel.ERROR, "Direction can not be less than 0");
-            return;
-        }
-        else if (dir > 180) {
-            logger.log(LogLevel.ERROR, "Direction can not be greater than or equal to 180");
-            return;
-        }
-        Main.inst().getWorld().getRender().getSkylight().setDirection(-dir);
-        logger.success("Skylight is now pointing in direction " + dir);
-    }
-
-    @ClientsideOnly
     @ConsoleDoc(description = "Set how much information to show", paramDescriptions = "normal (default), debug or none")
     public void hud(String modusName) {
         try {
@@ -233,6 +216,26 @@ public class Commands extends CommandExecutor {
         }
         Main.inst().getPlayer().getControls().setBrushSize(size);
         logger.log(LogLevel.SUCCESS, "Brush size for player is now " + size);
+    }
+
+    @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
+    public void timescale(float scale) {
+        float old = Main.inst().getWorld().getTimeScale();
+        Main.inst().getWorld().setTimeScale(scale);
+        logger.success("Changed time scale from % .3f to % .3f", old, scale);
+    }
+
+    @ConsoleDoc(description = "Toggle if time ticks or not")
+    public void toggleTime() {
+        World.dayTicking = !World.dayTicking;
+        logger.success("Time is now " + (World.dayTicking ? "" : "not ") + "ticking");
+    }
+
+    @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
+    public void time(float time) {
+        float old = Main.inst().getWorld().getTime();
+        Main.inst().getWorld().setTime(time);
+        logger.success("Changed time from % .3f to % .3f", old, time);
     }
 }
 
