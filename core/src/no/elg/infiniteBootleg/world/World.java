@@ -567,9 +567,10 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
-    public float getSkyColor() {return getSkyColor(time);}
+    public float getSkyBrightness() {return getSkyBrightness(time);}
 
-    public float getSkyColor(float time) {
+    /**
+    public float getSkyBrightness(float time) {
         float dir;
         if (time >= 0) {
             dir = time % 360;
@@ -614,8 +615,11 @@ public class World implements Disposable, Ticking, Resizable {
         if (Main.renderGraphic && WorldRender.lights && ticker.getTickId() % 3 == 0) {
             synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
-                    float brightness = 1 / getSkyColor(time);
-                    wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
+                    float brightness = getSkyBrightness(time);
+                    if (brightness > 0) {
+                        wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
+                    }
+                    else { wr.getSkylight().setColor(Color.BLACK); }
                     wr.getRayHandler().update();
                 }
             }

@@ -171,32 +171,32 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void skyColorForMiddayIsWhite() {
-        assertEquals(1, world.getSkyColor(World.MIDDAY_TIME), 0);
+        assertEquals(1, world.getSkyBrightness(World.MIDDAY_TIME), 0);
     }
 
     @Test
     public void skyColorForMiddayIsWhiteNextDay() {
-        assertEquals(1, world.getSkyColor(World.MIDDAY_TIME + 360), 0);
+        assertEquals(1, world.getSkyBrightness(World.MIDDAY_TIME + 360), 0);
     }
 
     @Test
     public void skyColorForMiddayIsWhitePrevDay() {
-        assertEquals(1, world.getSkyColor(World.MIDDAY_TIME - 360), 0);
+        assertEquals(1, world.getSkyBrightness(World.MIDDAY_TIME - 360), 0);
     }
 
     @Test
     public void skyColorForMidnightIsBlack() {
-        assertEquals(0, world.getSkyColor(World.MIDNIGHT_TIME), 0);
+        assertEquals(0, world.getSkyBrightness(World.MIDNIGHT_TIME), 0);
     }
 
     @Test
     public void skyColorForMidnightIsBlackNextDay() {
-        assertEquals(0, world.getSkyColor(World.MIDNIGHT_TIME + 360), 0);
+        assertEquals(0, world.getSkyBrightness(World.MIDNIGHT_TIME + 360), 0);
     }
 
     @Test
     public void skyColorForMidnightIsBlackPrevDay() {
-        assertEquals(0, world.getSkyColor(World.MIDNIGHT_TIME - 360), 0);
+        assertEquals(0, world.getSkyBrightness(World.MIDNIGHT_TIME - 360), 0);
     }
 
 
@@ -206,27 +206,27 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void skyColorAtStartOfDawnIsBlack() {
-        assertEquals(0, world.getSkyColor(World.TWILIGHT_DEGREES), 0);
+        assertEquals(0, world.getSkyBrightness(World.TWILIGHT_DEGREES), 0);
     }
 
     @Test
     public void skyColorDuringStartOfDawnIsHalfGrayHalfBlack() {
-        assertEquals(0, world.getSkyColor((World.TWILIGHT_DEGREES / 2)), 0);
+        assertEquals(0, world.getSkyBrightness((World.TWILIGHT_DEGREES / 2)), 0);
     }
 
     @Test
     public void skyColorDawnIsGray() {
-        assertEquals(0, world.getSkyColor(World.DAWN_TIME), 0);
+        assertEquals(0, world.getSkyBrightness(World.SUNRISE_TIME), 0);
     }
 
     @Test
     public void skyColorDuringEndOfDawnIsHalfGrayHalfWhite() {
-        assertEquals(0.5f, world.getSkyColor(-World.TWILIGHT_DEGREES / 2), 0);
+        assertEquals(0.5f, world.getSkyBrightness(-World.TWILIGHT_DEGREES / 2), 0);
     }
 
     @Test
     public void skyColorAtEndOfDawnIsWhite() {
-        assertEquals(1, world.getSkyColor(-World.TWILIGHT_DEGREES), 0);
+        assertEquals(1, world.getSkyBrightness(-World.TWILIGHT_DEGREES), 0);
     }
 
 
@@ -237,26 +237,26 @@ public class WorldTest extends TestGraphic {
 
     @Test
     public void skyColorAtStartOfDuskIsWhite() {
-        assertEquals(1, world.getSkyColor(180 + World.TWILIGHT_DEGREES), 0);
+        assertEquals(1, world.getSkyBrightness(180 + World.TWILIGHT_DEGREES), 0);
     }
 
     @Test
     public void skyColorDuringStartOfDuskIsHalfGrayHalfWhite() {
-        assertEquals(0.5f, world.getSkyColor(180 + World.TWILIGHT_DEGREES / 2), 0);
+        assertEquals(0.5f, world.getSkyBrightness(180 + World.TWILIGHT_DEGREES / 2), 0);
     }
 
     @Test
     public void skyColorDuskIsGray() {
-        assertEquals(0, world.getSkyColor(World.DUSK_TIME), 0);
+        assertEquals(0, world.getSkyBrightness(World.SUNSET_TIME), 0);
     }
 
     @Test
     public void skyColorDuringEndOfDuskIsHalfGrayHalfBlack() {
-        assertEquals(0, world.getSkyColor(180 - World.TWILIGHT_DEGREES / 2), 0);
+        assertEquals(0, world.getSkyBrightness(180 - World.TWILIGHT_DEGREES / 2), 0);
     }
 
     @Test
     public void skyColorAtEndOfDuskIBlack() {
-        assertEquals(0, world.getSkyColor(180 - World.TWILIGHT_DEGREES), 0);
+        assertEquals(0, world.getSkyBrightness(180 - World.TWILIGHT_DEGREES), 0);
     }
 }

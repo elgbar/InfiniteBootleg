@@ -99,7 +99,7 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                        player.isOnGround(), player.isFlying()//
                                       );
             String sky = String.format("time: %.2f scale: %.2f skycolor: %s", world.getTime(), world.getTimeScale(),
-                                       world.getSkyColor());
+                                       world.getSkyBrightness());
 
             String nl = "\n    ";
             StringBuilder ents = new StringBuilder("E = ");
