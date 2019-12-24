@@ -567,9 +567,27 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    /**
+     * Calculate how bright the sky should be. During the night the value will always be {@code 0}, during twilight (ie
+     * from {@code 360} to {@code 360-}{@link #TWILIGHT_DEGREES} and {@code 180+}{@link #TWILIGHT_DEGREES} to {@code
+     * 180-}{@link #TWILIGHT_DEGREES}) the light will change. During daytime the value will always be 1
+     * <p>
+     * The time used will be the current world time ie {@link #getTime()}
+     *
+     * @return A brightness value between 0 and 1 (both inclusives)
+     */
     public float getSkyBrightness() {return getSkyBrightness(time);}
 
     /**
+     * Calculate how bright the sky should be. During the night the value will always be {@code 0}, during twilight (ie
+     * from {@code 360} to {@code 360-}{@link #TWILIGHT_DEGREES} and {@code 180+}{@link #TWILIGHT_DEGREES} to {@code
+     * 180-}{@link #TWILIGHT_DEGREES}) the light will change. During daytime the value will always be 1
+     *
+     * @param time
+     *     The time to calculate
+     *
+     * @return A brightness value between 0 and 1 (both inclusive)
+     */
     public float getSkyBrightness(float time) {
         float dir;
         if (time >= 0) {
