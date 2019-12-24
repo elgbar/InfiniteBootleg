@@ -116,7 +116,9 @@ public class ChunkBody implements Disposable {
                         rel = relChunk.getBlocks()[relOffsetX][relOffsetY];
                     }
                     if (rel == null || !rel.getMaterial().isSolid() ||
-                        (dir == Direction.NORTH && localY == CHUNK_SIZE - 1)) {
+                        (dir == Direction.NORTH && localY == CHUNK_SIZE - 1)//always render top of chunk
+                        || (dir == Direction.EAST && localX == CHUNK_SIZE - 1) //and the sides
+                        || (dir == Direction.WEST && localX == 0)) {
                         byte[] ds = tuple.value;
                         edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
 
