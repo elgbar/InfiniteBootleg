@@ -241,31 +241,37 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Set the current time", paramDescriptions = "Time of day")
     public void time(String timeOfDay) {
         float time;
-        switch (timeOfDay.toLowerCase()) {
-            case "day":
-            case "dawn":
-            case "sunrise":
-                time = World.SUNRISE_TIME;
-                break;
-            case "midday":
-            case "noon":
-                time = World.MIDDAY_TIME;
-                break;
-            case "dusk":
-            case "sunset":
-                time = World.SUNSET_TIME;
-                break;
-            case "midnight":
-            case "night":
-                time = World.MIDNIGHT_TIME;
-                break;
-            case "end":
-                time = Integer.MAX_VALUE;
-                break;
-            default:
-                logger.error("ERR", "Unknown time of day, try sunrise, midday, sunset or midnight");
-                return;
+        try {
+            //There is a chance this method is before selected the other time method
+            time = Float.parseFloat(timeOfDay);
+        } catch (NumberFormatException ignored) {
+            switch (timeOfDay.toLowerCase()) {
+                case "day":
+                case "dawn":
+                case "sunrise":
+                    time = World.SUNRISE_TIME;
+                    break;
+                case "midday":
+                case "noon":
+                    time = World.MIDDAY_TIME;
+                    break;
+                case "dusk":
+                case "sunset":
+                    time = World.SUNSET_TIME;
+                    break;
+                case "midnight":
+                case "night":
+                    time = World.MIDNIGHT_TIME;
+                    break;
+                case "end":
+                    time = Integer.MAX_VALUE;
+                    break;
+                default:
+                    logger.error("ERR", "Unknown time of day, try sunrise, midday, sunset or midnight");
+                    return;
+            }
         }
+
         //call the other time function
         time(time);
     }
