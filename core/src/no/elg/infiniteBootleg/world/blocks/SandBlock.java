@@ -6,7 +6,8 @@ import no.elg.infiniteBootleg.world.*;
 import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
 import org.jetbrains.annotations.NotNull;
 
-public class SandBlock extends UpdatableBlock {
+/**
+public class SandBlock extends TickingBlock {
 
     public SandBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);

@@ -23,7 +23,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 /**
  * @author Elg
  */
-public class TntBlock extends UpdatableBlock {
+public class TntBlock extends TickingBlock {
 
 
     private static final TextureRegion whiteTexture;
@@ -59,7 +59,7 @@ public class TntBlock extends UpdatableBlock {
     }
 
     @Override
-    public boolean shouldUpdate() {
+    public boolean shouldTick() {
         return !exploded;
     }
 

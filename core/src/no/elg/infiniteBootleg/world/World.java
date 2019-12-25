@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
-import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
+import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
@@ -380,8 +380,8 @@ public class World implements Disposable, Ticking, Resizable {
     public void updateBlocksAround(int worldX, int worldY) {
         for (Direction dir : Direction.CARDINAL) {
             Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
-            if (rel instanceof UpdatableBlock) {
-                ((UpdatableBlock) rel).setUpdate(true);
+            if (rel instanceof TickingBlock) {
+                ((TickingBlock) rel).setShouldTick(true);
             }
         }
     }

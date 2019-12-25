@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.world.blocks.UpdatableBlock;
+import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +43,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     private final int chunkX;
     private final int chunkY;
 
-    private final Set<UpdatableBlock> updatableBlocks;
+    private final Set<TickingBlock> tickingBlocks;
 
     //if this chunk should be prioritized to be updated
     private boolean dirty; //if texture/allair needs to be updated
@@ -92,7 +92,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
-        updatableBlocks = Collections.synchronizedSet(new HashSet<>());
+        tickingBlocks = Collections.synchronizedSet(new HashSet<>());
         chunkBody = new ChunkBody(this);
 
         dirty = true;
@@ -230,23 +230,23 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
         if (block == null) {
             blocks[localX][localY] = null;
-            if (currBlock instanceof UpdatableBlock) {
-                synchronized (updatableBlocks) {
-                    updatableBlocks.remove(currBlock);
+            if (currBlock instanceof TickingBlock) {
+                synchronized (tickingBlocks) {
+                    tickingBlocks.remove(currBlock);
                 }
             }
         }
         else {
             blocks[localX][localY] = block;
 
-            if (currBlock instanceof UpdatableBlock && !(block instanceof UpdatableBlock)) {
-                synchronized (updatableBlocks) {
-                    updatableBlocks.remove(currBlock);
+            if (currBlock instanceof TickingBlock && !(block instanceof TickingBlock)) {
+                synchronized (tickingBlocks) {
+                    tickingBlocks.remove(currBlock);
                 }
             }
-            if (block instanceof UpdatableBlock) {
-                synchronized (updatableBlocks) {
-                    updatableBlocks.add((UpdatableBlock) block);
+            if (block instanceof TickingBlock) {
+                synchronized (tickingBlocks) {
+                    tickingBlocks.add((TickingBlock) block);
                 }
             }
         }
@@ -308,8 +308,8 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     @Override
     public void tick() {
-        synchronized (updatableBlocks) {
-            for (UpdatableBlock block : updatableBlocks) {
+        synchronized (tickingBlocks) {
+            for (TickingBlock block : tickingBlocks) {
                 block.tryTick(false);
             }
         }
@@ -317,8 +317,8 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
     @Override
     public void tickRare() {
-        synchronized (updatableBlocks) {
-            for (UpdatableBlock block : updatableBlocks) {
+        synchronized (tickingBlocks) {
+            for (TickingBlock block : tickingBlocks) {
                 block.tryTick(true);
             }
         }
@@ -529,18 +529,18 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     public void finishLoading() {
         synchronized (this) {
-            HashSet<UpdatableBlock> updateBlocks = new HashSet<>();
+            HashSet<TickingBlock> updateBlocks = new HashSet<>();
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     Block block = blocks[x][y];
-                    if (block instanceof UpdatableBlock) {
-                        updateBlocks.add((UpdatableBlock) block);
+                    if (block instanceof TickingBlock) {
+                        updateBlocks.add((TickingBlock) block);
                     }
                 }
             }
 
-            synchronized (updatableBlocks) {
-                updatableBlocks.addAll(updateBlocks);
+            synchronized (tickingBlocks) {
+                tickingBlocks.addAll(updateBlocks);
             }
         }
         initializing = false;
@@ -566,7 +566,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                                     bytes.length);
         int index = 0;
         synchronized (this) {
-            HashSet<UpdatableBlock> updateBlocks = new HashSet<>();
+            HashSet<TickingBlock> updateBlocks = new HashSet<>();
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
                     Material mat = Material.fromByte(bytes[index++]);
@@ -575,14 +575,14 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                         continue;
                     }
                     Block block = mat.createBlock(world, this, x, y);
-                    if (block instanceof UpdatableBlock) {
-                        updateBlocks.add((UpdatableBlock) block);
+                    if (block instanceof TickingBlock) {
+                        updateBlocks.add((TickingBlock) block);
                     }
                     blocks[x][y] = block;
                 }
             }
-            synchronized (updatableBlocks) {
-                updatableBlocks.addAll(updateBlocks);
+            synchronized (tickingBlocks) {
+                tickingBlocks.addAll(updateBlocks);
             }
 
         }
