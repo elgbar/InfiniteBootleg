@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.utils.PauseableThread;
-import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
@@ -26,15 +25,12 @@ public class WorldTicker implements Runnable {
     private final World world;
 
     private long tickId;
-    private long frameId;
-
-    private long stuckFrames;
 
     public WorldTicker(@NotNull World world) {
         this.world = world;
-        Main.inst().getConsoleLogger().log("Starting world ticking thread with TPS = " + TICKS_PER_SECOND);
+        Main.logger().log("Starting world ticking thread with TPS = " + TICKS_PER_SECOND);
         worldTickThread = new PauseableThread(this);
-        worldTickThread.setName("World tick thread");
+        worldTickThread.setName("World Ticker");
         worldTickThread.setDaemon(true);
         worldTickThread.start();
     }
@@ -42,37 +38,18 @@ public class WorldTicker implements Runnable {
     @Override
     public void run() {
         try {
-            if (frameId != Gdx.graphics.getFrameId()) {
-//                            if (tickId % TICKS_PER_SECOND == 0) {
-////                                System.out.println("tick: " + tickId);
-//                            }
-                //force save every 30 sec, but not first tick
-                //FIXME not currently working (not writing chunks that hasn't been modified since last times
-//                            if (tickId > 0 && tickId % (TICKS_PER_SECOND * 10) == 0) {
-//                                System.out.println("Saving world " + world.getName() + " (" + world.getUuid() + ")");
-//                                Gdx.app.postRunnable(world::save);
-//                            }
-                Gdx.app.postRunnable(world::tick);
-                if (tickId % Ticking.TICK_RARE_RATE == 0) {
-                    Gdx.app.postRunnable(world::tickRare);
-                }
-                tickId++;
-                stuckFrames = 0;
-                frameId = Gdx.graphics.getFrameId();
+
+            Gdx.app.postRunnable(world::tick);
+            if (tickId % Ticking.TICK_RARE_RATE == 0) {
+                Gdx.app.postRunnable(world::tickRare);
             }
-            else {
-                stuckFrames++;
-                if (stuckFrames == TICKS_PER_SECOND || stuckFrames % (TICKS_PER_SECOND * 10) == 0) {
-                    Main.inst().getConsoleLogger().logf(LogLevel.ERROR,
-                                                        "Can't keep up! Failed to update world for %d ticks",
-                                                        stuckFrames);
-                }
-            }
+            tickId++;
             Thread.sleep(MS_DELAY_BETWEEN_TICKS);
         } catch (InterruptedException ignored) {
-            Main.inst().getConsoleLogger().log("World updater interrupted");
+            Main.logger().log("World updater interrupted");
         }
     }
+
 
     /**
      * @return How many times the world have been updated since start
