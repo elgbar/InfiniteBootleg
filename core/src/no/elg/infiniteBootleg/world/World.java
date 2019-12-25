@@ -53,14 +53,13 @@ public class World implements Disposable, Ticking, Resizable {
     public static final short GROUND_CATEGORY = 0x1;
     public static final short LIGHTS_CATEGORY = 0x2;
     public static final short ENTITY_CATEGORY = 0x4;
-    public static final short GROUND_ENTITY_CATEGORY = 0x8;
 
     public static final Filter BLOCK_ENTITY_FILTER;
     public static final Filter SOLID_TRANSPARENT_FILTER;
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
-    public static final int SKYLIGHT_SHADOW_LENGTH = 2;
+    public static final float SKYLIGHT_SHADOW_LENGTH = 2f;
     /**
      * How many degrees the time light should have before triggering sunset/sunrise. This will happen from {@code
      * -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
@@ -117,6 +116,7 @@ public class World implements Disposable, Ticking, Resizable {
     private float timeScale = 1;
     private final Color baseColor = new Color(Color.WHITE);
     private final Color tmpColor = new Color();
+    private long lastFrame;
 
     /**
      * Generate a world with a random seed
@@ -626,21 +626,24 @@ public class World implements Disposable, Ticking, Resizable {
                 wr.getSkylight().setDirection(time);
             }
         }
-        if (getTick() % WorldTicker.TICKS_PER_SECOND / 20 == 0) {
-            float brightness = getSkyBrightness(time);
-            if (brightness > 0) {
-                wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
-            }
-            else { wr.getSkylight().setColor(Color.BLACK); }
+        float brightness = getSkyBrightness(time);
+        if (brightness > 0) {
+            wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
         }
+        else { wr.getSkylight().setColor(Color.BLACK); }
 
         //update lights
-        if (Main.renderGraphic && WorldRender.lights) {
-            synchronized (WorldRender.BOX2D_LOCK) {
-                synchronized (WorldRender.LIGHT_LOCK) {
-                    wr.getRayHandler().update();
+        if (Main.renderGraphic && WorldRender.lights && lastFrame < Gdx.graphics.getFrameId() &&
+            getTick() % (WorldTicker.TICKS_PER_SECOND / 20) == 0) {
+            lastFrame = Gdx.graphics.getFrameId();
+
+            Main.inst().getScheduler().executeAsync(() -> {
+                synchronized (WorldRender.BOX2D_LOCK) {
+                    synchronized (WorldRender.LIGHT_LOCK) {
+                        wr.getRayHandler().update();
+                    }
                 }
-            }
+            });
         }
 
         //tick all chunks and blocks in chunks

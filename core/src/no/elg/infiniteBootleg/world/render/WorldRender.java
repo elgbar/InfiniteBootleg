@@ -164,8 +164,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         entityRenderer.render();
         batch.end();
         if (lights) {
-            synchronized (LIGHT_LOCK) {
-                synchronized (BOX2D_LOCK) {
+
+            synchronized (BOX2D_LOCK) {
+                synchronized (LIGHT_LOCK) {
                     rayHandler.render();
                 }
             }
