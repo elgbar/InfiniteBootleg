@@ -42,6 +42,7 @@ public class ChunkRenderer implements Renderer, Disposable {
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
         synchronized (renderQueue) {
+            Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().updateFixture(true));
             if (prioritize) { renderQueue.add(0, chunk); }
             else { renderQueue.add(chunk); }
         }
@@ -61,7 +62,6 @@ public class ChunkRenderer implements Renderer, Disposable {
         FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
 
         final Chunk finalChunk = chunk;
-        Main.inst().getScheduler().executeAsync(() -> finalChunk.getChunkBody().updateFixture(true));
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
