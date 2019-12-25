@@ -7,6 +7,8 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * A blocks that falls when ticked
+ */
 public class SandBlock extends TickingBlock {
 
     public SandBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {

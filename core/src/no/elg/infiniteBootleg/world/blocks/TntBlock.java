@@ -21,6 +21,8 @@ import java.util.Set;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
 /**
+ * A block that explodes after {@link #FUSE_DURATION} ticks
+ *
  * @author Elg
  */
 public class TntBlock extends TickingBlock {
@@ -48,9 +50,24 @@ public class TntBlock extends TickingBlock {
     @Nullable
     private PointLight light;
 
+    /**
+     * How long, in ticks, the fuse time should be
+     */
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
-    public static final int EXPLOSION_STRENGTH = 25; //basically max radius
-    public static final int RESISTANCE = 10;
+    /**
+     * Maximum explosion radius
+     */
+    public static final int EXPLOSION_STRENGTH = 25;
+    /**
+     * Randomness to what blocks are destroyed.
+     * <p>
+     * Lower means more blocks destroyed, but more random holes around the crater.
+     * <p>
+     * Higher means fewer blocks destroyed but less unconnected destroyed blocks. Note that too large will not look good
+     * <p>
+     * Minimum value should be above 3 as otherwise the edge of the explosion will clearly be visible
+     */
+    public final static int RESISTANCE = 10;
 
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);

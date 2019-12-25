@@ -9,6 +9,9 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A block that lights up the surrounding area
+ */
 public class Torch extends Block {
 
     private PointLight light;
