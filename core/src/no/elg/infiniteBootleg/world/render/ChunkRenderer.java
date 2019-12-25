@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
@@ -58,16 +57,17 @@ public class ChunkRenderer implements Renderer, Disposable {
                 chunk = renderQueue.remove(0);
             } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
         }
-
-        FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
-
         final Chunk finalChunk = chunk;
+
+        FrameBuffer fbo = chunk.getFbo();
 
         // this is the main render function
         Block[][] blocks = chunk.getBlocks();
         fbo.begin();
         batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (finalChunk) {
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -77,6 +77,7 @@ public class ChunkRenderer implements Renderer, Disposable {
                     }
                     int dx = block.getLocalX() * BLOCK_SIZE;
                     int dy = block.getLocalY() * BLOCK_SIZE;
+
                     //noinspection ConstantConditions
                     batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
                 }
@@ -85,7 +86,6 @@ public class ChunkRenderer implements Renderer, Disposable {
         batch.end();
         fbo.end();
 
-        chunk.setFbo(fbo);
         worldRender.update();
     }
 

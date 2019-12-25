@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -287,20 +288,14 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         return fboRegion;
     }
 
-    /**
-     * Update the framebuffer object of this chunk
-     *
-     * @param fbo
-     *     The new fbo
-     */
-    public void setFbo(@NotNull FrameBuffer fbo) {
-        if (this.fbo != null) {
-            this.fbo.dispose();
+    public FrameBuffer getFbo() {
+        if (fbo == null) {
+            fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
+            fbo.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            fboRegion = new TextureRegion(fbo.getColorBufferTexture());
+            fboRegion.flip(false, true);
         }
-        this.fbo = fbo;
-        fbo.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        fboRegion = new TextureRegion(fbo.getColorBufferTexture());
-        fboRegion.flip(false, true);
+        return fbo;
     }
 
     /**
