@@ -214,6 +214,10 @@ public class Main extends ApplicationAdapter {
         return inst;
     }
 
+    public static ConsoleLogger logger() {
+        return inst().getConsoleLogger();
+    }
+
     @Nullable
     public Player getPlayer() {
         for (LivingEntity entity : world.getLivingEntities()) {

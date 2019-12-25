@@ -27,7 +27,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
     public ProgramArgs(String[] args) {
         Preconditions.checkNotNull(Main.inst(), "Main not initiated");
-        Preconditions.checkNotNull(Main.inst().getConsoleLogger(), "The console logger should not be null");
+        Preconditions.checkNotNull(Main.logger(), "The console logger should not be null");
         scheduler = new CancellableThreadScheduler(1);
         Map<Pair<String, Boolean>, String> options = Util.interpreterArgs(args);
 
@@ -50,7 +50,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                     }
                 }
                 if (name == null) {
-                    Main.inst().getConsoleLogger().logf(LogLevel.ERROR,
+                    Main.logger().logf(LogLevel.ERROR,
                                                         "Failed to find a valid argument with with the alt '%s'",
                                                         altKey);
                     continue;
@@ -63,7 +63,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                     method.invoke(this, entry.getValue());
                 }
                 else {
-                    Main.inst().getConsoleLogger().logf(LogLevel.ERROR, "Unknown argument '%s'", entry.getKey());
+                    Main.logger().logf(LogLevel.ERROR, "Unknown argument '%s'", entry.getKey());
                 }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -74,7 +74,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
     @Override
     public void log(@NotNull LogLevel level, @NotNull String msg) {
-        scheduler.scheduleAsync(() -> Main.inst().getConsoleLogger().log(level, msg), 2);
+        scheduler.scheduleAsync(() -> Main.logger().log(level, msg), 2);
     }
 
     @Override

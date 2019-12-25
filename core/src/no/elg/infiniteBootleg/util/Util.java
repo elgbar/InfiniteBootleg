@@ -162,7 +162,7 @@ public class Util {
 
         for (final String arg : args) {
             if (!arg.startsWith("-")) {
-                Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
+                Main.logger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
             }
             else {
                 //we only care about the first equals sign, the rest is a part of the value
@@ -208,7 +208,7 @@ public class Util {
             savedHash = FALLBACK_VERSION;
         }
         if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
-            Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to get the current version");
+            Main.logger().log(LogLevel.ERROR, "Failed to get the current version");
             return FALLBACK_VERSION;
         }
         if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
@@ -216,7 +216,7 @@ public class Util {
             try {
                 versionFile.writeString(calcHash, false);
             } catch (Exception ignore) {
-                Main.inst().getConsoleLogger().log(LogLevel.ERROR, "Failed to write new version to file");
+                Main.logger().log(LogLevel.ERROR, "Failed to write new version to file");
             }
         }
         return calcHash.equals(FALLBACK_VERSION) ? savedHash : calcHash;

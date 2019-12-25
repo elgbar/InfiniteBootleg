@@ -529,10 +529,9 @@ public class World implements Disposable, Ticking, Resizable {
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         try {
             ZipUtils.zip(worldFolder, worldZip);
-            Main.inst().getConsoleLogger().log("World saved!");
+            Main.logger().log("World saved!");
         } catch (IOException e) {
-            Main.inst().getConsoleLogger().log(LogLevel.ERROR,
-                                               "Failed to save world due to a " + e.getClass().getSimpleName());
+            Main.logger().log(LogLevel.ERROR, "Failed to save world due to a " + e.getClass().getSimpleName());
             e.printStackTrace();
             return;
         }
@@ -549,7 +548,7 @@ public class World implements Disposable, Ticking, Resizable {
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         Main.inst.getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
         if (!worldZip.exists()) {
-            Main.inst().getConsoleLogger().log("No world save found");
+            Main.logger().log("No world save found");
             return;
         }
 

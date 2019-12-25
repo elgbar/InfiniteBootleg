@@ -107,7 +107,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     public void teleport(float worldX, float worldY, boolean validate) {
         if (validate && isInvalidLocation(worldX, worldY)) {
-            Main.inst().getConsoleLogger().error("Entity", String
+            Main.logger().error("Entity", String
                 .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX,
                         worldY, posCache.x, posCache.y));
             return;
