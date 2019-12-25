@@ -18,6 +18,7 @@ public class Torch extends Block {
         if (Main.renderGraphic) {
             light = PointLightPool.inst.obtain();
             light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+            light.setColor(1, 1, 0.9f, 1);
         }
     }
 
