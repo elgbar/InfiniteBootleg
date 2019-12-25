@@ -110,11 +110,12 @@ public class TntBlock extends UpdatableBlock {
         if (getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND / 6) == 0) {
 
             glowing = !glowing;
-            
+
             if (Main.renderGraphic) {
                 if (light == null) {
                     light = PointLightPool.inst.obtain();
                     light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+                    light.setColor(Color.RED);
                 }
                 light.setActive(glowing);
                 getChunk().updateTexture(true);
