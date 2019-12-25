@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks;
 
+import box2dLight.PointLight;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,10 +40,13 @@ public class TntBlock extends UpdatableBlock {
         }
     }
 
-    private boolean white;
+    private boolean glowing;
     private boolean exploded;
     private long tickLeft;
     private float strength;
+
+    @Nullable
+    private PointLight light;
 
     public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
     public static final int EXPLOSION_STRENGTH = 25; //basically max radius
@@ -103,8 +108,15 @@ public class TntBlock extends UpdatableBlock {
             });
         }
         if (getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND / 6) == 0) {
-            white = !white;
+
+            glowing = !glowing;
+            
             if (Main.renderGraphic) {
+                if (light == null) {
+                    light = PointLightPool.inst.obtain();
+                    light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+                }
+                light.setActive(glowing);
                 getChunk().updateTexture(true);
             }
         }
@@ -113,7 +125,12 @@ public class TntBlock extends UpdatableBlock {
 
     @Override
     public @Nullable TextureRegion getTexture() {
-        if (white) { return whiteTexture; }
+        if (glowing) { return whiteTexture; }
         return super.getTexture();
+    }
+
+    @Override
+    public void dispose() {
+        if (light != null) { PointLightPool.inst.free(light); }
     }
 }
