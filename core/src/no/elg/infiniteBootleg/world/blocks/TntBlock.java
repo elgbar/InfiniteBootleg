@@ -124,7 +124,7 @@ public class TntBlock extends TickingBlock {
 
             });
         }
-        if (getWorld().getTick() % (WorldTicker.TICKS_PER_SECOND / 6) == 0) {
+        if (getWorld().getTick() % (1 + tickLeft / (WorldTicker.TICKS_PER_SECOND / 3)) == 0) {
 
             glowing = !glowing;
 
