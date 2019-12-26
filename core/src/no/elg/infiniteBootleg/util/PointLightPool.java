@@ -45,6 +45,7 @@ public final class PointLightPool extends Pool<PointLight> {
         light.setDistance(POINT_LIGHT_DISTANCE);
         light.setColor(Color.WHITE);
         light.setContactFilter(World.LIGHT_FILTER);
+        light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     @Override
