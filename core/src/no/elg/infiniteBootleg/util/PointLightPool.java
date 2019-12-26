@@ -19,17 +19,32 @@ public final class PointLightPool extends Pool<PointLight> {
 
     private RayHandler rayHandler;
 
-    public static final int POINT_LIGHT_RAYS = 8;
+    public static final int POINT_LIGHT_RAYS = 16;
     public static final int POINT_LIGHT_DISTANCE = 15;
 
     private PointLightPool() {
         rayHandler = Main.inst().getWorld().getRender().getRayHandler();
     }
 
+    @Override
+    public PointLight obtain() {
+        PointLight light = super.obtain();
+
+        synchronized (WorldRender.LIGHT_LOCK) {
+            light.setActive(true);
+        }
+        return light;
+    }
 
     @Override
-    protected void reset(PointLight pl) {
-        pl.setActive(false);
+    protected void reset(PointLight light) {
+        light.setStaticLight(true);
+        light.setXray(false);
+        light.setSoft(true);
+        light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+        light.setDistance(POINT_LIGHT_DISTANCE);
+        light.setColor(Color.WHITE);
+        light.setContactFilter(World.LIGHT_FILTER);
     }
 
     @Override
@@ -38,13 +53,13 @@ public final class PointLightPool extends Pool<PointLight> {
         synchronized (WorldRender.LIGHT_LOCK) {
             light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, 0, 0);
         }
-        light.setStaticLight(true);
-        light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+        reset(light);
         return light;
     }
 
     @Override
     public void free(PointLight light) {
+        super.free(light);
         synchronized (WorldRender.LIGHT_LOCK) {
             light.setActive(false);
         }
