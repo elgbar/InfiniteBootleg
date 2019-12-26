@@ -78,15 +78,15 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
-            rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld());
-            rayHandler.setBlurNum(3);
+            rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld(), 1, 1);
+            rayHandler.setBlurNum(2);
             rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1);
 
             //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
-            skylight = new DirectionalLight(rayHandler, 75000, Color.WHITE, World.MIDDAY_TIME);
+            skylight = new DirectionalLight(rayHandler, 15000, Color.WHITE, World.MIDDAY_TIME);
             skylight.setContactFilter(World.LIGHT_FILTER);
             skylight.setStaticLight(true);
-            skylight.setSoftnessLength(World.SKYLIGHT_SHADOW_LENGTH); //restore lights 1.4 functionality
+            skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH); //restore lights 1.4 functionality
         }
     }
 

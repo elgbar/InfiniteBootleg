@@ -59,7 +59,7 @@ public class World implements Disposable, Ticking, Resizable {
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
-    public static final float SKYLIGHT_SHADOW_LENGTH = 2f;
+    public static final float SKYLIGHT_SOFTNESS_LENGTH = 1.5f;
     /**
      * How many degrees the time light should have before triggering sunset/sunrise. This will happen from {@code
      * -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
