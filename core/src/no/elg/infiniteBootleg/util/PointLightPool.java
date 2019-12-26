@@ -5,6 +5,7 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 
 /**
@@ -19,7 +20,7 @@ public final class PointLightPool extends Pool<PointLight> {
     private RayHandler rayHandler;
 
     public static final int POINT_LIGHT_RAYS = 8;
-    public static final int POINT_LIGHT_DISTANCE = 10;
+    public static final int POINT_LIGHT_DISTANCE = 15;
 
     private PointLightPool() {
         rayHandler = Main.inst().getWorld().getRender().getRayHandler();
@@ -38,8 +39,7 @@ public final class PointLightPool extends Pool<PointLight> {
             light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, 0, 0);
         }
         light.setStaticLight(true);
-        light.setXray(true);
-        light.setSoft(false);
+        light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
         return light;
     }
 
