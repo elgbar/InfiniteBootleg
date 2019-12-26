@@ -38,12 +38,15 @@ public class WorldTicker implements Runnable {
     @Override
     public void run() {
         try {
-
-            Gdx.app.postRunnable(world::tick);
-            if (tickId % Ticking.TICK_RARE_RATE == 0) {
-                Gdx.app.postRunnable(world::tickRare);
-            }
-            tickId++;
+            Gdx.app.postRunnable(() -> {
+                synchronized (this) {
+                    world.tick();
+                    if (tickId % Ticking.TICK_RARE_RATE == 0) {
+                        world.tickRare();
+                    }
+                    tickId++;
+                }
+            });
             Thread.sleep(MS_DELAY_BETWEEN_TICKS);
         } catch (InterruptedException ignored) {
             Main.logger().log("World updater interrupted");
