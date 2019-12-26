@@ -44,7 +44,7 @@ public class TntBlock extends TickingBlock {
 
     private boolean glowing;
     private boolean exploded;
-    private long tickLeft;
+    private long startTick;
     private float strength;
 
     @Nullable
@@ -53,7 +53,7 @@ public class TntBlock extends TickingBlock {
     /**
      * How long, in ticks, the fuse time should be
      */
-    public static final long FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 2;
+    public static final float FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 3f;
     /**
      * Maximum explosion radius
      */
@@ -71,7 +71,6 @@ public class TntBlock extends TickingBlock {
 
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        tickLeft = FUSE_DURATION;
         strength = EXPLOSION_STRENGTH;
     }
 
@@ -83,7 +82,12 @@ public class TntBlock extends TickingBlock {
     @Override
     public void tick() {
         if (exploded) { return; }
-        if (tickLeft <= 0) {
+        long currTick = getWorld().getTick();
+        if (startTick == 0) {
+            startTick = currTick;
+        }
+        long ticked = currTick - startTick;
+        if (ticked > FUSE_DURATION) {
             exploded = true;
             Main.inst().getScheduler().executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
@@ -124,21 +128,27 @@ public class TntBlock extends TickingBlock {
 
             });
         }
-        if (getWorld().getTick() % (1 + tickLeft / (WorldTicker.TICKS_PER_SECOND / 3)) == 0) {
 
-            glowing = !glowing;
-
-            if (Main.renderGraphic) {
-                if (light == null) {
-                    light = PointLightPool.inst.obtain();
-                    light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
-                    light.setColor(Color.RED);
-                }
-                light.setActive(glowing);
-                getChunk().updateTexture(true);
-            }
+        final long r = WorldTicker.TICKS_PER_SECOND / 5;
+        boolean old = glowing;
+        if (ticked >= FUSE_DURATION - WorldTicker.TICKS_PER_SECOND) {
+            glowing = true;
         }
-        tickLeft--;
+        else if (ticked % r == 0) {
+            glowing = !glowing;
+        }
+
+        if (old != glowing && Main.renderGraphic) {
+            if (light == null) {
+                light = PointLightPool.inst.obtain();
+                light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+                light.setColor(Color.RED);
+                light.setXray(true);
+                light.setSoft(false);
+            }
+            light.setActive(glowing);
+            getChunk().updateTexture(true);
+        }
     }
 
     @Override
