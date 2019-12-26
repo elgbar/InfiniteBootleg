@@ -62,7 +62,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         while (isInvalidLocation(posCache.x, posCache.y)) {
             if (print) {
                 Gdx.app.debug("Entity", //
-                              String.format("Did not spawn %s at (% 8.2f,% 8.2f) as the spawn is invalid", //
+                              String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", //
                                             simpleName(), posCache.x, posCache.y));
                 print = false;
             }

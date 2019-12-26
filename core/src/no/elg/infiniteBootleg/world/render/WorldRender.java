@@ -140,7 +140,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         int rowStart = chunksInView[VERT_START];
 
         //set to 1 to debug what chunks are rendered
-        int debug = 0;
+        final int debug = 0;
 
         batch.begin();
         for (int y = rowStart + debug; y < rowEnd - debug; y++) {
@@ -149,8 +149,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 if (chunk.isAllAir()) {
                     continue;
                 }
-                TextureRegion textureRegion =
-                    chunk.getTextureRegion(); //get texture here to update last viewed in chunk
+                //get texture here to update last viewed in chunk
+                TextureRegion textureRegion = chunk.getTextureRegion();
                 if (textureRegion == null) {
                     chunkRenderer.queueRendering(chunk, false);
                     continue;

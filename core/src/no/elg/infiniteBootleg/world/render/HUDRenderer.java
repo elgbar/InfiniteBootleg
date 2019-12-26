@@ -73,8 +73,9 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
 
             int[] vChunks = world.getRender().getChunksInView();
 
-            int chunksInView = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]) * Math.abs(
-                vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
+            int chunksHorz = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]);
+            int chunksVert = Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
+            int chunksInView = chunksHorz * chunksVert;
 
             Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
 
@@ -90,8 +91,9 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
                                          world.getChunkLoader().getGenerator().getBiome(main.getMouseBlockX()), //
                                          pointChunk.isAllAir(), pointChunk.isAllowingUnloading() //
                                         );
-            String viewChunk = String.format("Viewing %d chunks (%d blocks) with zoom: %.3f", chunksInView,
-                                             chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
+            String viewChunk = String.format("Viewing %d chunks (total %d blocks, w %d b, h %d b) with zoom: %.3f",
+                                             chunksInView, chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
+                                             chunksHorz * Chunk.CHUNK_SIZE, chunksVert * Chunk.CHUNK_SIZE,
                                              world.getRender().getCamera().zoom);
 
             String pos = String.format("p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x,
