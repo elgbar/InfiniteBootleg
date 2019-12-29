@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 public class CancellableThreadScheduler {
 
     private final ScheduledExecutorService executorService;
-    private final Set<ScheduledFuture> tasks;
+    private final Set<ScheduledFuture<?>> tasks;
     private final int threads;
 
     public CancellableThreadScheduler(int threads) {
@@ -34,7 +34,7 @@ public class CancellableThreadScheduler {
      * Cancel all future and running tasks
      */
     public void cancelTasks() {
-        for (ScheduledFuture sf : tasks) {
+        for (ScheduledFuture<?> sf : tasks) {
             sf.cancel(true);
         }
     }
@@ -67,14 +67,16 @@ public class CancellableThreadScheduler {
             executeSync(runnable);
             return;
         }
-        tasks.add(executorService.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS));
+        try {
+            tasks.add(executorService.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS));
+        } catch (RejectedExecutionException ignored) {
+            Main.logger().error("Scheduler", "Runnable rejected from scheduling");
+        }
     }
 
     /**
      * Post the given runnable as fast as possible (though not as fast as calling {@link
      * Application#postRunnable(Runnable)})
-     * <p>
-     * This is NOT the same as doing {@code Gdx.app.postRunnable(runnable)}
      *
      * @param runnable
      *     What to do
