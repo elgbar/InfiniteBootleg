@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
+import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
+import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +21,18 @@ public class Player extends LivingEntity {
 
     private final TextureRegion region;
     private final EntityControls controls;
+    private final PointLight light;
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
         region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         controls = new KeyboardControls(world.getRender(), this);
+
+        light = PointLightPool.inst.obtain();
+        light.setStaticLight(false);
+        light.attachToBody(getBody());
+        light.setColor(1, 1, 1, 0.1f);
+        light.setDistance(2.5f);
     }
 
     @Override
@@ -55,5 +64,11 @@ public class Player extends LivingEntity {
     @NotNull
     public EntityControls getControls() {
         return controls;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        light.dispose();
     }
 }
