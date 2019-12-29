@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Different kind of views
@@ -98,7 +99,7 @@ public class World implements Disposable, Ticking, Resizable {
 
     private final UUID uuid;
     private final long seed;
-    private final Map<Location, Chunk> chunks;
+    private final ConcurrentMap<Location, Chunk> chunks;
     private final WorldTicker ticker;
     private final ChunkLoader chunkLoader;
     private FileHandle worldFile;
@@ -633,18 +634,19 @@ public class World implements Disposable, Ticking, Resizable {
         }
         else { wr.getSkylight().setColor(Color.BLACK); }
 
-        //update lights
-        if (Main.renderGraphic && WorldRender.lights && lastFrame < Gdx.graphics.getFrameId() &&
-            getTick() % (WorldTicker.TICKS_PER_SECOND / 20) == 0) {
-            lastFrame = Gdx.graphics.getFrameId();
 
-            Main.inst().getScheduler().executeAsync(() -> {
-                synchronized (WorldRender.BOX2D_LOCK) {
-                    synchronized (WorldRender.LIGHT_LOCK) {
-                        wr.getRayHandler().update();
-                    }
+        long currFrame = Gdx.graphics.getFrameId();
+
+        //update lights
+        if (Main.renderGraphic && WorldRender.lights && lastFrame < currFrame &&
+            getTick() % (WorldTicker.TICKS_PER_SECOND / 20) == 0) {
+            lastFrame = currFrame;
+
+            synchronized (WorldRender.BOX2D_LOCK) {
+                synchronized (WorldRender.LIGHT_LOCK) {
+                    wr.getRayHandler().update();
                 }
-            });
+            }
         }
 
         //tick all chunks and blocks in chunks

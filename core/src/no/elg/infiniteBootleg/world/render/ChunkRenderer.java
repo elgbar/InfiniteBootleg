@@ -30,6 +30,9 @@ public class ChunkRenderer implements Renderer, Disposable {
     private final SetUniqueList<Chunk> renderQueue;
     private final WorldRender worldRender;
 
+    //current rendering chunk
+    private Chunk curr = null;
+
     public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
         batch = new SpriteBatch();
@@ -41,9 +44,11 @@ public class ChunkRenderer implements Renderer, Disposable {
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
         synchronized (renderQueue) {
-            Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().updateFixture(true));
-            if (prioritize) { renderQueue.add(0, chunk); }
-            else { renderQueue.add(chunk); }
+            if (chunk != curr && !renderQueue.contains(chunk)) {
+                Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().updateFixture(true));
+                if (prioritize) { renderQueue.add(0, chunk); }
+                else { renderQueue.add(chunk); }
+            }
         }
     }
 
@@ -56,6 +61,7 @@ public class ChunkRenderer implements Renderer, Disposable {
                 if (renderQueue.isEmpty()) { return; } //nothing to render
                 chunk = renderQueue.remove(0);
             } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
+            curr = chunk;
         }
         final Chunk finalChunk = chunk;
 
@@ -87,6 +93,10 @@ public class ChunkRenderer implements Renderer, Disposable {
         fbo.end();
 
         worldRender.update();
+
+        synchronized (renderQueue) {
+            curr = null;
+        }
     }
 
     @Override

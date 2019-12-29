@@ -20,6 +20,9 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 
 /**
@@ -119,6 +122,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
     }
 
+    Map<Chunk, TextureRegion> draw = new HashMap<>();
+
     @Override
     public void render() {
         chunkRenderer.render();
@@ -141,25 +146,35 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
         //set to 1 to debug what chunks are rendered
         final int debug = 0;
+        draw.clear();
 
-        batch.begin();
         for (int y = rowStart + debug; y < rowEnd - debug; y++) {
             for (int x = colStart + debug; x < colEnd - debug; x++) {
                 Chunk chunk = world.getChunk(x, y);
+                if (chunk.isDirty()) {
+                    //noinspection LibGDXFlushInsideLoop
+                    chunk.updateTextureNow();
+                }
+
+                //noinspection LibGDXFlushInsideLoop
                 if (chunk.isAllAir()) {
                     continue;
                 }
+
                 //get texture here to update last viewed in chunk
+                //noinspection LibGDXFlushInsideLoop
                 TextureRegion textureRegion = chunk.getTextureRegion();
                 if (textureRegion == null) {
-                    chunkRenderer.queueRendering(chunk, false);
                     continue;
                 }
-
-                float dx = chunk.getChunkX() * CHUNK_TEXTURE_SIZE;
-                float dy = chunk.getChunkY() * CHUNK_TEXTURE_SIZE;
-                batch.draw(textureRegion, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
+                draw.put(chunk, textureRegion);
             }
+        }
+        batch.begin();
+        for (Map.Entry<Chunk, TextureRegion> entry : draw.entrySet()) {
+            float dx = entry.getKey().getChunkX() * CHUNK_TEXTURE_SIZE;
+            float dy = entry.getKey().getChunkY() * CHUNK_TEXTURE_SIZE;
+            batch.draw(entry.getValue(), dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
         }
         entityRenderer.render();
         batch.end();

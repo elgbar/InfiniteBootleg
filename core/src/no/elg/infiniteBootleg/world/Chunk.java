@@ -469,7 +469,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Override
     public void dispose() {
         if (fbo != null) {
-            fbo.dispose();
+            Main.inst().getScheduler().executeSync(fbo::dispose);
         }
         loaded = false;
         allowUnload = false;
