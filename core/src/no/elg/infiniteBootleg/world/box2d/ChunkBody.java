@@ -79,14 +79,15 @@ public class ChunkBody implements Disposable {
         bodyDef.position.set(chunk.getChunkX() * CHUNK_SIZE, chunk.getChunkY() * CHUNK_SIZE);
         bodyDef.fixedRotation = true;
         bodyDef.awake = false;
+        bodyDef.type = BodyDef.BodyType.StaticBody;
 
         Body tmpBody = chunk.getWorld().getWorldBody().createBody(bodyDef);
 
         EdgeShape edgeShape = new EdgeShape();
 
-        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-            for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                @NotNull Block b = chunk.getRawBlock(localX, localY);
+        for (byte localX = 0; localX < CHUNK_SIZE; localX++) {
+            for (byte localY = 0; localY < CHUNK_SIZE; localY++) {
+                Block b = chunk.getRawBlock(localX, localY);
 
                 if (b == null || !b.getMaterial().isSolid()) {
                     continue;

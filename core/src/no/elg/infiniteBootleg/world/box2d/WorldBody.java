@@ -27,6 +27,12 @@ public class WorldBody implements Ticking {
         }
     }
 
+    /**
+     * Create a new body in this world, this method can be called from any thread
+     *
+     * @param def
+     *     The definition of the body to create
+     */
     @NotNull
     public Body createBody(@NotNull BodyDef def) {
         synchronized (WorldRender.BOX2D_LOCK) {
@@ -34,6 +40,12 @@ public class WorldBody implements Ticking {
         }
     }
 
+    /**
+     * Destroy the given body, this method can be called from any thread
+     *
+     * @param body
+     *     The body to destroy
+     */
     public void destroyBody(@Nullable Body body) {
         if (body == null) {
             return;
@@ -51,6 +63,13 @@ public class WorldBody implements Ticking {
         }
     }
 
+    /**
+     * Use the returned object with care,
+     * <p>
+     * Synchronized over {@link WorldRender#BOX2D_LOCK} when it must be used
+     *
+     * @return The underlying box2d world
+     */
     public com.badlogic.gdx.physics.box2d.World getBox2dWorld() {
         return box2dWorld;
     }

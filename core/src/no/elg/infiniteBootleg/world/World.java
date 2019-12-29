@@ -78,7 +78,7 @@ public class World implements Disposable, Ticking, Resizable {
         ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
         ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
-        //skylight
+        //How light should collide
         LIGHT_FILTER = new Filter();
         LIGHT_FILTER.categoryBits = LIGHTS_CATEGORY;
         LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;

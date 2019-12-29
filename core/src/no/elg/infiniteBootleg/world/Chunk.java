@@ -326,6 +326,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         return blocks;
     }
 
+    @Nullable
     public Block getRawBlock(int localX, int localY) {
         return blocks[localX][localY];
     }
