@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.utils.PauseableThread;
+import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
@@ -18,13 +18,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class WorldTicker implements Runnable {
 
-    public static final long TICKS_PER_SECOND = 60L;
+    public static final long TICKS_PER_SECOND = 30L;
     public static final long MS_DELAY_BETWEEN_TICKS = 1000L / TICKS_PER_SECOND;
+    public static final long NANO_DELAY_BETWEEN_TICKS = 1_000_000_000L / TICKS_PER_SECOND;
     public static final float SECONDS_DELAY_BETWEEN_TICKS = 1f / TICKS_PER_SECOND;
     private final PauseableThread worldTickThread;
     private final World world;
 
     private long tickId;
+    private long tps = -1;
+    private long startTime;
+    private long tpsTick;
 
     public WorldTicker(@NotNull World world) {
         this.world = world;
@@ -32,24 +36,46 @@ public class WorldTicker implements Runnable {
         worldTickThread = new PauseableThread(this);
         worldTickThread.setName("World Ticker");
         worldTickThread.setDaemon(true);
-        worldTickThread.start();
+        //Do not begin ticking until the render thread is finish initialization
+        Main.inst().getScheduler().executeSync(worldTickThread::start);
     }
 
     @Override
     public void run() {
+        long start = TimeUtils.nanoTime();
         try {
-            Gdx.app.postRunnable(() -> {
-                synchronized (this) {
-                    world.tick();
-                    if (tickId % Ticking.TICK_RARE_RATE == 0) {
-                        world.tickRare();
-                    }
-                    tickId++;
-                }
-            });
-            Thread.sleep(MS_DELAY_BETWEEN_TICKS);
-        } catch (InterruptedException ignored) {
-            Main.logger().log("World updater interrupted");
+            world.tick();
+            if (tickId % Ticking.TICK_RARE_RATE == 0) {
+                world.tickRare();
+            }
+        } catch (Exception e) {
+            Main.logger().error("TICK", "Failed to tick world " + world.getName(), e);
+        }
+        tickId++;
+        
+        //Calculate ticks per second
+        if (start - startTime >= 1000000000) {
+            tps = tpsTick;
+            tpsTick = 0;
+            startTime = start;
+        }
+        tpsTick++;
+
+        long totalNanos = TimeUtils.nanoTime() - start;
+        long ms = MS_DELAY_BETWEEN_TICKS - TimeUtils.nanosToMillis(totalNanos);
+
+        if (ms > 0) {
+            try {
+                int nano = (int) (totalNanos % 1_000_000); // There are one million nano second in a millisecond
+                Thread.sleep(ms, nano);
+            } catch (InterruptedException e) {
+                Main.logger().error("TICK", "World ticker interrupted");
+            }
+        }
+        else {
+            Main.logger().error("TICK",
+                                "Cant keep up a single tick took around " + TimeUtils.nanosToMillis(totalNanos) +
+                                " ms, while at max it should take " + MS_DELAY_BETWEEN_TICKS + " ms");
         }
     }
 
@@ -59,6 +85,11 @@ public class WorldTicker implements Runnable {
      */
     public long getTickId() {
         return tickId;
+    }
+
+
+    public long getRealTPS() {
+        return tps;
     }
 
     /**
