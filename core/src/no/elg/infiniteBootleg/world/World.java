@@ -107,6 +107,7 @@ public class World implements Disposable, Ticking, Resizable {
     //only exists when graphics exits
     private WorldInputHandler input;
     private WorldRender render;
+
     @NotNull
     private final WorldBody worldBody;
 
@@ -624,16 +625,17 @@ public class World implements Disposable, Ticking, Resizable {
         //update light direction
         if (dayTicking) {
             time -= WorldTicker.SECONDS_DELAY_BETWEEN_TICKS * timeScale;
-            if (normalizedTime() >= 180) {
-                wr.getSkylight().setDirection(time);
+            if (Main.renderGraphic) {
+                if (normalizedTime() >= 180) {
+                    wr.getSkylight().setDirection(time);
+                }
+                float brightness = getSkyBrightness(time);
+                if (brightness > 0) {
+                    wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
+                }
+                else { wr.getSkylight().setColor(Color.BLACK); }
             }
         }
-        float brightness = getSkyBrightness(time);
-        if (brightness > 0) {
-            wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
-        }
-        else { wr.getSkylight().setColor(Color.BLACK); }
-
 
         long currFrame = Gdx.graphics.getFrameId();
 

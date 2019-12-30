@@ -6,6 +6,7 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
+import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,10 @@ public class TestGraphic {
 
         Main.inst = Mockito.mock(Main.class);
         when(Main.inst.getConsoleLogger()).thenReturn(logger);
+
+        CancellableThreadScheduler scheduler = new CancellableThreadScheduler(0);
+        when(Main.inst.getScheduler()).thenReturn(scheduler);
+
         World world = new World(new EmptyChunkGenerator());
         when(Main.inst.getWorld()).thenReturn(world);
     }
