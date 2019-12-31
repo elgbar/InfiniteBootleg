@@ -70,7 +70,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         return console.isVisible();
     }
 
-    public void draw() {
+    public synchronized void draw() {
         console.draw();
     }
 
