@@ -520,6 +520,10 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         return true;
     }
 
+    public synchronized boolean isDirty() {
+        return dirty;
+    }
+
     /**
      * Allow textures to be loaded
      */
