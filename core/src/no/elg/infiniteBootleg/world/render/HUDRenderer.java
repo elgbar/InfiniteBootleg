@@ -79,8 +79,10 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
 
             Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
 
-            String fps = String.format("FPS: %4d delta: %.5f tps: %2d", Gdx.graphics.getFramesPerSecond(),
-                                       Gdx.graphics.getDeltaTime(), world.getWorldTicker().getRealTPS());
+            String fps = String.format("FPS: %4d delta: %.5f tps: %2d active threads %d",
+                                       Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime(),
+                                       world.getWorldTicker().getRealTPS(),
+                                       Main.inst().getScheduler().getActiveThreads());
             String pointing = String.format("Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b",
                                             block != null ? block.getMaterial() : Material.AIR, //
                                             main.getMouseX(), main.getMouseY(), //
