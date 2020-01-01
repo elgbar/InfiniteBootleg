@@ -1,29 +1,14 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class EntityTest extends TestGraphic {
-
-    private World world;
-
-    @Before
-    public void before() {
-        world = Main.inst().getWorld();
-    }
-
-    @After
-    public void after() {
-        world.getEntities().clear();
-    }
 
     @Test
     public void touchingBlockOneOne() {

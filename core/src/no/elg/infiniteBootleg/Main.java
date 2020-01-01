@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -39,6 +40,7 @@ public class Main extends ApplicationAdapter {
     public static final String VERSION_FILE = "version";
 
     private static InputMultiplexer inputMultiplexer;
+    private final boolean test;
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
     private CancellableThreadScheduler scheduler;
@@ -71,24 +73,36 @@ public class Main extends ApplicationAdapter {
     private ConsoleHandler console;
     private HUDRenderer hud;
 
-    public static Main inst;
+    private static Main inst;
+    private final static Object INST_LOCK = new Object();
 
     private int mouseBlockX;
     private int mouseBlockY;
     private float mouseX;
     private float mouseY;
 
-    public Main() {
-        inst = this;
+    public Main(boolean test) {
+        synchronized (INST_LOCK) {
+            if (inst != null) {
+                throw new IllegalStateException("A main instance have already be declared");
+            }
+            inst = this;
+        }
+        this.test = test;
         console = new ConsoleHandler(false);
+        scheduler = new CancellableThreadScheduler(schedulerThreads);
+        inputMultiplexer = new InputMultiplexer();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (world != null) {
+                world.save();
+            }
+            scheduler.shutdown(); // we want make sure this thread is dead
+        }));
     }
 
     @Override
     public void create() {
-
-        scheduler = new CancellableThreadScheduler(schedulerThreads);
-
-        inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (renderGraphic) {
@@ -114,7 +128,7 @@ public class Main extends ApplicationAdapter {
 
 
         Gdx.app.setApplicationLogger(console);
-        Gdx.app.setLogLevel(debug ? Application.LOG_DEBUG : Application.LOG_INFO);
+        Gdx.app.setLogLevel(test || debug ? Application.LOG_DEBUG : Application.LOG_INFO);
 
         if (renderGraphic) {
             hud = new HUDRenderer();
@@ -123,12 +137,8 @@ public class Main extends ApplicationAdapter {
             entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
         }
 
-        world = new World(new PerlinChunkGenerator(worldSeed), worldSeed);
+        world = new World(new PerlinChunkGenerator(worldSeed), worldSeed, !test);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            world.save();
-            scheduler.shutdown(); // we want make sure this thread is dead
-        }));
     }
 
     @Override
@@ -145,11 +155,13 @@ public class Main extends ApplicationAdapter {
         mouseBlockY = MathUtils.floor(mouseY);
 
         //noinspection ConstantConditions
-        world.getInput().update();
-        for (LivingEntity entity : world.getLivingEntities()) {
-            entity.getControls().update();
+        synchronized (INST_LOCK) {
+            world.getInput().update();
+            for (LivingEntity entity : world.getLivingEntities()) {
+                entity.getControls().update();
+            }
+            world.getRender().render();
         }
-        world.getRender().render();
 
         hud.render();
         console.draw();
@@ -210,7 +222,6 @@ public class Main extends ApplicationAdapter {
     }
 
     public static Main inst() {
-        if (inst == null) { throw new IllegalStateException("Main instance not created"); }
         return inst;
     }
 
@@ -230,6 +241,12 @@ public class Main extends ApplicationAdapter {
 
     public World getWorld() {
         return world;
+    }
+
+    public void setWorld(@NotNull World world) {
+        synchronized (INST_LOCK) {
+            this.world = world;
+        }
     }
 
     public ConsoleHandler getConsole() {

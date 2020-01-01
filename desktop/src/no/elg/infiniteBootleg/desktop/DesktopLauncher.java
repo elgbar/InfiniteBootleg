@@ -12,8 +12,7 @@ public class DesktopLauncher {
 
     public static void main(String[] args) {
 
-        Main main = new Main();
-
+        Main main = new Main(false);
 
         new ProgramArgs(args);
 

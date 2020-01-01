@@ -30,14 +30,18 @@ public class WorldTicker implements Runnable {
     private long startTime;
     private long tpsTick;
 
-    public WorldTicker(@NotNull World world) {
+    public WorldTicker(@NotNull World world, boolean start) {
         this.world = world;
         Main.logger().log("Starting world ticking thread with TPS = " + TICKS_PER_SECOND);
+
         worldTickThread = new PauseableThread(this);
         worldTickThread.setName("World Ticker");
         worldTickThread.setDaemon(true);
-        //Do not begin ticking until the render thread is finish initialization
-        Main.inst().getScheduler().executeSync(worldTickThread::start);
+
+        if (start) {
+            //Do not begin ticking until the render thread is finish initialization
+            Main.inst().getScheduler().executeSync(worldTickThread::start);
+        }
     }
 
     @Override
@@ -52,7 +56,7 @@ public class WorldTicker implements Runnable {
             Main.logger().error("TICK", "Failed to tick world " + world.getName(), e);
         }
         tickId++;
-        
+
         //Calculate ticks per second
         if (start - startTime >= 1000000000) {
             tps = tpsTick;

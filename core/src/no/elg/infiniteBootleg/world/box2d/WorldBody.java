@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world.box2d;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.WorldTicker;
 import no.elg.infiniteBootleg.world.render.Ticking;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -20,7 +19,7 @@ public class WorldBody implements Ticking {
 
     private final com.badlogic.gdx.physics.box2d.World box2dWorld;
 
-    public WorldBody(@NotNull World world) {
+    public WorldBody(@NotNull no.elg.infiniteBootleg.world.World world) {
         synchronized (WorldRender.BOX2D_LOCK) {
             box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
             box2dWorld.setContactListener(new ContactManager(world));

@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
 import no.elg.infiniteBootleg.TestGraphic;
-import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +22,7 @@ public class ChunkTest extends TestGraphic {
 
     @Before
     public void setUp() {
-        chunk = new Chunk(new World(new EmptyChunkGenerator()), 0, 0);
+        chunk = new Chunk(world, 0, 0);
         chunk.finishLoading();
     }
 

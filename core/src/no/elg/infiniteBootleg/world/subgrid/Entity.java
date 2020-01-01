@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -61,9 +60,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         float checkStep = getHalfBox2dHeight() != 0 ? getHalfBox2dHeight() : 0.1f;
         while (isInvalidLocation(posCache.x, posCache.y)) {
             if (print) {
-                Gdx.app.debug("Entity", //
-                              String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", //
-                                            simpleName(), posCache.x, posCache.y));
+                Main.logger().debug("Entity", //
+                                    String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", //
+                                                  simpleName(), posCache.x, posCache.y));
                 print = false;
             }
             posCache.y += checkStep;

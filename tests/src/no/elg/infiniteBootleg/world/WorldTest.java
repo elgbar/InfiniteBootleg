@@ -1,14 +1,9 @@
 package no.elg.infiniteBootleg.world;
 
-import box2dLight.DirectionalLight;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ObjectSet;
 import no.elg.infiniteBootleg.TestGraphic;
-import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,36 +14,17 @@ import java.util.stream.StreamSupport;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Elg
  */
 public class WorldTest extends TestGraphic {
 
-    private World world;
     private Location loc;
 
     @Before
     public void setUp() {
         loc = new Location(0, 0);
-        world = Mockito.spy(new World(new EmptyChunkGenerator()));
-
-        WorldRender wr = mock(WorldRender.class);
-        when(world.getRender()).thenReturn(wr);
-
-        DirectionalLight dl = mock(DirectionalLight.class);
-        when(wr.getSkylight()).thenReturn(dl);
-
-        final Color color = new Color(Color.WHITE);
-
-        when(dl.getColor()).thenReturn(color);
-
-        Mockito.doAnswer(i -> color.set(i.getArgument(0))).when(dl).setColor(any(Color.class));
-        Mockito.doAnswer(i -> color.set(i.getArgument(0), i.getArgument(1), i.getArgument(2), i.getArgument(3))).when(
-            dl).setColor(any(Float.class), any(Float.class), any(Float.class), any(Float.class));
     }
 
     @Test
@@ -155,8 +131,9 @@ public class WorldTest extends TestGraphic {
         ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1, false);
         //convert set to the locations of the blocks
         Set<Location> bal = StreamSupport.stream(
-            Spliterators.spliteratorUnknownSize(blocks.iterator(), Spliterator.ORDERED), false).map(
-            block -> new Location(block.getWorldX(), block.getWorldY())).collect(Collectors.toSet());
+            Spliterators.spliteratorUnknownSize(blocks.iterator(), Spliterator.ORDERED | Spliterator.IMMUTABLE), false)
+                                         .map(block -> new Location(block.getWorldX(), block.getWorldY())).collect(
+                Collectors.toSet());
 
         Set<Block> expected = new HashSet<>();
         expected.add(world.getBlock(0, 0, false));

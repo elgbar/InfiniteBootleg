@@ -127,10 +127,10 @@ public class World implements Disposable, Ticking, Resizable {
      * @param generator
      */
     public World(@NotNull ChunkGenerator generator) {
-        this(generator, MathUtils.random(Long.MAX_VALUE));
+        this(generator, MathUtils.random(Long.MAX_VALUE), true);
     }
 
-    public World(@NotNull ChunkGenerator generator, long seed) {
+    public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
         chunks = new ConcurrentHashMap<>();
@@ -144,7 +144,6 @@ public class World implements Disposable, Ticking, Resizable {
         uuid = UUID.nameUUIDFromBytes(UUIDSeed);
 
         chunkLoader = new ChunkLoader(this, generator);
-        ticker = new WorldTicker(this);
         worldBody = new WorldBody(this);
 
         if (Main.renderGraphic) {
@@ -158,6 +157,7 @@ public class World implements Disposable, Ticking, Resizable {
         }
 
         load();
+        ticker = new WorldTicker(this, tick);
     }
 
     @NotNull
@@ -549,7 +549,7 @@ public class World implements Disposable, Ticking, Resizable {
         FileHandle worldFolder = worldFolder();
         if (worldFolder == null) { return; }
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        Main.inst.getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
+        Main.inst().getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
         if (!worldZip.exists()) {
             Main.logger().log("No world save found");
             return;

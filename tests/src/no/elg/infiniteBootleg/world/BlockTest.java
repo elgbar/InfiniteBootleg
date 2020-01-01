@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
 import no.elg.infiniteBootleg.TestGraphic;
-import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,14 +8,8 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Elg
  */
+
 public class BlockTest extends TestGraphic {
-
-    private World world;
-
-    @Before
-    public void setUp() {
-        world = new World(new EmptyChunkGenerator());
-    }
 
     @Test
     public void correctBlockType() {
