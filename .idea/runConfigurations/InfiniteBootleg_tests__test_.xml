@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="InfiniteBootleg [dist]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+  <configuration default="false" name="InfiniteBootleg:tests [test]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/tests" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="--warning-mode all" />
       <option name="taskDescriptions">
@@ -10,15 +10,12 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="dist" />
+          <option value="test" />
         </list>
       </option>
       <option name="vmOptions" value="" />
     </ExternalSystemSettings>
     <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
-    <method v="2">
-      <option name="Gradle.BeforeRunTask" enabled="true" tasks="clean" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Whole project [100]" run_configuration_type="JUnit" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>
