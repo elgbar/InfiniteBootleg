@@ -21,7 +21,7 @@ import static com.badlogic.gdx.Input.Keys.*;
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
     private final static int CAM_SPEED = 100 * Block.BLOCK_SIZE;
-    public static final float SCROLL_SPEED = 0.05f;
+    public static final float SCROLL_SPEED = 0.25f;
 
     private final WorldRender worldRender;
 
@@ -44,6 +44,15 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
                 else {
                     hud.setModus(HUDModus.DEBUG);
                 }
+                break;
+            case F5:
+                Main.inst().getWorld().save();
+                Main.logger().log("World", "World saved");
+                break;
+            case F9:
+                Main.inst().getWorld().load();
+                Main.logger().log("World", "World reloaded last save");
+                Main.inst().getWorld().unloadChunks(true, false);
                 break;
             default:
                 return false;

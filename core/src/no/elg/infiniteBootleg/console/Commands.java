@@ -8,7 +8,6 @@ import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.HUDRenderer;
@@ -76,12 +75,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Reload all loaded chunks",
                 paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
     public void reload(boolean force) {
-        World world = Main.inst().getWorld();
-        for (Chunk chunk : world.getLoadedChunks()) {
-            if (force || chunk.isAllowingUnloading()) {
-                world.unload(chunk);
-            }
-        }
+        Main.inst().getWorld().unloadChunks(force, true);
         logger.log(LogLevel.SUCCESS, "All chunks have been reloaded");
     }
 

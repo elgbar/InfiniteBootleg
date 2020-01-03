@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
-import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
@@ -407,15 +406,45 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     /**
+     * Unload the given chunks and save it to disk
+     *
      * @param chunk
      *     The chunk to unload
-     *
-     * @return If the chunk was unloaded
      */
-    public void unload(@Nullable Chunk chunk) {
-        if (chunk != null && chunk.isLoaded() && chunk.isAllowingUnloading()) {
-            chunkLoader.save(chunk);
+    public void unloadChunk(@Nullable Chunk chunk) {
+        unloadChunk(chunk, false, true);
+    }
+
+    /**
+     * Unload the given chunks and save it to disk
+     *
+     * @param chunk
+     *     The chunk to unload
+     * @param force
+     *     If the chunk will be forced to unload
+     * @param save
+     *     If the chunk will be saved
+     */
+    public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
+        if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
+            if (save) {
+                chunkLoader.save(chunk);
+            }
             chunk.dispose();
+        }
+    }
+
+    /**
+     * Unload and save all chunks in this world
+     *
+     * @param force
+     *     If the chunks will be forced to unload
+     * @param save
+     *     If the chunks will be saved
+     */
+    public void unloadChunks(boolean force, boolean save) {
+        for (Chunk chunk : getLoadedChunks()) {
+            unloadChunk(chunk, force, save);
         }
     }
 
@@ -534,8 +563,7 @@ public class World implements Disposable, Ticking, Resizable {
             ZipUtils.zip(worldFolder, worldZip);
             Main.logger().log("World saved!");
         } catch (IOException e) {
-            Main.logger().log(LogLevel.ERROR, "Failed to save world due to a " + e.getClass().getSimpleName());
-            e.printStackTrace();
+            Main.logger().error("Save", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
             return;
         }
 
@@ -664,7 +692,8 @@ public class World implements Disposable, Ticking, Resizable {
             //Unload chunks not seen for 5 seconds
             if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) &&
                 tick - chunk.getLastViewedTick() > Chunk.CHUNK_UNLOAD_TIME) {
-                unload(chunk);
+
+                unloadChunk(chunk);
                 iterator.remove();
                 continue;
             }
