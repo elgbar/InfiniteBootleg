@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.render;
 import box2dLight.DirectionalLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -48,6 +49,17 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     //add one to make sure we are always in darkness underground
     public static final int CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET = 1;
 
+    /**
+     * How much must the player zoom to trigger a skylight reset
+     *
+     * @see #resetSkylight()
+     */
+    public static final float SKYLIGHT_ZOOM_THRESHOLD = 0.25f;
+    /**
+     * How many {@link Graphics#getFramesPerSecond()} should there be when rendering multiple chunks
+     */
+    public static final int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
+
 
     public final World world;
     private RayHandler rayHandler;
@@ -64,6 +76,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     private Matrix4 m4 = new Matrix4();
     private DirectionalLight skylight;
+    private float lastZoom;
 
     public static boolean lights = true;
     public static boolean debugBox2d = false;
@@ -101,7 +114,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             camera = new OrthographicCamera();
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-            camera.zoom = 1.5f;
+            camera.zoom = 1f;
             camera.position.x = 0;
             camera.position.y = 0;
 
@@ -113,15 +126,25 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
-            rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld(), 1, 1);
+            rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
             rayHandler.setBlurNum(2);
             rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1);
+            resetSkylight();
+        }
+    }
 
-            //TODO maybe use the zoom level to get a nice number of rays? ie width*zoom*4 or something
-            skylight = new DirectionalLight(rayHandler, 15000, Color.WHITE, World.MIDDAY_TIME);
-            skylight.setContactFilter(World.LIGHT_FILTER);
-            skylight.setStaticLight(true);
-            skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH); //restore lights 1.4 functionality
+    public void resetSkylight() {
+        synchronized (BOX2D_LOCK) {
+            synchronized (LIGHT_LOCK) {
+                if (skylight != null) {
+                    skylight.remove();
+                }
+                skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE,
+                                                World.SUNRISE_TIME);
+                skylight.setStaticLight(true);
+                skylight.setContactFilter(World.LIGHT_FILTER);
+                skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH); //restore lights 1.4 functionality
+            }
         }
     }
 
@@ -139,18 +162,25 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
             viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-            chunksInView.horizontal_start = MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
-            chunksInView.horizontal_end = MathUtils.floor(
-                (viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+            chunksInView.horizontal_start = //
+                MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
+            chunksInView.horizontal_end = //
+                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
+                CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
 
             chunksInView.vertical_start = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
-            //add one to make sure we are always in darkness underground
-            chunksInView.vertical_end = MathUtils.floor(
-                (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
+            chunksInView.vertical_end = //
+                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
+                CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
+
+            if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
+                lastZoom = camera.zoom;
+                resetSkylight();
+            }
         }
         if (lights) {
-            rayHandler.setCombinedMatrix(m4, Main.inst().getMouseBlockX(), Main.inst().getMouseBlockY(),
-                                         camera.viewportWidth * camera.zoom, camera.viewportHeight * camera.zoom);
+            rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom,
+                                         camera.viewportHeight * camera.zoom);
         }
     }
 
@@ -159,7 +189,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     @Override
     public void render() {
         chunkRenderer.render();
-        if (Gdx.graphics.getDeltaTime() < 0.05f) {
+        if (Gdx.graphics.getFramesPerSecond() > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
             //only render more chunks when the computer isn't struggling with the rendering
             chunkRenderer.render();
             chunkRenderer.render();
@@ -272,9 +302,17 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     }
 
     public DirectionalLight getSkylight() {
-        return skylight;
+        synchronized (LIGHT_LOCK) {
+            return skylight;
+        }
     }
 
+    /**
+     * @return How many blocks there currently are horizontally on screen
+     */
+    public int blocksHorizontally() {
+        return (int) Math.ceil(camera.viewportWidth * camera.zoom / Block.BLOCK_SIZE) + 1;
+    }
 
     @Override
     public void dispose() {
@@ -285,7 +323,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     @Override
     public void resize(int width, int height) {
-        rayHandler.resizeFBO(width / 4, height / 4);
         Vector3 old = camera.position.cpy();
         camera.setToOrtho(false, width, height);
         camera.position.set(old);
