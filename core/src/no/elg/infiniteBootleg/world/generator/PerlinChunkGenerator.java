@@ -16,9 +16,9 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
  */
 public class PerlinChunkGenerator implements ChunkGenerator {
 
-    private static final float CAVE_CREATION_THRESHOLD = 0.95f; //noise values above this value will be cave (ie air)
+    private static final float CAVE_CREATION_THRESHOLD = 0.92f; //noise values above this value will be cave (ie air)
     private static final float WORM_SIZE_AMPLITUDE = 0.15f; //how much the size of the caves(worms) changes
-    private static final float WORM_SIZE_FREQUENCY = 0.01f; //how fast the size of the caves(worms) changes
+    private static final float WORM_SIZE_FREQUENCY = 0.1f; //how fast the size of the caves(worms) changes
     private final PerlinNoise noise;
     private final FastNoise noise2;
 
@@ -87,7 +87,8 @@ public class PerlinChunkGenerator implements ChunkGenerator {
                     int worldY = worldChunkY + localY;
 
                     //calculate the size of the worm
-                    float wormSize = 1 + Math.abs(noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
+                    float wormSize = 1 + Math.abs(
+                        noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
                     float x = noise2.GetNoise(worldX, worldY) / wormSize;
                     if (x > CAVE_CREATION_THRESHOLD) {
 //                        Material mat = x > 0.99 && chunkY < genChunkY ? Material.TORCH : null;
