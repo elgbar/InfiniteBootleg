@@ -176,13 +176,20 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         final int debug = 0;
         draw.clear();
 
-        int yEnd = chunksInView.vertical_end - debug, xEnd = chunksInView.horizontal_end - debug;
+        int yEnd = chunksInView.vertical_end - debug;
+        int xEnd = chunksInView.horizontal_end - debug;
+
         for (int y = chunksInView.vertical_start + debug; y < yEnd; y++) {
             for (int x = chunksInView.horizontal_start + debug; x < xEnd; x++) {
                 Chunk chunk = world.getChunk(x, y);
                 if (chunk.isDirty()) {
                     //noinspection LibGDXFlushInsideLoop
                     chunk.updateTextureNow();
+                }
+
+                if (y == chunksInView.vertical_end - debug - 1 || x == chunksInView.horizontal_start + debug ||
+                    x == chunksInView.horizontal_end - debug - 1) {
+                    continue;
                 }
 
                 //noinspection LibGDXFlushInsideLoop
