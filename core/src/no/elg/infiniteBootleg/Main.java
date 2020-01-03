@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import com.strongjoshua.console.LogLevel;
@@ -82,6 +83,7 @@ public class Main extends ApplicationAdapter {
     private int mouseBlockY;
     private float mouseX;
     private float mouseY;
+    private Vector2 mouse = new Vector2();
 
     private Vector3 mouseVec = new Vector3();
 
@@ -156,6 +158,7 @@ public class Main extends ApplicationAdapter {
         world.getRender().getCamera().unproject(mouseVec);
         mouseX = mouseVec.x / BLOCK_SIZE;
         mouseY = mouseVec.y / BLOCK_SIZE;
+        mouse.set(mouseX, mouseY);
 
         mouseBlockX = MathUtils.floor(mouseX);
         mouseBlockY = MathUtils.floor(mouseY);
@@ -224,6 +227,10 @@ public class Main extends ApplicationAdapter {
 
     public float getMouseY() {
         return mouseY;
+    }
+    
+    public Vector2 getMouse() {
+        return mouse.cpy();
     }
 
     public static Main inst() {

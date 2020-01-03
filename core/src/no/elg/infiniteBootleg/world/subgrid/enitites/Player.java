@@ -1,14 +1,13 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
-import box2dLight.PointLight;
+import box2dLight.ConeLight;
+import box2dLight.Light;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
-import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -21,27 +20,16 @@ public class Player extends LivingEntity {
 
     private final TextureRegion region;
     private final EntityControls controls;
-    private final PointLight light;
+    private final Light torchLight;
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
         region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         controls = new KeyboardControls(world.getRender(), this);
 
-        light = PointLightPool.inst.obtain();
-        light.setStaticLight(false);
-        light.attachToBody(getBody());
-        light.setColor(1, 1, 1, 0.1f);
-        light.setDistance(2.5f);
-    }
-
-    @Override
-    protected void createFixture(@NotNull Body body) {
-        PolygonShape box = new PolygonShape();
-        box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
-        Fixture fix = body.createFixture(box, 1.0f);
-        fix.setFilterData(World.ENTITY_FILTER);
-        box.dispose();
+        torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 32, Color.SALMON, 48, 5, 5, 0,
+                                   30);
+        torchLight.setStaticLight(true);
     }
 
     @Override
@@ -51,12 +39,21 @@ public class Player extends LivingEntity {
 
     @Override
     public int getWidth() {
-        return BLOCK_SIZE * 2;
+        return 2 * BLOCK_SIZE;
     }
 
     @Override
     public int getHeight() {
-        return getWidth() * 2;
+        return 4 * BLOCK_SIZE;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        Vector2 pos = super.getPosition();
+        float angle = Main.inst().getMouse().cpy().sub(pos).angle();
+        torchLight.setDirection(angle);
+        torchLight.setPosition(pos);
     }
 
     @Override
@@ -68,6 +65,6 @@ public class Player extends LivingEntity {
     @Override
     public void dispose() {
         super.dispose();
-        light.dispose();
+        torchLight.dispose();
     }
 }
