@@ -245,9 +245,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     @Override
     public void tick() {
-        if (Main.renderGraphic) {
-            updatePos();
-        }
+        updatePos();
     }
 
     /**
