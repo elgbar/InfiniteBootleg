@@ -281,11 +281,14 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     @Nullable
     public TextureRegion getTextureRegion() {
-        lastViewedTick = world.getTick();
         if (dirty) {
             updateTextureNow();
         }
         return fboRegion;
+    }
+
+    public void view() {
+        lastViewedTick = world.getTick();
     }
 
     public FrameBuffer getFbo() {
