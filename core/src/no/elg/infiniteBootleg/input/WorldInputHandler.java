@@ -5,11 +5,11 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Updatable;
+import no.elg.infiniteBootleg.screen.HUDRenderer;
+import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.HUDRenderer;
-import no.elg.infiniteBootleg.world.render.HUDRenderer.HUDModus;
-import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 

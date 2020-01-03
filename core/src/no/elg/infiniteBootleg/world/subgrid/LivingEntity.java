@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
+import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.Updatable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.AirResistanceEntity;
 import org.jetbrains.annotations.NotNull;
 

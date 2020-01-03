@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import org.apache.commons.collections4.list.SetUniqueList;

@@ -15,6 +15,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Renderer;
+import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;

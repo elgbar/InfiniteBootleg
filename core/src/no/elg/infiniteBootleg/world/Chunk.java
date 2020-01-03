@@ -8,11 +8,11 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
-import no.elg.infiniteBootleg.world.render.Ticking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

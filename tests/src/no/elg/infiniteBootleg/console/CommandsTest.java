@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.console;
 
 import no.elg.infiniteBootleg.TestGraphic;
-import no.elg.infiniteBootleg.world.render.HUDRenderer;
+import no.elg.infiniteBootleg.screen.HUDRenderer;
 import org.junit.Before;
 import org.junit.Test;
 

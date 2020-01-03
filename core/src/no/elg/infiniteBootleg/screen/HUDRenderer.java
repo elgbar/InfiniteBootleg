@@ -1,13 +1,14 @@
-package no.elg.infiniteBootleg.world.render;
+package no.elg.infiniteBootleg.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.screen.ScreenRenderer;
+import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 

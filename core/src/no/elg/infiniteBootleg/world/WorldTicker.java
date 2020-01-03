@@ -4,7 +4,7 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.utils.PauseableThread;
 import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.render.Ticking;
+import no.elg.infiniteBootleg.Ticking;
 import org.jetbrains.annotations.NotNull;
 
 /**
