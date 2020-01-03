@@ -77,6 +77,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private Matrix4 m4 = new Matrix4();
     private DirectionalLight skylight;
     private float lastZoom;
+    Map<Chunk, TextureRegion> draw = new HashMap<>();
 
     public static boolean lights = true;
     public static boolean debugBox2d = false;
@@ -154,9 +155,14 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         batch.setProjectionMatrix(camera.combined);
         m4.set(camera.combined).scl(Block.BLOCK_SIZE);
 
+        final float width = camera.viewportWidth * camera.zoom;
+        final float height = camera.viewportHeight * camera.zoom;
+
+        if (lights) {
+            rayHandler.setCombinedMatrix(m4, 0, 0, width, height);
+        }
+
         if (!getWorld().getWorldTicker().isPaused()) {
-            float width = camera.viewportWidth * camera.zoom;
-            float height = camera.viewportHeight * camera.zoom;
 
             float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
             float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
@@ -178,13 +184,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 resetSkylight();
             }
         }
-        if (lights) {
-            rayHandler.setCombinedMatrix(m4, 0, 0, camera.viewportWidth * camera.zoom,
-                                         camera.viewportHeight * camera.zoom);
-        }
     }
-
-    Map<Chunk, TextureRegion> draw = new HashMap<>();
 
     @Override
     public void render() {
@@ -202,15 +202,10 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             chunkRenderer.render();
         }
 
-        //set to 1 to debug what chunks are rendered
-        final int debug = 0;
         draw.clear();
 
-        int yEnd = chunksInView.vertical_end - debug;
-        int xEnd = chunksInView.horizontal_end - debug;
-
-        for (int y = chunksInView.vertical_start + debug; y < yEnd; y++) {
-            for (int x = chunksInView.horizontal_start + debug; x < xEnd; x++) {
+        for (int y = chunksInView.vertical_start; y < chunksInView.vertical_end; y++) {
+            for (int x = chunksInView.horizontal_start; x < chunksInView.horizontal_end; x++) {
                 Chunk chunk = world.getChunk(x, y);
                 chunk.view();
 
@@ -219,8 +214,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                     chunk.updateTextureNow();
                 }
 
-                if (y == chunksInView.vertical_end - debug - 1 || x == chunksInView.horizontal_start + debug ||
-                    x == chunksInView.horizontal_end - debug - 1) {
+                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start ||
+                    x == chunksInView.horizontal_end - 1) {
                     continue;
                 }
 

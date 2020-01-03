@@ -83,6 +83,8 @@ public class Main extends ApplicationAdapter {
     private float mouseX;
     private float mouseY;
 
+    private Vector3 mouseVec = new Vector3();
+
     public Main(boolean test) {
         synchronized (INST_LOCK) {
             if (inst != null) {
@@ -150,9 +152,10 @@ public class Main extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        Vector3 unproject = world.getRender().getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-        mouseX = unproject.x / BLOCK_SIZE;
-        mouseY = unproject.y / BLOCK_SIZE;
+        mouseVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        world.getRender().getCamera().unproject(mouseVec);
+        mouseX = mouseVec.x / BLOCK_SIZE;
+        mouseY = mouseVec.y / BLOCK_SIZE;
 
         mouseBlockX = MathUtils.floor(mouseX);
         mouseBlockY = MathUtils.floor(mouseY);

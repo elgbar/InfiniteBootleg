@@ -137,3 +137,5 @@ version
 .idea/uiDesigner.xml
 .idea/inspectionProfiles/
 .idea/dictionaries/elg.xml
+
+.idea/compiler.xml
