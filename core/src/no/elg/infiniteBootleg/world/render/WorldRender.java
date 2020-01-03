@@ -32,6 +32,22 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public static final float MIN_ZOOM = 0.25f;
     public static final float AMBIENT_LIGHT = 0.026f;
+    public static final int RAYS_PER_BLOCK = 200;
+    /**
+     * How many chunks to the sides extra should be included.
+     * <p>
+     * One of the these chunks comes from the need that the player should not see that a chunks loads in.
+     */
+    public static final int CHUNKS_IN_VIEW_HORIZONTAL_RENDER = 1;
+    /**
+     * How many chunks to the sides extra should be included.
+     * <p>
+     * This is the for light during twilight to stop light bleeding into the sides of the screen when moving.
+     */
+    public static final int CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS = CHUNKS_IN_VIEW_HORIZONTAL_RENDER + 1;
+    //add one to make sure we are always in darkness underground
+    public static final int CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET = 1;
+
 
     public final World world;
     private RayHandler rayHandler;
@@ -42,7 +58,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private final Rectangle viewBound;
     private final ChunkViewed chunksInView;
     private ChunkRenderer chunkRenderer;
-    private Box2DDebugRenderer debugRenderer;
+
+    private Box2DDebugRenderer box2DDebugRenderer;
+    private DebugChunkRenderer chunkDebugRenderer;
 
     private Matrix4 m4 = new Matrix4();
     private DirectionalLight skylight;
@@ -90,7 +108,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             batch = new SpriteBatch();
             batch.setProjectionMatrix(camera.combined);
 
-            debugRenderer = new Box2DDebugRenderer();
+            chunkDebugRenderer = new DebugChunkRenderer(this);
+            box2DDebugRenderer = new Box2DDebugRenderer();
 
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
@@ -198,8 +217,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
         if (debugBox2d && Main.debug) {
             synchronized (BOX2D_LOCK) {
-                debugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
+                box2DDebugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
             }
+            chunkDebugRenderer.render();
         }
     }
 
