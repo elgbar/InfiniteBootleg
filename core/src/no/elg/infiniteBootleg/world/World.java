@@ -670,13 +670,15 @@ public class World implements Disposable, Ticking, Resizable {
         //update lights
         if (Main.renderGraphic && WorldRender.lights && lastFrame < currFrame &&
             getTick() % (WorldTicker.TICKS_PER_SECOND / 20) == 0) {
-            lastFrame = currFrame;
+            Main.inst().getScheduler().executeAsync(() -> {
+                lastFrame = currFrame;
 
-            synchronized (WorldRender.BOX2D_LOCK) {
-                synchronized (WorldRender.LIGHT_LOCK) {
-                    wr.getRayHandler().update();
+                synchronized (WorldRender.BOX2D_LOCK) {
+                    synchronized (WorldRender.LIGHT_LOCK) {
+                        wr.getRayHandler().update();
+                    }
                 }
-            }
+            });
         }
 
         //tick all chunks and blocks in chunks
