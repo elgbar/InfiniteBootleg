@@ -41,7 +41,6 @@ public class Player extends LivingEntity {
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = body.createFixture(box, 1.0f);
         fix.setFilterData(World.ENTITY_FILTER);
-        fix.setFriction(0);
         box.dispose();
     }
 

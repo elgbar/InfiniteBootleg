@@ -63,8 +63,8 @@ public class WorldTicker implements Runnable {
         }
         tickId++;
 
-        //Calculate ticks per second
-        if (start - tpsCalcStartTime >= 1000000000) {
+        //Calculate ticks per second once per second
+        if (start - tpsCalcStartTime >= 1_000_000_000) {
             tps = tpsTick;
             tpsTick = 0;
             tpsCalcStartTime = start;
@@ -83,7 +83,6 @@ public class WorldTicker implements Runnable {
             }
         }
         else if (tickId - lastNagged >= NAG_DELAY_TICKS) {
-
             lastNagged = tickId;
             Main.logger().error("TICK", "Cant keep up a single tick took around " + TimeUtils.nanosToMillis(tpsDelta) +
                                         " ms, while at max it should take " + MS_DELAY_BETWEEN_TICKS + " ms");
