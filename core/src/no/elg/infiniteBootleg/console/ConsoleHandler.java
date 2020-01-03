@@ -109,9 +109,14 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         }
 
         if (possible.size <= 0) {
-            log(LogLevel.ERROR, "Unknown command. Perhaps you meant");
-            for (String methodSig : potentialMethods) {
-                log(LogLevel.ERROR, methodSig);
+            if (potentialMethods.isEmpty()) {
+                log(LogLevel.ERROR, "Unknown command");
+            }
+            else {
+                log(LogLevel.ERROR, "Unknown command. Perhaps you meant");
+                for (String methodSig : potentialMethods) {
+                    log(LogLevel.ERROR, methodSig);
+                }
             }
             return false;
         }

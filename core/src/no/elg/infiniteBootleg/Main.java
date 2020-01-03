@@ -166,7 +166,7 @@ public class Main extends ApplicationAdapter {
         synchronized (INST_LOCK) {
             world.getInput().update();
             for (LivingEntity entity : world.getLivingEntities()) {
-                entity.getControls().update();
+                entity.update();
             }
             world.getRender().render();
         }
