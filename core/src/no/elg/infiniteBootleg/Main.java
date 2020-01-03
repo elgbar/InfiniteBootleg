@@ -12,6 +12,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.strongjoshua.console.LogLevel;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
+import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
@@ -72,6 +73,7 @@ public class Main extends ApplicationAdapter {
     private World world;
     private ConsoleHandler console;
     private HUDRenderer hud;
+    private ScreenRenderer screenRenderer;
 
     private static Main inst;
     private final static Object INST_LOCK = new Object();
@@ -131,6 +133,7 @@ public class Main extends ApplicationAdapter {
         Gdx.app.setLogLevel(test || debug ? Application.LOG_DEBUG : Application.LOG_INFO);
 
         if (renderGraphic) {
+            screenRenderer = new ScreenRenderer();
             hud = new HUDRenderer();
 
             blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
@@ -154,7 +157,6 @@ public class Main extends ApplicationAdapter {
         mouseBlockX = MathUtils.floor(mouseX);
         mouseBlockY = MathUtils.floor(mouseY);
 
-        //noinspection ConstantConditions
         synchronized (INST_LOCK) {
             world.getInput().update();
             for (LivingEntity entity : world.getLivingEntities()) {
@@ -171,7 +173,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         if (renderGraphic) {
-            hud.dispose();
+            screenRenderer.dispose();
             blockAtlas.dispose();
             entityAtlas.dispose();
             VisUI.dispose();
@@ -184,7 +186,7 @@ public class Main extends ApplicationAdapter {
     public void resize(int width, int height) {
         if (renderGraphic) {
             world.resize(width, height);
-            hud.resize(width, height);
+            screenRenderer.resize(width, height);
             console.resize(width, height);
         }
     }
@@ -227,6 +229,10 @@ public class Main extends ApplicationAdapter {
 
     public static ConsoleLogger logger() {
         return inst().getConsoleLogger();
+    }
+
+    public ScreenRenderer getScreenRenderer() {
+        return screenRenderer;
     }
 
     @Nullable
