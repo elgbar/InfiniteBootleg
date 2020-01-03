@@ -20,7 +20,7 @@ public final class PointLightPool extends Pool<PointLight> {
     private RayHandler rayHandler;
 
     public static final int POINT_LIGHT_RAYS = 16;
-    public static final int POINT_LIGHT_DISTANCE = 15;
+    public static final int POINT_LIGHT_DISTANCE = 32;
 
     private PointLightPool() {
         rayHandler = Main.inst().getWorld().getRender().getRayHandler();

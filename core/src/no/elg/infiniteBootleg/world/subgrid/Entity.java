@@ -281,7 +281,11 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      */
     @NotNull
     public Vector2 getPosition() {
-        return posCache.cpy();
+        Vector2 cpy;
+        synchronized (WorldRender.BOX2D_LOCK) {
+            cpy = posCache.cpy();
+        }
+        return cpy;
     }
 
     /**
@@ -289,7 +293,11 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      */
     @NotNull
     public Vector2 getVelocity() {
-        return velCache.cpy();
+        Vector2 cpy;
+        synchronized (WorldRender.BOX2D_LOCK) {
+            cpy = velCache.cpy();
+        }
+        return cpy;
     }
 
     /**

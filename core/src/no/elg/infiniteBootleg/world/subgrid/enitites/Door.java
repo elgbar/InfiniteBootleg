@@ -69,11 +69,11 @@ public class Door extends MaterialEntity {
 
     @Override
     public int getWidth() {
-        return BLOCK_SIZE;
+        return 2 * BLOCK_SIZE;
     }
 
     @Override
     public int getHeight() {
-        return 2 * BLOCK_SIZE;
+        return 4 * BLOCK_SIZE;
     }
 }

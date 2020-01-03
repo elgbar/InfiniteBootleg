@@ -57,7 +57,7 @@ public class TntBlock extends TickingBlock {
     /**
      * Maximum explosion radius
      */
-    public static final int EXPLOSION_STRENGTH = 25;
+    public static final int EXPLOSION_STRENGTH = 40;
     /**
      * Randomness to what blocks are destroyed.
      * <p>
@@ -67,7 +67,7 @@ public class TntBlock extends TickingBlock {
      * <p>
      * Minimum value should be above 3 as otherwise the edge of the explosion will clearly be visible
      */
-    public final static int RESISTANCE = 10;
+    public final static int RESISTANCE = 8;
 
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
@@ -145,6 +145,7 @@ public class TntBlock extends TickingBlock {
                 light.setColor(Color.RED);
                 light.setXray(true);
                 light.setSoft(false);
+                light.setDistance(16);
             }
             light.setActive(glowing);
             getChunk().updateTexture(true);
