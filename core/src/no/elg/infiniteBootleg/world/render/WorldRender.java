@@ -30,11 +30,6 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
  */
 public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
-    public static final int VERT_START = 0;
-    public static final int VERT_END = 1;
-    public static final int HOR_START = 2;
-    public static final int HOR_END = 3;
-
     public static final float MIN_ZOOM = 0.25f;
     public static final float AMBIENT_LIGHT = 0.026f;
 
@@ -45,11 +40,11 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     private OrthographicCamera camera;
     private final Rectangle viewBound;
-    private final int[] chunksInView;
+    private final ChunkViewed chunksInView;
     private ChunkRenderer chunkRenderer;
     private Box2DDebugRenderer debugRenderer;
 
-    private Matrix4 m4;
+    private Matrix4 m4 = new Matrix4();
     private DirectionalLight skylight;
 
     public static boolean lights = true;
@@ -58,9 +53,27 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public final static Object LIGHT_LOCK = new Object();
     public final static Object BOX2D_LOCK = new Object();
 
+    public final static class ChunkViewed {
+
+        private ChunkViewed() {}
+
+        public int horizontal_start;
+        public int horizontal_end;
+        public int vertical_start;
+        public int vertical_end;
+
+        public int getHorizontalLength() {
+            return horizontal_end - horizontal_start;
+        }
+
+        public int getVerticalLength() {
+            return vertical_end - vertical_start;
+        }
+    }
+
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
-        chunksInView = new int[4];
+        chunksInView = new ChunkViewed();
         this.world = world;
 
         if (Main.renderGraphic) {
@@ -97,7 +110,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public void update() {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-        m4 = camera.combined.cpy().scl(Block.BLOCK_SIZE);
+        m4.set(camera.combined).scl(Block.BLOCK_SIZE);
 
         if (!getWorld().getWorldTicker().isPaused()) {
             float width = camera.viewportWidth * camera.zoom;
@@ -107,13 +120,13 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
             viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-            chunksInView[HOR_START] = MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
-            chunksInView[HOR_END] = MathUtils.floor(
+            chunksInView.horizontal_start = MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - 1;
+            chunksInView.horizontal_end = MathUtils.floor(
                 (viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
 
-            chunksInView[VERT_START] = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
+            chunksInView.vertical_start = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
             //add one to make sure we are always in darkness underground
-            chunksInView[VERT_END] = MathUtils.floor(
+            chunksInView.vertical_end = MathUtils.floor(
                 (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + 1;
         }
         if (lights) {
@@ -139,17 +152,14 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             chunkRenderer.render();
             chunkRenderer.render();
         }
-        int colEnd = chunksInView[HOR_END];
-        int colStart = chunksInView[HOR_START];
-        int rowEnd = chunksInView[VERT_END];
-        int rowStart = chunksInView[VERT_START];
 
         //set to 1 to debug what chunks are rendered
         final int debug = 0;
         draw.clear();
 
-        for (int y = rowStart + debug; y < rowEnd - debug; y++) {
-            for (int x = colStart + debug; x < colEnd - debug; x++) {
+        int yEnd = chunksInView.vertical_end - debug, xEnd = chunksInView.horizontal_end - debug;
+        for (int y = chunksInView.vertical_start + debug; y < yEnd; y++) {
+            for (int x = chunksInView.horizontal_start + debug; x < xEnd; x++) {
                 Chunk chunk = world.getChunk(x, y);
                 if (chunk.isDirty()) {
                     //noinspection LibGDXFlushInsideLoop
@@ -200,11 +210,11 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
      * @return {@code true} if the given chunk is outside the view of the camera
      */
     public boolean isOutOfView(@NotNull Chunk chunk) {
-        return chunk.getChunkX() < chunksInView[HOR_START] || chunk.getChunkX() >= chunksInView[HOR_END] ||
-               chunk.getChunkY() < chunksInView[VERT_START] || chunk.getChunkY() >= chunksInView[VERT_END];
+        return chunk.getChunkX() < chunksInView.horizontal_start || chunk.getChunkX() >= chunksInView.horizontal_end ||
+               chunk.getChunkY() < chunksInView.vertical_start || chunk.getChunkY() >= chunksInView.vertical_end;
     }
 
-    public int[] getChunksInView() {
+    public ChunkViewed getChunksInView() {
         return chunksInView;
     }
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
@@ -71,17 +72,18 @@ public class HUDRenderer implements Renderer, Disposable, Resizable {
         if (modus == HUDModus.DEBUG) {
             Block block = world.getBlock(main.getMouseBlockX(), main.getMouseBlockY(), true);
 
-            int[] vChunks = world.getRender().getChunksInView();
+            WorldRender.ChunkViewed vChunks = world.getRender().getChunksInView();
 
-            int chunksHorz = Math.abs(vChunks[WorldRender.HOR_END] - vChunks[WorldRender.HOR_START]);
-            int chunksVert = Math.abs(vChunks[WorldRender.VERT_END] - vChunks[WorldRender.VERT_START]);
+            int chunksHorz = vChunks.getHorizontalLength();
+            int chunksVert = vChunks.getVerticalLength();
             int chunksInView = chunksHorz * chunksVert;
 
             Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
 
-            String fps = String.format("FPS: %4d delta: %.5f tps: %2d active threads %d",
+            String fps = String.format("FPS: %4d delta: %.5f tps: %2d tps delta: %3d ms active threads %d",
                                        Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime(),
                                        world.getWorldTicker().getRealTPS(),
+                                       TimeUtils.nanosToMillis(world.getWorldTicker().getTpsDelta()),
                                        Main.inst().getScheduler().getActiveThreads());
             String pointing = String.format("Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b",
                                             block != null ? block.getMaterial() : Material.AIR, //
