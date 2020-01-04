@@ -93,7 +93,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         batch.end();
         fbo.end();
 
-        worldRender.update();
+        Main.inst().getScheduler().executeAsync(worldRender::update);
 
         synchronized (renderQueue) {
             curr = null;
