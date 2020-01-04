@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Tuple;
 import no.elg.infiniteBootleg.world.*;
+import no.elg.infiniteBootleg.world.blocks.StaticLightBlock;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,8 +64,13 @@ public class ChunkBody implements Disposable {
      *
      * @param recalculateNeighbors
      *     If the neighbors also should be updated
+     * @param lightsOnly
      */
-    public void updateFixture(boolean recalculateNeighbors) {
+    public void update(boolean recalculateNeighbors, boolean lightsOnly) {
+        if (lightsOnly) {
+            updateLights();
+            return;
+        }
         if (chunk.isAllAir()) {
             synchronized (this) {
                 chunk.getWorld().getWorldBody().destroyBody(box2dBody);
@@ -146,12 +152,12 @@ public class ChunkBody implements Disposable {
         boolean potentiallyDirty = false;
 
         //TODO Try to optimize this (ie select what directions to recalculate)
-        for (Direction direction : Direction.CARDINAL) {
+        for (Direction direction : Direction.values()) {
             Location relChunk = Location.relative(chunk.getChunkX(), chunk.getChunkY(), direction);
             if (chunk.getWorld().isChunkLoaded(relChunk)) {
                 if (recalculateNeighbors) {
                     //noinspection LibGDXFlushInsideLoop
-                    chunk.getWorld().getChunk(relChunk).getChunkBody().updateFixture(false);
+                    chunk.getWorld().getChunk(relChunk).getChunkBody().update(false, !direction.isCardinal());
                 }
             }
             else {
@@ -162,6 +168,7 @@ public class ChunkBody implements Disposable {
         if (potentiallyDirty) {
             scheduleFixtureReload(true);
         }
+        updateLights();
     }
 
     private void scheduleFixtureReload(boolean initial) {
@@ -172,12 +179,26 @@ public class ChunkBody implements Disposable {
         Main.inst().getScheduler().scheduleAsync(() -> {
             unsureFixture = false;
             if (chunk.isNeighborsLoaded()) {
-                updateFixture(false);
+                update(false, false);
             }
             else {
                 scheduleFixtureReload(false);
             }
         }, initial ? INITIAL_UNSURE_FIXTURE_RELOAD_DELAY : UNSURE_FIXTURE_RELOAD_DELAY);
+    }
+
+    private void updateLights() {
+        synchronized (chunk) {
+            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                    Block block = chunk.getRawBlock(localX, localY);
+                    if (block instanceof StaticLightBlock) {
+                        ((StaticLightBlock) block).updateLight();
+                    }
+                }
+            }
+        }
+
     }
 
     @Override

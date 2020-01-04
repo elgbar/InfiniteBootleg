@@ -17,10 +17,15 @@ public enum Direction {
     public final int dy;
 
     public static final Direction[] CARDINAL = {NORTH, EAST, SOUTH, WEST};
+    public static final Direction[] NON_CARDINAL = {NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST};
 
     Direction(int dx, int dy) {
         this.dx = dx;
         this.dy = dy;
+    }
+
+    public boolean isCardinal() {
+        return this == Direction.NORTH || this == Direction.EAST || this == Direction.SOUTH || this == Direction.WEST;
     }
 
     public static Direction fromAngleCardinal(double angle) {

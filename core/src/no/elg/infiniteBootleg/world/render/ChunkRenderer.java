@@ -46,7 +46,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
         synchronized (renderQueue) {
             if (chunk != curr && !renderQueue.contains(chunk)) {
-                Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().updateFixture(true));
+                Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().update(true, false));
                 if (prioritize) { renderQueue.add(0, chunk); }
                 else { renderQueue.add(chunk); }
             }
