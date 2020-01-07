@@ -32,8 +32,7 @@ public class Player extends LivingEntity {
             wih.setFollowing(this);
         }
 
-        torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 32, Color.SALMON, 48, 5, 5, 0,
-                                   30);
+        torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 32, Color.TAN, 48, 5, 5, 0, 30);
         torchLight.setStaticLight(true);
     }
 
