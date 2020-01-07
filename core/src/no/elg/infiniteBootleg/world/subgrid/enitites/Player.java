@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
+import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,10 @@ public class Player extends LivingEntity {
         super(world, 0, 0);
         region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         controls = new KeyboardControls(world.getRender(), this);
+        WorldInputHandler wih = world.getInput();
+        if (wih != null) {
+            wih.setFollowing(this);
+        }
 
         torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 32, Color.SALMON, 48, 5, 5, 0,
                                    30);

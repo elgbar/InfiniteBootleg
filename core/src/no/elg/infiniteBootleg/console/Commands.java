@@ -278,13 +278,15 @@ public class Commands extends CommandExecutor {
             logger.error("PLR", "Failed to find any players");
             return;
         }
-        WorldRender render = Main.inst().getWorld().getRender();
+        World world = Main.inst().getWorld();
+        WorldRender render = world.getRender();
         render.getCamera().zoom = 1f;
         render.getCamera().position.x = player.getPosition().x * Block.BLOCK_SIZE;
         render.getCamera().position.y = player.getPosition().y * Block.BLOCK_SIZE;
+        if (world.getInput() != null) {
+            world.getInput().setLockedOn(true);
+        }
         render.update();
-
-
     }
 }
 

@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Updatable;
@@ -11,7 +12,9 @@ import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.badlogic.gdx.Input.Keys.*;
 
@@ -20,10 +23,13 @@ import static com.badlogic.gdx.Input.Keys.*;
  */
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
-    private final static int CAM_SPEED = 100 * Block.BLOCK_SIZE;
+    private final static int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
     public static final float SCROLL_SPEED = 0.25f;
+    public static final float CAMERA_LERP = 2.5f;
 
     private final WorldRender worldRender;
+    private Entity following;
+    private boolean lockedOn;
 
     public WorldInputHandler(@NotNull WorldRender world) {
         worldRender = world;
@@ -89,14 +95,50 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return;
         }
 
-        int vertical = Gdx.input.isKeyPressed(W) ? 1 : Gdx.input.isKeyPressed(S) ? -1 : 0;
-        int horizontal = Gdx.input.isKeyPressed(A) ? 1 : Gdx.input.isKeyPressed(D) ? -1 : 0;
         OrthographicCamera camera = worldRender.getCamera();
-        camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAM_SPEED * camera.zoom;
-        camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAM_SPEED * camera.zoom;
+
+        float vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
+        float horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
 
         if (vertical != 0 || horizontal != 0) {
+            camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
+            camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
+            lockedOn = false;
             worldRender.update();
         }
+        else if (following != null && lockedOn) {
+            Vector2 pos = following.getBody().getPosition();
+
+            camera.position.x +=
+                (pos.x * Block.BLOCK_SIZE - camera.position.x) * CAMERA_LERP * Gdx.graphics.getDeltaTime();
+            camera.position.y +=
+                (pos.y * Block.BLOCK_SIZE - camera.position.y) * CAMERA_LERP * Gdx.graphics.getDeltaTime();
+
+            worldRender.update();
+        }
+    }
+
+
+    public Entity getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(@Nullable Entity following) {
+        this.following = following;
+        lockedOn = true;
+    }
+
+    /**
+     * Only applies if {@link #getFollowing()} is not {@code null}
+     */
+    public boolean isLockedOn() {
+        return lockedOn;
+    }
+
+    /**
+     * Only applies if {@link #getFollowing()} is not {@code null}
+     */
+    public void setLockedOn(boolean lockedOn) {
+        this.lockedOn = lockedOn;
     }
 }

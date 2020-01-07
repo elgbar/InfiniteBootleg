@@ -25,7 +25,7 @@ public class KeyboardControls extends AbstractEntityControls {
 
     private Material selected;
     //if objects can be placed on non-air blocks
-    public boolean replacePlacement = false;
+    public boolean replacePlacement;
     private float brushSize = 1;
 
     public KeyboardControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
@@ -91,23 +91,23 @@ public class KeyboardControls extends AbstractEntityControls {
                 }
             }
             else if (getControlled().isFlying()) {
-                if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                     getControlled().getBody().applyLinearImpulse(0, HORIZONTAL_IMPULSE * shift,
                                                                  getControlled().getPosition().x,
                                                                  getControlled().getPosition().y, true);
                 }
-                if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                if (Gdx.input.isKeyPressed(Input.Keys.S)) {
                     getControlled().getBody().applyLinearImpulse(0, -HORIZONTAL_IMPULSE * shift,
                                                                  getControlled().getPosition().x,
                                                                  getControlled().getPosition().y, true);
                 }
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
                 getControlled().getBody().applyLinearImpulse(-HORIZONTAL_IMPULSE * shift, 0,
                                                              getControlled().getPosition().x,
                                                              getControlled().getPosition().y, true);
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
                 getControlled().getBody().applyLinearImpulse(HORIZONTAL_IMPULSE * shift, 0,
                                                              getControlled().getPosition().x,
                                                              getControlled().getPosition().y, true);
