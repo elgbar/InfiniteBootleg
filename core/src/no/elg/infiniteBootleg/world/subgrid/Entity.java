@@ -105,11 +105,23 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     public void teleport(float worldX, float worldY, boolean validate) {
-        if (validate && isInvalidLocation(worldX, worldY)) {
-            Main.logger().error("Entity", String
-                .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX,
-                        worldY, posCache.x, posCache.y));
-            return;
+
+        if (validate) {
+            int tries = getHeight() / Block.BLOCK_SIZE;
+            boolean invalid = true;
+            for (int y = tries - 1; y >= -tries; y--) {
+                if (!isInvalidLocation(worldX, worldY + y)) {
+                    worldY += y;
+                    invalid = false;
+                    break;
+                }
+            }
+            if (invalid) {
+                Main.logger().error("Entity", String
+                    .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX,
+                            worldY, posCache.x, posCache.y));
+                return;
+            }
         }
 
         synchronized (WorldRender.BOX2D_LOCK) {
