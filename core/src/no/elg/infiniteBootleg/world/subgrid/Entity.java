@@ -247,12 +247,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     /**
      * Update the cached position and velocity
      */
-    private void updatePos() {
+    private synchronized void updatePos() {
         if (body == null) { return; }
-        synchronized (WorldRender.BOX2D_LOCK) {
-            posCache = body.getPosition();
-            velCache = body.getLinearVelocity();
-        }
+        posCache = body.getPosition();
+        velCache = body.getLinearVelocity();
     }
 
     @Override
@@ -289,27 +287,19 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     /**
-     * @return Position of this entity last tick, changing this have no impact of the body of this entity
+     * @return Position of this entity last tick, note that the same vector is returned each time
      */
     @NotNull
     public Vector2 getPosition() {
-        Vector2 cpy;
-        synchronized (WorldRender.BOX2D_LOCK) {
-            cpy = posCache.cpy();
-        }
-        return cpy;
+        return posCache;
     }
 
     /**
-     * @return Velocity of this entity last tick, changing this have no impact of the body of this entity
+     * @return Velocity of this entity last tick, note that the same vector is returned each time
      */
     @NotNull
     public Vector2 getVelocity() {
-        Vector2 cpy;
-        synchronized (WorldRender.BOX2D_LOCK) {
-            cpy = velCache.cpy();
-        }
-        return cpy;
+        return velCache;
     }
 
     /**
@@ -374,10 +364,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      * @param filter
      *     The type of filter to set
      */
-    public void setFilter(Filter filter) {
+    public synchronized void setFilter(Filter filter) {
         this.filter = filter;
-        if (body != null) {
-            synchronized (WorldRender.BOX2D_LOCK) {
+        synchronized (WorldRender.BOX2D_LOCK) {
+            if (body != null) {
                 for (Fixture fixture : body.getFixtureList()) {
                     fixture.setFilterData(filter);
                 }
@@ -386,7 +376,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         world.getWorldBody().destroyBody(body);
         body = null;
     }

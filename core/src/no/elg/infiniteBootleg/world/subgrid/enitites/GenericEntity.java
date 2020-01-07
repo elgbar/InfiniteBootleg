@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import org.jetbrains.annotations.NotNull;
@@ -32,11 +33,15 @@ public class GenericEntity extends Entity implements Removable {
         this.height = height * Block.BLOCK_SIZE;
 
         //make sure the width and height is correct
-        for (Fixture fixture : getBody().getFixtureList()) {
-            getBody().destroyFixture(fixture);
+        synchronized (this) {
+            for (Fixture fixture : getBody().getFixtureList()) {
+                getBody().destroyFixture(fixture);
+            }
         }
-        createFixture(getBody());
-        setFilter(filter);
+        synchronized (WorldRender.BOX2D_LOCK) {
+            createFixture(getBody());
+            setFilter(filter);
+        }
     }
 
     @Override
