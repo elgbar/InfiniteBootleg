@@ -269,5 +269,22 @@ public class Commands extends CommandExecutor {
         //call the other time function
         time(time);
     }
+
+    @ClientsideOnly
+    @ConsoleDoc(description = "Reset camera and zoom")
+    public void reset() {
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("PLR", "Failed to find any players");
+            return;
+        }
+        WorldRender render = Main.inst().getWorld().getRender();
+        render.getCamera().zoom = 1f;
+        render.getCamera().position.x = player.getPosition().x * Block.BLOCK_SIZE;
+        render.getCamera().position.y = player.getPosition().y * Block.BLOCK_SIZE;
+        render.update();
+
+
+    }
 }
 
