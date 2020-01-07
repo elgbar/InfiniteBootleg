@@ -66,123 +66,127 @@ public class ChunkBody implements Disposable {
      *     If the neighbors also should be updated
      * @param lightsOnly
      */
-    public void update(boolean recalculateNeighbors, boolean lightsOnly) {
-        if (lightsOnly) {
-            updateLights();
-            return;
-        }
-        if (chunk.isAllAir()) {
-            synchronized (this) {
+    public synchronized void update(boolean recalculateNeighbors, boolean lightsOnly) {
+        synchronized (WorldRender.BOX2D_LOCK) {
+            if (lightsOnly) {
+                updateLights();
+                return;
+            }
+            if (chunk.isAllAir()) {
                 chunk.getWorld().getWorldBody().destroyBody(box2dBody);
                 box2dBody = null;
+
+                return;
             }
-            return;
-        }
 
-        //recalculate the shape of the chunk (box2d)
+            //recalculate the shape of the chunk (box2d)
 
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(chunk.getChunkX() * CHUNK_SIZE, chunk.getChunkY() * CHUNK_SIZE);
-        bodyDef.fixedRotation = true;
-        bodyDef.awake = false;
-        bodyDef.type = BodyDef.BodyType.StaticBody;
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.position.set(chunk.getChunkX() * CHUNK_SIZE, chunk.getChunkY() * CHUNK_SIZE);
+            bodyDef.fixedRotation = true;
+            bodyDef.awake = false;
+            bodyDef.type = BodyDef.BodyType.StaticBody;
 
-        Body tmpBody = chunk.getWorld().getWorldBody().createBody(bodyDef);
+            Body tmpBody = chunk.getWorld().getWorldBody().createBody(bodyDef);
 
-        EdgeShape edgeShape = new EdgeShape();
+            EdgeShape edgeShape = new EdgeShape();
 
-        for (byte localX = 0; localX < CHUNK_SIZE; localX++) {
-            for (byte localY = 0; localY < CHUNK_SIZE; localY++) {
-                Block b = chunk.getRawBlock(localX, localY);
+            for (byte localX = 0; localX < CHUNK_SIZE; localX++) {
+                for (byte localY = 0; localY < CHUNK_SIZE; localY++) {
+                    Block b = chunk.getRawBlock(localX, localY);
 
-                if (b == null || !b.getMaterial().isSolid()) {
-                    continue;
-                }
-
-                int worldX = CoordUtil.chunkToWorld(chunk.getChunkX(), localX);
-                int worldY = CoordUtil.chunkToWorld(chunk.getChunkY(), localY);
-
-                for (Tuple<Direction, byte[]> tuple : EDGE_DEF) {
-                    Direction dir = tuple.key;
-
-                    //FIXME only check the chunk if the local coordinates are outside this chunk
-                    if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && //
-                        !chunk.getWorld().isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx),
-                                                        CoordUtil.worldToChunk(worldY + dir.dy))) {
+                    if (b == null || !b.getMaterial().isSolid()) {
                         continue;
                     }
 
-                    Block rel;
-                    if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
-                        rel = chunk.getRawBlock(localX + dir.dx, localY + dir.dy);
-                    }
-                    else {
-                        Chunk relChunk = chunk.getWorld().getChunkFromWorld(worldX + dir.dx, worldY + dir.dy);
-                        int relOffsetX = CoordUtil.chunkOffset(worldX + dir.dx);
-                        int relOffsetY = CoordUtil.chunkOffset(worldY + dir.dy);
-                        rel = relChunk.getBlocks()[relOffsetX][relOffsetY];
-                    }
-                    if (rel == null || !rel.getMaterial().isSolid() ||
-                        (dir == Direction.NORTH && localY == CHUNK_SIZE - 1)//always render top of chunk
-                        || (dir == Direction.EAST && localX == CHUNK_SIZE - 1) //and the sides
-                        || (dir == Direction.WEST && localX == 0)) {
-                        byte[] ds = tuple.value;
-                        edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
+                    int worldX = CoordUtil.chunkToWorld(chunk.getChunkX(), localX);
+                    int worldY = CoordUtil.chunkToWorld(chunk.getChunkY(), localY);
 
-                        synchronized (WorldRender.BOX2D_LOCK) {
-                            Fixture fix = tmpBody.createFixture(edgeShape, 0);
-                            if (!b.getMaterial().blocksLight()) {
-                                fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
+                    for (Tuple<Direction, byte[]> tuple : EDGE_DEF) {
+                        Direction dir = tuple.key;
+
+                        //FIXME only check the chunk if the local coordinates are outside this chunk
+                        if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && //
+                            !chunk.getWorld().isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx),
+                                                            CoordUtil.worldToChunk(worldY + dir.dy))) {
+                            continue;
+                        }
+
+                        Block rel;
+                        if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
+                            rel = chunk.getRawBlock(localX + dir.dx, localY + dir.dy);
+                        }
+                        else {
+                            Chunk relChunk = chunk.getWorld().getChunkFromWorld(worldX + dir.dx, worldY + dir.dy);
+                            int relOffsetX = CoordUtil.chunkOffset(worldX + dir.dx);
+                            int relOffsetY = CoordUtil.chunkOffset(worldY + dir.dy);
+                            rel = relChunk.getBlocks()[relOffsetX][relOffsetY];
+                        }
+                        if (rel == null || !rel.getMaterial().isSolid() ||
+                            (dir == Direction.NORTH && localY == CHUNK_SIZE - 1)//always render top of chunk
+                            || (dir == Direction.EAST && localX == CHUNK_SIZE - 1) //and the sides
+                            || (dir == Direction.WEST && localX == 0)) {
+                            byte[] ds = tuple.value;
+                            edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
+
+                            synchronized (WorldRender.BOX2D_LOCK) {
+                                Fixture fix = tmpBody.createFixture(edgeShape, 0);
+                                if (!b.getMaterial().blocksLight()) {
+                                    fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        edgeShape.dispose();
+            edgeShape.dispose();
 
-        synchronized (this) {
+
             chunk.getWorld().getWorldBody().destroyBody(box2dBody);
             box2dBody = tmpBody;
-        }
-
-        Gdx.app.postRunnable(() -> chunk.getWorld().getRender().update());
 
 
-        boolean potentiallyDirty = false;
+            Gdx.app.postRunnable(() -> chunk.getWorld().getRender().update());
 
-        //TODO Try to optimize this (ie select what directions to recalculate)
-        for (Direction direction : Direction.values()) {
-            Location relChunk = Location.relative(chunk.getChunkX(), chunk.getChunkY(), direction);
-            if (chunk.getWorld().isChunkLoaded(relChunk)) {
-                if (recalculateNeighbors) {
-                    //noinspection LibGDXFlushInsideLoop
-                    chunk.getWorld().getChunk(relChunk).getChunkBody().update(false, !direction.isCardinal());
+
+            boolean potentiallyDirty = false;
+
+            //TODO Try to optimize this (ie select what directions to recalculate)
+            for (Direction direction : Direction.values()) {
+                Location relChunk = Location.relative(chunk.getChunkX(), chunk.getChunkY(), direction);
+                if (chunk.getWorld().isChunkLoaded(relChunk)) {
+                    if (recalculateNeighbors) {
+                        Main.inst().getScheduler().executeAsync(() -> {
+                            chunk.getWorld().getChunk(relChunk).getChunkBody().update(false, !direction.isCardinal());
+                        });
+                    }
+                }
+                else {
+                    potentiallyDirty = true;
                 }
             }
-            else {
-                potentiallyDirty = true;
-            }
-        }
 
-        if (potentiallyDirty) {
-            scheduleFixtureReload(true);
+            if (potentiallyDirty) {
+                scheduleFixtureReload(true);
+            }
+            updateLights();
         }
-        updateLights();
     }
 
-    private void scheduleFixtureReload(boolean initial) {
+    private synchronized void scheduleFixtureReload(boolean initial) {
         if (unsureFixture) {
             return;
         }
         unsureFixture = true;
         Main.inst().getScheduler().scheduleAsync(() -> {
-            unsureFixture = false;
-            if (chunk.isNeighborsLoaded()) {
-                update(false, false);
-            }
-            else {
-                scheduleFixtureReload(false);
+            synchronized (this) {
+                unsureFixture = false;
+                if (chunk.isNeighborsLoaded()) {
+                    update(false, false);
+                }
+                else {
+                    scheduleFixtureReload(false);
+                }
             }
         }, initial ? INITIAL_UNSURE_FIXTURE_RELOAD_DELAY : UNSURE_FIXTURE_RELOAD_DELAY);
     }
