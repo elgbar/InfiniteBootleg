@@ -77,6 +77,9 @@ public class KeyboardControls extends AbstractEntityControls {
         if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
             //teleport the player to the (last) location of the mouse
             getControlled().teleport(Main.inst().getMouseX(), Main.inst().getMouseY(), true);
+            if (world.getInput() != null) {
+                world.getInput().setLockedOn(true);
+            }
 
         }
         else {
