@@ -26,6 +26,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     private final static int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
     public static final float SCROLL_SPEED = 0.25f;
     public static final float CAMERA_LERP = 2.5f;
+    public static final float LERP_CUTOFF = 5f;
 
     private final WorldRender worldRender;
     private Entity following;
@@ -109,12 +110,14 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         else if (following != null && lockedOn) {
             Vector2 pos = following.getBody().getPosition();
 
-            camera.position.x +=
-                (pos.x * Block.BLOCK_SIZE - camera.position.x) * CAMERA_LERP * Gdx.graphics.getDeltaTime();
-            camera.position.y +=
-                (pos.y * Block.BLOCK_SIZE - camera.position.y) * CAMERA_LERP * Gdx.graphics.getDeltaTime();
+            float dx = (pos.x * Block.BLOCK_SIZE - camera.position.x) * CAMERA_LERP;
+            float dy = (pos.y * Block.BLOCK_SIZE - camera.position.y) * CAMERA_LERP;
 
-            worldRender.update();
+            if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
+                camera.position.x += dx * Gdx.graphics.getDeltaTime();
+                camera.position.y += dy * Gdx.graphics.getDeltaTime();
+                worldRender.update();
+            }
         }
     }
 
