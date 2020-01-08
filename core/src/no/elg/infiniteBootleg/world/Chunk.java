@@ -470,7 +470,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         if (fbo != null) {
             Main.inst().getScheduler().executeSync(fbo::dispose);
         }
@@ -479,12 +479,10 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
         chunkBody.dispose();
 
-        synchronized (this) {
-            for (Block[] blocks : blocks) {
-                for (Block block : blocks) {
-                    if (block != null) {
-                        block.dispose();
-                    }
+        for (Block[] blocks : blocks) {
+            for (Block block : blocks) {
+                if (block != null) {
+                    block.dispose();
                 }
             }
         }

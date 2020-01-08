@@ -32,7 +32,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     private final WorldRender worldRender;
 
     //current rendering chunk
-    private Chunk curr = null;
+    private Chunk curr;
 
     public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
