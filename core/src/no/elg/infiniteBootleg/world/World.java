@@ -72,6 +72,8 @@ public class World implements Disposable, Ticking, Resizable {
     public static final float SUNSET_TIME = -180 + TWILIGHT_DEGREES;
     public static final float MIDNIGHT_TIME = -270;
 
+    public static final float TIME_CHANGE_PER_TICK = WorldTicker.SECONDS_DELAY_BETWEEN_TICKS / 10;
+
     static {
         //base filter for entities
         ENTITY_FILTER = new Filter();
@@ -652,7 +654,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         //update light direction
         if (dayTicking) {
-            time -= WorldTicker.SECONDS_DELAY_BETWEEN_TICKS * timeScale;
+            time -= TIME_CHANGE_PER_TICK * timeScale;
             if (Main.renderGraphic) {
                 if (normalizedTime() >= 180) {
                     wr.getSkylight().setDirection(time);
