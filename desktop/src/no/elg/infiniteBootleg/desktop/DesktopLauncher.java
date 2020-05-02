@@ -16,27 +16,32 @@ public class DesktopLauncher {
 
         new ProgramArgs(args);
 
-        if (Main.renderGraphic) {
+        try {
+            if (Main.renderGraphic) {
 
-            LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-            if (SCALE > 1) {
-                config.width = 1920;
-                config.height = 1080;
+                LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+                if (SCALE > 1) {
+                    config.width = 1920;
+                    config.height = 1080;
+                }
+                else {
+                    config.width = 1280;
+                    config.height = 720;
+                }
+                config.vSyncEnabled = false;
+                config.foregroundFPS = 9999;
+                config.backgroundFPS = 10;
+                config.samples = 16;
+                config.title = "Infinite Terraria";
+                config.useHDPI = true;
+                new LwjglApplication(main, config);
             }
             else {
-                config.width = 1280;
-                config.height = 720;
+                new HeadlessApplication(main, null);
             }
-            config.vSyncEnabled = false;
-            config.foregroundFPS = 9999;
-            config.backgroundFPS = 10;
-            config.samples = 16;
-            config.title = "Infinite Terraria";
-            config.useHDPI = true;
-            new LwjglApplication(main, config);
-        }
-        else {
-            new HeadlessApplication(main, null);
+        } catch (Throwable t) {
+            System.out.println("Uncaught exception thrown: " + t.getClass().getSimpleName());
+            t.printStackTrace();
         }
     }
 }
