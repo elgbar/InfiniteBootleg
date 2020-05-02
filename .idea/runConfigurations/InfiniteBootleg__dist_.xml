@@ -17,7 +17,6 @@
     </ExternalSystemSettings>
     <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
     <method v="2">
-      <option name="Gradle.BeforeRunTask" enabled="true" tasks="clean" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Whole project [100]" run_configuration_type="JUnit" />
     </method>
   </configuration>
