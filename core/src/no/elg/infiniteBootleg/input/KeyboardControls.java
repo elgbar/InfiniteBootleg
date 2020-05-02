@@ -67,7 +67,7 @@ public class KeyboardControls extends AbstractEntityControls {
                     selected.create(world, blockX, blockY);
                 }
                 else {
-                    for (Block block : world.getBlocksWithin(rawX, rawY, placeBrushSize, true)) {
+                    for (Block block : world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
                         selected.create(world, block.getWorldX(), block.getWorldY());
                     }
                 }
