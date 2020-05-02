@@ -33,10 +33,9 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1",
                 paramDescriptions = {"red", "green", "blue", "alpha"})
     public void skyColor(float r, float g, float b, float a) {
-        DirectionalLight skylight = Main.inst().getWorld().getRender().getSkylight();
-        skylight.setColor(r, g, b, a);
-        logger.log("Sky color changed to " + skylight.getColor());
-
+        Color skylight = Main.inst().getWorld().getBaseColor();
+        skylight.set(r, g, b, a);
+        logger.success("Sky color changed to " + skylight);
     }
 
     @ClientsideOnly
