@@ -26,7 +26,8 @@ public class KeyboardControls extends AbstractEntityControls {
     private Material selected;
     //if objects can be placed on non-air blocks
     public boolean replacePlacement;
-    private float brushSize = 2f;
+    private float breakBrushSize = 2f;
+    private float placeBrushSize = 1f;
 
     public KeyboardControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
         super(worldRender, entity);
@@ -49,11 +50,11 @@ public class KeyboardControls extends AbstractEntityControls {
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 
-            if (brushSize <= 1) {
+            if (breakBrushSize <= 1) {
                 world.remove(blockX, blockY, true);
             }
             else {
-                for (Block block : world.getBlocksWithin(rawX, rawY, brushSize, true)) {
+                for (Block block : world.getBlocksWithin(rawX, rawY, breakBrushSize, true)) {
                     world.remove(block.getWorldX(), block.getWorldY(), true);
                 }
             }
@@ -62,11 +63,11 @@ public class KeyboardControls extends AbstractEntityControls {
         else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Q)) {
 
             if (replacePlacement || world.isAir(blockX, blockY)) {
-                if (brushSize <= 1) {
+                if (placeBrushSize <= 1) {
                     selected.create(world, blockX, blockY);
                 }
                 else {
-                    for (Block block : world.getBlocksWithin(rawX, rawY, brushSize, true)) {
+                    for (Block block : world.getBlocksWithin(rawX, rawY, placeBrushSize, true)) {
                         selected.create(world, block.getWorldX(), block.getWorldY());
                     }
                 }
@@ -187,12 +188,22 @@ public class KeyboardControls extends AbstractEntityControls {
     }
 
     @Override
-    public float getBrushSize() {
-        return brushSize;
+    public float getBreakBrushSize() {
+        return breakBrushSize;
     }
 
     @Override
-    public void setBrushSize(float brushSize) {
-        this.brushSize = brushSize;
+    public void setBreakBrushSize(float breakBrushSize) {
+        this.breakBrushSize = breakBrushSize;
+    }
+
+    @Override
+    public float getPlaceBrushSize() {
+        return placeBrushSize;
+    }
+
+    @Override
+    public void setPlaceBrushSize(float placeBrushSize) {
+        this.placeBrushSize = placeBrushSize;
     }
 }

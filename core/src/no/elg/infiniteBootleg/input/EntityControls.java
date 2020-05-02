@@ -30,7 +30,11 @@ public interface EntityControls extends InputProcessor, Updatable, Disposable {
      */
     void setSelected(@Nullable Material selected);
 
-    float getBrushSize();
+    float getBreakBrushSize();
 
-    void setBrushSize(float brushSize);
+    void setBreakBrushSize(float breakBrushSize);
+
+    float getPlaceBrushSize();
+
+    void setPlaceBrushSize(float breakBrushSize);
 }

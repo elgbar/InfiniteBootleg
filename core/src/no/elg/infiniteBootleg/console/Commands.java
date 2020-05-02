@@ -201,15 +201,42 @@ public class Commands extends CommandExecutor {
     }
 
     @ClientsideOnly
-    @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = "New brush size, positive integer")
-    public void brush(float size) {
+    @ConsoleDoc(description = "Get the brush sizes")
+    public void brush() {
         Player player = Main.inst().getPlayer();
         if (player == null) {
-            logger.error("PLR", "Failed to find any players");
+            logger.error("CMD", "Failed to find any players");
             return;
         }
-        Main.inst().getPlayer().getControls().setBrushSize(size);
-        logger.log(LogLevel.SUCCESS, "Brush size for player is now " + size);
+        EntityControls controls = Main.inst().getPlayer().getControls();
+        logger.logf(LogLevel.SUCCESS,
+                    "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
+                    controls.getBreakBrushSize(), controls.getPlaceBrushSize());
+    }
+
+    @ClientsideOnly
+    @ConsoleDoc(description = "Set the brush size of the mouse",
+                paramDescriptions = {"Type of brush to change, can be 'break' and 'place'",
+                    "New brush size, positive integer"})
+    public void brush(String type, float size) {
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("CMD", "Failed to find any players");
+            return;
+        }
+        EntityControls controls = Main.inst().getPlayer().getControls();
+
+        if ("break".equalsIgnoreCase(type)) {
+            controls.setBreakBrushSize(size);
+        }
+        else if ("place".equalsIgnoreCase(type)) {
+            controls.setPlaceBrushSize(size);
+        }
+        else {
+            logger.error("CMD", "Valid brush types are 'break' and 'place'");
+            return;
+        }
+        brush();
     }
 
     @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
