@@ -1,12 +1,12 @@
 package no.elg.infiniteBootleg.console;
 
-import box2dLight.DirectionalLight;
 import com.badlogic.gdx.graphics.Color;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Commands extends CommandExecutor {
 
-    private ConsoleLogger logger;
+    private final ConsoleLogger logger;
 
     public Commands(@NotNull ConsoleLogger logger) {
         this.logger = logger;
@@ -46,7 +46,7 @@ public class Commands extends CommandExecutor {
             try {
                 Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
                 skylight.set(color);
-                logger.log("Sky color changed to " + colorName.toLowerCase());
+                logger.log("Sky color changed to " + colorName.toLowerCase() + " (" + color + ")");
             } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
                 logger.logf(LogLevel.ERROR, "Unknown color '%s'", colorName);
             }
@@ -81,7 +81,11 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Toggle flight for player")
     public void fly() {
-        Entity player = Main.inst().getWorld().getLivingEntities().iterator().next(); //assume this is the player
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("CMD", "Failed to find any players");
+            return;
+        }
         player.setFlying(!player.isFlying());
         logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") + "flying");
     }
@@ -173,7 +177,7 @@ public class Commands extends CommandExecutor {
     public void paint() {
         Player player = Main.inst().getPlayer();
         if (player == null) {
-            logger.error("PLR", "Failed to find any players");
+            logger.error("CMD", "Failed to find any players");
             return;
         }
         for (Block block : player.touchingBlocks()) {
@@ -287,7 +291,7 @@ public class Commands extends CommandExecutor {
                     time = Integer.MAX_VALUE;
                     break;
                 default:
-                    logger.error("ERR", "Unknown time of day, try sunrise, midday, sunset or midnight");
+                    logger.error("CMD", "Unknown time of day, try sunrise, midday, sunset or midnight");
                     return;
             }
         }
@@ -301,7 +305,7 @@ public class Commands extends CommandExecutor {
     public void reset() {
         Player player = Main.inst().getPlayer();
         if (player == null) {
-            logger.error("PLR", "Failed to find any players");
+            logger.error("CMD", "Failed to find any players");
             return;
         }
         World world = Main.inst().getWorld();

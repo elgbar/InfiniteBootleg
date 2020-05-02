@@ -48,6 +48,6 @@ public abstract class LivingEntity extends AirResistanceEntity implements Updata
 
     @Override
     public String toString() {
-        return "LivingEntity{" + "name='" + name + '\'' + "} " + super.toString();
+        return "LivingEntity{name='" + name + "'} " + super.toString();
     }
 }

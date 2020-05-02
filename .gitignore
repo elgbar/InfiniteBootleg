@@ -141,3 +141,5 @@ version
 .idea/compiler.xml
 
 .idea/codeStyles/codeStyleConfig.xml
+
+tests/

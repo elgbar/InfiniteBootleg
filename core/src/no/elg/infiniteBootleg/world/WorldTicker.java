@@ -38,7 +38,7 @@ public class WorldTicker implements Runnable {
 
     public WorldTicker(@NotNull World world, boolean start) {
         this.world = world;
-        Main.logger().log("Starting world ticking thread with TPS = " + TICKS_PER_SECOND);
+        Main.logger().log("TICK", "Starting world ticking thread with TPS = " + TICKS_PER_SECOND);
 
         worldTickThread = new PauseableThread(this);
         worldTickThread.setName("World Ticker");

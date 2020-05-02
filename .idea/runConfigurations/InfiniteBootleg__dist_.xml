@@ -18,6 +18,7 @@
     <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Whole project [100]" run_configuration_type="JUnit" />
+      <option name="TypeScript.Before.Run" enabled="true" FAIL_ON_ERROR="true" />
     </method>
   </configuration>
 </component>

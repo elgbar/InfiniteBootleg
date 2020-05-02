@@ -203,13 +203,13 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
      * @param block
      *     The new block
-     * @param update
+     * @param updateTexture
      *     If the texture of this chunk should be updated
      *
      * @return The given block, equal to the {@code block} parameter
      */
     @Nullable
-    public synchronized Block setBlock(int localX, int localY, @Nullable Block block, boolean update) {
+    public synchronized Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
         if (block != null) {
@@ -252,7 +252,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             }
         }
 
-        if (update) {
+        if (updateTexture) {
             modified = true;
             dirty = true;
             prioritize = true;
