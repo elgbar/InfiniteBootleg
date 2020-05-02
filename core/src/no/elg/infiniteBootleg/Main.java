@@ -69,7 +69,7 @@ public class Main extends ApplicationAdapter {
 
     public static int schedulerThreads = -1;
 
-    public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 1920 ? 2 : 1;
+    public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
 
     private World world;
     private ConsoleHandler console;
