@@ -26,7 +26,7 @@ public class KeyboardControls extends AbstractEntityControls {
     private Material selected;
     //if objects can be placed on non-air blocks
     public boolean replacePlacement;
-    private float brushSize = 1;
+    private float brushSize = 2f;
 
     public KeyboardControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
         super(worldRender, entity);
