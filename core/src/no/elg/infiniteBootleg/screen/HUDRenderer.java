@@ -44,7 +44,7 @@ public class HUDRenderer implements Renderer {
         World world = main.getWorld();
         int h = Gdx.graphics.getHeight();
 
-        LivingEntity player = world.getLivingEntities().iterator().next();
+        LivingEntity player = Main.inst().getPlayer();
         ScreenRenderer sr = Main.inst().getScreenRenderer();
         if (modus == HUDModus.DEBUG) {
             Block block = world.getBlock(main.getMouseBlockX(), main.getMouseBlockY(), true);
@@ -55,7 +55,7 @@ public class HUDRenderer implements Renderer {
             int chunksVert = vChunks.getVerticalLength();
             int chunksInView = chunksHorz * chunksVert;
 
-            Chunk pointChunk = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
+            Chunk pc = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
 
             String fps = String.format("FPS: %4d delta: %.5f tps: %2d tps delta: %3d ms active threads %d",
                                        Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime(),
@@ -67,26 +67,29 @@ public class HUDRenderer implements Renderer {
                                             main.getMouseX(), main.getMouseY(), //
                                             main.getMouseBlockX(), main.getMouseBlockY(), //
                                             block != null);
-            String chunk = String.format("chunk (% 4d,% 4d) : type: %-9.9s just air? %-5b can unload? %-5b)", //
-                                         pointChunk.getChunkX(), pointChunk.getChunkY(), //
-                                         world.getChunkLoader().getGenerator().getBiome(main.getMouseBlockX()), //
-                                         pointChunk.isAllAir(), pointChunk.isAllowingUnloading() //
-                                        );
+            String chunk = pc == null ? "chunk (???,???) : type: ??? just air? ??? can unload? ???)" : String.format(
+                "chunk (% 4d,% 4d) : type: %-9.9s just air? %-5b can unload? %-5b)", //
+                pc.getChunkX(), pc.getChunkY(), //
+                world.getChunkLoader().getGenerator().getBiome(main.getMouseBlockX()), //
+                pc.isAllAir(), pc.isAllowingUnloading() //
+                                                                                                                    );
             String viewChunk = String.format("Viewing %d chunks (total %d blocks, w %d b, h %d b) with zoom: %.3f",
                                              chunksInView, chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
                                              chunksHorz * Chunk.CHUNK_SIZE, chunksVert * Chunk.CHUNK_SIZE,
                                              world.getRender().getCamera().zoom);
 
-            String pos = String.format("p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x,
-                                       player.getPosition().y, player.getVelocity().x, player.getVelocity().y, //
-                                       player.isOnGround(), player.isFlying()//
-                                      );
+
+            String pos = player == null ? "No player" : String.format(
+                "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x, player.getPosition().y,
+                player.getVelocity().x, player.getVelocity().y, //
+                player.isOnGround(), player.isFlying()//
+                                                                     );
             String sky = String.format("time: %.2f scale: %.2f skycolor: %s", world.getTime(), world.getTimeScale(),
                                        world.getSkyBrightness());
 
             String nl = "\n    ";
             StringBuilder ents = new StringBuilder("E = ");
-            //noinspection LibGDXUnsafeIterator
+
             for (Entity entity : world.getEntities(Main.inst().getMouseX(), Main.inst().getMouseY())) {
                 ents.append(entity.simpleName()).append(nl);
             }
@@ -105,10 +108,12 @@ public class HUDRenderer implements Renderer {
         else {
             sr.begin();
         }
-        Material sel = player.getControls().getSelected();
-        if (sel != null && sel.getTextureRegion() != null) {
-            sr.getBatch().draw(sel.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3 * SCALE,
-                               h - BLOCK_SIZE * 3 * SCALE, BLOCK_SIZE * 2 * SCALE, BLOCK_SIZE * 2 * SCALE);
+        if (player != null) {
+            Material mat = player.getControls().getSelected();
+            if (mat != null && mat.getTextureRegion() != null) {
+                sr.getBatch().draw(mat.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3 * SCALE,
+                                   h - BLOCK_SIZE * 3 * SCALE, BLOCK_SIZE * 2 * SCALE, BLOCK_SIZE * 2 * SCALE);
+            }
         }
         sr.end();
     }

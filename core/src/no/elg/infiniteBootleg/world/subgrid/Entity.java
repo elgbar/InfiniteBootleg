@@ -36,6 +36,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     private Vector2 velCache;
     private int groundContacts;
     private Filter filter;
+    private boolean valid;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
         this(world, worldX, worldY, true);
@@ -379,6 +380,11 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     public synchronized void dispose() {
         world.getWorldBody().destroyBody(body);
         body = null;
+        valid = false;
+    }
+
+    public synchronized boolean isValid() {
+        return valid;
     }
 
     @Override

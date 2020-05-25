@@ -200,14 +200,19 @@ public class World implements Disposable, Ticking, Resizable {
     @Nullable
     @Contract("_, _, false -> !null")
     public Block getBlock(int worldX, int worldY, boolean raw) {
+
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
         int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-        if (raw) { return getChunk(chunkX, chunkY).getBlocks()[localX][localY]; }
-        else { return getChunk(chunkX, chunkY).getBlock(localX, localY); }
+        Chunk c = getChunk(chunkX, chunkY);
+        if (c == null) {
+            return null;
+        }
+        if (raw) { return c.getBlocks()[localX][localY]; }
+        else { return c.getBlock(localX, localY); }
     }
 
     /**
@@ -270,6 +275,7 @@ public class World implements Disposable, Ticking, Resizable {
      *
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
+    @Nullable
     public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean update) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
@@ -278,7 +284,9 @@ public class World implements Disposable, Ticking, Resizable {
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
         Chunk chunk = getChunk(chunkX, chunkY);
-        chunk.setBlock(localX, localY, material, update);
+        if (chunk != null) {
+            chunk.setBlock(localX, localY, material, update);
+        }
         return chunk;
     }
 
@@ -303,7 +311,9 @@ public class World implements Disposable, Ticking, Resizable {
         int localY = CoordUtil.chunkOffset(worldY);
 
         Chunk chunk = getChunk(chunkX, chunkY);
-        chunk.setBlock(localX, localY, block, update);
+        if (chunk != null) {
+            chunk.setBlock(localX, localY, block, update);
+        }
     }
 
     /**
@@ -324,11 +334,13 @@ public class World implements Disposable, Ticking, Resizable {
         int localY = CoordUtil.chunkOffset(worldY);
 
         Chunk chunk = getChunk(chunkX, chunkY);
-        chunk.setBlock(localX, localY, (Block) null, update);
-        for (Entity entity : getEntities(worldX, worldY)) {
-            if (entity instanceof Removable) {
-                ((Removable) entity).onRemove();
-                removeEntity(entity);
+        if (chunk != null) {
+            chunk.setBlock(localX, localY, (Block) null, update);
+            for (Entity entity : getEntities(worldX, worldY)) {
+                if (entity instanceof Removable) {
+                    ((Removable) entity).onRemove();
+                    removeEntity(entity);
+                }
             }
         }
     }
@@ -350,13 +362,12 @@ public class World implements Disposable, Ticking, Resizable {
     public boolean isAir(@NotNull Location worldLoc) {return isAir(worldLoc.x, worldLoc.y);}
 
     /**
-     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
-     * than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int, boolean)}
-     * method
-     * migt
-     * createBlock
-     * and store a new air block at the given location
+     * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist) this is faster
+     * than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int,
+     * boolean)} method might create a Block and store a new air block at the given location.
+     * <p>
+     * If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent teleportation and
+     * other actions that depend on an empty space.
      *
      * @param worldX
      *     The x coordinate from world view
@@ -372,7 +383,14 @@ public class World implements Disposable, Ticking, Resizable {
         int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-        Block b = getChunk(chunkX, chunkY).getBlocks()[localX][localY];
+        Chunk chunk = getChunk(chunkX, chunkY);
+        if (chunk == null) {
+            //What should we return here? we don't really know as it does not exist.
+            //Return false to prevent teleportation and other actions that depend on an empty space.
+            return false;
+        }
+
+        Block b = chunk.getBlocks()[localX][localY];
         return b == null || b.getMaterial() == Material.AIR;
     }
 
@@ -609,9 +627,11 @@ public class World implements Disposable, Ticking, Resizable {
      * <p>
      * The time used will be the current world time ie {@link #getTime()}
      *
-     * @return A brightness value between 0 and 1 (both inclusives)
+     * @return A brightness value between 0 and 1 (both inclusive)
      */
-    public float getSkyBrightness() {return getSkyBrightness(time);}
+    public float getSkyBrightness() {
+        return getSkyBrightness(time);
+    }
 
     /**
      * Calculate how bright the sky should be. During the night the value will always be {@code 0}, during twilight (ie
@@ -840,18 +860,23 @@ public class World implements Disposable, Ticking, Resizable {
         return block.getMaterial();
     }
 
-
     /**
      * Remove and disposes the given entity
      *
      * @param entity
+     *     The entity to remove
+     *
+     * @throws IllegalArgumentException
+     *     if the given entity is not part of this world
      */
     public void removeEntity(@NotNull Entity entity) {
-        entities.remove(entity);
+        boolean removed = entities.remove(entity);
         if (entity instanceof Player) {
-            livingEntities.remove(entity);
+            removed |= livingEntities.remove(entity);
         }
-        entity.dispose();
+        if (removed) {
+            entity.dispose();
+        }
     }
 
     public Collection<Chunk> getLoadedChunks() {

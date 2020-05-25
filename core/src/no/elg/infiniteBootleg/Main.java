@@ -164,9 +164,13 @@ public class Main extends ApplicationAdapter {
         mouseBlockY = MathUtils.floor(mouseY);
 
         synchronized (INST_LOCK) {
+            //noinspection ConstantConditions
             world.getInput().update();
-            for (LivingEntity entity : world.getLivingEntities()) {
-                entity.update();
+            if (!world.getWorldTicker().isPaused()) {
+                //only update controls when we're not paused
+                for (LivingEntity entity : world.getLivingEntities()) {
+                    entity.update();
+                }
             }
             world.getRender().render();
         }
@@ -228,7 +232,7 @@ public class Main extends ApplicationAdapter {
     public float getMouseY() {
         return mouseY;
     }
-    
+
     public Vector2 getMouse() {
         return mouse.cpy();
     }

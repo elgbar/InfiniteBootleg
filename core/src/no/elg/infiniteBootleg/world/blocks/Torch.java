@@ -15,7 +15,7 @@ public class Torch extends StaticLightBlock {
         super(world, chunk, localX, localY, material);
         Light light = getLight();
         if (light != null) {
-            light.setColor(1, 1, 0.9f, 1);
+            light.setColor(244 / 255f, 178 / 255f, 153 / 255f, 1);
         }
     }
 }

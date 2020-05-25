@@ -42,6 +42,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         if (Main.inst().getConsole().isVisible()) {
             return false;
         }
+        World world = Main.inst().getWorld();
         switch (keycode) {
             case F3:
                 HUDRenderer hud = Main.inst().getHud();
@@ -53,13 +54,14 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
                 }
                 break;
             case F5:
-                Main.inst().getWorld().save();
+                world.save();
                 Main.logger().log("World", "World saved");
                 break;
             case F9:
-                Main.inst().getWorld().load();
+                world.load();
                 Main.logger().log("World", "World reloaded last save");
-                Main.inst().getWorld().unloadChunks(true, false);
+                world.unloadChunks(true, false);
+                world.getEntities().forEach(world::removeEntity);
                 break;
             default:
                 return false;
@@ -98,8 +100,8 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
         OrthographicCamera camera = worldRender.getCamera();
 
-        float vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
-        float horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
+        int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
+        int horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
 
         if (vertical != 0 || horizontal != 0) {
             camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
@@ -107,7 +109,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             lockedOn = false;
             worldRender.update();
         }
-        else if (following != null && lockedOn) {
+        else if (following != null && following.isValid() && lockedOn) {
             Vector2 pos = following.getBody().getPosition();
 
             float dx = (pos.x * Block.BLOCK_SIZE - camera.position.x) * CAMERA_LERP;
@@ -120,7 +122,6 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             }
         }
     }
-
 
     public Entity getFollowing() {
         return following;
