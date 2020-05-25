@@ -155,13 +155,33 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         try {
             int threads = Integer.parseInt(val);
             if (threads < 0) {
-                log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
+                log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0, got " + val);
                 return false;
             }
             Main.schedulerThreads = threads;
             return true;
         } catch (NumberFormatException e) {
-            log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0");
+            log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0, got " + val);
+            return false;
+        }
+    }
+
+    @Argument(value = "Specify the of physics updates per seconds. Must be an integer greater than to 0", alt = 'T')
+    public boolean tps(String val) {
+        if (val == null) {
+            log(LogLevel.ERROR, "Specify the of physics updates per seconds. Must be an integer greater than to 0");
+            return false;
+        }
+        try {
+            int tps = Integer.parseInt(val);
+            if (tps <= 0) {
+                log(LogLevel.ERROR, "Argument must be an integer greater than to 0, got " + val);
+                return false;
+            }
+            Main.tps = tps;
+            return true;
+        } catch (NumberFormatException e) {
+            log(LogLevel.ERROR, "Argument must be an integer greater than to 0, got " + val);
             return false;
         }
     }

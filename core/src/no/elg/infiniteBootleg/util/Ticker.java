@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Ticker implements Runnable {
 
-    public static final long DEFAULT_TICKS_PER_SECOND = 20L;
+    public static final long DEFAULT_TICKS_PER_SECOND = 60L;
     /**
      * How many seconds to wait (based on the tps) between each lag message
      */

@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
+import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
@@ -45,7 +46,7 @@ public class Main extends ApplicationAdapter {
     private final boolean test;
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
-    private CancellableThreadScheduler scheduler;
+    private final CancellableThreadScheduler scheduler;
 
     /**
      * If worlds should be loaded from disk
@@ -68,6 +69,8 @@ public class Main extends ApplicationAdapter {
     public static boolean debug = false;
 
     public static int schedulerThreads = -1;
+
+    public static long tps = Ticker.DEFAULT_TICKS_PER_SECOND;
 
     public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
 
