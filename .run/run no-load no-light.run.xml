@@ -1,8 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debug noload" type="Application" factoryName="Application">
+  <configuration default="false" name="run no-load no-light" type="Application" factoryName="Application">
+    <envs>
+      <env name="vblank_mode" value="0" />
+    </envs>
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncher" />
     <module name="InfiniteBootleg.desktop.main" />
-    <option name="PROGRAM_PARAMETERS" value="-dl" />
+    <option name="PROGRAM_PARAMETERS" value="-lL" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/assets" />
     <method v="2">
       <option name="Make" enabled="true" />

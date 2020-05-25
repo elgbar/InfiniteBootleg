@@ -23,7 +23,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class ProgramArgs implements ConsoleLogger, Disposable {
 
-    private CancellableThreadScheduler scheduler;
+    private final CancellableThreadScheduler scheduler;
 
     public ProgramArgs(String[] args) {
         Preconditions.checkNotNull(Main.inst(), "Main not initiated");
@@ -36,8 +36,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
             String name = null;
             if (key.getValue()) {
-                name = Util.toTitleCase(false, key.getKey().toLowerCase().replace('_', ' ').replace('-', ' ')).replace(
-                    " ", "");
+                name = key.getKey().toLowerCase().replace('-', '_');
             }
             else {
                 char altKey = key.getKey().charAt(0);
@@ -50,21 +49,15 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                     }
                 }
                 if (name == null) {
-                    Main.logger().logf(LogLevel.ERROR,
-                                                        "Failed to find a valid argument with with the alt '%s'",
-                                                        altKey);
+                    Main.logger().logf(LogLevel.ERROR, "Failed to find a valid argument with with the alt '%s'",
+                                       altKey);
                     continue;
                 }
             }
 
             try {
                 Method method = ProgramArgs.class.getDeclaredMethod(name, String.class);
-                if (method != null) {
-                    method.invoke(this, entry.getValue());
-                }
-                else {
-                    Main.logger().logf(LogLevel.ERROR, "Unknown argument '%s'", entry.getKey());
-                }
+                method.invoke(this, entry.getValue());
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -108,7 +101,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      * Do not load the worlds from disk
      */
     @Argument(value = "The world will not be loaded from disk", alt = 'l')
-    private void noLoad(String val) {
+    private void no_load(String val) {
         Main.loadWorldFromDisk = false;
         log("Worlds will not be loaded/saved from/to disk");
     }
@@ -120,7 +113,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      *     The world seed
      */
     @Argument(value = "Set the default world seed, a value must be specified. Example: --world_seed=test", alt = 's')
-    private void worldSeed(String val) {
+    private void world_seed(String val) {
         if (val == null) {
             log(LogLevel.ERROR,
                 "The seed must be provided when using world_Seed argument.\nExample: --world_seed=test");
@@ -136,7 +129,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      */
 
     @Argument(value = "Disable rendering of lights", alt = 'L')
-    private void noLights(String val) {
+    private void no_lights(String val) {
         log("Lights are disabled. To dynamically enable this use command 'lights true'");
         WorldRender.lights = false;
     }
@@ -189,8 +182,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
             Argument arg = method.getAnnotation(Argument.class);
             if (arg != null) {
                 String singleFlag = arg.alt() != '\0' ? "-" + arg.alt() : "  ";
-                System.out.printf(MessageFormat.format(" --%-{0}s %s  %s%n", maxNameSize), method.getName(), singleFlag,
-                                  arg.value());
+                System.out.printf(MessageFormat.format(" --%-{0}s %s  %s%n", maxNameSize),
+                                  method.getName().replace('_', '-'), singleFlag, arg.value());
             }
         }
         System.exit(0);
