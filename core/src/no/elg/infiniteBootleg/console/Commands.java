@@ -8,6 +8,7 @@ import com.strongjoshua.console.annotation.HiddenCommand;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
+import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -94,8 +95,14 @@ public class Commands extends CommandExecutor {
                     "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
                     " entity updates and chunks update")
     public void pause() {
-        Main.inst().getWorld().getWorldTicker().pause();
-        logger.log(LogLevel.SUCCESS, "World is now paused");
+        Ticker ticker = Main.inst().getWorld().getWorldTicker();
+        if (ticker.isPaused()) {
+            logger.log(LogLevel.ERROR, "World is already paused");
+        }
+        else {
+            ticker.pause();
+            logger.log(LogLevel.SUCCESS, "World is now paused");
+        }
     }
 
     @ConsoleDoc(description =
@@ -103,9 +110,15 @@ public class Commands extends CommandExecutor {
                     " entity updates and chunks update")
     public void resume() {
         World world = Main.inst().getWorld();
-        world.getWorldTicker().resume();
-        world.getRender().update();
-        logger.log(LogLevel.SUCCESS, "World is now resumed");
+        Ticker ticker = Main.inst().getWorld().getWorldTicker();
+        if (ticker.isPaused()) {
+            world.getWorldTicker().resume();
+            world.getRender().update();
+            logger.log(LogLevel.SUCCESS, "World is now resumed");
+        }
+        else {
+            logger.log(LogLevel.ERROR, "World is not paused");
+        }
     }
 
     @ClientsideOnly
