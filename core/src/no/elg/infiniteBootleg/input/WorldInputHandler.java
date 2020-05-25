@@ -103,6 +103,11 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
         int horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
 
+        if (lockedOn && (following != null && !following.isValid())) {
+            lockedOn = false;
+            following = null;
+        }
+
         if (vertical != 0 || horizontal != 0) {
             camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
             camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
@@ -127,7 +132,11 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         return following;
     }
 
+
     public void setFollowing(@Nullable Entity following) {
+        if (following == null || !following.isValid()) {
+            throw new IllegalArgumentException("Cannot pass a non-null invalid entity!");
+        }
         this.following = following;
         lockedOn = true;
     }

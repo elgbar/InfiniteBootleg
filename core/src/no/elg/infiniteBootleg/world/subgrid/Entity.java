@@ -36,7 +36,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     private Vector2 velCache;
     private int groundContacts;
     private Filter filter;
-    private boolean valid;
+    private boolean valid = true;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
         this(world, worldX, worldY, true);

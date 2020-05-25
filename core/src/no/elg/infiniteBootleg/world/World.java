@@ -150,8 +150,6 @@ public class World implements Disposable, Ticking, Resizable {
         if (Main.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
-
-            Gdx.app.postRunnable(() -> new Player(this));
         }
         else {
             render = new HeadlessWorldRenderer(this);
@@ -162,6 +160,15 @@ public class World implements Disposable, Ticking, Resizable {
         timeChangePerTick = ticker.getSecondsDelayBetweenTicks() / 10;
 
         load();
+
+        if (Main.renderGraphic) {
+            Gdx.app.postRunnable(() -> {
+                WorldInputHandler input = getInput();
+                if (input != null) {
+                    input.setFollowing(new Player(this));
+                }
+            });
+        }
     }
 
     @Nullable
