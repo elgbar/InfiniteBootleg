@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A helper class that calls a {@link Ticking}'s {@link Ticking#tick()} and {@link Ticking#tickRare()} method
@@ -23,10 +24,11 @@ public class Ticker implements Runnable {
     /**
      * How many seconds to wait (based on the tps) between each lag message
      */
-    public static final float DEFAULT_NAG_DELAY = 3f;
+    public static final double DEFAULT_NAG_DELAY = 3d;
 
     private final PauseableThread tickerThread;
     private final Ticking ticking;
+    private final String tag;
 
     /**
      * The ticks per seconds this ticker is using. Defaults to {@link #DEFAULT_TICKS_PER_SECOND}
@@ -36,7 +38,7 @@ public class Ticker implements Runnable {
     private final long msDelayBetweenTicks;
     private final long nanoDelayBetweenTicks;
     private final float secondsDelayBetweenTicks;
-    private final float nagDelay;
+    private final long nagDelayTicks;
 
     /**
      * How many ticks between each rare update. Currently each rare tick is the same as one second
@@ -69,7 +71,7 @@ public class Ticker implements Runnable {
     /**
      * How long ago we last showed a "can't keep up" warning
      */
-    private long lastNagged;
+    private long lastTickNagged;
 
 
     /**
@@ -98,8 +100,29 @@ public class Ticker implements Runnable {
      * @see #DEFAULT_TICKS_PER_SECOND
      * @see #DEFAULT_NAG_DELAY
      */
-    public Ticker(@NotNull Ticking ticking, boolean start, long tps, float nagDelay) {
+    public Ticker(@NotNull Ticking ticking, boolean start, long tps, double nagDelay) {
+        this(ticking, null, start, tps, nagDelay);
+    }
+
+    /**
+     * @param ticking
+     *     The ticker to tick
+     * @param name
+     *     Name of the ticker thread
+     * @param start
+     *     If the thread should start at once
+     * @param tps
+     *     Ticks per seconds, must be a strictly positive number
+     * @param nagDelay
+     *     Minimum seconds between each nag message, If less than or equal to zero there will be no delay (note that
+     *     this will be a lot of spam!)
+     *
+     * @see #DEFAULT_TICKS_PER_SECOND
+     * @see #DEFAULT_NAG_DELAY
+     */
+    public Ticker(@NotNull Ticking ticking, @Nullable String name, boolean start, long tps, double nagDelay) {
         this.ticking = ticking;
+        this.tag = ((name != null) ? name : ticking.toString()) + " ticker";
         if (tps <= 0) {
             throw new IllegalArgumentException("TPS must be strictly positive! Was given " + tps);
         }
@@ -109,16 +132,16 @@ public class Ticker implements Runnable {
         nanoDelayBetweenTicks = 1_000_000_000L / tps;
         secondsDelayBetweenTicks = 1f / tps;
         tickRareRate = this.tps;
-        this.nagDelay = Math.max(0, tps * nagDelay);
+        this.nagDelayTicks = (long) Math.max(0, tps * nagDelay);
 
-        Main.logger().debug("TICK", "Starting ticking thread for '" + ticking + "' with TPS = " + tps);
+        Main.logger().debug(tag, "Starting ticking thread for '" + name + "' with TPS = " + tps);
 
         tickerThread = new PauseableThread(this);
-        tickerThread.setName("Ticker");
+        tickerThread.setName(tag);
         tickerThread.setDaemon(true);
 
         if (start) {
-            //Do not begin ticking until the render thread is finish initialization
+            //Do not begin ticking until the render thread is initialized
             Main.inst().getScheduler().executeSync(tickerThread::start);
         }
     }
@@ -131,8 +154,8 @@ public class Ticker implements Runnable {
             if (tickId % tickRareRate == 0) {
                 ticking.tickRare();
             }
-        } catch (Exception e) {
-            Main.logger().error("TICK", "Failed to tick " + ticking, e);
+        } catch (Throwable e) {
+            Main.logger().error(tag, "Failed to tick", e);
         }
         tickId++;
 
@@ -147,18 +170,20 @@ public class Ticker implements Runnable {
         tpsDelta = TimeUtils.nanoTime() - start;
         long ms = msDelayBetweenTicks - TimeUtils.nanosToMillis(tpsDelta);
 
+
         if (ms > 0) {
+            int nano = (int) tpsDelta % 1_000_000; // There are one million nano second in a millisecond
             try {
-                int nano = (int) tpsDelta % 1_000_000; // There are one million nano second in a millisecond
                 Thread.sleep(ms, nano);
             } catch (InterruptedException e) {
-                Main.logger().error("TICK", "World ticker interrupted");
+                Main.logger().error(tag, "Ticker interrupted");
             }
         }
-        else if (tickId - lastNagged >= nagDelay) {
-            lastNagged = tickId;
-            Main.logger().error("TICK", "Cant keep up a single tick took around " + TimeUtils.nanosToMillis(tpsDelta) +
-                                        " ms, while at max it should take " + msDelayBetweenTicks + " ms");
+        else if (tickId - lastTickNagged >= nagDelayTicks) {
+            lastTickNagged = tickId;
+            Main.logger().error(tag, "Cant keep up a single tick took around " + TimeUtils.nanosToMillis(tpsDelta) +
+                                     " ms, while at max it should take " + getMsDelayBetweenTicks() + " ms " +
+                                     getNanoDelayBetweenTicks() + " ns");
         }
     }
 
@@ -191,10 +216,6 @@ public class Ticker implements Runnable {
 
     public float getSecondsDelayBetweenTicks() {
         return secondsDelayBetweenTicks;
-    }
-
-    public float getNagDelay() {
-        return nagDelay;
     }
 
     public long getTickRareRate() {
