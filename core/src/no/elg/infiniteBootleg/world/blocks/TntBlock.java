@@ -21,7 +21,7 @@ import java.util.Set;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
 /**
- * A block that explodes after {@link #FUSE_DURATION} ticks
+ * A block that explodes after {@link #fuseDuration} ticks
  *
  * @author Elg
  */
@@ -53,7 +53,7 @@ public class TntBlock extends TickingBlock {
     /**
      * How long, in ticks, the fuse time should be
      */
-    public static final float FUSE_DURATION = WorldTicker.TICKS_PER_SECOND * 3f;
+    public final float fuseDuration;
     /**
      * Maximum explosion radius
      */
@@ -72,6 +72,7 @@ public class TntBlock extends TickingBlock {
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         strength = EXPLOSION_STRENGTH;
+        fuseDuration = getWorld().getWorldTicker().getTPS() * 3f;
     }
 
     @Override
@@ -87,7 +88,7 @@ public class TntBlock extends TickingBlock {
             startTick = currTick;
         }
         long ticked = currTick - startTick;
-        if (ticked > FUSE_DURATION) {
+        if (ticked > fuseDuration) {
             exploded = true;
             Main.inst().getScheduler().executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
@@ -129,9 +130,9 @@ public class TntBlock extends TickingBlock {
             });
         }
 
-        final long r = WorldTicker.TICKS_PER_SECOND / 5;
+        final long r = getWorld().getWorldTicker().getTPS() / 5;
         boolean old = glowing;
-        if (ticked >= FUSE_DURATION - WorldTicker.TICKS_PER_SECOND) {
+        if (ticked >= fuseDuration - getWorld().getWorldTicker().getTPS()) {
             glowing = true;
         }
         else if (ticked % r == 0) {

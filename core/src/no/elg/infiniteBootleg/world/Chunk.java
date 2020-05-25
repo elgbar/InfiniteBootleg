@@ -36,7 +36,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     public final static int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
     public static final int CHUNK_SIZE_SHIFT = (int) (Math.log(CHUNK_SIZE) / Math.log(2));
     public static final String CHUNK_FOLDER = "chunks";
-    public static final long CHUNK_UNLOAD_TIME = WorldTicker.TICKS_PER_SECOND * 5;
 
     private final World world;
     private final Block[][] blocks;

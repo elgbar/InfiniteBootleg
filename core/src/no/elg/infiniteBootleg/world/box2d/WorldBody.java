@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import no.elg.infiniteBootleg.Ticking;
-import no.elg.infiniteBootleg.world.WorldTicker;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager;
 import org.jetbrains.annotations.NotNull;
@@ -18,11 +17,13 @@ import org.jetbrains.annotations.Nullable;
 public class WorldBody implements Ticking {
 
     private final com.badlogic.gdx.physics.box2d.World box2dWorld;
+    private final float timeStep;
 
     public WorldBody(@NotNull no.elg.infiniteBootleg.world.World world) {
         synchronized (WorldRender.BOX2D_LOCK) {
             box2dWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0f, -10), true);
             box2dWorld.setContactListener(new ContactManager(world));
+            timeStep = world.getWorldTicker().getSecondsDelayBetweenTicks();
         }
     }
 
@@ -58,7 +59,7 @@ public class WorldBody implements Ticking {
     @Override
     public void tick() {
         synchronized (WorldRender.BOX2D_LOCK) {
-            box2dWorld.step(WorldTicker.SECONDS_DELAY_BETWEEN_TICKS, 8, 3);
+            box2dWorld.step(timeStep, 8, 3);
         }
     }
 
