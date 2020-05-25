@@ -2,16 +2,19 @@ package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.physics.box2d.Body;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.badlogic.gdx.Input.Keys.*;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -75,46 +78,38 @@ public class KeyboardControls extends AbstractEntityControls {
             }
         }
 
+        Entity entity = getControlled();
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
             //teleport the player to the (last) location of the mouse
-            getControlled().teleport(Main.inst().getMouseX(), Main.inst().getMouseY(), true);
-            if (world.getInput() != null) {
-                world.getInput().setLockedOn(true);
+            entity.teleport(Main.inst().getMouseX(), Main.inst().getMouseY(), true);
+            WorldInputHandler input = world.getInput();
+            if (input != null) {
+                input.setFollowing(entity);
+                input.setLockedOn(true);
             }
-
         }
         else {
             int shift = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) ? 2 : 1;
-            //TODO if shift is held, the impulse should be multiplied with 2
-            if (getControlled().isOnGround() && !getControlled().isFlying()) {
+            if (entity.isOnGround() && !entity.isFlying()) {
 
                 if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                    getControlled().getBody().applyLinearImpulse(0, JUMP_VERTICAL_IMPULSE,
-                                                                 getControlled().getPosition().x,
-                                                                 getControlled().getPosition().y, true);
+                    applyImpulse(0, JUMP_VERTICAL_IMPULSE);
                 }
             }
-            else if (getControlled().isFlying()) {
+            else if (entity.isFlying()) {
                 if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-                    getControlled().getBody().applyLinearImpulse(0, HORIZONTAL_IMPULSE * shift,
-                                                                 getControlled().getPosition().x,
-                                                                 getControlled().getPosition().y, true);
+                    applyImpulse(0, HORIZONTAL_IMPULSE * shift);
                 }
                 if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-                    getControlled().getBody().applyLinearImpulse(0, -HORIZONTAL_IMPULSE * shift,
-                                                                 getControlled().getPosition().x,
-                                                                 getControlled().getPosition().y, true);
+                    applyImpulse(0, -HORIZONTAL_IMPULSE * shift);
                 }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                getControlled().getBody().applyLinearImpulse(-HORIZONTAL_IMPULSE * shift, 0,
-                                                             getControlled().getPosition().x,
-                                                             getControlled().getPosition().y, true);
+                applyImpulse(-HORIZONTAL_IMPULSE * shift, 0);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                getControlled().getBody().applyLinearImpulse(HORIZONTAL_IMPULSE * shift, 0,
-                                                             getControlled().getPosition().x,
-                                                             getControlled().getPosition().y, true);
+                applyImpulse(HORIZONTAL_IMPULSE * shift, 0);
             }
         }
 
@@ -123,6 +118,12 @@ public class KeyboardControls extends AbstractEntityControls {
         }
     }
 
+    private void applyImpulse(float impulseX, float impulseY) {
+        synchronized (BOX2D_LOCK) {
+            Body body = getControlled().getBody();
+            body.applyLinearImpulse(impulseX, impulseY, body.getPosition().x, body.getPosition().y, true);
+        }
+    }
 
     @Override
     public boolean keyDown(int keycode) {
