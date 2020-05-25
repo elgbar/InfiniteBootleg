@@ -96,7 +96,9 @@ public class World implements Disposable, Ticking, Resizable {
     private final UUID uuid;
     private final long seed;
     private final ConcurrentMap<Location, Chunk> chunks;
+
     private final Ticker ticker;
+
     private final ChunkLoader chunkLoader;
     private FileHandle worldFile;
 
@@ -118,7 +120,6 @@ public class World implements Disposable, Ticking, Resizable {
     private float timeScale = 1;
     private final Color baseColor = new Color(Color.WHITE);
     private final Color tmpColor = new Color();
-    private long lastFrame;
 
     /**
      * Generate a world with a random seed
@@ -130,18 +131,18 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {
-        ticker = new Ticker(this, tick);
-
         this.seed = seed;
         MathUtils.random.setSeed(seed);
-        chunks = new ConcurrentHashMap<>();
-        entities = ConcurrentHashMap.newKeySet();
-        livingEntities = ConcurrentHashMap.newKeySet();
-        time = MIDDAY_TIME;
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
         uuid = UUID.nameUUIDFromBytes(UUIDSeed);
+
+        ticker = new Ticker(this, "World", tick, Main.tps, Ticker.DEFAULT_NAG_DELAY);
+
+        chunks = new ConcurrentHashMap<>();
+        entities = ConcurrentHashMap.newKeySet();
+        livingEntities = ConcurrentHashMap.newKeySet();
 
         chunkLoader = new ChunkLoader(this, generator);
         worldBody = new WorldBody(this);
@@ -156,9 +157,11 @@ public class World implements Disposable, Ticking, Resizable {
             render = new HeadlessWorldRenderer(this);
         }
 
-        load();
+        time = MIDDAY_TIME;
         chunkUnloadTime = ticker.getTPS() * 5;
         timeChangePerTick = ticker.getSecondsDelayBetweenTicks() / 10;
+
+        load();
     }
 
     @Nullable
@@ -690,20 +693,12 @@ public class World implements Disposable, Ticking, Resizable {
             }
         }
 
-        long currFrame = Gdx.graphics.getFrameId();
-
-        //update lights
-        if (Main.renderGraphic && WorldRender.lights && lastFrame < currFrame &&
-            getTick() % (ticker.getTPS() / 20) == 0) {
-            Main.inst().getScheduler().executeAsync(() -> {
-                lastFrame = currFrame;
-
-                synchronized (WorldRender.BOX2D_LOCK) {
-                    synchronized (WorldRender.LIGHT_LOCK) {
-                        wr.getRayHandler().update();
-                    }
+        if (Main.renderGraphic && WorldRender.lights) {
+            synchronized (WorldRender.BOX2D_LOCK) {
+                synchronized (WorldRender.LIGHT_LOCK) {
+                    getRender().getRayHandler().update();
                 }
-            });
+            }
         }
 
         //tick all chunks and blocks in chunks
