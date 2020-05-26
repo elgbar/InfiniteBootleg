@@ -73,6 +73,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             BodyDef def = createBodyDef(posCache.x, posCache.y);
             body = world.getWorldBody().createBody(def);
             createFixture(body);
+            body.setGravityScale(2f);
         }
     }
 
