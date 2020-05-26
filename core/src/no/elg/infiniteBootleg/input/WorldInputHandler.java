@@ -30,7 +30,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     private final WorldRender worldRender;
     private Entity following;
-    private boolean lockedOn;
+    private boolean lockedOn = true;
 
     public WorldInputHandler(@NotNull WorldRender world) {
         worldRender = world;
@@ -103,11 +103,6 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
         int horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
 
-        if (lockedOn && (following != null && !following.isValid())) {
-            lockedOn = false;
-            following = null;
-        }
-
         if (vertical != 0 || horizontal != 0) {
             camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
             camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
@@ -115,7 +110,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             worldRender.update();
         }
         else if (following != null && following.isValid() && lockedOn) {
-            Vector2 pos = following.getBody().getPosition();
+            Vector2 pos = following.getPosition();
 
             float dx = (pos.x * Block.BLOCK_SIZE - camera.position.x) * CAMERA_LERP;
             float dy = (pos.y * Block.BLOCK_SIZE - camera.position.y) * CAMERA_LERP;
@@ -123,8 +118,8 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
                 camera.position.x += dx * Gdx.graphics.getDeltaTime();
                 camera.position.y += dy * Gdx.graphics.getDeltaTime();
-                worldRender.update();
             }
+            worldRender.update();
         }
     }
 
@@ -133,12 +128,17 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     }
 
 
+    /**
+     * Change who to follow, does not change if the camera <i>is</i> locked on
+     *
+     * @param following
+     *     What to follow, null if none
+     */
     public void setFollowing(@Nullable Entity following) {
         if (following == null || !following.isValid()) {
             throw new IllegalArgumentException("Cannot pass a non-null invalid entity!");
         }
         this.following = following;
-        lockedOn = true;
     }
 
     /**
