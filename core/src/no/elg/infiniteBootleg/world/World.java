@@ -115,7 +115,7 @@ public class World implements Disposable, Ticking, Resizable {
     private final Set<Entity> entities; //all entities in this world (including living entities)
     private final Set<LivingEntity> livingEntities; //all player in this world
 
-    private String name = "World";
+    private String name;
     private float time;
     private float timeScale = 1;
     private final Color baseColor = new Color(Color.WHITE);
@@ -130,13 +130,17 @@ public class World implements Disposable, Ticking, Resizable {
         this(generator, MathUtils.random(Long.MAX_VALUE), true);
     }
 
-    public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {
+    public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {this(generator, seed, tick, "World");}
+
+    public World(@NotNull ChunkGenerator generator, long seed, boolean tick, String worldName) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
 
         byte[] UUIDSeed = new byte[128];
         MathUtils.random.nextBytes(UUIDSeed);
         uuid = UUID.nameUUIDFromBytes(UUIDSeed);
+
+        name = worldName;
 
         ticker = new Ticker(this, "World", tick, Main.tps, Ticker.DEFAULT_NAG_DELAY);
 
@@ -730,9 +734,7 @@ public class World implements Disposable, Ticking, Resizable {
         }
 
         //tick all entities
-        for (Entity entity : entities) {
-            entity.tick();
-        }
+        entities.forEach(Entity::tick);
     }
 
     /**
