@@ -9,7 +9,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class EntityRenderer implements Renderer {
 
-    private WorldRender worldRender;
+    private final WorldRender worldRender;
 
     public EntityRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;

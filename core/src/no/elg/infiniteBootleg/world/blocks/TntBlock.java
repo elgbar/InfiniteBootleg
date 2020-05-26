@@ -45,7 +45,7 @@ public class TntBlock extends TickingBlock {
     private boolean glowing;
     private boolean exploded;
     private long startTick;
-    private float strength;
+    private final float strength;
 
     @Nullable
     private PointLight light;

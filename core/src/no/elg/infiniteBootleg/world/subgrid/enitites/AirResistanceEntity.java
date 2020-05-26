@@ -35,9 +35,8 @@ public abstract class AirResistanceEntity extends Entity {
         float speed = getVelocity().len();
 
         float a = 1.0f;
-        float cd = DRAG_COEFFICIENT_CUBE;
         float v = (float) Math.pow(speed, 2);
-        float dragForce = 0.5f * FLUID_DENSITY_OF_AIR * v * cd * a;
+        float dragForce = 0.5f * FLUID_DENSITY_OF_AIR * v * DRAG_COEFFICIENT_CUBE * a;
         float dragAngle = getVelocity().angle();
         Vector2 appliedDrag = new Vector2(dragForce, 0);
         appliedDrag.setAngle(dragAngle);
@@ -49,7 +48,7 @@ public abstract class AirResistanceEntity extends Entity {
         if (Math.abs(dragForce) < MIN_SPEED) {
             return;
         }
-//        System.out.println("appliedDrag = " + appliedDrag);
+
         synchronized (WorldRender.BOX2D_LOCK) {
             getBody().applyForceToCenter(appliedDrag, true);
         }

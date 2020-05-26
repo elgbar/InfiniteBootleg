@@ -76,7 +76,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private Box2DDebugRenderer box2DDebugRenderer;
     private DebugChunkRenderer chunkDebugRenderer;
 
-    private Matrix4 m4 = new Matrix4();
+    private final Matrix4 m4 = new Matrix4();
     private DirectionalLight skylight;
     private float lastZoom;
     Map<Chunk, TextureRegion> draw = new HashMap<>();

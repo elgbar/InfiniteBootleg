@@ -85,7 +85,6 @@ public class ChunkRenderer implements Renderer, Disposable {
                     int dx = block.getLocalX() * BLOCK_SIZE;
                     int dy = block.getLocalY() * BLOCK_SIZE;
 
-                    //noinspection ConstantConditions
                     batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
                 }
             }

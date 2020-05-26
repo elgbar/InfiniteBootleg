@@ -29,9 +29,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     private static final float GROUND_CHECK_OFFSET = 0.25f;
 
     private final World world;
+    private final UUID uuid;
+
     private Body body;
     private boolean flying; //ignore world gravity
-    private UUID uuid;
     private Vector2 posCache;
     private Vector2 velCache;
     private int groundContacts;

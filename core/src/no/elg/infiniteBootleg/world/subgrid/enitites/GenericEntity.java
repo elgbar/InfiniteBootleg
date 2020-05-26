@@ -33,12 +33,12 @@ public class GenericEntity extends Entity implements Removable {
         this.height = height * Block.BLOCK_SIZE;
 
         //make sure the width and height is correct
-        synchronized (this) {
-            for (Fixture fixture : getBody().getFixtureList()) {
-                getBody().destroyFixture(fixture);
-            }
-        }
         synchronized (WorldRender.BOX2D_LOCK) {
+            synchronized (this) {
+                for (Fixture fixture : getBody().getFixtureList()) {
+                    getBody().destroyFixture(fixture);
+                }
+            }
             createFixture(getBody());
             setFilter(filter);
         }
