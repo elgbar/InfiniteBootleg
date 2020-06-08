@@ -118,6 +118,9 @@ public class ChunkBody implements Disposable {
                         }
                         else {
                             Chunk relChunk = chunk.getWorld().getChunkFromWorld(worldX + dir.dx, worldY + dir.dy);
+                            if (relChunk == null) {
+                                continue;
+                            }
                             int relOffsetX = CoordUtil.chunkOffset(worldX + dir.dx);
                             int relOffsetY = CoordUtil.chunkOffset(worldY + dir.dy);
                             rel = relChunk.getBlocks()[relOffsetX][relOffsetY];
@@ -129,12 +132,12 @@ public class ChunkBody implements Disposable {
                             byte[] ds = tuple.value;
                             edgeShape.set(localX + ds[0], localY + ds[1], localX + ds[2], localY + ds[3]);
 
-                            synchronized (WorldRender.BOX2D_LOCK) {
-                                Fixture fix = tmpBody.createFixture(edgeShape, 0);
-                                if (!b.getMaterial().blocksLight()) {
-                                    fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
-                                }
+//                            synchronized (WorldRender.BOX2D_LOCK) {
+                            Fixture fix = tmpBody.createFixture(edgeShape, 0);
+                            if (!b.getMaterial().blocksLight()) {
+                                fix.setFilterData(World.SOLID_TRANSPARENT_FILTER);
                             }
+//                            }
                         }
                     }
                 }
@@ -145,9 +148,7 @@ public class ChunkBody implements Disposable {
             chunk.getWorld().getWorldBody().destroyBody(box2dBody);
             box2dBody = tmpBody;
 
-
             Gdx.app.postRunnable(() -> chunk.getWorld().getRender().update());
-
 
             boolean potentiallyDirty = false;
 

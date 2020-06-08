@@ -1,11 +1,12 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
-import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Add resistance while not in contacting of
+ */
 public abstract class AirResistanceEntity extends Entity {
 
     /*
@@ -31,26 +32,26 @@ public abstract class AirResistanceEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-
-        float speed = getVelocity().len();
-
-        float a = 1.0f;
-        float v = (float) Math.pow(speed, 2);
-        float dragForce = 0.5f * FLUID_DENSITY_OF_AIR * v * DRAG_COEFFICIENT_CUBE * a;
-        float dragAngle = getVelocity().angle();
-        Vector2 appliedDrag = new Vector2(dragForce, 0);
-        appliedDrag.setAngle(dragAngle);
-        appliedDrag.scl(-1);
-
-        if (!isFlying()) {
-            appliedDrag.y = 0;
-        }
-        if (Math.abs(dragForce) < MIN_SPEED) {
-            return;
-        }
-
-        synchronized (WorldRender.BOX2D_LOCK) {
-            getBody().applyForceToCenter(appliedDrag, true);
-        }
+//
+//        float speed = getVelocity().len();
+//
+//        float a = 1.0f;
+//        float v = (float) Math.pow(speed, 2);
+//        float dragForce = 0.5f * FLUID_DENSITY_OF_AIR * v * DRAG_COEFFICIENT_CUBE * a;
+//        float dragAngle = getVelocity().angle();
+//        Vector2 appliedDrag = new Vector2(dragForce, 0);
+//        appliedDrag.setAngle(dragAngle);
+//        appliedDrag.scl(-1);
+//
+//        if (!isFlying()) {
+//            appliedDrag.y = 0;
+//        }
+//        if (Math.abs(dragForce) < MIN_SPEED) {
+//            return;
+//        }
+//
+//        synchronized (WorldRender.BOX2D_LOCK) {
+//            getBody().applyForceToCenter(appliedDrag, true);
+//        }
     }
 }

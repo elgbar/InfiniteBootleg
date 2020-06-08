@@ -45,7 +45,8 @@ public class GenericEntity extends Entity implements Removable {
     }
 
     @Override
-    protected @NotNull BodyDef createBodyDef(float worldX, float worldY) {
+    @NotNull
+    protected BodyDef createBodyDef(float worldX, float worldY) {
         BodyDef def = super.createBodyDef(worldX, worldY);
         def.type = BodyDef.BodyType.StaticBody;
         return def;

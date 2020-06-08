@@ -49,10 +49,12 @@ public class Player extends LivingEntity {
     @Override
     public void tick() {
         super.tick();
-        Vector2 pos = super.getPosition();
-        float angle = Main.inst().getMouse().cpy().sub(pos).angle();
-        torchLight.setDirection(angle);
-        torchLight.setPosition(pos);
+        if (torchLight != null) {
+            Vector2 pos = super.getPosition();
+            float angle = Main.inst().getMouse().cpy().sub(pos).angle();
+            torchLight.setDirection(angle);
+            torchLight.setPosition(pos);
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Block;
@@ -23,14 +24,16 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
  */
 public class KeyboardControls extends AbstractEntityControls {
 
-    public static final float JUMP_VERTICAL_IMPULSE = 0.5f;
-    public static final float HORIZONTAL_IMPULSE = 1f;
+    public static final float JUMP_VERTICAL_IMPULSE = .5f;
+    public static final float HORIZONTAL_IMPULSE = .15f;
+    public static final int EDIT_TICK_DELAY = 1; //delay in ticks between allowing to place/break blocks
 
     private Material selected;
     //if objects can be placed on non-air blocks
     public boolean replacePlacement;
     private float breakBrushSize = 2f;
     private float placeBrushSize = 1f;
+    private long lastEditTick;
 
     public KeyboardControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
         super(worldRender, entity);
@@ -61,20 +64,21 @@ public class KeyboardControls extends AbstractEntityControls {
                     world.remove(block.getWorldX(), block.getWorldY(), true);
                 }
             }
+            lastEditTick = world.getTick();
             update = true;
         }
         else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Q)) {
 
-            if (replacePlacement || world.isAir(blockX, blockY)) {
-                if (placeBrushSize <= 1) {
-                    selected.create(world, blockX, blockY);
+            if (placeBrushSize <= 1) {
+                update = selected.create(world, blockX, blockY);
+            }
+            else {
+                for (Block block : world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
+                    update |= selected.create(world, block.getWorldX(), block.getWorldY());
                 }
-                else {
-                    for (Block block : world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
-                        selected.create(world, block.getWorldX(), block.getWorldY());
-                    }
-                }
-                update = true;
+            }
+            if (update) {
+                lastEditTick = world.getTick();
             }
         }
 
@@ -90,26 +94,42 @@ public class KeyboardControls extends AbstractEntityControls {
             }
         }
         else {
-            int shift = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) ? 2 : 1;
-            if (entity.isOnGround() && !entity.isFlying()) {
+            boolean shift = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
 
-                if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                    applyImpulse(0, JUMP_VERTICAL_IMPULSE);
-                }
-            }
-            else if (entity.isFlying()) {
+            if (entity.isFlying()) {
+
+                float modifier = shift ? 2f : 1f;
+
                 if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-                    applyImpulse(0, HORIZONTAL_IMPULSE * shift);
+                    setVel(0, HORIZONTAL_IMPULSE * modifier);
                 }
                 if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-                    applyImpulse(0, -HORIZONTAL_IMPULSE * shift);
+                    setVel(0, -HORIZONTAL_IMPULSE * modifier);
+                }
+
+
+                if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                    setVel(-HORIZONTAL_IMPULSE * modifier, 0);
+                }
+                if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                    setVel(HORIZONTAL_IMPULSE * modifier, 0);
                 }
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                applyImpulse(-HORIZONTAL_IMPULSE * shift, 0);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                applyImpulse(HORIZONTAL_IMPULSE * shift, 0);
+            else {
+                if (entity.isOnGround()) {
+                    if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                        setVel(0, JUMP_VERTICAL_IMPULSE);
+                    }
+
+                }
+                float modifier = (shift ? 2 : 1);
+
+                if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                    setVel(-HORIZONTAL_IMPULSE * modifier, 0);
+                }
+                if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                    setVel(HORIZONTAL_IMPULSE * modifier, 0);
+                }
             }
         }
 
@@ -118,10 +138,18 @@ public class KeyboardControls extends AbstractEntityControls {
         }
     }
 
-    private void applyImpulse(float impulseX, float impulseY) {
-        synchronized (BOX2D_LOCK) {
-            Body body = getControlled().getBody();
-            body.applyLinearImpulse(impulseX, impulseY, body.getPosition().x, body.getPosition().y, true);
+    private void setVel(float velX, float velY) {
+        if (lastEditTick + EDIT_TICK_DELAY <= getWorldRender().getWorld().getTick()) {
+            synchronized (BOX2D_LOCK) {
+                System.out.println("updating tick (tick " + lastEditTick + ")");
+                Body body = getControlled().getBody();
+                Vector2 vel = body.getLinearVelocity();
+                Vector2 pos = body.getPosition();
+
+                body.applyLinearImpulse(velX == 0 ? vel.x : velX, velY == 0 ? vel.y : velY, pos.x, pos.y, true);
+//            body.setLinearVelocity(velX == 0 ? vel.x : velX, velY == 0 ? vel.y : velY);
+//            body.setAwake(true);
+            }
         }
     }
 

@@ -59,7 +59,7 @@ public class FallingBlock extends Entity {
                 int newX = getBlockX();
                 int newY = getBlockY();
 
-                if (world.isAir(newX, newY) || world.getMaterial(newX, newY).isEntity()) {
+                if (world.isAirBlock(newX, newY)) {
                     world.setBlock(newX, newY, material, true);
                 }
 //                else{

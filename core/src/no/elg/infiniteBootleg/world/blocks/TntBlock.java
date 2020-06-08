@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.*;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,37 +97,39 @@ public class TntBlock extends TickingBlock {
                 int worldY = getWorldY();
                 for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
                     for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
-                        Block b = getWorld().getBlock(x, y, true);
-                        Material mat = b == null ? AIR : b.getMaterial();
-                        float hardness = mat.getHardness();
-                        if (mat == AIR || hardness < 0) {
-                            continue;
-                        }
-                        double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness *
-                                      Math.abs(MathUtils.random.nextGaussian() + RESISTANCE);
-                        if (dist < strength * strength) {
-                            if (b instanceof TntBlock && b != this) {
-                                TntBlock tntb = (TntBlock) b;
-                                tntb.exploded = true;
+                        synchronized (WorldRender.BOX2D_LOCK) {
+                            Block b = getWorld().getBlock(x, y, true);
+                            Material mat = b == null ? AIR : b.getMaterial();
+                            float hardness = mat.getHardness();
+                            if (mat == AIR || hardness < 0) {
+                                continue;
                             }
-                            destroyed.add(b);
+                            double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness *
+                                          Math.abs(MathUtils.random.nextGaussian() + RESISTANCE);
+                            if (dist < strength * strength) {
+                                if (b instanceof TntBlock && b != this) {
+                                    TntBlock tntb = (TntBlock) b;
+                                    tntb.exploded = true;
+                                }
+                                destroyed.add(b);
+                            }
                         }
                     }
                 }
 
                 Gdx.app.postRunnable(() -> {
                     Set<Chunk> chunks = new HashSet<>();
+                    World world = getWorld();
                     for (Block block : destroyed) {
-                        getWorld().setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
+                        world.setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
+                        world.updateBlocksAround(block.getWorldX(), block.getWorldY());
+
                         chunks.add(block.getChunk());
-                        getWorld().updateBlocksAround(block.getWorldX(), block.getWorldY());
                     }
                     for (Chunk chunk : chunks) {
                         chunk.updateTexture(false);
                     }
                 });
-
-
             });
         }
 

@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
@@ -147,8 +147,7 @@ public class Main extends ApplicationAdapter {
             entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
         }
 
-        world = new World(new PerlinChunkGenerator(worldSeed), worldSeed, !test);
-
+        world = new World(new FlatChunkGenerator(), worldSeed, !test);
     }
 
     @Override

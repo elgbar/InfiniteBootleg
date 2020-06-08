@@ -284,13 +284,13 @@ public class World implements Disposable, Ticking, Resizable {
      *     The y coordinate from world view
      * @param material
      *     The new material to at given location
-     * @param update
+     * @param updateTexture
      *     If the texture of the corresponding chunk should be updated
      *
      * @see Chunk#setBlock(int, int, Material, boolean)
      */
     @Nullable
-    public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean update) {
+    public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean updateTexture) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -299,7 +299,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
-            chunk.setBlock(localX, localY, material, update);
+            chunk.setBlock(localX, localY, material, updateTexture);
         }
         return chunk;
     }
@@ -363,17 +363,16 @@ public class World implements Disposable, Ticking, Resizable {
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
      * than a
      * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int, boolean)}
-     * method
-     * migt
-     * createBlock
-     * and store a new air block at the given location
+     * method might createBlock and store a new air block at the given location
+     * <p>
+     * <b>note</b> this does not if there are entities at this location
      *
      * @param worldLoc
      *     The world location to check
      *
      * @return If the block at the given location is air.
      */
-    public boolean isAir(@NotNull Location worldLoc) {return isAir(worldLoc.x, worldLoc.y);}
+    public boolean isAirBlock(@NotNull Location worldLoc) {return isAirBlock(worldLoc.x, worldLoc.y);}
 
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist) this is faster
@@ -382,6 +381,8 @@ public class World implements Disposable, Ticking, Resizable {
      * <p>
      * If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent teleportation and
      * other actions that depend on an empty space.
+     * <p>
+     * <b>note</b> this does not if there are entities at this location
      *
      * @param worldX
      *     The x coordinate from world view
@@ -390,7 +391,7 @@ public class World implements Disposable, Ticking, Resizable {
      *
      * @return If the block at the given location is air.
      */
-    public boolean isAir(int worldX, int worldY) {
+    public boolean isAirBlock(int worldX, int worldY) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -853,15 +854,16 @@ public class World implements Disposable, Ticking, Resizable {
     @NotNull
     public Material getMaterial(int worldX, int worldY) {
         Block block = getBlock(worldX, worldY, true);
-        if (block == null) {
-            for (Entity entity : getEntities(worldX, worldY)) {
-                if (entity instanceof MaterialEntity) {
-                    return ((MaterialEntity) entity).getMaterial();
-                }
-            }
-            return Material.AIR;
+        if (block != null) {
+            return block.getMaterial();
         }
-        return block.getMaterial();
+
+        for (Entity entity : getEntities(worldX, worldY)) {
+            if (entity instanceof MaterialEntity) {
+                return ((MaterialEntity) entity).getMaterial();
+            }
+        }
+        return Material.AIR;
     }
 
     /**

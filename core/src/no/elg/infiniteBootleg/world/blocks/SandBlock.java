@@ -18,7 +18,7 @@ public class SandBlock extends TickingBlock {
     @Override
     public void tick() {
         Location south = Location.relative(getWorldX(), getWorldY(), Direction.SOUTH);
-        if (getWorld().isAir(south)) {
+        if (getWorld().isAirBlock(south)) {
             Gdx.app.postRunnable(() -> {
                 if (getChunk().isLoaded()) {
                     destroy();

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks;
 
+import com.badlogic.gdx.Gdx;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -24,6 +25,8 @@ public abstract class TickingBlock extends Block implements Ticking {
 
     public TickingBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
+        //should not tick right away to not spawn multiple entities when spawning f.eks sand
+        Gdx.app.postRunnable(() -> shouldTick = true);
     }
 
     /**

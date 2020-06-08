@@ -38,7 +38,7 @@ public enum Material {
     private final boolean placable;
     private final float hardness;
     private final TextureRegion texture;
-    private ItemType itemType;
+    private final ItemType itemType;
 
     Material(float hardness) {
         this(null, hardness);
@@ -142,18 +142,22 @@ public enum Material {
             throw new IllegalStateException(String.format(
                 "Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX,
                 worldY), e);
+
         }
     }
 
-    @NotNull
-    public Object create(@NotNull World world, int worldX, int worldY) {
-        if (isBlock()) {
-            return world.setBlock(worldX, worldY, this);
+    public boolean create(@NotNull World world, int worldX, int worldY) {
+        if (world.getMaterial(worldX, worldY) == AIR) {
+            if (isBlock()) {
+                return world.setBlock(worldX, worldY, this) != null;
+            }
+            else if (isEntity()) {
+                createEntity(world, worldX, worldY);
+                return true;
+            }
+            throw new IllegalStateException("This material (" + name() + ") is neither a block nor an entity");
         }
-        if (itemType == ItemType.ENTITY) {
-            return createEntity(world, worldX, worldY);
-        }
-        throw new IllegalStateException("This material (" + name() + ") is neither a block nor an entity");
+        return false;
     }
 
     public boolean isBlock() {

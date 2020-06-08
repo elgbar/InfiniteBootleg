@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
-    private static final float GROUND_CHECK_OFFSET = 0.25f;
+    private static final float GROUND_CHECK_OFFSET = 0.1f;
 
     private final World world;
     private final UUID uuid;
@@ -78,21 +78,43 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         }
     }
 
+    /**
+     * Always call while synchronized with {@link WorldRender#BOX2D_LOCK}
+     */
     @NotNull
     protected BodyDef createBodyDef(float worldX, float worldY) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(worldX, worldY);
+        bodyDef.linearDamping = 0.01f;
         bodyDef.fixedRotation = true;
+        bodyDef.bullet = true; //glitching through world == bad!
         return bodyDef;
     }
 
+    /**
+     * Always call while synchronized with {@link WorldRender#BOX2D_LOCK}
+     */
     protected void createFixture(@NotNull Body body) {
-        PolygonShape box = new PolygonShape();
-        box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
-        Fixture fix = body.createFixture(box, 1.0f);
+        PolygonShape shape = new PolygonShape();
+//        shape.set(new float[] { //
+//            -getHalfBox2dWidth(), -getHalfBox2dHeight(), //
+//            getHalfBox2dWidth(), -getHalfBox2dHeight(), //
+//            getHalfBox2dWidth(), getHalfBox2dHeight(), //
+//            -getHalfBox2dWidth(), getHalfBox2dHeight() //
+//        });
+
+        shape.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
+
+        FixtureDef def = new FixtureDef();
+        def.shape = shape;
+        def.density = 1f; //Average density of humans is 1.27 kg/m^3 => ~ x kg/m^2
+        def.friction = 0.5f;
+        def.restitution = 0.1f; // a bit bouncy!
+
+        Fixture fix = body.createFixture(def);
         fix.setFilterData(World.ENTITY_FILTER);
-        box.dispose();
+        shape.dispose();
     }
 
     /**
@@ -182,7 +204,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             int y = MathUtils.floor(worldY - getHalfBox2dHeight());
             float maxY = worldY + getHalfBox2dHeight();
             for (; y < maxY; y++) {
-                if (!world.isAir(x, y)) {
+                if (!world.isAirBlock(x, y)) {
                     return false;
                 }
             }
@@ -237,7 +259,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 updatePos();
                 //y pos - getHalfBox2dHeight is middle
                 int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - GROUND_CHECK_OFFSET);
-                if (world.isAir(getBlockX(), y)) { return; }
+                if (world.isAirBlock(getBlockX(), y)) { return; }
                 groundContacts++;
             }
             else if (type == ContactType.END_CONTACT) {
@@ -250,7 +272,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     /**
      * Update the cached position and velocity
      */
-    private synchronized void updatePos() {
+    protected synchronized void updatePos() {
         if (body == null) { return; }
         posCache = body.getPosition();
         velCache = body.getLinearVelocity();
