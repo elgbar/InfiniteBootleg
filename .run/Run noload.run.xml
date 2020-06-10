@@ -6,7 +6,7 @@
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncher" />
     <module name="InfiniteBootleg.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="--no-load" />
-    <option name="VM_PARAMETERS" value="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:+UnlockCommercialFeatures" />
+    <option name="VM_PARAMETERS" value="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/assets" />
     <method v="2">
       <option name="Make" enabled="true" />
