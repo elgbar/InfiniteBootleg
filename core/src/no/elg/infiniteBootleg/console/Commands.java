@@ -30,6 +30,7 @@ public class Commands extends CommandExecutor {
         this.logger = logger;
     }
 
+    @CmdArgNames({"red", "green", "blue", "alpha"})
     @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1",
                 paramDescriptions = {"red", "green", "blue", "alpha"})
@@ -39,6 +40,8 @@ public class Commands extends CommandExecutor {
         logger.success("Sky color changed to " + skylight);
     }
 
+
+    @CmdArgNames("color")
     @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
     public void skyColor(String colorName) {
@@ -71,6 +74,8 @@ public class Commands extends CommandExecutor {
         reload(false);
     }
 
+
+    @CmdArgNames("force")
     @ClientsideOnly
     @ConsoleDoc(description = "Reload all loaded chunks",
                 paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
@@ -130,6 +135,8 @@ public class Commands extends CommandExecutor {
                    "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
 
+
+    @CmdArgNames({"x", "y"})
     @ClientsideOnly
     @ConsoleDoc(description = "Teleport to given world coordinate",
                 paramDescriptions = {"World x coordinate", "World y coordinate"})
@@ -144,6 +151,7 @@ public class Commands extends CommandExecutor {
         logger.logf(LogLevel.SUCCESS, "Teleported to (% d,% d)", worldX, worldY);
     }
 
+    @CmdArgNames({"quality"})
     @ClientsideOnly
     @ConsoleDoc(description = "The quality of the light. To disable light use command 'light'",
                 paramDescriptions = "Quality of light, between 0 and 4")
@@ -160,6 +168,7 @@ public class Commands extends CommandExecutor {
         logger.success("Light quality is now " + quality);
     }
 
+    @CmdArgNames({"modus"})
     @ClientsideOnly
     @ConsoleDoc(description = "Set how much information to show", paramDescriptions = "normal (default), debug or none")
     public void hud(String modusName) {
@@ -171,6 +180,7 @@ public class Commands extends CommandExecutor {
         }
     }
 
+    @CmdArgNames({"zoom level"})
     @ClientsideOnly
     @ConsoleDoc(description = "Change the zoom level of the world camera",
                 paramDescriptions = "The new zoom level, min is " + WorldRender.MIN_ZOOM)
@@ -198,6 +208,7 @@ public class Commands extends CommandExecutor {
         }
     }
 
+    @CmdArgNames({"x", "y", "width", "height"})
     @ConsoleDoc(description = "Spawn a generic static entity at the given location with the given width and height",
                 paramDescriptions = {"worldX", "worldY", "width", "height"})
     public void ent(float worldX, float worldY, int width, int height) {
@@ -205,6 +216,7 @@ public class Commands extends CommandExecutor {
         new GenericEntity(Main.inst().getWorld(), worldX, worldY, width, height);
     }
 
+    @CmdArgNames({"players"})
     @ConsoleDoc(description = "Kill all non-player entities")
     public void killall(boolean players) {
         World world = Main.inst().getWorld();
@@ -230,6 +242,7 @@ public class Commands extends CommandExecutor {
                     controls.getBreakBrushSize(), controls.getPlaceBrushSize());
     }
 
+    @CmdArgNames({"type", "size"})
     @ClientsideOnly
     @ConsoleDoc(description = "Set the brush size of the mouse",
                 paramDescriptions = {"Type of brush to change, can be 'break' and 'place'",
@@ -255,6 +268,7 @@ public class Commands extends CommandExecutor {
         brush();
     }
 
+    @CmdArgNames({"scale"})
     @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
     public void timescale(float scale) {
         float old = Main.inst().getWorld().getTimeScale();
@@ -268,6 +282,8 @@ public class Commands extends CommandExecutor {
         logger.success("Time is now " + (World.dayTicking ? "" : "not ") + "ticking");
     }
 
+
+    @CmdArgNames({"time"})
     @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
     public void time(float time) {
         float old = Main.inst().getWorld().getTime();
@@ -275,6 +291,8 @@ public class Commands extends CommandExecutor {
         logger.success("Changed time from % .3f to % .3f", old, time);
     }
 
+
+    @CmdArgNames({"time of day"})
     @ConsoleDoc(description = "Set the current time", paramDescriptions = "Time of day")
     public void time(String timeOfDay) {
         float time;

@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.console.consoles;
 import com.badlogic.gdx.Gdx;
 import com.strongjoshua.console.HeadlessConsole;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
+import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -37,6 +38,16 @@ public class StdConsole extends HeadlessConsole implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void printHelp(String command) {
+        HelpfulConsoleHelpUtil.printHelp(this, exec, command);
+    }
+
+    @Override
+    public void printCommands() {
+        HelpfulConsoleHelpUtil.printCommands(this, exec);
     }
 
     @Override

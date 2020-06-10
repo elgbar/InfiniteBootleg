@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
     private final boolean inGameConsole;
-    private Console console;
+    private final Console console;
+    private final CommandExecutor exec;
     private Window consoleWindow;
-    private CommandExecutor exec;
 
     public ConsoleHandler() {this(Main.renderGraphic);}
 
@@ -92,7 +92,6 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         }
 
         Method[] methods = ClassReflection.getMethods(exec.getClass());
-
 
         List<String> potentialMethods = Arrays.stream(methods).filter(
             m -> m.getName().toLowerCase().startsWith(methodName.toLowerCase())).map(
@@ -203,6 +202,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         }
         return false;
     }
+
 
     /**
      * @see com.strongjoshua.console.Console#log(String, LogLevel)
