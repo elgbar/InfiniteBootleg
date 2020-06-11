@@ -55,7 +55,7 @@ public final class HelpfulConsoleHelpUtil {
                 }
             }
             else {
-                printCmdSignature(sb, m);
+                appendCmdSignature(sb, m);
             }
 
             Main.logger().log(sb.toString());
@@ -66,11 +66,12 @@ public final class HelpfulConsoleHelpUtil {
     public static void printCommands(Console console, CommandExecutor exec) {
         for (Method method : getRelevantMethods(console, exec, null)) {
             StringBuilder sb = createCmdPrefix(method);
-            printCmdSignature(sb, method);
+            appendCmdSignature(sb, method);
+            Main.logger().log(sb.toString());
         }
     }
 
-    private static void printCmdSignature(StringBuilder sb, Method method) {
+    public static void appendCmdSignature(StringBuilder sb, Method method) {
         Class<?>[] params = method.getParameterTypes();
         String[] names = getArgNames(method, params);
 
@@ -89,8 +90,12 @@ public final class HelpfulConsoleHelpUtil {
                 sb.append(' ');
             }
         }
+    }
 
-        Main.logger().log(sb.toString());
+    public static String generateCommandSignature(Method method) {
+        StringBuilder sb = createCmdPrefix(method);
+        appendCmdSignature(sb, method);
+        return sb.toString();
     }
 
     private static String[] getArgNames(Method method, Class<?>[] params) {
@@ -102,9 +107,8 @@ public final class HelpfulConsoleHelpUtil {
             if (names.length != params.length) {
                 Main.logger().warn(
                     "Command argument names annotation is present on command '%s', but there are too %s names. " +
-                    "Expected %d " +
-                    "names " + "found %d", method.getName(), (names.length < params.length) ? "few" : "many",
-                    params.length, names.length);
+                    "Expected %d " + "names " + "found %d", method.getName(),
+                    (names.length < params.length) ? "few" : "many", params.length, names.length);
             }
         }
         return names;
@@ -127,8 +131,8 @@ public final class HelpfulConsoleHelpUtil {
      *
      * @return All relevant command method
      */
-    private static Set<Method> getRelevantMethods(@NotNull Console console, @NotNull CommandExecutor exec,
-                                                  @Nullable String command) {
+    public static Set<Method> getRelevantMethods(@NotNull Console console, @NotNull CommandExecutor exec,
+                                                 @Nullable String command) {
         Set<Method> methods = new HashSet<>();
         Class<?> c = exec.getClass();
         while (c != Object.class) {

@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
@@ -93,10 +93,9 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
         Method[] methods = ClassReflection.getMethods(exec.getClass());
 
-        List<String> potentialMethods = Arrays.stream(methods).filter(
+        Set<String> potentialMethods = Arrays.stream(methods).filter(
             m -> m.getName().toLowerCase().startsWith(methodName.toLowerCase())).map(
-            m -> m.getName() + " " + Arrays.stream(m.getParameterTypes()).map(Class::getSimpleName)
-                                           .collect(Collectors.joining(" "))).collect(Collectors.toList());
+            HelpfulConsoleHelpUtil::generateCommandSignature).collect(Collectors.toSet());
 
         Array<Integer> possible = new Array<>(false, 8);
         for (int i = 0; i < methods.length; i++) {
