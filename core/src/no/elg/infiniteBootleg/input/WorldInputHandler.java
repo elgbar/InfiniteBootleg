@@ -75,9 +75,12 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             return false;
         }
         OrthographicCamera camera = worldRender.getCamera();
-        camera.zoom += amount * SCROLL_SPEED * camera.zoom;
+        camera.zoom += amount * SCROLL_SPEED;
         if (camera.zoom < WorldRender.MIN_ZOOM) {
             camera.zoom = WorldRender.MIN_ZOOM;
+        }
+        else if (camera.zoom > WorldRender.MAX_ZOOM) {
+            camera.zoom = WorldRender.MAX_ZOOM;
         }
         worldRender.update();
         return true;

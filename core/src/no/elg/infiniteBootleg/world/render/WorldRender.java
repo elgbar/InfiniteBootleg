@@ -34,6 +34,8 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public static final float MIN_ZOOM = 0.25f;
+    public static final float MAX_ZOOM = 1.75f;
+
     public static final float AMBIENT_LIGHT = 0.026f;
     public static final int RAYS_PER_BLOCK = 200;
     /**
