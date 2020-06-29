@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import com.strongjoshua.console.LogLevel;
+import java.awt.Toolkit;
+import java.io.File;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
@@ -18,17 +20,13 @@ import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
-import java.io.File;
-
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Main extends ApplicationAdapter {
 
@@ -147,7 +145,7 @@ public class Main extends ApplicationAdapter {
             entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
         }
 
-        world = new World(new FlatChunkGenerator(), worldSeed, !test);
+        world = new World(new PerlinChunkGenerator(worldSeed), worldSeed, !test);
     }
 
     @Override
