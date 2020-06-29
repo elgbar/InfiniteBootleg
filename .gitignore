@@ -143,3 +143,5 @@ version
 .idea/codeStyles/codeStyleConfig.xml
 
 tests/
+
+.idea/
