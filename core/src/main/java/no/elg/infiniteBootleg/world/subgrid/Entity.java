@@ -255,17 +255,39 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return entities;
     }
 
-
+    /**
+     * Must be called while synchronized under WorldRender.BOX2D_LOCK
+     *
+     * @param type
+     *     The type of contact
+     * @param contact
+     *     Contact made
+     */
     @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+    public synchronized void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (contact.getFixtureA().getFilterData().categoryBits == World.GROUND_CATEGORY) {
             if (type == ContactType.BEGIN_CONTACT) {
                 //newest pos is needed to accurately check if this is on ground
                 updatePos();
-                //y pos - getHalfBox2dHeight is middle
+
                 int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - GROUND_CHECK_OFFSET);
-                if (world.isAirBlock(getBlockX(), y)) { return; }
-                groundContacts++;
+
+                int leftX = MathUtils.ceil((posCache.x - (2 * getHalfBox2dWidth())));
+                int middleX = MathUtils.floor(posCache.x - getHalfBox2dWidth());
+                int rightX = MathUtils.floor(posCache.x);
+
+//                System.out.println("leftX = " + leftX);
+//                System.out.println("middleX = " + middleX);
+//                System.out.println("rightX = " + rightX);
+
+                int detected = 0;
+
+                if (!world.isAirBlock(leftX, y)) { detected++; }
+                if (!world.isAirBlock(middleX, y)) { detected++; }
+                if (!world.isAirBlock(rightX, y)) { detected++; }
+                if (detected > 0) {
+                    groundContacts++;
+                }
             }
             else if (type == ContactType.END_CONTACT) {
                 groundContacts--;
