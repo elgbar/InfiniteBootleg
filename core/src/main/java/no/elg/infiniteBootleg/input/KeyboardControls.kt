@@ -7,6 +7,9 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.math.sign
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -21,7 +24,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   private var breakBrushSize = 2f
   private var placeBrushSize = 1f
   private var lastEditTick: Long = 0
-  
+
   override fun update() {
     if (Main.inst().console.isVisible) {
       return
@@ -64,59 +67,67 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
         input.isLockedOn = true
       }
     } else {
-      if (entity.isFlying) {
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-          moveHorz(0f)
+
+      fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
+        synchronized(WorldRender.BOX2D_LOCK) {
+          controlled.updatePos()
+          val body = controlled.body
+          val vel = body.linearVelocity
+          val (nx, ny) = modify(vel.x, vel.y)
+          val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
+          body.setLinearVelocity(cap(nx, MAX_X_VEL), cap(ny, MAX_Y_VEL))
+          body.isAwake = true
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-          moveHorz(0f)
+      }
+
+      if (entity.isFlying) {
+
+        fun fly(dx: Float = 0f, dy: Float = 0f) {
+          setVel { oldX, oldY -> oldX + dx to oldY + dy }
+        }
+
+        when {
+          Gdx.input.isKeyPressed(Input.Keys.W) -> fly(dy = FLY_VEL)
+          Gdx.input.isKeyPressed(Input.Keys.S) -> fly(dy = -FLY_VEL)
+          Gdx.input.isKeyPressed(Input.Keys.A) -> fly(dx = -FLY_VEL)
+          Gdx.input.isKeyPressed(Input.Keys.D) -> fly(dx = FLY_VEL)
         }
       } else {
         if (entity.isOnGround && Gdx.input.isKeyPressed(Input.Keys.W)) {
-          jump()
+          setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
         }
-      }
-      if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-        moveHorz(-HORIZONTAL_IMPULSE)
-      }
-      if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-        moveHorz(HORIZONTAL_IMPULSE)
+
+        fun moveHorz(velX: Float) {
+          setVel { oldX, oldY ->
+            val multiplier = {
+              //Stop faster when switching direction
+              val currSig = sign(oldX)
+              val reverseDir = if (currSig != 0f && sign(velX) != currSig) 1f else 0f
+
+              //hold shift to run
+              val shift = if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) 1f else 0f
+
+              1f + reverseDir + shift
+            }
+
+            val newVel = (oldX + velX * multiplier()).let {
+              if (it > 20f) 20f else it
+            }
+
+            return@setVel oldX + velX * multiplier() to oldY
+          }
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+          moveHorz(-HORIZONTAL_IMPULSE)
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+          moveHorz(HORIZONTAL_IMPULSE)
+        }
       }
     }
     if (update) {
       worldRender.update()
-    }
-  }
-
-  private fun setVel(x: Float, y: Float) {
-    synchronized(WorldRender.BOX2D_LOCK) {
-      controlled.updatePos()
-      val body = controlled.body
-      val vel = body.linearVelocity
-      body.setLinearVelocity(vel.x, vel.y + JUMP_VERTICAL_VEL)
-      body.isAwake = true
-    }
-  }
-
-  private fun jump() {}
-  private fun moveHorz(velX: Float) {
-    synchronized(WorldRender.BOX2D_LOCK) {
-      controlled.updatePos()
-      val body = controlled.body
-      val vel = body.linearVelocity
-      var multiplier = 1f
-
-      //Stop faster when switching direction
-      val currSig = Math.signum(vel.x)
-      if (currSig != 0f && Math.signum(velX) != currSig) {
-        multiplier++
-      }
-      //Shift to run!
-      if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-        multiplier++
-      }
-      body.setLinearVelocity(velX * multiplier, vel.y)
-      body.isAwake = true
     }
   }
 
@@ -166,8 +177,13 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
 
   companion object {
     const val JUMP_VERTICAL_VEL = 7.5f
-    const val HORIZONTAL_IMPULSE = .15f
+    const val HORIZONTAL_IMPULSE = 0.15f
+    const val FLY_VEL = .075f
     const val EDIT_TICK_DELAY = 1 //delay in ticks between allowing to place/break blocks
+
+
+    const val MAX_X_VEL = 30f
+    const val MAX_Y_VEL = JUMP_VERTICAL_VEL
   }
 
   init {

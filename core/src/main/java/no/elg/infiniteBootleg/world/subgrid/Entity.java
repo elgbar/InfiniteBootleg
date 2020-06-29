@@ -91,7 +91,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(worldX, worldY);
-        bodyDef.linearDamping = 0.01f;
+        bodyDef.linearDamping = 1f;
         bodyDef.fixedRotation = true;
         bodyDef.bullet = true; //glitching through world == bad!
         return bodyDef;
@@ -317,7 +317,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     /**
-     * @return Position of this entity last tick, note that the same vector is returned each time
+     * @return Position of this entity last tick, note that the same vector is returned each time. You should not edit
+     * this vector
      */
     @NotNull
     public Vector2 getPosition() {

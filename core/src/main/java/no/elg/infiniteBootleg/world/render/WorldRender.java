@@ -14,19 +14,17 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
+import java.util.HashMap;
+import java.util.Map;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 
 /**
  * @author Elg
@@ -210,6 +208,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         for (int y = chunksInView.vertical_start; y < chunksInView.vertical_end; y++) {
             for (int x = chunksInView.horizontal_start; x < chunksInView.horizontal_end; x++) {
                 Chunk chunk = world.getChunk(x, y);
+                if (chunk == null) {
+                    continue;
+                }
                 chunk.view();
 
                 if (chunk.isDirty()) {
@@ -238,8 +239,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
         batch.begin();
         for (Map.Entry<Chunk, TextureRegion> entry : draw.entrySet()) {
-            float dx = entry.getKey().getChunkX() * CHUNK_TEXTURE_SIZE;
-            float dy = entry.getKey().getChunkY() * CHUNK_TEXTURE_SIZE;
+            int dx = entry.getKey().getChunkX() * CHUNK_TEXTURE_SIZE;
+            int dy = entry.getKey().getChunkY() * CHUNK_TEXTURE_SIZE;
             batch.draw(entry.getValue(), dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
         }
         entityRenderer.render();
