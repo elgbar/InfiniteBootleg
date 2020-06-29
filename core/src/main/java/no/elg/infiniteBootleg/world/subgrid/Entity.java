@@ -3,9 +3,16 @@ package no.elg.infiniteBootleg.world.subgrid;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
+import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Util;
@@ -16,8 +23,6 @@ import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.UUID;
 
 /**
  * An entity that can move between the main world grid.
@@ -272,7 +277,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     /**
      * Update the cached position and velocity
      */
-    protected synchronized void updatePos() {
+    public synchronized void updatePos() {
         if (body == null) { return; }
         posCache = body.getPosition();
         velCache = body.getLinearVelocity();

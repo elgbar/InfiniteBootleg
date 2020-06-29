@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.InputAdapter;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,10 @@ public abstract class AbstractEntityControls extends InputAdapter implements Ent
 
     public WorldRender getWorldRender() {
         return worldRender;
+    }
+    
+    public World getWorld() {
+        return worldRender.world;
     }
 
     @Override

@@ -39,6 +39,7 @@ tasks.named('wrapper') {
 }
 
 allprojects {
+  apply plugin: "java"
   apply plugin: 'idea'
   apply plugin: 'kotlin'
 
@@ -76,7 +77,6 @@ subprojects {
 }
 
 project(":desktop") {
-  apply plugin: "java"
 
   dependencies {
     implementation project(":core")
@@ -90,8 +90,6 @@ project(":desktop") {
 }
 
 project(":core") {
-  apply plugin: "java-library"
-
 
   dependencies {
 
@@ -111,30 +109,10 @@ project(":core") {
 
     implementation 'org.jetbrains:annotations:18.0.0'
     implementation 'org.projectlombok:lombok:1.18.12'
-  }
-}
 
-project(":tests") {
-  apply plugin: "java"
-
-
-  dependencies {
-
-    /**
-     * If you do have some classes to test in os specific code you may want to uncomment
-     * some of these lines.
-     *
-     * BUT: I recommend to create separate test sub projects for each platform. Trust me :)
-     *
-     */
-
-    implementation project(":core")
-
-    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-
+    testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testImplementation 'junit:junit:4.+'
     testImplementation "org.mockito:mockito-all:1.9.+"
-
     testRuntime "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 }

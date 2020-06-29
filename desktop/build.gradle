@@ -1,39 +1,34 @@
-apply plugin: "java"
-
-sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = ["src/"]
-
 project.ext.mainClassName = "no.elg.infiniteBootleg.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../core/assets")
+project.ext.assetsDir = new File("../core/src/main/resources")
 
 task run(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = project.assetsDir
-    ignoreExitValue = true
+  main = project.mainClassName
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  workingDir = project.assetsDir
+  ignoreExitValue = true
 }
 
 task debug(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = project.assetsDir
-    ignoreExitValue = true
-    debug = true
+  main = project.mainClassName
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  workingDir = project.assetsDir
+  ignoreExitValue = true
+  debug = true
 }
 
 task dist(type: Jar) {
-    from files(sourceSets.main.output.getClassesDirs()[0])
-    from files(sourceSets.main.output.resourcesDir)
+  from files(sourceSets.main.output.getClassesDirs()[0])
+  from files(sourceSets.main.output.resourcesDir)
 
-    project.configurations.getByName("implementation").setCanBeResolved(true)
-    from { configurations.implementation.collect { zipTree(it) } }
-    from files(project.assetsDir);
-    archiveBaseName = appName + "-desktop"
-    manifest {
-        attributes 'Main-Class': project.mainClassName
-    }
+  project.configurations.getByName("implementation").setCanBeResolved(true)
+  from { configurations.implementation.collect { zipTree(it) } }
+  from files(project.assetsDir);
+  archiveBaseName = appName + "-desktop"
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
 }
 
 dist.dependsOn classes
