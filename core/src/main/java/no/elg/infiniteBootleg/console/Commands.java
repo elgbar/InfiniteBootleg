@@ -130,6 +130,14 @@ public class Commands extends CommandExecutor {
                    "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
 
+
+    @ClientsideOnly
+    @ConsoleDoc(description = "Toggles smoothed camera movement when following a player")
+    public void lerp() {
+        WorldRender.useLerp = !WorldRender.useLerp;
+        logger.log(LogLevel.SUCCESS, "Camera lerp is now " + (WorldRender.useLerp ? "enabled" : "disabled"));
+    }
+
     @ClientsideOnly
     @ConsoleDoc(description = "Teleport to given world coordinate",
                 paramDescriptions = {"World x coordinate", "World y coordinate"})

@@ -83,6 +83,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public static boolean lights = true;
     public static boolean debugBox2d = false;
+    public static boolean useLerp = true;
 
     public final static Object LIGHT_LOCK = new Object();
     public final static Object BOX2D_LOCK = new Object();

@@ -1,9 +1,15 @@
 package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.Gdx;
+import static com.badlogic.gdx.Input.Keys.DOWN;
+import static com.badlogic.gdx.Input.Keys.F3;
+import static com.badlogic.gdx.Input.Keys.F5;
+import static com.badlogic.gdx.Input.Keys.F9;
+import static com.badlogic.gdx.Input.Keys.LEFT;
+import static com.badlogic.gdx.Input.Keys.RIGHT;
+import static com.badlogic.gdx.Input.Keys.UP;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Updatable;
@@ -15,8 +21,6 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static com.badlogic.gdx.Input.Keys.*;
 
 /**
  * @author Elg
@@ -110,14 +114,21 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             worldRender.update();
         }
         else if (following != null && following.isValid() && lockedOn) {
-            Vector2 pos = following.getPosition();
+            float x = following.getPosition().x * Block.BLOCK_SIZE;
+            float y = following.getPosition().y * Block.BLOCK_SIZE;
 
-            float dx = (pos.x * Block.BLOCK_SIZE - camera.position.x) * CAMERA_LERP;
-            float dy = (pos.y * Block.BLOCK_SIZE - camera.position.y) * CAMERA_LERP;
+            if (WorldRender.useLerp) {
+                float dx = (x - camera.position.x) * CAMERA_LERP;
+                float dy = (y - camera.position.y) * CAMERA_LERP;
 
-            if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
-                camera.position.x += dx * Gdx.graphics.getDeltaTime();
-                camera.position.y += dy * Gdx.graphics.getDeltaTime();
+                if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
+                    camera.position.x += dx * Gdx.graphics.getDeltaTime();
+                    camera.position.y += dy * Gdx.graphics.getDeltaTime();
+                }
+            }
+            else {
+                camera.position.x = x;
+                camera.position.y = y;
             }
             worldRender.update();
         }
