@@ -274,7 +274,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
                 int leftX = MathUtils.ceil((posCache.x - (2 * getHalfBox2dWidth())));
                 int middleX = MathUtils.floor(posCache.x - getHalfBox2dWidth());
-                int rightX = MathUtils.floor(posCache.x);
+                int rightX = MathUtils.ceil(posCache.x - GROUND_CHECK_OFFSET);
 
 //                System.out.println("leftX = " + leftX);
 //                System.out.println("middleX = " + middleX);
