@@ -3,6 +3,11 @@ package no.elg.infiniteBootleg.args;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Map;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
@@ -10,12 +15,6 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Map;
 
 /**
  * @author Elg
@@ -87,6 +86,16 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      *
      */
 
+    @Argument(value = "Run given command after init has completed, split command by ';'", alt = 'c')
+    private void run_cmd(String val) {
+        log("Running commands '" + val + "' as initial commands");
+
+        scheduler.scheduleAsync(() -> {
+            for (String cmd : val.split(";")) {
+                Main.inst().getConsole().execCommand(cmd);
+            }
+        }, 10);
+    }
 
     /**
      * Do not render the graphics
