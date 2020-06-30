@@ -176,13 +176,13 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   }
 
   companion object {
-    const val JUMP_VERTICAL_VEL = 7.5f
+    const val JUMP_VERTICAL_VEL = 12.5f
     const val HORIZONTAL_IMPULSE = 0.15f
     const val FLY_VEL = .075f
     const val EDIT_TICK_DELAY = 1 //delay in ticks between allowing to place/break blocks
 
 
-    const val MAX_X_VEL = 30f
+    const val MAX_X_VEL = 20f
     const val MAX_Y_VEL = JUMP_VERTICAL_VEL
   }
 
