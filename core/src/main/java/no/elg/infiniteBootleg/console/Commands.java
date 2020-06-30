@@ -149,7 +149,15 @@ public class Commands extends CommandExecutor {
         render.getCamera().position.x = worldX * Block.BLOCK_SIZE;
         render.getCamera().position.y = worldY * Block.BLOCK_SIZE;
         render.update();
-        logger.logf(LogLevel.SUCCESS, "Teleported to (% d,% d)", worldX, worldY);
+        logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY);
+
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("CMD", "Failed to find any players");
+            return;
+        }
+        player.teleport(worldX, worldY, false);
+        logger.logf(LogLevel.SUCCESS, "Teleported player to (% .2f,% .2f)", worldX, worldY);
     }
 
     @ClientsideOnly
