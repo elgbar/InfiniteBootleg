@@ -12,9 +12,13 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
+import static java.lang.Math.abs;
+import static java.lang.Math.signum;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
+import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
+import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
@@ -36,7 +40,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     private final World world;
     private final UUID uuid;
 
-    private Body body;
+    private final Body body;
     private boolean flying; //ignore world gravity
     private Vector2 posCache;
     private Vector2 velCache;
@@ -113,12 +117,13 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
         FixtureDef def = new FixtureDef();
         def.shape = shape;
-        def.density = 1f; //Average density of humans is 1.27 kg/m^3 => ~ x kg/m^2
-        def.friction = 0.5f;
-        def.restitution = 0.1f; // a bit bouncy!
+        def.density = 100f;
+        def.friction = 1f;
+        def.restitution = 0.025f; // a bit bouncy!
 
         Fixture fix = body.createFixture(def);
         fix.setFilterData(World.ENTITY_FILTER);
+
         shape.dispose();
     }
 
@@ -135,7 +140,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     public void teleport(float worldX, float worldY, boolean validate) {
-
         if (validate) {
             int tries = getHeight() / Block.BLOCK_SIZE;
             boolean invalid = true;
@@ -161,6 +165,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             body.setAwake(true);
             posCache.x = worldX;
             posCache.y = worldY;
+            velCache.x = 0;
+            velCache.y = 0;
         }
     }
 
@@ -272,7 +278,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
                 int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - GROUND_CHECK_OFFSET);
 
-                int leftX = MathUtils.ceil((posCache.x - (2 * getHalfBox2dWidth())));
+                int leftX = MathUtils.ceil(posCache.x - (2 * getHalfBox2dWidth()));
                 int middleX = MathUtils.floor(posCache.x - getHalfBox2dWidth());
                 int rightX = MathUtils.ceil(posCache.x - GROUND_CHECK_OFFSET);
 
@@ -299,7 +305,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     /**
      * Update the cached position and velocity
      */
-    public synchronized void updatePos() {
+    public final synchronized void updatePos() {
         if (body == null) { return; }
         posCache = body.getPosition();
         velCache = body.getLinearVelocity();
@@ -307,7 +313,23 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     @Override
     public void tick() {
+        if (body == null) { return; }
         updatePos();
+        synchronized (WorldRender.BOX2D_LOCK) {
+            float nx;
+            if (abs(velCache.x) > MAX_X_VEL) {
+                nx = signum(velCache.x) * MAX_X_VEL;
+            }
+            else { nx = velCache.x; }
+
+            float ny;
+            if (abs(velCache.y) > MAX_Y_VEL) {
+                ny = signum(velCache.y) * MAX_Y_VEL;
+            }
+            else { ny = velCache.y; }
+
+            body.setLinearVelocity(nx, ny);
+        }
     }
 
     /**
@@ -370,6 +392,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     public Body getBody() {
+        if (!valid) {
+            throw new IllegalStateException("Cannot access the body of an invalid entity!");
+        }
         return body;
     }
 
@@ -431,7 +456,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     @Override
     public synchronized void dispose() {
         world.getWorldBody().destroyBody(body);
-        body = null;
         valid = false;
     }
 

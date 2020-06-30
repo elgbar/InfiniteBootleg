@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.input
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
@@ -17,13 +18,14 @@ import kotlin.math.sign
  * @author Elg
  */
 class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : AbstractEntityControls(worldRender, entity) {
-  private var selected: Material?
+  private var selected: Material = Material.STONE
 
   //if objects can be placed on non-air blocks
   var replacePlacement = false
   private var breakBrushSize = 2f
   private var placeBrushSize = 1f
   private var lastEditTick: Long = 0
+  private val tmpVec = Vector2()
 
   override fun update() {
     if (Main.inst().console.isVisible) {
@@ -47,10 +49,10 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
       update = true
     } else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
       if (placeBrushSize <= 1) {
-        update = selected!!.create(world, blockX, blockY)
+        update = selected.create(world, blockX, blockY)
       } else {
         for (block in world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
-          update = update or selected!!.create(world, block.worldX, block.worldY)
+          update = update or selected.create(world, block.worldX, block.worldY)
         }
       }
       if (update) {
@@ -70,7 +72,6 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
 
       fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
         synchronized(WorldRender.BOX2D_LOCK) {
-          controlled.updatePos()
           val body = controlled.body
           val vel = body.linearVelocity
           val (nx, ny) = modify(vel.x, vel.y)
@@ -97,32 +98,24 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
           setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
         }
 
-        fun moveHorz(velX: Float) {
-          setVel { oldX, oldY ->
-            val multiplier = {
-              //Stop faster when switching direction
-              val currSig = sign(oldX)
-              val reverseDir = if (currSig != 0f && sign(velX) != currSig) 1f else 0f
+        fun moveHorz(dir: Float) {
+          synchronized(WorldRender.BOX2D_LOCK) {
+            val body = controlled.body
 
-              //hold shift to run
-              val shift = if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) 1f else 0f
+            val currSpeed = body.linearVelocity.x
+            val wantedSpeed = dir * (if (entity.isOnGround) MAX_X_VEL else MAX_X_VEL / 2)
+            val impulse = body.mass * (wantedSpeed - currSpeed)
 
-              1f + reverseDir + shift
-            }
-
-            val newVel = (oldX + velX * multiplier()).let {
-              if (it > 20f) 20f else it
-            }
-
-            return@setVel oldX + velX * multiplier() to oldY
+            tmpVec.set(impulse, 0f)
+            body.applyLinearImpulse(tmpVec, body.worldCenter, true)
           }
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-          moveHorz(-HORIZONTAL_IMPULSE)
+          moveHorz(-1f)
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-          moveHorz(HORIZONTAL_IMPULSE)
+          moveHorz(1f)
         }
       }
     }
@@ -151,11 +144,11 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     return true
   }
 
-  override fun getSelected(): Material? {
+  override fun getSelected(): Material {
     return selected
   }
 
-  override fun setSelected(selected: Material?) {
+  override fun setSelected(selected: Material) {
     this.selected = selected
   }
 
@@ -176,17 +169,11 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   }
 
   companion object {
-    const val JUMP_VERTICAL_VEL = 12.5f
-    const val HORIZONTAL_IMPULSE = 0.15f
+    const val JUMP_VERTICAL_VEL = 12f
     const val FLY_VEL = .075f
-    const val EDIT_TICK_DELAY = 1 //delay in ticks between allowing to place/break blocks
 
+    const val MAX_X_VEL = 15f //ie target velocity
+    const val MAX_Y_VEL = 100f
 
-    const val MAX_X_VEL = 20f
-    const val MAX_Y_VEL = JUMP_VERTICAL_VEL
-  }
-
-  init {
-    selected = Material.STONE
   }
 }

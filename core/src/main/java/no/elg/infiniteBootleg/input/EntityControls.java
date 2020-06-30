@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -22,13 +21,13 @@ public interface EntityControls extends InputProcessor, Updatable, Disposable {
     /**
      * @return The selected material for this entity
      */
-    @Nullable Material getSelected();
+    @NotNull Material getSelected();
 
     /**
      * @param selected
      *     The new selected material
      */
-    void setSelected(@Nullable Material selected);
+    void setSelected(@NotNull Material selected);
 
     float getBreakBrushSize();
 
