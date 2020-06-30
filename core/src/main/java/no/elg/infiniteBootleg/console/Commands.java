@@ -141,7 +141,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Teleport to given world coordinate",
                 paramDescriptions = {"World x coordinate", "World y coordinate"})
-    public void tp(int worldX, int worldY) {
+    public void tp(float worldX, float worldY) {
         if (!Main.renderGraphic) {
             return;
         }
