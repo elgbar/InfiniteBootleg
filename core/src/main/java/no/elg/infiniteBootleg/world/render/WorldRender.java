@@ -16,8 +16,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.HashMap;
 import java.util.Map;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
@@ -59,57 +59,32 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
      * How many {@link Graphics#getFramesPerSecond()} should there be when rendering multiple chunks
      */
     public static final int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
-
-
-    public final World world;
-    private RayHandler rayHandler;
-    private EntityRenderer entityRenderer;
-    private SpriteBatch batch;
-
-    private OrthographicCamera camera;
-    private final Rectangle viewBound;
-    private final ChunkViewed chunksInView;
-    private ChunkRenderer chunkRenderer;
-
-    private Box2DDebugRenderer box2DDebugRenderer;
-    private DebugChunkRenderer chunkDebugRenderer;
-
-    private final Matrix4 m4 = new Matrix4();
-    private DirectionalLight skylight;
-    private float lastZoom;
-    Map<Chunk, TextureRegion> draw = new HashMap<>();
-
+    public final static Object LIGHT_LOCK = new Object();
+    public final static Object BOX2D_LOCK = new Object();
     public static boolean lights = true;
     public static boolean debugBox2d = false;
     public static boolean useLerp = true;
-
-    public final static Object LIGHT_LOCK = new Object();
-    public final static Object BOX2D_LOCK = new Object();
-
-    public final static class ChunkViewed {
-
-        private ChunkViewed() {}
-
-        public int horizontal_start;
-        public int horizontal_end;
-        public int vertical_start;
-        public int vertical_end;
-
-        public int getHorizontalLength() {
-            return horizontal_end - horizontal_start;
-        }
-
-        public int getVerticalLength() {
-            return vertical_end - vertical_start;
-        }
-    }
+    public final World world;
+    private final Rectangle viewBound;
+    private final ChunkViewed chunksInView;
+    private final Matrix4 m4 = new Matrix4();
+    Map<Chunk, TextureRegion> draw = new HashMap<>();
+    private RayHandler rayHandler;
+    private EntityRenderer entityRenderer;
+    private SpriteBatch batch;
+    private OrthographicCamera camera;
+    private ChunkRenderer chunkRenderer;
+    private Box2DDebugRenderer box2DDebugRenderer;
+    private DebugChunkRenderer chunkDebugRenderer;
+    private DirectionalLight skylight;
+    private float lastZoom;
 
     public WorldRender(@NotNull World world) {
         viewBound = new Rectangle();
         chunksInView = new ChunkViewed();
         this.world = world;
 
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             chunkRenderer = new ChunkRenderer(this);
             entityRenderer = new EntityRenderer(this);
 
@@ -150,41 +125,11 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
     }
 
-    @Override
-    public void update() {
-        camera.update();
-        Gdx.app.postRunnable(() -> batch.setProjectionMatrix(camera.combined));
-        m4.set(camera.combined).scl(Block.BLOCK_SIZE);
-
-        final float width = camera.viewportWidth * camera.zoom;
-        final float height = camera.viewportHeight * camera.zoom;
-
-        if (lights) {
-            rayHandler.setCombinedMatrix(m4, 0, 0, width, height);
-        }
-
-        if (!getWorld().getWorldTicker().isPaused()) {
-
-            float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
-            float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
-            viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
-
-            chunksInView.horizontal_start = //
-                MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
-            chunksInView.horizontal_end = //
-                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
-                CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
-
-            chunksInView.vertical_start = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
-            chunksInView.vertical_end = //
-                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
-                CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
-
-            if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
-                lastZoom = camera.zoom;
-                resetSkylight();
-            }
-        }
+    /**
+     * @return How many blocks there currently are horizontally on screen
+     */
+    public int blocksHorizontally() {
+        return (int) Math.ceil(camera.viewportWidth * camera.zoom / Block.BLOCK_SIZE) + 1;
     }
 
     @Override
@@ -253,7 +198,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 }
             }
         }
-        if (debugBox2d && Main.debug) {
+        if (debugBox2d && Settings.debug) {
             synchronized (BOX2D_LOCK) {
                 box2DDebugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
             }
@@ -280,10 +225,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         return camera;
     }
 
-    public World getWorld() {
-        return world;
-    }
-
     public ChunkRenderer getChunkRenderer() {
         return chunkRenderer;
     }
@@ -306,13 +247,6 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
     }
 
-    /**
-     * @return How many blocks there currently are horizontally on screen
-     */
-    public int blocksHorizontally() {
-        return (int) Math.ceil(camera.viewportWidth * camera.zoom / Block.BLOCK_SIZE) + 1;
-    }
-
     @Override
     public void dispose() {
         batch.dispose();
@@ -326,5 +260,65 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         camera.setToOrtho(false, width, height);
         camera.position.set(old);
         update();
+    }
+
+    @Override
+    public void update() {
+        camera.update();
+        Gdx.app.postRunnable(() -> batch.setProjectionMatrix(camera.combined));
+        m4.set(camera.combined).scl(Block.BLOCK_SIZE);
+
+        final float width = camera.viewportWidth * camera.zoom;
+        final float height = camera.viewportHeight * camera.zoom;
+
+        if (lights) {
+            rayHandler.setCombinedMatrix(m4, 0, 0, width, height);
+        }
+
+        if (!getWorld().getWorldTicker().isPaused()) {
+
+            float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
+            float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
+            viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
+
+            chunksInView.horizontal_start = //
+                MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
+            chunksInView.horizontal_end = //
+                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
+                CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
+
+            chunksInView.vertical_start = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
+            chunksInView.vertical_end = //
+                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
+                CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
+
+            if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
+                lastZoom = camera.zoom;
+                resetSkylight();
+            }
+        }
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public final static class ChunkViewed {
+
+        public int horizontal_start;
+        public int horizontal_end;
+        public int vertical_start;
+        public int vertical_end;
+
+        private ChunkViewed() {
+        }
+
+        public int getHorizontalLength() {
+            return horizontal_end - horizontal_start;
+        }
+
+        public int getVerticalLength() {
+            return vertical_end - vertical_start;
+        }
     }
 }

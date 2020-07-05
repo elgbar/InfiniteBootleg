@@ -103,8 +103,12 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
             val body = controlled.body
 
             val currSpeed = body.linearVelocity.x
-            val wantedSpeed = dir * (if (entity.isOnGround) MAX_X_VEL else MAX_X_VEL / 2)
-            val impulse = body.mass * (wantedSpeed - currSpeed)
+            val wantedSpeed = dir * if (entity.isOnGround) {
+              MAX_X_VEL
+            } else {
+              MAX_X_VEL * (2f / 3f)
+            }
+            val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
 
             tmpVec.set(impulse, 0f)
             body.applyLinearImpulse(tmpVec, body.worldCenter, true)

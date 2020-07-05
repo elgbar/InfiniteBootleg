@@ -1,15 +1,19 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 /**
  * @author Elg
@@ -26,7 +30,7 @@ public class Door extends MaterialEntity {
 
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
             closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
         }
@@ -36,12 +40,6 @@ public class Door extends MaterialEntity {
     @Override
     public Material getMaterial() {
         return Material.DOOR;
-    }
-
-    @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
-        if (type == ContactType.BEGIN_CONTACT) { open++; }
-        if (type == ContactType.END_CONTACT) { open--; }
     }
 
     @NotNull
@@ -60,6 +58,16 @@ public class Door extends MaterialEntity {
         fix.setFilterData(World.BLOCK_ENTITY_FILTER);
         fix.setSensor(true);
         box.dispose();
+    }
+
+    @Override
+    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+        if (type == ContactType.BEGIN_CONTACT) {
+            open++;
+        }
+        if (type == ContactType.END_CONTACT) {
+            open--;
+        }
     }
 
     @Override

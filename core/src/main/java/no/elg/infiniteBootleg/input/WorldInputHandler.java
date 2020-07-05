@@ -27,18 +27,17 @@ import org.jetbrains.annotations.Nullable;
  */
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
-    private final static int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
     public static final float SCROLL_SPEED = 0.25f;
     public static final float CAMERA_LERP = 2.5f;
     public static final float LERP_CUTOFF = 5f;
-
+    private static final int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
     private final WorldRender worldRender;
     private Entity following;
     private boolean lockedOn = true;
 
     public WorldInputHandler(@NotNull WorldRender world) {
         worldRender = world;
-        Main.getInputMultiplexer().addProcessor(this);
+        Main.inst().getInputMultiplexer().addProcessor(this);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public void dispose() {
-        Main.getInputMultiplexer().removeProcessor(this);
+        Main.inst().getInputMultiplexer().removeProcessor(this);
     }
 
     @Override

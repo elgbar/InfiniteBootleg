@@ -26,16 +26,16 @@ public class Location {
         return new Location(this.x * x, this.y * y);
     }
 
+    public double dist(@NotNull Location loc) {
+        return Math.sqrt(distCubed(loc));
+    }
+
     public long distCubed(@NotNull Location loc) {
         return distCubed(x, y, loc.x, loc.y);
     }
 
     public static long distCubed(int x1, int y1, int x2, int y2) {
         return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-    }
-
-    public double dist(@NotNull Location loc) {
-        return Math.sqrt(distCubed(loc));
     }
 
     public Vector2 toVector2() {
@@ -47,6 +47,11 @@ public class Location {
     }
 
     @Override
+    public int hashCode() {
+        return 31 * x + y;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o instanceof Location) {
@@ -54,11 +59,6 @@ public class Location {
             return y == location.y && x == location.x;
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * x + y;
     }
 
     @Override

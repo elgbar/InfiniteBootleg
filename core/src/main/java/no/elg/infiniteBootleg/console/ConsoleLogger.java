@@ -12,14 +12,6 @@ import org.jetbrains.annotations.Nullable;
 public interface ConsoleLogger extends ApplicationLogger {
 
     /**
-     * @param level
-     *     The level to log at
-     * @param msg
-     *     The message to log
-     */
-    void log(@NotNull LogLevel level, @NotNull String msg);
-
-    /**
      * Log a level with {@link LogLevel#DEFAULT} loglevel
      *
      * @param msg
@@ -48,6 +40,18 @@ public interface ConsoleLogger extends ApplicationLogger {
     }
 
     /**
+     * @param level
+     *     The level to log at
+     * @param msg
+     *     The message to log
+     */
+    void log(@NotNull LogLevel level, @NotNull String msg);
+
+    default void success(@NotNull String msg) {
+        log(LogLevel.SUCCESS, msg);
+    }
+
+    /**
      * Log a level with {@link LogLevel#DEFAULT} loglevel
      *
      * @param msg
@@ -57,9 +61,17 @@ public interface ConsoleLogger extends ApplicationLogger {
         log(LogLevel.DEFAULT, msg);
     }
 
+    default void success(@NotNull String msg, @NotNull Object... objs) {
+        logf(LogLevel.SUCCESS, msg, objs);
+    }
+
     @Override
     default void log(@NotNull String tag, @NotNull String message) {
         log("[" + tag + "] " + message);
+    }
+
+    default void warn(@NotNull String message) {
+        error("WARN", message);
     }
 
     @Override
@@ -70,34 +82,24 @@ public interface ConsoleLogger extends ApplicationLogger {
         }
     }
 
-    default void success(@NotNull String msg) {
-        log(LogLevel.SUCCESS, msg);
-    }
-
-    default void success(@NotNull String msg, @NotNull Object... objs) {
-        logf(LogLevel.SUCCESS, msg, objs);
-    }
-
-    default void warn(@NotNull String message) {
-        error("WARN", message);
-    }
-
     default void warn(@NotNull String message, @NotNull Object... objs) {
         error("WARN", message, objs);
+    }
+
+    default void error(@NotNull String tag, @NotNull String message, @NotNull Object... objs) {
+        logf(LogLevel.ERROR, "[" + tag + "] " + message, objs);
     }
 
     default void warn(@NotNull String message, @Nullable Throwable exception) {
         error("WARN", message, exception);
     }
 
+
     @Override
     default void error(@NotNull String tag, @NotNull String message) {
         log(LogLevel.ERROR, "[" + tag + "] " + message);
     }
 
-    default void error(@NotNull String tag, @NotNull String message, @NotNull Object... objs) {
-        logf(LogLevel.ERROR, "[" + tag + "] " + message, objs);
-    }
 
     @Override
     default void error(@NotNull String tag, @NotNull String message, @Nullable Throwable exception) {

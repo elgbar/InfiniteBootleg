@@ -2,7 +2,10 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.common.base.Preconditions;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.items.ItemType;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.SandBlock;
@@ -12,9 +15,6 @@ import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Door;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Elg
@@ -99,15 +99,20 @@ public enum Material {
         this.blocksLight = blocksLight;
         this.placable = placable;
         this.hardness = hardness;
-        if (Main.renderGraphic && itemType != ItemType.AIR) {
+        if (Settings.renderGraphic && itemType != ItemType.AIR) {
             texture = Main.inst().getBlockAtlas().findRegion(name().toLowerCase());
             if (texture == null) {
                 throw new NullPointerException("Failed to find a texture for " + name());
             }
         }
-        else { texture = null; }
+        else {
+            texture = null;
+        }
     }
 
+    public static Material fromByte(byte b) {
+        return values()[b];
+    }
 
     /**
      * @param world
@@ -133,17 +138,8 @@ public enum Material {
         }
     }
 
-    @NotNull
-    public MaterialEntity createEntity(@NotNull World world, float worldX, float worldY) {
-        Preconditions.checkArgument(itemType == ItemType.ENTITY);
-        try {
-            return (MaterialEntity) constructor.newInstance(world, worldX, worldY);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException(String.format(
-                "Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX,
-                worldY), e);
-
-        }
+    public boolean isBlock() {
+        return itemType == ItemType.BLOCK || itemType == ItemType.AIR;
     }
 
     public boolean create(@NotNull World world, int worldX, int worldY) {
@@ -160,12 +156,21 @@ public enum Material {
         return false;
     }
 
-    public boolean isBlock() {
-        return itemType == ItemType.BLOCK || itemType == ItemType.AIR;
-    }
-
     public boolean isEntity() {
         return itemType == ItemType.ENTITY;
+    }
+
+    @NotNull
+    public MaterialEntity createEntity(@NotNull World world, float worldX, float worldY) {
+        Preconditions.checkArgument(itemType == ItemType.ENTITY);
+        try {
+            return (MaterialEntity) constructor.newInstance(world, worldX, worldY);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException(String.format(
+                "Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX,
+                worldY), e);
+
+        }
     }
 
     @Nullable
@@ -187,9 +192,5 @@ public enum Material {
 
     public float getHardness() {
         return hardness;
-    }
-
-    public static Material fromByte(byte b) {
-        return values()[b];
     }
 }

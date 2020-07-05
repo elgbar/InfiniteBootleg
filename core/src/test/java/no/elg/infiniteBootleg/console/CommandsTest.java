@@ -2,10 +2,9 @@ package no.elg.infiniteBootleg.console;
 
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 public class CommandsTest extends TestGraphic {
 

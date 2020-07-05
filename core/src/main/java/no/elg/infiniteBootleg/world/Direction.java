@@ -13,19 +13,14 @@ public enum Direction {
     WEST(-1, 0),
     NORTH_WEST(-1, 1);
 
-    public final int dx;
-    public final int dy;
-
     public static final Direction[] CARDINAL = {NORTH, EAST, SOUTH, WEST};
     public static final Direction[] NON_CARDINAL = {NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST};
+    public final int dx;
+    public final int dy;
 
     Direction(int dx, int dy) {
         this.dx = dx;
         this.dy = dy;
-    }
-
-    public boolean isCardinal() {
-        return this == Direction.NORTH || this == Direction.EAST || this == Direction.SOUTH || this == Direction.WEST;
     }
 
     public static Direction fromAngleCardinal(double angle) {
@@ -76,6 +71,10 @@ public enum Direction {
             return SOUTH_EAST;
         }
         throw new IllegalArgumentException("Cannot find angle of " + angle);
+    }
+
+    public boolean isCardinal() {
+        return this == Direction.NORTH || this == Direction.EAST || this == Direction.SOUTH || this == Direction.WEST;
     }
 
     @Override

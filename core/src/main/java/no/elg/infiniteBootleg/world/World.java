@@ -10,10 +10,23 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
-import no.elg.infiniteBootleg.util.*;
+import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Resizable;
+import no.elg.infiniteBootleg.util.Ticker;
+import no.elg.infiniteBootleg.util.Util;
+import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -28,11 +41,6 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Different kind of views
@@ -68,6 +76,7 @@ public class World implements Disposable, Ticking, Resizable {
     public static final float MIDDAY_TIME = -90;
     public static final float SUNSET_TIME = -180 + TWILIGHT_DEGREES;
     public static final float MIDNIGHT_TIME = -270;
+    public static boolean dayTicking = true;
 
     static {
         //base filter for entities
@@ -91,8 +100,6 @@ public class World implements Disposable, Ticking, Resizable {
         SOLID_TRANSPARENT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
     }
 
-    public static boolean dayTicking = true;
-
     private final UUID uuid;
     private final long seed;
     private final ConcurrentMap<Location, Chunk> chunks;
@@ -100,26 +107,21 @@ public class World implements Disposable, Ticking, Resizable {
     private final Ticker ticker;
 
     private final ChunkLoader chunkLoader;
-    private FileHandle worldFile;
-
     private final long chunkUnloadTime;
     private final float timeChangePerTick;
-
-    //only exists when graphics exits
-    private WorldInputHandler input;
     private final WorldRender render;
-
     @NotNull
     private final WorldBody worldBody;
-
     private final Set<Entity> entities; //all entities in this world (including living entities)
     private final Set<LivingEntity> livingEntities; //all player in this world
-
+    private final Color baseColor = new Color(Color.WHITE);
+    private final Color tmpColor = new Color();
+    private FileHandle worldFile;
+    //only exists when graphics exits
+    private WorldInputHandler input;
     private String name;
     private float time;
     private float timeScale = 1;
-    private final Color baseColor = new Color(Color.WHITE);
-    private final Color tmpColor = new Color();
 
     /**
      * Generate a world with a random seed
@@ -130,7 +132,9 @@ public class World implements Disposable, Ticking, Resizable {
         this(generator, MathUtils.random(Long.MAX_VALUE), true);
     }
 
-    public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {this(generator, seed, tick, "World");}
+    public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {
+        this(generator, seed, tick, "World");
+    }
 
     public World(@NotNull ChunkGenerator generator, long seed, boolean tick, String worldName) {
         this.seed = seed;
@@ -142,7 +146,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         name = worldName;
 
-        ticker = new Ticker(this, "World", tick, Main.tps, Ticker.DEFAULT_NAG_DELAY);
+        ticker = new Ticker(this, "World-" + name, tick, Settings.tps, Ticker.DEFAULT_NAG_DELAY);
 
         chunks = new ConcurrentHashMap<>();
         entities = ConcurrentHashMap.newKeySet();
@@ -151,7 +155,7 @@ public class World implements Disposable, Ticking, Resizable {
         chunkLoader = new ChunkLoader(this, generator);
         worldBody = new WorldBody(this);
 
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
         }
@@ -165,7 +169,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         load();
 
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             Gdx.app.postRunnable(() -> {
                 WorldInputHandler input = getInput();
                 if (input != null) {
@@ -173,6 +177,53 @@ public class World implements Disposable, Ticking, Resizable {
                 }
             });
         }
+    }
+
+    public void load() {
+        if (!Settings.loadWorldFromDisk) {
+            return;
+        }
+        FileHandle worldFolder = worldFolder();
+        if (worldFolder == null) {
+            return;
+        }
+        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
+        Main.inst().getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
+        if (!worldZip.exists()) {
+            Main.logger().log("No world save found");
+            return;
+        }
+
+        worldFolder.deleteDirectory();
+        ZipUtils.unzip(worldFolder, worldZip);
+    }
+
+    @Nullable
+    public WorldInputHandler getInput() {
+        return input;
+    }
+
+    /**
+     * @return The current folder of the world or {@code null} if no disk should be used
+     */
+    @Nullable
+    public FileHandle worldFolder() {
+        if (Settings.renderGraphic) {
+            if (worldFile == null) {
+                worldFile = Gdx.files.external(Main.WORLD_FOLDER + uuid);
+            }
+            return worldFile;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public Chunk getChunkFromWorld(int worldX, int worldY) {
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+        return getChunk(chunkX, chunkY);
     }
 
     @Nullable
@@ -191,42 +242,6 @@ public class World implements Disposable, Ticking, Resizable {
             chunks.put(chunkLoc, chunk);
         }
         return chunk;
-    }
-
-    @Nullable
-    public Chunk getChunkFromWorld(int worldX, int worldY) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-        return getChunk(chunkX, chunkY);
-    }
-
-    /**
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param raw
-     *
-     * @return The block at the given x and y
-     *
-     * @see Chunk#getBlock(int, int)
-     */
-    @Nullable
-    @Contract("_, _, false -> !null")
-    public Block getBlock(int worldX, int worldY, boolean raw) {
-
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
-        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
-
-        Chunk c = getChunk(chunkX, chunkY);
-        if (c == null) {
-            return null;
-        }
-        if (raw) { return c.getBlocks()[localX][localY]; }
-        else { return c.getBlock(localX, localY); }
     }
 
     /**
@@ -260,22 +275,6 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     /**
-     * Set a block at a given location and update the textures
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param material
-     *     The new material to at given location
-     *
-     * @see Chunk#setBlock(int, int, Material, boolean)
-     */
-    public Chunk setBlock(int worldX, int worldY, @Nullable Material material) {
-        return setBlock(worldX, worldY, material, true);
-    }
-
-    /**
      * Set a block at a given location
      *
      * @param worldX
@@ -302,6 +301,22 @@ public class World implements Disposable, Ticking, Resizable {
             chunk.setBlock(localX, localY, material, updateTexture);
         }
         return chunk;
+    }
+
+    /**
+     * Set a block at a given location and update the textures
+     *
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     * @param material
+     *     The new material to at given location
+     *
+     * @see Chunk#setBlock(int, int, Material, boolean)
+     */
+    public Chunk setBlock(int worldX, int worldY, @Nullable Material material) {
+        return setBlock(worldX, worldY, material, true);
     }
 
     /**
@@ -359,6 +374,38 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    public Array<Entity> getEntities(float worldX, float worldY) {
+        Array<Entity> entities = new Array<>(false, 5);
+        for (Entity entity : this.entities) {
+            Vector2 pos = entity.getPosition();
+            if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
+                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
+
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    /**
+     * Remove and disposes the given entity
+     *
+     * @param entity
+     *     The entity to remove
+     *
+     * @throws IllegalArgumentException
+     *     if the given entity is not part of this world
+     */
+    public void removeEntity(@NotNull Entity entity) {
+        boolean removed = entities.remove(entity);
+        if (entity instanceof Player) {
+            removed |= livingEntities.remove(entity);
+        }
+        if (removed) {
+            entity.dispose();
+        }
+    }
+
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
      * than a
@@ -372,7 +419,9 @@ public class World implements Disposable, Ticking, Resizable {
      *
      * @return If the block at the given location is air.
      */
-    public boolean isAirBlock(@NotNull Location worldLoc) {return isAirBlock(worldLoc.x, worldLoc.y);}
+    public boolean isAirBlock(@NotNull Location worldLoc) {
+        return isAirBlock(worldLoc.x, worldLoc.y);
+    }
 
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist) this is faster
@@ -427,6 +476,39 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     /**
+     * @param worldX
+     *     The x coordinate from world view
+     * @param worldY
+     *     The y coordinate from world view
+     * @param raw
+     *
+     * @return The block at the given x and y
+     *
+     * @see Chunk#getBlock(int, int)
+     */
+    @Nullable
+    @Contract("_, _, false -> !null")
+    public Block getBlock(int worldX, int worldY, boolean raw) {
+
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+        Chunk c = getChunk(chunkX, chunkY);
+        if (c == null) {
+            return null;
+        }
+        if (raw) {
+            return c.getBlocks()[localX][localY];
+        }
+        else {
+            return c.getBlock(localX, localY);
+        }
+    }
+
+    /**
      * @return If the given chunk is loaded in memory
      */
     public boolean isChunkLoaded(int chunkX, int chunkY) {
@@ -444,13 +526,21 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     /**
-     * Unload the given chunks and save it to disk
+     * Unload and save all chunks in this world
      *
-     * @param chunk
-     *     The chunk to unload
+     * @param force
+     *     If the chunks will be forced to unload
+     * @param save
+     *     If the chunks will be saved
      */
-    public void unloadChunk(@Nullable Chunk chunk) {
-        unloadChunk(chunk, false, true);
+    public void unloadChunks(boolean force, boolean save) {
+        for (Chunk chunk : getLoadedChunks()) {
+            unloadChunk(chunk, force, save);
+        }
+    }
+
+    public Collection<Chunk> getLoadedChunks() {
+        return chunks.values();
     }
 
     /**
@@ -469,20 +559,6 @@ public class World implements Disposable, Ticking, Resizable {
                 chunkLoader.save(chunk);
             }
             chunk.dispose();
-        }
-    }
-
-    /**
-     * Unload and save all chunks in this world
-     *
-     * @param force
-     *     If the chunks will be forced to unload
-     * @param save
-     *     If the chunks will be saved
-     */
-    public void unloadChunks(boolean force, boolean save) {
-        for (Chunk chunk : getLoadedChunks()) {
-            unloadChunk(chunk, force, save);
         }
     }
 
@@ -511,31 +587,15 @@ public class World implements Disposable, Ticking, Resizable {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * @return Unique identification of this world
      */
     public UUID getUuid() {
         return uuid;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @NotNull
-    public WorldRender getRender() {
-        return render;
-    }
-
-    @Nullable
-    public WorldInputHandler getInput() {
-        return input;
-    }
-
-    @NotNull
-    public Ticker getWorldTicker() {
-        return ticker;
     }
 
     /**
@@ -546,53 +606,45 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     @Override
-    public String toString() {
-        return "World{" + "name='" + name + '\'' + ", uuid=" + uuid + '}';
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : 0;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         World world = (World) o;
         return Objects.equals(uuid, world.uuid);
     }
 
     @Override
-    public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
+    public String toString() {
+        return "World{" + "name='" + name + '\'' + ", uuid=" + uuid + '}';
     }
 
     @Override
     public void dispose() {
         render.dispose();
         ticker.stop();
-        if (input != null) { input.dispose(); }
-    }
-
-    /**
-     * @return The current folder of the world or {@code null} if no disk should be used
-     */
-    @Nullable
-    public FileHandle worldFolder() {
-        if (Main.renderGraphic) {
-            if (worldFile == null) {
-                worldFile = Gdx.files.external(Main.WORLD_FOLDER + uuid);
-            }
-            return worldFile;
-        }
-        else {
-            return null;
+        if (input != null) {
+            input.dispose();
         }
     }
 
     public void save() {
-        if (!Main.loadWorldFromDisk) {
+        if (!Settings.loadWorldFromDisk) {
             return;
         }
         FileHandle worldFolder = worldFolder();
-        if (worldFolder == null) { return; }
+        if (worldFolder == null) {
+            return;
+        }
         for (Chunk chunk : chunks.values()) {
             chunkLoader.save(chunk);
         }
@@ -606,33 +658,6 @@ public class World implements Disposable, Ticking, Resizable {
         }
 
         worldFolder.deleteDirectory();
-    }
-
-    public void load() {
-        if (!Main.loadWorldFromDisk) {
-            return;
-        }
-        FileHandle worldFolder = worldFolder();
-        if (worldFolder == null) { return; }
-        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        Main.inst().getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
-        if (!worldZip.exists()) {
-            Main.logger().log("No world save found");
-            return;
-        }
-
-        worldFolder.deleteDirectory();
-        ZipUtils.unzip(worldFolder, worldZip);
-    }
-
-    @Override
-    public void tickRare() {
-        for (Chunk chunk : chunks.values()) {
-            chunk.tickRare();
-        }
-        for (Entity entity : entities) {
-            entity.tickRare();
-        }
     }
 
     /**
@@ -680,10 +705,6 @@ public class World implements Disposable, Ticking, Resizable {
         return gray;
     }
 
-    public float normalizedTime() {
-        return Util.normalizedDir(time);
-    }
-
     @Override
     public void tick() {
         //tick all box2d elements
@@ -693,7 +714,7 @@ public class World implements Disposable, Ticking, Resizable {
         //update light direction
         if (dayTicking) {
             time -= timeChangePerTick * timeScale;
-            if (Main.renderGraphic) {
+            if (Settings.renderGraphic) {
                 if (normalizedTime() >= 180) {
                     wr.getSkylight().setDirection(time);
                 }
@@ -701,11 +722,13 @@ public class World implements Disposable, Ticking, Resizable {
                 if (brightness > 0) {
                     wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
                 }
-                else { wr.getSkylight().setColor(Color.BLACK); }
+                else {
+                    wr.getSkylight().setColor(Color.BLACK);
+                }
             }
         }
 
-        if (Main.renderGraphic && WorldRender.lights) {
+        if (Settings.renderGraphic && WorldRender.lights) {
             synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
                     getRender().getRayHandler().update();
@@ -738,6 +761,40 @@ public class World implements Disposable, Ticking, Resizable {
         entities.forEach(Entity::tick);
     }
 
+    @NotNull
+    public WorldRender getRender() {
+        return render;
+    }
+
+    public float normalizedTime() {
+        return Util.normalizedDir(time);
+    }
+
+    @NotNull
+    public Ticker getWorldTicker() {
+        return ticker;
+    }
+
+    /**
+     * Unload the given chunks and save it to disk
+     *
+     * @param chunk
+     *     The chunk to unload
+     */
+    public void unloadChunk(@Nullable Chunk chunk) {
+        unloadChunk(chunk, false, true);
+    }
+
+    @Override
+    public void tickRare() {
+        for (Chunk chunk : chunks.values()) {
+            chunk.tickRare();
+        }
+        for (Entity entity : entities) {
+            entity.tickRare();
+        }
+    }
+
     /**
      * @return the current entities
      */
@@ -761,25 +818,6 @@ public class World implements Disposable, Ticking, Resizable {
         if (entity instanceof Player) {
             livingEntities.add((Player) entity);
         }
-    }
-
-    @NotNull
-    public ObjectSet<Block> getBlocksAABB(float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
-        ObjectSet<Block> blocks = new ObjectSet<>();
-        int x = MathUtils.floor(worldX - offsetX);
-        float maxX = worldX + offsetX;
-        for (; x <= maxX; x++) {
-            int y = MathUtils.floor(worldY - offsetY);
-            float maxY = worldY + offsetY;
-            for (; y <= maxY; y++) {
-                Block b = getBlock(x, y, raw);
-                if (b == null) {
-                    continue;
-                }
-                blocks.add(b);
-            }
-        }
-        return blocks;
     }
 
     /**
@@ -809,6 +847,24 @@ public class World implements Disposable, Ticking, Resizable {
         return blocks;
     }
 
+    @NotNull
+    public ObjectSet<Block> getBlocksAABB(float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
+        ObjectSet<Block> blocks = new ObjectSet<>();
+        int x = MathUtils.floor(worldX - offsetX);
+        float maxX = worldX + offsetX;
+        for (; x <= maxX; x++) {
+            int y = MathUtils.floor(worldY - offsetY);
+            float maxY = worldY + offsetY;
+            for (; y <= maxY; y++) {
+                Block b = getBlock(x, y, raw);
+                if (b == null) {
+                    continue;
+                }
+                blocks.add(b);
+            }
+        }
+        return blocks;
+    }
 
     /**
      * @param worldX
@@ -828,19 +884,6 @@ public class World implements Disposable, Ticking, Resizable {
             }
         }
         return null;
-    }
-
-    public Array<Entity> getEntities(float worldX, float worldY) {
-        Array<Entity> entities = new Array<>(false, 5);
-        for (Entity entity : this.entities) {
-            Vector2 pos = entity.getPosition();
-            if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
-                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
-
-                entities.add(entity);
-            }
-        }
-        return entities;
     }
 
     /**
@@ -866,36 +909,13 @@ public class World implements Disposable, Ticking, Resizable {
         return Material.AIR;
     }
 
-    /**
-     * Remove and disposes the given entity
-     *
-     * @param entity
-     *     The entity to remove
-     *
-     * @throws IllegalArgumentException
-     *     if the given entity is not part of this world
-     */
-    public void removeEntity(@NotNull Entity entity) {
-        boolean removed = entities.remove(entity);
-        if (entity instanceof Player) {
-            removed |= livingEntities.remove(entity);
-        }
-        if (removed) {
-            entity.dispose();
-        }
-    }
-
-    public Collection<Chunk> getLoadedChunks() {
-        return chunks.values();
-    }
-
     public ChunkLoader getChunkLoader() {
         return chunkLoader;
     }
 
     @Override
     public void resize(int width, int height) {
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             render.resize(width, height);
         }
     }

@@ -1,43 +1,41 @@
 package no.elg.infiniteBootleg.args;
 
-import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.TestGraphic;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
+import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.TestGraphic;
+import org.junit.Assert;
 import static org.junit.Assert.fail;
+import org.junit.Test;
 
 public class ProgramArgsTest extends TestGraphic {
 
     @Test
     public void headless() {
-        Main.renderGraphic = true;
+        Settings.renderGraphic = true;
         new ProgramArgs(new String[] {"--headless"});
-        Assert.assertFalse(Main.renderGraphic);
+        Assert.assertFalse(Settings.renderGraphic);
     }
 
     @Test
     public void noLoad() {
-        Main.loadWorldFromDisk = true;
+        Settings.loadWorldFromDisk = true;
         new ProgramArgs(new String[] {"--no_load"});
-        Assert.assertFalse(Main.loadWorldFromDisk);
+        Assert.assertFalse(Settings.loadWorldFromDisk);
     }
 
     @Test
     public void worldSeed() {
         new ProgramArgs(new String[] {"--world_seed=test123"});
-        Assert.assertEquals("test123".hashCode(), Main.worldSeed);
+        Assert.assertEquals("test123".hashCode(), Settings.worldSeed);
     }
 
     @Test
     public void handlesRandomCasing() {
-        Main.renderGraphic = true;
+        Settings.renderGraphic = true;
         new ProgramArgs(new String[] {"--hEadlESS"});
-        Assert.assertFalse(Main.renderGraphic);
+        Assert.assertFalse(Settings.renderGraphic);
     }
 
     @Test

@@ -9,9 +9,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.util.Resizable;
-
 import static no.elg.infiniteBootleg.Main.SCALE;
+import no.elg.infiniteBootleg.util.Resizable;
 
 public class ScreenRenderer implements Disposable, Resizable {
 

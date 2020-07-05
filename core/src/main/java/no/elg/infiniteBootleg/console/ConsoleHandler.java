@@ -12,18 +12,18 @@ import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.Console;
 import com.strongjoshua.console.ConsoleUtils;
 import com.strongjoshua.console.LogLevel;
-import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
-import no.elg.infiniteBootleg.console.consoles.StdConsole;
-import no.elg.infiniteBootleg.util.Resizable;
-import no.kh498.util.Reflection;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
+import no.elg.infiniteBootleg.console.consoles.StdConsole;
+import no.elg.infiniteBootleg.util.Resizable;
+import no.kh498.util.Reflection;
+import org.jetbrains.annotations.NotNull;
 
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
@@ -32,14 +32,16 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     private Window consoleWindow;
     private CommandExecutor exec;
 
-    public ConsoleHandler() {this(Main.renderGraphic);}
+    public ConsoleHandler() {
+        this(Settings.renderGraphic);
+    }
 
     public ConsoleHandler(boolean inGameConsole) {
         this.inGameConsole = inGameConsole;
         if (inGameConsole) {
             console = new CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
             console.setLoggingToSystem(true);
-            Main.getInputMultiplexer().addProcessor(console.getInputProcessor());
+            Main.inst().getInputMultiplexer().addProcessor(console.getInputProcessor());
             try {
                 consoleWindow = (Window) Reflection.getSuperField(console, "consoleWindow");
             } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -55,15 +57,15 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         console.setCommandExecutor(exec);
     }
 
+    public float getAlpha() {
+        return inGameConsole ? consoleWindow.getColor().a : 1;
+    }
+
     public void setAlpha(float a) {
         if (inGameConsole) {
             consoleWindow.getColor().a = a;
         }
 
-    }
-
-    public float getAlpha() {
-        return inGameConsole ? consoleWindow.getColor().a : 1;
     }
 
     public boolean isVisible() {
@@ -74,12 +76,10 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         console.draw();
     }
 
-    private boolean isClientsideOnly(@NotNull Method method) {
-        return method.isAnnotationPresent(ClientsideOnly.class);
-    }
-
     public boolean execCommand(@NotNull String command) {
-        if (console.isDisabled()) { return false; }
+        if (console.isDisabled()) {
+            return false;
+        }
 
         log(LogLevel.COMMAND, command);
 
@@ -169,7 +169,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
                         // to next function
                         continue;
                     }
-                    if (isClientsideOnly(m) && !Main.renderGraphic) {
+                    if (isClientsideOnly(m) && !Settings.renderGraphic) {
                         log(LogLevel.ERROR, "This command can only be executed client side");
                         return true;
                     }
@@ -217,6 +217,10 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
             System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg,
                               level.toString(), ex.getClass().getSimpleName(), ex.getMessage());
         }
+    }
+
+    private boolean isClientsideOnly(@NotNull Method method) {
+        return method.isAnnotationPresent(ClientsideOnly.class);
     }
 
     @Override

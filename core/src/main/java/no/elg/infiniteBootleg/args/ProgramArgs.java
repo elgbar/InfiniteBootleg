@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Map;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
@@ -65,13 +66,19 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     }
 
     @Override
-    public void log(@NotNull LogLevel level, @NotNull String msg) {
-        scheduler.scheduleAsync(() -> Main.logger().log(level, msg), 2);
-    }
-
-    @Override
     public void dispose() {
         scheduler.shutdown();
+    }
+
+    @Argument(value = "Run given command after init has completed, split command by ';'", alt = 'c')
+    private void run_cmd(String val) {
+        log("Running commands '" + val + "' as initial commands");
+
+        scheduler.scheduleAsync(() -> {
+            for (String cmd : val.split(";")) {
+                Main.inst().getConsole().execCommand(cmd);
+            }
+        }, 10);
     }
 
     /*
@@ -86,23 +93,12 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      *
      */
 
-    @Argument(value = "Run given command after init has completed, split command by ';'", alt = 'c')
-    private void run_cmd(String val) {
-        log("Running commands '" + val + "' as initial commands");
-
-        scheduler.scheduleAsync(() -> {
-            for (String cmd : val.split(";")) {
-                Main.inst().getConsole().execCommand(cmd);
-            }
-        }, 10);
-    }
-
     /**
      * Do not render the graphics
      */
     @Argument(value = "Disable rendering of graphics.", alt = 'h')
     private void headless(String val) {
-        Main.renderGraphic = false;
+        Settings.renderGraphic = false;
         log("Graphics is disabled");
     }
 
@@ -111,7 +107,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      */
     @Argument(value = "The world will not be loaded from disk", alt = 'l')
     private void no_load(String val) {
-        Main.loadWorldFromDisk = false;
+        Settings.loadWorldFromDisk = false;
         log("Worlds will not be loaded/saved from/to disk");
     }
 
@@ -129,8 +125,13 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
             return;
         }
-        Main.worldSeed = val.hashCode();
+        Settings.worldSeed = val.hashCode();
         logf("World seed set to '%s'", val);
+    }
+
+    @Override
+    public void log(@NotNull LogLevel level, @NotNull String msg) {
+        scheduler.scheduleAsync(() -> Main.logger().log(level, msg), 2);
     }
 
     /**
@@ -150,7 +151,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     private void debug(String val) {
         log("Debug view is enabled. To disable this at runtime use command 'debug'");
         WorldRender.debugBox2d = true;
-        Main.debug = true;
+        Settings.debug = true;
     }
 
     @Argument(value = "Specify the number of secondary threads. Must be an integer greater than or equal to 0",
@@ -167,7 +168,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                 log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0, got " + val);
                 return false;
             }
-            Main.schedulerThreads = threads;
+            Settings.schedulerThreads = threads;
             return true;
         } catch (NumberFormatException e) {
             log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0, got " + val);
@@ -187,7 +188,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                 log(LogLevel.ERROR, "Argument must be an integer greater than to 0, got " + val);
                 return false;
             }
-            Main.tps = tps;
+            Settings.tps = tps;
             return true;
         } catch (NumberFormatException e) {
             log(LogLevel.ERROR, "Argument must be an integer greater than to 0, got " + val);
@@ -202,9 +203,9 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         //find the maximum length of the argument methods
         //@formatter:off
         int maxNameSize = Arrays.stream(ProgramArgs.class.getDeclaredMethods()).
-            filter(m -> m.isAnnotationPresent(Argument.class)).
-            mapToInt(m -> m.getName().length()).
-            max().orElse(0);
+                filter(m -> m.isAnnotationPresent(Argument.class)).
+                mapToInt(m -> m.getName().length()).
+                max().orElse(0);
         //@formatter:on
 
         for (Method method : ProgramArgs.class.getDeclaredMethods()) {

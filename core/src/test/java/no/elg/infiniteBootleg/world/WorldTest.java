@@ -1,19 +1,19 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import no.elg.infiniteBootleg.TestGraphic;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
+import no.elg.infiniteBootleg.TestGraphic;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Elg

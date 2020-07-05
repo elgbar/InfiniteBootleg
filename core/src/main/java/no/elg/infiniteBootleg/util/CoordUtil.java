@@ -1,11 +1,10 @@
 package no.elg.infiniteBootleg.util;
 
 import no.elg.infiniteBootleg.world.Chunk;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import no.elg.infiniteBootleg.world.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 
 /**
@@ -28,6 +27,17 @@ public class CoordUtil {
     }
 
     /**
+     * @param worldCoord
+     *     The world coordinate to convert
+     *
+     * @return The chunk coordinate the given coordinate is in
+     */
+    @Contract(pure = true)
+    public static int worldToChunk(int worldCoord) {
+        return worldCoord >> Chunk.CHUNK_SIZE_SHIFT;
+    }
+
+    /**
      * @param chunkLocation
      *     A location in chunk view
      *
@@ -37,6 +47,19 @@ public class CoordUtil {
     @Contract("_ -> new")
     public static Location chunkToWorld(@NotNull Location chunkLocation) {
         return new Location(chunkToWorld(chunkLocation.x), chunkToWorld(chunkLocation.y));
+    }
+
+    /**
+     * Convert a chunk coordinate to world coordinate
+     *
+     * @param chunkCoord
+     *     The chunk coordinate to convert
+     *
+     * @return The chunk coordinate in world view
+     */
+    @Contract(pure = true)
+    public static int chunkToWorld(int chunkCoord) {
+        return chunkCoord << Chunk.CHUNK_SIZE_SHIFT;
     }
 
     /**
@@ -53,31 +76,6 @@ public class CoordUtil {
     @Contract("_, _, _ -> new")
     public static Location chunkToWorld(@NotNull Location chunkLocation, int localX, int localY) {
         return new Location(chunkToWorld(chunkLocation.x, localX), chunkToWorld(chunkLocation.y, localY));
-    }
-
-    /**
-     * @param worldCoord
-     *     The world coordinate to convert
-     *
-     * @return The chunk coordinate the given coordinate is in
-     */
-    @Contract(pure = true)
-    public static int worldToChunk(int worldCoord) {
-        return worldCoord >> Chunk.CHUNK_SIZE_SHIFT;
-    }
-
-
-    /**
-     * Convert a chunk coordinate to world coordinate
-     *
-     * @param chunkCoord
-     *     The chunk coordinate to convert
-     *
-     * @return The chunk coordinate in world view
-     */
-    @Contract(pure = true)
-    public static int chunkToWorld(int chunkCoord) {
-        return chunkCoord << Chunk.CHUNK_SIZE_SHIFT;
     }
 
     /**

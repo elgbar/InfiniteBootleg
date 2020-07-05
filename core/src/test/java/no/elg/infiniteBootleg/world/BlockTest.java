@@ -1,9 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
 import no.elg.infiniteBootleg.TestGraphic;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * @author Elg

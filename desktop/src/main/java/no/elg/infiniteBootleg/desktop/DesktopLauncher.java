@@ -4,9 +4,9 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.args.ProgramArgs;
-
 import static no.elg.infiniteBootleg.Main.SCALE;
+import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.args.ProgramArgs;
 
 public class DesktopLauncher {
 
@@ -17,7 +17,7 @@ public class DesktopLauncher {
         new ProgramArgs(args);
 
         try {
-            if (Main.renderGraphic) {
+            if (Settings.renderGraphic) {
 
                 LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
                 if (SCALE > 1) {

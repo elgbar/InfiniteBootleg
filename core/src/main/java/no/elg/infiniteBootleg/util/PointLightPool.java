@@ -16,36 +16,12 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 public final class PointLightPool extends Pool<PointLight> {
 
     public static final PointLightPool inst = new PointLightPool();
-
-    private RayHandler rayHandler;
-
     public static final int POINT_LIGHT_RAYS = 64;
     public static final int POINT_LIGHT_DISTANCE = 32;
+    private RayHandler rayHandler;
 
     private PointLightPool() {
         rayHandler = Main.inst().getWorld().getRender().getRayHandler();
-    }
-
-    @Override
-    public PointLight obtain() {
-        PointLight light = super.obtain();
-
-        synchronized (WorldRender.LIGHT_LOCK) {
-            light.setActive(true);
-        }
-        return light;
-    }
-
-    @Override
-    protected void reset(PointLight light) {
-        light.setStaticLight(true);
-        light.setXray(false);
-        light.setSoft(true);
-        light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-        light.setDistance(POINT_LIGHT_DISTANCE);
-        light.setColor(Color.WHITE);
-        light.setContactFilter(World.LIGHT_FILTER);
-        light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
     }
 
     @Override
@@ -59,10 +35,32 @@ public final class PointLightPool extends Pool<PointLight> {
     }
 
     @Override
+    public PointLight obtain() {
+        PointLight light = super.obtain();
+
+        synchronized (WorldRender.LIGHT_LOCK) {
+            light.setActive(true);
+        }
+        return light;
+    }
+
+    @Override
     public void free(PointLight light) {
         super.free(light);
         synchronized (WorldRender.LIGHT_LOCK) {
             light.setActive(false);
         }
+    }
+
+    @Override
+    protected void reset(PointLight light) {
+        light.setStaticLight(true);
+        light.setXray(false);
+        light.setSoft(true);
+        light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+        light.setDistance(POINT_LIGHT_DISTANCE);
+        light.setColor(Color.WHITE);
+        light.setContactFilter(World.LIGHT_FILTER);
+        light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
     }
 }

@@ -10,15 +10,15 @@ import org.junit.runner.RunWith;
 @RunWith(GdxTestRunner.class)
 public class TestGraphic {
 
-    public World world;
-
     static {
-        Main.schedulerThreads = 0;
-        Main.renderGraphic = false;
-        Main.loadWorldFromDisk = false;
-        Main.debug = true;
+        Settings.schedulerThreads = 0;
+        Settings.renderGraphic = false;
+        Settings.loadWorldFromDisk = false;
+        Settings.debug = true;
         new Main(true);
     }
+
+    public World world;
 
     //
     @Before

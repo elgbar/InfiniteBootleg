@@ -19,17 +19,17 @@ public class HeadlessWorldRenderer extends WorldRender {
     }
 
     @Override
-    public void update() {
-
-    }
-
-    @Override
     public void dispose() {
 
     }
 
     @Override
     public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void update() {
 
     }
 }

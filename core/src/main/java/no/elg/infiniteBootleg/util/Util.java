@@ -5,14 +5,18 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import no.elg.infiniteBootleg.Main;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.*;
 
 public class Util {
 
@@ -223,21 +227,6 @@ public class Util {
     }
 
     /**
-     * @return The number of commits in this repository
-     */
-    public static int commitCount() {
-        final String countCommand = "git rev-list master --count";
-        try {
-            final Process p = Runtime.getRuntime().exec(countCommand);
-            p.waitFor();
-            String countStr = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-            return Integer.parseInt(countStr);
-        } catch (Exception e) {
-            return DEFAULT_COMMIT_COUNT;
-        }
-    }
-
-    /**
      * @return The latest commit ID in the current repo
      */
     public static String getLastGitCommitID(final boolean full) {
@@ -252,6 +241,21 @@ public class Util {
             return hash.toUpperCase();
         } catch (final Exception e) {
             return DEFAULT_HASH;
+        }
+    }
+
+    /**
+     * @return The number of commits in this repository
+     */
+    public static int commitCount() {
+        final String countCommand = "git rev-list master --count";
+        try {
+            final Process p = Runtime.getRuntime().exec(countCommand);
+            p.waitFor();
+            String countStr = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
+            return Integer.parseInt(countStr);
+        } catch (Exception e) {
+            return DEFAULT_COMMIT_COUNT;
         }
     }
 

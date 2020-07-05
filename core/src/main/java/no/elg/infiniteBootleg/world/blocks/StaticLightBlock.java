@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.blocks;
 
 import box2dLight.Light;
 import box2dLight.PointLight;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -19,7 +19,7 @@ public abstract class StaticLightBlock extends Block {
     public StaticLightBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY,
                             @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             light = PointLightPool.inst.obtain();
             light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
         }
@@ -36,7 +36,7 @@ public abstract class StaticLightBlock extends Block {
     }
 
     /**
-     * @return The light of this block, might be null if {@link Main#renderGraphic} is true
+     * @return The light of this block, might be null if {@link Settings#renderGraphic} is true
      */
     @Nullable
     public Light getLight() {

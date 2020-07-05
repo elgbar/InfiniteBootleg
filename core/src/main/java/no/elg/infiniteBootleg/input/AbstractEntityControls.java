@@ -18,7 +18,7 @@ public abstract class AbstractEntityControls extends InputAdapter implements Ent
     public AbstractEntityControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
         this.worldRender = worldRender;
         this.entity = entity;
-        Main.getInputMultiplexer().addProcessor(this);
+        Main.inst().getInputMultiplexer().addProcessor(this);
     }
 
     @Override
@@ -30,13 +30,13 @@ public abstract class AbstractEntityControls extends InputAdapter implements Ent
     public WorldRender getWorldRender() {
         return worldRender;
     }
-    
+
     public World getWorld() {
         return worldRender.world;
     }
 
     @Override
     public void dispose() {
-        Main.getInputMultiplexer().removeProcessor(this);
+        Main.inst().getInputMultiplexer().removeProcessor(this);
     }
 }

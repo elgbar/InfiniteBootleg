@@ -117,8 +117,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
         FixtureDef def = new FixtureDef();
         def.shape = shape;
-        def.density = 100f;
-        def.friction = 1f;
+        def.density = 1000f;
+        def.friction = 10f;
         def.restitution = 0.025f; // a bit bouncy!
 
         Fixture fix = body.createFixture(def);
@@ -200,6 +200,28 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return blocks;
     }
 
+    public float getHalfBox2dWidth() {
+        return getWidth() / (Block.BLOCK_SIZE * 2f);
+    }
+
+    public float getHalfBox2dHeight() {
+        return getHeight() / (Block.BLOCK_SIZE * 2f);
+    }
+
+    /**
+     * One unit is {@link Block#BLOCK_SIZE}
+     *
+     * @return The width of this entity in world view
+     */
+    public abstract int getWidth();
+
+    /**
+     * One unit is {@link Block#BLOCK_SIZE}
+     *
+     * @return The height of this entity in world view
+     */
+    public abstract int getHeight();
+
     /**
      * @param worldX
      *     World x coordinate to pretend the player is at
@@ -259,6 +281,36 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             }
         }
         return entities;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    /**
+     * @return Position of this entity last tick, note that the same vector is returned each time. You should not edit
+     * this vector
+     */
+    @NotNull
+    public Vector2 getPosition() {
+        return posCache;
+    }
+
+    /**
+     * Set the type of filter for this entities fixtures
+     *
+     * @param filter
+     *     The type of filter to set
+     */
+    public synchronized void setFilter(Filter filter) {
+        this.filter = filter;
+        synchronized (WorldRender.BOX2D_LOCK) {
+            if (body != null) {
+                for (Fixture fixture : body.getFixtureList()) {
+                    fixture.setFilterData(filter);
+                }
+            }
+        }
     }
 
     /**
@@ -339,37 +391,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     public abstract TextureRegion getTextureRegion();
 
     /**
-     * One unit is {@link Block#BLOCK_SIZE}
-     *
-     * @return The width of this entity in world view
-     */
-    public abstract int getWidth();
-
-    /**
-     * One unit is {@link Block#BLOCK_SIZE}
-     *
-     * @return The height of this entity in world view
-     */
-    public abstract int getHeight();
-
-    public float getHalfBox2dWidth() {
-        return getWidth() / (Block.BLOCK_SIZE * 2f);
-    }
-
-    public float getHalfBox2dHeight() {
-        return getHeight() / (Block.BLOCK_SIZE * 2f);
-    }
-
-    /**
-     * @return Position of this entity last tick, note that the same vector is returned each time. You should not edit
-     * this vector
-     */
-    @NotNull
-    public Vector2 getPosition() {
-        return posCache;
-    }
-
-    /**
      * @return Velocity of this entity last tick, note that the same vector is returned each time
      */
     @NotNull
@@ -432,27 +453,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return getClass().getSimpleName();
     }
 
-    public Filter getFilter() {
-        return filter;
-    }
-
-    /**
-     * Set the type of filter for this entities fixtures
-     *
-     * @param filter
-     *     The type of filter to set
-     */
-    public synchronized void setFilter(Filter filter) {
-        this.filter = filter;
-        synchronized (WorldRender.BOX2D_LOCK) {
-            if (body != null) {
-                for (Fixture fixture : body.getFixtureList()) {
-                    fixture.setFilterData(filter);
-                }
-            }
-        }
-    }
-
     @Override
     public synchronized void dispose() {
         world.getWorldBody().destroyBody(body);
@@ -464,16 +464,16 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (!(o instanceof Entity)) { return false; }
         Entity entity = (Entity) o;
         return uuid.equals(entity.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
     }
 
     @Override

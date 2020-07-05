@@ -25,26 +25,21 @@ public class Ticker implements Runnable {
      * How many seconds to wait (based on the tps) between each lag message
      */
     public static final double DEFAULT_NAG_DELAY = 3d;
-
-    private final PauseableThread tickerThread;
-    private final Ticking ticking;
-    private final String tag;
-
-    /**
-     * The ticks per seconds this ticker is using. Defaults to {@link #DEFAULT_TICKS_PER_SECOND}
-     */
-    private final long tps;
-
-    private final long msDelayBetweenTicks;
-    private final long nanoDelayBetweenTicks;
-    private final float secondsDelayBetweenTicks;
-    private final long nagDelayTicks;
-
     /**
      * How many ticks between each rare update. Currently each rare tick is the same as one second
      */
     public final long tickRareRate;
-
+    private final PauseableThread tickerThread;
+    private final Ticking ticking;
+    private final String tag;
+    /**
+     * The ticks per seconds this ticker is using. Defaults to {@link #DEFAULT_TICKS_PER_SECOND}
+     */
+    private final long tps;
+    private final long msDelayBetweenTicks;
+    private final long nanoDelayBetweenTicks;
+    private final float secondsDelayBetweenTicks;
+    private final long nagDelayTicks;
     /**
      * The current tick
      */
@@ -187,13 +182,20 @@ public class Ticker implements Runnable {
         }
     }
 
+    public long getMsDelayBetweenTicks() {
+        return msDelayBetweenTicks;
+    }
+
+    public long getNanoDelayBetweenTicks() {
+        return nanoDelayBetweenTicks;
+    }
+
     /**
      * @return How many ticks have passed since start
      */
     public long getTickId() {
         return tickId;
     }
-
 
     /**
      * @return The current TPS might differ from {@link #DEFAULT_TICKS_PER_SECOND} but will never be greater than it
@@ -204,14 +206,6 @@ public class Ticker implements Runnable {
 
     public long getTPS() {
         return tps;
-    }
-
-    public long getMsDelayBetweenTicks() {
-        return msDelayBetweenTicks;
-    }
-
-    public long getNanoDelayBetweenTicks() {
-        return nanoDelayBetweenTicks;
     }
 
     public float getSecondsDelayBetweenTicks() {

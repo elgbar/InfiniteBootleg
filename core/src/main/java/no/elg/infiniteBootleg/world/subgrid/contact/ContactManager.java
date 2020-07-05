@@ -23,6 +23,9 @@ public class ContactManager implements ContactListener {
             for (Entity entity : world.getEntities()) {
                 if (contact.getFixtureB().getBody() == entity.getBody()) {
                     ((ContactHandler) entity).contact(ContactType.BEGIN_CONTACT, contact);
+
+                    entity.getBody().setLinearVelocity(0, entity.getVelocity().y);
+//                    System.out.println("entity y vel = " + entity.getVelocity().y);
                 }
             }
         }
@@ -34,6 +37,7 @@ public class ContactManager implements ContactListener {
             for (Entity entity : world.getEntities()) {
                 if (contact.getFixtureB().getBody() == entity.getBody()) {
                     ((ContactHandler) entity).contact(ContactType.END_CONTACT, contact);
+                    System.out.println("entity y vel = " + entity.getVelocity().y);
                 }
             }
         }

@@ -6,6 +6,7 @@ import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.util.Ticker;
@@ -42,7 +43,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
     public void skyColor(String colorName) {
-        if (Main.renderGraphic) {
+        if (Settings.renderGraphic) {
             Color skylight = Main.inst().getWorld().getBaseColor();
             try {
                 Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
@@ -61,7 +62,9 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Toggle rendering of lights")
     public void lights() {
         WorldRender.lights = !WorldRender.lights;
-        if (WorldRender.lights) { Main.inst().getWorld().getRender().update(); }
+        if (WorldRender.lights) {
+            Main.inst().getWorld().getRender().update();
+        }
         logger.log(LogLevel.SUCCESS, "Lighting is now " + (WorldRender.lights ? "enabled" : "disabled"));
     }
 
@@ -125,7 +128,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
     public void debug() {
         WorldRender.debugBox2d = !WorldRender.debugBox2d;
-        Main.debug = true;
+        Settings.debug = true;
         logger.log(LogLevel.SUCCESS,
                    "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
     }
@@ -142,7 +145,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Teleport to given world coordinate",
                 paramDescriptions = {"World x coordinate", "World y coordinate"})
     public void tp(float worldX, float worldY) {
-        if (!Main.renderGraphic) {
+        if (!Settings.renderGraphic) {
             return;
         }
         WorldRender render = Main.inst().getWorld().getRender();
@@ -233,20 +236,6 @@ public class Commands extends CommandExecutor {
     }
 
     @ClientsideOnly
-    @ConsoleDoc(description = "Get the brush sizes")
-    public void brush() {
-        Player player = Main.inst().getPlayer();
-        if (player == null) {
-            logger.error("CMD", "Failed to find any players");
-            return;
-        }
-        EntityControls controls = Main.inst().getPlayer().getControls();
-        logger.logf(LogLevel.SUCCESS,
-                    "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
-                    controls.getBreakBrushSize(), controls.getPlaceBrushSize());
-    }
-
-    @ClientsideOnly
     @ConsoleDoc(description = "Set the brush size of the mouse",
                 paramDescriptions = {"Type of brush to change, can be 'break' and 'place'",
                     "New brush size, positive integer"})
@@ -271,6 +260,20 @@ public class Commands extends CommandExecutor {
         brush();
     }
 
+    @ClientsideOnly
+    @ConsoleDoc(description = "Get the brush sizes")
+    public void brush() {
+        Player player = Main.inst().getPlayer();
+        if (player == null) {
+            logger.error("CMD", "Failed to find any players");
+            return;
+        }
+        EntityControls controls = Main.inst().getPlayer().getControls();
+        logger.logf(LogLevel.SUCCESS,
+                    "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
+                    controls.getBreakBrushSize(), controls.getPlaceBrushSize());
+    }
+
     @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
     public void timescale(float scale) {
         float old = Main.inst().getWorld().getTimeScale();
@@ -282,13 +285,6 @@ public class Commands extends CommandExecutor {
     public void toggleTime() {
         World.dayTicking = !World.dayTicking;
         logger.success("Time is now " + (World.dayTicking ? "" : "not ") + "ticking");
-    }
-
-    @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
-    public void time(float time) {
-        float old = Main.inst().getWorld().getTime();
-        Main.inst().getWorld().setTime(time);
-        logger.success("Changed time from % .3f to % .3f", old, time);
     }
 
     @ConsoleDoc(description = "Set the current time", paramDescriptions = "Time of day")
@@ -327,6 +323,13 @@ public class Commands extends CommandExecutor {
 
         //call the other time function
         time(time);
+    }
+
+    @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
+    public void time(float time) {
+        float old = Main.inst().getWorld().getTime();
+        Main.inst().getWorld().setTime(time);
+        logger.success("Changed time from % .3f to % .3f", old, time);
     }
 
     @ClientsideOnly

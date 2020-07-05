@@ -1,120 +1,120 @@
 import java.nio.charset.StandardCharsets
 
 def getGitVersion() {
-    def file = new File(project.projectDir, "core/assets/version")
-    if (!file.exists() || !file.canRead()) {
-        System.err.println("Failed to read version from file " + file.absolutePath)
-        return "UNKNOWN"
-    }
-    return file.readLines(StandardCharsets.UTF_8.toString())[0]
+  def file = new File(project.projectDir, "core/assets/version")
+  if (!file.exists() || !file.canRead()) {
+    System.err.println("Failed to read version from file " + file.absolutePath)
+    return "UNKNOWN"
+  }
+  return file.readLines(StandardCharsets.UTF_8.toString())[0]
 }
 
 
 buildscript {
-    ext {
-        kotlin_version = "1.3.72"
-        appName = "InfiniteBootleg"
-        gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.6'
-        box2DLightsVersion = '1.5'
-        ashleyVersion = '1.7.3'
-        aiVersion = '1.8.2'
-        powermockVersion = '2.0.2'
-        visVersion = '1.4.4'
-    }
-  
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
-        google()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+  ext {
+    kotlin_version = "1.3.72"
+    appName = "InfiniteBootleg"
+    gdxVersion = '1.9.10'
+    roboVMVersion = '2.3.6'
+    box2DLightsVersion = '1.5'
+    ashleyVersion = '1.7.3'
+    aiVersion = '1.8.2'
+    powermockVersion = '2.0.2'
+    visVersion = '1.4.4'
+  }
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    jcenter()
+    google()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
 }
 
 tasks.named('wrapper') {
-    distributionType = Wrapper.DistributionType.ALL
+  distributionType = Wrapper.DistributionType.ALL
 }
 
 allprojects {
-    apply plugin: "java"
-    apply plugin: 'idea'
-    apply plugin: 'kotlin'
+  apply plugin: "java"
+  apply plugin: 'idea'
+  apply plugin: 'kotlin'
 
-    version = getGitVersion()
+  version = getGitVersion()
 }
 
 test {
-    failFast = true
+  failFast = true
 }
 
 subprojects {
 
-    sourceCompatibility = 1.8
-    targetCompatibility = sourceCompatibility
-    [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = sourceCompatibility
+  sourceCompatibility = 1.8
+  targetCompatibility = sourceCompatibility
+  [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = sourceCompatibility
 
-    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+  [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-    sourceSets.test.java.srcDirs = ["src/"]
+  sourceSets.test.java.srcDirs = ["src/"]
 
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        jcenter()
-        google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url "https://raw.githubusercontent.com/kh498/maven2/repo/" }
-    }
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    google()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://raw.githubusercontent.com/kh498/maven2/repo/" }
+  }
 
-    dependencies {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    }
+  dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+  }
 }
 
 project(":desktop") {
 
-    dependencies {
-        implementation project(":core")
+  dependencies {
+    implementation project(":core")
 
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    }
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+  }
 }
 
 project(":core") {
 
-    dependencies {
+  dependencies {
 
-        api "com.strongjoshua:libgdx-inGameConsole:0.7.1"
-        api "org.apache.commons:commons-lang3:3.8.1"
-        api "no.kh498.util:CommonUtil:1.0.4"
+    api "com.strongjoshua:libgdx-inGameConsole:0.7.1"
+    api "org.apache.commons:commons-lang3:3.8.1"
+    api "no.kh498.util:CommonUtil:1.0.4"
 
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
 
-        api "com.kotcrab.vis:vis-ui:$visVersion"
-        api 'com.google.guava:guava:28.0-jre'
-        api group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    api "com.kotcrab.vis:vis-ui:$visVersion"
+    api 'com.google.guava:guava:28.0-jre'
+    api group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
-        implementation 'org.jetbrains:annotations:18.0.0'
-        implementation 'org.projectlombok:lombok:1.18.12'
+    implementation 'org.jetbrains:annotations:18.0.0'
+    implementation 'org.projectlombok:lombok:1.18.12'
 
-        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-        testImplementation 'junit:junit:4.+'
-        testImplementation "org.mockito:mockito-all:1.9.+"
-        testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-    }
+    testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    testImplementation 'junit:junit:4.+'
+    testImplementation "org.mockito:mockito-all:1.9.+"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  }
 }

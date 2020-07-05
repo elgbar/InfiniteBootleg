@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
-import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.World;
@@ -39,54 +38,24 @@ public class Main extends ApplicationAdapter {
     public static final String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
     public static final String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
     public static final String VERSION_FILE = "version";
-
-    private static InputMultiplexer inputMultiplexer;
+    public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
+    private static final Object INST_LOCK = new Object();
+    private static Main inst;
+    private final InputMultiplexer inputMultiplexer;
     private final boolean test;
+    private final CancellableThreadScheduler scheduler;
+    private final Vector2 mouse = new Vector2();
+    private final Vector3 mouseVec = new Vector3();
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
-    private final CancellableThreadScheduler scheduler;
-
-    /**
-     * If worlds should be loaded from disk
-     */
-    public static boolean loadWorldFromDisk = true;
-
-    /**
-     * If graphics should be rendered
-     */
-    public static boolean renderGraphic = true;
-
-    /**
-     * Seed of the world loaded
-     */
-    public static int worldSeed = 0;
-
-    /**
-     * If general debug variable. Use this and-ed with your specific debug variable
-     */
-    public static boolean debug = false;
-
-    public static int schedulerThreads = -1;
-
-    public static long tps = Ticker.DEFAULT_TICKS_PER_SECOND;
-
-    public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
-
     private World world;
     private ConsoleHandler console;
     private HUDRenderer hud;
     private ScreenRenderer screenRenderer;
-
-    private static Main inst;
-    private final static Object INST_LOCK = new Object();
-
     private int mouseBlockX;
     private int mouseBlockY;
     private float mouseX;
     private float mouseY;
-    private Vector2 mouse = new Vector2();
-
-    private Vector3 mouseVec = new Vector3();
 
     public Main(boolean test) {
         synchronized (INST_LOCK) {
@@ -95,24 +64,36 @@ public class Main extends ApplicationAdapter {
             }
             inst = this;
         }
+
         this.test = test;
         console = new ConsoleHandler(false);
-        scheduler = new CancellableThreadScheduler(schedulerThreads);
-        inputMultiplexer = new InputMultiplexer();
-
+        scheduler = new CancellableThreadScheduler(Settings.schedulerThreads);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (world != null) {
                 world.save();
             }
             scheduler.shutdown(); // we want make sure this thread is dead
         }));
+        inputMultiplexer = new InputMultiplexer();
+    }
+
+    public static ConsoleLogger logger() {
+        return inst().getConsoleLogger();
+    }
+
+    public ConsoleLogger getConsoleLogger() {
+        return console;
+    }
+
+    public static Main inst() {
+        return inst;
     }
 
     @Override
     public void create() {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        if (renderGraphic) {
+        if (Settings.renderGraphic) {
             if (SCALE > 1) {
                 VisUI.load(VisUI.SkinScale.X2);
             }
@@ -135,9 +116,9 @@ public class Main extends ApplicationAdapter {
 
 
         Gdx.app.setApplicationLogger(console);
-        Gdx.app.setLogLevel(test || debug ? Application.LOG_DEBUG : Application.LOG_INFO);
+        Gdx.app.setLogLevel(test || Settings.debug ? Application.LOG_DEBUG : Application.LOG_INFO);
 
-        if (renderGraphic) {
+        if (Settings.renderGraphic) {
             screenRenderer = new ScreenRenderer();
             hud = new HUDRenderer();
 
@@ -145,12 +126,23 @@ public class Main extends ApplicationAdapter {
             entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
         }
 
-        world = new World(new PerlinChunkGenerator(worldSeed), worldSeed, !test);
+        world = new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, !test);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        if (Settings.renderGraphic) {
+            world.resize(width, height);
+            screenRenderer.resize(width, height);
+            console.resize(width, height);
+        }
     }
 
     @Override
     public void render() {
-        if (!renderGraphic) { return; }
+        if (!Settings.renderGraphic) {
+            return;
+        }
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -179,10 +171,9 @@ public class Main extends ApplicationAdapter {
         console.draw();
     }
 
-
     @Override
     public void dispose() {
-        if (renderGraphic) {
+        if (Settings.renderGraphic) {
             screenRenderer.dispose();
             blockAtlas.dispose();
             entityAtlas.dispose();
@@ -192,21 +183,8 @@ public class Main extends ApplicationAdapter {
         console.dispose();
     }
 
-    @Override
-    public void resize(int width, int height) {
-        if (renderGraphic) {
-            world.resize(width, height);
-            screenRenderer.resize(width, height);
-            console.resize(width, height);
-        }
-    }
-
-    public static InputMultiplexer getInputMultiplexer() {
+    public InputMultiplexer getInputMultiplexer() {
         return inputMultiplexer;
-    }
-
-    public ConsoleLogger getConsoleLogger() {
-        return console;
     }
 
     public TextureAtlas getBlockAtlas() {
@@ -235,14 +213,6 @@ public class Main extends ApplicationAdapter {
 
     public Vector2 getMouse() {
         return mouse.cpy();
-    }
-
-    public static Main inst() {
-        return inst;
-    }
-
-    public static ConsoleLogger logger() {
-        return inst().getConsoleLogger();
     }
 
     public ScreenRenderer getScreenRenderer() {

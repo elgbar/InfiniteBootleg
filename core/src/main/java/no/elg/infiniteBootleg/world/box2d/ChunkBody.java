@@ -9,12 +9,15 @@ import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Tuple;
-import no.elg.infiniteBootleg.world.*;
+import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import no.elg.infiniteBootleg.world.Direction;
+import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.blocks.StaticLightBlock;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg
@@ -23,12 +26,6 @@ public class ChunkBody implements Disposable {
 
     public static final long INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L;
     public static final long UNSURE_FIXTURE_RELOAD_DELAY = 100L;
-
-    private final Chunk chunk;
-    private Body box2dBody;
-    //make there is only one delayed check for this chunk
-    private boolean unsureFixture;
-
     private final static Tuple<Direction, byte[]>[] EDGE_DEF;
 
     static {
@@ -53,6 +50,11 @@ public class ChunkBody implements Disposable {
         EDGE_DEF[2] = new Tuple<>(Direction.SOUTH, new byte[] {0, 0, 1, 0});
         EDGE_DEF[3] = new Tuple<>(Direction.WEST, new byte[] {0, 0, 0, 1});
     }
+
+    private final Chunk chunk;
+    private Body box2dBody;
+    //make there is only one delayed check for this chunk
+    private boolean unsureFixture;
 
     public ChunkBody(@NotNull Chunk chunk) {
         this.chunk = chunk;

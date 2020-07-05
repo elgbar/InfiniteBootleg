@@ -7,23 +7,30 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Spliterator;
+import static java.util.Spliterator.DISTINCT;
+import static java.util.Spliterator.NONNULL;
+import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterator.SIZED;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import static java.util.Spliterator.*;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.Material.AIR;
 
 /**
  * A piece of the world
@@ -44,7 +51,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     private final int chunkY;
 
     private final Set<TickingBlock> tickingBlocks;
-
+    private final ChunkBody chunkBody;
     //if this chunk should be prioritized to be updated
     private boolean dirty; //if texture/allair needs to be updated
     private boolean prioritize;
@@ -53,12 +60,10 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     private boolean allowUnload;
     private boolean initializing;
     private boolean allAir;
-
     private long lastViewedTick;
     private TextureRegion fboRegion;
     private FileHandle chunkFile;
     private FrameBuffer fbo;
-    private final ChunkBody chunkBody;
 
     /**
      * Create a new empty chunk
@@ -107,59 +112,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     /**
-     * Force update of texture and recalculate internal variables
-     * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link
-     * #getTextureRegion()}
-     * called.
-     */
-    public void updateTextureNow() {
-        if (initializing) { return; }
-        dirty = false;
-
-        //test if all the blocks in this chunk has the material air
-        allAir = true;
-        outer:
-        synchronized (this) {
-            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                    Block b = blocks[localX][localY];
-                    if (b != null && b.getMaterial() != AIR) {
-                        allAir = false;
-                        break outer;
-                    }
-                }
-            }
-        }
-        if (Main.renderGraphic) {
-            world.getRender().getChunkRenderer().queueRendering(this, prioritize);
-            prioritize = false;
-        }
-    }
-
-    /**
-     * @param localX
-     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
-     * @param localY
-     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
-     *
-     * @return A block from the relative coordinates
-     */
-    @NotNull
-    public synchronized Block getBlock(int localX, int localY) {
-        Preconditions.checkState(loaded, "Chunk is not loaded");
-        Preconditions.checkArgument(CoordUtil.isInsideChunk(localX, localY),
-                                    "Given arguments are not inside this chunk, localX=" + localX + " localY=" +
-                                    localY);
-        Block block = blocks[localX][localY];
-
-        if (block == null) {
-            block = setBlock(localX, localY, AIR, false);
-        }
-        //noinspection ConstantConditions block will not be null when material is not null
-        return block;
-    }
-
-    /**
      * Set a block and update all blocks around it
      *
      * @param localX
@@ -175,7 +127,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     public Block setBlock(int localX, int localY, @Nullable Material material) {
         return setBlock(localX, localY, material, true);
     }
-
 
     /**
      * @param localX
@@ -220,7 +171,9 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
         if ((currBlock == null && block == null) ||
             (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
-            if (block != null) { block.dispose(); }
+            if (block != null) {
+                block.dispose();
+            }
             return null;
         }
 
@@ -262,6 +215,30 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     /**
+     * @param localX
+     *     The local chunk x coordinate
+     *
+     * @return The world coordinate from the local position as offset
+     *
+     * @see CoordUtil#chunkToWorld(int, int)
+     */
+    public int getWorldX(int localX) {
+        return CoordUtil.chunkToWorld(chunkX, localX);
+    }
+
+    /**
+     * @param localY
+     *     The local chunk y coordinate
+     *
+     * @return The world coordinate from the local position as offset
+     *
+     * @see CoordUtil#chunkToWorld(int, int)
+     */
+    public int getWorldY(int localY) {
+        return CoordUtil.chunkToWorld(chunkY, localY);
+    }
+
+    /**
      * Force update of this chunk's texture and invariants
      *
      * @param prioritize
@@ -284,6 +261,38 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             updateTextureNow();
         }
         return fboRegion;
+    }
+
+    /**
+     * Force update of texture and recalculate internal variables
+     * This is usually called when the dirty flag of the chunk is set and either {@link #isAllAir()} or {@link
+     * #getTextureRegion()}
+     * called.
+     */
+    public void updateTextureNow() {
+        if (initializing) {
+            return;
+        }
+        dirty = false;
+
+        //test if all the blocks in this chunk has the material air
+        allAir = true;
+        outer:
+        synchronized (this) {
+            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                    Block b = blocks[localX][localY];
+                    if (b != null && b.getMaterial() != AIR) {
+                        allAir = false;
+                        break outer;
+                    }
+                }
+            }
+        }
+        if (Settings.renderGraphic) {
+            world.getRender().getChunkRenderer().queueRendering(this, prioritize);
+            prioritize = false;
+        }
     }
 
     public void view() {
@@ -400,30 +409,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     /**
-     * @param localX
-     *     The local chunk x coordinate
-     *
-     * @return The world coordinate from the local position as offset
-     *
-     * @see CoordUtil#chunkToWorld(int, int)
-     */
-    public int getWorldX(int localX) {
-        return CoordUtil.chunkToWorld(chunkX, localX);
-    }
-
-    /**
-     * @param localY
-     *     The local chunk y coordinate
-     *
-     * @return The world coordinate from the local position as offset
-     *
-     * @see CoordUtil#chunkToWorld(int, int)
-     */
-    public int getWorldY(int localY) {
-        return CoordUtil.chunkToWorld(chunkY, localY);
-    }
-
-    /**
      * f
      *
      * @return The last tick this chunk's texture was pulled
@@ -437,6 +422,12 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     public boolean isModified() {
         return modified;
+    }
+
+    public Stream<Block> stream() {
+        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), CHUNK_SIZE * CHUNK_SIZE,
+                                                                  SIZED | DISTINCT | NONNULL | ORDERED);
+        return StreamSupport.stream(spliterator, false);
     }
 
     @NotNull
@@ -462,10 +453,27 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         };
     }
 
-    public Stream<Block> stream() {
-        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), CHUNK_SIZE * CHUNK_SIZE,
-                                                                  SIZED | DISTINCT | NONNULL | ORDERED);
-        return StreamSupport.stream(spliterator, false);
+    /**
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
+     *
+     * @return A block from the relative coordinates
+     */
+    @NotNull
+    public synchronized Block getBlock(int localX, int localY) {
+        Preconditions.checkState(loaded, "Chunk is not loaded");
+        Preconditions.checkArgument(CoordUtil.isInsideChunk(localX, localY),
+                                    "Given arguments are not inside this chunk, localX=" + localX + " localY=" +
+                                    localY);
+        Block block = blocks[localX][localY];
+
+        if (block == null) {
+            block = setBlock(localX, localY, AIR, false);
+        }
+        //noinspection ConstantConditions block will not be null when material is not null
+        return block;
     }
 
     @Override
@@ -498,7 +506,9 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Nullable
     public static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
         FileHandle worldFile = world.worldFolder();
-        if (worldFile == null) { return null; }
+        if (worldFile == null) {
+            return null;
+        }
         return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY);
     }
 
@@ -590,24 +600,34 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-
-        Chunk chunk = (Chunk) o;
-
-        if (chunkX != chunk.chunkX) { return false; }
-        if (chunkY != chunk.chunkY) { return false; }
-        if (loaded != chunk.loaded) { return false; }
-        return world.equals(chunk.world);
-    }
-
-    @Override
     public int hashCode() {
         int result = world.hashCode();
         result = 31 * result + chunkX;
         result = 31 * result + chunkY;
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Chunk chunk = (Chunk) o;
+
+        if (chunkX != chunk.chunkX) {
+            return false;
+        }
+        if (chunkY != chunk.chunkY) {
+            return false;
+        }
+        if (loaded != chunk.loaded) {
+            return false;
+        }
+        return world.equals(chunk.world);
     }
 
     @Override

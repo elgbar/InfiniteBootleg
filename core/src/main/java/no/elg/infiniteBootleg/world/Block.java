@@ -56,21 +56,6 @@ public class Block implements Binembly, Disposable {
         return world;
     }
 
-
-    /**
-     * @return World location of this block
-     */
-    public int getWorldX() {
-        return chunk.getWorldX(localX);
-    }
-
-    /**
-     * @return World location of this block
-     */
-    public int getWorldY() {
-        return chunk.getWorldY(localY);
-    }
-
     /**
      * @return The offset/local position of this block within its chunk
      */
@@ -96,6 +81,20 @@ public class Block implements Binembly, Disposable {
     @NotNull
     public Block getRelative(@NotNull Direction dir) {
         return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
+    }
+
+    /**
+     * @return World location of this block
+     */
+    public int getWorldX() {
+        return chunk.getWorldX(localX);
+    }
+
+    /**
+     * @return World location of this block
+     */
+    public int getWorldY() {
+        return chunk.getWorldY(localY);
     }
 
     /**
@@ -149,6 +148,16 @@ public class Block implements Binembly, Disposable {
     }
 
     @Override
+    public int hashCode() {
+        int result = material.hashCode();
+        result = 31 * result + world.hashCode();
+        result = 31 * result + chunk.hashCode();
+        result = 31 * result + localX;
+        result = 31 * result + localY;
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
@@ -160,16 +169,6 @@ public class Block implements Binembly, Disposable {
         if (material != block.material) { return false; }
         if (!world.equals(block.world)) { return false; }
         return chunk.equals(block.chunk);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = material.hashCode();
-        result = 31 * result + world.hashCode();
-        result = 31 * result + chunk.hashCode();
-        result = 31 * result + localX;
-        result = 31 * result + localY;
-        return result;
     }
 
     @Override

@@ -3,11 +3,15 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.strongjoshua.console.LogLevel;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import no.elg.infiniteBootleg.Main;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
-import java.util.concurrent.*;
 
 /**
  * Run (cancellable) tasks on other threads
@@ -37,13 +41,6 @@ public class CancellableThreadScheduler {
     }
 
     /**
-     * @return If all tasks (even those who should be async) should be executed on the main Gdx thread
-     */
-    public boolean isAlwaysSync() {
-        return threads == 0;
-    }
-
-    /**
      * Cancel all future and running tasks
      */
     public void cancelTasks() {
@@ -54,20 +51,6 @@ public class CancellableThreadScheduler {
 
     public int size() {
         return tasks.size();
-    }
-
-    @NotNull
-    private Runnable caughtRunnable(@NotNull Runnable runnable) {
-        return () -> {
-            try {
-                runnable.run();
-            } catch (Exception e) {
-                Gdx.app.postRunnable(() -> {
-                    Main.logger().log(LogLevel.ERROR, "Exception caught on secondary thread");
-                    e.printStackTrace();
-                });
-            }
-        };
     }
 
     /**
@@ -89,6 +72,13 @@ public class CancellableThreadScheduler {
     }
 
     /**
+     * @return If all tasks (even those who should be async) should be executed on the main Gdx thread
+     */
+    public boolean isAlwaysSync() {
+        return threads == 0;
+    }
+
+    /**
      * Post the given runnable as fast as possible (though not as fast as calling {@link
      * Application#postRunnable(Runnable)})
      *
@@ -99,6 +89,20 @@ public class CancellableThreadScheduler {
      */
     public void executeSync(@NotNull Runnable runnable) {
         Gdx.app.postRunnable(runnable);
+    }
+
+    @NotNull
+    private Runnable caughtRunnable(@NotNull Runnable runnable) {
+        return () -> {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                Gdx.app.postRunnable(() -> {
+                    Main.logger().log(LogLevel.ERROR, "Exception caught on secondary thread");
+                    e.printStackTrace();
+                });
+            }
+        };
     }
 
     /**

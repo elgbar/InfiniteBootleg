@@ -4,12 +4,11 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.FastNoise;
 import no.elg.infiniteBootleg.world.Chunk;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 /**
  * @author Elg
@@ -35,6 +34,10 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         noise2.SetFractalOctaves(1);
         noise2.SetFractalLacunarity(1.0f);
         noise2.SetFractalGain(0.5f);
+    }
+
+    public PerlinNoise getNoise() {
+        return noise;
     }
 
     @Override
@@ -102,7 +105,5 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         return chunk;
     }
 
-    public PerlinNoise getNoise() {
-        return noise;
-    }
+
 }

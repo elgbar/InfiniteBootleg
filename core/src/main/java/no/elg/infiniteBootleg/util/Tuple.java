@@ -28,8 +28,10 @@ public class Tuple<K, V> {
     }
 
     @Override
-    public String toString() {
-        return key + "=" + value;
+    public int hashCode() {
+        int result = key.hashCode();
+        result = 31 * result + value.hashCode();
+        return result;
     }
 
     @Override
@@ -46,9 +48,7 @@ public class Tuple<K, V> {
     }
 
     @Override
-    public int hashCode() {
-        int result = key.hashCode();
-        result = 31 * result + value.hashCode();
-        return result;
+    public String toString() {
+        return key + "=" + value;
     }
 }

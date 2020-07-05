@@ -8,11 +8,11 @@ import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class Player extends LivingEntity {
 
@@ -47,6 +47,12 @@ public class Player extends LivingEntity {
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        torchLight.dispose();
+    }
+
+    @Override
     public void tick() {
         super.tick();
         if (torchLight != null) {
@@ -61,11 +67,5 @@ public class Player extends LivingEntity {
     @NotNull
     public EntityControls getControls() {
         return controls;
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        torchLight.dispose();
     }
 }

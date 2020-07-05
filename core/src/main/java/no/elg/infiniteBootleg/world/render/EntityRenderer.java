@@ -2,10 +2,9 @@ package no.elg.infiniteBootleg.world.render;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import no.elg.infiniteBootleg.Renderer;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class EntityRenderer implements Renderer {
 

@@ -7,19 +7,22 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.util.PointLightPool;
-import no.elg.infiniteBootleg.world.*;
-import no.elg.infiniteBootleg.world.render.WorldRender;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.util.PointLightPool;
+import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.Material;
 import static no.elg.infiniteBootleg.world.Material.AIR;
+import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.WorldRender;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A block that explodes after {@link #fuseDuration} ticks
@@ -29,32 +32,6 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 public class TntBlock extends TickingBlock {
 
 
-    private static final TextureRegion whiteTexture;
-
-    static {
-        if (Main.renderGraphic) {
-            Pixmap pixmap = new Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444);
-            pixmap.setColor(Color.WHITE);
-            pixmap.fill();
-            whiteTexture = new TextureRegion(new Texture(pixmap));
-        }
-        else {
-            whiteTexture = null;
-        }
-    }
-
-    private boolean glowing;
-    private boolean exploded;
-    private long startTick;
-    private final float strength;
-
-    @Nullable
-    private PointLight light;
-
-    /**
-     * How long, in ticks, the fuse time should be
-     */
-    public final float fuseDuration;
     /**
      * Maximum explosion radius
      */
@@ -69,6 +46,30 @@ public class TntBlock extends TickingBlock {
      * Minimum value should be above 3 as otherwise the edge of the explosion will clearly be visible
      */
     public final static int RESISTANCE = 8;
+    private static final TextureRegion whiteTexture;
+
+    static {
+        if (Settings.renderGraphic) {
+            Pixmap pixmap = new Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444);
+            pixmap.setColor(Color.WHITE);
+            pixmap.fill();
+            whiteTexture = new TextureRegion(new Texture(pixmap));
+        }
+        else {
+            whiteTexture = null;
+        }
+    }
+
+    /**
+     * How long, in ticks, the fuse time should be
+     */
+    public final float fuseDuration;
+    private final float strength;
+    private boolean glowing;
+    private boolean exploded;
+    private long startTick;
+    @Nullable
+    private PointLight light;
 
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
@@ -83,7 +84,9 @@ public class TntBlock extends TickingBlock {
 
     @Override
     public void tick() {
-        if (exploded) { return; }
+        if (exploded) {
+            return;
+        }
         long currTick = getWorld().getTick();
         if (startTick == 0) {
             startTick = currTick;
@@ -142,7 +145,7 @@ public class TntBlock extends TickingBlock {
             glowing = !glowing;
         }
 
-        if (old != glowing && Main.renderGraphic) {
+        if (old != glowing && Settings.renderGraphic) {
             if (light == null) {
                 light = PointLightPool.inst.obtain();
                 light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
@@ -158,12 +161,16 @@ public class TntBlock extends TickingBlock {
 
     @Override
     public @Nullable TextureRegion getTexture() {
-        if (glowing) { return whiteTexture; }
+        if (glowing) {
+            return whiteTexture;
+        }
         return super.getTexture();
     }
 
     @Override
     public void dispose() {
-        if (light != null) { PointLightPool.inst.free(light); }
+        if (light != null) {
+            PointLightPool.inst.free(light);
+        }
     }
 }

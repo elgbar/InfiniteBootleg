@@ -7,14 +7,13 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
 public class FallingBlock extends Entity {
 
@@ -36,17 +35,6 @@ public class FallingBlock extends Entity {
         Fixture fix = body.createFixture(box, 1.0f);
         fix.setFilterData(World.BLOCK_ENTITY_FILTER);
         box.dispose();
-    }
-
-    @Override
-    public void tickRare() {
-        //Unload this entity if it entered an unloaded chunk
-        //TODO do not _remove_ this entity, just save it to the unloaded chunk
-        int chunkX = CoordUtil.worldToChunk(getBlockX());
-        int chunkY = CoordUtil.worldToChunk(getBlockY());
-        if (!getWorld().isChunkLoaded(chunkX, chunkY)) {
-            Gdx.app.postRunnable(() -> getWorld().removeEntity(this));
-        }
     }
 
     @Override
@@ -73,7 +61,6 @@ public class FallingBlock extends Entity {
         }
     }
 
-
     @Override
     public TextureRegion getTextureRegion() {
         return region;
@@ -87,5 +74,16 @@ public class FallingBlock extends Entity {
     @Override
     public int getHeight() {
         return BLOCK_SIZE - 1;
+    }
+
+    @Override
+    public void tickRare() {
+        //Unload this entity if it entered an unloaded chunk
+        //TODO do not _remove_ this entity, just save it to the unloaded chunk
+        int chunkX = CoordUtil.worldToChunk(getBlockX());
+        int chunkY = CoordUtil.worldToChunk(getBlockY());
+        if (!getWorld().isChunkLoaded(chunkX, chunkY)) {
+            Gdx.app.postRunnable(() -> getWorld().removeEntity(this));
+        }
     }
 }

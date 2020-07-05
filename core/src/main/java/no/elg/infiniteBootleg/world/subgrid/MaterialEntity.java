@@ -15,10 +15,10 @@ public abstract class MaterialEntity extends Entity implements Removable {
         super(world, worldX, worldY, center);
     }
 
-    public abstract Material getMaterial();
-
     @Override
     public String toString() {
         return "MaterialEntity{" + "material='" + getMaterial() + '\'' + "} " + super.toString();
     }
+
+    public abstract Material getMaterial();
 }

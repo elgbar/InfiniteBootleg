@@ -2,7 +2,11 @@ package no.elg.infiniteBootleg.world.blocks;
 
 import com.badlogic.gdx.Gdx;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.*;
+import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Direction;
+import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.Material;
+import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
 import org.jetbrains.annotations.NotNull;
 

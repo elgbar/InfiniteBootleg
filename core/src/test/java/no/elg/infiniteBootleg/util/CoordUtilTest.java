@@ -1,10 +1,11 @@
 package no.elg.infiniteBootleg.util;
 
-import no.elg.infiniteBootleg.world.Location;
-import org.junit.Test;
-
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static org.junit.Assert.*;
+import no.elg.infiniteBootleg.world.Location;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * @author Elg

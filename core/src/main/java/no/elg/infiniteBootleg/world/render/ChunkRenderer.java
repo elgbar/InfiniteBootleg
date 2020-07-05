@@ -6,21 +6,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
-import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Renderer;
-import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Chunk;
-import org.apache.commons.collections4.list.SetUniqueList;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
+import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Renderer;
+import no.elg.infiniteBootleg.world.Block;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import no.elg.infiniteBootleg.world.Chunk;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
+import org.apache.commons.collections4.list.SetUniqueList;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Elg

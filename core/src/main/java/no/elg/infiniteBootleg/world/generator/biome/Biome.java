@@ -51,21 +51,6 @@ public enum Biome {
         this.topBlocks = mats.toArray();
     }
 
-    public static float rawHeightAt(@NotNull PerlinNoise noise, int worldX, float y, float z, float amplitude,
-                                    float frequency, int offset) {
-        return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5f) * amplitude + offset;
-    }
-
-    public Material materialAt(@NotNull PerlinNoise noise, int height, int worldX, int worldY) {
-        int delta = height - worldY - 1;
-        if (delta == 0) { return topmostBlock; }
-
-        delta += (int) Math.abs(Math.floor(rawHeightAt(noise, worldX, y, z, 10, 0.05f, 0)));
-
-        if (delta >= topBlocks.length) { return filler; }
-        return topBlocks[delta];
-    }
-
     public int heightAt(@NotNull PerlinChunkGenerator pcg, int worldX) {
         int y = 0;
         for (int dx = -INTERPOLATION_RADIUS; dx <= INTERPOLATION_RADIUS; dx++) {
@@ -86,11 +71,26 @@ public enum Biome {
         return rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset);
     }
 
+    public static float rawHeightAt(@NotNull PerlinNoise noise, int worldX, float y, float z, float amplitude,
+                                    float frequency, int offset) {
+        return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5f) * amplitude + offset;
+    }
+
     public void fillUpTo(@NotNull PerlinNoise noise, @NotNull Chunk chunk, int localX, int localY, int height) {
         Block[] blocks = chunk.getBlocks()[localX];
         for (int dy = 0; dy < localY; dy++) {
             Material mat = materialAt(noise, height, chunk.getWorldX() + localX, chunk.getWorldY() + dy);
             blocks[dy] = mat.createBlock(chunk.getWorld(), chunk, localX, dy);
         }
+    }
+
+    public Material materialAt(@NotNull PerlinNoise noise, int height, int worldX, int worldY) {
+        int delta = height - worldY - 1;
+        if (delta == 0) { return topmostBlock; }
+
+        delta += (int) Math.abs(Math.floor(rawHeightAt(noise, worldX, y, z, 10, 0.05f, 0)));
+
+        if (delta >= topBlocks.length) { return filler; }
+        return topBlocks[delta];
     }
 }
