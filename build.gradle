@@ -113,6 +113,6 @@ project(":core") {
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testImplementation 'junit:junit:4.+'
     testImplementation "org.mockito:mockito-all:1.9.+"
-    testRuntime "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 }
