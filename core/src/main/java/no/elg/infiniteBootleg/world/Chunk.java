@@ -40,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
     public static final int CHUNK_SIZE = 32;
-    public final static int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
+    public static final int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
     public static final int CHUNK_SIZE_SHIFT = (int) (Math.log(CHUNK_SIZE) / Math.log(2));
     public static final String CHUNK_FOLDER = "chunks";
 

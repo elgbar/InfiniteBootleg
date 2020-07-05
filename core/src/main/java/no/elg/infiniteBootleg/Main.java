@@ -39,13 +39,16 @@ public class Main extends ApplicationAdapter {
     public static final String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
     public static final String VERSION_FILE = "version";
     public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
+    
     private static final Object INST_LOCK = new Object();
     private static Main inst;
+
     private final InputMultiplexer inputMultiplexer;
     private final boolean test;
     private final CancellableThreadScheduler scheduler;
     private final Vector2 mouse = new Vector2();
     private final Vector3 mouseVec = new Vector3();
+
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
     private World world;

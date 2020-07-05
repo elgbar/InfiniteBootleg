@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Block implements Binembly, Disposable {
 
-    public final static int BLOCK_SIZE = 16;
+    public static final int BLOCK_SIZE = 16;
 
     private final Material material;
     private final World world;

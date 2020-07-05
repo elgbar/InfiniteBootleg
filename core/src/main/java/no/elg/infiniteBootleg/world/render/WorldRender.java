@@ -59,11 +59,10 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
      * How many {@link Graphics#getFramesPerSecond()} should there be when rendering multiple chunks
      */
     public static final int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
-    public final static Object LIGHT_LOCK = new Object();
-    public final static Object BOX2D_LOCK = new Object();
-    public static boolean lights = true;
-    public static boolean debugBox2d = false;
-    public static boolean useLerp = true;
+
+    public static final Object LIGHT_LOCK = new Object();
+    public static final Object BOX2D_LOCK = new Object();
+
     public final World world;
     private final Rectangle viewBound;
     private final ChunkViewed chunksInView;
@@ -190,7 +189,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
         entityRenderer.render();
         batch.end();
-        if (lights) {
+        if (Settings.renderLight) {
 
             synchronized (BOX2D_LOCK) {
                 synchronized (LIGHT_LOCK) {
@@ -198,7 +197,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 }
             }
         }
-        if (debugBox2d && Settings.debug) {
+        if (Settings.renderBox2dDebug && Settings.debug) {
             synchronized (BOX2D_LOCK) {
                 box2DDebugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
             }
@@ -271,7 +270,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         final float width = camera.viewportWidth * camera.zoom;
         final float height = camera.viewportHeight * camera.zoom;
 
-        if (lights) {
+        if (Settings.renderLight) {
             rayHandler.setCombinedMatrix(m4, 0, 0, width, height);
         }
 
@@ -303,7 +302,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         return world;
     }
 
-    public final static class ChunkViewed {
+    public static final class ChunkViewed {
 
         public int horizontal_start;
         public int horizontal_end;

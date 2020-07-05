@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -141,7 +140,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     @Argument(value = "Disable rendering of lights", alt = 'L')
     private void no_lights(String val) {
         log("Lights are disabled. To dynamically enable this use command 'lights true'");
-        WorldRender.lights = false;
+        Settings.renderLight = false;
     }
 
     /**
@@ -150,7 +149,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     @Argument(value = "Enable debugging including debug rendering for box2d", alt = 'd')
     private void debug(String val) {
         log("Debug view is enabled. To disable this at runtime use command 'debug'");
-        WorldRender.debugBox2d = true;
+        Settings.renderBox2dDebug = true;
         Settings.debug = true;
     }
 

@@ -127,7 +127,9 @@ public class Util {
      *
      * @return The title case version of the given string
      */
-    public static String toTitleCase(final String string) {return toTitleCase(true, string);}
+    public static String toTitleCase(final String string) {
+        return toTitleCase(true, string);
+    }
 
     /**
      * @param string

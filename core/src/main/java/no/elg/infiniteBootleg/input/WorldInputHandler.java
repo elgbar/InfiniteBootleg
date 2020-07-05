@@ -12,6 +12,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
@@ -116,7 +117,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             float x = following.getPosition().x * Block.BLOCK_SIZE;
             float y = following.getPosition().y * Block.BLOCK_SIZE;
 
-            if (WorldRender.useLerp) {
+            if (Settings.enableCameraFollowLerp) {
                 float dx = (x - camera.position.x) * CAMERA_LERP;
                 float dy = (y - camera.position.y) * CAMERA_LERP;
 

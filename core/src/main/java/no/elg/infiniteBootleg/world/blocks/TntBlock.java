@@ -45,7 +45,7 @@ public class TntBlock extends TickingBlock {
      * <p>
      * Minimum value should be above 3 as otherwise the edge of the explosion will clearly be visible
      */
-    public final static int RESISTANCE = 8;
+    public static final int RESISTANCE = 8;
     private static final TextureRegion whiteTexture;
 
     static {

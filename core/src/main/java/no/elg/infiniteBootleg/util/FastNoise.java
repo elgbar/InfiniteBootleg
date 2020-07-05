@@ -476,15 +476,15 @@ public class FastNoise {
         new Float3(-0.2016773589f, 0.008816271194f, -0.4021797064f), new Float3(-0.07527055435f, -0.425643481f,
                                                                                 -0.1251477955f),};
     // Hashing
-    private final static int X_PRIME = 1619;
-    private final static int Y_PRIME = 31337;
-    private final static int Z_PRIME = 6971;
-    private final static int W_PRIME = 1013;
-    private final static float F3 = (float) (1.0 / 3.0);
-    private final static float G3 = (float) (1.0 / 6.0);
-    private final static float G33 = G3 * 3 - 1;
-    private final static float F2 = (float) (1.0 / 2.0);
-    private final static float G2 = (float) (1.0 / 4.0);
+    private static final int X_PRIME = 1619;
+    private static final int Y_PRIME = 31337;
+    private static final int Z_PRIME = 6971;
+    private static final int W_PRIME = 1013;
+    private static final float F3 = (float) (1.0 / 3.0);
+    private static final float G3 = (float) (1.0 / 6.0);
+    private static final float G33 = G3 * 3 - 1;
+    private static final float F2 = (float) (1.0 / 2.0);
+    private static final float G2 = (float) (1.0 / 4.0);
     private static final byte[] SIMPLEX_4D =
         {0, 1, 2, 3, 0, 1, 3, 2, 0, 0, 0, 0, 0, 2, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 2, 1, 3, 0,
             0, 0, 0, 0, 3, 1, 2, 0, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -494,10 +494,10 @@ public class FastNoise {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 1, 2, 3, 0, 2, 1, 0,
             0, 0, 0, 3, 1, 2, 0, 2, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 0, 2, 0, 0, 0, 0, 3, 2, 0, 1, 3,
             2, 1, 0};
-    private final static float F4 = (float) ((2.23606797 - 1.0) / 4.0);
-    private final static float G4 = (float) ((5.0 - 2.23606797) / 20.0);
-    private final static float CUBIC_3D_BOUNDING = 1 / (float) (1.5 * 1.5 * 1.5);
-    private final static float CUBIC_2D_BOUNDING = 1 / (float) (1.5 * 1.5);
+    private static final float F4 = (float) ((2.23606797 - 1.0) / 4.0);
+    private static final float G4 = (float) ((5.0 - 2.23606797) / 20.0);
+    private static final float CUBIC_3D_BOUNDING = 1 / (float) (1.5 * 1.5 * 1.5);
+    private static final float CUBIC_2D_BOUNDING = 1 / (float) (1.5 * 1.5);
     private int m_seed = 1337;
     private float m_frequency = (float) 0.01;
     private Interp m_interp = Interp.Quintic;

@@ -61,11 +61,11 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Toggle rendering of lights")
     public void lights() {
-        WorldRender.lights = !WorldRender.lights;
-        if (WorldRender.lights) {
+        Settings.renderLight = !Settings.renderLight;
+        if (Settings.renderLight) {
             Main.inst().getWorld().getRender().update();
         }
-        logger.log(LogLevel.SUCCESS, "Lighting is now " + (WorldRender.lights ? "enabled" : "disabled"));
+        logger.log(LogLevel.SUCCESS, "Lighting is now " + (Settings.renderLight ? "enabled" : "disabled"));
     }
 
     @ClientsideOnly
@@ -127,18 +127,19 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
     public void debug() {
-        WorldRender.debugBox2d = !WorldRender.debugBox2d;
+        Settings.renderBox2dDebug = !Settings.renderBox2dDebug;
         Settings.debug = true;
         logger.log(LogLevel.SUCCESS,
-                   "Debug rendering for Box2D is now " + (WorldRender.debugBox2d ? "enabled" : "disabled"));
+                   "Debug rendering for Box2D is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
     }
 
 
     @ClientsideOnly
     @ConsoleDoc(description = "Toggles smoothed camera movement when following a player")
     public void lerp() {
-        WorldRender.useLerp = !WorldRender.useLerp;
-        logger.log(LogLevel.SUCCESS, "Camera lerp is now " + (WorldRender.useLerp ? "enabled" : "disabled"));
+        Settings.enableCameraFollowLerp = !Settings.enableCameraFollowLerp;
+        logger.log(LogLevel.SUCCESS,
+                   "Camera lerp is now " + (Settings.enableCameraFollowLerp ? "enabled" : "disabled"));
     }
 
     @ClientsideOnly
@@ -283,8 +284,8 @@ public class Commands extends CommandExecutor {
 
     @ConsoleDoc(description = "Toggle if time ticks or not")
     public void toggleTime() {
-        World.dayTicking = !World.dayTicking;
-        logger.success("Time is now " + (World.dayTicking ? "" : "not ") + "ticking");
+        Settings.dayTicking = !Settings.dayTicking;
+        logger.success("Time is now " + (Settings.dayTicking ? "" : "not ") + "ticking");
     }
 
     @ConsoleDoc(description = "Set the current time", paramDescriptions = "Time of day")

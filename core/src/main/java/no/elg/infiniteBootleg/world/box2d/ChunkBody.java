@@ -26,7 +26,7 @@ public class ChunkBody implements Disposable {
 
     public static final long INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L;
     public static final long UNSURE_FIXTURE_RELOAD_DELAY = 100L;
-    private final static Tuple<Direction, byte[]>[] EDGE_DEF;
+    private static final Tuple<Direction, byte[]>[] EDGE_DEF;
 
     static {
         //represent the direction to look and if no solid block there how to create a fixture at that location (ie

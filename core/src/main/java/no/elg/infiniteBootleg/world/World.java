@@ -76,7 +76,6 @@ public class World implements Disposable, Ticking, Resizable {
     public static final float MIDDAY_TIME = -90;
     public static final float SUNSET_TIME = -180 + TWILIGHT_DEGREES;
     public static final float MIDNIGHT_TIME = -270;
-    public static boolean dayTicking = true;
 
     static {
         //base filter for entities
@@ -140,9 +139,9 @@ public class World implements Disposable, Ticking, Resizable {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
 
-        byte[] UUIDSeed = new byte[128];
-        MathUtils.random.nextBytes(UUIDSeed);
-        uuid = UUID.nameUUIDFromBytes(UUIDSeed);
+        byte[] uuidSeed = new byte[128];
+        MathUtils.random.nextBytes(uuidSeed);
+        uuid = UUID.nameUUIDFromBytes(uuidSeed);
 
         name = worldName;
 
@@ -712,7 +711,7 @@ public class World implements Disposable, Ticking, Resizable {
         WorldRender wr = getRender();
 
         //update light direction
-        if (dayTicking) {
+        if (Settings.dayTicking) {
             time -= timeChangePerTick * timeScale;
             if (Settings.renderGraphic) {
                 if (normalizedTime() >= 180) {
@@ -728,7 +727,7 @@ public class World implements Disposable, Ticking, Resizable {
             }
         }
 
-        if (Settings.renderGraphic && WorldRender.lights) {
+        if (Settings.renderGraphic && Settings.renderLight) {
             synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
                     getRender().getRayHandler().update();

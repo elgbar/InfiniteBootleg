@@ -33,6 +33,21 @@ object Settings {
   @JvmField
   var schedulerThreads = -1
 
+  /**
+   * The ticks per seconds to use by default. Changing this will only apply to new instances created.
+   */
   @JvmField
   var tps = Ticker.DEFAULT_TICKS_PER_SECOND
+
+  @JvmField
+  var dayTicking = true
+
+  @JvmField
+  var renderLight = true
+
+  @JvmField
+  var renderBox2dDebug = false
+
+  @JvmField
+  var enableCameraFollowLerp = true
 }
