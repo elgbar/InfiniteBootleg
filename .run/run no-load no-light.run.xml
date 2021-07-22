@@ -6,7 +6,7 @@
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncher" />
     <module name="InfiniteBootleg.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="-lL" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/assets" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
