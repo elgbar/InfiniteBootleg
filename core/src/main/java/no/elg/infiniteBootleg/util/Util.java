@@ -250,7 +250,7 @@ public class Util {
      * @return The number of commits in this repository
      */
     public static int commitCount() {
-        final String countCommand = "git rev-list master --count";
+        final String countCommand = "git rev-list HEAD --count";
         try {
             final Process p = Runtime.getRuntime().exec(countCommand);
             p.waitFor();
