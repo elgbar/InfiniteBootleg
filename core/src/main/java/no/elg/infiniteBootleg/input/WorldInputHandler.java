@@ -74,12 +74,12 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     }
 
     @Override
-    public boolean scrolled(int amount) {
+    public boolean scrolled(float amountX, float amountY) {
         if (Main.inst().getConsole().isVisible()) {
             return false;
         }
         OrthographicCamera camera = worldRender.getCamera();
-        camera.zoom += amount * SCROLL_SPEED;
+        camera.zoom += ((amountX + amountY) / 2) * SCROLL_SPEED;
         if (camera.zoom < WorldRender.MIN_ZOOM) {
             camera.zoom = WorldRender.MIN_ZOOM;
         }
