@@ -90,7 +90,11 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   private fun walk() {
 
     fun moveHorz(dir: Float) {
+      if (!controlled.wouldOnlyTouchAir(controlled.position.x + dir, controlled.position.y)) {
+        return
+      }
       synchronized(WorldRender.BOX2D_LOCK) {
+
         val body = controlled.body
 
         val currSpeed = body.linearVelocity.x
