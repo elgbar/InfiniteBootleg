@@ -169,8 +169,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         }
         Block currBlock = blocks[localX][localY];
 
-        if ((currBlock == null && block == null) ||
-            (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
+        if ((currBlock == null && block == null) || (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
             if (block != null) {
                 block.dispose();
             }
@@ -314,6 +313,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     @Override
     public void tick() {
+        Preconditions.checkState(loaded, "Chunk is not loaded");
         synchronized (tickingBlocks) {
             for (TickingBlock block : tickingBlocks) {
                 block.tryTick(false);
@@ -323,6 +323,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
     @Override
     public void tickRare() {
+        Preconditions.checkState(loaded, "Chunk is not loaded");
         synchronized (tickingBlocks) {
             for (TickingBlock block : tickingBlocks) {
                 block.tryTick(true);
@@ -425,8 +426,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     public Stream<Block> stream() {
-        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), CHUNK_SIZE * CHUNK_SIZE,
-                                                                  SIZED | DISTINCT | NONNULL | ORDERED);
+        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), CHUNK_SIZE * CHUNK_SIZE, SIZED | DISTINCT | NONNULL | ORDERED);
         return StreamSupport.stream(spliterator, false);
     }
 
@@ -465,8 +465,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     public synchronized Block getBlock(int localX, int localY) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
         Preconditions.checkArgument(CoordUtil.isInsideChunk(localX, localY),
-                                    "Given arguments are not inside this chunk, localX=" + localX + " localY=" +
-                                    localY);
+                                    "Given arguments are not inside this chunk, localX=" + localX + " localY=" + localY);
         Block block = blocks[localX][localY];
 
         if (block == null) {
@@ -572,8 +571,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Override
     public void assemble(@NotNull byte[] bytes) {
         Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE,
-                                    "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " +
-                                    bytes.length);
+                                    "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + bytes.length);
         int index = 0;
         synchronized (this) {
             HashSet<TickingBlock> updateBlocks = new HashSet<>();
