@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
@@ -233,7 +234,7 @@ public class World implements Disposable, Ticking, Resizable {
     @Nullable
     public Chunk getChunk(@NotNull Location chunkLoc) {
         Chunk chunk = chunks.get(chunkLoc);
-        if (chunk == null) {
+        if (chunk == null || !chunk.isLoaded()) {
             if (ticker.isPaused()) {
                 return null;
             }
@@ -521,7 +522,8 @@ public class World implements Disposable, Ticking, Resizable {
      * @return If the given chunk is loaded in memory
      */
     public boolean isChunkLoaded(@NotNull Location chunkLoc) {
-        return chunks.containsKey(chunkLoc);
+        Chunk chunk = chunks.get(chunkLoc);
+        return chunk != null && chunk.isLoaded();
     }
 
     /**
@@ -533,13 +535,14 @@ public class World implements Disposable, Ticking, Resizable {
      *     If the chunks will be saved
      */
     public void unloadChunks(boolean force, boolean save) {
-        for (Chunk chunk : getLoadedChunks()) {
+        //ok to incude unloaded chunks as they will not cause an error when unloading again
+        for (Chunk chunk : chunks.values()) {
             unloadChunk(chunk, force, save);
         }
     }
 
     public Collection<Chunk> getLoadedChunks() {
-        return chunks.values();
+        return chunks.values().stream().filter(it -> !it.isLoaded()).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
@@ -644,7 +647,7 @@ public class World implements Disposable, Ticking, Resizable {
         if (worldFolder == null) {
             return;
         }
-        for (Chunk chunk : chunks.values()) {
+        for (Chunk chunk : getLoadedChunks()) {
             chunkLoader.save(chunk);
         }
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
@@ -746,8 +749,7 @@ public class World implements Disposable, Ticking, Resizable {
                 continue;
             }
             //Unload chunks not seen for CHUNK_UNLOAD_TIME
-            if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) &&
-                tick - chunk.getLastViewedTick() > chunkUnloadTime) {
+            if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
                 unloadChunk(chunk);
                 iterator.remove();
@@ -786,7 +788,7 @@ public class World implements Disposable, Ticking, Resizable {
 
     @Override
     public void tickRare() {
-        for (Chunk chunk : chunks.values()) {
+        for (Chunk chunk : getLoadedChunks()) {
             chunk.tickRare();
         }
         for (Entity entity : entities) {
@@ -814,8 +816,8 @@ public class World implements Disposable, Ticking, Resizable {
      */
     public void addEntity(@NotNull Entity entity) {
         entities.add(entity);
-        if (entity instanceof Player) {
-            livingEntities.add((Player) entity);
+        if (entity instanceof Player player) {
+            livingEntities.add(player);
         }
     }
 
@@ -837,8 +839,7 @@ public class World implements Disposable, Ticking, Resizable {
         ObjectSet<Block> blocks = new ObjectSet<>();
         float radiusSquare = radius * radius;
         for (Block block : getBlocksAABB(worldX, worldY, radius, radius, raw)) {
-            if (Math.abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f)) <=
-                radiusSquare) {
+            if (Math.abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f)) <= radiusSquare) {
                 blocks.add(block);
             }
         }
