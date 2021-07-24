@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.console;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -15,28 +14,20 @@ import com.strongjoshua.console.LogLevel;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
 import no.elg.infiniteBootleg.console.consoles.StdConsole;
 import no.elg.infiniteBootleg.util.Resizable;
-import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
     private final boolean inGameConsole;
     private final Console console;
     private final CommandExecutor exec;
-    private Window consoleWindow;
 
     public ConsoleHandler() {
         this(Settings.renderGraphic);
@@ -48,11 +39,6 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
             console = new CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
             console.setLoggingToSystem(true);
             Main.inst().getInputMultiplexer().addProcessor(console.getInputProcessor());
-            try {
-                consoleWindow = (Window) Reflection.getSuperField(console, "consoleWindow");
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
         }
         else {
             console = new StdConsole(this);
@@ -64,12 +50,12 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     }
 
     public float getAlpha() {
-        return inGameConsole ? consoleWindow.getColor().a : 1;
+        return inGameConsole ? console.getWindow().getColor().a : 1;
     }
 
     public void setAlpha(float a) {
         if (inGameConsole) {
-            consoleWindow.getColor().a = a;
+            console.getWindow().getColor().a = a;
         }
 
     }
@@ -99,8 +85,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
         Method[] methods = ClassReflection.getMethods(exec.getClass());
 
-        Set<String> potentialMethods = Arrays.stream(methods).filter(
-            m -> m.getName().toLowerCase().startsWith(methodName.toLowerCase())).map(
+        Set<String> potentialMethods = Arrays.stream(methods).filter(m -> m.getName().toLowerCase().startsWith(methodName.toLowerCase())).map(
             HelpfulConsoleHelpUtil::generateCommandSignature).collect(Collectors.toSet());
 
         Array<Integer> possible = new Array<>(false, 8);
@@ -219,8 +204,8 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
                 console.log(msg, level);
             }
         } catch (Exception ex) {
-            System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg,
-                              level.toString(), ex.getClass().getSimpleName(), ex.getMessage());
+            System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg, level.toString(),
+                              ex.getClass().getSimpleName(), ex.getMessage());
         }
     }
 

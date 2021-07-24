@@ -20,7 +20,7 @@ buildscript {
     ashleyVersion = '1.7.3'
     aiVersion = '1.8.2'
     powermockVersion = '2.0.2'
-    visVersion = '1.4.4'
+    visVersion = '1.5.0'
   }
 
   repositories {
@@ -94,7 +94,7 @@ project(":core") {
 
   dependencies {
 
-    api "com.strongjoshua:libgdx-inGameConsole:0.7.1"
+    api "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     api "org.apache.commons:commons-lang3:3.8.1"
     api "no.kh498.util:CommonUtil:1.0.4"
 
