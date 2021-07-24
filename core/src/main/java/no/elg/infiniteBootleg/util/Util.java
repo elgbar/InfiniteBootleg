@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public class Util {
 
     public static final String DEFAULT_HASH = "UNKNOWN";
-    public static final int DEFAULT_COMMIT_COUNT = -1;
+    public static final int DEFAULT_COMMIT_COUNT = 0;
     public static final String VERSION_DELIMITER = "-";
     public static final String FALLBACK_VERSION = DEFAULT_HASH + VERSION_DELIMITER + DEFAULT_COMMIT_COUNT;
 
