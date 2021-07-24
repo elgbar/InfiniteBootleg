@@ -68,7 +68,6 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     it.type = StaticBody
   }
 
-
   /**
    * Update the box2d fixture of this chunk
    *
@@ -105,8 +104,11 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
           //FIXME only check the chunk if the local coordinates are outside this chunk
           if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) &&  //
-            !chunk.world.isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx),
-              CoordUtil.worldToChunk(worldY + dir.dy))) {
+            !chunk.world.isChunkLoaded(
+              CoordUtil.worldToChunk(worldX + dir.dx),
+              CoordUtil.worldToChunk(worldY + dir.dy)
+            )
+          ) {
             continue
           }
           var rel: Block?
@@ -123,7 +125,8 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
             || !rel.material.isSolid
             || dir == NORTH && localY == Chunk.CHUNK_SIZE - 1 //always render top of chunk
             || dir == EAST && localX == Chunk.CHUNK_SIZE - 1 //and the sides
-            || dir == WEST && localX == 0) {
+            || dir == WEST && localX == 0
+          ) {
 
             edgeShape.set(
               localX + edgeDelta[0].toFloat(),
@@ -177,7 +180,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     }
     unsureFixture = true
     Main.inst().scheduler.scheduleAsync({
-      synchronized(this) {
+      synchronized(this@ChunkBody) {
         unsureFixture = false
         if (chunk.isNeighborsLoaded) {
           update(false, false)

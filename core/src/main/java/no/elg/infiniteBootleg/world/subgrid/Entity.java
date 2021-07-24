@@ -152,8 +152,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             }
             if (invalid) {
                 Main.logger().error("Entity", String
-                    .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX,
-                            worldY, posCache.x, posCache.y));
+                    .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX, worldY, posCache.x, posCache.y));
                 return;
             }
         }
@@ -272,10 +271,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
             Vector2 pos = entity.getPosition();
             //exclude equality of lower bond
-            boolean bx = Util.isBetween((pos.x + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dWidth(), worldX,
-                                        pos.x + entity.getHalfBox2dWidth());
-            boolean by = Util.isBetween((pos.y + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dHeight(), worldY,
-                                        pos.y + entity.getHalfBox2dHeight());
+            boolean bx = Util.isBetween((pos.x + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth());
+            boolean by = Util.isBetween((pos.y + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight());
             if (bx && by) {
                 entities.add(entity);
             }
@@ -367,19 +364,19 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     public void tick() {
         if (body == null) { return; }
         updatePos();
+        float nx;
+        if (abs(velCache.x) > MAX_X_VEL) {
+            nx = signum(velCache.x) * MAX_X_VEL;
+        }
+        else { nx = velCache.x; }
+
+        float ny;
+        if (abs(velCache.y) > MAX_Y_VEL) {
+            ny = signum(velCache.y) * MAX_Y_VEL;
+        }
+        else { ny = velCache.y; }
+
         synchronized (WorldRender.BOX2D_LOCK) {
-            float nx;
-            if (abs(velCache.x) > MAX_X_VEL) {
-                nx = signum(velCache.x) * MAX_X_VEL;
-            }
-            else { nx = velCache.x; }
-
-            float ny;
-            if (abs(velCache.y) > MAX_Y_VEL) {
-                ny = signum(velCache.y) * MAX_Y_VEL;
-            }
-            else { ny = velCache.y; }
-
             body.setLinearVelocity(nx, ny);
         }
     }

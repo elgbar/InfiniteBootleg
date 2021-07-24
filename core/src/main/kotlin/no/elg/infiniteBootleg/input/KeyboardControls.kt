@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
-import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import kotlin.math.abs
 import kotlin.math.min
@@ -27,104 +26,136 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   private var lastEditTick: Long = 0
   private val tmpVec = Vector2()
 
-  override fun update() {
-    if (Main.inst().console.isVisible) {
-      return
-    }
-    var update = false
+  private fun breakBlocks(): Boolean {
     val blockX = Main.inst().mouseBlockX
     val blockY = Main.inst().mouseBlockY
     val rawX = Main.inst().mouseX
     val rawY = Main.inst().mouseY
-    val world = worldRender.getWorld()
-    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-      if (breakBrushSize <= 1) {
-        world.remove(blockX, blockY, true)
-      } else {
-        for (block in world.getBlocksWithin(rawX, rawY, breakBrushSize, true)) {
-          world.remove(block.worldX, block.worldY, true)
-        }
-      }
-      lastEditTick = world.tick
-      update = true
-    } else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) || Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-      if (placeBrushSize <= 1) {
-        update = selected.create(world, blockX, blockY)
-      } else {
-        for (block in world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
-          update = update or selected.create(world, block.worldX, block.worldY)
-        }
-      }
-      if (update) {
-        lastEditTick = world.tick
+
+    if (breakBrushSize <= 1) {
+      world.remove(blockX, blockY, true)
+    } else {
+      for (block in world.getBlocksWithin(rawX, rawY, breakBrushSize, true)) {
+        world.remove(block.worldX, block.worldY, true)
       }
     }
-    val entity: Entity = controlled
-    if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
-      //teleport the player to the (last) location of the mouse
-      entity.teleport(Main.inst().mouseX, Main.inst().mouseY, true)
-      val input = world.input
-      if (input != null) {
-        input.following = entity
-        input.isLockedOn = true
-      }
+    lastEditTick = world.tick
+    return true
+  }
+
+  private fun placeBlocks(): Boolean {
+    val blockX = Main.inst().mouseBlockX
+    val blockY = Main.inst().mouseBlockY
+    val rawX = Main.inst().mouseX
+    val rawY = Main.inst().mouseY
+
+    var update = false
+    if (placeBrushSize <= 1) {
+      update = selected.create(world, blockX, blockY)
     } else {
+      for (block in world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
+        update = update or selected.create(world, block.worldX, block.worldY)
+      }
+    }
+    if (update) {
+      lastEditTick = world.tick
+    }
+    return update
+  }
 
-      fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-        synchronized(WorldRender.BOX2D_LOCK) {
-          val body = controlled.body
-          val vel = body.linearVelocity
-          val (nx, ny) = modify(vel.x, vel.y)
-          val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
-          body.setLinearVelocity(cap(nx, MAX_X_VEL), cap(ny, MAX_Y_VEL))
-          body.isAwake = true
+  private fun teleport() {
+    //teleport the player to the (last) location of the mouse
+    controlled.teleport(Main.inst().mouseX, Main.inst().mouseY, true)
+    val input = world.input
+    if (input != null) {
+      input.following = controlled
+      input.isLockedOn = true
+    }
+  }
+
+  private fun fly() {
+
+    fun fly(dx: Float = 0f, dy: Float = 0f) {
+      setVel { oldX, oldY -> oldX + dx to oldY + dy }
+    }
+
+    when {
+      Gdx.input.isKeyPressed(Input.Keys.W) -> fly(dy = FLY_VEL)
+      Gdx.input.isKeyPressed(Input.Keys.S) -> fly(dy = -FLY_VEL)
+      Gdx.input.isKeyPressed(Input.Keys.A) -> fly(dx = -FLY_VEL)
+      Gdx.input.isKeyPressed(Input.Keys.D) -> fly(dx = FLY_VEL)
+    }
+  }
+
+  private fun walk() {
+
+    fun moveHorz(dir: Float) {
+      synchronized(WorldRender.BOX2D_LOCK) {
+        val body = controlled.body
+
+        val currSpeed = body.linearVelocity.x
+        val wantedSpeed = dir * if (controlled.isOnGround) {
+          MAX_X_VEL
+        } else {
+          MAX_X_VEL * (2f / 3f)
         }
+        val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
+
+        tmpVec.set(impulse, controlled.velocity.y)
+
+        body.applyLinearImpulse(tmpVec, body.worldCenter, true)
+      }
+    }
+
+    if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+      moveHorz(-1f)
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+      moveHorz(1f)
+    }
+  }
+
+  private fun jump() {
+    if (controlled.isOnGround && Gdx.input.isKeyPressed(Input.Keys.W)) {
+      setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
+    }
+  }
+
+  override fun update() {
+    if (Main.inst().console.isVisible) {
+      return
+    }
+    val update =
+      when {
+        Gdx.input.isButtonPressed(Input.Buttons.LEFT) -> breakBlocks()
+        Gdx.input.isButtonPressed(Input.Buttons.RIGHT) -> placeBlocks()
+        Gdx.input.isKeyJustPressed(Input.Keys.Q) -> placeBlocks()
+        else -> false
       }
 
-      if (entity.isFlying) {
-
-        fun fly(dx: Float = 0f, dy: Float = 0f) {
-          setVel { oldX, oldY -> oldX + dx to oldY + dy }
-        }
-
-        when {
-          Gdx.input.isKeyPressed(Input.Keys.W) -> fly(dy = FLY_VEL)
-          Gdx.input.isKeyPressed(Input.Keys.S) -> fly(dy = -FLY_VEL)
-          Gdx.input.isKeyPressed(Input.Keys.A) -> fly(dx = -FLY_VEL)
-          Gdx.input.isKeyPressed(Input.Keys.D) -> fly(dx = FLY_VEL)
-        }
+    if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+      teleport()
+    } else {
+      if (controlled.isFlying) {
+        fly()
       } else {
-        if (entity.isOnGround && Gdx.input.isKeyPressed(Input.Keys.W)) {
-          setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
-        }
-
-        fun moveHorz(dir: Float) {
-          synchronized(WorldRender.BOX2D_LOCK) {
-            val body = controlled.body
-
-            val currSpeed = body.linearVelocity.x
-            val wantedSpeed = dir * if (entity.isOnGround) {
-              MAX_X_VEL
-            } else {
-              MAX_X_VEL * (2f / 3f)
-            }
-            val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
-
-            tmpVec.set(impulse, 0f)
-            body.applyLinearImpulse(tmpVec, body.worldCenter, true)
-          }
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-          moveHorz(-1f)
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-          moveHorz(1f)
-        }
+        jump()
+        walk()
       }
     }
     if (update) {
       worldRender.update()
+    }
+  }
+
+  private fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
+    synchronized(WorldRender.BOX2D_LOCK) {
+      val body = controlled.body
+      val vel = body.linearVelocity
+      val (nx, ny) = modify(vel.x, vel.y)
+      val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
+      body.setLinearVelocity(cap(nx, MAX_X_VEL), cap(ny, MAX_Y_VEL))
+      body.isAwake = true
     }
   }
 
@@ -173,7 +204,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   }
 
   companion object {
-    const val JUMP_VERTICAL_VEL = 12f
+    const val JUMP_VERTICAL_VEL = 20f
     const val FLY_VEL = .075f
 
     const val MAX_X_VEL = 15f //ie target velocity
