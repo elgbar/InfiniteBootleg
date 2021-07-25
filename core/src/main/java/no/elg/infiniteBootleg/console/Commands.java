@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
@@ -227,16 +228,20 @@ public class Commands extends CommandExecutor {
         new GenericEntity(Main.inst().getWorld(), worldX, worldY, width, height);
     }
 
-    @CmdArgNames({"players"})
     @ConsoleDoc(description = "Kill all non-player entities")
-    public void killall(boolean players) {
+    public void killall() {
         World world = Main.inst().getWorld();
-        for (Entity entity : world.getEntities()) {
-            if (!(entity instanceof Player)) {
-                continue;
+        int entities;
+        synchronized (BOX2D_LOCK) {
+            entities = world.getEntities().size();
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof Player) {
+                    continue;
+                }
+                world.removeEntity(entity);
             }
-            world.removeEntity(entity);
         }
+        logger.log(LogLevel.SUCCESS, "Killed " + entities + " entities");
     }
 
     @ClientsideOnly
