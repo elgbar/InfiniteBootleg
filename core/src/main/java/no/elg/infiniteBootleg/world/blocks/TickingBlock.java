@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks;
 
-import com.badlogic.gdx.Gdx;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -21,12 +20,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TickingBlock extends Block implements Ticking {
 
-    private boolean shouldTick;
+    private long minimumTick;
+    private boolean shouldTick = true;
+
 
     public TickingBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        //should not tick right away to not spawn multiple entities when spawning f.eks sand
-        Gdx.app.postRunnable(() -> shouldTick = true);
+        minimumTick = getWorld().getTick();
     }
 
     /**
@@ -36,7 +36,8 @@ public abstract class TickingBlock extends Block implements Ticking {
      *     If the the rare update should be called instead of the normal update
      */
     public void tryTick(boolean rare) {
-        if (shouldTick()) {
+        //should not tick right away to not spawn multiple entities when spawning f.ex sand
+        if (shouldTick() && minimumTick < getWorld().getTick()) {
             shouldTick = false;
             if (rare) {
                 tickRare();
@@ -53,5 +54,6 @@ public abstract class TickingBlock extends Block implements Ticking {
 
     public void setShouldTick(boolean shouldTick) {
         this.shouldTick = shouldTick;
+        minimumTick = getWorld().getTick();
     }
 }
