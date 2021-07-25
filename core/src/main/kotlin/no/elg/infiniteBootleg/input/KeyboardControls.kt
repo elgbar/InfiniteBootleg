@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import kotlin.math.abs
 import kotlin.math.min
@@ -90,7 +91,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   private fun walk() {
 
     fun moveHorz(dir: Float) {
-      if (!controlled.wouldOnlyTouchAir(controlled.position.x + dir, controlled.position.y)) {
+      if (!controlled.validLocation(controlled.position.x + GROUND_CHECK_OFFSET * dir, controlled.position.y)) {
         return
       }
       synchronized(WorldRender.BOX2D_LOCK) {

@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
-    private static final float GROUND_CHECK_OFFSET = 0.1f;
+    public static final float GROUND_CHECK_OFFSET = 0.1f;
 
     private final World world;
     private final UUID uuid;
@@ -220,6 +220,29 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      * @return The height of this entity in world view
      */
     public abstract int getHeight();
+
+    /**
+     * @param worldX
+     *     World x coordinate to pretend the player is at
+     * @param worldY
+     *     World y coordinate to pretend the player is at
+     *
+     * @return {@code True} if the given location is valid
+     */
+    public boolean validLocation(float worldX, float worldY) {
+        int x = MathUtils.floor(worldX - getHalfBox2dWidth());
+        float maxX = worldX + getHalfBox2dWidth();
+        for (; x < maxX; x++) {
+            int y = MathUtils.floor(worldY - getHalfBox2dHeight());
+            float maxY = worldY + getHalfBox2dHeight();
+            for (; y < maxY; y++) {
+                if (!world.canPassThrough(x, y)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * @param worldX

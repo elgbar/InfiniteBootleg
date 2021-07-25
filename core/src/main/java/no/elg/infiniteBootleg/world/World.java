@@ -458,6 +458,23 @@ public class World implements Disposable, Ticking, Resizable {
         return b == null || b.getMaterial() == Material.AIR;
     }
 
+    public boolean canPassThrough(int worldX, int worldY) {
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+        Chunk chunk = getChunk(chunkX, chunkY);
+        if (chunk == null) {
+            //What should we return here? we don't really know as it does not exist.
+            //Return false to prevent teleportation and other actions that depend on an empty space.
+            return false;
+        }
+
+        Block b = chunk.getBlocks()[localX][localY];
+        return b == null || !b.getMaterial().isSolid();
+    }
     /**
      * Set all blocks in all cardinal directions around a given block to be updated. Given location not included
      *
