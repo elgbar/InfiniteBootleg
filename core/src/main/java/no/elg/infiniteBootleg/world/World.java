@@ -366,8 +366,8 @@ public class World implements Disposable, Ticking, Resizable {
         if (chunk != null) {
             chunk.setBlock(localX, localY, (Block) null, update);
             for (Entity entity : getEntities(worldX, worldY)) {
-                if (entity instanceof Removable) {
-                    ((Removable) entity).onRemove();
+                if (entity instanceof Removable removableEntity) {
+                    removableEntity.onRemove();
                     removeEntity(entity);
                 }
             }
@@ -375,16 +375,16 @@ public class World implements Disposable, Ticking, Resizable {
     }
 
     public Array<Entity> getEntities(float worldX, float worldY) {
-        Array<Entity> entities = new Array<>(false, 5);
-        for (Entity entity : this.entities) {
+        Array<Entity> foundEntities = new Array<>(false, 5);
+        for (Entity entity : entities) {
             Vector2 pos = entity.getPosition();
             if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
                 Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
 
-                entities.add(entity);
+                foundEntities.add(entity);
             }
         }
-        return entities;
+        return foundEntities;
     }
 
     /**
@@ -398,7 +398,7 @@ public class World implements Disposable, Ticking, Resizable {
      */
     public void removeEntity(@NotNull Entity entity) {
         boolean removed = entities.remove(entity);
-        if (entity instanceof Player) {
+        if (entity instanceof LivingEntity) {
             removed |= livingEntities.remove(entity);
         }
         if (removed) {
@@ -833,8 +833,8 @@ public class World implements Disposable, Ticking, Resizable {
      */
     public void addEntity(@NotNull Entity entity) {
         entities.add(entity);
-        if (entity instanceof Player player) {
-            livingEntities.add(player);
+        if (entity instanceof LivingEntity livingEntity) {
+            livingEntities.add(livingEntity);
         }
     }
 
