@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +57,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         uuid = UUID.randomUUID();
         this.world = world;
         flying = false;
-        world.addEntity(this);
+        Main.inst().getScheduler().executeAsync(() -> world.addEntity(this));
         posCache = new Vector2(worldX, worldY);
         velCache = new Vector2();
         filter = World.ENTITY_FILTER;
@@ -79,7 +80,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             posCache.y += checkStep;
         }
 
-        synchronized (WorldRender.BOX2D_LOCK) {
+        synchronized (BOX2D_LOCK) {
             BodyDef def = createBodyDef(posCache.x, posCache.y);
             body = world.getWorldBody().createBody(def);
             createFixture(body);
@@ -157,7 +158,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             }
         }
 
-        synchronized (WorldRender.BOX2D_LOCK) {
+        synchronized (BOX2D_LOCK) {
             body.setTransform(worldX, worldY, 0);
             body.setAngularVelocity(0);
             body.setLinearVelocity(0, 0);
@@ -324,7 +325,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      */
     public synchronized void setFilter(Filter filter) {
         this.filter = filter;
-        synchronized (WorldRender.BOX2D_LOCK) {
+        synchronized (BOX2D_LOCK) {
             if (body != null) {
                 for (Fixture fixture : body.getFixtureList()) {
                     fixture.setFilterData(filter);
@@ -399,7 +400,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         }
         else { ny = velCache.y; }
 
-        synchronized (WorldRender.BOX2D_LOCK) {
+        synchronized (BOX2D_LOCK) {
             body.setLinearVelocity(nx, ny);
         }
     }
@@ -445,7 +446,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     public void setFlying(boolean flying) {
         this.flying = flying;
-        synchronized (WorldRender.BOX2D_LOCK) {
+        synchronized (BOX2D_LOCK) {
             if (flying) {
                 body.setLinearVelocity(0, 0);
                 body.setGravityScale(0);

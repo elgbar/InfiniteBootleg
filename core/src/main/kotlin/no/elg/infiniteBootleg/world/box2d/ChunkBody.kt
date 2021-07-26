@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.EdgeShape
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.util.CoordUtil
-import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Direction.EAST
@@ -62,7 +61,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
   private var unsureFixture = false
 
   /**calculate the shape of the chunk (box2d)*/
-  private val bodyDef = BodyDef().also { it ->
+  private val bodyDef = BodyDef().also {
     it.position[chunk.chunkX * Chunk.CHUNK_SIZE.toFloat()] = chunk.chunkY * Chunk.CHUNK_SIZE.toFloat()
     it.fixedRotation = true
     it.type = StaticBody
@@ -103,16 +102,15 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
         for ((dir, edgeDelta) in EDGE_DEF) {
 
           //FIXME only check the chunk if the local coordinates are outside this chunk
-          if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) &&  //
-            !chunk.world.isChunkLoaded(
+          if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && !chunk.world.isChunkLoaded(
               CoordUtil.worldToChunk(worldX + dir.dx),
               CoordUtil.worldToChunk(worldY + dir.dy)
             )
           ) {
             continue
           }
-          var rel: Block?
-          rel = if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
+
+          val rel = if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
             chunk.getRawBlock(localX + dir.dx, localY + dir.dy)
           } else {
             val relChunk = chunk.world.getChunkFromWorld(worldX + dir.dx, worldY + dir.dy) ?: continue
@@ -211,5 +209,4 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
   override fun dispose() {
     destroyCurrentBody()
   }
-
 }

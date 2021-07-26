@@ -475,6 +475,7 @@ public class World implements Disposable, Ticking, Resizable {
         Block b = chunk.getBlocks()[localX][localY];
         return b == null || !b.getMaterial().isSolid();
     }
+
     /**
      * Set all blocks in all cardinal directions around a given block to be updated. Given location not included
      *
@@ -486,8 +487,8 @@ public class World implements Disposable, Ticking, Resizable {
     public void updateBlocksAround(int worldX, int worldY) {
         for (Direction dir : Direction.CARDINAL) {
             Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
-            if (rel instanceof TickingBlock) {
-                ((TickingBlock) rel).setShouldTick(true);
+            if (rel instanceof TickingBlock tickingBlock) {
+                tickingBlock.setShouldTick(true);
             }
         }
     }

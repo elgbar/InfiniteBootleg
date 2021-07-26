@@ -426,14 +426,14 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     public Stream<Block> stream() {
-        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), CHUNK_SIZE * CHUNK_SIZE, SIZED | DISTINCT | NONNULL | ORDERED);
+        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), (long) CHUNK_SIZE * CHUNK_SIZE, SIZED | DISTINCT | NONNULL | ORDERED);
         return StreamSupport.stream(spliterator, false);
     }
 
     @NotNull
     @Override
     public Iterator<Block> iterator() {
-        return new Iterator<Block>() {
+        return new Iterator<>() {
             int x;
             int y;
 

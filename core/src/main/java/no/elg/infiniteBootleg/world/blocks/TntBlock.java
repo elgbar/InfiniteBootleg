@@ -107,11 +107,10 @@ public class TntBlock extends TickingBlock {
                             if (mat == AIR || hardness < 0) {
                                 continue;
                             }
-                            double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness *
-                                          Math.abs(MathUtils.random.nextGaussian() + RESISTANCE);
+                            double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness * Math.abs(
+                                MathUtils.random.nextGaussian() + RESISTANCE);
                             if (dist < strength * strength) {
-                                if (b instanceof TntBlock && b != this) {
-                                    TntBlock tntb = (TntBlock) b;
+                                if (b instanceof TntBlock tntb && b != this) {
                                     tntb.exploded = true;
                                 }
                                 destroyed.add(b);

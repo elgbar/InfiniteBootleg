@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
 import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 
@@ -35,7 +36,7 @@ class WorldBody(world: World) : Ticking {
    * The definition of the body to create
    */
   fun createBody(def: BodyDef): Body {
-    synchronized(WorldRender.BOX2D_LOCK) {
+    synchronized(BOX2D_LOCK) {
       return box2dWorld.createBody(def)
     }
   }
@@ -50,13 +51,13 @@ class WorldBody(world: World) : Ticking {
     if (body == null) {
       return
     }
-    synchronized(WorldRender.BOX2D_LOCK) {
+    synchronized(BOX2D_LOCK) {
       box2dWorld.destroyBody(body)
     }
   }
 
   override fun tick() {
-    synchronized(WorldRender.BOX2D_LOCK) {
+    synchronized(BOX2D_LOCK) {
       box2dWorld.step(timeStep, 20, 10)
     }
   }
@@ -67,7 +68,7 @@ class WorldBody(world: World) : Ticking {
   }
 
   init {
-    synchronized(WorldRender.BOX2D_LOCK) {
+    synchronized(BOX2D_LOCK) {
       box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
       box2dWorld.setContactListener(ContactManager(world))
       timeStep = world.worldTicker.secondsDelayBetweenTicks
