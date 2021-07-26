@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Spliterator;
 import static java.util.Spliterator.DISTINCT;
@@ -447,6 +448,9 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                 if (x == CHUNK_SIZE) {
                     x = 0;
                     y++;
+                }
+                if (y >= CHUNK_SIZE) {
+                    throw new NoSuchElementException();
                 }
                 return getBlock(x++, y);
             }
