@@ -92,7 +92,7 @@ public class World implements Disposable, Ticking, Resizable {
         //for falling blocks
         BLOCK_ENTITY_FILTER = new Filter();
         BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
-        BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
+        BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
 
         //ie glass
         SOLID_TRANSPARENT_FILTER = new Filter();
