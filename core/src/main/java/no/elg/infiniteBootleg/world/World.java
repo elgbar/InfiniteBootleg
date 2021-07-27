@@ -754,8 +754,6 @@ public class World implements Disposable, Ticking, Resizable {
 
     @Override
     public void tick() {
-        //tick all box2d elements
-        worldBody.tick();
         WorldRender wr = getRender();
 
         //update light direction
@@ -803,8 +801,17 @@ public class World implements Disposable, Ticking, Resizable {
             chunk.tick();
         }
 
-        //tick all entities
-        entities.forEach(Entity::tick);
+        for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext(); ) {
+            Entity entity = iterator.next();
+
+            if (entity.isInvalid()) {
+                removeEntity(entity);
+                continue;
+            }
+            entity.tick();
+        }
+        //tick all box2d elements
+        worldBody.tick();
     }
 
     @NotNull
