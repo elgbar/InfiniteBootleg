@@ -3,10 +3,9 @@ package no.elg.infiniteBootleg.world.subgrid;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.subgrid.enitites.AirResistanceEntity;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class LivingEntity extends AirResistanceEntity implements Updatable {
+public abstract class LivingEntity extends Entity implements Updatable {
 
     public static final int DEFAULT_HEALTH = 10;
     public static final String DEFAULT_NAME = "LivingEntity";
