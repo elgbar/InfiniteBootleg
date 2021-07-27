@@ -387,6 +387,24 @@ public class World implements Disposable, Ticking, Resizable {
         return foundEntities;
     }
 
+
+    public Array<Entity> getEntities(@NotNull Chunk chunk) {
+        Array<Entity> foundEntities = new Array<>(false, 5);
+
+        float minX = chunk.getWorldX();
+        float maxX = minX + Chunk.CHUNK_SIZE;
+        float minY = chunk.getWorldY();
+        float maxY = minY + Chunk.CHUNK_SIZE;
+
+        for (Entity entity : entities) {
+            Vector2 pos = entity.getPosition();
+            if (Util.isBetween(minX, pos.x, maxX) && Util.isBetween(minY, pos.y, maxY)) {
+                foundEntities.add(entity);
+            }
+        }
+        return foundEntities;
+    }
+
     /**
      * Remove and disposes the given entity
      *
@@ -555,7 +573,11 @@ public class World implements Disposable, Ticking, Resizable {
      *     If the chunks will be saved
      */
     public void unloadChunks(boolean force, boolean save) {
-        //ok to incude unloaded chunks as they will not cause an error when unloading again
+        //remove all entites to speed up unloading
+        for (Entity entity : getEntities()) {
+            removeEntity(entity);
+        }
+        //ok to include unloaded chunks as they will not cause an error when unloading again
         for (Chunk chunk : chunks.values()) {
             unloadChunk(chunk, force, save);
         }
@@ -579,6 +601,9 @@ public class World implements Disposable, Ticking, Resizable {
         if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
             if (save) {
                 chunkLoader.save(chunk);
+            }
+            for (Entity entity : getEntities(chunk)) {
+                removeEntity(entity);
             }
             chunk.dispose();
         }
