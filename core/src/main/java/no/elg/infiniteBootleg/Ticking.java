@@ -8,12 +8,16 @@ import no.elg.infiniteBootleg.util.Ticker;
 public interface Ticking {
 
     /**
-     * Tick an object. This will be called in sync with the current {@link Ticker}
+     * Tick an object. This will be called in sync with the current {@link Ticker}.
+     * <p>
+     * You might want to use synchronization either on the whole method or parts of the method to ensure correctness
      */
     void tick();
 
     /**
-     * Update rarely (for expensive methods) this should be called every {@link Ticker#getTickRareRate()} ticks
+     * Update rarely (for expensive methods) this should be called every {@link Ticker#getTickRareRate()} ticks.
+     * <p>
+     * You might want to use synchronization either on the whole method or parts of the method to ensure correctness
      */
     default void tickRare() {}
 }

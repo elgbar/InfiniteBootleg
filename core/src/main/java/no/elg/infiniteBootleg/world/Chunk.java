@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import java.io.File;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -19,6 +18,7 @@ import static java.util.Spliterator.NONNULL;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterator.SIZED;
 import java.util.Spliterators;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.Main;
@@ -54,14 +54,14 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     private final Set<TickingBlock> tickingBlocks;
     private final ChunkBody chunkBody;
     //if this chunk should be prioritized to be updated
-    private boolean dirty; //if texture/allair needs to be updated
-    private boolean prioritize;
-    private boolean modified; //if the chunk has been modified since loaded
-    private boolean loaded; //once unloaded it no longer is valid
-    private boolean allowUnload;
-    private boolean initializing;
-    private boolean allAir;
-    private long lastViewedTick;
+    private volatile boolean dirty; //if texture/allair needs to be updated
+    private volatile boolean prioritize;
+    private volatile boolean modified; //if the chunk has been modified since loaded
+    private volatile boolean loaded; //once unloaded it no longer is valid
+    private volatile boolean allowUnload;
+    private volatile boolean initializing;
+    private volatile boolean allAir;
+    private volatile long lastViewedTick;
     private TextureRegion fboRegion;
     private FileHandle chunkFile;
     private FrameBuffer fbo;
@@ -98,7 +98,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
-        tickingBlocks = Collections.synchronizedSet(new HashSet<>());
+        tickingBlocks = ConcurrentHashMap.newKeySet();//Collections.synchronizedSet(new HashSet<>());
         chunkBody = new ChunkBody(this);
 
         dirty = true;
@@ -160,7 +160,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      * @return The given block, equal to the {@code block} parameter
      */
     @Nullable
-    public synchronized Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture) {
+    public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
         if (block != null) {
@@ -168,48 +168,44 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             Preconditions.checkArgument(block.getLocalY() == localY);
             Preconditions.checkArgument(block.getChunk() == this);
         }
-        Block currBlock = blocks[localX][localY];
+        synchronized (this) {
+            Block currBlock = blocks[localX][localY];
 
-        if ((currBlock == null && block == null) || (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
-            if (block != null) {
-                block.dispose();
+            if ((currBlock == null && block == null) || (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
+                if (block != null) {
+                    block.dispose();
+                }
+                return null;
             }
-            return null;
-        }
 
-        if (currBlock != null) {
-            currBlock.dispose();
-        }
+            if (currBlock != null) {
+                currBlock.dispose();
+            }
 
-        if (block == null) {
-            blocks[localX][localY] = null;
-            if (currBlock instanceof TickingBlock) {
-                synchronized (tickingBlocks) {
+            if (block == null) {
+                blocks[localX][localY] = null;
+                if (currBlock instanceof TickingBlock) {
                     tickingBlocks.remove(currBlock);
                 }
             }
-        }
-        else {
-            blocks[localX][localY] = block;
+            else {
+                blocks[localX][localY] = block;
 
-            if (currBlock instanceof TickingBlock && !(block instanceof TickingBlock)) {
-                synchronized (tickingBlocks) {
+                if (currBlock instanceof TickingBlock && !(block instanceof TickingBlock)) {
                     tickingBlocks.remove(currBlock);
                 }
-            }
-            if (block instanceof TickingBlock) {
-                synchronized (tickingBlocks) {
-                    tickingBlocks.add((TickingBlock) block);
+                if (block instanceof TickingBlock tickingBlock) {
+                    tickingBlocks.add(tickingBlock);
                 }
             }
-        }
 
-        if (updateTexture) {
-            modified = true;
-            dirty = true;
-            prioritize = true;
+            if (updateTexture) {
+                modified = true;
+                dirty = true;
+                prioritize = true;
 
-            world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
+                Main.inst().getScheduler().executeAsync(() -> world.updateBlocksAround(getWorldX(localX), getWorldY(localY)));
+            }
         }
         return block;
     }
@@ -251,14 +247,14 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     /**
-     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
+     * Might cause a call to {@link #updateTextureIfDirty()} if the chunk is marked as dirty
      *
      * @return The texture of this chunk
      */
     @Nullable
     public TextureRegion getTextureRegion() {
         if (dirty) {
-            updateTextureNow();
+            updateTextureIfDirty();
         }
         return fboRegion;
     }
@@ -269,16 +265,19 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      * #getTextureRegion()}
      * called.
      */
-    public void updateTextureNow() {
+    public void updateTextureIfDirty() {
         if (initializing) {
             return;
         }
-        dirty = false;
-
-        //test if all the blocks in this chunk has the material air
-        allAir = true;
-        outer:
         synchronized (this) {
+            if (!dirty) {
+                return;
+            }
+            dirty = false;
+
+            //test if all the blocks in this chunk has the material air
+            allAir = true;
+            outer:
             for (int localX = 0; localX < CHUNK_SIZE; localX++) {
                 for (int localY = 0; localY < CHUNK_SIZE; localY++) {
                     Block b = blocks[localX][localY];
@@ -288,6 +287,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                     }
                 }
             }
+
         }
         if (Settings.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
@@ -299,7 +299,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         lastViewedTick = world.getTick();
     }
 
-    public FrameBuffer getFbo() {
+    public synchronized FrameBuffer getFbo() {
         if (fbo == null) {
             fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
             fbo.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
@@ -315,20 +315,16 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Override
     public void tick() {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        synchronized (tickingBlocks) {
-            for (TickingBlock block : tickingBlocks) {
-                block.tryTick(false);
-            }
+        for (TickingBlock block : tickingBlocks) {
+            block.tryTick(false);
         }
     }
 
     @Override
     public void tickRare() {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        synchronized (tickingBlocks) {
-            for (TickingBlock block : tickingBlocks) {
-                block.tryTick(true);
-            }
+        for (TickingBlock block : tickingBlocks) {
+            block.tryTick(true);
         }
     }
 
@@ -345,14 +341,15 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     /**
-     * Might cause a call to {@link #updateTextureNow()} if the chunk is marked as dirty
+     * Might cause a call to {@link #updateTextureIfDirty()} if the chunk is marked as dirty
      *
      * @return If all blocks in this chunk is air
      */
     public boolean isAllAir() {
         if (dirty) {
-            updateTextureNow();
+            updateTextureIfDirty();
         }
+
         return allAir;
     }
 
@@ -516,7 +513,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     @NotNull
-    public ChunkBody getChunkBody() {
+    public synchronized ChunkBody getChunkBody() {
         return chunkBody;
     }
 
@@ -542,18 +539,13 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     public void finishLoading() {
         synchronized (this) {
-            HashSet<TickingBlock> updateBlocks = new HashSet<>();
             for (int x = 0; x < CHUNK_SIZE; x++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     Block block = blocks[x][y];
-                    if (block instanceof TickingBlock) {
-                        updateBlocks.add((TickingBlock) block);
+                    if (block instanceof TickingBlock tickingBlock) {
+                        tickingBlocks.add(tickingBlock);
                     }
                 }
-            }
-
-            synchronized (tickingBlocks) {
-                tickingBlocks.addAll(updateBlocks);
             }
         }
         initializing = false;
@@ -573,7 +565,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     @Override
-    public void assemble(@NotNull byte[] bytes) {
+    public void assemble(byte[] bytes) {
         Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE,
                                     "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + bytes.length);
         int index = 0;
@@ -587,16 +579,12 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                         continue;
                     }
                     Block block = mat.createBlock(world, this, x, y);
-                    if (block instanceof TickingBlock) {
-                        updateBlocks.add((TickingBlock) block);
+                    if (block instanceof TickingBlock tickingBlock) {
+                        tickingBlocks.add(tickingBlock);
                     }
                     blocks[x][y] = block;
                 }
             }
-            synchronized (tickingBlocks) {
-                tickingBlocks.addAll(updateBlocks);
-            }
-
         }
         initializing = false;
     }
@@ -624,9 +612,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             return false;
         }
         if (chunkY != chunk.chunkY) {
-            return false;
-        }
-        if (loaded != chunk.loaded) {
             return false;
         }
         return world.equals(chunk.world);

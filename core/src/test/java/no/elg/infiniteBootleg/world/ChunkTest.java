@@ -56,13 +56,13 @@ public class ChunkTest extends TestGraphic {
     @Test
     public void checkAllAirModified() {
         chunk.setBlock(0, 0, Material.AIR, false);
-        chunk.updateTextureNow();
+        chunk.updateTextureIfDirty();
         assertTrue(chunk.isAllAir());
         chunk.setBlock(0, 0, Material.STONE, false);
-        chunk.updateTextureNow();
+        chunk.updateTextureIfDirty();
         assertFalse(chunk.isAllAir());
         chunk.setBlock(0, 0, Material.AIR, false);
-        chunk.updateTextureNow();
+        chunk.updateTextureIfDirty();
         assertTrue(chunk.isAllAir());
     }
 

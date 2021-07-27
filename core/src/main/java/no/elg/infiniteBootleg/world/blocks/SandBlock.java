@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks;
 
-import com.badlogic.gdx.Gdx;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Location;
@@ -20,17 +18,11 @@ public class SandBlock extends TickingBlock {
     }
 
     @Override
-    public void tick() {
+    public synchronized void tick() {
         Location south = Location.relative(getWorldX(), getWorldY(), Direction.SOUTH);
-        if (getWorld().isAirBlock(south)) {
-            Gdx.app.postRunnable(() -> {
-                if (getChunk().isLoaded()) {
-                    destroy();
-                    Main.inst().getScheduler().scheduleSync(() -> {
-                        new FallingBlock(getWorld(), getWorldX(), getWorldY(), Material.SAND);
-                    }, 10L);
-                }
-            });
+        if (getWorld().isAirBlock(south) && getChunk().isLoaded()) {
+            destroy();
+            new FallingBlock(getWorld(), getWorldX(), getWorldY(), Material.SAND);
         }
     }
 }

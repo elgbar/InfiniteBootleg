@@ -161,7 +161,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
                 if (chunk.isDirty()) {
                     //noinspection LibGDXFlushInsideLoop
-                    chunk.updateTextureNow();
+                    chunk.updateTextureIfDirty();
                 }
 
                 if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start ||

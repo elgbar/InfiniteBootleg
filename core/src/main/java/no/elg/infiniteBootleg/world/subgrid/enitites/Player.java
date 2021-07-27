@@ -47,7 +47,7 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         super.dispose();
         torchLight.dispose();
     }
@@ -57,7 +57,7 @@ public class Player extends LivingEntity {
         super.tick();
         if (torchLight != null) {
             Vector2 pos = super.getPosition();
-            float angle = Main.inst().getMouse().cpy().sub(pos).angle();
+            float angle = Main.inst().getMouse().cpy().sub(pos).angleDeg();
             torchLight.setDirection(angle);
             torchLight.setPosition(pos);
         }

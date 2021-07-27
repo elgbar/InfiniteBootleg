@@ -1,15 +1,12 @@
 package no.elg.infiniteBootleg.console.consoles;
 
-import com.badlogic.gdx.Gdx;
 import com.strongjoshua.console.HeadlessConsole;
-import no.elg.infiniteBootleg.console.ConsoleHandler;
-import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
+import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**

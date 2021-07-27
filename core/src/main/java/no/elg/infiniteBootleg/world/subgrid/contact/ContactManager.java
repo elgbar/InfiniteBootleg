@@ -5,7 +5,6 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,22 +18,18 @@ public class ContactManager implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        synchronized (WorldRender.BOX2D_LOCK) {
-            for (Entity entity : world.getEntities()) {
-                if (contact.getFixtureB().getBody() == entity.getBody()) {
-                    entity.contact(ContactType.BEGIN_CONTACT, contact);
-                }
+        for (Entity entity : world.getEntities()) {
+            if (!entity.isInvalid() && contact.getFixtureB().getBody() == entity.getBody()) {
+                entity.contact(ContactType.BEGIN_CONTACT, contact);
             }
         }
     }
 
     @Override
     public void endContact(Contact contact) {
-        synchronized (WorldRender.BOX2D_LOCK) {
-            for (Entity entity : world.getEntities()) {
-                if (contact.getFixtureB().getBody() == entity.getBody()) {
-                    entity.contact(ContactType.END_CONTACT, contact);
-                }
+        for (Entity entity : world.getEntities()) {
+            if (!entity.isInvalid() && contact.getFixtureB().getBody() == entity.getBody()) {
+                entity.contact(ContactType.END_CONTACT, contact);
             }
         }
     }

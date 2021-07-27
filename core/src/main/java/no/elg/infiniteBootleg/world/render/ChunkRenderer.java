@@ -43,6 +43,7 @@ public class ChunkRenderer implements Renderer, Disposable {
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
         synchronized (renderQueue) {
+            //do not queue the chunk we're currently rendering
             if (chunk != curr && !renderQueue.contains(chunk)) {
                 Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().update(true, false));
                 if (prioritize) { renderQueue.add(0, chunk); }
@@ -62,7 +63,6 @@ public class ChunkRenderer implements Renderer, Disposable {
             } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
             curr = chunk;
         }
-        final Chunk finalChunk = chunk;
 
         FrameBuffer fbo = chunk.getFbo();
 
@@ -72,21 +72,19 @@ public class ChunkRenderer implements Renderer, Disposable {
         batch.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (finalChunk) {
-            for (int x = 0; x < CHUNK_SIZE; x++) {
-                for (int y = 0; y < CHUNK_SIZE; y++) {
-                    Block block = blocks[x][y];
-                    if (block == null || block.getMaterial() == AIR) {
-                        continue;
-                    }
-                    int dx = block.getLocalX() * BLOCK_SIZE;
-                    int dy = block.getLocalY() * BLOCK_SIZE;
-
-                    batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                Block block = blocks[x][y];
+                if (block == null || block.getMaterial() == AIR) {
+                    continue;
                 }
+                int dx = block.getLocalX() * BLOCK_SIZE;
+                int dy = block.getLocalY() * BLOCK_SIZE;
+
+                batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
             }
         }
+
         batch.end();
         fbo.end();
 
@@ -100,5 +98,8 @@ public class ChunkRenderer implements Renderer, Disposable {
     @Override
     public void dispose() {
         batch.dispose();
+        synchronized (renderQueue) {
+            renderQueue.clear();
+        }
     }
 }

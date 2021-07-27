@@ -397,12 +397,14 @@ public class World implements Disposable, Ticking, Resizable {
      *     if the given entity is not part of this world
      */
     public void removeEntity(@NotNull Entity entity) {
-        boolean removed = entities.remove(entity);
-        if (entity instanceof LivingEntity) {
-            removed |= livingEntities.remove(entity);
-        }
-        if (removed) {
-            entity.dispose();
+        synchronized (entities) {
+            boolean removed = entities.remove(entity);
+            if (entity instanceof LivingEntity) {
+                removed |= livingEntities.remove(entity);
+            }
+            if (removed) {
+                entity.dispose();
+            }
         }
     }
 

@@ -20,13 +20,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TickingBlock extends Block implements Ticking {
 
-    private long minimumTick;
-    private boolean shouldTick = true;
-
+    private volatile long minimumTick;
+    private volatile boolean shouldTick;
+    private final Object tickLock = new Object();
 
     public TickingBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        minimumTick = getWorld().getTick();
+        synchronized (tickLock) {
+            shouldTick = true;
+            minimumTick = getWorld().getTick();
+        }
     }
 
     /**
@@ -35,16 +38,21 @@ public abstract class TickingBlock extends Block implements Ticking {
      * @param rare
      *     If the the rare update should be called instead of the normal update
      */
-    public void tryTick(boolean rare) {
-        //should not tick right away to not spawn multiple entities when spawning f.ex sand
-        if (shouldTick() && minimumTick < getWorld().getTick()) {
-            shouldTick = false;
-            if (rare) {
-                tickRare();
+    public final void tryTick(boolean rare) {
+        synchronized (tickLock) {
+            //should not tick right away to not spawn multiple entities when spawning f.ex sand
+            if (shouldTick() && minimumTick < getWorld().getTick()) {
+                setShouldTick(false);
             }
             else {
-                tick();
+                return;
             }
+        }
+        if (rare) {
+            tickRare();
+        }
+        else {
+            tick();
         }
     }
 
@@ -52,8 +60,12 @@ public abstract class TickingBlock extends Block implements Ticking {
         return shouldTick;
     }
 
-    public void setShouldTick(boolean shouldTick) {
-        this.shouldTick = shouldTick;
-        minimumTick = getWorld().getTick();
+    public synchronized void setShouldTick(boolean shouldTick) {
+        synchronized (tickLock) {
+            if (this.shouldTick != shouldTick) {
+                this.shouldTick = shouldTick;
+                minimumTick = getWorld().getTick();
+            }
+        }
     }
 }

@@ -41,13 +41,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     private final World world;
     private final UUID uuid;
 
-    private final Body body;
+    private Body body;
     private boolean flying; //ignore world gravity
     private Vector2 posCache;
     private Vector2 velCache;
     private int groundContacts;
     private Filter filter;
-    private boolean valid = true;
 
     public Entity(@NotNull World world, float worldX, float worldY) {
         this(world, worldX, worldY, true);
@@ -57,7 +56,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         uuid = UUID.randomUUID();
         this.world = world;
         flying = false;
-        Main.inst().getScheduler().executeAsync(() -> world.addEntity(this));
         posCache = new Vector2(worldX, worldY);
         velCache = new Vector2();
         filter = World.ENTITY_FILTER;
@@ -86,6 +84,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             createFixture(body);
             body.setGravityScale(2f);
         }
+        Main.inst().getScheduler().executeAsync(() -> world.addEntity(this));
     }
 
     /**
@@ -107,12 +106,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      */
     protected void createFixture(@NotNull Body body) {
         PolygonShape shape = new PolygonShape();
-//        shape.set(new float[] { //
-//            -getHalfBox2dWidth(), -getHalfBox2dHeight(), //
-//            getHalfBox2dWidth(), -getHalfBox2dHeight(), //
-//            getHalfBox2dWidth(), getHalfBox2dHeight(), //
-//            -getHalfBox2dWidth(), getHalfBox2dHeight() //
-//        });
 
         shape.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
 
@@ -141,6 +134,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     public void teleport(float worldX, float worldY, boolean validate) {
+        if (isInvalid()) {
+            return;
+        }
         if (validate) {
             int tries = getHeight() / Block.BLOCK_SIZE;
             boolean invalid = true;
@@ -159,14 +155,19 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         }
 
         synchronized (BOX2D_LOCK) {
-            body.setTransform(worldX, worldY, 0);
-            body.setAngularVelocity(0);
-            body.setLinearVelocity(0, 0);
-            body.setAwake(true);
-            posCache.x = worldX;
-            posCache.y = worldY;
-            velCache.x = 0;
-            velCache.y = 0;
+            synchronized (this) {
+                if (isInvalid()) {
+                    return;
+                }
+                body.setTransform(worldX, worldY, 0);
+                body.setAngularVelocity(0);
+                body.setLinearVelocity(0, 0);
+                body.setAwake(true);
+                posCache.x = worldX;
+                posCache.y = worldY;
+                velCache.x = 0;
+                velCache.y = 0;
+            }
         }
     }
 
@@ -324,9 +325,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      *     The type of filter to set
      */
     public synchronized void setFilter(Filter filter) {
-        this.filter = filter;
         synchronized (BOX2D_LOCK) {
-            if (body != null) {
+            synchronized (this) {
+                if (isInvalid()) { return; }
+                this.filter = filter;
                 for (Fixture fixture : body.getFixtureList()) {
                     fixture.setFilterData(filter);
                 }
@@ -343,7 +345,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      *     Contact made
      */
     @Override
-    public synchronized void contact(@NotNull ContactType type, @NotNull Contact contact) {
+    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+        if (isInvalid()) {
+            return;
+        }
         if (contact.getFixtureA().getFilterData().categoryBits == World.GROUND_CATEGORY) {
             if (type == ContactType.BEGIN_CONTACT) {
                 //newest pos is needed to accurately check if this is on ground
@@ -354,10 +359,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 int leftX = MathUtils.ceil(posCache.x - (2 * getHalfBox2dWidth()));
                 int middleX = MathUtils.floor(posCache.x - getHalfBox2dWidth());
                 int rightX = MathUtils.ceil(posCache.x - GROUND_CHECK_OFFSET);
-
-//                System.out.println("leftX = " + leftX);
-//                System.out.println("middleX = " + middleX);
-//                System.out.println("rightX = " + rightX);
 
                 int detected = 0;
 
@@ -378,15 +379,19 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     /**
      * Update the cached position and velocity
      */
-    public final synchronized void updatePos() {
-        if (body == null) { return; }
-        posCache = body.getPosition();
-        velCache = body.getLinearVelocity();
+    public final void updatePos() {
+
+        synchronized (BOX2D_LOCK) {
+            synchronized (this) {
+                if (isInvalid()) { return;}
+                posCache = body.getPosition();
+                velCache = body.getLinearVelocity();
+            }
+        }
     }
 
     @Override
     public void tick() {
-        if (body == null) { return; }
         updatePos();
         float nx;
         if (abs(velCache.x) > MAX_X_VEL) {
@@ -401,7 +406,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         else { ny = velCache.y; }
 
         synchronized (BOX2D_LOCK) {
-            body.setLinearVelocity(nx, ny);
+            synchronized (this) {
+                if (isInvalid()) { return; }
+                body.setLinearVelocity(nx, ny);
+            }
         }
     }
 
@@ -433,8 +441,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return MathUtils.floor(posCache.y);
     }
 
-    public Body getBody() {
-        if (!valid) {
+    @NotNull
+    public synchronized Body getBody() {
+        if (isInvalid()) {
             throw new IllegalStateException("Cannot access the body of an invalid entity!");
         }
         return body;
@@ -447,13 +456,18 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     public void setFlying(boolean flying) {
         this.flying = flying;
         synchronized (BOX2D_LOCK) {
-            if (flying) {
-                body.setLinearVelocity(0, 0);
-                body.setGravityScale(0);
-            }
-            else {
-                body.setGravityScale(1);
-                body.setAwake(true);
+            synchronized (this) {
+                if (isInvalid()) {
+                    return;
+                }
+                if (flying) {
+                    body.setLinearVelocity(0, 0);
+                    body.setGravityScale(0);
+                }
+                else {
+                    body.setGravityScale(1);
+                    body.setAwake(true);
+                }
             }
         }
     }
@@ -475,13 +489,20 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     }
 
     @Override
-    public synchronized void dispose() {
-        world.getWorldBody().destroyBody(body);
-        valid = false;
+    public void dispose() {
+        synchronized (BOX2D_LOCK) {
+            synchronized (this) {
+                if (isInvalid()) {
+                    return;
+                }
+                world.getWorldBody().destroyBody(body);
+                body = null;
+            }
+        }
     }
 
-    public synchronized boolean isValid() {
-        return valid;
+    public boolean isInvalid() {
+        return body == null;
     }
 
     @Override

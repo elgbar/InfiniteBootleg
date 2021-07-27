@@ -1,16 +1,15 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
@@ -38,11 +37,11 @@ public class FallingBlock extends Entity {
     }
 
     @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+    public synchronized void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
 
-            Gdx.app.postRunnable(() -> {
+            Main.inst().getScheduler().executeAsync(() -> {
                 World world = getWorld();
                 int newX = getBlockX();
                 int newY = getBlockY();
@@ -54,9 +53,7 @@ public class FallingBlock extends Entity {
 //                    //TODO drop as an item
 //                }
 
-                synchronized (WorldRender.BOX2D_LOCK) {
-                    world.removeEntity(this);
-                }
+                world.removeEntity(this);
             });
         }
     }
@@ -83,7 +80,7 @@ public class FallingBlock extends Entity {
         int chunkX = CoordUtil.worldToChunk(getBlockX());
         int chunkY = CoordUtil.worldToChunk(getBlockY());
         if (!getWorld().isChunkLoaded(chunkX, chunkY)) {
-            Gdx.app.postRunnable(() -> getWorld().removeEntity(this));
+            Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
         }
     }
 }

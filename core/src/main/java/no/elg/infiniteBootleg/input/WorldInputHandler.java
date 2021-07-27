@@ -116,7 +116,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             lockedOn = false;
             worldRender.update();
         }
-        else if (following != null && following.isValid() && lockedOn) {
+        else if (following != null && !following.isInvalid() && lockedOn) {
             float x = following.getPosition().x * Block.BLOCK_SIZE;
             float y = following.getPosition().y * Block.BLOCK_SIZE;
 
@@ -149,7 +149,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
      *     What to follow, null if none
      */
     public void setFollowing(@Nullable Entity following) {
-        if (following == null || !following.isValid()) {
+        if (following == null || following.isInvalid()) {
             throw new IllegalArgumentException("Cannot pass a non-null invalid entity!");
         }
         this.following = following;
