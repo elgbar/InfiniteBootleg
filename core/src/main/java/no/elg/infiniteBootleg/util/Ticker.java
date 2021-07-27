@@ -26,6 +26,11 @@ public class Ticker implements Runnable {
      */
     public static final double DEFAULT_NAG_DELAY = 3d;
     /**
+     * How low, in percent (0f..1f), the real tps must reach for the user to be warned
+     */
+    public static final float TPS_LOSS_PERCENTAGE = 0.94f;
+
+    /**
      * How many ticks between each rare update. Currently each rare tick is the same as one second
      */
     public final long tickRareRate;
@@ -40,6 +45,12 @@ public class Ticker implements Runnable {
     private final long nanoDelayBetweenTicks;
     private final float secondsDelayBetweenTicks;
     private final long nagDelayTicks;
+
+    /**
+     * How low the tps must reach before displaying a "can't keep up" warning
+     */
+    private final long tpsWarnThreshold;
+
     /**
      * The current tick
      */
@@ -117,7 +128,7 @@ public class Ticker implements Runnable {
      */
     public Ticker(@NotNull Ticking ticking, @Nullable String name, boolean start, long tps, double nagDelay) {
         this.ticking = ticking;
-        this.tag = ((name != null) ? name : ticking.toString()) + " ticker";
+        tag = ((name != null) ? name : ticking.toString()) + " ticker";
         if (tps <= 0) {
             throw new IllegalArgumentException("TPS must be strictly positive! Was given " + tps);
         }
@@ -127,9 +138,11 @@ public class Ticker implements Runnable {
         nanoDelayBetweenTicks = 1_000_000_000L / tps;
         secondsDelayBetweenTicks = 1f / tps;
         tickRareRate = this.tps;
-        this.nagDelayTicks = (long) Math.max(0, tps * nagDelay);
+        // Round down ok as realTPS is a long
+        tpsWarnThreshold = (long) (TPS_LOSS_PERCENTAGE * tps);
+        nagDelayTicks = (long) Math.max(0, tps * nagDelay);
 
-        Main.logger().debug(tag, "Starting ticking thread for '" + name + "' with TPS = " + tps);
+        Main.logger().debug(tag, "Starting ticking thread for '" + name + "' with TPS = " + tps + " (warn when tps <= " + tpsWarnThreshold + ")");
 
         tickerThread = new PauseableThread(this);
         tickerThread.setName(tag);
@@ -156,6 +169,8 @@ public class Ticker implements Runnable {
 
         //Calculate ticks per second once per second
         if (start - tpsCalcStartTime >= 1_000_000_000) {
+            // tps is number of times we ticked.
+            //  We calculate once per second, so no dividing is required
             realTPS = tpsTick;
             tpsTick = 0;
             tpsCalcStartTime = start;
@@ -174,11 +189,10 @@ public class Ticker implements Runnable {
                 Main.logger().error(tag, "Ticker interrupted");
             }
         }
-        else if (tickId - lastTickNagged >= nagDelayTicks) {
+        else if (tickId - lastTickNagged >= nagDelayTicks && tpsWarnThreshold >= realTPS) {
             lastTickNagged = tickId;
-            Main.logger().error(tag, "Cant keep up a single tick took around " + TimeUtils.nanosToMillis(tpsDelta) +
-                                     " ms, while at max it should take " + getMsDelayBetweenTicks() + " ms " +
-                                     getNanoDelayBetweenTicks() + " ns");
+            Main.logger().error(tag, "Cant keep up a single tick took around " + TimeUtils.nanosToMillis(tpsDelta) + " ms, while at max it should take " +
+                                     getMsDelayBetweenTicks() + " ms " + getNanoDelayBetweenTicks() + " ns");
         }
     }
 
