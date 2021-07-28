@@ -232,13 +232,13 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Kill all non-player entities")
     public void killall() {
         World world = Main.inst().getWorld();
-        int entities;
+        int entities = 0;
         synchronized (BOX2D_LOCK) {
-            entities = world.getEntities().size();
             for (Entity entity : world.getEntities()) {
                 if (entity instanceof Player) {
                     continue;
                 }
+                entities++;
                 world.removeEntity(entity);
             }
         }
