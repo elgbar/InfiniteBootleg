@@ -2,11 +2,8 @@ package no.elg.infiniteBootleg.util;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +19,6 @@ public class CancellableThreadScheduler {
 
     @NotNull
     private final ScheduledThreadPoolExecutor executor;
-    private final Set<ScheduledFuture<?>> tasks;
     private final int threads;
 
     /**
@@ -31,8 +27,6 @@ public class CancellableThreadScheduler {
      *     If less than or equal to zero the number of threads will be equal to {@link Runtime#availableProcessors()}
      */
     public CancellableThreadScheduler(int threads) {
-        tasks = ConcurrentHashMap.newKeySet();
-
         if (threads < 0) {
             threads = Runtime.getRuntime().availableProcessors();
         }
@@ -41,16 +35,8 @@ public class CancellableThreadScheduler {
     }
 
     /**
-     * Cancel all future and running tasks
      */
-    public void cancelTasks() {
-        for (ScheduledFuture<?> sf : tasks) {
-            sf.cancel(true);
         }
-    }
-
-    public int size() {
-        return tasks.size();
     }
 
     /**
@@ -64,11 +50,7 @@ public class CancellableThreadScheduler {
             executeSync(runnable);
             return;
         }
-        try {
-            tasks.add(executor.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS));
-        } catch (RejectedExecutionException ignored) {
-            Main.logger().error("Scheduler", "Runnable rejected from scheduling");
-        }
+        executor.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS);
     }
 
     /**
@@ -118,7 +100,7 @@ public class CancellableThreadScheduler {
             executeSync(runnable);
             return;
         }
-        tasks.add(executor.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS));
+        executor.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS);
     }
 
 
@@ -131,14 +113,19 @@ public class CancellableThreadScheduler {
      *     How many milliseconds to wait before running the task
      */
     public void scheduleSync(@NotNull Runnable runnable, long ms) {
-        tasks.add(executor.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS));
+        executor.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Shut down the thread
      */
     public void shutdown() {
-        executor.shutdownNow();
+        executor.shutdown();
+        try {
+            executor.awaitTermination(10L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getActiveThreads() {
