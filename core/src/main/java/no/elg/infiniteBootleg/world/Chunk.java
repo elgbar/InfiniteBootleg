@@ -180,20 +180,17 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
 
             if (currBlock != null) {
                 currBlock.dispose();
-            }
 
-            if (block == null) {
-                blocks[localX][localY] = null;
                 if (currBlock instanceof TickingBlock) {
                     tickingBlocks.remove(currBlock);
                 }
             }
+
+            if (block == null) {
+                blocks[localX][localY] = null;
+            }
             else {
                 blocks[localX][localY] = block;
-
-                if (currBlock instanceof TickingBlock && !(block instanceof TickingBlock)) {
-                    tickingBlocks.remove(currBlock);
-                }
                 if (block instanceof TickingBlock tickingBlock) {
                     tickingBlocks.add(tickingBlock);
                 }
