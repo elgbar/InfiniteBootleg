@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
+import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -150,7 +151,9 @@ public class World implements Disposable, Resizable {
         }
 
         load();
+    }
 
+    public void load() {
         if (Settings.renderGraphic) {
             Gdx.app.postRunnable(() -> {
                 WorldInputHandler input = getInput();
@@ -159,9 +162,6 @@ public class World implements Disposable, Resizable {
                 }
             });
         }
-    }
-
-    public void load() {
         if (!Settings.loadWorldFromDisk) {
             return;
         }
