@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks;
 
 import box2dLight.PointLight;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,12 +19,11 @@ import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A block that explodes after {@link #fuseDuration} ticks
+ * A block that explodes after {@link #fuseDurationTicks} ticks
  *
  * @author Elg
  */
@@ -46,6 +44,9 @@ public class TntBlock extends TickingBlock {
      * Minimum value should be above 3 as otherwise the edge of the explosion will clearly be visible
      */
     public static final int RESISTANCE = 8;
+
+    public static final float FUSE_DURATION_SECONDS = 3f;
+
     private static final TextureRegion whiteTexture;
 
     static {
@@ -63,10 +64,10 @@ public class TntBlock extends TickingBlock {
     /**
      * How long, in ticks, the fuse time should be
      */
-    public final float fuseDuration;
+    public final float fuseDurationTicks;
     private final float strength;
     private boolean glowing;
-    private boolean exploded;
+    private volatile boolean exploded;
     private long startTick;
     @Nullable
     private PointLight light;
@@ -74,7 +75,7 @@ public class TntBlock extends TickingBlock {
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         strength = EXPLOSION_STRENGTH;
-        fuseDuration = getWorld().getWorldTicker().getTPS() * 3f;
+        fuseDurationTicks = getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS;
     }
 
     @Override
@@ -92,7 +93,7 @@ public class TntBlock extends TickingBlock {
             startTick = currTick;
         }
         long ticked = currTick - startTick;
-        if (ticked > fuseDuration) {
+        if (ticked > fuseDurationTicks) {
             exploded = true;
             Main.inst().getScheduler().executeAsync(() -> {
                 List<Block> destroyed = new ArrayList<>();
@@ -100,44 +101,40 @@ public class TntBlock extends TickingBlock {
                 int worldY = getWorldY();
                 for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
                     for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
-                        synchronized (WorldRender.BOX2D_LOCK) {
-                            Block b = getWorld().getBlock(x, y, true);
-                            Material mat = b == null ? AIR : b.getMaterial();
-                            float hardness = mat.getHardness();
-                            if (mat == AIR || hardness < 0) {
-                                continue;
+                        Block b = getWorld().getBlock(x, y, true);
+                        Material mat = b == null ? AIR : b.getMaterial();
+                        float hardness = mat.getHardness();
+                        if (mat == AIR || hardness < 0) {
+                            continue;
+                        }
+                        double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness * Math.abs(
+                            MathUtils.random.nextGaussian() + RESISTANCE);
+                        if (dist < strength * strength) {
+                            if (b instanceof TntBlock tntb && b != this) {
+                                tntb.exploded = true;
                             }
-                            double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness * Math.abs(
-                                MathUtils.random.nextGaussian() + RESISTANCE);
-                            if (dist < strength * strength) {
-                                if (b instanceof TntBlock tntb && b != this) {
-                                    tntb.exploded = true;
-                                }
-                                destroyed.add(b);
-                            }
+                            destroyed.add(b);
                         }
                     }
                 }
 
-                Gdx.app.postRunnable(() -> {
-                    Set<Chunk> chunks = new HashSet<>();
-                    World world = getWorld();
-                    for (Block block : destroyed) {
-                        world.setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
-                        world.updateBlocksAround(block.getWorldX(), block.getWorldY());
+                Set<Chunk> chunks = new HashSet<>();
+                World world = getWorld();
+                for (Block block : destroyed) {
+                    world.setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
+                    world.updateBlocksAround(block.getWorldX(), block.getWorldY());
 
-                        chunks.add(block.getChunk());
-                    }
-                    for (Chunk chunk : chunks) {
-                        chunk.updateTexture(false);
-                    }
-                });
+                    chunks.add(block.getChunk());
+                }
+                for (Chunk chunk : chunks) {
+                    chunk.updateTexture(false);
+                }
             });
         }
 
         final long r = getWorld().getWorldTicker().getTPS() / 5;
         boolean old = glowing;
-        if (ticked >= fuseDuration - getWorld().getWorldTicker().getTPS()) {
+        if (ticked >= fuseDurationTicks - getWorld().getWorldTicker().getTPS()) {
             glowing = true;
         }
         else if (ticked % r == 0) {
