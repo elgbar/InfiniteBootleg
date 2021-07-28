@@ -30,6 +30,8 @@ public class Player extends LivingEntity {
         synchronized (LIGHT_LOCK) {
             torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
             torchLight.setStaticLight(true);
+            torchLight.setContactFilter(World.LIGHT_FILTER);
+            torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
         }
     }
 
