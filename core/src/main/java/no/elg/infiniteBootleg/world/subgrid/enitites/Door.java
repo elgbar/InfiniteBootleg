@@ -9,6 +9,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import no.elg.infiniteBootleg.world.Direction;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -68,6 +70,12 @@ public class Door extends MaterialEntity {
         if (type == ContactType.END_CONTACT) {
             open--;
         }
+    }
+
+    @Override
+    public boolean isOnGround() {
+        //it's on the ground if the block below is not air
+        return !getWorld().isAirBlock(Location.relative(getBlockX(), getBlockY(), Direction.SOUTH));
     }
 
     @Override

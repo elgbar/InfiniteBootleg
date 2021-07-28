@@ -58,6 +58,11 @@ public class FallingBlock extends Entity {
     }
 
     @Override
+    public boolean isOnGround() {
+        return false;
+    }
+
+    @Override
     public TextureRegion getTextureRegion() {
         return region;
     }
