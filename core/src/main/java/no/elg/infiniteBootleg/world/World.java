@@ -197,7 +197,7 @@ public class World implements Disposable, Resizable {
      */
     @Nullable
     public FileHandle worldFolder() {
-        if (Settings.renderGraphic) {
+        if (Settings.loadWorldFromDisk) {
             if (worldFile == null) {
                 worldFile = Gdx.files.external(Main.WORLD_FOLDER + uuid);
             }
