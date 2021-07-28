@@ -114,7 +114,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
               tmpBody.createFixture(edgeShape, 0f)
             }
             if (!block.material.blocksLight()) {
-              fix.filterData = World.SOLID_TRANSPARENT_FILTER
+              fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER
             }
           }
         }

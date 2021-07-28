@@ -61,7 +61,7 @@ public class World implements Disposable, Resizable {
     public static final short ENTITY_CATEGORY = 0x4;
 
     public static final Filter FALLING_BLOCK_ENTITY_FILTER;
-    public static final Filter SOLID_TRANSPARENT_FILTER;
+    public static final Filter TRANSPARENT_BLOCK_ENTITY_FILTER;
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
     public static final Filter BLOCK_ENTITY_FILTER;
@@ -86,9 +86,9 @@ public class World implements Disposable, Resizable {
         FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
 
         //ie glass
-        SOLID_TRANSPARENT_FILTER = new Filter();
-        SOLID_TRANSPARENT_FILTER.categoryBits = ENTITY_CATEGORY;
-        SOLID_TRANSPARENT_FILTER.maskBits = LIGHTS_CATEGORY | GROUND_CATEGORY;
+        TRANSPARENT_BLOCK_ENTITY_FILTER = new Filter();
+        TRANSPARENT_BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
+        TRANSPARENT_BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
         //door
         BLOCK_ENTITY_FILTER = new Filter();

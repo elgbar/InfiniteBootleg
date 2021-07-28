@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import static no.elg.infiniteBootleg.world.World.BLOCK_ENTITY_FILTER;
+import static no.elg.infiniteBootleg.world.World.TRANSPARENT_BLOCK_ENTITY_FILTER;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +59,7 @@ public class Door extends MaterialEntity {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = body.createFixture(box, 0.0f);
-        fix.setFilterData(World.BLOCK_ENTITY_FILTER);
+        fix.setFilterData(BLOCK_ENTITY_FILTER);
         fix.setSensor(true);
         box.dispose();
     }
@@ -65,11 +67,18 @@ public class Door extends MaterialEntity {
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (type == ContactType.BEGIN_CONTACT) {
-            open.getAndIncrement();
+            var old = open.getAndIncrement();
+            if (old == 0) {
+                setFilter(TRANSPARENT_BLOCK_ENTITY_FILTER);
+            }
         }
-        if (type == ContactType.END_CONTACT) {
-            open.getAndDecrement();
+        else if (type == ContactType.END_CONTACT) {
+            var old = open.decrementAndGet();
+            if (old == 0) {
+                setFilter(BLOCK_ENTITY_FILTER);
+            }
         }
+
     }
 
     @Override
