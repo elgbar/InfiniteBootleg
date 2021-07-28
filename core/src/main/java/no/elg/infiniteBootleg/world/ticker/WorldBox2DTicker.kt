@@ -4,18 +4,13 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.world.World
-import kotlin.system.measureTimeMillis
 
-class WorldBox2DTicker internal constructor(private val world: World, tick: Boolean) : Ticking {
-  val ticker: Ticker
+class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
+  
+  val ticker: Ticker = Ticker(this, "Box2DWorldLight-" + world.name, tick, Settings.tps, Double.MAX_VALUE)
+
   override fun tick() {
-    val time = measureTimeMillis {
-      //tick all box2d elements
-      world.worldBody.tick()
-    }
-  }
-
-  init {
-    ticker = Ticker(this, "Box2DWorldLight-" + world.name, tick, Settings.tps, Double.MAX_VALUE)
+    //tick all box2d elements
+    world.worldBody.tick()
   }
 }
