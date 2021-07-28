@@ -59,10 +59,11 @@ public class World implements Disposable, Resizable {
     public static final short LIGHTS_CATEGORY = 0x2;
     public static final short ENTITY_CATEGORY = 0x4;
 
-    public static final Filter BLOCK_ENTITY_FILTER;
+    public static final Filter FALLING_BLOCK_ENTITY_FILTER;
     public static final Filter SOLID_TRANSPARENT_FILTER;
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
+    public static final Filter BLOCK_ENTITY_FILTER;
 
     public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
     public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
@@ -79,14 +80,19 @@ public class World implements Disposable, Resizable {
         LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
         //for falling blocks
-        BLOCK_ENTITY_FILTER = new Filter();
-        BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-        BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
+        FALLING_BLOCK_ENTITY_FILTER = new Filter();
+        FALLING_BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
+        FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
 
         //ie glass
         SOLID_TRANSPARENT_FILTER = new Filter();
-        SOLID_TRANSPARENT_FILTER.categoryBits = GROUND_CATEGORY;
-        SOLID_TRANSPARENT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+        SOLID_TRANSPARENT_FILTER.categoryBits = ENTITY_CATEGORY;
+        SOLID_TRANSPARENT_FILTER.maskBits = LIGHTS_CATEGORY | GROUND_CATEGORY;
+
+        //door
+        BLOCK_ENTITY_FILTER = new Filter();
+        BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
+        BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
     }
 
     private final UUID uuid;

@@ -32,7 +32,7 @@ public class FallingBlock extends Entity {
         PolygonShape box = new PolygonShape();
         box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
         Fixture fix = body.createFixture(box, 1.0f);
-        fix.setFilterData(World.BLOCK_ENTITY_FILTER);
+        fix.setFilterData(World.FALLING_BLOCK_ENTITY_FILTER);
         box.dispose();
     }
 
