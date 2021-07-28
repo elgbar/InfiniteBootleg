@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
+import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -17,7 +18,6 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
-import no.elg.infiniteBootleg.world.ticker.WorldTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
@@ -102,7 +102,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
                               " entity updates and chunks update")
     public void pause() {
-        WorldTicker ticker = Main.inst().getWorld().getWorldTicker();
+        Ticker ticker = Main.inst().getWorld().getWorldTicker();
         if (ticker.isPaused()) {
             logger.log(LogLevel.ERROR, "World is already paused");
         }
@@ -116,7 +116,7 @@ public class Commands extends CommandExecutor {
                               " entity updates and chunks update")
     public void resume() {
         World world = Main.inst().getWorld();
-        WorldTicker ticker = Main.inst().getWorld().getWorldTicker();
+        Ticker ticker = Main.inst().getWorld().getWorldTicker();
         if (ticker.isPaused()) {
             world.getWorldTicker().resume();
             world.getRender().update();

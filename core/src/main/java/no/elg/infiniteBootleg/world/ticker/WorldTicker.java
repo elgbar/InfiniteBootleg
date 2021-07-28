@@ -21,25 +21,18 @@ public class WorldTicker extends Ticker {
 
     @NotNull
     private final WorldLightTicker lightTicker;
+    private final WorldBox2DTicker box2DTicker;
 
     public WorldTicker(@NotNull World world, boolean tick) {
         super(new WorldTickee(world), "World-" + world.getName(), tick, Settings.tps, Ticker.DEFAULT_NAG_DELAY);
         lightTicker = new WorldLightTicker(world, tick);
-
+        box2DTicker = new WorldBox2DTicker(world, tick);
     }
 
-    private static class WorldTickee implements Ticking {
-
-        private final World world;
-
-        public WorldTickee(World world) {
-            this.world = world;
-        }
+    private record WorldTickee(World world) implements Ticking {
 
         @Override
         public void tick() {
-            //tick all box2d elements
-            world.getWorldBody().tick();
 
             WorldRender wr = world.getRender();
             long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
@@ -90,7 +83,6 @@ public class WorldTicker extends Ticker {
         }
     }
 
-
     /**
      * Stop this ticker, the tickers thread will not be called anymore
      */
@@ -98,6 +90,7 @@ public class WorldTicker extends Ticker {
     public void stop() {
         super.stop();
         lightTicker.getTicker().stop();
+        box2DTicker.getTicker().stop();
     }
 
     /**
@@ -110,6 +103,7 @@ public class WorldTicker extends Ticker {
     public void pause() {
         super.pause();
         lightTicker.getTicker().pause();
+        box2DTicker.getTicker().pause();
     }
 
     /**
@@ -122,5 +116,6 @@ public class WorldTicker extends Ticker {
     public void resume() {
         super.resume();
         lightTicker.getTicker().resume();
+        box2DTicker.getTicker().resume();
     }
 }
