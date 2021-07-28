@@ -98,8 +98,9 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
           if (rel == null
             || !rel.material.isSolid
             || dir == NORTH && localY == Chunk.CHUNK_SIZE - 1 //always render top of chunk
-            || dir == EAST && localX == Chunk.CHUNK_SIZE - 1 //and the sides
-            || dir == WEST && localX == 0
+            || dir == EAST && localX == Chunk.CHUNK_SIZE - 1 //and the east side
+            || dir == WEST && localX == 0 //and the west side
+            || (!rel.material.blocksLight() && block.material.blocksLight()) //prevent leaking of light
           ) {
 
             edgeShape.set(
@@ -109,11 +110,11 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
               localY + edgeDelta[3].toFloat()
             )
 
-            synchronized(BOX2D_LOCK) {
-              val fix = tmpBody.createFixture(edgeShape, 0f)
-              if (!block.material.blocksLight()) {
-                fix.filterData = World.SOLID_TRANSPARENT_FILTER
-              }
+            val fix = synchronized(BOX2D_LOCK) {
+              tmpBody.createFixture(edgeShape, 0f)
+            }
+            if (!block.material.blocksLight()) {
+              fix.filterData = World.SOLID_TRANSPARENT_FILTER
             }
           }
         }
