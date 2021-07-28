@@ -90,7 +90,8 @@ public class World implements Disposable, Resizable {
 
     private final UUID uuid;
     private final long seed;
-    private final ConcurrentMap<Location, Chunk> chunks;
+    @NotNull
+    private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks;
 
     private final WorldTicker worldTicker;
 
@@ -100,8 +101,8 @@ public class World implements Disposable, Resizable {
     private final WorldBody worldBody;
 
     private final WorldTime worldTime;
-    private final Set<Entity> entities; //all entities in this world (including living entities)
-    private final Set<LivingEntity> livingEntities; //all player in this world
+    private final Set<@NotNull Entity> entities; //all entities in this world (including living entities)
+    private final Set<@NotNull LivingEntity> livingEntities; //all player in this world
     private FileHandle worldFile;
     //only exists when graphics exits
     private WorldInputHandler input;
@@ -177,11 +178,6 @@ public class World implements Disposable, Resizable {
 
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
-    }
-
-    @Nullable
-    public WorldInputHandler getInput() {
-        return input;
     }
 
     /**
@@ -572,13 +568,6 @@ public class World implements Disposable, Resizable {
     }
 
     /**
-     * @return Backing map of chunks
-     */
-    public ConcurrentMap<Location, Chunk> getChunks() {
-        return chunks;
-    }
-
-    /**
      * Unload the given chunks and save it to disk
      *
      * @param chunk
@@ -611,70 +600,6 @@ public class World implements Disposable, Resizable {
         return getChunk(CoordUtil.worldToChunk(worldLoc));
     }
 
-    /**
-     * @return The random seed of this world
-     */
-    public long getSeed() {
-        return seed;
-    }
-
-    /**
-     * @return The name of the world
-     */
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return Unique identification of this world
-     */
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    /**
-     * @return The current world tick
-     */
-    public long getTick() {
-        return worldTicker.getTickId();
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        World world = (World) o;
-        return Objects.equals(uuid, world.uuid);
-    }
-
-    @Override
-    public String toString() {
-        return "World{" + "name='" + name + '\'' + ", uuid=" + uuid + '}';
-    }
-
-    @Override
-    public void dispose() {
-        render.dispose();
-        getWorldTicker().stop();
-        if (input != null) {
-            input.dispose();
-        }
-    }
-
     public void save() {
         if (!Settings.loadWorldFromDisk) {
             return;
@@ -698,16 +623,6 @@ public class World implements Disposable, Resizable {
         worldFolder.deleteDirectory();
     }
 
-    @NotNull
-    public WorldRender getRender() {
-        return render;
-    }
-
-    @NotNull
-    public WorldTicker getWorldTicker() {
-        return worldTicker;
-    }
-
     /**
      * Unload the given chunks and save it to disk
      *
@@ -716,17 +631,6 @@ public class World implements Disposable, Resizable {
      */
     public void unloadChunk(@Nullable Chunk chunk) {
         unloadChunk(chunk, false, true);
-    }
-
-    /**
-     * @return the current entities
-     */
-    public Set<Entity> getEntities() {
-        return entities;
-    }
-
-    public Set<LivingEntity> getLivingEntities() {
-        return livingEntities;
     }
 
     /**
@@ -831,15 +735,82 @@ public class World implements Disposable, Resizable {
         return Material.AIR;
     }
 
-    public ChunkLoader getChunkLoader() {
-        return chunkLoader;
-    }
 
     @Override
     public void resize(int width, int height) {
         if (Settings.renderGraphic) {
             render.resize(width, height);
         }
+    }
+
+    @Nullable
+    public WorldInputHandler getInput() {
+        return input;
+    }
+
+    /**
+     * @return Backing map of chunks
+     */
+    public ConcurrentMap<Location, Chunk> getChunks() {
+        return chunks;
+    }
+
+
+    /**
+     * @return The random seed of this world
+     */
+    public long getSeed() {
+        return seed;
+    }
+
+    /**
+     * @return The name of the world
+     */
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return Unique identification of this world
+     */
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    /**
+     * @return The current world tick
+     */
+    public long getTick() {
+        return worldTicker.getTickId();
+    }
+
+    @NotNull
+    public WorldRender getRender() {
+        return render;
+    }
+
+    @NotNull
+    public WorldTicker getWorldTicker() {
+        return worldTicker;
+    }
+
+    /**
+     * @return the current entities
+     */
+    public Set<Entity> getEntities() {
+        return entities;
+    }
+
+    public Set<LivingEntity> getLivingEntities() {
+        return livingEntities;
+    }
+
+    public ChunkLoader getChunkLoader() {
+        return chunkLoader;
     }
 
     @NotNull
@@ -850,5 +821,38 @@ public class World implements Disposable, Resizable {
 
     public WorldTime getWorldTime() {
         return worldTime;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        World world = (World) o;
+        return Objects.equals(uuid, world.uuid);
+    }
+
+    @Override
+    public String toString() {
+        return "World{" + "name='" + name + '\'' + ", uuid=" + uuid + '}';
+    }
+
+    @Override
+    public void dispose() {
+        render.dispose();
+        getWorldTicker().stop();
+        if (input != null) {
+            input.dispose();
+        }
     }
 }
