@@ -172,10 +172,11 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             Block currBlock = blocks[localX][localY];
 
             if ((currBlock == null && block == null) || (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
+                //Block is the same, ignore this set
                 if (block != null) {
                     block.dispose();
                 }
-                return null;
+                return currBlock;
             }
 
             if (currBlock != null) {
