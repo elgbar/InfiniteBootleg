@@ -201,9 +201,11 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                 modified = true;
                 dirty = true;
                 prioritize = true;
-
-                Main.inst().getScheduler().executeAsync(() -> world.updateBlocksAround(getWorldX(localX), getWorldY(localY)));
             }
+        }
+        if (updateTexture) {
+            //TODO maybe this can be done async? (it was before)
+            world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
         }
         return block;
     }
