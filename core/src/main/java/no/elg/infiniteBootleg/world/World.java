@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -95,30 +96,35 @@ public class World implements Disposable, Resizable {
         BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
     }
 
+    @NotNull
     private final UUID uuid;
     private final long seed;
     @NotNull
     private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks;
-
+    @NotNull
     private final WorldTicker worldTicker;
-
+    @NotNull
     private final ChunkLoader chunkLoader;
+    @NotNull
     private final WorldRender render;
     @NotNull
     private final WorldBody worldBody;
-
+    @NotNull
     private final WorldTime worldTime;
+    @NotNull
     private final Set<@NotNull Entity> entities; //all entities in this world (including living entities)
+    @NotNull
     private final Set<@NotNull LivingEntity> livingEntities; //all player in this world
-    private FileHandle worldFile;
+    @Nullable
+    private volatile FileHandle worldFile;
     //only exists when graphics exits
+    @Nullable
     private WorldInputHandler input;
+    @NotNull
     private String name;
 
     /**
      * Generate a world with a random seed
-     *
-     * @param generator
      */
     public World(@NotNull ChunkGenerator generator) {
         this(generator, MathUtils.random(Long.MAX_VALUE), true);
@@ -128,7 +134,7 @@ public class World implements Disposable, Resizable {
         this(generator, seed, tick, "World");
     }
 
-    public World(@NotNull ChunkGenerator generator, long seed, boolean tick, String worldName) {
+    public World(@NotNull ChunkGenerator generator, long seed, boolean tick, @NotNull String worldName) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
 
@@ -348,6 +354,7 @@ public class World implements Disposable, Resizable {
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
             chunk.setBlock(localX, localY, (Block) null, update);
+            //noinspection GDXJavaUnsafeIterator
             for (Entity entity : getEntities(worldX, worldY)) {
                 if (entity instanceof Removable removableEntity) {
                     removableEntity.onRemove();
@@ -386,27 +393,6 @@ public class World implements Disposable, Resizable {
             }
         }
         return foundEntities;
-    }
-
-    /**
-     * Remove and disposes the given entity
-     *
-     * @param entity
-     *     The entity to remove
-     *
-     * @throws IllegalArgumentException
-     *     if the given entity is not part of this world
-     */
-    public void removeEntity(@NotNull Entity entity) {
-        synchronized (entities) {
-            boolean removed = entities.remove(entity);
-            if (entity instanceof LivingEntity) {
-                removed |= livingEntities.remove(entity);
-            }
-            if (removed) {
-                entity.dispose();
-            }
-        }
     }
 
     /**
@@ -584,6 +570,17 @@ public class World implements Disposable, Resizable {
         return chunks.values().stream().filter(it -> !it.isLoaded()).collect(Collectors.toUnmodifiableSet());
     }
 
+
+    /**
+     * Unload the given chunks and save it to disk
+     *
+     * @param chunk
+     *     The chunk to unload
+     */
+    public void unloadChunk(@Nullable Chunk chunk) {
+        unloadChunk(chunk, false, true);
+    }
+
     /**
      * Unload the given chunks and save it to disk
      *
@@ -631,24 +628,15 @@ public class World implements Disposable, Resizable {
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         try {
             ZipUtils.zip(worldFolder, worldZip);
-            Main.logger().log("World saved!");
+            Main.logger().log("World", "World saved!");
         } catch (IOException e) {
-            Main.logger().error("Save", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
+            Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
             return;
         }
 
         worldFolder.deleteDirectory();
     }
 
-    /**
-     * Unload the given chunks and save it to disk
-     *
-     * @param chunk
-     *     The chunk to unload
-     */
-    public void unloadChunk(@Nullable Chunk chunk) {
-        unloadChunk(chunk, false, true);
-    }
 
     /**
      * Add the given entity to entities in the world.
@@ -658,9 +646,41 @@ public class World implements Disposable, Resizable {
      *     The entity to add
      */
     public void addEntity(@NotNull Entity entity) {
+        //Load chunk of entity
+        var chunk = getChunk(entity.getBlockX(), entity.getBlockY());
+        if (chunk == null) {
+            //Failed to load chunk, remove entity
+            Main.logger().error("World", "Failed to add entity to world, as its spawning chunk could not be loaded");
+            removeEntity(entity);
+            return;
+        }
+
         entities.add(entity);
         if (entity instanceof LivingEntity livingEntity) {
             livingEntities.add(livingEntity);
+        }
+    }
+
+    /**
+     * Remove and disposes the given entity.
+     * <p>
+     * Even if the given entity is not a part of this world, it will be disposed
+     *
+     * @param entity
+     *     The entity to remove
+     *
+     * @throws IllegalArgumentException
+     *     if the given entity is not part of this world
+     */
+    public void removeEntity(@NotNull Entity entity) {
+        entities.remove(entity);
+        if (entity instanceof LivingEntity) {
+            livingEntities.remove(entity);
+        }
+
+        if (!entity.isInvalid()) {
+            //even if we do not know of this entity, dispose it
+            entity.dispose();
         }
     }
 
@@ -783,11 +803,11 @@ public class World implements Disposable, Resizable {
     /**
      * @return The name of the world
      */
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 

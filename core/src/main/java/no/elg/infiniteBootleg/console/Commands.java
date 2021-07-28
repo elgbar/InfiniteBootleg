@@ -303,33 +303,20 @@ public class Commands extends CommandExecutor {
     public void time(String timeOfDay) {
         float time;
         try {
-            //There is a chance this method is before selected the other time method
+            //There is a chance this method is selected before  the other time method
             time = Float.parseFloat(timeOfDay);
         } catch (NumberFormatException ignored) {
+
             switch (timeOfDay.toLowerCase()) {
-                case "day":
-                case "dawn":
-                case "sunrise":
-                    time = WorldTime.SUNRISE_TIME;
-                    break;
-                case "midday":
-                case "noon":
-                    time = WorldTime.MIDDAY_TIME;
-                    break;
-                case "dusk":
-                case "sunset":
-                    time = WorldTime.SUNSET_TIME;
-                    break;
-                case "midnight":
-                case "night":
-                    time = WorldTime.MIDNIGHT_TIME;
-                    break;
-                case "end":
-                    time = Integer.MAX_VALUE;
-                    break;
-                default:
+                case "day", "dawn", "sunrise" -> time = WorldTime.SUNRISE_TIME;
+                case "midday", "noon" -> time = WorldTime.MIDDAY_TIME;
+                case "dusk", "sunset" -> time = WorldTime.SUNSET_TIME;
+                case "midnight", "night" -> time = WorldTime.MIDNIGHT_TIME;
+                case "end" -> time = Integer.MAX_VALUE;
+                default -> {
                     logger.error("CMD", "Unknown time of day, try sunrise, midday, sunset or midnight");
                     return;
+                }
             }
         }
 

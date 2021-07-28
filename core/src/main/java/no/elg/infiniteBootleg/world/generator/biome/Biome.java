@@ -31,8 +31,8 @@ public enum Biome {
     private final Material[] topBlocks;
 
     @SafeVarargs
-    Biome(float y, float z, float amplitude, float frequency, int offset, @NotNull Material filler,
-          @NotNull Material topmostBlock, @NotNull Tuple<Material, Integer>... topBlocks) {
+    Biome(float y, float z, float amplitude, float frequency, int offset, @NotNull Material filler, @NotNull Material topmostBlock,
+          @NotNull Tuple<@NotNull Material, @NotNull Integer>... topBlocks) {
         this.y = y;
         this.z = z;
         this.amplitude = amplitude;
@@ -71,8 +71,7 @@ public enum Biome {
         return rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset);
     }
 
-    public static float rawHeightAt(@NotNull PerlinNoise noise, int worldX, float y, float z, float amplitude,
-                                    float frequency, int offset) {
+    public static float rawHeightAt(@NotNull PerlinNoise noise, int worldX, float y, float z, float amplitude, float frequency, int offset) {
         return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5f) * amplitude + offset;
     }
 

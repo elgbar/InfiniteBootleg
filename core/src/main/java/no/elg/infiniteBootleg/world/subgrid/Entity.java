@@ -163,12 +163,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 body.setAngularVelocity(0);
                 body.setLinearVelocity(0, 0);
                 body.setAwake(true);
-                posCache.x = worldX;
-                posCache.y = worldY;
-                velCache.x = 0;
-                velCache.y = 0;
             }
         }
+        posCache.x = worldX;
+        posCache.y = worldY;
+        velCache.x = 0;
+        velCache.y = 0;
     }
 
     /**
@@ -391,6 +391,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     @Override
     public void tick() {
+        if (isInvalid()) {
+            return;
+        }
         updatePos();
         float nx;
         if (abs(velCache.x) > MAX_X_VEL) {
@@ -492,6 +495,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) {
+                    Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
                     return;
                 }
                 world.getWorldBody().destroyBody(body);

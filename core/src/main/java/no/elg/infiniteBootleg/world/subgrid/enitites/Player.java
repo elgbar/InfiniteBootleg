@@ -51,7 +51,11 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
+        if (isInvalid()) {
+            Main.logger().error("Player", "Tried to dispose disposed player");
+            return;
+        }
         super.dispose();
         controls.dispose();
         synchronized (LIGHT_LOCK) {
@@ -62,7 +66,7 @@ public class Player extends LivingEntity {
     @Override
     public void tick() {
         super.tick();
-        
+
         Vector2 pos = getPosition();
         float angle = Main.inst().getMouse().cpy().sub(pos).angleDeg();
         synchronized (LIGHT_LOCK) {

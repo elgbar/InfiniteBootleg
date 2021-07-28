@@ -204,8 +204,8 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
                 console.log(msg, level);
             }
         } catch (Exception ex) {
-            System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg, level.toString(),
-                              ex.getClass().getSimpleName(), ex.getMessage());
+            System.err.printf("Failed to log the message '%s' with level %s due to the exception %s: %s%n", msg, level, ex.getClass().getSimpleName(),
+                              ex.getMessage());
         }
     }
 
