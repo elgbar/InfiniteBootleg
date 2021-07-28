@@ -60,7 +60,7 @@ public abstract class TickingBlock extends Block implements Ticking {
         return shouldTick;
     }
 
-    public synchronized void setShouldTick(boolean shouldTick) {
+    public void setShouldTick(boolean shouldTick) {
         synchronized (tickLock) {
             if (this.shouldTick != shouldTick) {
                 this.shouldTick = shouldTick;
