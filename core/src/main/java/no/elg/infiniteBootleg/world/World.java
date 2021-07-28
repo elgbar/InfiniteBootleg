@@ -79,7 +79,7 @@ public class World implements Disposable, Resizable {
 
         //for falling blocks
         BLOCK_ENTITY_FILTER = new Filter();
-        BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
+        BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
         BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
 
         //ie glass
