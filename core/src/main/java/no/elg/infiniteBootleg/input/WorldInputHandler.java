@@ -62,10 +62,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
                 Main.logger().log("World", "World saved");
                 break;
             case F9:
+                world.reload(true, false);
                 world.load();
                 Main.logger().log("World", "World reloaded last save");
-                world.unloadChunks(true, false);
-                world.getEntities().forEach(world::removeEntity);
                 break;
             default:
                 return false;

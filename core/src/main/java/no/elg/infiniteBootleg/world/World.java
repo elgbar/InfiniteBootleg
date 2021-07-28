@@ -542,21 +542,32 @@ public class World implements Disposable, Resizable {
     }
 
     /**
-     * Unload and save all chunks in this world
+     * Unload and save all chunks in this world.
+     * <p>
+     * Must be called on main thread!
      *
      * @param force
      *     If the chunks will be forced to unload
      * @param save
      *     If the chunks will be saved
      */
-    public void unloadChunks(boolean force, boolean save) {
-        //remove all entites to speed up unloading
+    public void reload(boolean force, boolean save) {
+        var wasNotPaused = !worldTicker.isPaused();
+        if (wasNotPaused) {
+            worldTicker.pause();
+        }
+
+        Main.inst().getScheduler().waitForTasks();
+        //remove all entities to speed up unloading
         for (Entity entity : getEntities()) {
             removeEntity(entity);
         }
         //ok to include unloaded chunks as they will not cause an error when unloading again
         for (Chunk chunk : chunks.values()) {
             unloadChunk(chunk, force, save);
+        }
+        if (wasNotPaused) {
+            worldTicker.resume();
         }
     }
 
@@ -794,7 +805,7 @@ public class World implements Disposable, Resizable {
     }
 
     @NotNull
-    public WorldTicker getWorldTicker() {
+    public Ticker getWorldTicker() {
         return worldTicker;
     }
 

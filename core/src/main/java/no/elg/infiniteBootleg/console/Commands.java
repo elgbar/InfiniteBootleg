@@ -83,7 +83,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Reload all loaded chunks", paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
     public void reload(boolean force) {
-        Main.inst().getWorld().unloadChunks(force, true);
+        Main.inst().getWorld().reload(force, true);
         logger.log(LogLevel.SUCCESS, "All chunks have been reloaded");
     }
 
