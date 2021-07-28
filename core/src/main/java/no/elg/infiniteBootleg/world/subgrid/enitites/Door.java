@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import java.util.concurrent.atomic.AtomicInteger;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
@@ -28,7 +29,7 @@ public class Door extends MaterialEntity {
     private TextureRegion openDoorRegion;
     private TextureRegion closedDoorRegion;
 
-    private int open;
+    private final AtomicInteger open = new AtomicInteger();
 
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
@@ -36,7 +37,6 @@ public class Door extends MaterialEntity {
             openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
             closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
         }
-        open = 0;
     }
 
     @Override
@@ -65,10 +65,10 @@ public class Door extends MaterialEntity {
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (type == ContactType.BEGIN_CONTACT) {
-            open++;
+            open.getAndIncrement();
         }
         if (type == ContactType.END_CONTACT) {
-            open--;
+            open.getAndDecrement();
         }
     }
 
@@ -80,7 +80,7 @@ public class Door extends MaterialEntity {
 
     @Override
     public TextureRegion getTextureRegion() {
-        return open == 0 ? openDoorRegion : closedDoorRegion;
+        return open.get() == 0 ? openDoorRegion : closedDoorRegion;
     }
 
     @Override
