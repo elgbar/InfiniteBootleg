@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -117,8 +118,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 if (skylight != null) {
                     skylight.remove();
                 }
-                skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE,
-                                                World.SUNRISE_TIME);
+                skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.SUNRISE_TIME);
                 skylight.setStaticLight(true);
                 skylight.setContactFilter(World.LIGHT_FILTER);
                 skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH); //restore lights 1.4 functionality
@@ -164,8 +164,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                     chunk.updateTextureIfDirty();
                 }
 
-                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start ||
-                    x == chunksInView.horizontal_end - 1) {
+                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start || x == chunksInView.horizontal_end - 1) {
                     continue;
                 }
 
@@ -285,13 +284,11 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             chunksInView.horizontal_start = //
                 MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
             chunksInView.horizontal_end = //
-                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
-                CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
+                MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
 
             chunksInView.vertical_start = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
             chunksInView.vertical_end = //
-                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) +
-                CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
+                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
 
             if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
                 lastZoom = camera.zoom;

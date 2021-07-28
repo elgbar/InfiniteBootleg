@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
@@ -12,7 +11,6 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -21,11 +19,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
-import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -39,6 +35,8 @@ import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import no.elg.infiniteBootleg.world.ticker.WorldTicker;
+import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class World implements Disposable, Ticking, Resizable {
+public class World implements Disposable, Resizable {
 
     public static final short GROUND_CATEGORY = 0x1;
     public static final short LIGHTS_CATEGORY = 0x2;
@@ -67,16 +65,6 @@ public class World implements Disposable, Ticking, Resizable {
 
     public static final float SKYLIGHT_SOFTNESS_LENGTH = 1.5f;
     public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
-    /**
-     * How many degrees the time light should have before triggering sunset/sunrise. This will happen from {@code
-     * -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
-     */
-    public static final float TWILIGHT_DEGREES = 20;
-
-    public static final float SUNRISE_TIME = 0;
-    public static final float MIDDAY_TIME = -90;
-    public static final float SUNSET_TIME = -180 + TWILIGHT_DEGREES;
-    public static final float MIDNIGHT_TIME = -270;
 
     static {
         //base filter for entities
@@ -104,24 +92,20 @@ public class World implements Disposable, Ticking, Resizable {
     private final long seed;
     private final ConcurrentMap<Location, Chunk> chunks;
 
-    private final Ticker ticker;
+    private final WorldTicker worldTicker;
 
     private final ChunkLoader chunkLoader;
-    private final long chunkUnloadTime;
-    private final float timeChangePerTick;
     private final WorldRender render;
     @NotNull
     private final WorldBody worldBody;
+
+    private final WorldTime worldTime;
     private final Set<Entity> entities; //all entities in this world (including living entities)
     private final Set<LivingEntity> livingEntities; //all player in this world
-    private final Color baseColor = new Color(Color.WHITE);
-    private final Color tmpColor = new Color();
     private FileHandle worldFile;
     //only exists when graphics exits
     private WorldInputHandler input;
     private String name;
-    private float time;
-    private float timeScale = 1;
 
     /**
      * Generate a world with a random seed
@@ -146,7 +130,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         name = worldName;
 
-        ticker = new Ticker(this, "World-" + name, tick, Settings.tps, Ticker.DEFAULT_NAG_DELAY);
+        worldTicker = new WorldTicker(this, tick);
 
         chunks = new ConcurrentHashMap<>();
         entities = ConcurrentHashMap.newKeySet();
@@ -154,6 +138,7 @@ public class World implements Disposable, Ticking, Resizable {
 
         chunkLoader = new ChunkLoader(this, generator);
         worldBody = new WorldBody(this);
+        worldTime = new WorldTime(this);
 
         if (Settings.renderGraphic) {
             render = new WorldRender(this);
@@ -162,10 +147,6 @@ public class World implements Disposable, Ticking, Resizable {
         else {
             render = new HeadlessWorldRenderer(this);
         }
-
-        time = MIDDAY_TIME;
-        chunkUnloadTime = ticker.getTPS() * 5;
-        timeChangePerTick = ticker.getSecondsDelayBetweenTicks() / 10;
 
         load();
 
@@ -235,7 +216,7 @@ public class World implements Disposable, Ticking, Resizable {
     public Chunk getChunk(@NotNull Location chunkLoc) {
         Chunk chunk = chunks.get(chunkLoc);
         if (chunk == null || !chunk.isLoaded()) {
-            if (ticker.isPaused()) {
+            if (getWorldTicker().isPaused()) {
                 return null;
             }
             chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
@@ -583,8 +564,18 @@ public class World implements Disposable, Ticking, Resizable {
         }
     }
 
+    /**
+     * @return All currently loaded chunks
+     */
     public Collection<Chunk> getLoadedChunks() {
         return chunks.values().stream().filter(it -> !it.isLoaded()).collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
+     * @return Backing map of chunks
+     */
+    public ConcurrentMap<Location, Chunk> getChunks() {
+        return chunks;
     }
 
     /**
@@ -649,7 +640,7 @@ public class World implements Disposable, Ticking, Resizable {
      * @return The current world tick
      */
     public long getTick() {
-        return ticker.getTickId();
+        return worldTicker.getTickId();
     }
 
     @Override
@@ -678,7 +669,7 @@ public class World implements Disposable, Ticking, Resizable {
     @Override
     public void dispose() {
         render.dispose();
-        ticker.stop();
+        getWorldTicker().stop();
         if (input != null) {
             input.dispose();
         }
@@ -707,125 +698,14 @@ public class World implements Disposable, Ticking, Resizable {
         worldFolder.deleteDirectory();
     }
 
-    /**
-     * Calculate how bright the sky should be. During the night the value will always be {@code 0}, during twilight (ie
-     * from {@code 360} to {@code 360-}{@link #TWILIGHT_DEGREES} and {@code 180+}{@link #TWILIGHT_DEGREES} to {@code
-     * 180-}{@link #TWILIGHT_DEGREES}) the light will change. During daytime the value will always be 1
-     * <p>
-     * The time used will be the current world time ie {@link #getTime()}
-     *
-     * @return A brightness value between 0 and 1 (both inclusive)
-     */
-    public float getSkyBrightness() {
-        return getSkyBrightness(time);
-    }
-
-    /**
-     * Calculate how bright the sky should be. During the night the value will always be {@code 0}, during twilight (ie
-     * from {@code 360} to {@code 360-}{@link #TWILIGHT_DEGREES} and {@code 180+}{@link #TWILIGHT_DEGREES} to {@code
-     * 180-}{@link #TWILIGHT_DEGREES}) the light will change. During daytime the value will always be 1
-     *
-     * @param time
-     *     The time to calculate
-     *
-     * @return A brightness value between 0 and 1 (both inclusive)
-     */
-    public float getSkyBrightness(float time) {
-        float dir = Util.normalizedDir(time);
-        float gray = 0;
-
-        if (dir <= 180) {
-            return 0;
-        }
-        else if (dir == 0) {
-            gray = 0.5f;
-        }
-        else if (dir > 360 - World.TWILIGHT_DEGREES && dir < 360) {
-            gray = (360 - dir) / (World.TWILIGHT_DEGREES);
-        }
-        else if (dir >= 180 && dir <= 180 + World.TWILIGHT_DEGREES) {
-            gray = ((dir - 180) / (World.TWILIGHT_DEGREES));
-        }
-        else if (dir > 180) {
-            gray = 1; //white
-        }
-        return gray;
-    }
-
-    @Override
-    public void tick() {
-        WorldRender wr = getRender();
-
-        //update light direction
-        if (Settings.dayTicking) {
-            time -= timeChangePerTick * timeScale;
-            if (Settings.renderGraphic) {
-                if (normalizedTime() >= 180) {
-                    wr.getSkylight().setDirection(time);
-                }
-                float brightness = getSkyBrightness(time);
-                if (brightness > 0) {
-                    wr.getSkylight().setColor(tmpColor.set(baseColor).mul(brightness, brightness, brightness, 1));
-                }
-                else {
-                    wr.getSkylight().setColor(Color.BLACK);
-                }
-            }
-        }
-
-        if (Settings.renderGraphic && Settings.renderLight) {
-            synchronized (WorldRender.BOX2D_LOCK) {
-                synchronized (WorldRender.LIGHT_LOCK) {
-                    getRender().getRayHandler().update();
-                }
-            }
-        }
-
-        //tick all chunks and blocks in chunks
-        long tick = getWorldTicker().getTickId();
-        for (Iterator<Chunk> iterator = chunks.values().iterator(); iterator.hasNext(); ) {
-            Chunk chunk = iterator.next();
-
-            //clean up dead chunks
-            if (!chunk.isLoaded()) {
-                iterator.remove();
-                continue;
-            }
-            //Unload chunks not seen for CHUNK_UNLOAD_TIME
-            if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
-
-                unloadChunk(chunk);
-                iterator.remove();
-                continue;
-            }
-            chunk.tick();
-        }
-
-        for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext(); ) {
-            Entity entity = iterator.next();
-
-            if (entity.isInvalid()) {
-                removeEntity(entity);
-                continue;
-            }
-            entity.tick();
-        }
-        //tick all box2d elements
-        worldBody.tick();
-    }
-
     @NotNull
     public WorldRender getRender() {
         return render;
     }
 
-    public float normalizedTime() {
-        return Util.normalizedDir(time);
-    }
-
     @NotNull
-    public Ticker getWorldTicker() {
-        return ticker;
+    public WorldTicker getWorldTicker() {
+        return worldTicker;
     }
 
     /**
@@ -836,16 +716,6 @@ public class World implements Disposable, Ticking, Resizable {
      */
     public void unloadChunk(@Nullable Chunk chunk) {
         unloadChunk(chunk, false, true);
-    }
-
-    @Override
-    public void tickRare() {
-        for (Chunk chunk : getLoadedChunks()) {
-            chunk.tickRare();
-        }
-        for (Entity entity : entities) {
-            entity.tickRare();
-        }
     }
 
     /**
@@ -977,23 +847,8 @@ public class World implements Disposable, Ticking, Resizable {
         return worldBody;
     }
 
-    public float getTimeScale() {
-        return timeScale;
-    }
 
-    public void setTimeScale(float timeScale) {
-        this.timeScale = timeScale;
-    }
-
-    public float getTime() {
-        return time;
-    }
-
-    public void setTime(float time) {
-        this.time = time;
-    }
-
-    public Color getBaseColor() {
-        return baseColor;
+    public WorldTime getWorldTime() {
+        return worldTime;
     }
 }

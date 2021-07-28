@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
-import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -18,6 +17,8 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import no.elg.infiniteBootleg.world.ticker.WorldTicker;
+import no.elg.infiniteBootleg.world.time.WorldTime;
 import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +37,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1", paramDescriptions = {"red", "green", "blue", "alpha"})
     public void skyColor(float r, float g, float b, float a) {
-        Color skylight = Main.inst().getWorld().getBaseColor();
+        Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
         skylight.set(r, g, b, a);
         logger.success("Sky color changed to " + skylight);
     }
@@ -47,7 +48,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
     public void skyColor(String colorName) {
         if (Settings.renderGraphic) {
-            Color skylight = Main.inst().getWorld().getBaseColor();
+            Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
             try {
                 Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
                 skylight.set(color);
@@ -101,7 +102,7 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks," +
                               " entity updates and chunks update")
     public void pause() {
-        Ticker ticker = Main.inst().getWorld().getWorldTicker();
+        WorldTicker ticker = Main.inst().getWorld().getWorldTicker();
         if (ticker.isPaused()) {
             logger.log(LogLevel.ERROR, "World is already paused");
         }
@@ -115,7 +116,7 @@ public class Commands extends CommandExecutor {
                               " entity updates and chunks update")
     public void resume() {
         World world = Main.inst().getWorld();
-        Ticker ticker = Main.inst().getWorld().getWorldTicker();
+        WorldTicker ticker = Main.inst().getWorld().getWorldTicker();
         if (ticker.isPaused()) {
             world.getWorldTicker().resume();
             world.getRender().update();
@@ -285,8 +286,8 @@ public class Commands extends CommandExecutor {
     @CmdArgNames({"scale"})
     @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
     public void timescale(float scale) {
-        float old = Main.inst().getWorld().getTimeScale();
-        Main.inst().getWorld().setTimeScale(scale);
+        float old = Main.inst().getWorld().getWorldTime().getTimeScale();
+        Main.inst().getWorld().getWorldTime().setTimeScale(scale);
         logger.success("Changed time scale from % .3f to % .3f", old, scale);
     }
 
@@ -309,19 +310,19 @@ public class Commands extends CommandExecutor {
                 case "day":
                 case "dawn":
                 case "sunrise":
-                    time = World.SUNRISE_TIME;
+                    time = WorldTime.SUNRISE_TIME;
                     break;
                 case "midday":
                 case "noon":
-                    time = World.MIDDAY_TIME;
+                    time = WorldTime.MIDDAY_TIME;
                     break;
                 case "dusk":
                 case "sunset":
-                    time = World.SUNSET_TIME;
+                    time = WorldTime.SUNSET_TIME;
                     break;
                 case "midnight":
                 case "night":
-                    time = World.MIDNIGHT_TIME;
+                    time = WorldTime.MIDNIGHT_TIME;
                     break;
                 case "end":
                     time = Integer.MAX_VALUE;
@@ -339,8 +340,8 @@ public class Commands extends CommandExecutor {
     @CmdArgNames({"time"})
     @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
     public void time(float time) {
-        float old = Main.inst().getWorld().getTime();
-        Main.inst().getWorld().setTime(time);
+        float old = Main.inst().getWorld().getWorldTime().getTime();
+        Main.inst().getWorld().getWorldTime().setTime(time);
         logger.success("Changed time from % .3f to % .3f", old, time);
     }
 
