@@ -121,7 +121,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.SUNRISE_TIME);
                 skylight.setStaticLight(true);
                 skylight.setContactFilter(World.LIGHT_FILTER);
-                skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH); //restore lights 1.4 functionality
+                skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
             }
         }
     }

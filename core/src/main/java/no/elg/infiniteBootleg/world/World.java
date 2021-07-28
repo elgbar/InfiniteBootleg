@@ -64,7 +64,7 @@ public class World implements Disposable, Resizable {
     public static final Filter ENTITY_FILTER;
     public static final Filter LIGHT_FILTER;
 
-    public static final float SKYLIGHT_SOFTNESS_LENGTH = 1.5f;
+    public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
     public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
 
     static {
