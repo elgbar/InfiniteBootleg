@@ -380,7 +380,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      * Update the cached position and velocity
      */
     public final void updatePos() {
-
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) { return;}

@@ -19,7 +19,7 @@ public class FallingBlock extends Entity {
     private final Material material;
     private final TextureRegion region;
 
-    private boolean crashed;
+    private volatile boolean crashed;
 
     public FallingBlock(@NotNull World world, float worldX, float worldY, @NotNull Material material) {
         super(world, worldX + 0.5f, worldY + 0.5f, false);
@@ -46,14 +46,13 @@ public class FallingBlock extends Entity {
                 int newX = getBlockX();
                 int newY = getBlockY();
 
+                world.removeEntity(this);
                 if (world.isAirBlock(newX, newY)) {
                     world.setBlock(newX, newY, material, true);
                 }
 //                else{
 //                    //TODO drop as an item
 //                }
-
-                world.removeEntity(this);
             });
         }
     }

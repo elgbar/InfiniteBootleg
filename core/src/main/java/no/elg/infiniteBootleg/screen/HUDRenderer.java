@@ -48,11 +48,9 @@ public class HUDRenderer implements Renderer {
 
             Chunk pc = world.getChunkFromWorld(main.getMouseBlockX(), main.getMouseBlockY());
 
-            String fps = String.format("FPS: %4d delta: %.5f tps: %2d tps delta: %3d ms active threads %d",
-                                       Gdx.graphics.getFramesPerSecond(), Gdx.graphics.getDeltaTime(),
-                                       world.getWorldTicker().getRealTPS(),
-                                       TimeUtils.nanosToMillis(world.getWorldTicker().getTpsDelta()),
-                                       Main.inst().getScheduler().getActiveThreads());
+            String fps = String.format("FPS: %4d delta: %.5f tps: %2d tps delta: %3d ms active threads %d", Gdx.graphics.getFramesPerSecond(),
+                                       Gdx.graphics.getDeltaTime(), world.getWorldTicker().getRealTPS(),
+                                       TimeUtils.nanosToMillis(world.getWorldTicker().getTpsDelta()), Main.inst().getScheduler().getActiveThreads());
             String pointing = String.format("Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b",
                                             block != null ? block.getMaterial() : Material.AIR, //
                                             main.getMouseX(), main.getMouseY(), //
@@ -64,19 +62,17 @@ public class HUDRenderer implements Renderer {
                 world.getChunkLoader().getGenerator().getBiome(main.getMouseBlockX()), //
                 pc.isAllAir(), pc.isAllowingUnloading() //
                                                                                                                     );
-            String viewChunk = String.format("Viewing %d chunks (total %d blocks, w %d b, h %d b) with zoom: %.3f",
-                                             chunksInView, chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
-                                             chunksHorz * Chunk.CHUNK_SIZE, chunksVert * Chunk.CHUNK_SIZE,
+            String viewChunk = String.format("Viewing %d chunks (total %d blocks, w %d b, h %d b) with zoom: %.3f", chunksInView,
+                                             chunksInView * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE, chunksHorz * Chunk.CHUNK_SIZE, chunksVert * Chunk.CHUNK_SIZE,
                                              world.getRender().getCamera().zoom);
 
 
-            String pos = player == null ? "No player" : String.format(
-                "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x, player.getPosition().y,
-                player.getVelocity().x, player.getVelocity().y, //
-                player.isOnGround(), player.isFlying()//
+            String pos = player == null ? "No player" : String.format("p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g?%5b f?%5b", player.getPosition().x,
+                                                                      player.getPosition().y, player.getVelocity().x, player.getVelocity().y, //
+                                                                      player.isOnGround(), player.isFlying()//
                                                                      );
-            String sky = String.format("time: %.2f scale: %.2f skycolor: %s", world.getTime(), world.getTimeScale(),
-                                       world.getSkyBrightness());
+            String sky = String.format("time: %.2f scale: %.2f skycolor: %s", world.getWorldTime().getTime(), world.getWorldTime().getTimeScale(),
+                                       world.getWorldTime().getSkyBrightness());
 
             String nl = "\n    ";
             StringBuilder ents = new StringBuilder("E = ");
@@ -104,8 +100,8 @@ public class HUDRenderer implements Renderer {
         if (player != null) {
             Material mat = player.getControls().getSelected();
             if (mat != null && mat.getTextureRegion() != null) {
-                sr.getBatch().draw(mat.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3 * SCALE,
-                                   h - BLOCK_SIZE * 3 * SCALE, BLOCK_SIZE * 2 * SCALE, BLOCK_SIZE * 2 * SCALE);
+                sr.getBatch().draw(mat.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3 * SCALE, h - BLOCK_SIZE * 3 * SCALE, BLOCK_SIZE * 2 * SCALE,
+                                   BLOCK_SIZE * 2 * SCALE);
             }
         }
         sr.end();

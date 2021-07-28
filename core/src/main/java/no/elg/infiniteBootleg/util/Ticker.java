@@ -142,7 +142,7 @@ public class Ticker implements Runnable {
         tpsWarnThreshold = (long) (TPS_LOSS_PERCENTAGE * tps);
         nagDelayTicks = (long) Math.max(0, tps * nagDelay);
 
-        Main.logger().debug(tag, "Starting ticking thread for '" + name + "' with TPS = " + tps + " (warn when tps <= " + tpsWarnThreshold + ")");
+        Main.logger().debug(tag, "Starting ticking thread for '" + name + "' with tps = " + tps + " (warn when tps <= " + tpsWarnThreshold + ")");
 
         tickerThread = new PauseableThread(this);
         tickerThread.setName(tag);

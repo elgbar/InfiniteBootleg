@@ -32,7 +32,7 @@ public class StdConsole extends HeadlessConsole implements Runnable {
         while (running) {
             try {
                 String read = in.readLine();
-                Gdx.app.postRunnable(() -> consoleHandler.execCommand(read));
+                Main.inst().getScheduler().executeSync(() -> consoleHandler.execCommand(read));
             } catch (IOException e) {
                 e.printStackTrace();
             }
