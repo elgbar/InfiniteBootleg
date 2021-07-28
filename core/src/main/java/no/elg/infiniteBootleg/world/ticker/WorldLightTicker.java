@@ -1,11 +1,13 @@
 package no.elg.infiniteBootleg.world.ticker;
 
+import box2dLight.DirectionalLight;
 import com.badlogic.gdx.graphics.Color;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,15 +36,24 @@ public class WorldLightTicker implements Ticking {
         if (Settings.dayTicking) {
             time.setTime(time.getTime() - timeChangePerTick * time.getTimeScale());
             if (Settings.renderGraphic) {
+                DirectionalLight skylight = wr.getSkylight();
+                float currTime = time.getTime();
                 if (time.normalizedTime() >= 180) {
-                    wr.getSkylight().setDirection(time.getTime());
+                    synchronized (LIGHT_LOCK) {
+                        skylight.setDirection(currTime);
+                    }
                 }
-                float brightness = time.getSkyBrightness(time.getTime());
+                float brightness = time.getSkyBrightness(currTime);
                 if (brightness > 0) {
-                    wr.getSkylight().setColor(tmpColor.set(time.getBaseColor()).mul(brightness, brightness, brightness, 1));
+                    Color newColor = tmpColor.set(time.getBaseColor()).mul(brightness, brightness, brightness, 1);
+                    synchronized (LIGHT_LOCK) {
+                        skylight.setColor(newColor);
+                    }
                 }
                 else {
-                    wr.getSkylight().setColor(Color.BLACK);
+                    synchronized (LIGHT_LOCK) {
+                        skylight.setColor(Color.BLACK);
+                    }
                 }
             }
         }

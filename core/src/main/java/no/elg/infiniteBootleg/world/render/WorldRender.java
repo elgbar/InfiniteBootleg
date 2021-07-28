@@ -242,9 +242,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     }
 
     public DirectionalLight getSkylight() {
-        synchronized (LIGHT_LOCK) {
-            return skylight;
-        }
+        return skylight;
     }
 
     @Override

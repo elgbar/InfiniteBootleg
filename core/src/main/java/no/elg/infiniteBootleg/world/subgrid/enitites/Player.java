@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.World;
+import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,9 +27,10 @@ public class Player extends LivingEntity {
         super(world, 0, 0);
         region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         controls = new KeyboardControls(world.getRender(), this);
-
-        torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
-        torchLight.setStaticLight(true);
+        synchronized (LIGHT_LOCK) {
+            torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
+            torchLight.setStaticLight(true);
+        }
     }
 
     @Override
@@ -47,7 +49,7 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public synchronized void dispose() {
+    public void dispose() {
         super.dispose();
         torchLight.dispose();
     }
@@ -55,9 +57,10 @@ public class Player extends LivingEntity {
     @Override
     public void tick() {
         super.tick();
-        if (torchLight != null) {
-            Vector2 pos = super.getPosition();
-            float angle = Main.inst().getMouse().cpy().sub(pos).angleDeg();
+        
+        Vector2 pos = getPosition();
+        float angle = Main.inst().getMouse().cpy().sub(pos).angleDeg();
+        synchronized (LIGHT_LOCK) {
             torchLight.setDirection(angle);
             torchLight.setPosition(pos);
         }
