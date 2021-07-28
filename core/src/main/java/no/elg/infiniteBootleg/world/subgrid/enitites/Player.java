@@ -51,7 +51,10 @@ public class Player extends LivingEntity {
     @Override
     public void dispose() {
         super.dispose();
-        torchLight.dispose();
+        controls.dispose();
+        synchronized (LIGHT_LOCK) {
+            torchLight.remove();
+        }
     }
 
     @Override
