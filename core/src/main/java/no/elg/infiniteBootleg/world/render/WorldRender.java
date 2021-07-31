@@ -159,13 +159,14 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 }
                 chunk.view();
 
+                //No need to update texture when when out of view, but in loaded zone
+                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start || x == chunksInView.horizontal_end - 1) {
+                    continue;
+                }
+
                 if (chunk.isDirty()) {
                     //noinspection LibGDXFlushInsideLoop
                     chunk.updateTextureIfDirty();
-                }
-
-                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start || x == chunksInView.horizontal_end - 1) {
-                    continue;
                 }
 
                 //noinspection LibGDXFlushInsideLoop
