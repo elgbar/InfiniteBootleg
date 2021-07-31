@@ -646,7 +646,7 @@ public class World implements Disposable, Resizable {
      */
     public void addEntity(@NotNull Entity entity) {
         //Load chunk of entity
-        var chunk = getChunk(entity.getBlockX(), entity.getBlockY());
+        var chunk = getChunk(CoordUtil.worldToChunk(entity.getBlockX()), CoordUtil.worldToChunk(entity.getBlockY()));
         if (chunk == null) {
             //Failed to load chunk, remove entity
             Main.logger().error("World", "Failed to add entity to world, as its spawning chunk could not be loaded");
