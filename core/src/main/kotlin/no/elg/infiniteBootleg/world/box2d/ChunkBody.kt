@@ -45,7 +45,6 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
    * If the neighbors also should be updated
    * @param lightsOnly
    */
-//  @Synchronized
   fun update(recalculateNeighbors: Boolean, lightsOnly: Boolean) {
     if (lightsOnly) {
       updateLights()
@@ -132,7 +131,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
         return
       }
     }
-    Main.inst().scheduler.executeSync { chunk.world.render.update() }
+    Main.inst().scheduler.executeAsync { chunk.world.render.update() }
     var potentiallyDirty = false
 
     //TODO Try to optimize this (ie select what directions to recalculate)

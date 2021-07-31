@@ -35,7 +35,7 @@ public class CancellableThreadScheduler {
     }
 
     /**
-     * Block until all scheduled tasks have been completed
+     * Block until all scheduled tasks have been completed. Must be on the main thread, and not hold any locks
      */
     public void waitForTasks() {
         Preconditions.checkState(!Thread.currentThread().getName().contains("pool"), "Can only wait for tasks on main thread");

@@ -67,7 +67,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         //teleport entity upwards till we find a valid location
         boolean print = true;
         //make sure we're not stuck in a infinite loop if the given height is zero
-        float checkStep = getHalfBox2dHeight() != 0 ? getHalfBox2dHeight() : 0.1f;
+        float checkStep = getHalfBox2dHeight() < 0.1f ? getHalfBox2dHeight() : 0.1f;
         while (isInvalidLocation(posCache.x, posCache.y)) {
             if (print) {
                 Main.logger().debug("Entity", //

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import java.io.File;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -572,7 +571,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                                     "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + bytes.length);
         int index = 0;
         synchronized (this) {
-            HashSet<TickingBlock> updateBlocks = new HashSet<>();
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
                     Material mat = Material.fromByte(bytes[index++]);

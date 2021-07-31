@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,7 +89,7 @@ public class World implements Disposable, Resizable {
         TRANSPARENT_BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
         TRANSPARENT_BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
-        //door
+        //closed door
         BLOCK_ENTITY_FILTER = new Filter();
         BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
         BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
@@ -628,7 +627,7 @@ public class World implements Disposable, Resizable {
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         try {
             ZipUtils.zip(worldFolder, worldZip);
-            Main.logger().log("World", "World saved!");
+            Main.logger().debug("World", "World saved!");
         } catch (IOException e) {
             Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
             return;
@@ -788,7 +787,7 @@ public class World implements Disposable, Resizable {
     /**
      * @return Backing map of chunks
      */
-    public ConcurrentMap<Location, Chunk> getChunks() {
+    public @NotNull ConcurrentMap<Location, Chunk> getChunks() {
         return chunks;
     }
 
@@ -814,7 +813,7 @@ public class World implements Disposable, Resizable {
     /**
      * @return Unique identification of this world
      */
-    public UUID getUuid() {
+    public @NotNull UUID getUuid() {
         return uuid;
     }
 
@@ -838,15 +837,15 @@ public class World implements Disposable, Resizable {
     /**
      * @return the current entities
      */
-    public Set<Entity> getEntities() {
+    public @NotNull Set<Entity> getEntities() {
         return entities;
     }
 
-    public Set<LivingEntity> getLivingEntities() {
+    public @NotNull Set<LivingEntity> getLivingEntities() {
         return livingEntities;
     }
 
-    public ChunkLoader getChunkLoader() {
+    public @NotNull ChunkLoader getChunkLoader() {
         return chunkLoader;
     }
 
@@ -856,14 +855,14 @@ public class World implements Disposable, Resizable {
     }
 
 
-    public WorldTime getWorldTime() {
+    public @NotNull WorldTime getWorldTime() {
         return worldTime;
     }
 
 
     @Override
     public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
+        return uuid.hashCode();
     }
 
     @Override
@@ -876,7 +875,7 @@ public class World implements Disposable, Resizable {
         }
 
         World world = (World) o;
-        return Objects.equals(uuid, world.uuid);
+        return uuid.equals(world.uuid);
     }
 
     @Override

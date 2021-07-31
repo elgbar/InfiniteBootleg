@@ -215,7 +215,7 @@ public class Main extends ApplicationAdapter {
     }
 
     public Vector2 getMouse() {
-        return mouse.cpy();
+        return mouse;
     }
 
     public ScreenRenderer getScreenRenderer() {
