@@ -43,8 +43,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
 
     private Body body;
     private boolean flying; //ignore world gravity
-    private Vector2 posCache;
-    private Vector2 velCache;
+    private final Vector2 posCache;
+    private final Vector2 velCache;
     private int groundContacts;
     private Filter filter;
 
@@ -383,8 +383,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) { return;}
-                posCache = body.getPosition();
-                velCache = body.getLinearVelocity();
+                posCache.set(body.getPosition());
+                velCache.set(body.getLinearVelocity());
             }
         }
     }
