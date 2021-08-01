@@ -170,11 +170,13 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         synchronized (this) {
             Block currBlock = blocks[localX][localY];
 
-            if ((currBlock == null && block == null) || (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial())) {
+            //accounts for both being null also ofc
+            if (currBlock == block) {
+                return currBlock;
+            }
+            else if (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial()) {
                 //Block is the same, ignore this set
-                if (block != null) {
-                    block.dispose();
-                }
+                block.dispose();
                 return currBlock;
             }
 
@@ -186,14 +188,9 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                 }
             }
 
-            if (block == null) {
-                blocks[localX][localY] = null;
-            }
-            else {
-                blocks[localX][localY] = block;
-                if (block instanceof TickingBlock tickingBlock) {
-                    tickingBlocks.add(tickingBlock);
-                }
+            blocks[localX][localY] = block;
+            if (block instanceof TickingBlock tickingBlock) {
+                tickingBlocks.add(tickingBlock);
             }
 
             if (updateTexture) {
