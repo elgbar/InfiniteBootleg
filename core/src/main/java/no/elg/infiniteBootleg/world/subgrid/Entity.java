@@ -396,21 +396,25 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         }
         updatePos();
         float nx;
-        if (abs(velCache.x) > MAX_X_VEL) {
+        boolean tooFastX = abs(velCache.x) > MAX_X_VEL;
+        if (tooFastX) {
             nx = signum(velCache.x) * MAX_X_VEL;
         }
         else { nx = velCache.x; }
 
         float ny;
-        if (abs(velCache.y) > MAX_Y_VEL) {
+        boolean tooFastY = abs(velCache.y) > MAX_Y_VEL;
+        if (tooFastY) {
             ny = signum(velCache.y) * MAX_Y_VEL;
         }
         else { ny = velCache.y; }
 
-        synchronized (BOX2D_LOCK) {
-            synchronized (this) {
-                if (isInvalid()) { return; }
-                body.setLinearVelocity(nx, ny);
+        if (tooFastX || tooFastY) {
+            synchronized (BOX2D_LOCK) {
+                synchronized (this) {
+                    if (isInvalid()) { return; }
+                    body.setLinearVelocity(nx, ny);
+                }
             }
         }
     }
