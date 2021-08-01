@@ -29,18 +29,17 @@ public class DebugChunkRenderer implements Renderer {
 
         WorldRender.ChunkViewed chunksInView = worldRender.getChunksInView();
 
-        int yEnd = chunksInView.vertical_end;
-        int xEnd = chunksInView.horizontal_end;
+        int yEnd = chunksInView.verticalEnd;
+        int xEnd = chunksInView.horizontalEnd;
 
         lr.begin(ShapeRenderer.ShapeType.Line);
         lr.setProjectionMatrix(camera.combined);
 
         float offset = Chunk.CHUNK_SIZE * Block.BLOCK_SIZE;
-        for (float y = chunksInView.vertical_start; y < yEnd; y++) {
-            for (float x = chunksInView.horizontal_start; x < xEnd; x++) {
+        for (float y = chunksInView.verticalStart; y < yEnd; y++) {
+            for (float x = chunksInView.horizontalStart; x < xEnd; x++) {
                 Color c;
-                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start ||
-                    x == chunksInView.horizontal_end - 1) {
+                if (y == chunksInView.verticalEnd - 1 || x == chunksInView.horizontalStart || x == chunksInView.horizontalEnd - 1) {
                     c = OUTSIDE_CAMERA_COLOR;
                 }
                 else {

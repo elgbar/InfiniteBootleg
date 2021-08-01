@@ -14,8 +14,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import java.util.HashMap;
-import java.util.Map;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
@@ -70,7 +70,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private final Rectangle viewBound;
     private final ChunkViewed chunksInView;
     private final Matrix4 m4 = new Matrix4();
-    Map<Chunk, TextureRegion> draw = new HashMap<>();
+    OrderedMap<Chunk, TextureRegion> draw;
     private RayHandler rayHandler;
     private EntityRenderer entityRenderer;
     private SpriteBatch batch;
@@ -85,6 +85,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         viewBound = new Rectangle();
         chunksInView = new ChunkViewed();
         this.world = world;
+        draw = new OrderedMap<>();
+        draw.orderedKeys().ordered = false; //improve remove
 
         if (Settings.renderGraphic) {
             chunkRenderer = new ChunkRenderer(this);
@@ -150,9 +152,10 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
 
         draw.clear();
+        draw.ensureCapacity(chunksInView.getHorizontalLength() * chunksInView.getVerticalLength());
 
-        for (int y = chunksInView.vertical_start; y < chunksInView.vertical_end; y++) {
-            for (int x = chunksInView.horizontal_start; x < chunksInView.horizontal_end; x++) {
+        for (int y = chunksInView.verticalStart; y < chunksInView.verticalEnd; y++) {
+            for (int x = chunksInView.horizontalStart; x < chunksInView.horizontalEnd; x++) {
                 Chunk chunk = world.getChunk(x, y);
                 if (chunk == null) {
                     continue;
@@ -160,7 +163,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 chunk.view();
 
                 //No need to update texture when when out of view, but in loaded zone
-                if (y == chunksInView.vertical_end - 1 || x == chunksInView.horizontal_start || x == chunksInView.horizontal_end - 1) {
+                if (y == chunksInView.verticalEnd - 1 || x == chunksInView.horizontalStart || x == chunksInView.horizontalEnd - 1) {
                     continue;
                 }
 
@@ -184,10 +187,10 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             }
         }
         batch.begin();
-        for (Map.Entry<Chunk, TextureRegion> entry : draw.entrySet()) {
-            int dx = entry.getKey().getChunkX() * CHUNK_TEXTURE_SIZE;
-            int dy = entry.getKey().getChunkY() * CHUNK_TEXTURE_SIZE;
-            batch.draw(entry.getValue(), dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
+        for (ObjectMap.Entry<Chunk, TextureRegion> entry : draw.entries()) {
+            int dx = entry.key.getChunkX() * CHUNK_TEXTURE_SIZE;
+            int dy = entry.key.getChunkY() * CHUNK_TEXTURE_SIZE;
+            batch.draw(entry.value, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
         }
         entityRenderer.render();
         batch.end();
@@ -214,8 +217,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
      * @return {@code true} if the given chunk is outside the view of the camera
      */
     public boolean isOutOfView(@NotNull Chunk chunk) {
-        return chunk.getChunkX() < chunksInView.horizontal_start || chunk.getChunkX() >= chunksInView.horizontal_end ||
-               chunk.getChunkY() < chunksInView.vertical_start || chunk.getChunkY() >= chunksInView.vertical_end;
+        return chunk.getChunkX() < chunksInView.horizontalStart || chunk.getChunkX() >= chunksInView.horizontalEnd ||
+               chunk.getChunkY() < chunksInView.verticalStart || chunk.getChunkY() >= chunksInView.verticalEnd;
     }
 
     public ChunkViewed getChunksInView() {
@@ -280,13 +283,13 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
             viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
 
-            chunksInView.horizontal_start = //
+            chunksInView.horizontalStart = //
                 MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
-            chunksInView.horizontal_end = //
+            chunksInView.horizontalEnd = //
                 MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
 
-            chunksInView.vertical_start = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
-            chunksInView.vertical_end = //
+            chunksInView.verticalStart = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
+            chunksInView.verticalEnd = //
                 MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
 
             if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
@@ -302,20 +305,20 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public static final class ChunkViewed {
 
-        public int horizontal_start;
-        public int horizontal_end;
-        public int vertical_start;
-        public int vertical_end;
+        public int horizontalStart;
+        public int horizontalEnd;
+        public int verticalStart;
+        public int verticalEnd;
 
         private ChunkViewed() {
         }
 
         public int getHorizontalLength() {
-            return horizontal_end - horizontal_start;
+            return horizontalEnd - horizontalStart;
         }
 
         public int getVerticalLength() {
-            return vertical_end - vertical_start;
+            return verticalEnd - verticalStart;
         }
     }
 }
