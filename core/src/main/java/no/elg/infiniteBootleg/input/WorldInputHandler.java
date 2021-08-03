@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.Gdx;
 import static com.badlogic.gdx.Input.Keys.DOWN;
+import static com.badlogic.gdx.Input.Keys.F12;
 import static com.badlogic.gdx.Input.Keys.F3;
 import static com.badlogic.gdx.Input.Keys.F5;
 import static com.badlogic.gdx.Input.Keys.F9;
@@ -16,6 +17,7 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
+import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -65,6 +67,17 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
                 world.reload(true, false);
                 world.load();
                 Main.logger().log("World", "World reloaded last save");
+                break;
+            case F12:
+                Ticker ticker = world.getWorldTicker();
+                if (ticker.isPaused()) {
+                    ticker.resume();
+                    Main.logger().log("World", "Ticker resumed by F12");
+                }
+                else {
+                    ticker.pause();
+                    Main.logger().log("World", "Ticker paused by F12");
+                }
                 break;
             default:
                 return false;
