@@ -38,19 +38,17 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public static final float AMBIENT_LIGHT = 0.026f;
     public static final int RAYS_PER_BLOCK = 200;
     /**
-     * How many chunks to the sides extra should be included.
+     * How many chunks around extra should be included.
      * <p>
      * One of the these chunks comes from the need that the player should not see that a chunks loads in.
      */
-    public static final int CHUNKS_IN_VIEW_HORIZONTAL_RENDER = 1;
+    public static final int CHUNKS_IN_VIEW_PADDING_RENDER = 1;
     /**
      * How many chunks to the sides extra should be included.
      * <p>
      * This is the for light during twilight to stop light bleeding into the sides of the screen when moving.
      */
-    public static final int CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS = CHUNKS_IN_VIEW_HORIZONTAL_RENDER + 1;
-    //add one to make sure we are always in darkness underground
-    public static final int CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET = 1;
+    public static final int CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS = CHUNKS_IN_VIEW_PADDING_RENDER + 1;
 
     /**
      * How much must the player zoom to trigger a skylight reset
@@ -163,7 +161,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 chunk.view();
 
                 //No need to update texture when when out of view, but in loaded zone
-                if (y == chunksInView.verticalEnd - 1 || x == chunksInView.horizontalStart || x == chunksInView.horizontalEnd - 1) {
+                if (y == chunksInView.verticalEnd - 1 || y == chunksInView.verticalStart || x == chunksInView.horizontalStart ||
+                    x == chunksInView.horizontalEnd - 1) {
                     continue;
                 }
 
@@ -288,9 +287,9 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             chunksInView.horizontalEnd = //
                 MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
 
-            chunksInView.verticalStart = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE);
+            chunksInView.verticalStart = MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_PADDING_RENDER;
             chunksInView.verticalEnd = //
-                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_TOP_VERTICAL_OFFSET;
+                MathUtils.floor((viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE) + CHUNKS_IN_VIEW_PADDING_RENDER;
 
             if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
                 lastZoom = camera.zoom;
