@@ -61,6 +61,8 @@ public class Main extends ApplicationAdapter {
     private float mouseX;
     private float mouseY;
 
+    private volatile Player mainPlayer;
+
     public Main(boolean test) {
         synchronized (INST_LOCK) {
             if (inst != null) {
@@ -226,12 +228,18 @@ public class Main extends ApplicationAdapter {
 
     @Nullable
     public Player getPlayer() {
-        for (LivingEntity entity : world.getLivingEntities()) {
-            if (entity instanceof Player) {
-                return (Player) entity;
+        if (mainPlayer == null || mainPlayer.isInvalid()) {
+            for (LivingEntity entity : world.getLivingEntities()) {
+                if (entity instanceof Player player) {
+                    mainPlayer = player;
+                    return mainPlayer;
+                }
             }
+            return null;
         }
-        return null;
+        else {
+            return mainPlayer;
+        }
     }
 
     public World getWorld() {
