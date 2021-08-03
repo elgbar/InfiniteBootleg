@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Collections;
 import com.kotcrab.vis.ui.VisUI;
 import com.strongjoshua.console.LogLevel;
 import java.awt.Toolkit;
@@ -39,7 +40,7 @@ public class Main extends ApplicationAdapter {
     public static final String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
     public static final String VERSION_FILE = "version";
     public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
-    
+
     private static final Object INST_LOCK = new Object();
     private static Main inst;
 
@@ -114,12 +115,13 @@ public class Main extends ApplicationAdapter {
                     "  arrow-keys to control the player\n" +//
                     "  T to teleport player to current mouse pos\n" + //
                     "  Apostrophe (') to open console (type help for help)");
-        console.log(
-            "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options");
+        console.log("You can also start the program with arguments for '--help' or '-?' as arg to see all possible options");
 
 
         Gdx.app.setApplicationLogger(console);
         Gdx.app.setLogLevel(test || Settings.debug ? Application.LOG_DEBUG : Application.LOG_INFO);
+        //use unique iterators
+        Collections.allocateIterators = true;
 
         if (Settings.renderGraphic) {
             screenRenderer = new ScreenRenderer();
