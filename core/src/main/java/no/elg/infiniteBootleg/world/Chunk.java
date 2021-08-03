@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
@@ -24,10 +25,12 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Util;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
+import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -478,6 +481,23 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             }
             return block;
         }
+    }
+
+    public Array<Entity> getEntities() {
+        Array<Entity> foundEntities = new Array<>(false, 5);
+
+        float minX = getWorldX();
+        float maxX = minX + Chunk.CHUNK_SIZE;
+        float minY = getWorldY();
+        float maxY = minY + Chunk.CHUNK_SIZE;
+
+        for (Entity entity : world.getEntities()) {
+            Vector2 pos = entity.getPosition();
+            if (Util.isBetween(minX, pos.x, maxX) && Util.isBetween(minY, pos.y, maxY)) {
+                foundEntities.add(entity);
+            }
+        }
+        return foundEntities;
     }
 
     @Override

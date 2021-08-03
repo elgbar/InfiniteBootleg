@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -376,24 +375,6 @@ public class World implements Disposable, Resizable {
         return foundEntities;
     }
 
-
-    public Array<Entity> getEntities(@NotNull Chunk chunk) {
-        Array<Entity> foundEntities = new Array<>(false, 5);
-
-        float minX = chunk.getWorldX();
-        float maxX = minX + Chunk.CHUNK_SIZE;
-        float minY = chunk.getWorldY();
-        float maxY = minY + Chunk.CHUNK_SIZE;
-
-        for (Entity entity : entities) {
-            Vector2 pos = entity.getPosition();
-            if (Util.isBetween(minX, pos.x, maxX) && Util.isBetween(minY, pos.y, maxY)) {
-                foundEntities.add(entity);
-            }
-        }
-        return foundEntities;
-    }
-
     /**
      * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
      * than a
@@ -595,7 +576,7 @@ public class World implements Disposable, Resizable {
             if (save) {
                 chunkLoader.save(chunk);
             }
-            for (Entity entity : getEntities(chunk)) {
+            for (Entity entity : chunk.getEntities()) {
                 removeEntity(entity);
             }
             chunk.dispose();
