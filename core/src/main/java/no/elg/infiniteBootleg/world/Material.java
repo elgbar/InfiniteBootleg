@@ -40,6 +40,8 @@ public enum Material {
     private final TextureRegion texture;
     private final ItemType itemType;
 
+    private static final Material[] VALUES = values();
+
     Material(float hardness) {
         this(null, hardness);
     }
@@ -111,7 +113,7 @@ public enum Material {
     }
 
     public static Material fromByte(byte b) {
-        return values()[b];
+        return VALUES[b];
     }
 
     /**
