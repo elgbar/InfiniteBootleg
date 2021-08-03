@@ -19,8 +19,10 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
@@ -305,7 +307,17 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
         return entities;
     }
 
-    public Filter getFilter() {
+    /**
+     * @return Current chunk this entity is in
+     */
+    @Nullable
+    public Chunk getChunk() {
+        var chunkX = CoordUtil.worldToChunk(getBlockX());
+        var chunkY = CoordUtil.worldToChunk(getBlockY());
+        return world.getChunk(chunkX, chunkY);
+    }
+
+    public synchronized Filter getFilter() {
         return filter;
     }
 
