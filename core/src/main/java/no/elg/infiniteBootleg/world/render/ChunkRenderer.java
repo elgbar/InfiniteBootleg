@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import no.elg.infiniteBootleg.Main;
@@ -32,17 +31,19 @@ public class ChunkRenderer implements Renderer, Disposable {
     //current rendering chunk
     private Chunk curr;
 
+    private static final Object QUEUE_LOCK = new Object();
+
     public ChunkRenderer(@NotNull WorldRender worldRender) {
         this.worldRender = worldRender;
         batch = new SpriteBatch();
         //use linked list for fast adding to end and beginning
-        List<Chunk> chunkList = Collections.synchronizedList(new LinkedList<>());
+        List<Chunk> chunkList = new LinkedList<>();
         renderQueue = SetUniqueList.setUniqueList(chunkList);
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
     }
 
     public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
-        synchronized (renderQueue) {
+        synchronized (QUEUE_LOCK) {
             //do not queue the chunk we're currently rendering
             if (chunk != curr && !renderQueue.contains(chunk)) {
                 Main.inst().getScheduler().executeAsync(() -> chunk.getChunkBody().update(true, false));
@@ -56,7 +57,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     public void render() {
         //get the first valid chunk to render
         Chunk chunk;
-        synchronized (renderQueue) {
+        synchronized (QUEUE_LOCK) {
             do {
                 if (renderQueue.isEmpty()) { return; } //nothing to render
                 chunk = renderQueue.remove(0);
@@ -87,10 +88,9 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         batch.end();
         fbo.end();
-
         Main.inst().getScheduler().executeAsync(worldRender::update);
 
-        synchronized (renderQueue) {
+        synchronized (QUEUE_LOCK) {
             curr = null;
         }
     }
@@ -98,7 +98,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     @Override
     public void dispose() {
         batch.dispose();
-        synchronized (renderQueue) {
+        synchronized (QUEUE_LOCK) {
             renderQueue.clear();
         }
     }
