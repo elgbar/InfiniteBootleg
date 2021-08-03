@@ -131,20 +131,19 @@ public class Block implements Binembly, Disposable {
         chunk.setBlock(localX, localY, (Block) null, true);
     }
 
-    @NotNull
     @Override
     public byte[] disassemble() {
         return new byte[] {(byte) material.ordinal()};
     }
 
     @Override
-    public void assemble(@NotNull byte[] bytes) {
+    public void assemble(byte[] bytes) {
         throw new UnsupportedOperationException("Cannot assemble blocks directly. Blocks must be assembled by a chunk");
     }
 
     @Override
     public void dispose() {
-
+        //Nothing to dispose by default
     }
 
     @Override

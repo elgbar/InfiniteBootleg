@@ -115,6 +115,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             lockedOn = false;
             worldRender.update();
         }
+
         else if (following != null && !following.isInvalid() && lockedOn) {
             float x = following.getPosition().x * Block.BLOCK_SIZE;
             float y = following.getPosition().y * Block.BLOCK_SIZE;

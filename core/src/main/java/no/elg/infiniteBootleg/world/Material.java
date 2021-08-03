@@ -62,32 +62,27 @@ public enum Material {
      *     If a block of this material can be placed by a player
      * @param hardness
      */
-    Material(@Nullable Class<?> impl, ItemType itemType, boolean solid, boolean blocksLight, boolean placable,
-             float hardness) {
+    Material(@Nullable Class<?> impl, ItemType itemType, boolean solid, boolean blocksLight, boolean placable, float hardness) {
         this.itemType = itemType;
         if (impl != null) {
             if (itemType == ItemType.BLOCK) {
                 Preconditions.checkArgument(Util.hasSuperClass(impl, Block.class),
-                                            name() + " does not have " + Block.class.getSimpleName() +
-                                            " as a super class");
+                                            name() + " does not have " + Block.class.getSimpleName() + " as a super class");
                 try {
-                    constructor = impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class,
-                                                              Material.class);
+                    constructor = impl.getDeclaredConstructor(World.class, Chunk.class, int.class, int.class, Material.class);
 
                 } catch (NoSuchMethodException e) {
-                    throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() +
-                                                    " with the arguments World, Chunk, int, int, Material");
+                    throw new IllegalStateException(
+                        "There is no constructor of " + impl.getSimpleName() + " with the arguments World, Chunk, int, int, Material");
                 }
             }
             else if (itemType == ItemType.ENTITY) {
                 Preconditions.checkArgument(Util.hasSuperClass(impl, MaterialEntity.class),
-                                            name() + " does not have " + MaterialEntity.class.getSimpleName() +
-                                            " as a super class");
+                                            name() + " does not have " + MaterialEntity.class.getSimpleName() + " as a super class");
                 try {
                     constructor = impl.getConstructor(World.class, float.class, float.class);
                 } catch (NoSuchMethodException e) {
-                    throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() +
-                                                    " with the arguments World, float, float");
+                    throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() + " with the arguments World, float, float");
                 }
             }
             else {
@@ -168,9 +163,8 @@ public enum Material {
         try {
             return (MaterialEntity) constructor.newInstance(world, worldX, worldY);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException(String.format(
-                "Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX,
-                worldY), e);
+            throw new IllegalStateException(
+                String.format("Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX, worldY), e);
 
         }
     }
