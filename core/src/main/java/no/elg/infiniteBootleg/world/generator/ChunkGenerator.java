@@ -29,6 +29,8 @@ public interface ChunkGenerator {
     int getHeight(int worldX);
 
     /**
+     * This method will call {@link Chunk#finishLoading()} when the chunk is ready to be rendered
+     *
      * @param world
      *     The world to generate the chunk in
      * @param chunkX

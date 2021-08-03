@@ -541,20 +541,24 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     /**
-     * Allow textures to be loaded
+     * Allow textures to be loaded. Only call once per chunk
      */
-    public void finishLoading() {
-        synchronized (this) {
-            for (int x = 0; x < CHUNK_SIZE; x++) {
-                for (int y = 0; y < CHUNK_SIZE; y++) {
-                    Block block = blocks[x][y];
-                    if (block instanceof TickingBlock tickingBlock) {
-                        tickingBlocks.add(tickingBlock);
-                    }
+    public synchronized void finishLoading() {
+        if (!initializing) {
+            return;
+        }
+        initializing = false;
+
+        tickingBlocks.clear();
+        tickingBlocks.ensureCapacity(CHUNK_SIZE);
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                Block block = blocks[x][y];
+                if (block instanceof TickingBlock tickingBlock) {
+                    tickingBlocks.add(tickingBlock);
                 }
             }
         }
-        initializing = false;
     }
 
     @Override
@@ -579,14 +583,9 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
                     Material mat = Material.fromByte(bytes[index++]);
                     if (mat == null || mat == AIR) {
-                        blocks[x][y] = null;
                         continue;
                     }
-                    Block block = mat.createBlock(world, this, x, y);
-                    if (block instanceof TickingBlock tickingBlock) {
-                        tickingBlocks.add(tickingBlock);
-                    }
-                    blocks[x][y] = block;
+                    blocks[x][y] = mat.createBlock(world, this, x, y);
                 }
             }
         }

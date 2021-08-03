@@ -41,6 +41,7 @@ public class ChunkLoader {
             Chunk chunk = new Chunk(world, chunkX, chunkY);
             //noinspection ConstantConditions checked in existsOnDisk
             chunk.assemble(chunk.getChunkFile().readBytes());
+            chunk.finishLoading();
             return chunk;
         }
         else {
