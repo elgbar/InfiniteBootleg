@@ -5,19 +5,18 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
 import java.io.File;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.Spliterator;
 import static java.util.Spliterator.DISTINCT;
 import static java.util.Spliterator.NONNULL;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterator.SIZED;
 import java.util.Spliterators;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.Main;
@@ -29,6 +28,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +50,10 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     private final int chunkX;
     private final int chunkY;
 
-    private final Set<TickingBlock> tickingBlocks;
+    /**
+     * Must be accessed under a synchronized self block i.e {@code synchronized(tickingBlocks){...}}
+     */
+    private final Array<TickingBlock> tickingBlocks;
     private final ChunkBody chunkBody;
     //if this chunk should be prioritized to be updated
     private volatile boolean dirty; //if texture/allair needs to be updated
@@ -97,7 +100,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         this.chunkX = chunkX;
         this.chunkY = chunkY;
 
-        tickingBlocks = ConcurrentHashMap.newKeySet();//Collections.synchronizedSet(new HashSet<>());
+        tickingBlocks = new Array<>(false, CHUNK_SIZE);
         chunkBody = new ChunkBody(this);
 
         dirty = true;
@@ -123,7 +126,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      *
      * @return The new block, only {@code null} if {@code material} parameter is {@code null}
      */
-    @Nullable
+    @Contract("_,_,!null->!null;_,_,null->null")
     public Block setBlock(int localX, int localY, @Nullable Material material) {
         return setBlock(localX, localY, material, true);
     }
@@ -140,7 +143,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      *
      * @return The new block, only {@code null} if {@code material} parameter is {@code null}
      */
-    @Nullable
+    @Contract("_,_,!null,_->!null;_,_,null,_->null")
     public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {
         Block block = material == null ? null : material.createBlock(world, this, localX, localY);
         return setBlock(localX, localY, block, update);
@@ -158,7 +161,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      *
      * @return The given block, equal to the {@code block} parameter
      */
-    @Nullable
+    @Contract("_,_,!null,_->!null;_,_,null,_->null")
     public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
@@ -183,8 +186,8 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             if (currBlock != null) {
                 currBlock.dispose();
 
-                if (currBlock instanceof TickingBlock) {
-                    tickingBlocks.remove(currBlock);
+                if (currBlock instanceof TickingBlock tickingBlock) {
+                    tickingBlocks.removeValue(tickingBlock, true);
                 }
             }
 
@@ -311,16 +314,20 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Override
     public void tick() {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        for (TickingBlock block : tickingBlocks) {
-            block.tryTick(false);
+        synchronized (this) {
+            for (TickingBlock block : tickingBlocks) {
+                block.tryTick(false);
+            }
         }
     }
 
     @Override
     public void tickRare() {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        for (TickingBlock block : tickingBlocks) {
-            block.tryTick(true);
+        synchronized (this) {
+            for (TickingBlock block : tickingBlocks) {
+                block.tryTick(true);
+            }
         }
     }
 
@@ -459,17 +466,18 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      * @return A block from the relative coordinates
      */
     @NotNull
-    public synchronized Block getBlock(int localX, int localY) {
+    public Block getBlock(int localX, int localY) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
         Preconditions.checkArgument(CoordUtil.isInsideChunk(localX, localY),
                                     "Given arguments are not inside this chunk, localX=" + localX + " localY=" + localY);
-        Block block = blocks[localX][localY];
+        synchronized (this) {
+            Block block = blocks[localX][localY];
 
-        if (block == null) {
-            block = setBlock(localX, localY, AIR, false);
+            if (block == null) {
+                return setBlock(localX, localY, AIR, false);
+            }
+            return block;
         }
-        //noinspection ConstantConditions block will not be null when material is not null
-        return block;
     }
 
     @Override
@@ -484,8 +492,8 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         chunkBody.dispose();
         tickingBlocks.clear();
 
-        for (Block[] blocks : blocks) {
-            for (Block block : blocks) {
+        for (Block[] blockArr : blocks) {
+            for (Block block : blockArr) {
                 if (block != null) {
                     block.dispose();
                 }
@@ -511,7 +519,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     @NotNull
-    public synchronized ChunkBody getChunkBody() {
+    public ChunkBody getChunkBody() {
         return chunkBody;
     }
 
@@ -549,7 +557,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
         initializing = false;
     }
 
-    @NotNull
     @Override
     public byte[] disassemble() {
         byte[] bytes = new byte[CHUNK_SIZE * CHUNK_SIZE];
@@ -583,7 +590,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                 }
             }
         }
-        initializing = false;
     }
 
     @Override
