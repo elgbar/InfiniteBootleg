@@ -71,4 +71,11 @@ public abstract class TickingBlock extends Block implements Ticking {
             }
         }
     }
+
+    public void delayedShouldTick(long delayTicks) {
+        synchronized (tickLock) {
+            setShouldTick(true);
+            minimumTick += delayTicks;
+        }
+    }
 }
