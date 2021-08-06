@@ -83,7 +83,9 @@ public class FallingBlock extends Entity {
         //TODO do not _remove_ this entity, just save it to the unloaded chunk
         int chunkX = CoordUtil.worldToChunk(getBlockX());
         int chunkY = CoordUtil.worldToChunk(getBlockY());
-        if (!getWorld().isChunkLoaded(chunkX, chunkY)) {
+
+        //remove entity if the it no longer falling and have not become a true block for some reason
+        if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
             Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
         }
     }
