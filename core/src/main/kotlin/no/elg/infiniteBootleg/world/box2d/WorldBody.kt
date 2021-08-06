@@ -52,6 +52,9 @@ class WorldBody(world: World) : Ticking {
       return
     }
     synchronized(BOX2D_LOCK) {
+      require(!box2dWorld.isLocked) {
+        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async"
+      }
       box2dWorld.destroyBody(body)
     }
   }
