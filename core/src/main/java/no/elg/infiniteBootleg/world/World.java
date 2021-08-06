@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import static java.lang.Math.abs;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +32,7 @@ import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -686,7 +689,7 @@ public class World implements Disposable, Resizable {
         ObjectSet<Block> blocks = new ObjectSet<>();
         float radiusSquare = radius * radius;
         for (Block block : getBlocksAABB(worldX, worldY, radius, radius, raw)) {
-            if (Math.abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f)) <= radiusSquare) {
+            if (abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f)) <= radiusSquare) {
                 blocks.add(block);
             }
         }
@@ -695,14 +698,14 @@ public class World implements Disposable, Resizable {
     }
 
     @NotNull
-    public ObjectSet<Block> getBlocksAABB(float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
-        ObjectSet<Block> blocks = new ObjectSet<>();
+    public Array<Block> getBlocksAABB(float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
+        int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
+        Array<Block> blocks = new Array<>(true, capacity);
         int x = MathUtils.floor(worldX - offsetX);
         float maxX = worldX + offsetX;
+        float maxY = worldY + offsetY;
         for (; x <= maxX; x++) {
-            int y = MathUtils.floor(worldY - offsetY);
-            float maxY = worldY + offsetY;
-            for (; y <= maxY; y++) {
+            for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
                 Block b = getBlock(x, y, raw);
                 if (b == null) {
                     continue;
