@@ -336,7 +336,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      * @param filter
      *     The type of filter to set
      */
-    public synchronized void setFilter(Filter filter) {
+    public void setFilter(Filter filter) {
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) { return; }
