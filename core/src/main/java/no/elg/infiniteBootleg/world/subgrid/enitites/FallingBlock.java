@@ -7,8 +7,10 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.world.Block;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Material;
+import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
@@ -38,6 +40,9 @@ public class FallingBlock extends Entity {
 
     @Override
     public synchronized void contact(@NotNull ContactType type, @NotNull Contact contact) {
+        if (isInvalid()) {
+            return;
+        }
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
 
@@ -46,10 +51,16 @@ public class FallingBlock extends Entity {
                 int newX = getBlockX();
                 int newY = getBlockY();
 
-                world.removeEntity(this);
-                if (world.isAirBlock(newX, newY)) {
-                    world.setBlock(newX, newY, material, true);
+                var deltaY = 0;
+                while (true) {
+                    Block block = world.getBlock(newX, newY + deltaY, true);
+                    if (block == null || block.getMaterial() == AIR) {
+                        break;
+                    }
+                    deltaY++;
                 }
+                world.removeEntity(this);
+                world.setBlock(newX, newY + deltaY, material, true);
 //                else{
 //                    //TODO drop as an item
 //                }
