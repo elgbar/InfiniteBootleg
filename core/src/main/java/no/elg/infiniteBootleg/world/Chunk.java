@@ -410,6 +410,10 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     }
 
     public boolean isAllowingUnloading() {
+        var player = Main.inst().getPlayer();
+        if (player != null && equals(player.getChunk())) {
+            return false;
+        }
         return allowUnload;
     }
 
