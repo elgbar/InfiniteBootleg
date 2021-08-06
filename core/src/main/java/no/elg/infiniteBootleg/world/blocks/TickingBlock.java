@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks;
 
+import com.badlogic.gdx.math.RandomXS128;
+import java.util.Random;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -24,11 +26,14 @@ public abstract class TickingBlock extends Block implements Ticking {
     private volatile boolean shouldTick;
     private final Object tickLock = new Object();
 
+    private final static Random random = new RandomXS128();
+
     public TickingBlock(@NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         synchronized (tickLock) {
             shouldTick = true;
-            minimumTick = getWorld().getTick();
+            //spread ticking over multiple ticks to ease strain on ticker
+            minimumTick = getWorld().getTick() + random.nextInt((int) getWorld().getWorldTicker().getTPS() / 3);
         }
     }
 
@@ -41,12 +46,10 @@ public abstract class TickingBlock extends Block implements Ticking {
     public final void tryTick(boolean rare) {
         synchronized (tickLock) {
             //should not tick right away to not spawn multiple entities when spawning f.ex sand
-            if (shouldTick() && minimumTick < getWorld().getTick()) {
-                setShouldTick(false);
-            }
-            else {
+            if (!shouldTick() || minimumTick > getWorld().getTick()) {
                 return;
             }
+            setShouldTick(false);
         }
         if (rare) {
             tickRare();
