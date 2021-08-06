@@ -352,20 +352,18 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Override
     public void tick() {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        synchronized (this) {
-            for (TickingBlock block : tickingBlocks) {
-                block.tryTick(false);
-            }
+        //OK to not synchonize over tickingBlocks as the iterator implementation should not result in any errors
+        for (TickingBlock block : tickingBlocks) {
+            block.tryTick(false);
         }
     }
 
     @Override
     public void tickRare() {
         Preconditions.checkState(loaded, "Chunk is not loaded");
-        synchronized (this) {
-            for (TickingBlock block : tickingBlocks) {
-                block.tryTick(true);
-            }
+        //OK to not synchonize over tickingBlocks as the iterator implementation should not result in any errors
+        for (TickingBlock block : tickingBlocks) {
+            block.tryTick(true);
         }
     }
 
