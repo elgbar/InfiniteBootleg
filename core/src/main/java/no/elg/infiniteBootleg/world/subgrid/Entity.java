@@ -86,7 +86,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             createFixture(body);
             body.setGravityScale(2f);
         }
-        Main.inst().getScheduler().executeAsync(() -> world.addEntity(this));
+        Main.inst().getScheduler().scheduleAsync(() -> world.addEntity(this), 1L);
     }
 
     /**

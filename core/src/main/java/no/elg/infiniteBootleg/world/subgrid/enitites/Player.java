@@ -65,6 +65,9 @@ public class Player extends LivingEntity {
 
     @Override
     public void tick() {
+        if (torchLight == null) {
+            return;
+        }
         super.tick();
 
         Vector2 pos = getPosition();
