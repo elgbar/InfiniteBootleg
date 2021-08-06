@@ -140,9 +140,13 @@ public enum Material {
     }
 
     public boolean create(@NotNull World world, int worldX, int worldY) {
+        return create(world, worldX, worldY, false);
+    }
+
+    public boolean create(@NotNull World world, int worldX, int worldY, boolean prioritize) {
         if (world.getMaterial(worldX, worldY) == AIR) {
             if (isBlock()) {
-                return world.setBlock(worldX, worldY, this) != null;
+                return world.setBlock(worldX, worldY, this, prioritize) != null;
             }
             else if (isEntity()) {
                 createEntity(world, worldX, worldY);

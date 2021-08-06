@@ -52,10 +52,10 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
 
     var update = false
     if (placeBrushSize <= 1) {
-      update = selected.create(world, blockX, blockY)
+      update = selected.create(world, blockX, blockY, true)
     } else {
       for (block in world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
-        update = update or selected.create(world, block.worldX, block.worldY)
+        update = update or selected.create(world, block.worldX, block.worldY, true)
       }
     }
     if (update) {

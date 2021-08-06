@@ -277,6 +277,10 @@ public class World implements Disposable, Resizable {
      */
     @Nullable
     public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean updateTexture) {
+        return setBlock(worldX, worldY, material, updateTexture, false);
+    }
+
+    public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean updateTexture, boolean prioritize) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -285,7 +289,7 @@ public class World implements Disposable, Resizable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
-            chunk.setBlock(localX, localY, material, updateTexture);
+            chunk.setBlock(localX, localY, material, updateTexture, prioritize);
         }
         return chunk;
     }

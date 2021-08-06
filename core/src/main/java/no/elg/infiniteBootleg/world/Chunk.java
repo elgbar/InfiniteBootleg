@@ -146,8 +146,26 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      *
      * @return The new block, only {@code null} if {@code material} parameter is {@code null}
      */
+
     @Contract("_,_,!null,_->!null;_,_,null,_->null")
-    public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {
+    public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {return setBlock(localX, localY, material, update, false);}
+
+    /**
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param material
+     *     The material of the new block
+     * @param update
+     *     If the texture of this chunk should be updated
+     * @param prioritize
+     *
+     * @return The new block, only {@code null} if {@code material} parameter is {@code null}
+     */
+
+    @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
+    public Block setBlock(int localX, int localY, @Nullable Material material, boolean update, boolean prioritize) {
         Block block = material == null ? null : material.createBlock(world, this, localX, localY);
         return setBlock(localX, localY, block, update);
     }
@@ -166,6 +184,24 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
     @Contract("_,_,!null,_->!null;_,_,null,_->null")
     public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture) {
+        return setBlock(localX, localY, block, updateTexture, false);
+    }
+
+    /**
+     * @param localX
+     *     The local x ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param localY
+     *     The local y ie a value between 0 and {@link #CHUNK_SIZE}
+     * @param block
+     *     The new block
+     * @param updateTexture
+     *     If the texture of this chunk should be updated
+     * @param prioritize
+     *
+     * @return The given block, equal to the {@code block} parameter
+     */
+    @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
+    public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture, boolean prioritize) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
         if (block != null) {
@@ -202,7 +238,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
             if (updateTexture) {
                 modified = true;
                 dirty = true;
-                prioritize = true;
+                this.prioritize |= prioritize; //do not remove prioritization this already is
             }
         }
         if (updateTexture) {
@@ -289,7 +325,6 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
                     }
                 }
             }
-
         }
         if (Settings.renderGraphic) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
