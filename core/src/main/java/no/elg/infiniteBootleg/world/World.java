@@ -587,6 +587,7 @@ public class World implements Disposable, Resizable {
                 removeEntity(entity);
             }
             chunk.dispose();
+            chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
         }
     }
 
