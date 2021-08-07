@@ -535,16 +535,33 @@ public class World implements Disposable, Resizable {
         if (wasNotPaused) {
             worldTicker.pause();
         }
-
         Main.inst().getScheduler().waitForTasks();
+
         //remove all entities to speed up unloading
         for (Entity entity : getEntities()) {
             removeEntity(entity);
+        }
+        if (!entities.isEmpty() || !livingEntities.isEmpty()) {
+            throw new IllegalStateException("Failed to clear entities during reload");
         }
         //ok to include unloaded chunks as they will not cause an error when unloading again
         for (Chunk chunk : chunks.values()) {
             unloadChunk(chunk, force, save);
         }
+        if (!chunks.isEmpty()) {
+            throw new IllegalStateException("Failed to clear chunks during reload");
+        }
+        synchronized (BOX2D_LOCK) {
+            var bodies = new Array<Body>(false, worldBody.getBox2dWorld().getBodyCount());
+            worldBody.getBox2dWorld().getBodies(bodies);
+            if (!bodies.isEmpty()) {
+                Main.logger().error("BOX2D", "There existed dangling bodies after reload!");
+            }
+            for (Body body : bodies) {
+                worldBody.destroyBody(body);
+            }
+        }
+
         if (wasNotPaused) {
             worldTicker.resume();
         }
