@@ -110,6 +110,10 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
             )
 
             val fix = synchronized(BOX2D_LOCK) {
+              if (!tmpBody.isActive) {
+                //tmp body was disposed somewhere else (probably in a reload)
+                return
+              }
               tmpBody.createFixture(edgeShape, 0f)
             }
             if (!block.material.blocksLight()) {
@@ -163,7 +167,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
       synchronized(this@ChunkBody) {
         unsureFixture = false
         if (chunk.isNeighborsLoaded) {
-          update(false, false)
+          update(recalculateNeighbors = false, lightsOnly = false)
         } else {
           scheduleFixtureReload(false)
         }

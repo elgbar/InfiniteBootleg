@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.box2d
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
+import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender
@@ -54,6 +55,9 @@ class WorldBody(world: World) : Ticking {
     synchronized(BOX2D_LOCK) {
       require(!box2dWorld.isLocked) {
         "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async"
+      }
+      if (!body.isActive) {
+        Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash")
       }
       box2dWorld.destroyBody(body)
     }
