@@ -26,7 +26,7 @@ public enum Material {
     BRICK(2f),
     DIRT(1f),
     GRASS(0.8f),
-    TNT(TntBlock.class, 0.5f),
+    TNT(TntBlock.class, ItemType.BLOCK, true, false, true, 0.5f),
     SAND(SandBlock.class, 1f),
     TORCH(Torch.class, ItemType.BLOCK, false, false, true, 0.1f),
     GLASS(null, ItemType.BLOCK, true, false, true, 0.1f),

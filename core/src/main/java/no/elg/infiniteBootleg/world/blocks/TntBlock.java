@@ -149,7 +149,7 @@ public class TntBlock extends TickingBlock {
                 light = PointLightPool.inst.obtain();
                 light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
                 light.setColor(Color.RED);
-                light.setXray(true);
+                light.setXray(false);
                 light.setSoft(false);
                 light.setDistance(16);
             }
