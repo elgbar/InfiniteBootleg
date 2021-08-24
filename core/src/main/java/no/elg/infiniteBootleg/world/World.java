@@ -377,16 +377,22 @@ public class World implements Disposable, Resizable {
         int localX = CoordUtil.chunkOffset(worldX);
         int localY = CoordUtil.chunkOffset(worldY);
 
+
+        for (Entity entity : getEntities(worldX, worldY)) {
+
+            if (entity instanceof Removable removableEntity) {
+                System.out.println("Removing " + entity);
+                removableEntity.onRemove();
+                removeEntity(entity);
+            }
+            else {
+                System.out.println("Cannot remove ");
+            }
+        }
+
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
             chunk.setBlock(localX, localY, (Block) null, update);
-            //noinspection GDXJavaUnsafeIterator
-            for (Entity entity : getEntities(worldX, worldY)) {
-                if (entity instanceof Removable removableEntity) {
-                    removableEntity.onRemove();
-                    removeEntity(entity);
-                }
-            }
         }
     }
 
@@ -768,8 +774,8 @@ public class World implements Disposable, Resizable {
         }
 
         for (Entity entity : getEntities(worldX, worldY)) {
-            if (entity instanceof MaterialEntity) {
-                return ((MaterialEntity) entity).getMaterial();
+            if (entity instanceof MaterialEntity materialEntity) {
+                return materialEntity.getMaterial();
             }
         }
         return Material.AIR;
