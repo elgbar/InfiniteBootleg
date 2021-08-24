@@ -55,6 +55,11 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     val rawX = Main.inst().mouseX
     val rawY = Main.inst().mouseY
 
+    if (!world.getEntities(rawX, rawY).isEmpty) {
+      //cannot place on an entity
+      return false
+    }
+
     var update = false
     if (placeBrushSize <= 1) {
       update = selected.create(world, blockX, blockY, true)
