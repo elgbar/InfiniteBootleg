@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks;
 
+import static no.elg.infiniteBootleg.world.Material.AIR;
+
 import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -17,7 +19,6 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
-import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -111,7 +112,9 @@ public class TntBlock extends TickingBlock {
                             MathUtils.random.nextGaussian() + RESISTANCE);
                         if (dist < strength * strength) {
                             if (b instanceof TntBlock tntb && b != this) {
-                                tntb.exploded = true;
+                                //ignore other tnt blocks
+                                tntb.startTick = -1; //ensure it will explode as soon as possible
+                                continue;
                             }
                             destroyed.add(b);
                         }
