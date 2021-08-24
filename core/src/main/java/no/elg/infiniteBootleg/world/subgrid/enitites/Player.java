@@ -1,5 +1,8 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
+
 import box2dLight.ConeLight;
 import box2dLight.Light;
 import com.badlogic.gdx.graphics.Color;
@@ -8,9 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.World;
-import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +23,8 @@ public class Player extends LivingEntity {
     private final TextureRegion region;
     private final EntityControls controls;
     private final Light torchLight;
+
+    private final Vector2 tmpAngle = new Vector2();
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
@@ -71,7 +74,7 @@ public class Player extends LivingEntity {
         super.tick();
 
         Vector2 pos = getPosition();
-        float angle = Main.inst().getMouse().cpy().sub(pos).angleDeg();
+        float angle = tmpAngle.set(Main.inst().getMouse()).sub(pos).angleDeg();
         synchronized (LIGHT_LOCK) {
             torchLight.setDirection(angle);
             torchLight.setPosition(pos);
