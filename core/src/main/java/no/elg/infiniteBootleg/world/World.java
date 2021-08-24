@@ -394,8 +394,8 @@ public class World implements Disposable, Resizable {
         Array<Entity> foundEntities = new Array<>(false, 5);
         for (Entity entity : entities) {
             Vector2 pos = entity.getPosition();
-            if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
-                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
+            if (Util.isBetween(MathUtils.floor(pos.x - entity.getHalfBox2dWidth()), worldX, MathUtils.ceil(pos.x + entity.getHalfBox2dWidth())) && //
+                Util.isBetween(MathUtils.floor(pos.y - entity.getHalfBox2dHeight()), worldY, MathUtils.ceil(pos.y + entity.getHalfBox2dHeight()))) {
 
                 foundEntities.add(entity);
             }
