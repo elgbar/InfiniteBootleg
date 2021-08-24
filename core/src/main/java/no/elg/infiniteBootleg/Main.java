@@ -1,9 +1,12 @@
 package no.elg.infiniteBootleg;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
@@ -20,7 +23,6 @@ import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -77,6 +79,11 @@ public class Main extends ApplicationAdapter {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (world != null) {
                 world.save();
+                final FileHandle worldFolder = world.worldFolder();
+                if (worldFolder != null) {
+
+                    worldFolder.deleteDirectory();
+                }
             }
             scheduler.shutdown(); // we want make sure this thread is dead
         }));

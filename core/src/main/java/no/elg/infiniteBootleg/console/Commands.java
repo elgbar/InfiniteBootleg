@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.console;
 
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
+
 import com.badlogic.gdx.graphics.Color;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
@@ -14,7 +16,6 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
@@ -83,7 +84,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Reload all loaded chunks", paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
     public void reload(boolean force) {
-        Main.inst().getWorld().reload(force, true);
+        Main.inst().getWorld().reload(force);
         logger.log(LogLevel.SUCCESS, "All chunks have been reloaded");
     }
 

@@ -66,8 +66,8 @@ public class ChunkLoader {
     }
 
     public void save(@NotNull Chunk chunk) {
-        if (Settings.loadWorldFromDisk && chunk.isModified()) {
-            //only save if modified
+        if (Settings.loadWorldFromDisk && chunk.isModified() && chunk.isLoaded()) {
+            //only save if valid and changed
             FileHandle fh = chunk.getChunkFile();
             if (fh == null) {
                 return;

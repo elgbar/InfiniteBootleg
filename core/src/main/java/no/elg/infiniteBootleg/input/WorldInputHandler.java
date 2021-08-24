@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.input;
 
-import com.badlogic.gdx.Gdx;
 import static com.badlogic.gdx.Input.Keys.DOWN;
 import static com.badlogic.gdx.Input.Keys.F12;
 import static com.badlogic.gdx.Input.Keys.F3;
@@ -9,6 +8,8 @@ import static com.badlogic.gdx.Input.Keys.F9;
 import static com.badlogic.gdx.Input.Keys.LEFT;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.UP;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Disposable;
@@ -61,12 +62,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
                 break;
             case F5:
                 world.save();
-                Main.logger().log("World", "World saved");
                 break;
             case F9:
-                world.reload(true, false);
-                world.load();
-                Main.logger().log("World", "World reloaded last save");
+                world.reload(true);
                 break;
             case F12:
                 Ticker ticker = world.getWorldTicker();

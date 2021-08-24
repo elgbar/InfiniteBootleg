@@ -1,5 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
+import static java.lang.Math.abs;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
@@ -11,7 +14,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
-import static java.lang.Math.abs;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -32,7 +34,6 @@ import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -183,7 +184,7 @@ public class World implements Disposable, Resizable {
             return;
         }
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        Main.inst().getConsoleLogger().log("Loading/saving world from '" + worldZip.file().getAbsolutePath() + '\'');
+        Main.inst().getConsoleLogger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
         if (!worldZip.exists()) {
             Main.logger().log("No world save found");
             return;
@@ -191,6 +192,26 @@ public class World implements Disposable, Resizable {
 
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
+    }
+
+    public void save() {
+        if (!Settings.loadWorldFromDisk) {
+            return;
+        }
+        FileHandle worldFolder = worldFolder();
+        if (worldFolder == null) {
+            return;
+        }
+        for (Chunk chunk : getChunks().values()) {
+            chunkLoader.save(chunk);
+        }
+        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
+        try {
+            ZipUtils.zip(worldFolder, worldZip);
+            Main.logger().log("World", "World saved!");
+        } catch (IOException e) {
+            Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
+        }
     }
 
     /**
@@ -527,10 +548,8 @@ public class World implements Disposable, Resizable {
      *
      * @param force
      *     If the chunks will be forced to unload
-     * @param save
-     *     If the chunks will be saved
      */
-    public void reload(boolean force, boolean save) {
+    public void reload(boolean force) {
         var wasNotPaused = !worldTicker.isPaused();
         if (wasNotPaused) {
             worldTicker.pause();
@@ -546,7 +565,7 @@ public class World implements Disposable, Resizable {
         }
         //ok to include unloaded chunks as they will not cause an error when unloading again
         for (Chunk chunk : chunks.values()) {
-            unloadChunk(chunk, force, save);
+            unloadChunk(chunk, force, false);
         }
         if (!chunks.isEmpty()) {
             throw new IllegalStateException("Failed to clear chunks during reload");
@@ -561,10 +580,12 @@ public class World implements Disposable, Resizable {
                 worldBody.destroyBody(body);
             }
         }
+        load();
 
         if (wasNotPaused) {
             worldTicker.resume();
         }
+        Main.logger().log("World", "World reloaded last save");
     }
 
     /**
@@ -617,29 +638,6 @@ public class World implements Disposable, Resizable {
     @Nullable
     public Chunk getChunkFromWorld(@NotNull Location worldLoc) {
         return getChunk(CoordUtil.worldToChunk(worldLoc));
-    }
-
-    public void save() {
-        if (!Settings.loadWorldFromDisk) {
-            return;
-        }
-        FileHandle worldFolder = worldFolder();
-        if (worldFolder == null) {
-            return;
-        }
-        for (Chunk chunk : getLoadedChunks()) {
-            chunkLoader.save(chunk);
-        }
-        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        try {
-            ZipUtils.zip(worldFolder, worldZip);
-            Main.logger().debug("World", "World saved!");
-        } catch (IOException e) {
-            Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
-            return;
-        }
-
-        worldFolder.deleteDirectory();
     }
 
 
