@@ -3,14 +3,14 @@ package no.elg.infiniteBootleg.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.math.sign
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
-import kotlin.math.abs
-import kotlin.math.min
-import kotlin.math.sign
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -36,8 +36,13 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     if (breakBrushSize <= 1) {
       world.remove(blockX, blockY, true)
     } else {
-      for (block in world.getBlocksWithin(rawX, rawY, breakBrushSize, true)) {
-        world.remove(block.worldX, block.worldY, true)
+      val blocksWithin = world.getBlocksWithin(rawX, rawY, breakBrushSize, true)
+      if (blocksWithin.isEmpty) {
+        world.remove(blockX, blockY, true)
+      } else {
+        for (block in blocksWithin) {
+          world.remove(block.worldX, block.worldY, true)
+        }
       }
     }
     lastEditTick = world.tick
@@ -54,8 +59,13 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     if (placeBrushSize <= 1) {
       update = selected.create(world, blockX, blockY, true)
     } else {
-      for (block in world.getBlocksWithin(rawX, rawY, placeBrushSize, false)) {
-        update = update or selected.create(world, block.worldX, block.worldY, true)
+      val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize, false)
+      if (blocksWithin.isEmpty) {
+        update = update or selected.create(world, blockX, blockY, true)
+      } else {
+        for (block in blocksWithin) {
+          update = update or selected.create(world, block.worldX, block.worldY, true)
+        }
       }
     }
     if (update) {
