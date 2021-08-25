@@ -1,5 +1,12 @@
 package no.elg.infiniteBootleg.world;
 
+import static java.util.Spliterator.DISTINCT;
+import static java.util.Spliterator.NONNULL;
+import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterator.SIZED;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Material.AIR;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,10 +20,6 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
-import static java.util.Spliterator.DISTINCT;
-import static java.util.Spliterator.NONNULL;
-import static java.util.Spliterator.ORDERED;
-import static java.util.Spliterator.SIZED;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -26,8 +29,6 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -148,7 +149,9 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
      */
 
     @Contract("_,_,!null,_->!null;_,_,null,_->null")
-    public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {return setBlock(localX, localY, material, update, false);}
+    public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {
+        return setBlock(localX, localY, material, update, false);
+    }
 
     /**
      * @param localX
@@ -167,7 +170,7 @@ public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
     @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
     public Block setBlock(int localX, int localY, @Nullable Material material, boolean update, boolean prioritize) {
         Block block = material == null ? null : material.createBlock(world, this, localX, localY);
-        return setBlock(localX, localY, block, update);
+        return setBlock(localX, localY, block, update, prioritize);
     }
 
     /**
