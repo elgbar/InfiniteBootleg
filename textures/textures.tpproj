@@ -1,8 +1,8 @@
 name=blocks
 filename=
-output=../core/assets/textures
+output=../core/src/main/resources/textures
 
-alias=false
+alias=true
 alphaThreshold=0
 debug=false
 duplicatePadding=true
@@ -39,9 +39,9 @@ inputFiles=[{path:blocks,type:Input,dirFilePrefix:null,recursive:false,flattenPa
 
 name=entities
 filename=
-output=../core/assets/textures
+output=../core/src/main/resources/textures
 
-alias=false
+alias=true
 alphaThreshold=0
 debug=false
 duplicatePadding=true
@@ -76,7 +76,7 @@ inputFiles=[{path:entities,type:Input,dirFilePrefix:null,recursive:false,flatten
 
 -PROJ-
 
-version=4.8.2
+version=4.10.0
 fileTypeType=png
 fileTypeData={encoding:RGBA4444}
 previewBackgroundColor=ffffffff

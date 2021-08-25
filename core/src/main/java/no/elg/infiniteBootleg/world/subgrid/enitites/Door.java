@@ -89,7 +89,7 @@ public class Door extends MaterialEntity {
 
     @Override
     public TextureRegion getTextureRegion() {
-        return open.get() == 0 ? openDoorRegion : closedDoorRegion;
+        return open.get() == 0 ? closedDoorRegion : openDoorRegion;
     }
 
     @Override

@@ -1,27 +1,10 @@
-
 entities.png
-size: 177,338
-format: RGBA4444
-filter: Nearest,Nearest
-repeat: xy
+size:177,338
+format:RGBA4444
+repeat:xy
 door_closed
-  rotate: false
-  xy: 160, 305
-  size: 16, 32
-  orig: 16, 32
-  offset: 0, 0
-  index: -1
+bounds:160,271,16,32
 door_open
-  rotate: false
-  xy: 160, 271
-  size: 16, 32
-  orig: 16, 32
-  offset: 0, 0
-  index: -1
+bounds:160,305,16,32
 player
-  rotate: false
-  xy: 1, 1
-  size: 157, 336
-  orig: 157, 336
-  offset: 0, 0
-  index: -1
+bounds:1,1,157,336
