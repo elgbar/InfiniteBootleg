@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
+import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
 
 import box2dLight.ConeLight;
 import box2dLight.Light;
@@ -12,6 +13,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -64,6 +66,11 @@ public class Player extends LivingEntity {
         synchronized (LIGHT_LOCK) {
             torchLight.remove();
         }
+    }
+    
+    @Override
+    public InvalidSpawnAction invalidSpawnLocationAction() {
+        return PUSH_UP;
     }
 
     @Override

@@ -1,5 +1,11 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.signum;
+import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
+import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -12,22 +18,19 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
-import static java.lang.Math.abs;
-import static java.lang.Math.signum;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
-import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
-import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,18 +69,26 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
         }
 
-        //teleport entity upwards till we find a valid location
-        boolean print = true;
-        //make sure we're not stuck in a infinite loop if the given height is zero
-        float checkStep = getHalfBox2dHeight() < 0.1f ? getHalfBox2dHeight() : 0.1f;
-        while (isInvalidLocation(posCache.x, posCache.y)) {
-            if (print) {
-                Main.logger().debug("Entity", //
-                                    String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", //
-                                                  simpleName(), posCache.x, posCache.y));
-                print = false;
+        if (isInvalidLocation(posCache.x, posCache.y)) {
+            switch (invalidSpawnLocationAction()) {
+                case DELETE -> { return; }
+                case PUSH_UP -> {
+                    //teleport entity upwards till we find a valid location
+                    boolean print = true;
+                    //make sure we're not stuck in a infinite loop if the given height is zero
+                    float checkStep = getHalfBox2dHeight() < 0.1f ? getHalfBox2dHeight() : 0.1f;
+                    while (isInvalidLocation(posCache.x, posCache.y)) {
+                        if (print) {
+                            Main.logger().debug("Entity", //
+                                                String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", //
+                                                              simpleName(), posCache.x, posCache.y));
+                            print = false;
+                        }
+                        posCache.y += checkStep;
+
+                    }
+                }
             }
-            posCache.y += checkStep;
         }
 
         synchronized (BOX2D_LOCK) {
@@ -150,8 +161,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 }
             }
             if (invalid) {
-                Main.logger().error("Entity", String
-                    .format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX, worldY, posCache.x, posCache.y));
+                Main.logger().error("Entity", String.format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX, worldY,
+                                                            posCache.x, posCache.y));
                 return;
             }
         }
@@ -419,7 +430,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
     public final void updatePos() {
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
-                if (isInvalid()) { return;}
+                if (isInvalid()) { return; }
                 posCache.set(body.getPosition());
                 velCache.set(body.getLinearVelocity());
             }
@@ -461,6 +472,14 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      */
     @Nullable
     public abstract TextureRegion getTextureRegion();
+
+    /**
+     * @return How to handle invalid spawn location
+     */
+    @Contract(pure = true)
+    public InvalidSpawnAction invalidSpawnLocationAction() {
+        return InvalidSpawnAction.DELETE;
+    }
 
     /**
      * @return Velocity of this entity last tick, note that the same vector is returned each time

@@ -1,5 +1,9 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Material.AIR;
+import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -8,11 +12,10 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Material;
-import static no.elg.infiniteBootleg.world.Material.AIR;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 
@@ -86,6 +89,11 @@ public class FallingBlock extends Entity {
     @Override
     public int getHeight() {
         return BLOCK_SIZE - 1;
+    }
+
+    @Override
+    public InvalidSpawnAction invalidSpawnLocationAction() {
+        return PUSH_UP;
     }
 
     @Override
