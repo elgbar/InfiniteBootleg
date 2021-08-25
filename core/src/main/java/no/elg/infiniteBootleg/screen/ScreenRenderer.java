@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.screen;
 
+import static no.elg.infiniteBootleg.Main.SCALE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import static no.elg.infiniteBootleg.Main.SCALE;
 import no.elg.infiniteBootleg.util.Resizable;
 
 public class ScreenRenderer implements Disposable, Resizable {
@@ -22,8 +23,7 @@ public class ScreenRenderer implements Disposable, Resizable {
 
     public ScreenRenderer() {
 
-        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
-            Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
+        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
         final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = FONT_SIZE * SCALE;
 

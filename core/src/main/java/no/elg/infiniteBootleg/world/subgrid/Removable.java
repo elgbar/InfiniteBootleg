@@ -5,5 +5,5 @@ package no.elg.infiniteBootleg.world.subgrid;
  */
 public interface Removable {
 
-    default void onRemove() {}
+    default void onRemove() { }
 }

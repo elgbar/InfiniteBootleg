@@ -19,7 +19,7 @@ public class SandBlock extends TickingBlock {
         super(world, chunk, localX, localY, material);
     }
 
-    private boolean falling = false;
+    private boolean falling;
 
     @Override
     public synchronized void tick() {

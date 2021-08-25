@@ -9,7 +9,7 @@ public enum EntityType {
     FALLING_BLOCK(FallingBlock.class),
     PLAYER(Player.class);
 
-    private Class<? extends Entity> impl;
+    private final Class<? extends Entity> impl;
 
     EntityType(@NotNull Class<? extends Entity> impl) {
         this.impl = impl;

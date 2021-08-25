@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.box2d
 
+import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
@@ -9,7 +10,6 @@ import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
-import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 
 /**
  * Wrapper for [com.badlogic.gdx.physics.box2d.World1] for asynchronous reasons

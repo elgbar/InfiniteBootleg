@@ -16,8 +16,7 @@ public abstract class StaticLightBlock extends Block {
     @Nullable
     private PointLight light;
 
-    public StaticLightBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY,
-                            @NotNull Material material) {
+    public StaticLightBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         if (Settings.renderGraphic) {
             light = PointLightPool.inst.obtain();

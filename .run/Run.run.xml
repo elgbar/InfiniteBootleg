@@ -13,6 +13,7 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" />
       </ENTRIES>
     </extension>
+    <RunnerSettings />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -1,5 +1,10 @@
 package no.elg.infiniteBootleg.world.render;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
+import static no.elg.infiniteBootleg.world.Material.AIR;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,11 +19,6 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
-
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
-import static no.elg.infiniteBootleg.world.Material.AIR;
 
 /**
  * @author Elg

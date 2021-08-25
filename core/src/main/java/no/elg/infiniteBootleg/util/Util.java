@@ -50,8 +50,7 @@ public class Util {
      */
     public static <T extends Comparable<T>> T clamp(final T min, final T val, final T max) {
         Preconditions.checkArgument(min != null && val != null && max != null, "None of the parameters can be null");
-        Preconditions.checkArgument(min.compareTo(max) <= 0,
-                                    "Minimum argument must be less than or equal to the maximum argument");
+        Preconditions.checkArgument(min.compareTo(max) <= 0, "Minimum argument must be less than or equal to the maximum argument");
         if (val.compareTo(min) < 0) {
             return min;
         }
@@ -73,9 +72,7 @@ public class Util {
      */
     public static <T extends Comparable<T>> boolean isBetween(final T min, final T val, final T max) {
         Preconditions.checkArgument(min != null && val != null && max != null, "None of the parameters can be null");
-        Preconditions.checkArgument(min.compareTo(max) <= 0, "Minimum argument (" + min +
-                                                             ") must be less than or equal to the maximum argument(" +
-                                                             max + ")");
+        Preconditions.checkArgument(min.compareTo(max) <= 0, "Minimum argument (" + min + ") must be less than or equal to the maximum argument(" + max + ")");
         if (val.compareTo(min) < 0) { return false; }
         else { return val.compareTo(max) < 0; }
     }

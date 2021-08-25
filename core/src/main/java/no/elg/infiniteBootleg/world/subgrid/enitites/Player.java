@@ -67,7 +67,7 @@ public class Player extends LivingEntity {
             torchLight.remove();
         }
     }
-    
+
     @Override
     public InvalidSpawnAction invalidSpawnLocationAction() {
         return PUSH_UP;

@@ -24,8 +24,7 @@ public class GenericEntity extends Entity implements Removable {
         this(world, worldX, worldY, width, height, World.ENTITY_FILTER);
     }
 
-    public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height,
-                         @NotNull Filter filter) {
+    public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height, @NotNull Filter filter) {
         //Cannot center as the width and height will be 0 anyway
         super(world, worldX, worldY, false);
 

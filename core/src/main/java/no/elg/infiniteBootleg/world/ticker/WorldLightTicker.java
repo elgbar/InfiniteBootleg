@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.ticker;
 
+import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
+
 import box2dLight.DirectionalLight;
 import com.badlogic.gdx.graphics.Color;
 import no.elg.infiniteBootleg.Settings;
@@ -7,7 +9,6 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 

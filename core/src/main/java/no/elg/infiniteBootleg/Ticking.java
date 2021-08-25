@@ -19,5 +19,5 @@ public interface Ticking {
      * <p>
      * You might want to use synchronization either on the whole method or parts of the method to ensure correctness
      */
-    default void tickRare() {}
+    default void tickRare() { }
 }

@@ -1,5 +1,9 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.World.BLOCK_ENTITY_FILTER;
+import static no.elg.infiniteBootleg.world.World.TRANSPARENT_BLOCK_ENTITY_FILTER;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -9,13 +13,10 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.util.concurrent.atomic.AtomicInteger;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import static no.elg.infiniteBootleg.world.World.BLOCK_ENTITY_FILTER;
-import static no.elg.infiniteBootleg.world.World.TRANSPARENT_BLOCK_ENTITY_FILTER;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,8 @@
 package no.elg.infiniteBootleg.util;
 
-import no.elg.infiniteBootleg.world.Chunk;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

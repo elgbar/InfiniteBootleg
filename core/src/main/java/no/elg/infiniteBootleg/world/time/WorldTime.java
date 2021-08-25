@@ -28,7 +28,7 @@ public class WorldTime {
     public WorldTime(World world) {
         this.world = world;
     }
-    
+
 
     /**
      * Calculate how bright the sky should be. During the night the value will always be {@code 0}, during twilight (ie

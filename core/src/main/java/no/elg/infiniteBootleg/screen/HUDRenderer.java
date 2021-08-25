@@ -1,17 +1,18 @@
 package no.elg.infiniteBootleg.screen;
 
+import static no.elg.infiniteBootleg.Main.SCALE;
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
-import static no.elg.infiniteBootleg.Main.SCALE;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Chunk;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;

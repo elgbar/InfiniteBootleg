@@ -1,5 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
+import static java.lang.Math.abs;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
@@ -41,9 +44,6 @@ import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static java.lang.Math.abs;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 /**
  * Different kind of views

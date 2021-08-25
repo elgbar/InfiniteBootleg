@@ -1,11 +1,12 @@
 package no.elg.infiniteBootleg.world.subgrid.contact;
 
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
+
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import no.elg.infiniteBootleg.world.World;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 

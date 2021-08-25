@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.world.World
 
 class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
-  
+
   val ticker: Ticker = Ticker(this, "Box2DWorldLight-" + world.name, tick, Settings.tps, Double.MAX_VALUE)
 
   override fun tick() {

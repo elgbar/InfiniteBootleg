@@ -161,8 +161,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 }
             }
             if (invalid) {
-                Main.logger().error("Entity", String.format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", toString(), worldX, worldY,
-                                                            posCache.x, posCache.y));
+                Main.logger().error("Entity",
+                                    String.format("Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)", this, worldX, worldY, posCache.x,
+                                                  posCache.y));
                 return;
             }
         }

@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.render;
 
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
+
 import box2dLight.DirectionalLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
@@ -22,7 +24,6 @@ import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;

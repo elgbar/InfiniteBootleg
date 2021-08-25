@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Config implements Metadata {
 
-    private Map<String, Object> config = new ConcurrentHashMap<>();
+    private final Map<String, Object> config = new ConcurrentHashMap<>();
 
     @Nullable
     @Override

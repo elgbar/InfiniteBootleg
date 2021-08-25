@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager {
 
-    private Map<Class<? extends Event>, Set<EventListener>> listeners;
+    private final Map<Class<? extends Event>, Set<EventListener>> listeners;
 
 
     public EventManager() {
