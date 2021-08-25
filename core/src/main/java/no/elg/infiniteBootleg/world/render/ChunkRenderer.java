@@ -11,13 +11,14 @@ import java.util.List;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.world.Block;
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import no.elg.infiniteBootleg.world.Chunk;
+import org.apache.commons.collections4.list.SetUniqueList;
+import org.jetbrains.annotations.NotNull;
+
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
-import org.apache.commons.collections4.list.SetUniqueList;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Elg
@@ -76,7 +77,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 Block block = blocks[x][y];
-                if (block == null || block.getMaterial() == AIR) {
+                if (block == null || block.getMaterial() == AIR || block.getMaterial().isEntity()) {
                     continue;
                 }
                 int dx = block.getLocalX() * BLOCK_SIZE;

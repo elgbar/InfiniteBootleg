@@ -1,8 +1,5 @@
 package no.elg.infiniteBootleg.world;
 
-import static java.lang.Math.abs;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
@@ -44,6 +41,9 @@ import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static java.lang.Math.abs;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 /**
  * Different kind of views
@@ -379,14 +379,8 @@ public class World implements Disposable, Resizable {
 
 
         for (Entity entity : getEntities(worldX, worldY)) {
-
-            if (entity instanceof Removable removableEntity) {
-                System.out.println("Removing " + entity);
-                removableEntity.onRemove();
+            if (entity instanceof Removable) {
                 removeEntity(entity);
-            }
-            else {
-                System.out.println("Cannot remove ");
             }
         }
 
@@ -397,7 +391,7 @@ public class World implements Disposable, Resizable {
     }
 
     public Array<Entity> getEntities(float worldX, float worldY) {
-        Array<Entity> foundEntities = new Array<>(false, 5);
+        Array<Entity> foundEntities = new Array<>(false, 4);
         for (Entity entity : entities) {
             Vector2 pos = entity.getPosition();
             if (Util.isBetween(MathUtils.floor(pos.x - entity.getHalfBox2dWidth()), worldX, MathUtils.ceil(pos.x + entity.getHalfBox2dWidth())) && //

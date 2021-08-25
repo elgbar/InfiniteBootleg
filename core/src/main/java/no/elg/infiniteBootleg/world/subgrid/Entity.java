@@ -190,14 +190,39 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
      */
     @NotNull
     public ObjectSet<Block> touchingBlocks(float worldX, float worldY) {
+        var locations = touchingLocations(worldX, worldY);
         ObjectSet<Block> blocks = new ObjectSet<>();
+        for (Location location : locations) {
+            blocks.add(world.getBlock(location.x, location.y, false));
+        }
+        return blocks;
+    }
+
+    /**
+     * @return An unordered collection of all the locations this entity is currently touching
+     */
+    public ObjectSet<Location> touchingLocations() {
+        return touchingLocations(posCache.x, posCache.y);
+    }
+
+    /**
+     * @param worldX
+     *     World x coordinate to pretend the player is at
+     * @param worldY
+     *     World y coordinate to pretend the player is at
+     *
+     * @return An unordered collection of all the locations this entity would be touching if it was located here
+     */
+    @NotNull
+    public ObjectSet<Location> touchingLocations(float worldX, float worldY) {
+        ObjectSet<Location> blocks = new ObjectSet<>();
         int x = MathUtils.floor(worldX - getHalfBox2dWidth());
         float maxX = worldX + getHalfBox2dWidth();
         for (; x < maxX; x++) {
             int y = MathUtils.floor(worldY - getHalfBox2dHeight());
             float maxY = worldY + getHalfBox2dHeight();
             for (; y < maxY; y++) {
-                blocks.add(world.getBlock(x, y, false));
+                blocks.add(new Location(x, y));
             }
         }
         return blocks;
@@ -516,6 +541,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 }
                 world.getWorldBody().destroyBody(body);
                 body = null;
+                if (this instanceof Removable removable) {
+                    removable.onRemove();
+                }
             }
         }
     }

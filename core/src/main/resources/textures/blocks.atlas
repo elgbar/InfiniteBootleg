@@ -1,69 +1,22 @@
-
 blocks.png
-size: 72,36
-format: RGBA4444
-filter: Nearest,Nearest
-repeat: xy
+size:90,36
+format:RGBA4444
+repeat:xy
 brick
-  rotate: false
-  xy: 1, 19
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
+bounds:55,1,16,16
 dirt
-  rotate: false
-  xy: 19, 19
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-glass
-  rotate: false
-  xy: 55, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-grass
-  rotate: false
-  xy: 37, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-sand
-  rotate: false
-  xy: 1, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-stone
-  rotate: false
-  xy: 37, 19
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-tnt
-  rotate: false
-  xy: 55, 19
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-torch
-  rotate: false
-  xy: 19, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
+bounds:73,19,16,16
 door
-  rotate: false
-  xy: 10, 10
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
+bounds:55,19,16,16
+glass
+bounds:19,1,16,16
+grass
+bounds:37,1,16,16
+sand
+bounds:37,19,16,16
+stone
+bounds:1,19,16,16
+tnt
+bounds:1,1,16,16
+torch
+bounds:19,19,16,16

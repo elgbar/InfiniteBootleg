@@ -9,6 +9,7 @@ import kotlin.math.sign
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 
@@ -55,21 +56,23 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     val rawX = Main.inst().mouseX
     val rawY = Main.inst().mouseY
 
-    if (!world.getEntities(rawX, rawY).isEmpty) {
-      //cannot place on an entity
-      return false
-    }
-
     var update = false
-    if (placeBrushSize <= 1) {
-      update = selected.create(world, blockX, blockY, true)
-    } else {
-      val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize, false)
-      if (blocksWithin.isEmpty) {
-        update = update or selected.create(world, blockX, blockY, true)
+    synchronized(BOX2D_LOCK) {
+      if (!world.getEntities(rawX, rawY).isEmpty) {
+        //cannot place on an entity
+        return false
+      }
+
+      if (placeBrushSize <= 1) {
+        update = selected.create(world, blockX, blockY, true)
       } else {
-        for (block in blocksWithin) {
-          update = update or selected.create(world, block.worldX, block.worldY, true)
+        val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize, false)
+        if (blocksWithin.isEmpty) {
+          update = update or selected.create(world, blockX, blockY, true)
+        } else {
+          for (block in blocksWithin) {
+            update = update or selected.create(world, block.worldX, block.worldY, true)
+          }
         }
       }
     }

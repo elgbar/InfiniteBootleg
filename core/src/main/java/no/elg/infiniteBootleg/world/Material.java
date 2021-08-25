@@ -1,13 +1,16 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.items.ItemType;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
+import no.elg.infiniteBootleg.world.blocks.EntityBlock;
 import no.elg.infiniteBootleg.world.blocks.SandBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import no.elg.infiniteBootleg.world.blocks.Torch;
@@ -21,23 +24,26 @@ import org.jetbrains.annotations.Nullable;
  */
 public enum Material {
 
-    AIR(null, ItemType.AIR, false, false, false, 0f),
+    AIR(null, ItemType.AIR, 0f, false, false, false),
     STONE(1.5f),
     BRICK(2f),
     DIRT(1f),
     GRASS(0.8f),
-    TNT(TntBlock.class, ItemType.BLOCK, true, false, true, 0.5f),
+    TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true),
     SAND(SandBlock.class, 1f),
-    TORCH(Torch.class, ItemType.BLOCK, false, false, true, 0.1f),
-    GLASS(null, ItemType.BLOCK, true, false, true, 0.1f),
-    DOOR(Door.class, ItemType.ENTITY, true, true, true, 1f);
-
+    TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true),
+    GLASS(null, ItemType.BLOCK, 0.1f, true, false, true),
+    DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true),
+    ;
+    @Nullable
     private final Constructor<?> constructor;
     private final boolean solid;
     private final boolean blocksLight;
     private final boolean placable;
     private final float hardness;
+    @Nullable
     private final TextureRegion texture;
+    @NotNull
     private final ItemType itemType;
 
     private static final Material[] VALUES = values();
@@ -47,22 +53,22 @@ public enum Material {
     }
 
     Material(@Nullable Class<?> impl, float hardness) {
-        this(impl, ItemType.BLOCK, true, true, true, hardness);
+        this(impl, ItemType.BLOCK, hardness, true, true, true);
     }
 
     /**
      * @param impl
      *     The implementation a block of this material must have
      * @param itemType
+     * @param hardness
      * @param solid
      *     If objects can pass through this material
      * @param blocksLight
      *     If this material will block light
      * @param placable
      *     If a block of this material can be placed by a player
-     * @param hardness
      */
-    Material(@Nullable Class<?> impl, ItemType itemType, boolean solid, boolean blocksLight, boolean placable, float hardness) {
+    Material(@Nullable Class<?> impl, @NotNull ItemType itemType, float hardness, boolean solid, boolean blocksLight, boolean placable) {
         this.itemType = itemType;
         if (impl != null) {
             if (itemType == ItemType.BLOCK) {
@@ -107,7 +113,7 @@ public enum Material {
         }
     }
 
-    public static Material fromByte(byte b) {
+    public static @NotNull Material fromByte(byte b) {
         return VALUES[b];
     }
 
@@ -149,7 +155,23 @@ public enum Material {
                 return world.setBlock(worldX, worldY, this, prioritize) != null;
             }
             else if (isEntity()) {
-                createEntity(world, worldX, worldY);
+                var entity = createEntity(world, worldX, worldY);
+                if (entity.isInvalid()) {
+                    return false;
+                }
+                world.addEntity(entity);
+                final ObjectSet<Location> locations = entity.touchingLocations();
+                for (Location location : locations) {
+                    var chunk = world.getChunkFromWorld(location);
+                    if (chunk == null) {
+                        Main.logger().error("MATERIAL", "Failed get chunk for entity block");
+                        continue;
+                    }
+                    final int localX = CoordUtil.chunkOffset(location.x);
+                    final int localY = CoordUtil.chunkOffset(location.y);
+                    var block = new EntityBlock(world, chunk, localX, localY, this, entity);
+                    chunk.setBlock(localX, localY, block, false);
+                }
                 return true;
             }
             throw new IllegalStateException("This material (" + name() + ") is neither a block nor an entity");
@@ -164,12 +186,11 @@ public enum Material {
     @NotNull
     public MaterialEntity createEntity(@NotNull World world, float worldX, float worldY) {
         Preconditions.checkArgument(itemType == ItemType.ENTITY);
+        Preconditions.checkNotNull(constructor, "Constructor of entity cannot be null");
         try {
             return (MaterialEntity) constructor.newInstance(world, worldX, worldY);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException(
-                String.format("Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world.toString(), worldX, worldY), e);
-
+            throw new IllegalStateException(String.format("Failed to create entity of the type %s at world %s (%.2f,%.2f)", this, world, worldX, worldY), e);
         }
     }
 
