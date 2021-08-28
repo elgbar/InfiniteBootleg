@@ -3,8 +3,10 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.World.BLOCK_ENTITY_FILTER;
 import static no.elg.infiniteBootleg.world.World.TRANSPARENT_BLOCK_ENTITY_FILTER;
+import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -40,6 +42,15 @@ public class Door extends MaterialEntity {
             openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
             closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
         }
+        synchronized (BOX2D_LOCK) {
+            //Wake up all bodies to get an accurate contacts count
+            final Vector2 position = getBody().getPosition();
+            world.getWorldBody().getBox2dWorld().QueryAABB(fixture -> {
+                fixture.getBody().setAwake(true);
+                return true;
+            }, position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2);
+        }
+
     }
 
     @Override
