@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Direction.EAST
 import no.elg.infiniteBootleg.world.Direction.NORTH
@@ -15,7 +16,6 @@ import no.elg.infiniteBootleg.world.Direction.SOUTH
 import no.elg.infiniteBootleg.world.Direction.WEST
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.blocks.StaticLightBlock
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 
 /**
@@ -33,7 +33,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
   /**calculate the shape of the chunk (box2d)*/
   private val bodyDef = BodyDef().also {
-    it.position[chunk.chunkX * Chunk.CHUNK_SIZE.toFloat()] = chunk.chunkY * Chunk.CHUNK_SIZE.toFloat()
+    it.position[chunk.chunkX * CHUNK_SIZE.toFloat()] = chunk.chunkY * CHUNK_SIZE.toFloat()
     it.fixedRotation = true
     it.type = StaticBody
   }
@@ -45,11 +45,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
    * If the neighbors also should be updated
    * @param lightsOnly
    */
-  fun update(recalculateNeighbors: Boolean, lightsOnly: Boolean) {
-    if (lightsOnly) {
-      updateLights()
-      return
-    }
+  fun update(recalculateNeighbors: Boolean) {
     if (chunk.isAllAir) {
       destroyCurrentBody()
       return
@@ -63,8 +59,8 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     }
     val edgeShape = EdgeShape()
 
-    for (localX in 0 until Chunk.CHUNK_SIZE) {
-      for (localY in 0 until Chunk.CHUNK_SIZE) {
+    for (localX in 0 until CHUNK_SIZE) {
+      for (localY in 0 until CHUNK_SIZE) {
 
         val block = chunk.getRawBlock(localX, localY)
         if (block == null || !block.material.isSolid) {
@@ -96,8 +92,8 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
           if (rel == null
             || !rel.material.isSolid
-            || dir == NORTH && localY == Chunk.CHUNK_SIZE - 1 //always render top of chunk
-            || dir == EAST && localX == Chunk.CHUNK_SIZE - 1 //and the east side
+            || dir == NORTH && localY == CHUNK_SIZE - 1 //always render top of chunk
+            || dir == EAST && localX == CHUNK_SIZE - 1 //and the east side
             || dir == WEST && localX == 0 //and the west side
             || (!rel.material.blocksLight() && block.material.blocksLight()) //prevent leaking of light
           ) {
@@ -142,9 +138,9 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     for (direction in Direction.values()) {
       val relChunk: Location = Location.relative(chunk.chunkX, chunk.chunkY, direction)
       if (chunk.world.isChunkLoaded(relChunk)) {
-        if (recalculateNeighbors) {
+        if (recalculateNeighbors && !direction.isCardinal) {
           Main.inst().scheduler.executeAsync {
-            chunk.world.getChunk(relChunk)?.chunkBody?.update(false, !direction.isCardinal)
+            chunk.world.getChunk(relChunk)?.chunkBody?.update(false)
           }
         }
       } else {
@@ -154,7 +150,6 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     if (potentiallyDirty) {
       scheduleFixtureReload(true)
     }
-    updateLights()
   }
 
   @Synchronized
@@ -167,23 +162,12 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
       synchronized(this@ChunkBody) {
         unsureFixture = false
         if (chunk.isNeighborsLoaded) {
-          update(recalculateNeighbors = false, lightsOnly = false)
+          update(recalculateNeighbors = false)
         } else {
           scheduleFixtureReload(false)
         }
       }
     }, if (initial) INITIAL_UNSURE_FIXTURE_RELOAD_DELAY else UNSURE_FIXTURE_RELOAD_DELAY)
-  }
-
-  private fun updateLights() {
-    for (localX in 0 until Chunk.CHUNK_SIZE) {
-      for (localY in 0 until Chunk.CHUNK_SIZE) {
-        val block = chunk.getRawBlock(localX, localY)
-        if (block is StaticLightBlock) {
-          block.updateLight()
-        }
-      }
-    }
   }
 
   private fun destroyCurrentBody() {

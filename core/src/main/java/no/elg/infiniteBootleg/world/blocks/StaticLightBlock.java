@@ -25,16 +25,6 @@ public abstract class StaticLightBlock extends Block {
     }
 
     /**
-     * Update the light to make sure it collides with the current surrounding blocks
-     */
-    public void updateLight() {
-        if (light == null) {
-            return;
-        }
-        light.setPosition(light.getPosition());
-    }
-
-    /**
      * @return The light of this block, might be null if {@link Settings#renderGraphic} is true
      */
     @Nullable
