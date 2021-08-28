@@ -127,9 +127,11 @@ public class Block implements Dissemble, Disposable, HUDDebuggable {
 
     /**
      * Remove this block from the world
+     *
+     * @param updateTexture
      */
-    public void destroy() {
-        chunk.setBlock(localX, localY, (Block) null, true);
+    public void destroy(boolean updateTexture) {
+        chunk.setBlock(localX, localY, (Block) null, updateTexture);
     }
 
     @Override

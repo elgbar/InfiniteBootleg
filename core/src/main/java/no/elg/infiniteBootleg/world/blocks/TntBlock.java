@@ -130,7 +130,7 @@ public class TntBlock extends TickingBlock {
 
                 Set<Chunk> chunks = new HashSet<>();
                 for (Block block : destroyed) {
-                    world.setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
+                    block.destroy(false);
                     world.updateBlocksAround(block.getWorldX(), block.getWorldY());
 
                     chunks.add(block.getChunk());

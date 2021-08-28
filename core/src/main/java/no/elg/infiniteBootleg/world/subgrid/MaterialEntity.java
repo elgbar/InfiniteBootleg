@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MaterialEntity extends Entity implements Removable {
 
-
     public MaterialEntity(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
     }
@@ -20,7 +19,7 @@ public abstract class MaterialEntity extends Entity implements Removable {
     @Override
     public void onRemove() {
         for (Block block : touchingBlocks()) {
-            block.destroy();
+            block.destroy(true);
         }
     }
 
