@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks;
 
 import static no.elg.infiniteBootleg.world.Material.AIR;
+import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 
 import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
@@ -70,13 +71,20 @@ public class TntBlock extends TickingBlock {
     private boolean glowing;
     private volatile boolean exploded;
     private long startTick;
-    @Nullable
+    @NotNull
     private PointLight light;
 
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         strength = EXPLOSION_STRENGTH;
         fuseDurationTicks = getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS;
+
+        light = PointLightPool.inst.obtain();
+        light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+        light.setColor(Color.RED);
+        light.setXray(false);
+        light.setSoft(false);
+        light.setDistance(16);
     }
 
     @Override
@@ -145,15 +153,9 @@ public class TntBlock extends TickingBlock {
         }
 
         if (old != glowing && Settings.renderGraphic) {
-            if (light == null) {
-                light = PointLightPool.inst.obtain();
-                light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
-                light.setColor(Color.RED);
-                light.setXray(false);
-                light.setSoft(false);
-                light.setDistance(16);
+            synchronized (LIGHT_LOCK) {
+                light.setActive(glowing);
             }
-            light.setActive(glowing);
             getChunk().updateTexture(true);
         }
     }
@@ -168,8 +170,6 @@ public class TntBlock extends TickingBlock {
 
     @Override
     public void dispose() {
-        if (light != null) {
-            PointLightPool.inst.free(light);
-        }
+        PointLightPool.inst.free(light);
     }
 }
