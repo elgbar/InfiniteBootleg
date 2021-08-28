@@ -30,7 +30,7 @@ public class SandBlock extends TickingBlock {
         if (getWorld().isAirBlock(south)) {
             falling = true;
 
-            Main.inst().getScheduler().executeAsync(() -> {
+            Main.inst().getScheduler().executeSync(() -> {
                 //Do not update world straight away as if there are sand blocks above this it will begin to fall on the same tick
                 destroy();
                 new FallingBlock(getWorld(), getWorldX(), getWorldY() - 1f, Material.SAND);
@@ -38,7 +38,7 @@ public class SandBlock extends TickingBlock {
                 Block relative = getRelative(Direction.NORTH);
                 if (relative instanceof TickingBlock tickingBlock) {
                     //Wait a bit to let the falling block gain some momentum
-                    tickingBlock.delayedShouldTick(getWorld().getWorldTicker().getTPS() / 10L);
+                    tickingBlock.delayedShouldTick(1);
                 }
             });
         }
