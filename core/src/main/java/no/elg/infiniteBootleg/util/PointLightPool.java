@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.util;
 
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 
 import box2dLight.PointLight;
@@ -48,11 +47,8 @@ public final class PointLightPool extends Pool<PointLight> {
 
     @Override
     public void free(PointLight light) {
-
-        synchronized (BOX2D_LOCK) {
-            synchronized (LIGHT_LOCK) {
-                light.setActive(false);
-            }
+        synchronized (LIGHT_LOCK) {
+            light.setActive(false);
         }
         super.free(light);
     }
