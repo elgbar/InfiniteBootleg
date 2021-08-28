@@ -108,9 +108,10 @@ public class TntBlock extends TickingBlock {
                 List<Block> destroyed = new ArrayList<>();
                 int worldX = getWorldX();
                 int worldY = getWorldY();
+                World world = getWorld();
                 for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
                     for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
-                        Block b = getWorld().getBlock(x, y, true);
+                        Block b = world.getBlock(x, y, true);
                         Material mat = b == null ? AIR : b.getMaterial();
                         float hardness = mat.getHardness();
                         if (mat == AIR || hardness < 0) {
@@ -119,9 +120,7 @@ public class TntBlock extends TickingBlock {
                         double dist = Location.distCubed(worldX, worldY, b.getWorldX(), b.getWorldY()) * hardness * Math.abs(
                             MathUtils.random.nextGaussian() + RESISTANCE);
                         if (dist < strength * strength) {
-                            if (b instanceof TntBlock tntb && b != this) {
-                                //ignore other tnt blocks
-                                tntb.startTick = -1; //ensure it will explode as soon as possible
+                            if (b instanceof TntBlock && b != this) {
                                 continue;
                             }
                             destroyed.add(b);
@@ -130,7 +129,6 @@ public class TntBlock extends TickingBlock {
                 }
 
                 Set<Chunk> chunks = new HashSet<>();
-                World world = getWorld();
                 for (Block block : destroyed) {
                     world.setBlock(block.getWorldX(), block.getWorldY(), (Block) null, false);
                     world.updateBlocksAround(block.getWorldX(), block.getWorldY());
