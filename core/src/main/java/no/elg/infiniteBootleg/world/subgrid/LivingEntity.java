@@ -46,6 +46,11 @@ public abstract class LivingEntity extends Entity implements Updatable {
     public abstract EntityControls getControls();
 
     @Override
+    public @NotNull String hudDebug() {
+        return "Name: " + getName() + " hp: " + getHealth() + "/" + DEFAULT_HEALTH;
+    }
+
+    @Override
     public String toString() {
         return "LivingEntity{name='" + name + "'} " + super.toString();
     }
