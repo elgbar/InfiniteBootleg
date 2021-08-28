@@ -32,7 +32,7 @@ public class Door extends MaterialEntity {
     private TextureRegion openDoorRegion;
     private TextureRegion closedDoorRegion;
 
-    private final AtomicInteger open = new AtomicInteger();
+    private final AtomicInteger contacts = new AtomicInteger();
 
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
@@ -68,18 +68,17 @@ public class Door extends MaterialEntity {
     @Override
     public void contact(@NotNull ContactType type, @NotNull Contact contact) {
         if (type == ContactType.BEGIN_CONTACT) {
-            var old = open.getAndIncrement();
-            if (old == 0) {
+            int oldContacts = contacts.getAndIncrement();
+            if (oldContacts == 0) {
                 setFilter(TRANSPARENT_BLOCK_ENTITY_FILTER);
             }
         }
         else if (type == ContactType.END_CONTACT) {
-            var old = open.decrementAndGet();
-            if (old == 0) {
+            int newContacts = contacts.decrementAndGet();
+            if (newContacts == 0) {
                 setFilter(BLOCK_ENTITY_FILTER);
             }
         }
-
     }
 
     @Override
@@ -90,7 +89,12 @@ public class Door extends MaterialEntity {
 
     @Override
     public TextureRegion getTextureRegion() {
-        return open.get() == 0 ? closedDoorRegion : openDoorRegion;
+        return contacts.get() == 0 ? closedDoorRegion : openDoorRegion;
+    }
+
+    @Override
+    public @NotNull String hudDebug() {
+        return "contacts: " + contacts;
     }
 
     @Override

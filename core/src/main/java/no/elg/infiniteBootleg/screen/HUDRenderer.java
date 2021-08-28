@@ -74,7 +74,7 @@ public class HUDRenderer implements Renderer {
         StringBuilder ents = new StringBuilder("E = ");
 
         for (Entity entity : world.getEntities(Main.inst().getMouseX(), Main.inst().getMouseY())) {
-            ents.append(entity.simpleName()).append(nl);
+            ents.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl);
         }
         int index = ents.lastIndexOf(nl);
         if (index != -1) {
@@ -102,8 +102,8 @@ public class HUDRenderer implements Renderer {
         float rawY = Main.inst().getMouseY();
         boolean exists = block != null;
 
-        String format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b";
-        return String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists);
+        String format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b %s";
+        return String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, block != null ? block.hudDebug() : "");
     }
 
     private String chunk(int mouseBlockX, int mouseBlockY, World world) {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Dissemble;
+import no.elg.infiniteBootleg.util.HUDDebuggable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class Block implements Dissemble, Disposable {
+public class Block implements Dissemble, Disposable, HUDDebuggable {
 
     public static final int BLOCK_SIZE = 16;
 

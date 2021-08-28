@@ -22,6 +22,7 @@ import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The position of each entity is recorded in world coordinates and is centered in the middle of the entity.
  */
-public abstract class Entity implements Ticking, Disposable, ContactHandler {
+public abstract class Entity implements Ticking, Disposable, ContactHandler, HUDDebuggable {
 
     public static final float GROUND_CHECK_OFFSET = 0.1f;
 
@@ -75,7 +76,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler {
                 case PUSH_UP -> {
                     //teleport entity upwards till we find a valid location
                     boolean print = true;
-                    //make sure we're not stuck in a infinite loop if the given height is zero
+                    //make sure we're not stuck in an infinite loop if the given height is zero
                     float checkStep = getHalfBox2dHeight() < 0.1f ? getHalfBox2dHeight() : 0.1f;
                     while (isInvalidLocation(posCache.x, posCache.y)) {
                         if (print) {
