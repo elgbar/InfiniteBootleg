@@ -25,4 +25,9 @@ public class EntityBlock extends Block implements Removable {
     public MaterialEntity getEntity() {
         return entity;
     }
+
+    @Override
+    public @NotNull String hudDebug() {
+        return "Entity type " + entity.simpleName() + " id " + entity.getUuid();
+    }
 }
