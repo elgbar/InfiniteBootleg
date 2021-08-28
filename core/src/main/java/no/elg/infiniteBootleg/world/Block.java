@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
-import no.elg.infiniteBootleg.util.Binembly;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Dissemble;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class Block implements Binembly, Disposable {
+public class Block implements Dissemble, Disposable {
 
     public static final int BLOCK_SIZE = 16;
 
@@ -134,11 +134,6 @@ public class Block implements Binembly, Disposable {
     @Override
     public byte[] disassemble() {
         return new byte[] {(byte) material.ordinal()};
-    }
-
-    @Override
-    public void assemble(byte[] bytes) {
-        throw new UnsupportedOperationException("Cannot assemble blocks directly. Blocks must be assembled by a chunk");
     }
 
     @Override

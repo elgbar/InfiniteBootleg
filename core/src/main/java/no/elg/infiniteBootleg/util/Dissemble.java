@@ -3,16 +3,10 @@ package no.elg.infiniteBootleg.util;
 /**
  * @author Elg
  */
-public interface Binembly {
+public interface Dissemble {
 
     /**
      * @return This object as bytes
      */
     byte[] disassemble();
-
-    /**
-     * Assemble the given bytes to restore an object
-     */
-    void assemble(byte[] bytes);
-
 }

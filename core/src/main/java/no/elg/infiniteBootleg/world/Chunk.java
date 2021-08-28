@@ -26,9 +26,9 @@ import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
-import no.elg.infiniteBootleg.util.Binembly;
+import no.elg.infiniteBootleg.util.Assemble;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.Util;
+import no.elg.infiniteBootleg.util.Dissemble;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -41,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class Chunk implements Iterable<Block>, Ticking, Disposable, Binembly {
+public class Chunk implements Iterable<Block>, Ticking, Disposable, Assemble, Dissemble {
 
     public static final int CHUNK_SIZE = 32;
     public static final int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
