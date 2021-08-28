@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.loader;
 import com.badlogic.gdx.files.FileHandle;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public class ChunkLoader {
      */
     public Chunk load(int chunkX, int chunkY) {
         if (existsOnDisk(chunkX, chunkY)) {
-            Chunk chunk = new Chunk(world, chunkX, chunkY);
+            ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
             //noinspection ConstantConditions checked in existsOnDisk
             chunk.assemble(chunk.getChunkFile().readBytes());
             chunk.finishLoading();

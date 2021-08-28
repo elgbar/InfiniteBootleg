@@ -5,6 +5,7 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.FastNoise;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
@@ -66,7 +67,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     @Override
     public Chunk generate(@NotNull World world, int chunkX, int chunkY) {
 
-        Chunk chunk = new Chunk(world, chunkX, chunkY);
+        ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
         for (int localX = 0; localX < CHUNK_SIZE; localX++) {
             int worldX = CoordUtil.chunkToWorld(chunkX, localX);
             Biome biome = getBiome(worldX);

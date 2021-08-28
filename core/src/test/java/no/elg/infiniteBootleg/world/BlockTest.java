@@ -1,7 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
-import no.elg.infiniteBootleg.TestGraphic;
 import static org.junit.Assert.assertEquals;
+
+import no.elg.infiniteBootleg.TestGraphic;
 import org.junit.Test;
 
 /**
@@ -14,7 +15,7 @@ public class BlockTest extends TestGraphic {
     public void correctBlockType() {
         for (Material mat : Material.values()) {
             if (mat.isEntity()) { continue; }
-            Chunk c = new Chunk(world, 0, 0);
+            ChunkImpl c = new ChunkImpl(world, 0, 0);
             c.finishLoading();
             Block b = mat.createBlock(world, c, 0, 0);
             assertEquals(mat, b.getMaterial());

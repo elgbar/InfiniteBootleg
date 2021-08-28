@@ -512,15 +512,15 @@ public class World implements Disposable, Resizable {
         int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
         int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-        Chunk c = getChunk(chunkX, chunkY);
-        if (c == null) {
+        Chunk chunk = getChunk(chunkX, chunkY);
+        if (chunk == null) {
             return null;
         }
         if (raw) {
-            return c.getBlocks()[localX][localY];
+            return chunk.getBlocks()[localX][localY];
         }
         else {
-            return c.getBlock(localX, localY);
+            return chunk.getBlock(localX, localY);
         }
     }
 

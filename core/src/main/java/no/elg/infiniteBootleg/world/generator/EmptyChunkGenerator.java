@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.generator;
 
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +25,8 @@ public class EmptyChunkGenerator implements ChunkGenerator {
 
     @Override
     public @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY) {
-        Chunk c = new Chunk(world, chunkX, chunkY);
-        c.finishLoading();
-        return c;
+        ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
+        chunk.finishLoading();
+        return chunk;
     }
 }

@@ -1,15 +1,16 @@
 package no.elg.infiniteBootleg.world;
 
+import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.TestGraphic;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,11 +19,11 @@ import org.junit.Test;
  */
 public class ChunkTest extends TestGraphic {
 
-    private Chunk chunk;
+    private ChunkImpl chunk;
 
     @Before
     public void setUp() {
-        chunk = new Chunk(world, 0, 0);
+        chunk = new ChunkImpl(world, 0, 0);
         chunk.finishLoading();
     }
 
