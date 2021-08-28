@@ -250,6 +250,7 @@ public class World implements Disposable, Resizable {
                 return null;
             }
             chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
+            Preconditions.checkState(chunk.isValid());
             chunks.put(chunkLoc, chunk);
         }
         return chunk;

@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.generator;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.FastNoise;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -68,40 +67,37 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     public Chunk generate(@NotNull World world, int chunkX, int chunkY) {
 
         Chunk chunk = new Chunk(world, chunkX, chunkY);
+        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+            int worldX = CoordUtil.chunkToWorld(chunkX, localX);
+            Biome biome = getBiome(worldX);
 
-        Main.inst().getScheduler().executeAsync(() -> {
-            for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-                int worldX = CoordUtil.chunkToWorld(chunkX, localX);
-                Biome biome = getBiome(worldX);
+            int genHeight = biome.heightAt(this, worldX);
 
-                int genHeight = biome.heightAt(this, worldX);
+            int genChunkY = CoordUtil.worldToChunk(genHeight);
 
-                int genChunkY = CoordUtil.worldToChunk(genHeight);
+            if (chunkY == genChunkY) {
+                biome.fillUpTo(noise, chunk, localX, genHeight - genChunkY * CHUNK_SIZE, genHeight);
+            }
+            else if (chunkY < genChunkY) {
+                biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, genHeight);
+            }
 
-                if (chunkY == genChunkY) {
-                    biome.fillUpTo(noise, chunk, localX, genHeight - genChunkY * CHUNK_SIZE, genHeight);
-                }
-                else if (chunkY < genChunkY) {
-                    biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, genHeight);
-                }
+            //generate caves
+            int worldChunkY = CoordUtil.chunkToWorld(chunkY);
+            for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                int worldY = worldChunkY + localY;
 
-                //generate caves
-                int worldChunkY = CoordUtil.chunkToWorld(chunkY);
-                for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                    int worldY = worldChunkY + localY;
-
-                    //calculate the size of the worm
-                    float wormSize = 1 + Math.abs(noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
-                    float x = noise2.GetNoise(worldX, worldY) / wormSize;
-                    if (x > CAVE_CREATION_THRESHOLD) {
+                //calculate the size of the worm
+                float wormSize = 1 + Math.abs(noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
+                float x = noise2.GetNoise(worldX, worldY) / wormSize;
+                if (x > CAVE_CREATION_THRESHOLD) {
 //                        Material mat = x > 0.99 && chunkY < genChunkY ? Material.TORCH : null;
 //                        Block b = mat == null ? null : mat.createBlock(world, chunk, localX, localY);
-                        chunk.getBlocks()[localX][localY] = null;
-                    }
+                    chunk.getBlocks()[localX][localY] = null;
                 }
             }
-            chunk.finishLoading();
-        });
+        }
+        chunk.finishLoading();
         return chunk;
     }
 
