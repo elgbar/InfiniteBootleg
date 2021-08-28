@@ -22,14 +22,17 @@ public class Player extends LivingEntity {
 
     public static final String PLAYER_REGION_NAME = "player";
 
-    private final TextureRegion region;
-    private final EntityControls controls;
-    private final Light torchLight;
+    private TextureRegion region;
+    private EntityControls controls;
+    private Light torchLight;
 
     private final Vector2 tmpAngle = new Vector2();
 
     public Player(@NotNull World world) {
         super(world, 0, 0);
+        if (isInvalid()) {
+            return;
+        }
         region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         controls = new KeyboardControls(world.getRender(), this);
         synchronized (LIGHT_LOCK) {

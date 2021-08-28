@@ -9,13 +9,11 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
     public static final int DEFAULT_HEALTH = 10;
     public static final String DEFAULT_NAME = "LivingEntity";
-    private int health;
-    private String name;
+    private int health = DEFAULT_HEALTH;
+    private String name = DEFAULT_NAME;
 
     public LivingEntity(@NotNull World world, float x, float y) {
         super(world, x, y);
-        health = DEFAULT_HEALTH;
-        name = DEFAULT_NAME;
     }
 
     public int getHealth() {

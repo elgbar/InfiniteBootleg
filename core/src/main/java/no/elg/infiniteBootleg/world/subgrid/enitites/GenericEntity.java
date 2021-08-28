@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class GenericEntity extends Entity implements Removable {
 
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
 
     public GenericEntity(@NotNull World world, float worldX, float worldY) {
         this(world, worldX, worldY, 1, 1);
@@ -27,6 +27,9 @@ public class GenericEntity extends Entity implements Removable {
     public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height, @NotNull Filter filter) {
         //Cannot center as the width and height will be 0 anyway
         super(world, worldX, worldY, false);
+        if (isInvalid()) {
+            return;
+        }
 
         this.width = width * Block.BLOCK_SIZE;
         this.height = height * Block.BLOCK_SIZE;
