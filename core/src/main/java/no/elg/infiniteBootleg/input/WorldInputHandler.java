@@ -110,25 +110,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         Main.inst().getInputMultiplexer().removeProcessor(this);
     }
 
-    @Override
-    public void update() {
-        if (Main.inst().getConsole().isVisible()) {
-            return;
-        }
-
+    private void cameraFollowUpdate() {
         OrthographicCamera camera = worldRender.getCamera();
-
-        int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
-        int horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
-
-        if (vertical != 0 || horizontal != 0) {
-            camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
-            camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
-            lockedOn = false;
-            worldRender.update();
-        }
-
-        else if (following != null && !following.isInvalid() && lockedOn) {
+        if (following != null && !following.isInvalid() && lockedOn) {
             final Vector2 position = following.getPhysicsPosition();
             float x = position.x * Block.BLOCK_SIZE;
             float y = position.y * Block.BLOCK_SIZE;
@@ -146,6 +130,31 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
                 camera.position.x = x;
                 camera.position.y = y;
             }
+            worldRender.update();
+        }
+
+    }
+
+    @Override
+    public void update() {
+        if (Main.inst().getConsole().isVisible()) {
+            //keep following even when console is visible
+            cameraFollowUpdate();
+            return;
+        }
+
+        int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
+        int horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
+
+        if (vertical == 0 && horizontal == 0) {
+            //No input, we're still following the current entity
+            cameraFollowUpdate();
+        }
+        else {
+            OrthographicCamera camera = worldRender.getCamera();
+            camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
+            camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
+            lockedOn = false;
             worldRender.update();
         }
     }
