@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,7 +67,7 @@ public class TntBlock extends TickingBlock {
     /**
      * How long, in ticks, the fuse time should be
      */
-    public final float fuseDurationTicks;
+    public final int fuseDurationTicks;
     private final float strength;
     private boolean glowing;
     private volatile boolean exploded;
@@ -77,7 +78,8 @@ public class TntBlock extends TickingBlock {
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         strength = EXPLOSION_STRENGTH;
-        fuseDurationTicks = getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS;
+        fuseDurationTicks = (int) (getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS);
+        startTick = getWorld().getTick();
 
         light = PointLightPool.inst.obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
         light.setColor(Color.RED);
@@ -96,11 +98,7 @@ public class TntBlock extends TickingBlock {
         if (exploded) {
             return;
         }
-        long currTick = getWorld().getTick();
-        if (startTick == 0) {
-            startTick = currTick;
-        }
-        long ticked = currTick - startTick;
+        long ticked = getWorld().getTick() - startTick;
         if (ticked > fuseDurationTicks) {
             exploded = true;
             Main.inst().getScheduler().executeAsync(() -> {
@@ -157,12 +155,30 @@ public class TntBlock extends TickingBlock {
         }
     }
 
+    public synchronized long getTicksLeft() {
+        long ticked = getWorld().getTick() - startTick;
+        return fuseDurationTicks - ticked;
+    }
+
+    public synchronized void setTicksLeft(long ticksLeft) {
+        //Do min 1 as 0 would set startTick to current tick
+        startTick = getWorld().getTick() - (fuseDurationTicks - ticksLeft);
+        Preconditions.checkState(ticksLeft == getTicksLeft(), ticksLeft + " =/= " + getTicksLeft());
+    }
+
     @Override
     public @Nullable TextureRegion getTexture() {
         if (glowing) {
             return whiteTexture;
         }
         return super.getTexture();
+    }
+
+    @Override
+
+    @Override
+    public @NotNull String hudDebug() {
+        return "ticks left: " + getTicksLeft();
     }
 
     @Override
