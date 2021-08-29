@@ -60,7 +60,7 @@ subprojects {
 
   [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-  sourceSets.test.java.srcDirs = ["src/"]
+  sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
 
 
   repositories {
