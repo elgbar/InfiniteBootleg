@@ -12,6 +12,7 @@ import static com.badlogic.gdx.Input.Keys.UP;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -128,8 +129,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         }
 
         else if (following != null && !following.isInvalid() && lockedOn) {
-            float x = following.getPosition().x * Block.BLOCK_SIZE;
-            float y = following.getPosition().y * Block.BLOCK_SIZE;
+            final Vector2 position = following.getPhysicsPosition();
+            float x = position.x * Block.BLOCK_SIZE;
+            float y = position.y * Block.BLOCK_SIZE;
 
             if (Settings.enableCameraFollowLerp) {
                 float dx = (x - camera.position.x) * CAMERA_LERP;

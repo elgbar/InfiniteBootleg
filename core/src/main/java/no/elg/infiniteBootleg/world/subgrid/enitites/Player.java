@@ -83,8 +83,8 @@ public class Player extends LivingEntity {
         }
         super.tick();
 
-        Vector2 pos = getPosition();
-        float angle = tmpAngle.set(Main.inst().getMouse()).sub(pos).angleDeg();
+        Vector2 pos = getPhysicsPosition();
+        float angle = tmpAngle.set(Main.inst().getMouse()).sub(getPosition()).angleDeg();
         synchronized (LIGHT_LOCK) {
             torchLight.setDirection(angle);
             torchLight.setPosition(pos);

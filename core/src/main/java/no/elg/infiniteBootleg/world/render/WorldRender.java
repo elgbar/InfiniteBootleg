@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.world.render;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 
 import box2dLight.DirectionalLight;
+import box2dLight.PublicRayHandler;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
@@ -22,9 +24,9 @@ import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.util.Resizable;
-import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,7 +72,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     private final ChunkViewed chunksInView;
     private final Matrix4 m4 = new Matrix4();
     OrderedMap<Chunk, TextureRegion> draw;
-    private RayHandler rayHandler;
+    private PublicRayHandler rayHandler;
     private EntityRenderer entityRenderer;
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -106,7 +108,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
             RayHandler.setGammaCorrection(true);
             RayHandler.useDiffuseLight(true);
-            rayHandler = new RayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
+            rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
             rayHandler.setBlurNum(2);
             rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1);
             resetSkylight();
@@ -131,7 +133,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
      * @return How many blocks there currently are horizontally on screen
      */
     public int blocksHorizontally() {
-        return (int) Math.ceil(camera.viewportWidth * camera.zoom / Block.BLOCK_SIZE) + 1;
+        return (int) Math.ceil(camera.viewportWidth * camera.zoom / BLOCK_SIZE) + 1;
     }
 
     @Override
@@ -153,6 +155,10 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         draw.clear();
         draw.ensureCapacity(chunksInView.getHorizontalLength() * chunksInView.getVerticalLength());
 
+
+        final WorldBody worldBody = world.getWorldBody();
+        float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
+        float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
         for (int y = chunksInView.verticalStart; y < chunksInView.verticalEnd; y++) {
             for (int x = chunksInView.horizontalStart; x < chunksInView.horizontalEnd; x++) {
                 Chunk chunk = world.getChunk(x, y);
@@ -161,7 +167,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 }
                 chunk.view();
 
-                //No need to update texture when when out of view, but in loaded zone
+                //No need to update texture when out of view, but in loaded zone
                 if (y == chunksInView.verticalEnd - 1 || y == chunksInView.verticalStart || x == chunksInView.horizontalStart ||
                     x == chunksInView.horizontalEnd - 1) {
                     continue;
@@ -188,8 +194,8 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
         batch.begin();
         for (ObjectMap.Entry<Chunk, TextureRegion> entry : draw.entries()) {
-            int dx = entry.key.getChunkX() * CHUNK_TEXTURE_SIZE;
-            int dy = entry.key.getChunkY() * CHUNK_TEXTURE_SIZE;
+            var dx = entry.key.getChunkX() * CHUNK_TEXTURE_SIZE + worldOffsetX;
+            var dy = entry.key.getChunkY() * CHUNK_TEXTURE_SIZE + worldOffsetY;
             batch.draw(entry.value, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
         }
         entityRenderer.render();
@@ -241,7 +247,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         return batch;
     }
 
-    public RayHandler getRayHandler() {
+    public PublicRayHandler getRayHandler() {
         return rayHandler;
     }
 
@@ -279,9 +285,13 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
         if (!getWorld().getWorldTicker().isPaused()) {
 
+            final WorldBody worldBody = world.getWorldBody();
+            float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
+            float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
+
             float w = width * Math.abs(camera.up.y) + height * Math.abs(camera.up.x);
             float h = height * Math.abs(camera.up.y) + width * Math.abs(camera.up.x);
-            viewBound.set(camera.position.x - w / 2, camera.position.y - h / 2, w, h);
+            viewBound.set((camera.position.x - worldOffsetX) - w / 2, (camera.position.y - worldOffsetY) - h / 2, w, h);
 
             chunksInView.horizontalStart = //
                 MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;

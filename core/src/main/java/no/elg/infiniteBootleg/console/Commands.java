@@ -351,5 +351,14 @@ public class Commands extends CommandExecutor {
         }
         render.update();
     }
+
+
+    @HiddenCommand
+    @ClientsideOnly
+    @CmdArgNames({"dx", "dy"})
+    @ConsoleDoc(description = "Shift world offset")
+    public void swo(float x, float y) {
+        Main.inst().getWorld().getWorldBody().shiftWorldOffset(x, y);
+    }
 }
 

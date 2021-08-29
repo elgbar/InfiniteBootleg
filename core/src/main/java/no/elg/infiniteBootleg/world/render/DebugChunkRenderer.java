@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.render;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -8,6 +10,7 @@ import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 
 public class DebugChunkRenderer implements Renderer {
 
@@ -33,6 +36,10 @@ public class DebugChunkRenderer implements Renderer {
         int xEnd = chunksInView.horizontalEnd;
 
         lr.begin(ShapeRenderer.ShapeType.Line);
+
+        final WorldBody worldBody = worldRender.world.getWorldBody();
+        float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
+        float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
         lr.setProjectionMatrix(camera.combined);
 
         float offset = Chunk.CHUNK_SIZE * Block.BLOCK_SIZE;
@@ -46,7 +53,7 @@ public class DebugChunkRenderer implements Renderer {
                     c = WITHIN_CAMERA_COLOR;
                 }
                 lr.setColor(c);
-                lr.rect(x * offset + 0.5f, y * offset + 0.5f, offset - 1, offset - 1);
+                lr.rect(x * offset + 0.5f + worldOffsetX, y * offset + 0.5f + worldOffsetY, offset - 1, offset - 1);
             }
         }
 

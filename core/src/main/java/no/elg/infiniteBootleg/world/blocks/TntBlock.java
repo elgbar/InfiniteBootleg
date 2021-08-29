@@ -79,8 +79,7 @@ public class TntBlock extends TickingBlock {
         strength = EXPLOSION_STRENGTH;
         fuseDurationTicks = getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS;
 
-        light = PointLightPool.inst.obtain();
-        light.setPosition(getWorldX() + 0.5f, getWorldY() + 0.5f);
+        light = PointLightPool.inst.obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
         light.setColor(Color.RED);
         light.setXray(false);
         light.setSoft(false);

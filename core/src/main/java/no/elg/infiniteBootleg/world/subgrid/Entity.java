@@ -28,6 +28,7 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
@@ -169,12 +170,15 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             }
         }
 
+        final WorldBody worldBody = world.getWorldBody();
+        float physicsWorldX = worldX + worldBody.getWorldOffsetX();
+        float physicsWorldY = worldY + worldBody.getWorldOffsetY();
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) {
                     return;
                 }
-                body.setTransform(worldX, worldY, 0);
+                body.setTransform(physicsWorldX, physicsWorldY, 0);
                 body.setAngularVelocity(0);
                 body.setLinearVelocity(0, 0);
                 body.setAwake(true);
@@ -368,6 +372,11 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         return posCache;
     }
 
+    @NotNull
+    public Vector2 getPhysicsPosition() {
+        return posCache.cpy().add(world.getWorldBody().getWorldOffsetX(), world.getWorldBody().getWorldOffsetY());
+    }
+
     /**
      * Set the type of filter for this entities fixtures
      *
@@ -433,8 +442,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) { return; }
-                posCache.set(body.getPosition());
-                velCache.set(body.getLinearVelocity());
+                final WorldBody worldBody = world.getWorldBody();
+                posCache.set(this.body.getPosition()).sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
+                velCache.set(this.body.getLinearVelocity());
             }
         }
     }

@@ -13,4 +13,8 @@ class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
     //tick all box2d elements
     world.worldBody.tick()
   }
+
+  override fun tickRare() {
+    world.worldBody.tickRare()
+  }
 }

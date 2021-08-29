@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
@@ -162,8 +163,9 @@ public class Main extends ApplicationAdapter {
 
         mouseVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         world.getRender().getCamera().unproject(mouseVec);
-        mouseX = mouseVec.x / BLOCK_SIZE;
-        mouseY = mouseVec.y / BLOCK_SIZE;
+        final WorldBody worldBody = world.getWorldBody();
+        mouseX = mouseVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
+        mouseY = mouseVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
         mouse.set(mouseX, mouseY);
 
         mouseBlockX = MathUtils.floor(mouseX);

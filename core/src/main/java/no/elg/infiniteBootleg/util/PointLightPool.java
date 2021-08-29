@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A pool for static xray point lights
@@ -20,9 +22,12 @@ public final class PointLightPool extends Pool<PointLight> {
     public static final int POINT_LIGHT_RAYS = 64;
     public static final int POINT_LIGHT_DISTANCE = 32;
     private final RayHandler rayHandler;
+    private final WorldBody worldBody;
 
     private PointLightPool() {
-        rayHandler = Main.inst().getWorld().getRender().getRayHandler();
+        final World world = Main.inst().getWorld();
+        rayHandler = world.getRender().getRayHandler();
+        worldBody = world.getWorldBody();
     }
 
     @Override
@@ -35,6 +40,16 @@ public final class PointLightPool extends Pool<PointLight> {
         return light;
     }
 
+    @NotNull
+    public PointLight obtain(float worldX, float worldY) {
+        var light = obtain();
+        light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
+        return light;
+    }
+
+    /**
+     * @deprecated Use {@link #obtain(float, float)} to correctly calculate any world offset
+     */
     @Override
     public PointLight obtain() {
         PointLight light = super.obtain();
