@@ -41,13 +41,13 @@ public class ChunkLoader {
         if (existsOnDisk(chunkX, chunkY)) {
             ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
             //noinspection ConstantConditions checked in existsOnDisk
-            chunk.assemble(chunk.getChunkFile().readBytes());
-            chunk.finishLoading();
-            return chunk;
+            if (chunk.assemble(chunk.getChunkFile().readBytes())) {
+                chunk.finishLoading();
+                return chunk;
+            }
+            //Failed to assemble, generate new chunk
         }
-        else {
-            return generator.generate(world, chunkX, chunkY);
-        }
+        return generator.generate(world, chunkX, chunkY);
     }
 
     /**
@@ -73,6 +73,7 @@ public class ChunkLoader {
             if (fh == null) {
                 return;
             }
+
             fh.writeBytes(chunk.disassemble(), false);
         }
     }
