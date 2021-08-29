@@ -85,25 +85,18 @@ class WorldBody(private val world: World) : Ticking {
     val player = Main.inst().player ?: return
     synchronized(BOX2D_LOCK) {
 
-      fun toShift(current: Float): Int {
-        val sign = when {
-          current > WORLD_MOVE_OFFSET_THRESHOLD -> -1
-          current < -WORLD_MOVE_OFFSET_THRESHOLD -> 1
-          else -> return 0
-        }
-        return sign * ((abs(current) / WORLD_MOVE_OFFSET_THRESHOLD).toInt() * WORLD_MOVE_OFFSET_THRESHOLD)
-      }
 
       val physicsPosition = player.physicsPosition
-      val shiftX = toShift(physicsPosition.x)
-      val shiftY = toShift(physicsPosition.y)
+      val shiftX = calculateShift(physicsPosition.x)
+      val shiftY = calculateShift(physicsPosition.y)
 
-      if (shiftX == 0 && shiftY == 0) {
+      if (shiftX == 0f && shiftY == 0f) {
         //Still in-bounds
         return
       }
-      Main.logger().debug("BOX2D", "Shifting world offset by $shiftX, $shiftY")
-      shiftWorldOffset(shiftX.toFloat(), shiftY.toFloat())
+      // the toShift method assumes no offset, so we must subtract the old offset from the new
+      shiftWorldOffset(shiftX, shiftY)
+      Main.logger().debug("BOX2D", "Shifting world offset by ($shiftX, $shiftY) now ($worldOffsetX, $worldOffsetY)")
     }
   }
 
@@ -152,7 +145,25 @@ class WorldBody(private val world: World) : Ticking {
     const val X_WORLD_GRAVITY = 0f
     const val Y_WORLD_GRAVITY = -20f
 
-    const val WORLD_MOVE_OFFSET_THRESHOLD = CHUNK_SIZE * 8
+    const val WORLD_MOVE_OFFSET_THRESHOLD = CHUNK_SIZE * 8f
+
+    /**
+     * Given the distance from the current physics origin, calculate how much the physics world offset should be shifted.
+     *
+     * Simply put this calculates how much we must move the world origin to stay with a distance of [WORLD_MOVE_OFFSET_THRESHOLD].
+     *
+     * @param physicsCoordinate Distance from the current physics origin
+     * @return How much we should shift the world origin by. If `0` we are within bounds.
+     */
+    @JvmStatic
+    fun calculateShift(physicsCoordinate: Float): Float {
+      val sign = when {
+        physicsCoordinate > WORLD_MOVE_OFFSET_THRESHOLD -> -1
+        physicsCoordinate < -WORLD_MOVE_OFFSET_THRESHOLD -> 1
+        else -> return 0f // Make no change
+      }
+      return sign * ((abs(physicsCoordinate) / WORLD_MOVE_OFFSET_THRESHOLD).toInt() * WORLD_MOVE_OFFSET_THRESHOLD)
+    }
   }
 
   init {
