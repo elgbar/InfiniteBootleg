@@ -145,3 +145,4 @@ version
 tests/
 
 .idea/
+protoc

@@ -1,0 +1,53 @@
+syntax = "proto3";
+package world;
+
+option java_multiple_files = false;
+option java_package = "no.elg.infiniteBootleg.protobuf";
+option java_outer_classname = "Proto";
+
+message Block {
+  int32 material_ordinal = 1; //ordinal from Material enum
+
+  optional TNT tnt = 16; //TntBlock, only applicable if material is TNT
+
+  message TNT{
+    int64 ticks_left = 1;
+  }
+}
+
+message Chunk {
+  Vector2i position = 1;
+  repeated Block blocks = 2;
+  repeated Entity entities = 16;
+}
+
+message Vector2f{
+  float x = 1;
+  float y = 2;
+}
+
+message Vector2i{
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Entity {
+  EntityType type = 1;
+  Vector2f position = 2;
+  Vector2f velocity = 3;
+  string uuid = 4;
+
+  optional Living living = 16;
+  message Living{
+    string name = 1;
+    string hp = 2;
+    //    string max_hp = 3; //TODO
+  }
+
+  enum EntityType{
+    GENERIC_ENTITY = 0; // default
+    FALLING_BLOCK = 1;
+    DOOR = 2;
+    PLAYER = 16;
+  }
+}

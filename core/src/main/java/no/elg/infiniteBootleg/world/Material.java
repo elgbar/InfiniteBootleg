@@ -113,7 +113,7 @@ public enum Material {
         }
     }
 
-    public static @NotNull Material fromByte(byte b) {
+    public static @NotNull Material fromOrdinal(int b) {
         return VALUES[b];
     }
 

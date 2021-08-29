@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.google.common.base.Preconditions;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -530,32 +532,50 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public byte[] disassemble() {
-        byte[] bytes = new byte[CHUNK_SIZE * CHUNK_SIZE];
-        int index = 0;
-        synchronized (this) {
-            for (Block block : this) {
-                bytes[index++] = block == null ? 0 : block.disassemble()[0];
-            }
+        final Proto.Chunk.Builder builder = Proto.Chunk.newBuilder();
+        builder.setPosition(Proto.Vector2i.newBuilder().setX(chunkX).setY(chunkY).build());
+
+        for (Block block : this) {
+            builder.addBlocks(block.save());
         }
-        return bytes;
+        return builder.build().toByteArray();
     }
 
     @Override
-    public void assemble(byte[] bytes) {
-        Preconditions.checkArgument(bytes.length == CHUNK_SIZE * CHUNK_SIZE,
-                                    "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + bytes.length);
+    public boolean assemble(byte[] bytes) {
+
+        final Proto.Chunk protoChunk;
+        try {
+            protoChunk = Proto.Chunk.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        final Proto.Vector2i chunkPosition = protoChunk.getPosition();
+        var posErrorMsg =
+            "Invalid chunk coordinates given. Expected (" + chunkX + ", " + chunkY + ") but got (" + chunkPosition.getX() + ", " + chunkPosition.getY() + ")";
+        Preconditions.checkArgument(chunkPosition.getX() == chunkX, posErrorMsg);
+        Preconditions.checkArgument(chunkPosition.getY() == chunkY, posErrorMsg);
+        Preconditions.checkArgument(protoChunk.getBlocksCount() == CHUNK_SIZE * CHUNK_SIZE,
+                                    "Invalid number of bytes. expected " + CHUNK_SIZE * CHUNK_SIZE + ", but got " + protoChunk.getBlocksCount());
         int index = 0;
+        var protoBlocks = protoChunk.getBlocksList();
         synchronized (this) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
-                    Material mat = Material.fromByte(bytes[index++]);
+                    var protoBlock = protoBlocks.get(index++);
+                    Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
                     if (mat == AIR) {
                         continue;
                     }
-                    blocks[x][y] = mat.createBlock(world, this, x, y);
+                    final Block block = mat.createBlock(world, this, x, y);
+                    block.load(protoBlock);
+                    blocks[x][y] = block;
                 }
             }
         }
+        return true;
     }
 
     @Override

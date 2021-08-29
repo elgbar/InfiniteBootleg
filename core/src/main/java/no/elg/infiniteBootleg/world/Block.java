@@ -2,8 +2,9 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
+import com.google.common.base.Preconditions;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.Dissemble;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class Block implements Dissemble, Disposable, HUDDebuggable {
+public class Block implements Disposable, HUDDebuggable {
 
     public static final int BLOCK_SIZE = 16;
 
@@ -134,9 +135,12 @@ public class Block implements Dissemble, Disposable, HUDDebuggable {
         chunk.setBlock(localX, localY, (Block) null, updateTexture);
     }
 
-    @Override
-    public byte[] disassemble() {
-        return new byte[] {(byte) material.ordinal()};
+    public Proto.Block.Builder save() {
+        return Proto.Block.newBuilder().setMaterialOrdinal(material.ordinal());
+    }
+
+    public void load(Proto.Block protoBlock) {
+        Preconditions.checkArgument(protoBlock.getMaterialOrdinal() == material.ordinal());
     }
 
     @Override

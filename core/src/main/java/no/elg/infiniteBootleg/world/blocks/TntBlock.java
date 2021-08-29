@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -175,6 +176,17 @@ public class TntBlock extends TickingBlock {
     }
 
     @Override
+    public Proto.Block.Builder save() {
+        return super.save().setTnt(Proto.Block.TNT.newBuilder().setTicksLeft(getTicksLeft()));
+    }
+
+    @Override
+    public void load(Proto.Block protoBlock) {
+        super.load(protoBlock);
+        Preconditions.checkArgument(protoBlock.hasTnt());
+        var tnt = protoBlock.getTnt();
+        setTicksLeft(tnt.getTicksLeft());
+    }
 
     @Override
     public @NotNull String hudDebug() {
