@@ -29,8 +29,6 @@ public interface ChunkGenerator {
     int getHeight(int worldX);
 
     /**
-     * This method will call {@link Chunk#finishLoading()} when the chunk is ready to be rendered
-     *
      * @param world
      *     The world to generate the chunk in
      * @param chunkX
@@ -38,7 +36,7 @@ public interface ChunkGenerator {
      * @param chunkY
      *     Y coordinate of chunk in world to generate
      *
-     * @return A chunk at the given offset in the given world
+     * @return A valid chunk at the given offset in the given world
      */
     @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY);
 }

@@ -10,7 +10,6 @@ public class HeadlessWorldRenderer extends WorldRender {
 
     public HeadlessWorldRenderer(@NotNull World world) {
         super(world);
-
     }
 
     @Override
