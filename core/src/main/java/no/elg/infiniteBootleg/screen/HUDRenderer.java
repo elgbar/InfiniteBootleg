@@ -101,9 +101,10 @@ public class HUDRenderer implements Renderer {
         float rawX = Main.inst().getMouseX();
         float rawY = Main.inst().getMouseY();
         boolean exists = block != null;
+        final String blockDebug = block != null ? block.hudDebug() : "";
 
         String format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b %s";
-        return String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, block != null ? block.hudDebug() : "");
+        return String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug);
     }
 
     private String chunk(int mouseBlockX, int mouseBlockY, World world) {
@@ -153,12 +154,13 @@ public class HUDRenderer implements Renderer {
 
         Vector2 velocity = player.getVelocity();
         Vector2 position = player.getPosition();
+        Vector2 physicsPosition = player.getPhysicsPosition();
 
         boolean onGround = player.isOnGround();
         boolean flying = player.isFlying();
 
-        String format = "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) g? %-5b f? %-5b";
-        return String.format(format, position.x, position.y, velocity.x, velocity.y, onGround, flying);
+        String format = "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b f? %-5b";
+        return String.format(format, position.x, position.y, velocity.x, velocity.y, physicsPosition.x, physicsPosition.y, onGround, flying);
     }
 
     public HUDModus getModus() {
