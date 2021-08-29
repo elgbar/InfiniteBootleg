@@ -153,8 +153,9 @@ public class Commands extends CommandExecutor {
             return;
         }
         WorldRender render = Main.inst().getWorld().getRender();
-        render.getCamera().position.x = worldX * Block.BLOCK_SIZE;
-        render.getCamera().position.y = worldY * Block.BLOCK_SIZE;
+        var worldBody = Main.inst().getWorld().getWorldBody();
+        render.getCamera().position.x = worldX * Block.BLOCK_SIZE + worldBody.getWorldOffsetX();
+        render.getCamera().position.y = worldY * Block.BLOCK_SIZE + worldBody.getWorldOffsetY();
         render.update();
         logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY);
 
