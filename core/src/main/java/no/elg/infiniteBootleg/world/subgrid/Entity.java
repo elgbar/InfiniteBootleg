@@ -73,21 +73,16 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
 
         if (isInvalidLocation(posCache.x, posCache.y)) {
             switch (invalidSpawnLocationAction()) {
-                case DELETE -> { return; }
+                case DELETE -> {
+                    Main.logger().debug("Entity",
+                                        String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", simpleName(), posCache.x, posCache.y));
+                    return;
+                }
                 case PUSH_UP -> {
-                    //teleport entity upwards till we find a valid location
-                    boolean print = true;
                     //make sure we're not stuck in an infinite loop if the given height is zero
-                    float checkStep = getHalfBox2dHeight() < 0.1f ? getHalfBox2dHeight() : 0.1f;
+                    float checkStep = Math.min(getHalfBox2dHeight(), 0.1f);
                     while (isInvalidLocation(posCache.x, posCache.y)) {
-                        if (print) {
-                            Main.logger().debug("Entity", //
-                                                String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", //
-                                                              simpleName(), posCache.x, posCache.y));
-                            print = false;
-                        }
                         posCache.y += checkStep;
-
                     }
                 }
             }
