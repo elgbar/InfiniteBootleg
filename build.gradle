@@ -12,7 +12,7 @@ def getGitVersion() {
 
 buildscript {
   ext {
-    kotlin_version = "1.5.21"
+    kotlin_version = "1.5.30"
     appName = "InfiniteBootleg"
     gdxVersion = '1.10.0'
     roboVMVersion = '2.3.6'
@@ -94,21 +94,21 @@ project(":core") {
 
   dependencies {
 
-    api "com.strongjoshua:libgdx-inGameConsole:1.0.0"
-    api "org.apache.commons:commons-lang3:3.8.1"
-    api "no.kh498.util:CommonUtil:1.0.4"
+    implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
+    implementation "org.apache.commons:commons-lang3:3.12.0"
+    implementation "no.kh498.util:CommonUtil:1.0.4"
 
-    api "com.badlogicgames.gdx:gdx:$gdxVersion"
-    api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-    api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-    api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    implementation "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
 
-    api "com.kotcrab.vis:vis-ui:$visVersion"
-    api 'com.google.guava:guava:28.0-jre'
-    api group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation "com.kotcrab.vis:vis-ui:$visVersion"
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'org.apache.commons:commons-collections4:4.4'
 
-    implementation 'org.jetbrains:annotations:18.0.0'
+    implementation 'org.jetbrains:annotations:22.0.0'
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testImplementation 'junit:junit:4.+'
