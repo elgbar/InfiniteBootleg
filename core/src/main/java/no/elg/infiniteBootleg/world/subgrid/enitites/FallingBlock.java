@@ -49,7 +49,7 @@ public class FallingBlock extends Entity {
         if (!crashed && type == ContactType.BEGIN_CONTACT) {
             crashed = true;
 
-            Main.inst().getScheduler().executeAsync(() -> {
+            Main.inst().getScheduler().executeSync(() -> {
                 World world = getWorld();
                 int newX = getBlockX();
                 int newY = getBlockY();
