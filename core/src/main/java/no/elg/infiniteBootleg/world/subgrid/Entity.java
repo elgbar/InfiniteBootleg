@@ -68,8 +68,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             return;
         }
         Preconditions.checkArgument(protoEntity.getType() == getEntityType());
-        flying = protoEntity.getFlying();
-
+        if (protoEntity.getFlying()) {
+            setFlying(true);
+        }
         final Proto.Vector2f velocity = protoEntity.getVelocity();
         synchronized (BOX2D_LOCK) {
             getBody().setLinearVelocity(velocity.getX(), velocity.getY());
@@ -617,6 +618,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
                 builder.setType(getEntityType());
                 builder.setPosition(Proto.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
                 builder.setVelocity(Proto.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
+                builder.setFlying(flying);
                 return builder;
             }
         }
