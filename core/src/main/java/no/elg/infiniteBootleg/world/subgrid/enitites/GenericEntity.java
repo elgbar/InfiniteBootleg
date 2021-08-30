@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import java.util.UUID;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -16,6 +18,10 @@ public class GenericEntity extends Entity implements Removable {
     private int width;
     private int height;
 
+    public GenericEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+        super(world, protoEntity);
+    }
+
     public GenericEntity(@NotNull World world, float worldX, float worldY) {
         this(world, worldX, worldY, 1, 1);
     }
@@ -26,7 +32,7 @@ public class GenericEntity extends Entity implements Removable {
 
     public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height, @NotNull Filter filter) {
         //Cannot center as the width and height will be 0 anyway
-        super(world, worldX, worldY, false);
+        super(world, worldX, worldY, false, UUID.randomUUID());
         if (isInvalid()) {
             return;
         }
@@ -67,5 +73,10 @@ public class GenericEntity extends Entity implements Removable {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    protected @NotNull Proto.Entity.EntityType getEntityType() {
+        return Proto.Entity.EntityType.GENERIC_ENTITY;
     }
 }

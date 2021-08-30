@@ -44,7 +44,7 @@ public class Main extends ApplicationAdapter {
     public static final String VERSION_FILE = "version";
     public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
 
-    private static final Object INST_LOCK = new Object();
+    public static final Object INST_LOCK = new Object();
     private static Main inst;
 
     private final InputMultiplexer inputMultiplexer;
@@ -237,17 +237,19 @@ public class Main extends ApplicationAdapter {
 
     @Nullable
     public Player getPlayer() {
-        if (mainPlayer == null || mainPlayer.isInvalid()) {
-            for (LivingEntity entity : world.getLivingEntities()) {
-                if (entity instanceof Player player) {
-                    mainPlayer = player;
-                    return mainPlayer;
+        synchronized (INST_LOCK) {
+            if (mainPlayer == null || mainPlayer.isInvalid()) {
+                for (LivingEntity entity : world.getLivingEntities()) {
+                    if (entity instanceof Player player && player.getControls() != null) {
+                        mainPlayer = player;
+                        return mainPlayer;
+                    }
                 }
+                return null;
             }
-            return null;
-        }
-        else {
-            return mainPlayer;
+            else {
+                return mainPlayer;
+            }
         }
     }
 

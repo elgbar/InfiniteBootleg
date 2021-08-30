@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.util.concurrent.atomic.AtomicInteger;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
@@ -36,12 +37,18 @@ public class Door extends MaterialEntity {
 
     private final AtomicInteger contacts = new AtomicInteger();
 
+    public Door(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+        super(world, protoEntity);
+    }
+
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
         if (isInvalid()) {
             return;
         }
+    }
 
+    {
         if (Settings.renderGraphic) {
             openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
             closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
@@ -49,14 +56,14 @@ public class Door extends MaterialEntity {
         synchronized (BOX2D_LOCK) {
             //Wake up all bodies to get an accurate contacts count
             final Vector2 position = getBody().getPosition();
-            world.getWorldBody().getBox2dWorld().QueryAABB(fixture -> {
+            getWorld().getWorldBody().getBox2dWorld().QueryAABB(fixture -> {
                 fixture.getBody().setAwake(true);
                 return true;
             }, position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2);
         }
-
     }
 
+    @NotNull
     @Override
     public Material getMaterial() {
         return Material.DOOR;
@@ -121,4 +128,5 @@ public class Door extends MaterialEntity {
     public int getHeight() {
         return 4 * BLOCK_SIZE;
     }
+
 }

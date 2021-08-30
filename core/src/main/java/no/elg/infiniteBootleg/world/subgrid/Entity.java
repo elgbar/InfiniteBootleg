@@ -18,16 +18,20 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.blocks.EntityBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
@@ -55,12 +59,29 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     private int groundContacts;
     private Filter filter;
 
-    public Entity(@NotNull World world, float worldX, float worldY) {
-        this(world, worldX, worldY, true);
+    private volatile boolean valid = true;
+
+
+    public Entity(@NotNull World world, @NotNull Proto.Entity protoEntity) {
+        this(world, protoEntity.getPosition().getX(), protoEntity.getPosition().getY(), UUID.fromString(protoEntity.getUuid()));
+        if (isInvalid()) {
+            return;
+        }
+        Preconditions.checkArgument(protoEntity.getType() == getEntityType());
+        flying = protoEntity.getFlying();
+
+        final Proto.Vector2f velocity = protoEntity.getVelocity();
+        synchronized (BOX2D_LOCK) {
+            getBody().setLinearVelocity(velocity.getX(), velocity.getY());
+        }
     }
 
-    public Entity(@NotNull World world, float worldX, float worldY, boolean center) {
-        uuid = UUID.randomUUID();
+    public Entity(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
+        this(world, worldX, worldY, true, uuid);
+    }
+
+    public Entity(@NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
+        this.uuid = uuid;
         this.world = world;
         flying = false;
         posCache = new Vector2(worldX, worldY);
@@ -71,30 +92,40 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
         }
 
-        if (isInvalidLocation(posCache.x, posCache.y)) {
-            switch (invalidSpawnLocationAction()) {
-                case DELETE -> {
-                    Main.logger().debug("Entity",
-                                        String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", simpleName(), posCache.x, posCache.y));
-                    return;
-                }
-                case PUSH_UP -> {
-                    //make sure we're not stuck in an infinite loop if the given height is zero
-                    float checkStep = Math.min(getHalfBox2dHeight(), 0.1f);
-                    while (isInvalidLocation(posCache.x, posCache.y)) {
-                        posCache.y += checkStep;
-                    }
-                }
-            }
-        }
-
         synchronized (BOX2D_LOCK) {
             BodyDef def = createBodyDef(posCache.x, posCache.y);
             body = world.getWorldBody().createBody(def);
             createFixture(body);
             body.setGravityScale(2f);
         }
-        Main.inst().getScheduler().scheduleAsync(() -> world.addEntity(this), 1L);
+        Main.inst().getScheduler().scheduleAsync(() -> {
+
+            updatePos();
+            if (isInvalidLocation(posCache.x, posCache.y)) {
+                switch (invalidSpawnLocationAction()) {
+                    case DELETE -> {
+                        Main.logger().debug("Entity",
+                                            String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", simpleName(), posCache.x, posCache.y));
+                        dispose();
+                        return;
+                    }
+                    case PUSH_UP -> {
+                        //make sure we're not stuck in an infinite loop if the given height is zero
+                        float checkStep = Math.min(getHalfBox2dHeight(), 0.1f);
+                        Vector2 tmpPos = posCache.cpy();
+                        while (isInvalidLocation(tmpPos.x, tmpPos.y)) {
+                            tmpPos.y += checkStep;
+                        }
+
+                        synchronized (BOX2D_LOCK) {
+                            body.setTransform(tmpPos, 0f);
+                            posCache.y = tmpPos.y;
+                        }
+                    }
+                }
+            }
+            world.addEntity(this);
+        }, 1L);
     }
 
     /**
@@ -300,9 +331,11 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             int y = MathUtils.floor(worldY - getHalfBox2dHeight());
             float maxY = worldY + getHalfBox2dHeight();
             for (; y < maxY; y++) {
-                if (!world.isAirBlock(x, y)) {
-                    return false;
+                var block = world.getBlock(x, y, true);
+                if (block == null || block.getMaterial() == Material.AIR || (block instanceof EntityBlock entityBlock && entityBlock.getEntity() == this)) {
+                    continue;
                 }
+                return false;
             }
         }
         return true;
@@ -565,6 +598,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
                     Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
                     return;
                 }
+                valid = false;
                 world.getWorldBody().destroyBody(body);
                 body = null;
                 if (this instanceof Removable removable) {
@@ -574,8 +608,25 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         }
     }
 
+    public Proto.Entity.Builder save() {
+        synchronized (BOX2D_LOCK) {
+            synchronized (this) {
+                updatePos();
+                final Proto.Entity.Builder builder = Proto.Entity.newBuilder();
+                builder.setUuid(uuid.toString());
+                builder.setType(getEntityType());
+                builder.setPosition(Proto.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
+                builder.setVelocity(Proto.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
+                return builder;
+            }
+        }
+    }
+
+    @NotNull
+    protected abstract Proto.Entity.EntityType getEntityType();
+
     public boolean isInvalid() {
-        return body == null;
+        return !valid;
     }
 
     @Override

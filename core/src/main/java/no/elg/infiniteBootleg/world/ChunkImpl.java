@@ -29,6 +29,9 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
+import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -538,6 +541,9 @@ public class ChunkImpl implements Chunk {
         for (Block block : this) {
             builder.addBlocks(block.save());
         }
+        for (Entity entity : getEntities()) {
+            builder.addEntities(entity.save());
+        }
         return builder.build().toByteArray();
     }
 
@@ -566,7 +572,7 @@ public class ChunkImpl implements Chunk {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
                     var protoBlock = protoBlocks.get(index++);
                     Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
-                    if (mat == AIR) {
+                    if (mat == AIR || mat.isEntity()) {
                         continue;
                     }
                     final Block block = mat.createBlock(world, this, x, y);
@@ -575,6 +581,28 @@ public class ChunkImpl implements Chunk {
                 }
             }
         }
+
+        Main.inst().getScheduler().executeSync(() -> {
+
+            for (Proto.Entity protoEntity : protoChunk.getEntitiesList()) {
+                switch (protoEntity.getType()) {
+                    case GENERIC_ENTITY -> new GenericEntity(world, protoEntity);
+                    case FALLING_BLOCK -> new FallingBlock(world, protoEntity);
+                    case PLAYER -> new Player(world, protoEntity);
+                    case BLOCK -> {
+                        Preconditions.checkArgument(protoEntity.hasBlock());
+                        final Proto.Entity.BlockEntity entityBlock = protoEntity.getBlock();
+                        final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
+                        material.createEntity(world, protoEntity);
+                    }
+                    case UNRECOGNIZED -> {
+                        Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
+                        return;
+                    }
+                }
+            }
+        });
+
         return true;
     }
 

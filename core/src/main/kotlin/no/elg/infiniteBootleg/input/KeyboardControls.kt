@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -112,7 +113,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
       if (!controlled.validLocation(controlled.position.x + GROUND_CHECK_OFFSET * dir, controlled.position.y)) {
         return
       }
-      synchronized(WorldRender.BOX2D_LOCK) {
+      synchronized(BOX2D_LOCK) {
 
         val body = controlled.body
 
@@ -144,6 +145,14 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     }
   }
 
+  private fun updateTorch(player: Player) {
+    val angle: Float = tmpVec.set(Main.inst().mouse).sub(player.position).angleDeg()
+    synchronized(WorldRender.LIGHT_LOCK) {
+      val torchLight = player.torchLight
+      torchLight.direction = angle
+    }
+  }
+
   override fun update() {
     if (Main.inst().console.isVisible) {
       return
@@ -166,13 +175,18 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
         walk()
       }
     }
+
+    if (controlled is Player) {
+      updateTorch(controlled as Player)
+    }
+
     if (update) {
       worldRender.update()
     }
   }
 
   private fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-    synchronized(WorldRender.BOX2D_LOCK) {
+    synchronized(BOX2D_LOCK) {
       val body = controlled.body
       val vel = body.linearVelocity
       val (nx, ny) = modify(vel.x, vel.y)

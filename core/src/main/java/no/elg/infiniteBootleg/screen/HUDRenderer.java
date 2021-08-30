@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -60,8 +61,9 @@ public class HUDRenderer implements Renderer {
             sr.begin();
         }
         if (player != null) {
-            Material mat = player.getControls().getSelected();
-            if (mat.getTextureRegion() != null) {
+            final EntityControls controls = player.getControls();
+            Material mat = controls != null ? controls.getSelected() : null;
+            if (mat != null && mat.getTextureRegion() != null) {
                 sr.getBatch().draw(mat.getTextureRegion(), Gdx.graphics.getWidth() - BLOCK_SIZE * 3f * SCALE, h - BLOCK_SIZE * 3f * SCALE,
                                    BLOCK_SIZE * 2f * SCALE, BLOCK_SIZE * 2f * SCALE);
             }

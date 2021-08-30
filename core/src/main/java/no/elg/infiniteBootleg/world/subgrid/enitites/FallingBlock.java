@@ -9,7 +9,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.google.common.base.Preconditions;
+import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
@@ -26,8 +29,18 @@ public class FallingBlock extends Entity {
 
     private volatile boolean crashed;
 
+    public FallingBlock(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+        super(world, protoEntity);
+
+        Preconditions.checkArgument(protoEntity.hasFallingBlock());
+        final Proto.Entity.FallingBlock protoFallingBlock = protoEntity.getFallingBlock();
+
+        material = Material.fromOrdinal(protoFallingBlock.getMaterialOrdinal());
+        region = new TextureRegion(material.getTextureRegion());
+    }
+
     public FallingBlock(@NotNull World world, float worldX, float worldY, @NotNull Material material) {
-        super(world, worldX + 0.5f, worldY + 0.5f, false);
+        super(world, worldX + 0.5f, worldY + 0.5f, false, UUID.randomUUID());
         this.material = material;
         region = new TextureRegion(material.getTextureRegion());
     }
@@ -99,7 +112,6 @@ public class FallingBlock extends Entity {
     @Override
     public void tickRare() {
         //Unload this entity if it entered an unloaded chunk
-        //TODO do not _remove_ this entity, just save it to the unloaded chunk
         int chunkX = CoordUtil.worldToChunk(getBlockX());
         int chunkY = CoordUtil.worldToChunk(getBlockY());
 
@@ -107,5 +119,17 @@ public class FallingBlock extends Entity {
         if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
             Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
         }
+    }
+
+    @Override
+    protected @NotNull Proto.Entity.EntityType getEntityType() {
+        return Proto.Entity.EntityType.FALLING_BLOCK;
+    }
+
+    @Override
+    public Proto.Entity.Builder save() {
+        final Proto.Entity.Builder builder = super.save();
+        builder.setFallingBlock(Proto.Entity.FallingBlock.newBuilder().setMaterialOrdinal(material.ordinal()).build());
+        return builder;
     }
 }

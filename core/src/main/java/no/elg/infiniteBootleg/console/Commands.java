@@ -256,8 +256,13 @@ public class Commands extends CommandExecutor {
             return;
         }
         EntityControls controls = Main.inst().getPlayer().getControls();
-        logger.logf(LogLevel.SUCCESS, "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing", controls.getBreakBrushSize(),
-                    controls.getPlaceBrushSize());
+        if (controls == null) {
+            logger.error("CMD", "The main player does not have any controls");
+        }
+        else {
+            logger.logf(LogLevel.SUCCESS, "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing", controls.getBreakBrushSize(),
+                        controls.getPlaceBrushSize());
+        }
     }
 
     @CmdArgNames({"type", "size"})
@@ -271,6 +276,10 @@ public class Commands extends CommandExecutor {
             return;
         }
         EntityControls controls = Main.inst().getPlayer().getControls();
+        if (controls == null) {
+            logger.error("CMD", "The main player does not have any controls");
+            return;
+        }
 
         if ("break".equalsIgnoreCase(type)) {
             controls.setBreakBrushSize(size);

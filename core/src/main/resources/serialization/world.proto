@@ -27,8 +27,8 @@ message Vector2f{
 }
 
 message Vector2i{
-  int32 x = 1;
-  int32 y = 2;
+  sint32 x = 1;
+  sint32 y = 2;
 }
 
 message Entity {
@@ -36,18 +36,37 @@ message Entity {
   Vector2f position = 2;
   Vector2f velocity = 3;
   string uuid = 4;
-
-  optional Living living = 16;
-  message Living{
-    string name = 1;
-    string hp = 2;
-    //    string max_hp = 3; //TODO
-  }
+  bool flying = 5;
 
   enum EntityType{
     GENERIC_ENTITY = 0; // default
     FALLING_BLOCK = 1;
-    DOOR = 2;
+    BLOCK = 2;
     PLAYER = 16;
   }
+
+  optional Living living = 16;
+  optional FallingBlock fallingBlock = 17;
+  optional BlockEntity block = 18;
+  optional Player player = 19;
+
+  message Living{
+    string name = 1;
+    int32 health = 2;
+    int32 max_health = 3;
+  }
+
+  message FallingBlock{
+    int32 material_ordinal = 1; //ordinal from Material enum
+  }
+
+  message BlockEntity{
+    Vector2i position = 1;
+    int32 material_ordinal = 2; //ordinal from Material enum
+  }
+
+  message Player{
+    float torch_angle_deg = 1;
+  }
+
 }

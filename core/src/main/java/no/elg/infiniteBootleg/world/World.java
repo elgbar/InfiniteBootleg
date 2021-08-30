@@ -170,9 +170,10 @@ public class World implements Disposable, Resizable {
     public void load() {
         if (Settings.renderGraphic) {
             Gdx.app.postRunnable(() -> {
-                WorldInputHandler input = getInput();
-                if (input != null) {
-                    input.setFollowing(new Player(this));
+                WorldInputHandler inputHandler = getInput();
+                if (inputHandler != null) {
+                    var player = Main.inst().getPlayer();
+                    inputHandler.setFollowing(player != null ? player : new Player(this, 0, 0));
                 }
             });
         }
@@ -246,6 +247,7 @@ public class World implements Disposable, Resizable {
     public Chunk getChunk(@NotNull Location chunkLoc) {
         Chunk chunk = chunks.get(chunkLoc);
         if (chunk == null || !chunk.isLoaded()) {
+
             if (getWorldTicker().isPaused()) {
                 return null;
             }
@@ -255,7 +257,7 @@ public class World implements Disposable, Resizable {
         }
         return chunk;
     }
-
+    
     /**
      * Set a block at a given location and update the textures
      *
