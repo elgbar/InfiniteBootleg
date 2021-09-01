@@ -173,7 +173,7 @@ public enum Material {
     }
 
     @Nullable
-    public MaterialEntity createEntity(@NotNull World world, @NotNull Proto.Entity protoEntity) {
+    public MaterialEntity createEntity(@NotNull World world, @NotNull Proto.Entity protoEntity, @NotNull Chunk chunk) {
         Preconditions.checkArgument(itemType == ItemType.ENTITY);
         Preconditions.checkNotNull(constructorProtoBuf, "Constructor of entity cannot be null");
         MaterialEntity entity;
@@ -182,7 +182,7 @@ public enum Material {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException(e);
         }
-        return commonEntity(world, entity);
+        return commonEntity(world, entity, chunk);
     }
 
     @Nullable
@@ -196,23 +196,30 @@ public enum Material {
             throw new IllegalStateException(e);
         }
 
-        return commonEntity(world, entity);
+        return commonEntity(world, entity, null);
     }
 
-    private MaterialEntity commonEntity(@NotNull World world, @NotNull MaterialEntity entity) {
-
+    @Nullable
+    private MaterialEntity commonEntity(@NotNull World world, @NotNull MaterialEntity entity, @Nullable Chunk chunk) {
         if (entity.isInvalid()) { return null; }
         final ObjectSet<Location> locations = entity.touchingLocations();
         for (Location location : locations) {
-            var chunk = world.getChunkFromWorld(location);
-            if (chunk == null) {
+            Chunk locChunk;
+            if (chunk != null && CoordUtil.worldToChunk(location.x) == chunk.getChunkX() && CoordUtil.worldToChunk(location.y) == chunk.getChunkY()) {
+                locChunk = chunk;
+            }
+            else {
+                locChunk = world.getChunkFromWorld(location);
+            }
+            
+            if (locChunk == null) {
                 Main.logger().error("MATERIAL", "Failed get chunk for entity block");
                 continue;
             }
             final int localX = CoordUtil.chunkOffset(location.x);
             final int localY = CoordUtil.chunkOffset(location.y);
-            var block = new EntityBlock(world, chunk, localX, localY, this, entity);
-            chunk.setBlock(localX, localY, block, false);
+            var block = new EntityBlock(world, locChunk, localX, localY, this, entity);
+            locChunk.setBlock(localX, localY, block, false);
         }
         return entity;
     }

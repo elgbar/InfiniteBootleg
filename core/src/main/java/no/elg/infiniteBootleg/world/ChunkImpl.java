@@ -596,27 +596,23 @@ public class ChunkImpl implements Chunk {
             }
         }
 
-        Main.inst().getScheduler().executeSync(() -> {
-
-            for (Proto.Entity protoEntity : protoChunk.getEntitiesList()) {
-                switch (protoEntity.getType()) {
-                    case GENERIC_ENTITY -> new GenericEntity(world, protoEntity);
-                    case FALLING_BLOCK -> new FallingBlock(world, protoEntity);
-                    case PLAYER -> new Player(world, protoEntity);
-                    case BLOCK -> {
-                        Preconditions.checkArgument(protoEntity.hasBlock());
-                        final Proto.Entity.BlockEntity entityBlock = protoEntity.getBlock();
-                        final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
-                        material.createEntity(world, protoEntity);
-                    }
-                    case UNRECOGNIZED -> {
-                        Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
-                        return;
-                    }
+        for (Proto.Entity protoEntity : protoChunk.getEntitiesList()) {
+            switch (protoEntity.getType()) {
+                case GENERIC_ENTITY -> new GenericEntity(world, protoEntity);
+                case FALLING_BLOCK -> new FallingBlock(world, protoEntity);
+                case PLAYER -> new Player(world, protoEntity);
+                case BLOCK -> {
+                    Preconditions.checkArgument(protoEntity.hasMaterial());
+                    final Proto.Entity.Material entityBlock = protoEntity.getMaterial();
+                    final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
+                    material.createEntity(world, protoEntity, this);
+                }
+                case UNRECOGNIZED -> {
+                    Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
+                    continue;
                 }
             }
-        });
-
+        }
         return true;
     }
 
