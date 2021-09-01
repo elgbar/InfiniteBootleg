@@ -67,6 +67,7 @@ message Entity {
 
   message Player{
     float torch_angle_deg = 1;
+    bool controlled = 2;
   }
 
 }

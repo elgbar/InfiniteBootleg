@@ -40,7 +40,9 @@ public class Player extends LivingEntity {
         Preconditions.checkArgument(protoEntity.hasPlayer(), "Player does not contain player data");
         final Proto.Entity.Player protoPlayer = protoEntity.getPlayer();
         setTorchAngle(protoPlayer.getTorchAngleDeg());
+        if (protoPlayer.getControlled()) {
             Main.inst().setPlayer(this, false);
+        }
     }
 
     public Player(@NotNull World world, float worldX, float worldY) {
@@ -111,6 +113,7 @@ public class Player extends LivingEntity {
         final Proto.Entity.Player.Builder playerBuilder = Proto.Entity.Player.newBuilder();
 
         playerBuilder.setTorchAngleDeg(torchLight.getDirection());
+        playerBuilder.setControlled(hasControls());
 
         builder.setPlayer(playerBuilder.build());
         return builder;
