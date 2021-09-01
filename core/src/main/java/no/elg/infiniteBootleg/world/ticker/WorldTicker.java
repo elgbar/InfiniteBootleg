@@ -61,7 +61,7 @@ public class WorldTicker extends Ticker {
                 Entity entity = iterator.next();
 
                 if (entity.isInvalid()) {
-                    Main.logger().debug("WORLD", "Invalid entity in world entities");
+                    Main.logger().debug("WORLD", "Invalid entity in world entities (" + entity.simpleName() + ": " + entity.hudDebug() + ")");
                     world.removeEntity(entity);
                     continue;
                 }

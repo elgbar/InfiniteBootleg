@@ -98,6 +98,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             body = world.getWorldBody().createBody(def);
             createFixture(body);
             body.setGravityScale(2f);
+            body.setUserData(this);
         }
         Main.inst().getScheduler().scheduleAsync(() -> {
 
