@@ -19,9 +19,6 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
     public LivingEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
         super(world, protoEntity);
-        if (isInvalid()) {
-            return;
-        }
         Preconditions.checkArgument(protoEntity.hasLiving(), "Living entity does not contain living data");
         final Proto.Entity.Living protoLiving = protoEntity.getLiving();
         name = protoLiving.getName();
@@ -40,6 +37,11 @@ public abstract class LivingEntity extends Entity implements Updatable {
             controls.update();
         }
     }
+
+    /**
+     * @return If this entity currently has controls
+     */
+    public abstract boolean hasControls();
 
     public int getHealth() {
         return health;
@@ -86,7 +88,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
     @Override
     public @NotNull String hudDebug() {
-        return "Name: " + getName() + " hp: " + getHealth() + "/" + maxHealth;
+        return "Name: " + getName() + " hp: " + getHealth() + "/" + maxHealth + " has controls: " + hasControls() + " id: " + getUuid();
     }
 
     @Override
