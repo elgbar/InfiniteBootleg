@@ -14,15 +14,11 @@ public abstract class MaterialEntity extends Entity implements Removable {
         super(world, protoEntity);
         Preconditions.checkArgument(protoEntity.getType() == Proto.Entity.EntityType.BLOCK);
 
-        Preconditions.checkArgument(protoEntity.hasBlock());
-        final Proto.Entity.BlockEntity entityBlock = protoEntity.getBlock();
+        Preconditions.checkArgument(protoEntity.hasMaterial());
+        final Proto.Entity.Material entityBlock = protoEntity.getMaterial();
 
         final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
         Preconditions.checkArgument(material == getMaterial(), "Different materials");
-
-        final Proto.Vector2i blockPosition = entityBlock.getPosition();
-        teleport(blockPosition.getX(), blockPosition.getY(), false);
-
     }
 
     public MaterialEntity(@NotNull World world, float worldX, float worldY) {
@@ -53,10 +49,11 @@ public abstract class MaterialEntity extends Entity implements Removable {
     @Override
     public Proto.Entity.Builder save() {
         final Proto.Entity.Builder builder = super.save();
-        final Proto.Entity.BlockEntity.Builder blockBuilder = Proto.Entity.BlockEntity.newBuilder();
-        blockBuilder.setMaterialOrdinal(getMaterial().ordinal());
-        blockBuilder.setPosition(Proto.Vector2i.newBuilder().setX(getBlockX()).setY(getBlockY()).build());
-        builder.setBlock(blockBuilder.build());
+        final Proto.Entity.Material.Builder materialBuilder = Proto.Entity.Material.newBuilder();
+
+        materialBuilder.setMaterialOrdinal(getMaterial().ordinal());
+
+        builder.setMaterial(materialBuilder.build());
         return builder;
     }
 

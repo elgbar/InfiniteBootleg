@@ -32,10 +32,10 @@ public class FallingBlock extends Entity {
     public FallingBlock(@NotNull World world, Proto.@NotNull Entity protoEntity) {
         super(world, protoEntity);
 
-        Preconditions.checkArgument(protoEntity.hasFallingBlock());
-        final Proto.Entity.FallingBlock protoFallingBlock = protoEntity.getFallingBlock();
+        Preconditions.checkArgument(protoEntity.hasMaterial());
+        final Proto.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
 
-        material = Material.fromOrdinal(protoFallingBlock.getMaterialOrdinal());
+        material = Material.fromOrdinal(protoEntityMaterial.getMaterialOrdinal());
         region = new TextureRegion(material.getTextureRegion());
     }
 
@@ -115,7 +115,7 @@ public class FallingBlock extends Entity {
         int chunkX = CoordUtil.worldToChunk(getBlockX());
         int chunkY = CoordUtil.worldToChunk(getBlockY());
 
-        //remove entity if the it no longer falling and have not become a true block for some reason
+        //remove entity if it no longer falling and have not become a true block for some reason
         if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
             Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
         }
@@ -129,7 +129,11 @@ public class FallingBlock extends Entity {
     @Override
     public Proto.Entity.Builder save() {
         final Proto.Entity.Builder builder = super.save();
-        builder.setFallingBlock(Proto.Entity.FallingBlock.newBuilder().setMaterialOrdinal(material.ordinal()).build());
+        final Proto.Entity.Material.Builder materialBuilder = Proto.Entity.Material.newBuilder();
+
+        materialBuilder.setMaterialOrdinal(material.ordinal());
+
+        builder.setMaterial(materialBuilder.build());
         return builder;
     }
 }

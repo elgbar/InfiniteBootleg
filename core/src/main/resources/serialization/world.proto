@@ -46,9 +46,8 @@ message Entity {
   }
 
   optional Living living = 16;
-  optional FallingBlock fallingBlock = 17;
-  optional BlockEntity block = 18;
-  optional Player player = 19;
+  optional Material material = 17;
+  optional Player player = 18;
 
   message Living{
     string name = 1;
@@ -56,13 +55,8 @@ message Entity {
     int32 max_health = 3;
   }
 
-  message FallingBlock{
+  message Material{
     int32 material_ordinal = 1; //ordinal from Material enum
-  }
-
-  message BlockEntity{
-    Vector2i position = 1;
-    int32 material_ordinal = 2; //ordinal from Material enum
   }
 
   message Player{
