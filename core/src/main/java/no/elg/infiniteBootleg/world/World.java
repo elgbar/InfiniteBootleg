@@ -581,6 +581,9 @@ public class World implements Disposable, Resizable {
                 worldBody.destroyBody(body);
             }
         }
+
+        render.reload();
+
         load();
 
         if (wasNotPaused) {

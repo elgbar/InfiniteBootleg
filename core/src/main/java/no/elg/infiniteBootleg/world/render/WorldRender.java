@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
+import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -312,6 +313,17 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
 
     public World getWorld() {
         return world;
+    }
+
+    public void reload() {
+        synchronized (BOX2D_LOCK) {
+            synchronized (LIGHT_LOCK) {
+                PointLightPool.inst.clear();
+                rayHandler.removeAll();
+                skylight = null; //do not dispose skylight, it has already been disposed here
+                resetSkylight();
+            }
+        }
     }
 
     public static final class ChunkViewed {
