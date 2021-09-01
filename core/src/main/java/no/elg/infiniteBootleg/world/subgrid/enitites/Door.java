@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.World.BLOCK_ENTITY_FILTER;
 import static no.elg.infiniteBootleg.world.World.TRANSPARENT_BLOCK_ENTITY_FILTER;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -20,6 +19,7 @@ import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +32,8 @@ public class Door extends MaterialEntity {
     public static final String OPEN_DOOR_REGION_NAME = "door_open";
     public static final String CLOSED_DOOR_REGION_NAME = "door_closed";
 
-    private TextureRegion openDoorRegion;
-    private TextureRegion closedDoorRegion;
+    private static final TextureRegion openDoorRegion;
+    private static final TextureRegion closedDoorRegion;
 
     private final AtomicInteger contacts = new AtomicInteger();
 
@@ -43,24 +43,31 @@ public class Door extends MaterialEntity {
 
     public Door(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY);
-        if (isInvalid()) {
-            return;
-        }
     }
 
-    {
+    static {
         if (Settings.renderGraphic) {
             openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
             closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
         }
-        synchronized (BOX2D_LOCK) {
-            //Wake up all bodies to get an accurate contacts count
-            final Vector2 position = getBody().getPosition();
-            getWorld().getWorldBody().getBox2dWorld().QueryAABB(fixture -> {
-                fixture.getBody().setAwake(true);
-                return true;
-            }, position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2);
+        else {
+            openDoorRegion = null;
+            closedDoorRegion = null;
         }
+    }
+
+    {
+        //Wake up all bodies to get an accurate contacts count
+        final Vector2 position = getBody().getPosition();
+        final WorldBody worldBody = getWorld().getWorldBody();
+        worldBody.queryAABB(position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2, fixture -> {
+            final Body body = fixture.getBody();
+            if (body != null && body.getUserData() != this) {
+                System.out.println("Found fixture" + body.getUserData());
+                body.setAwake(true);
+            }
+            return true;
+        });
     }
 
     @NotNull

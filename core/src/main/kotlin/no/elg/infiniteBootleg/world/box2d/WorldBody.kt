@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.Array
 import kotlin.math.abs
 import no.elg.infiniteBootleg.Main
@@ -66,10 +67,10 @@ class WorldBody(private val world: World) : Ticking {
     }
     synchronized(BOX2D_LOCK) {
       require(!box2dWorld.isLocked) {
-        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async"
+        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
       }
       if (!body.isActive) {
-        Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash")
+        Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
       }
       box2dWorld.destroyBody(body)
     }
@@ -138,6 +139,15 @@ class WorldBody(private val world: World) : Ticking {
       //test logic only, move to world render when possible
       world.render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
       world.render.update()
+    }
+  }
+
+  /**
+   * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
+   */
+  fun queryAABB(worldX: Float, worldY: Float, worldWidth: Float, worldHeight: Float, callback: ((Fixture) -> Boolean)) {
+    synchronized(BOX2D_LOCK) {
+      box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
     }
   }
 
