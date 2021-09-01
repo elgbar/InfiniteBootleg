@@ -163,8 +163,6 @@ public class World implements Disposable, Resizable {
         else {
             render = new HeadlessWorldRenderer(this);
         }
-
-        load();
     }
 
     public void load() {

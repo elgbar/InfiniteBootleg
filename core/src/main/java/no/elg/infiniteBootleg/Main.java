@@ -142,6 +142,7 @@ public class Main extends ApplicationAdapter {
         }
 
         world = new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, !test);
+        world.load();
     }
 
     @Override
