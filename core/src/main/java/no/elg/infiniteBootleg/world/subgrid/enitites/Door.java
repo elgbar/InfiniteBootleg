@@ -108,6 +108,11 @@ public class Door extends MaterialEntity {
                 setFilter(BLOCK_ENTITY_FILTER);
             }
         }
+        final int cont = contacts.get();
+        if (cont < 0) {
+            Main.inst().getConsoleLogger().error("DOOR", "Negative contacts! (" + cont + ")");
+            contacts.set(0);
+        }
     }
 
     @Override
