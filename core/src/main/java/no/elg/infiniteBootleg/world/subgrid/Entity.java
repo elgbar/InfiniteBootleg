@@ -560,12 +560,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     }
 
     public void setFlying(boolean flying) {
-        this.flying = flying;
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 if (isInvalid()) {
                     return;
                 }
+                this.flying = flying;
                 if (flying) {
                     body.setLinearVelocity(0, 0);
                     body.setGravityScale(0);
