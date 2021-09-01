@@ -63,7 +63,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
 
 
     public Entity(@NotNull World world, @NotNull Proto.Entity protoEntity) {
-        this(world, protoEntity.getPosition().getX(), protoEntity.getPosition().getY(), UUID.fromString(protoEntity.getUuid()));
+        this(world, protoEntity.getPosition().getX(), protoEntity.getPosition().getY(), false, UUID.fromString(protoEntity.getUuid()));
         if (isInvalid()) {
             return;
         }
