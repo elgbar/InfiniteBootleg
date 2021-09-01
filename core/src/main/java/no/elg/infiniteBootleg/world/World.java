@@ -653,6 +653,17 @@ public class World implements Disposable, Resizable {
      *     The entity to add
      */
     public void addEntity(@NotNull Entity entity) {
+        if (entities.stream().anyMatch(it -> it == entity)) {
+            Main.logger().error("World", "Tried to add entity twice to world " + entity.hudDebug());
+            entity.dispose();
+            return;
+        }
+        if (entities.stream().anyMatch(it -> it.getUuid().equals(entity.getUuid()))) {
+            Main.logger().error("World", "Tried to add duplicate entity to world " + entity.hudDebug());
+            removeEntity(entity);
+            return;
+        }
+
         //Load chunk of entity
         var chunk = getChunk(CoordUtil.worldToChunk(entity.getBlockX()), CoordUtil.worldToChunk(entity.getBlockY()));
         if (chunk == null) {
