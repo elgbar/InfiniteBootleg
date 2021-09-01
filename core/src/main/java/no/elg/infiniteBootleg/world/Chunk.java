@@ -224,7 +224,7 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, D
 
     long getLastViewedTick();
 
-    boolean isModified();
+    boolean shouldSave();
 
     Stream<Block> stream();
 

@@ -382,8 +382,8 @@ public class ChunkImpl implements Chunk {
      * @return If the chunk has been modified since creation
      */
     @Override
-    public boolean isModified() {
-        return modified;
+    public boolean shouldSave() {
+        return modified || !getEntities().isEmpty();
     }
 
     @Override
@@ -440,6 +440,20 @@ public class ChunkImpl implements Chunk {
             }
             return block;
         }
+    }
+
+    public boolean hasEntities() {
+        float minX = getWorldX();
+        float maxX = minX + Chunk.CHUNK_SIZE;
+        float minY = getWorldY();
+        float maxY = minY + Chunk.CHUNK_SIZE;
+        for (Entity entity : world.getEntities()) {
+            Vector2 pos = entity.getPosition();
+            if (Util.isBetween(minX, pos.x, maxX) && Util.isBetween(minY, pos.y, maxY)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
