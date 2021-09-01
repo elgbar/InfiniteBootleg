@@ -19,6 +19,7 @@ import java.awt.Toolkit;
 import java.io.File;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
+import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
@@ -241,8 +242,8 @@ public class Main extends ApplicationAdapter {
         synchronized (INST_LOCK) {
             if (mainPlayer == null || mainPlayer.isInvalid()) {
                 for (LivingEntity entity : world.getLivingEntities()) {
-                    if (entity instanceof Player player && player.getControls() != null) {
-                        mainPlayer = player;
+                    if (entity instanceof Player player && !entity.isInvalid() && player.getControls() != null) {
+                        setPlayer(player, false);
                         return mainPlayer;
                     }
                 }
@@ -254,6 +255,29 @@ public class Main extends ApplicationAdapter {
         }
     }
 
+    public void setPlayer(@Nullable Player player, boolean removeOld) {
+        synchronized (INST_LOCK) {
+            if (mainPlayer != player) {
+                //if mainPlayer and player are the same, we would dispose the ''new'' mainPlayer
+
+
+                if (mainPlayer != null) {
+                    mainPlayer.removeControls();
+                }
+                if (player != null) {
+                    player.giveControls();
+                }
+                mainPlayer = player;
+                logger().debug("PLR", "Changing main player to " + player);
+            }
+            final WorldInputHandler worldInput = world.getInput();
+            if (worldInput != null) {
+                worldInput.setFollowing(player);
+            }
+        }
+    }
+
+    @NotNull
     public World getWorld() {
         return world;
     }
