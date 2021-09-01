@@ -8,6 +8,7 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -25,7 +26,6 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
-import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -362,6 +362,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     public ObjectSet<Entity> touchingEntities(float worldX, float worldY) {
         ObjectSet<Entity> entities = new ObjectSet<>();
 
+        var rect = new Rectangle(worldX, worldY, getHalfBox2dWidth() * 2, getHalfBox2dHeight() * 2);
+
+        var otherRect = new Rectangle();
         for (Entity entity : world.getEntities()) {
             //ignore entities we do not collide with and self
             if (entity == this || (getFilter().maskBits & entity.getFilter().categoryBits) == 0 ||
@@ -370,10 +373,8 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             }
 
             Vector2 pos = entity.getPosition();
-            //exclude equality of lower bond
-            boolean bx = Util.isBetween((pos.x + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth());
-            boolean by = Util.isBetween((pos.y + MathUtils.FLOAT_ROUNDING_ERROR) - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight());
-            if (bx && by) {
+            otherRect.set(pos.x, pos.y, entity.getHalfBox2dWidth() * 2, entity.getHalfBox2dHeight() * 2);
+            if (rect.overlaps(otherRect)) {
                 entities.add(entity);
             }
         }
