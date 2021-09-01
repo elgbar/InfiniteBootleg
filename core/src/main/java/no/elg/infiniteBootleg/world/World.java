@@ -166,28 +166,28 @@ public class World implements Disposable, Resizable {
     }
 
     public void load() {
-        if (Settings.renderGraphic) {
-            Gdx.app.postRunnable(() -> {
-                WorldInputHandler inputHandler = getInput();
-                if (inputHandler != null) {
-                    var player = Main.inst().getPlayer();
-                    inputHandler.setFollowing(player != null ? player : new Player(this, 0, 0));
-                }
-            });
-        }
-        if (!Settings.loadWorldFromDisk) {
-            return;
-        }
         FileHandle worldFolder = worldFolder();
-        if (worldFolder == null) {
+
+        FileHandle worldZip = worldFolder != null ? worldFolder.parent().child(uuid + ".zip") : null;
+
+        if (Settings.renderGraphic && (worldFolder == null || !worldFolder.exists() || worldZip == null || !worldZip.exists())) {
+            WorldInputHandler inputHandler = getInput();
+            if (inputHandler != null) {
+                synchronized (INST_LOCK) {
+                    var mainPlayer = Main.inst().getPlayer();
+                    final Player newPlayer = mainPlayer == null || mainPlayer.isInvalid() ? new Player(this, 0, 0) : mainPlayer;
+                    Main.inst().setPlayer(newPlayer, false);
+                }
+            }
+        }
+        if (!Settings.loadWorldFromDisk || worldFolder == null) {
             return;
         }
-        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        Main.inst().getConsoleLogger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
-        if (!worldZip.exists()) {
+        if (worldZip == null || !worldZip.exists()) {
             Main.logger().log("No world save found");
             return;
         }
+        Main.inst().getConsoleLogger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
 
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
