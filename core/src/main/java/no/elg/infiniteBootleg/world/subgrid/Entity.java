@@ -101,15 +101,15 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             body.setGravityScale(2f);
             body.setUserData(this);
         }
-        Main.inst().getScheduler().scheduleAsync(() -> {
 
+        Main.inst().getScheduler().scheduleAsync(() -> {
             updatePos();
             if (isInvalidLocation(posCache.x, posCache.y)) {
                 switch (invalidSpawnLocationAction()) {
                     case DELETE -> {
                         Main.logger().debug("Entity",
                                             String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", simpleName(), posCache.x, posCache.y));
-                        dispose();
+                        getWorld().removeEntity(this);
                         return;
                     }
                     case PUSH_UP -> {
@@ -594,6 +594,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         return getClass().getSimpleName();
     }
 
+    /**
+     * Do not call directly. Use {@link World#removeEntity(Entity)}
+     */
     @Override
     public void dispose() {
         synchronized (BOX2D_LOCK) {
