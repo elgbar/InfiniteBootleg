@@ -613,18 +613,20 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     }
 
     public Proto.Entity.Builder save() {
+        final Proto.Entity.Builder builder = Proto.Entity.newBuilder();
+
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 updatePos();
-                final Proto.Entity.Builder builder = Proto.Entity.newBuilder();
-                builder.setUuid(uuid.toString());
-                builder.setType(getEntityType());
                 builder.setPosition(Proto.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
                 builder.setVelocity(Proto.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
-                builder.setFlying(flying);
-                return builder;
             }
         }
+        builder.setUuid(uuid.toString());
+        builder.setType(getEntityType());
+        builder.setFlying(flying);
+
+        return builder;
     }
 
     @NotNull
