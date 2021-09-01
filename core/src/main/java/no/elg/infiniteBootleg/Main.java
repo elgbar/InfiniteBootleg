@@ -172,17 +172,16 @@ public class Main extends ApplicationAdapter {
         mouseBlockX = MathUtils.floor(mouseX);
         mouseBlockY = MathUtils.floor(mouseY);
 
-        synchronized (INST_LOCK) {
-            //noinspection ConstantConditions
-            world.getInput().update();
-            if (!world.getWorldTicker().isPaused()) {
-                //only update controls when we're not paused
-                for (LivingEntity entity : world.getLivingEntities()) {
-                    entity.update();
-                }
+        //noinspection ConstantConditions
+        world.getInput().update();
+        if (!world.getWorldTicker().isPaused()) {
+            //only update controls when we're not paused
+            for (LivingEntity entity : world.getLivingEntities()) {
+                entity.update();
             }
-            world.getRender().render();
         }
+        world.getRender().render();
+        
 
         hud.render();
         console.draw();
