@@ -83,9 +83,13 @@ class WorldBody(private val world: World) : Ticking {
   }
 
   override fun tickRare() {
-    val player = Main.inst().player ?: return
-    synchronized(BOX2D_LOCK) {
 
+    //TODO move to WorldRender, makes more sense to do this there
+    synchronized(BOX2D_LOCK) {
+      val player = Main.inst().player ?: return
+      if (player.isInvalid) {
+        return
+      }
 
       val physicsPosition = player.physicsPosition
       val shiftX = calculateShift(physicsPosition.x)
