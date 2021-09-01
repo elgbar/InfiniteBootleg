@@ -37,6 +37,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     public static final float LERP_CUTOFF = 5f;
     private static final int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
     private final WorldRender worldRender;
+    @Nullable
     private Entity following;
     private boolean lockedOn = true;
 
@@ -171,8 +172,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
      *     What to follow, null if none
      */
     public void setFollowing(@Nullable Entity following) {
-        if (following == null || following.isInvalid()) {
-            throw new IllegalArgumentException("Cannot pass a non-null invalid entity!");
+        if (following != null && following.isInvalid()) {
+            Main.inst().getConsoleLogger().error("World Input", "Cannot pass a non-null invalid entity!");
+            return;
         }
         this.following = following;
     }
