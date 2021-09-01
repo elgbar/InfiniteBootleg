@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
+import static no.elg.infiniteBootleg.Main.INST_LOCK;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.Gdx;
@@ -19,6 +20,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -102,8 +105,6 @@ public class World implements Disposable, Resizable {
     private final UUID uuid;
     private final long seed;
     @NotNull
-    private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks;
-    @NotNull
     private final WorldTicker worldTicker;
     @NotNull
     private final ChunkLoader chunkLoader;
@@ -114,9 +115,11 @@ public class World implements Disposable, Resizable {
     @NotNull
     private final WorldTime worldTime;
     @NotNull
-    private final Set<@NotNull Entity> entities; //all entities in this world (including living entities)
+    private final Set<@NotNull Entity> entities = ConcurrentHashMap.newKeySet(); //all entities in this world (including living entities)
     @NotNull
-    private final Set<@NotNull LivingEntity> livingEntities; //all player in this world
+    private final Set<@NotNull LivingEntity> livingEntities = ConcurrentHashMap.newKeySet(); //all player in this world
+    @NotNull
+    private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks = new ConcurrentHashMap<>();
     @Nullable
     private volatile FileHandle worldFile;
     //only exists when graphics exits
@@ -124,6 +127,7 @@ public class World implements Disposable, Resizable {
     private WorldInputHandler input;
     @NotNull
     private String name;
+    private final Lock loadLock = new ReentrantLock();
 
     /**
      * Generate a world with a random seed
@@ -147,10 +151,6 @@ public class World implements Disposable, Resizable {
         name = worldName;
 
         worldTicker = new WorldTicker(this, tick);
-
-        chunks = new ConcurrentHashMap<>();
-        entities = ConcurrentHashMap.newKeySet();
-        livingEntities = ConcurrentHashMap.newKeySet();
 
         chunkLoader = new ChunkLoader(this, generator);
         worldBody = new WorldBody(this);
@@ -243,19 +243,24 @@ public class World implements Disposable, Resizable {
 
     @Nullable
     public Chunk getChunk(@NotNull Location chunkLoc) {
+        loadLock.lock();
         Chunk chunk = chunks.get(chunkLoc);
-        if (chunk == null || !chunk.isLoaded()) {
+        try {
+            if (chunk == null || !chunk.isLoaded()) {
+                if (getWorldTicker().isPaused()) {
+                    return null;
+                }
+                chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
+                Preconditions.checkState(chunk.isValid());
+                chunks.put(chunkLoc, chunk);
 
-            if (getWorldTicker().isPaused()) {
-                return null;
             }
-            chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
-            Preconditions.checkState(chunk.isValid());
-            chunks.put(chunkLoc, chunk);
+        } finally {
+            loadLock.unlock();
         }
         return chunk;
     }
-    
+
     /**
      * Set a block at a given location and update the textures
      *
@@ -672,6 +677,7 @@ public class World implements Disposable, Resizable {
             removeEntity(entity);
             return;
         }
+
 
         entities.add(entity);
         if (entity instanceof LivingEntity livingEntity) {
