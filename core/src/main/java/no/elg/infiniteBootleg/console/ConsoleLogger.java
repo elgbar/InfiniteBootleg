@@ -90,8 +90,8 @@ public interface ConsoleLogger extends ApplicationLogger {
         logf(LogLevel.ERROR, "[" + tag + "] " + message, objs);
     }
 
-    default void warn(@NotNull String message, @Nullable Throwable exception) {
-        error("WARN", message, exception);
+    default void warn(@NotNull String tag, @NotNull String message, @NotNull Object... objs) {
+        logf(LogLevel.ERROR, "WARN [" + tag + "] " + message, objs);
     }
 
 
