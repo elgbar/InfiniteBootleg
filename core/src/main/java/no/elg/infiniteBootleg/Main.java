@@ -56,6 +56,7 @@ public class Main extends ApplicationAdapter {
 
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
+    @NotNull
     private World world;
     private ConsoleHandler console;
     private HUDRenderer hud;
@@ -79,13 +80,11 @@ public class Main extends ApplicationAdapter {
         console = new ConsoleHandler(false);
         scheduler = new CancellableThreadScheduler(Settings.schedulerThreads);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (world != null) {
-                world.save();
-                final FileHandle worldFolder = world.worldFolder();
-                if (worldFolder != null) {
+            world.save();
+            final FileHandle worldFolder = world.worldFolder();
+            if (worldFolder != null) {
 
-                    worldFolder.deleteDirectory();
-                }
+                worldFolder.deleteDirectory();
             }
             scheduler.shutdown(); // we want make sure this thread is dead
         }));
