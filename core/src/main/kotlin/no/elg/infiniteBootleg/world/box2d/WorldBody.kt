@@ -129,9 +129,7 @@ class WorldBody(private val world: World) : Ticking {
 
       val rayHandler = world.render.rayHandler
       for (light in rayHandler.enabledLights) {
-        println("o offset ${light.position}")
         light.position = light.position.add(deltaOffsetX, deltaOffsetY)
-        println("n offset ${light.position}")
       }
       //TODO enable if needed
 //      for (light in rayHandler.disabledLights) {
