@@ -172,7 +172,8 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
   private fun destroyCurrentBody() {
     synchronized(BOX2D_LOCK) {
-      chunk.world.worldBody.destroyBody(box2dBody)
+      val currentBody = box2dBody ?: return
+      chunk.world.worldBody.destroyBody(currentBody)
       box2dBody = null
     }
   }

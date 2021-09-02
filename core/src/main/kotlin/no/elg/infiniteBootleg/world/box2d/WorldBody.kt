@@ -61,10 +61,7 @@ class WorldBody(private val world: World) : Ticking {
    * @param body
    * The body to destroy
    */
-  fun destroyBody(body: Body?) {
-    if (body == null) {
-      return
-    }
+  fun destroyBody(body: Body) {
     synchronized(BOX2D_LOCK) {
       require(!box2dWorld.isLocked) {
         "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
