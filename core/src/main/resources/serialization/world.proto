@@ -48,6 +48,7 @@ message Entity {
   optional Living living = 16;
   optional Material material = 17;
   optional Player player = 18;
+  optional Generic generic = 19;
 
   message Living{
     string name = 1;
@@ -62,6 +63,10 @@ message Entity {
   message Player{
     float torch_angle_deg = 1;
     bool controlled = 2;
+  }
+
+  message Generic{
+    Vector2i size = 1; //x = width, y = height
   }
 
 }

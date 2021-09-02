@@ -2,13 +2,11 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.Fixture;
+import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +18,16 @@ public class GenericEntity extends Entity implements Removable {
 
     public GenericEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
         super(world, protoEntity);
+        if (isInvalid()) {
+            return;
+        }
+
+        Preconditions.checkArgument(protoEntity.hasGeneric());
+        var protoGeneric = protoEntity.getGeneric();
+
+        final Proto.Vector2i protoSize = protoGeneric.getSize();
+        width = protoSize.getX();
+        height = protoSize.getY();
     }
 
     public GenericEntity(@NotNull World world, float worldX, float worldY) {
@@ -58,6 +66,18 @@ public class GenericEntity extends Entity implements Removable {
         BodyDef def = super.createBodyDef(worldX, worldY);
         def.type = BodyDef.BodyType.StaticBody;
         return def;
+    }
+
+    @Override
+    public Proto.Entity.Builder save() {
+        final Proto.Entity.Builder builder = super.save();
+        final Proto.Entity.Generic.Builder genericBuilder = Proto.Entity.Generic.newBuilder();
+
+        genericBuilder.setSize(Proto.Vector2i.newBuilder().setX(width).setY(height).build());
+
+        builder.setGeneric(genericBuilder.build());
+        return builder;
+
     }
 
     @Override

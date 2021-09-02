@@ -3880,6 +3880,21 @@ public final class Proto {
      * <code>optional .world.Entity.Player player = 18;</code>
      */
     no.elg.infiniteBootleg.protobuf.Proto.Entity.PlayerOrBuilder getPlayerOrBuilder();
+
+    /**
+     * <code>optional .world.Entity.Generic generic = 19;</code>
+     * @return Whether the generic field is set.
+     */
+    boolean hasGeneric();
+    /**
+     * <code>optional .world.Entity.Generic generic = 19;</code>
+     * @return The generic.
+     */
+    no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic getGeneric();
+    /**
+     * <code>optional .world.Entity.Generic generic = 19;</code>
+     */
+    no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder getGenericOrBuilder();
   }
   /**
    * Protobuf type {@code world.Entity}
@@ -4009,6 +4024,19 @@ public final class Proto {
                 player_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000004;
+              break;
+            }
+            case 154: {
+              no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000008) != 0)) {
+                subBuilder = generic_.toBuilder();
+              }
+              generic_ = input.readMessage(no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(generic_);
+                generic_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000008;
               break;
             }
             default: {
@@ -5954,6 +5982,687 @@ public final class Proto {
 
     }
 
+    public interface GenericOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:world.Entity.Generic)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <pre>
+       *x = width, y = height
+       * </pre>
+       *
+       * <code>.world.Vector2i size = 1;</code>
+       * @return Whether the size field is set.
+       */
+      boolean hasSize();
+      /**
+       * <pre>
+       *x = width, y = height
+       * </pre>
+       *
+       * <code>.world.Vector2i size = 1;</code>
+       * @return The size.
+       */
+      no.elg.infiniteBootleg.protobuf.Proto.Vector2i getSize();
+      /**
+       * <pre>
+       *x = width, y = height
+       * </pre>
+       *
+       * <code>.world.Vector2i size = 1;</code>
+       */
+      no.elg.infiniteBootleg.protobuf.Proto.Vector2iOrBuilder getSizeOrBuilder();
+    }
+    /**
+     * Protobuf type {@code world.Entity.Generic}
+     */
+    public static final class Generic extends
+        com.google.protobuf.GeneratedMessageV3 implements
+        // @@protoc_insertion_point(message_implements:world.Entity.Generic)
+        GenericOrBuilder {
+    private static final long serialVersionUID = 0L;
+      // Use Generic.newBuilder() to construct.
+      private Generic(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+        super(builder);
+      }
+      private Generic() {
+      }
+
+      @java.lang.Override
+      @SuppressWarnings({"unused"})
+      protected java.lang.Object newInstance(
+          UnusedPrivateParameter unused) {
+        return new Generic();
+      }
+
+      @java.lang.Override
+      public final com.google.protobuf.UnknownFieldSet
+      getUnknownFields() {
+        return this.unknownFields;
+      }
+      private Generic(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        this();
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+            com.google.protobuf.UnknownFieldSet.newBuilder();
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                no.elg.infiniteBootleg.protobuf.Proto.Vector2i.Builder subBuilder = null;
+                if (size_ != null) {
+                  subBuilder = size_.toBuilder();
+                }
+                size_ = input.readMessage(no.elg.infiniteBootleg.protobuf.Proto.Vector2i.parser(), extensionRegistry);
+                if (subBuilder != null) {
+                  subBuilder.mergeFrom(size_);
+                  size_ = subBuilder.buildPartial();
+                }
+
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
+            }
+          }
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(this);
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(
+              e).setUnfinishedMessage(this);
+        } finally {
+          this.unknownFields = unknownFields.build();
+          makeExtensionsImmutable();
+        }
+      }
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return no.elg.infiniteBootleg.protobuf.Proto.internal_static_world_Entity_Generic_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return no.elg.infiniteBootleg.protobuf.Proto.internal_static_world_Entity_Generic_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.class, no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder.class);
+      }
+
+      public static final int SIZE_FIELD_NUMBER = 1;
+      private no.elg.infiniteBootleg.protobuf.Proto.Vector2i size_;
+      /**
+       * <pre>
+       *x = width, y = height
+       * </pre>
+       *
+       * <code>.world.Vector2i size = 1;</code>
+       * @return Whether the size field is set.
+       */
+      @java.lang.Override
+      public boolean hasSize() {
+        return size_ != null;
+      }
+      /**
+       * <pre>
+       *x = width, y = height
+       * </pre>
+       *
+       * <code>.world.Vector2i size = 1;</code>
+       * @return The size.
+       */
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Proto.Vector2i getSize() {
+        return size_ == null ? no.elg.infiniteBootleg.protobuf.Proto.Vector2i.getDefaultInstance() : size_;
+      }
+      /**
+       * <pre>
+       *x = width, y = height
+       * </pre>
+       *
+       * <code>.world.Vector2i size = 1;</code>
+       */
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Proto.Vector2iOrBuilder getSizeOrBuilder() {
+        return getSize();
+      }
+
+      private byte memoizedIsInitialized = -1;
+      @java.lang.Override
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      @java.lang.Override
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        if (size_ != null) {
+          output.writeMessage(1, getSize());
+        }
+        unknownFields.writeTo(output);
+      }
+
+      @java.lang.Override
+      public int getSerializedSize() {
+        int size = memoizedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        if (size_ != null) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(1, getSize());
+        }
+        size += unknownFields.getSerializedSize();
+        memoizedSize = size;
+        return size;
+      }
+
+      @java.lang.Override
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic)) {
+          return super.equals(obj);
+        }
+        no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic other = (no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic) obj;
+
+        if (hasSize() != other.hasSize()) return false;
+        if (hasSize()) {
+          if (!getSize()
+              .equals(other.getSize())) return false;
+        }
+        if (!unknownFields.equals(other.unknownFields)) return false;
+        return true;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptor().hashCode();
+        if (hasSize()) {
+          hash = (37 * hash) + SIZE_FIELD_NUMBER;
+          hash = (53 * hash) + getSize().hashCode();
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
+      }
+
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          java.nio.ByteBuffer data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          java.nio.ByteBuffer data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
+      }
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
+      }
+
+      @java.lang.Override
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
+      }
+      public static Builder newBuilder(no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      @java.lang.Override
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code world.Entity.Generic}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:world.Entity.Generic)
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return no.elg.infiniteBootleg.protobuf.Proto.internal_static_world_Entity_Generic_descriptor;
+        }
+
+        @java.lang.Override
+        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return no.elg.infiniteBootleg.protobuf.Proto.internal_static_world_Entity_Generic_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.class, no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder.class);
+        }
+
+        // Construct using no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.newBuilder()
+        private Builder() {
+          maybeForceBuilderInitialization();
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          super(parent);
+          maybeForceBuilderInitialization();
+        }
+        private void maybeForceBuilderInitialization() {
+          if (com.google.protobuf.GeneratedMessageV3
+                  .alwaysUseFieldBuilders) {
+          }
+        }
+        @java.lang.Override
+        public Builder clear() {
+          super.clear();
+          if (sizeBuilder_ == null) {
+            size_ = null;
+          } else {
+            size_ = null;
+            sizeBuilder_ = null;
+          }
+          return this;
+        }
+
+        @java.lang.Override
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return no.elg.infiniteBootleg.protobuf.Proto.internal_static_world_Entity_Generic_descriptor;
+        }
+
+        @java.lang.Override
+        public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic getDefaultInstanceForType() {
+          return no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance();
+        }
+
+        @java.lang.Override
+        public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic build() {
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        @java.lang.Override
+        public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic buildPartial() {
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic result = new no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic(this);
+          if (sizeBuilder_ == null) {
+            result.size_ = size_;
+          } else {
+            result.size_ = sizeBuilder_.build();
+          }
+          onBuilt();
+          return result;
+        }
+
+        @java.lang.Override
+        public Builder clone() {
+          return super.clone();
+        }
+        @java.lang.Override
+        public Builder setField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            java.lang.Object value) {
+          return super.setField(field, value);
+        }
+        @java.lang.Override
+        public Builder clearField(
+            com.google.protobuf.Descriptors.FieldDescriptor field) {
+          return super.clearField(field);
+        }
+        @java.lang.Override
+        public Builder clearOneof(
+            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+          return super.clearOneof(oneof);
+        }
+        @java.lang.Override
+        public Builder setRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            int index, java.lang.Object value) {
+          return super.setRepeatedField(field, index, value);
+        }
+        @java.lang.Override
+        public Builder addRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            java.lang.Object value) {
+          return super.addRepeatedField(field, value);
+        }
+        @java.lang.Override
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic) {
+            return mergeFrom((no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic other) {
+          if (other == no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance()) return this;
+          if (other.hasSize()) {
+            mergeSize(other.getSize());
+          }
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
+          return this;
+        }
+
+        @java.lang.Override
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        @java.lang.Override
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic parsedMessage = null;
+          try {
+            parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            parsedMessage = (no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic) e.getUnfinishedMessage();
+            throw e.unwrapIOException();
+          } finally {
+            if (parsedMessage != null) {
+              mergeFrom(parsedMessage);
+            }
+          }
+          return this;
+        }
+
+        private no.elg.infiniteBootleg.protobuf.Proto.Vector2i size_;
+        private com.google.protobuf.SingleFieldBuilderV3<
+            no.elg.infiniteBootleg.protobuf.Proto.Vector2i, no.elg.infiniteBootleg.protobuf.Proto.Vector2i.Builder, no.elg.infiniteBootleg.protobuf.Proto.Vector2iOrBuilder> sizeBuilder_;
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         * @return Whether the size field is set.
+         */
+        public boolean hasSize() {
+          return sizeBuilder_ != null || size_ != null;
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         * @return The size.
+         */
+        public no.elg.infiniteBootleg.protobuf.Proto.Vector2i getSize() {
+          if (sizeBuilder_ == null) {
+            return size_ == null ? no.elg.infiniteBootleg.protobuf.Proto.Vector2i.getDefaultInstance() : size_;
+          } else {
+            return sizeBuilder_.getMessage();
+          }
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        public Builder setSize(no.elg.infiniteBootleg.protobuf.Proto.Vector2i value) {
+          if (sizeBuilder_ == null) {
+            if (value == null) {
+              throw new NullPointerException();
+            }
+            size_ = value;
+            onChanged();
+          } else {
+            sizeBuilder_.setMessage(value);
+          }
+
+          return this;
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        public Builder setSize(
+            no.elg.infiniteBootleg.protobuf.Proto.Vector2i.Builder builderForValue) {
+          if (sizeBuilder_ == null) {
+            size_ = builderForValue.build();
+            onChanged();
+          } else {
+            sizeBuilder_.setMessage(builderForValue.build());
+          }
+
+          return this;
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        public Builder mergeSize(no.elg.infiniteBootleg.protobuf.Proto.Vector2i value) {
+          if (sizeBuilder_ == null) {
+            if (size_ != null) {
+              size_ =
+                no.elg.infiniteBootleg.protobuf.Proto.Vector2i.newBuilder(size_).mergeFrom(value).buildPartial();
+            } else {
+              size_ = value;
+            }
+            onChanged();
+          } else {
+            sizeBuilder_.mergeFrom(value);
+          }
+
+          return this;
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        public Builder clearSize() {
+          if (sizeBuilder_ == null) {
+            size_ = null;
+            onChanged();
+          } else {
+            size_ = null;
+            sizeBuilder_ = null;
+          }
+
+          return this;
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        public no.elg.infiniteBootleg.protobuf.Proto.Vector2i.Builder getSizeBuilder() {
+          
+          onChanged();
+          return getSizeFieldBuilder().getBuilder();
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        public no.elg.infiniteBootleg.protobuf.Proto.Vector2iOrBuilder getSizeOrBuilder() {
+          if (sizeBuilder_ != null) {
+            return sizeBuilder_.getMessageOrBuilder();
+          } else {
+            return size_ == null ?
+                no.elg.infiniteBootleg.protobuf.Proto.Vector2i.getDefaultInstance() : size_;
+          }
+        }
+        /**
+         * <pre>
+         *x = width, y = height
+         * </pre>
+         *
+         * <code>.world.Vector2i size = 1;</code>
+         */
+        private com.google.protobuf.SingleFieldBuilderV3<
+            no.elg.infiniteBootleg.protobuf.Proto.Vector2i, no.elg.infiniteBootleg.protobuf.Proto.Vector2i.Builder, no.elg.infiniteBootleg.protobuf.Proto.Vector2iOrBuilder> 
+            getSizeFieldBuilder() {
+          if (sizeBuilder_ == null) {
+            sizeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+                no.elg.infiniteBootleg.protobuf.Proto.Vector2i, no.elg.infiniteBootleg.protobuf.Proto.Vector2i.Builder, no.elg.infiniteBootleg.protobuf.Proto.Vector2iOrBuilder>(
+                    getSize(),
+                    getParentForChildren(),
+                    isClean());
+            size_ = null;
+          }
+          return sizeBuilder_;
+        }
+        @java.lang.Override
+        public final Builder setUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+          return super.setUnknownFields(unknownFields);
+        }
+
+        @java.lang.Override
+        public final Builder mergeUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+          return super.mergeUnknownFields(unknownFields);
+        }
+
+
+        // @@protoc_insertion_point(builder_scope:world.Entity.Generic)
+      }
+
+      // @@protoc_insertion_point(class_scope:world.Entity.Generic)
+      private static final no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic DEFAULT_INSTANCE;
+      static {
+        DEFAULT_INSTANCE = new no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic();
+      }
+
+      public static no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic getDefaultInstance() {
+        return DEFAULT_INSTANCE;
+      }
+
+      private static final com.google.protobuf.Parser<Generic>
+          PARSER = new com.google.protobuf.AbstractParser<Generic>() {
+        @java.lang.Override
+        public Generic parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Generic(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<Generic> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<Generic> getParserForType() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic getDefaultInstanceForType() {
+        return DEFAULT_INSTANCE;
+      }
+
+    }
+
     private int bitField0_;
     public static final int TYPE_FIELD_NUMBER = 1;
     private int type_;
@@ -6153,6 +6862,32 @@ public final class Proto {
       return player_ == null ? no.elg.infiniteBootleg.protobuf.Proto.Entity.Player.getDefaultInstance() : player_;
     }
 
+    public static final int GENERIC_FIELD_NUMBER = 19;
+    private no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic generic_;
+    /**
+     * <code>optional .world.Entity.Generic generic = 19;</code>
+     * @return Whether the generic field is set.
+     */
+    @java.lang.Override
+    public boolean hasGeneric() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional .world.Entity.Generic generic = 19;</code>
+     * @return The generic.
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic getGeneric() {
+      return generic_ == null ? no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance() : generic_;
+    }
+    /**
+     * <code>optional .world.Entity.Generic generic = 19;</code>
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder getGenericOrBuilder() {
+      return generic_ == null ? no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance() : generic_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6190,6 +6925,9 @@ public final class Proto {
       }
       if (((bitField0_ & 0x00000004) != 0)) {
         output.writeMessage(18, getPlayer());
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeMessage(19, getGeneric());
       }
       unknownFields.writeTo(output);
     }
@@ -6230,6 +6968,10 @@ public final class Proto {
       if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(18, getPlayer());
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, getGeneric());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6276,6 +7018,11 @@ public final class Proto {
         if (!getPlayer()
             .equals(other.getPlayer())) return false;
       }
+      if (hasGeneric() != other.hasGeneric()) return false;
+      if (hasGeneric()) {
+        if (!getGeneric()
+            .equals(other.getGeneric())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6313,6 +7060,10 @@ public final class Proto {
       if (hasPlayer()) {
         hash = (37 * hash) + PLAYER_FIELD_NUMBER;
         hash = (53 * hash) + getPlayer().hashCode();
+      }
+      if (hasGeneric()) {
+        hash = (37 * hash) + GENERIC_FIELD_NUMBER;
+        hash = (53 * hash) + getGeneric().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -6445,6 +7196,7 @@ public final class Proto {
           getLivingFieldBuilder();
           getMaterialFieldBuilder();
           getPlayerFieldBuilder();
+          getGenericFieldBuilder();
         }
       }
       @java.lang.Override
@@ -6486,6 +7238,12 @@ public final class Proto {
           playerBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
+        if (genericBuilder_ == null) {
+          generic_ = null;
+        } else {
+          genericBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -6550,6 +7308,14 @@ public final class Proto {
             result.player_ = playerBuilder_.build();
           }
           to_bitField0_ |= 0x00000004;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          if (genericBuilder_ == null) {
+            result.generic_ = generic_;
+          } else {
+            result.generic_ = genericBuilder_.build();
+          }
+          to_bitField0_ |= 0x00000008;
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -6624,6 +7390,9 @@ public final class Proto {
         }
         if (other.hasPlayer()) {
           mergePlayer(other.getPlayer());
+        }
+        if (other.hasGeneric()) {
+          mergeGeneric(other.getGeneric());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -7413,6 +8182,126 @@ public final class Proto {
         }
         return playerBuilder_;
       }
+
+      private no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic generic_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic, no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder, no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder> genericBuilder_;
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       * @return Whether the generic field is set.
+       */
+      public boolean hasGeneric() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       * @return The generic.
+       */
+      public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic getGeneric() {
+        if (genericBuilder_ == null) {
+          return generic_ == null ? no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance() : generic_;
+        } else {
+          return genericBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      public Builder setGeneric(no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic value) {
+        if (genericBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          generic_ = value;
+          onChanged();
+        } else {
+          genericBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      public Builder setGeneric(
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder builderForValue) {
+        if (genericBuilder_ == null) {
+          generic_ = builderForValue.build();
+          onChanged();
+        } else {
+          genericBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      public Builder mergeGeneric(no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic value) {
+        if (genericBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) != 0) &&
+              generic_ != null &&
+              generic_ != no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance()) {
+            generic_ =
+              no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.newBuilder(generic_).mergeFrom(value).buildPartial();
+          } else {
+            generic_ = value;
+          }
+          onChanged();
+        } else {
+          genericBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      public Builder clearGeneric() {
+        if (genericBuilder_ == null) {
+          generic_ = null;
+          onChanged();
+        } else {
+          genericBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder getGenericBuilder() {
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return getGenericFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder getGenericOrBuilder() {
+        if (genericBuilder_ != null) {
+          return genericBuilder_.getMessageOrBuilder();
+        } else {
+          return generic_ == null ?
+              no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.getDefaultInstance() : generic_;
+        }
+      }
+      /**
+       * <code>optional .world.Entity.Generic generic = 19;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic, no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder, no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder> 
+          getGenericFieldBuilder() {
+        if (genericBuilder_ == null) {
+          genericBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic, no.elg.infiniteBootleg.protobuf.Proto.Entity.Generic.Builder, no.elg.infiniteBootleg.protobuf.Proto.Entity.GenericOrBuilder>(
+                  getGeneric(),
+                  getParentForChildren(),
+                  isClean());
+          generic_ = null;
+        }
+        return genericBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -7511,6 +8400,11 @@ public final class Proto {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_world_Entity_Player_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_world_Entity_Generic_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_world_Entity_Generic_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -7528,22 +8422,24 @@ public final class Proto {
       "\034\n\006blocks\030\002 \003(\0132\014.world.Block\022\037\n\010entitie" +
       "s\030\020 \003(\0132\r.world.Entity\" \n\010Vector2f\022\t\n\001x\030" +
       "\001 \001(\002\022\t\n\001y\030\002 \001(\002\" \n\010Vector2i\022\t\n\001x\030\001 \001(\021\022" +
-      "\t\n\001y\030\002 \001(\021\"\241\004\n\006Entity\022&\n\004type\030\001 \001(\0162\030.wo" +
+      "\t\n\001y\030\002 \001(\021\"\204\005\n\006Entity\022&\n\004type\030\001 \001(\0162\030.wo" +
       "rld.Entity.EntityType\022!\n\010position\030\002 \001(\0132" +
       "\017.world.Vector2f\022!\n\010velocity\030\003 \001(\0132\017.wor" +
       "ld.Vector2f\022\014\n\004uuid\030\004 \001(\t\022\016\n\006flying\030\005 \001(" +
       "\010\022)\n\006living\030\020 \001(\0132\024.world.Entity.LivingH" +
       "\000\210\001\001\022-\n\010material\030\021 \001(\0132\026.world.Entity.Ma" +
       "terialH\001\210\001\001\022)\n\006player\030\022 \001(\0132\024.world.Enti" +
-      "ty.PlayerH\002\210\001\001\032:\n\006Living\022\014\n\004name\030\001 \001(\t\022\016" +
-      "\n\006health\030\002 \001(\005\022\022\n\nmax_health\030\003 \001(\005\032$\n\010Ma" +
-      "terial\022\030\n\020material_ordinal\030\001 \001(\005\0325\n\006Play" +
-      "er\022\027\n\017torch_angle_deg\030\001 \001(\002\022\022\n\ncontrolle" +
-      "d\030\002 \001(\010\"J\n\nEntityType\022\022\n\016GENERIC_ENTITY\020" +
-      "\000\022\021\n\rFALLING_BLOCK\020\001\022\t\n\005BLOCK\020\002\022\n\n\006PLAYE" +
-      "R\020\020B\t\n\007_livingB\013\n\t_materialB\t\n\007_playerB*" +
-      "\n\037no.elg.infiniteBootleg.protobufB\005Proto" +
-      "P\000b\006proto3"
+      "ty.PlayerH\002\210\001\001\022+\n\007generic\030\023 \001(\0132\025.world." +
+      "Entity.GenericH\003\210\001\001\032:\n\006Living\022\014\n\004name\030\001 " +
+      "\001(\t\022\016\n\006health\030\002 \001(\005\022\022\n\nmax_health\030\003 \001(\005\032" +
+      "$\n\010Material\022\030\n\020material_ordinal\030\001 \001(\005\0325\n" +
+      "\006Player\022\027\n\017torch_angle_deg\030\001 \001(\002\022\022\n\ncont" +
+      "rolled\030\002 \001(\010\032(\n\007Generic\022\035\n\004size\030\001 \001(\0132\017." +
+      "world.Vector2i\"J\n\nEntityType\022\022\n\016GENERIC_" +
+      "ENTITY\020\000\022\021\n\rFALLING_BLOCK\020\001\022\t\n\005BLOCK\020\002\022\n" +
+      "\n\006PLAYER\020\020B\t\n\007_livingB\013\n\t_materialB\t\n\007_p" +
+      "layerB\n\n\010_genericB*\n\037no.elg.infiniteBoot" +
+      "leg.protobufB\005ProtoP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -7584,7 +8480,7 @@ public final class Proto {
     internal_static_world_Entity_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_world_Entity_descriptor,
-        new java.lang.String[] { "Type", "Position", "Velocity", "Uuid", "Flying", "Living", "Material", "Player", "Living", "Material", "Player", });
+        new java.lang.String[] { "Type", "Position", "Velocity", "Uuid", "Flying", "Living", "Material", "Player", "Generic", "Living", "Material", "Player", "Generic", });
     internal_static_world_Entity_Living_descriptor =
       internal_static_world_Entity_descriptor.getNestedTypes().get(0);
     internal_static_world_Entity_Living_fieldAccessorTable = new
@@ -7603,6 +8499,12 @@ public final class Proto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_world_Entity_Player_descriptor,
         new java.lang.String[] { "TorchAngleDeg", "Controlled", });
+    internal_static_world_Entity_Generic_descriptor =
+      internal_static_world_Entity_descriptor.getNestedTypes().get(3);
+    internal_static_world_Entity_Generic_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_world_Entity_Generic_descriptor,
+        new java.lang.String[] { "Size", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
