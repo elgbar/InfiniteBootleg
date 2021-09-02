@@ -597,21 +597,25 @@ public class ChunkImpl implements Chunk {
         }
 
         for (Proto.Entity protoEntity : protoChunk.getEntitiesList()) {
+            Entity entity = null;
             switch (protoEntity.getType()) {
-                case GENERIC_ENTITY -> new GenericEntity(world, protoEntity);
-                case FALLING_BLOCK -> new FallingBlock(world, protoEntity);
-                case PLAYER -> new Player(world, protoEntity);
+                case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
+                case FALLING_BLOCK -> entity = new FallingBlock(world, protoEntity);
+                case PLAYER -> entity = new Player(world, protoEntity);
                 case BLOCK -> {
                     Preconditions.checkArgument(protoEntity.hasMaterial());
                     final Proto.Entity.Material entityBlock = protoEntity.getMaterial();
                     final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
-                    material.createEntity(world, protoEntity, this);
+                    entity = material.createEntity(world, protoEntity, this);
                 }
                 case UNRECOGNIZED -> {
                     Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
-                    continue;
                 }
             }
+            if (entity == null || entity.isInvalid()) {
+                continue;
+            }
+            world.addEntity(entity, false);
         }
         return true;
     }

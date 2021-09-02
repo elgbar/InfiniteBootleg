@@ -52,6 +52,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     private final World world;
     private final UUID uuid;
 
+    @Nullable
     private Body body;
     private boolean flying; //ignore world gravity
     private final Vector2 posCache;
@@ -85,9 +86,15 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     public Entity(@NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
         this.uuid = uuid;
         this.world = world;
-        flying = false;
         posCache = new Vector2(worldX, worldY);
         velCache = new Vector2();
+
+        if (world.containsEntity(uuid)) {
+            valid = false;
+            return;
+        }
+
+        flying = false;
         filter = World.ENTITY_FILTER;
 
         if (center) {
@@ -127,7 +134,6 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
                     }
                 }
             }
-            world.addEntity(this);
         }, 1L);
     }
 

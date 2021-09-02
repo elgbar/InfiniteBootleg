@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.console;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
@@ -227,8 +228,15 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Spawn a generic static entity at the given location with the given width and height",
                 paramDescriptions = {"worldX", "worldY", "width", "height"})
     public void ent(float worldX, float worldY, int width, int height) {
-        logger.logf("Created an entity at (% 7.2f,% 7.2f) with width %d and height %d", worldX, worldY, width, height);
-        new GenericEntity(Main.inst().getWorld(), worldX, worldY, width, height);
+        final World world = Main.inst().getWorld();
+        var entity = new GenericEntity(world, worldX, worldY, width, height);
+        if (entity.isInvalid()) {
+            logger.error("GEN ENT", "Failed to create an entity at (% 7.2f,% 7.2f) with width %d and height %d", worldX, worldY, width, height);
+        }
+        else {
+            world.addEntity(entity);
+            logger.logf("Created an entity at (% 7.2f,% 7.2f) with width %d and height %d", worldX, worldY, width, height);
+        }
     }
 
     @ConsoleDoc(description = "Kill all non-player entities")
@@ -369,6 +377,19 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Shift world offset")
     public void swo(float x, float y) {
         Main.inst().getWorld().getWorldBody().shiftWorldOffset(x, y);
+    }
+
+    @ClientsideOnly
+    public void detect(float x, float y) {
+        final World world = Main.inst().getWorld();
+//        Main.inst().getMouseX(), Main.inst().getMouseY()
+        world.getWorldBody().queryAABB(x, y, 1f, 1f, it -> {
+            final Body body = it.getBody();
+            if (body != null && body.getUserData() != null) {
+                logger.log("Entity " + body.getUserData());
+            }
+            return true;
+        });
     }
 }
 

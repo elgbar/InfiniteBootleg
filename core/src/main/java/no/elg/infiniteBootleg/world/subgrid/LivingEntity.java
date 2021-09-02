@@ -19,6 +19,9 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
     public LivingEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
         super(world, protoEntity);
+        if (isInvalid()) {
+            return;
+        }
         Preconditions.checkArgument(protoEntity.hasLiving(), "Living entity does not contain living data");
         final Proto.Entity.Living protoLiving = protoEntity.getLiving();
         name = protoLiving.getName();

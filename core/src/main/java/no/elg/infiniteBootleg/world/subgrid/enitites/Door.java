@@ -57,17 +57,18 @@ public class Door extends MaterialEntity {
     }
 
     {
-        //Wake up all bodies to get an accurate contacts count
-        final Vector2 position = getBody().getPosition();
-        final WorldBody worldBody = getWorld().getWorldBody();
-        worldBody.queryAABB(position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2, fixture -> {
-            final Body body = fixture.getBody();
-            if (body != null && body.getUserData() != this) {
-                System.out.println("Found fixture" + body.getUserData());
-                body.setAwake(true);
-            }
-            return true;
-        });
+        if (!isInvalid()) {
+            //Wake up all bodies to get an accurate contacts count
+            final Vector2 position = getBody().getPosition();
+            final WorldBody worldBody = getWorld().getWorldBody();
+            worldBody.queryAABB(position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2, fixture -> {
+                final Body body = fixture.getBody();
+                if (body != null && body.getUserData() != this) {
+                    body.setAwake(true);
+                }
+                return true;
+            });
+        }
     }
 
     @NotNull

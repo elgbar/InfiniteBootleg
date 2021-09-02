@@ -577,7 +577,7 @@ public class World implements Disposable, Resizable {
             throw new IllegalStateException("Failed to clear chunks during reload");
         }
         synchronized (BOX2D_LOCK) {
-            var bodies = new Array<Body>(false, worldBody.getBox2dWorld().getBodyCount());
+            var bodies = new Array<@NotNull Body>(false, worldBody.getBox2dWorld().getBodyCount());
             worldBody.getBox2dWorld().getBodies(bodies);
             if (!bodies.isEmpty()) {
                 Main.logger().error("BOX2D", "There existed dangling bodies after reload!");
@@ -650,6 +650,10 @@ public class World implements Disposable, Resizable {
     }
 
 
+    public boolean containsEntity(@NotNull UUID uuid) {
+        return entities.stream().anyMatch(it -> uuid.equals(it.getUuid()));
+    }
+
     /**
      * Add the given entity to entities in the world.
      * <b>NOTE</b> this is automatically done when creating a new entity instance. Do not use this method
@@ -657,27 +661,37 @@ public class World implements Disposable, Resizable {
      * @param entity
      *     The entity to add
      */
-    public void addEntity(@NotNull Entity entity) {
+    public void addEntity(@NotNull Entity entity) { addEntity(entity, true); }
+
+    /**
+     * Add the given entity to entities in the world.
+     * <b>NOTE</b> this is automatically done when creating a new entity instance. Do not use this method
+     *
+     * @param entity
+     *     The entity to add
+     * @param loadChunk
+     */
+    public void addEntity(@NotNull Entity entity, boolean loadChunk) {
         if (entities.stream().anyMatch(it -> it == entity)) {
             Main.logger().error("World", "Tried to add entity twice to world " + entity.hudDebug());
-            entity.dispose();
             return;
         }
-        if (entities.stream().anyMatch(it -> it.getUuid().equals(entity.getUuid()))) {
+        if (containsEntity(entity.getUuid())) {
             Main.logger().error("World", "Tried to add duplicate entity to world " + entity.hudDebug());
             removeEntity(entity);
             return;
         }
 
-        //Load chunk of entity
-        var chunk = getChunk(CoordUtil.worldToChunk(entity.getBlockX()), CoordUtil.worldToChunk(entity.getBlockY()));
-        if (chunk == null) {
-            //Failed to load chunk, remove entity
-            Main.logger().error("World", "Failed to add entity to world, as its spawning chunk could not be loaded");
-            removeEntity(entity);
-            return;
+        if (loadChunk) {
+            //Load chunk of entity
+            var chunk = getChunk(CoordUtil.worldToChunk(entity.getBlockX()), CoordUtil.worldToChunk(entity.getBlockY()));
+            if (chunk == null) {
+                //Failed to load chunk, remove entity
+                Main.logger().error("World", "Failed to add entity to world, as its spawning chunk could not be loaded");
+                removeEntity(entity);
+                return;
+            }
         }
-
 
         entities.add(entity);
         if (entity instanceof LivingEntity livingEntity) {

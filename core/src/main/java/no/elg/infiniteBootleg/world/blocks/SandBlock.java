@@ -32,8 +32,13 @@ public class SandBlock extends TickingBlock {
 
             Main.inst().getScheduler().executeSync(() -> {
                 //Do not update world straight away as if there are sand blocks above this it will begin to fall on the same tick
+                var fallingBlock = new FallingBlock(getWorld(), getWorldX(), getWorldY() - 1f, Material.SAND);
+                if (fallingBlock.isInvalid()) {
+                    falling = false; //try again later
+                    return;
+                }
+                getWorld().addEntity(fallingBlock);
                 destroy(true);
-                new FallingBlock(getWorld(), getWorldX(), getWorldY() - 1f, Material.SAND);
 
                 Block relative = getRelative(Direction.NORTH);
                 if (relative instanceof TickingBlock tickingBlock) {

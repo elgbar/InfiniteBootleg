@@ -36,6 +36,9 @@ public class Player extends LivingEntity {
 
     public Player(@NotNull World world, Proto.@NotNull Entity protoEntity) {
         super(world, protoEntity);
+        if (isInvalid()) {
+            return;
+        }
 
         Preconditions.checkArgument(protoEntity.hasPlayer(), "Player does not contain player data");
         final Proto.Entity.Player protoPlayer = protoEntity.getPlayer();
@@ -47,6 +50,9 @@ public class Player extends LivingEntity {
 
     public Player(@NotNull World world, float worldX, float worldY) {
         super(world, worldX, worldY, UUID.randomUUID());
+        if (isInvalid()) {
+            return;
+        }
         giveControls();
     }
 

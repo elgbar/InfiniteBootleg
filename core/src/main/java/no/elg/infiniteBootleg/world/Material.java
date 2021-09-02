@@ -201,7 +201,10 @@ public enum Material {
 
     @Nullable
     private MaterialEntity commonEntity(@NotNull World world, @NotNull MaterialEntity entity, @Nullable Chunk chunk) {
-        if (entity.isInvalid()) { return null; }
+        if (entity.isInvalid()) {
+            return null;
+        }
+        world.addEntity(entity, false);
         final ObjectSet<Location> locations = entity.touchingLocations();
         for (Location location : locations) {
             Chunk locChunk;
