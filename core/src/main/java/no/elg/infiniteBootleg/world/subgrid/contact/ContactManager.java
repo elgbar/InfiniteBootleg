@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.subgrid.contact;
 
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -21,11 +22,10 @@ public class ContactManager implements ContactListener {
     private void handleContact(ContactType type, Contact contact) {
         //Must be within a box2d lock to make sure the contact is valid
         synchronized (BOX2D_LOCK) {
-            for (Entity entity : world.getEntities()) {
-                if (!entity.isInvalid() && contact.getFixtureB().getBody() == entity.getBody()) {
-                    entity.contact(type, contact);
-                    break; //Assume each body is unique to an entity
-                }
+            final Body body = contact.getFixtureB().getBody();
+            final Object data = body.getUserData();
+            if (body != null && data != null && data instanceof Entity entity && !entity.isInvalid()) {
+                entity.contact(type, contact);
             }
         }
     }
