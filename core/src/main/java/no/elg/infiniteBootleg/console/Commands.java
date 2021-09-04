@@ -4,6 +4,7 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
@@ -379,17 +380,30 @@ public class Commands extends CommandExecutor {
         Main.inst().getWorld().getWorldBody().shiftWorldOffset(x, y);
     }
 
-    @ClientsideOnly
-    public void detect(float x, float y) {
-        final World world = Main.inst().getWorld();
-//        Main.inst().getMouseX(), Main.inst().getMouseY()
-        world.getWorldBody().queryAABB(x, y, 1f, 1f, it -> {
-            final Body body = it.getBody();
-            if (body != null && body.getUserData() != null) {
-                logger.log("Entity " + body.getUserData());
+    @HiddenCommand
+    @ConsoleDoc(description = "check dangling entities")
+    public void cde() {
+        synchronized (BOX2D_LOCK) {
+            var world = Main.inst().getWorld();
+            final com.badlogic.gdx.physics.box2d.World worldBox2dWorld = world.getWorldBody().getBox2dWorld();
+            var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
+            worldBox2dWorld.getBodies(bodies);
+
+            int invalid = 0;
+            for (Body body : bodies) {
+                final Object userData = body.getUserData();
+                if (userData != null && userData instanceof Entity entity) {
+                    if (world.containsEntity(entity.getUuid())) {
+                        continue;
+                    }
+                    invalid++;
+                    logger.error("Entity", "Found entity not added to the world! " + entity.simpleName() + " " + entity.hudDebug());
+                }
             }
-            return true;
-        });
+            if (invalid == 0) {
+                logger.success("No invalid bodies found!");
+            }
+        }
     }
 }
 
