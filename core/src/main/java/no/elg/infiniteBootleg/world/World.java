@@ -127,6 +127,8 @@ public class World implements Disposable, Resizable {
     private WorldInputHandler input;
     @NotNull
     private String name;
+
+    private Location spawn;
     private final Lock loadLock = new ReentrantLock();
 
     /**
@@ -155,6 +157,7 @@ public class World implements Disposable, Resizable {
         chunkLoader = new ChunkLoader(this, generator);
         worldBody = new WorldBody(this);
         worldTime = new WorldTime(this);
+        spawn = new Location(0, 0);
 
         if (Settings.renderGraphic) {
             render = new WorldRender(this);
@@ -898,6 +901,13 @@ public class World implements Disposable, Resizable {
         return worldTime;
     }
 
+    public Location getSpawn() {
+        return spawn;
+    }
+
+    public void setSpawn(Location spawn) {
+        this.spawn = spawn;
+    }
 
     @Override
     public int hashCode() {
