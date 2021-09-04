@@ -28,7 +28,7 @@ public class Player extends LivingEntity {
     public static final String PLAYER_REGION_NAME = "player";
 
     @NotNull
-    private final TextureRegion region;
+    private static final TextureRegion TEXTURE_REGION;
     @Nullable
     private EntityControls controls;
     @NotNull
@@ -54,10 +54,11 @@ public class Player extends LivingEntity {
             return;
         }
         giveControls();
+    static {
+        TEXTURE_REGION = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
     }
 
     {
-        region = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         synchronized (LIGHT_LOCK) {
             torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
             torchLight.setStaticLight(true);
