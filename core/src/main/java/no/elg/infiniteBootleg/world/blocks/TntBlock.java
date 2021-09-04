@@ -73,7 +73,7 @@ public class TntBlock extends TickingBlock {
     private boolean glowing;
     private volatile boolean exploded;
     private long startTick;
-    @NotNull
+    @Nullable
     private PointLight light;
 
     public TntBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
@@ -82,7 +82,14 @@ public class TntBlock extends TickingBlock {
         fuseDurationTicks = (int) (getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS);
         startTick = getWorld().getTick();
 
-        light = PointLightPool.inst.obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
+        if (Settings.renderLight) {
+            createLight();
+        }
+    }
+
+    private void createLight() {
+        Preconditions.checkState(light == null);
+        light = PointLightPool.getPool(getWorld()).obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
         light.setColor(Color.RED);
         light.setXray(false);
         light.setSoft(false);
@@ -149,7 +156,12 @@ public class TntBlock extends TickingBlock {
         }
 
         if (old != glowing && Settings.renderGraphic) {
+
             synchronized (LIGHT_LOCK) {
+                if (light == null) {
+                    createLight();
+                }
+                assert light != null;
                 light.setActive(glowing);
             }
             getChunk().updateTexture(true);
@@ -194,7 +206,10 @@ public class TntBlock extends TickingBlock {
     }
 
     @Override
+    @Override
     public void dispose() {
-        PointLightPool.inst.free(light);
+        if (light != null) {
+            PointLightPool.getPool(getWorld()).free(light);
+        }
     }
 }

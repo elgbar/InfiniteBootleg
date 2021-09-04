@@ -18,8 +18,12 @@ public abstract class StaticLightBlock extends Block {
 
     public StaticLightBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        if (Settings.renderGraphic) {
-            light = PointLightPool.inst.obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
+        createLight();
+    }
+
+    private void createLight() {
+        if (Settings.renderLight && light == null) {
+            light = PointLightPool.getPool(getWorld()).obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
         }
     }
 
@@ -28,14 +32,14 @@ public abstract class StaticLightBlock extends Block {
      */
     @Nullable
     public Light getLight() {
+        createLight();
         return light;
     }
 
     @Override
     public void dispose() {
-        super.dispose();
         if (light != null) {
-            PointLightPool.inst.free(light);
+            PointLightPool.getPool(getWorld()).free(light);
         }
     }
 }

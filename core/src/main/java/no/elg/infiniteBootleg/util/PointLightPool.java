@@ -5,7 +5,10 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
@@ -18,23 +21,33 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class PointLightPool extends Pool<PointLight> {
 
-    public static final PointLightPool inst = new PointLightPool();
     public static final int POINT_LIGHT_RAYS = 64;
     public static final int POINT_LIGHT_DISTANCE = 32;
     private final RayHandler rayHandler;
     private final WorldBody worldBody;
 
-    private PointLightPool() {
-        final World world = Main.inst().getWorld();
+    private static final ConcurrentMap<World, PointLightPool> poolMap = new ConcurrentHashMap<>();
+
+    private PointLightPool(@NotNull World world) {
         rayHandler = world.getRender().getRayHandler();
         worldBody = world.getWorldBody();
+    }
+
+    public static PointLightPool getPool(@NotNull World world) {
+        return poolMap.computeIfAbsent(world, PointLightPool::new);
+    }
+
+    public static void clearAllPools() {
+        synchronized (poolMap) {
+            poolMap.clear();
+        }
     }
 
     @Override
     protected PointLight newObject() {
         PointLight light;
         synchronized (LIGHT_LOCK) {
-            light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, 0, 0);
+            light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, Float.MAX_VALUE, Float.MAX_VALUE);
         }
         reset(light);
         return light;
@@ -43,6 +56,7 @@ public final class PointLightPool extends Pool<PointLight> {
     @NotNull
     public PointLight obtain(float worldX, float worldY) {
         var light = obtain();
+        Main.logger().log("Obtaining light @ " + worldX + ", " + worldY);
         light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
         return light;
     }
@@ -63,10 +77,20 @@ public final class PointLightPool extends Pool<PointLight> {
 
     @Override
     public void free(PointLight light) {
+
+        final Vector2 position = light.getPosition();
+        Main.logger().log("Freeing light @ " + position.x + ", " + position.y);
         synchronized (LIGHT_LOCK) {
             light.setActive(false);
         }
         super.free(light);
+    }
+
+    @Override
+    protected void discard(PointLight light) {
+        synchronized (LIGHT_LOCK) {
+            light.remove(true);
+        }
     }
 
     @Override

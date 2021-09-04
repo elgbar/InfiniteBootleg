@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
@@ -118,16 +119,14 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     }
 
     public void resetSkylight() {
-        synchronized (BOX2D_LOCK) {
-            synchronized (LIGHT_LOCK) {
-                if (skylight != null) {
-                    skylight.remove();
-                }
-                skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.SUNRISE_TIME);
-                skylight.setStaticLight(true);
-                skylight.setContactFilter(World.LIGHT_FILTER);
-                skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
+        synchronized (LIGHT_LOCK) {
+            if (skylight != null) {
+                skylight.remove();
             }
+            skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.SUNRISE_TIME);
+            skylight.setStaticLight(true);
+            skylight.setContactFilter(World.LIGHT_FILTER);
+            skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
         }
     }
 
@@ -318,10 +317,23 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public void reload() {
         synchronized (BOX2D_LOCK) {
             synchronized (LIGHT_LOCK) {
-                PointLightPool.inst.clear();
                 rayHandler.removeAll();
+                PointLightPool.clearAllPools();
                 skylight = null; //do not dispose skylight, it has already been disposed here
+
+
+                final int active = rayHandler.getEnabledLights().size;
+                if (active != 0) {
+                    Main.logger().error("LIGHT", "There are " + active + " active lights after reload");
+                }
+                final int disabled = rayHandler.getDisabledLights().size;
+                if (disabled != 0) {
+                    Main.logger().error("LIGHT", "There are " + disabled + " disabled lights after reload");
+                }
+
                 resetSkylight();
+
+                rayHandler.update();
             }
         }
     }

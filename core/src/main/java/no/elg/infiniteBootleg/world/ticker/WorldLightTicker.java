@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg.world.ticker;
 
-import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
-
 import box2dLight.DirectionalLight;
 import com.badlogic.gdx.graphics.Color;
 import no.elg.infiniteBootleg.Settings;
@@ -40,21 +38,15 @@ public class WorldLightTicker implements Ticking {
                 DirectionalLight skylight = wr.getSkylight();
                 float currTime = time.getTime();
                 if (time.normalizedTime() >= 180) {
-                    synchronized (LIGHT_LOCK) {
-                        skylight.setDirection(currTime);
-                    }
+                    skylight.setDirection(currTime);
                 }
                 float brightness = time.getSkyBrightness(currTime);
                 if (brightness > 0) {
                     Color newColor = tmpColor.set(time.getBaseColor()).mul(brightness, brightness, brightness, 1);
-                    synchronized (LIGHT_LOCK) {
-                        skylight.setColor(newColor);
-                    }
+                    skylight.setColor(newColor);
                 }
                 else {
-                    synchronized (LIGHT_LOCK) {
-                        skylight.setColor(Color.BLACK);
-                    }
+                    skylight.setColor(Color.BLACK);
                 }
             }
         }
