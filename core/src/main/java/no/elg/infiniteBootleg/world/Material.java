@@ -214,7 +214,7 @@ public enum Material {
             else {
                 locChunk = world.getChunkFromWorld(location);
             }
-            
+
             if (locChunk == null) {
                 Main.logger().error("MATERIAL", "Failed get chunk for entity block");
                 continue;

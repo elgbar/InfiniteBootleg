@@ -206,6 +206,40 @@ public class TntBlock extends TickingBlock {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TntBlock)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        TntBlock block = (TntBlock) o;
+
+        if (fuseDurationTicks != block.fuseDurationTicks) {
+            return false;
+        }
+        if (Float.compare(block.strength, strength) != 0) {
+            return false;
+        }
+        if (exploded != block.exploded) {
+            return false;
+        }
+        return getTicksLeft() == block.getTicksLeft(); //FIXME what if tickID is different between the two calls?
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + fuseDurationTicks;
+        result = 31 * result + (strength != +0.0f ? Float.floatToIntBits(strength) : 0);
+        result = 31 * result + (exploded ? 1 : 0);
+        return result;
+    }
+
     @Override
     public void dispose() {
         if (light != null) {

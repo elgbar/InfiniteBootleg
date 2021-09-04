@@ -8,7 +8,6 @@ import box2dLight.ConeLight;
 import box2dLight.Light;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
@@ -16,7 +15,6 @@ import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
 import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +77,7 @@ public class Player extends LivingEntity {
             controls = new KeyboardControls(getWorld().getRender(), this);
         }
         else {
-            Main.inst().getConsoleLogger().warn("PLR", "Tried to give control to a player already with control" + hudDebug());
+            Main.inst().getConsoleLogger().warn("PLR", "Tried to give control to a player already with control " + hudDebug());
         }
     }
 
@@ -90,7 +88,7 @@ public class Player extends LivingEntity {
             controls = null;
         }
         else {
-            Main.inst().getConsoleLogger().warn("PLR", "Tried to remove control from a player without control" + hudDebug());
+            Main.inst().getConsoleLogger().warn("PLR", "Tried to remove control from a player without control " + hudDebug());
         }
     }
 
@@ -101,7 +99,7 @@ public class Player extends LivingEntity {
 
     @Override
     public TextureRegion getTextureRegion() {
-        return region;
+        return TEXTURE_REGION;
     }
 
     @Override
@@ -114,10 +112,14 @@ public class Player extends LivingEntity {
         return 4 * BLOCK_SIZE - 1;
     }
 
-    public void setTorchAngle(float angleDeg) {
-        synchronized (WorldRender.LIGHT_LOCK) {
-            torchLight.setDirection(angleDeg);
+    public void toggleTorch() {
+        synchronized (LIGHT_LOCK) {
+            torchLight.setActive(!torchLight.isActive());
         }
+    }
+
+    public void setTorchAngle(float angleDeg) {
+        torchLight.setDirection(angleDeg);
     }
 
     @Override
@@ -133,9 +135,8 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public synchronized void dispose() {
+    public void dispose() {
         if (isInvalid()) {
-            Main.logger().error("Player", "Tried to dispose disposed player");
             return;
         }
         super.dispose();
@@ -152,7 +153,7 @@ public class Player extends LivingEntity {
         return PUSH_UP;
     }
 
-    public Light getTorchLight() {
+    public @NotNull Light getTorchLight() {
         return torchLight;
     }
 

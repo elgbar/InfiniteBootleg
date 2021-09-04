@@ -35,29 +35,10 @@ public class GenericEntity extends Entity implements Removable {
     }
 
     public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height) {
-        this(world, worldX, worldY, width, height, World.ENTITY_FILTER);
-    }
-
-    public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height, @NotNull Filter filter) {
-        //Cannot center as the width and height will be 0 anyway
-        super(world, worldX, worldY, false, UUID.randomUUID());
-        if (isInvalid()) {
-            return;
-        }
+        super(world, worldX, worldY, true, UUID.randomUUID());
 
         this.width = width * Block.BLOCK_SIZE;
         this.height = height * Block.BLOCK_SIZE;
-
-        //make sure the width and height is correct
-        synchronized (WorldRender.BOX2D_LOCK) {
-            synchronized (this) {
-                for (Fixture fixture : getBody().getFixtureList()) {
-                    getBody().destroyFixture(fixture);
-                }
-            }
-            createFixture(getBody());
-            setFilter(filter);
-        }
     }
 
     @Override
