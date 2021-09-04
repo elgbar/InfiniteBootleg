@@ -156,11 +156,6 @@ public class ChunkImpl implements Chunk {
             if (currBlock == block) {
                 return currBlock;
             }
-            else if (currBlock != null && block != null && currBlock.getMaterial() == block.getMaterial()) {
-                //Block is the same, ignore this set
-                block.dispose();
-                return currBlock;
-            }
 
             if (currBlock != null) {
                 currBlock.dispose();
@@ -556,6 +551,10 @@ public class ChunkImpl implements Chunk {
             builder.addBlocks(block.save());
         }
         for (Entity entity : getEntities()) {
+            if (entity instanceof Player) {
+                //Do not persist players
+                continue;
+            }
             builder.addEntities(entity.save());
         }
         return builder.build().toByteArray();
@@ -584,6 +583,9 @@ public class ChunkImpl implements Chunk {
         synchronized (this) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int x = 0; x < CHUNK_SIZE; x++) {
+                    if (blocks[x][y] != null) {
+                        throw new IllegalStateException("Double assemble");
+                    }
                     var protoBlock = protoBlocks.get(index++);
                     Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
                     if (mat == AIR || mat.isEntity()) {
@@ -606,10 +608,12 @@ public class ChunkImpl implements Chunk {
                     Preconditions.checkArgument(protoEntity.hasMaterial());
                     final Proto.Entity.Material entityBlock = protoEntity.getMaterial();
                     final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
-                    entity = material.createEntity(world, protoEntity, this);
+                    material.createEntity(world, protoEntity, this);
+                    continue; //Entity added in createEntity method
                 }
                 case UNRECOGNIZED -> {
                     Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
+                    continue;
                 }
             }
             if (entity == null || entity.isInvalid()) {
