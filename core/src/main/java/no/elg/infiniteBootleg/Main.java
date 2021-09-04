@@ -81,7 +81,7 @@ public class Main extends ApplicationAdapter {
         scheduler = new CancellableThreadScheduler(Settings.schedulerThreads);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             world.save();
-            final FileHandle worldFolder = world.worldFolder();
+            final FileHandle worldFolder = world.getWorldFolder();
             if (worldFolder != null) {
 
                 worldFolder.deleteDirectory();

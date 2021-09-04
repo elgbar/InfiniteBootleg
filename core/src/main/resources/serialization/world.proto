@@ -5,6 +5,33 @@ option java_multiple_files = false;
 option java_package = "no.elg.infiniteBootleg.protobuf";
 option java_outer_classname = "Proto";
 
+message Vector2f{
+  float x = 1;
+  float y = 2;
+}
+
+message Vector2i{
+  sint32 x = 1;
+  sint32 y = 2;
+}
+
+message World {
+  int64 seed = 1;
+  string name = 2;
+  float time = 3;
+  Vector2i spawn = 4;
+
+  Generator generator = 16;
+  optional Entity player = 17;
+
+  enum Generator{
+    PERLIN = 0;
+    FLAT = 1;
+    EMPTY = 2;
+  }
+
+}
+
 message Block {
   int32 material_ordinal = 1; //ordinal from Material enum
 
@@ -19,16 +46,6 @@ message Chunk {
   Vector2i position = 1;
   repeated Block blocks = 2;
   repeated Entity entities = 16;
-}
-
-message Vector2f{
-  float x = 1;
-  float y = 2;
-}
-
-message Vector2i{
-  sint32 x = 1;
-  sint32 y = 2;
 }
 
 message Entity {

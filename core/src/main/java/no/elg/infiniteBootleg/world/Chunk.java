@@ -34,7 +34,7 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, D
 
     @Nullable
     static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
-        FileHandle worldFile = world.worldFolder();
+        FileHandle worldFile = world.getWorldFolder();
         if (worldFile == null) {
             return null;
         }

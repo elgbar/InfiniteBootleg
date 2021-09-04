@@ -27,7 +27,7 @@ public class PerlinNoise {
      * @param seed
      *     The random seed used to swap elements around randomly
      */
-    public PerlinNoise(int seed) {
+    public PerlinNoise(long seed) {
         Random random = new RandomXS128(seed);
         for (int i = 0; i < 256; i++) {
             p[256 + i] = p[i] = permutation[i];

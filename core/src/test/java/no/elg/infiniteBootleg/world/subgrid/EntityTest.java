@@ -192,14 +192,14 @@ public class EntityTest extends TestGraphic {
         Assert.assertTrue(ent2.touchingEntities().contains(ent));
     }
 
-    @Test
-    public void touchingEntitiesOverlapNoCollision() {
-        Entity ent = new GenericEntity(world, 0, 0, 2, 2, World.LIGHT_FILTER);
-        Entity ent2 = new GenericEntity(world, 1.1f, 1.1f);
-        ent2.teleport(0, 0.5f, false);
-        Assert.assertTrue(ent.touchingEntities().isEmpty());
-        Assert.assertTrue(ent2.touchingEntities().isEmpty());
-    }
+//    @Test
+//    public void touchingEntitiesOverlapNoCollision() {
+//        Entity ent = new GenericEntity(world, 0, 0, 2, 2, World.LIGHT_FILTER);
+//        Entity ent2 = new GenericEntity(world, 1.1f, 1.1f);
+//        ent2.teleport(0, 0.5f, false);
+//        Assert.assertTrue(ent.touchingEntities().isEmpty());
+//        Assert.assertTrue(ent2.touchingEntities().isEmpty());
+//    }
 
     @Test
     public void touchingEntitiesOverlapCollideSpawnValid() {

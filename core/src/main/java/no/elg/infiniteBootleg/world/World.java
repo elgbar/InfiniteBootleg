@@ -1,7 +1,10 @@
 package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
-import static no.elg.infiniteBootleg.Main.INST_LOCK;
+import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.EMPTY;
+import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.FLAT;
+import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.PERLIN;
+import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.UNRECOGNIZED;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.Gdx;
@@ -14,8 +17,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +31,7 @@ import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
+import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
@@ -34,6 +40,9 @@ import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -73,6 +82,8 @@ public class World implements Disposable, Resizable {
 
     public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
     public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
+
+    public static final String WORLD_INFO_LOCATION = "world.dat";
 
     static {
         //base filter for entities
@@ -131,6 +142,10 @@ public class World implements Disposable, Resizable {
     private Location spawn;
     private final Lock loadLock = new ReentrantLock();
 
+    public World(@NotNull Proto.World protoWorld) {
+        this(generatorFromProto(protoWorld), protoWorld.getSeed(), true, protoWorld.getName());
+    }
+
     /**
      * Generate a world with a random seed
      */
@@ -145,10 +160,7 @@ public class World implements Disposable, Resizable {
     public World(@NotNull ChunkGenerator generator, long seed, boolean tick, @NotNull String worldName) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
-
-        byte[] uuidSeed = new byte[128];
-        MathUtils.random.nextBytes(uuidSeed);
-        uuid = UUID.nameUUIDFromBytes(uuidSeed);
+        uuid = getUUIDFromSeed(seed);
 
         name = worldName;
 
@@ -168,21 +180,36 @@ public class World implements Disposable, Resizable {
         }
     }
 
-    public void load() {
-        FileHandle worldFolder = worldFolder();
+    private static UUID getUUIDFromSeed(long seed) {
+        byte[] uuidSeed = new byte[128];
+        var random = new Random(seed);
+        random.nextBytes(uuidSeed);
+        return UUID.nameUUIDFromBytes(uuidSeed);
+    }
 
-        FileHandle worldZip = worldFolder != null ? worldFolder.parent().child(uuid + ".zip") : null;
+    @Nullable
+    private static World loadWorld(long seed) {
+        var uuid = getUUIDFromSeed(seed);
+        var worldFolder = getWorldFolder(uuid);
+        FileHandle worldZip = getWorldZip(worldFolder);
 
-        if (Settings.renderGraphic && (worldFolder == null || !worldFolder.exists() || worldZip == null || !worldZip.exists())) {
-            WorldInputHandler inputHandler = getInput();
-            if (inputHandler != null) {
-                synchronized (INST_LOCK) {
-                    var mainPlayer = Main.inst().getPlayer();
-                    final Player newPlayer = mainPlayer == null || mainPlayer.isInvalid() ? new Player(this, 0, 0) : mainPlayer;
-                    Main.inst().setPlayer(newPlayer, false);
-                }
-            }
+        if (!Settings.loadWorldFromDisk || worldFolder == null) {
+            return null;
         }
+        if (worldZip == null || !worldZip.exists()) {
+            Main.logger().log("No world save found");
+            return null;
+        }
+        worldFolder.deleteDirectory();
+        ZipUtils.unzip(worldFolder, worldZip);
+
+        return null;
+    }
+
+    public void load() {
+        FileHandle worldFolder = getWorldFolder();
+        FileHandle worldZip = getWorldZip();
+
         if (!Settings.loadWorldFromDisk || worldFolder == null) {
             return;
         }
@@ -194,19 +221,58 @@ public class World implements Disposable, Resizable {
 
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
+
+        var worldInfoFile = worldFolder.child(WORLD_INFO_LOCATION);
+
+        final Proto.World protoWorld;
+        try {
+            protoWorld = Proto.World.parseFrom(worldInfoFile.readBytes());
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        spawn = Location.fromVector2i(protoWorld.getSpawn());
+        worldTime.setTime(protoWorld.getTime());
+
+        if (protoWorld.hasPlayer()) {
+            final Player newPlayer = new Player(this, protoWorld.getPlayer());
+            if (!newPlayer.isInvalid()) {
+                addEntity(newPlayer, false);
+                Main.inst().setPlayer(newPlayer);
+            }
+        }
     }
 
     public void save() {
         if (!Settings.loadWorldFromDisk) {
             return;
         }
-        FileHandle worldFolder = worldFolder();
+        FileHandle worldFolder = getWorldFolder();
         if (worldFolder == null) {
             return;
         }
         for (Chunk chunk : getChunks().values()) {
             chunkLoader.save(chunk);
         }
+
+        var builder = Proto.World.newBuilder();
+        builder.setName(name);
+        builder.setSeed(seed);
+        builder.setTime(worldTime.getTime());
+        builder.setSpawn(spawn.toVector2i());
+        builder.setGenerator(getGeneratorType());
+        final Player player = Main.inst().getPlayer();
+        if (player != null) {
+            builder.setPlayer(player.save());
+        }
+
+        var worldInfoFile = worldFolder.child(WORLD_INFO_LOCATION);
+        if (worldInfoFile.exists()) {
+            worldInfoFile.moveTo(worldFolder.child(WORLD_INFO_LOCATION + ".old"));
+        }
+        worldInfoFile.writeBytes(builder.build().toByteArray(), false);
+
         FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
         try {
             ZipUtils.zip(worldFolder, worldZip);
@@ -220,15 +286,51 @@ public class World implements Disposable, Resizable {
      * @return The current folder of the world or {@code null} if no disk should be used
      */
     @Nullable
-    public FileHandle worldFolder() {
+    public FileHandle getWorldFolder() {
         if (Settings.loadWorldFromDisk) {
             if (worldFile == null) {
-                worldFile = Gdx.files.external(Main.WORLD_FOLDER + uuid);
+                worldFile = getWorldFolder(uuid);
             }
             return worldFile;
         }
         else {
             return null;
+        }
+    }
+
+    protected FileHandle getWorldZip() {
+        return getWorldZip(getWorldFolder());
+    }
+
+    public static FileHandle getWorldZip(FileHandle folder) {
+        return folder != null ? folder.parent().child(folder.name() + ".zip") : null;
+    }
+
+    public static FileHandle getWorldFolder(@NotNull UUID uuid) {
+        return Gdx.files.external(Main.WORLD_FOLDER + uuid);
+    }
+
+    private static ChunkGenerator generatorFromProto(@NotNull Proto.World protoWorld) {
+        return switch (protoWorld.getGenerator()) {
+            case PERLIN, UNRECOGNIZED -> new PerlinChunkGenerator(protoWorld.getSeed());
+            case FLAT -> new FlatChunkGenerator();
+            case EMPTY -> new EmptyChunkGenerator();
+        };
+    }
+
+    private Proto.World.Generator getGeneratorType() {
+        final ChunkGenerator generator = chunkLoader.getGenerator();
+        if (generator instanceof PerlinChunkGenerator) {
+            return PERLIN;
+        }
+        else if (generator instanceof FlatChunkGenerator) {
+            return FLAT;
+        }
+        else if (generator instanceof EmptyChunkGenerator) {
+            return EMPTY;
+        }
+        else {
+            return UNRECOGNIZED;
         }
     }
 
@@ -659,7 +761,7 @@ public class World implements Disposable, Resizable {
 
     /**
      * Add the given entity to entities in the world.
-     * <b>NOTE</b> this is automatically done when creating a new entity instance. Do not use this method
+     * <b>NOTE</b> this is NOT automatically done when creating a new entity instance.
      *
      * @param entity
      *     The entity to add
@@ -668,7 +770,7 @@ public class World implements Disposable, Resizable {
 
     /**
      * Add the given entity to entities in the world.
-     * <b>NOTE</b> this is automatically done when creating a new entity instance. Do not use this method
+     * <b>NOTE</b> this is NOT automatically done when creating a new entity instance.
      *
      * @param entity
      *     The entity to add
@@ -676,11 +778,11 @@ public class World implements Disposable, Resizable {
      */
     public void addEntity(@NotNull Entity entity, boolean loadChunk) {
         if (entities.stream().anyMatch(it -> it == entity)) {
-            Main.logger().error("World", "Tried to add entity twice to world " + entity.hudDebug());
+            Main.logger().error("World", "Tried to add entity twice to world " + entity.simpleName() + " " + entity.hudDebug());
             return;
         }
         if (containsEntity(entity.getUuid())) {
-            Main.logger().error("World", "Tried to add duplicate entity to world " + entity.hudDebug());
+            Main.logger().error("World", "Tried to add duplicate entity to world " + entity.simpleName() + " " + entity.hudDebug());
             removeEntity(entity);
             return;
         }

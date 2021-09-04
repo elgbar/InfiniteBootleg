@@ -22,9 +22,9 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     private final PerlinNoise noise;
     private final FastNoise noise2;
 
-    public PerlinChunkGenerator(int seed) {
+    public PerlinChunkGenerator(long seed) {
         noise = new PerlinNoise(seed);
-        noise2 = new FastNoise(seed);
+        noise2 = new FastNoise((int) seed);
 
         noise2.SetNoiseType(FastNoise.NoiseType.PerlinFractal);
         noise2.SetFrequency(0.01f);
