@@ -65,7 +65,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
 
 
     public Entity(@NotNull World world, @NotNull Proto.Entity protoEntity) {
-        this(world, protoEntity.getPosition().getX(), protoEntity.getPosition().getY(), false, UUID.fromString(protoEntity.getUuid()));
+        this(world, protoEntity.getPosition().getX(), protoEntity.getPosition().getY(), false, UUID.fromString(protoEntity.getUuid()), false);
 
         Preconditions.checkArgument(protoEntity.getType() == getEntityType());
         if (protoEntity.getFlying()) {
@@ -84,7 +84,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         this(world, worldX, worldY, true, uuid);
     }
 
-    public Entity(@NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
+    public Entity(@NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) { this(world, worldX, worldY, center, uuid, true); }
+
+    private Entity(@NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid, boolean validateLocation) {
         this.uuid = uuid;
         this.world = world;
         posCache = new Vector2(worldX, worldY);
@@ -95,11 +97,28 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             return;
         }
 
-        flying = false;
         filter = World.ENTITY_FILTER;
 
         if (center) {
             posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
+        }
+
+        if (validateLocation && isInvalidLocation(posCache.x, posCache.y)) {
+            switch (invalidSpawnLocationAction()) {
+                case DELETE -> {
+                    Main.logger().debug("Entity",
+                                        String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", simpleName(), posCache.x, posCache.y));
+                    valid = false;
+                    return;
+                }
+                case PUSH_UP -> {
+                    //make sure we're not stuck in an infinite loop if the given height is zero
+                    float checkStep = Math.min(getHalfBox2dHeight(), 0.1f);
+                    while (isInvalidLocation(posCache.x, posCache.y)) {
+                        posCache.y += checkStep;
+                    }
+                }
+            }
         }
 
         synchronized (BOX2D_LOCK) {
@@ -110,32 +129,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             body.setUserData(this);
         }
 
-        Main.inst().getScheduler().scheduleAsync(() -> {
-            updatePos();
-            if (isInvalidLocation(posCache.x, posCache.y)) {
-                switch (invalidSpawnLocationAction()) {
-                    case DELETE -> {
-                        Main.logger().debug("Entity",
-                                            String.format("Did not spawn %s at (%.2f,%.2f) as the spawn is invalid", simpleName(), posCache.x, posCache.y));
-                        getWorld().removeEntity(this);
-                        return;
-                    }
-                    case PUSH_UP -> {
-                        //make sure we're not stuck in an infinite loop if the given height is zero
-                        float checkStep = Math.min(getHalfBox2dHeight(), 0.1f);
-                        Vector2 tmpPos = posCache.cpy();
-                        while (isInvalidLocation(tmpPos.x, tmpPos.y)) {
-                            tmpPos.y += checkStep;
-                        }
-
-                        synchronized (BOX2D_LOCK) {
-                            body.setTransform(tmpPos, 0f);
-                            posCache.y = tmpPos.y;
-                        }
-                    }
-                }
+        //Sanity check
+        Main.inst().getScheduler().scheduleSync(() -> {
+            if (!isInvalid() && !world.containsEntity(uuid)) {
+                Main.inst().getConsoleLogger().warn("Failed to find entity '" + hudDebug() + "' in the world '" + world + "'! Did you forget to add it?");
             }
-        }, 1L);
+        }, 10L);
     }
 
     /**
