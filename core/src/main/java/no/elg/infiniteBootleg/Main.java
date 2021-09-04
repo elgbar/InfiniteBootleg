@@ -181,7 +181,7 @@ public class Main extends ApplicationAdapter {
             }
         }
         world.getRender().render();
-        
+
 
         hud.render();
         console.draw();
@@ -241,7 +241,7 @@ public class Main extends ApplicationAdapter {
             if (mainPlayer == null || mainPlayer.isInvalid()) {
                 for (LivingEntity entity : world.getLivingEntities()) {
                     if (entity instanceof Player player && !entity.isInvalid() && player.getControls() != null) {
-                        setPlayer(player, false);
+                        setPlayer(player);
                         return mainPlayer;
                     }
                 }
@@ -253,17 +253,26 @@ public class Main extends ApplicationAdapter {
         }
     }
 
-    public void setPlayer(@Nullable Player player, boolean removeOld) {
+    public void setPlayer(@Nullable Player player) {
+        if (player != null && player.isInvalid()) {
+            logger().error("PLR", "Tried to set main player to an invalid entity");
+            return;
+        }
         synchronized (INST_LOCK) {
             if (mainPlayer != player) {
                 //if mainPlayer and player are the same, we would dispose the ''new'' mainPlayer
 
-
-                if (mainPlayer != null) {
+                if (mainPlayer != null && mainPlayer.hasControls()) {
                     mainPlayer.removeControls();
                 }
                 if (player != null) {
-                    player.giveControls();
+                    if (!world.containsEntity(player.getUuid())) {
+                        logger().error("PLR", "Tried to set main player to an entity that's not in the world!");
+                        world.addEntity(player);
+                    }
+                    if (!player.hasControls()) {
+                        player.giveControls();
+                    }
                 }
                 mainPlayer = player;
                 logger().debug("PLR", "Changing main player to " + player);

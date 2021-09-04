@@ -44,7 +44,11 @@ public class Player extends LivingEntity {
         final Proto.Entity.Player protoPlayer = protoEntity.getPlayer();
         setTorchAngle(protoPlayer.getTorchAngleDeg());
         if (protoPlayer.getControlled()) {
-            Main.inst().setPlayer(this, false);
+            Main.inst().getScheduler().executeSync(() -> {
+                if (!isInvalid()) {
+                    Main.inst().setPlayer(this);
+                }
+            });
         }
     }
 
@@ -53,7 +57,9 @@ public class Player extends LivingEntity {
         if (isInvalid()) {
             return;
         }
-        giveControls();
+        Main.inst().setPlayer(this);
+    }
+
     static {
         TEXTURE_REGION = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
     }
