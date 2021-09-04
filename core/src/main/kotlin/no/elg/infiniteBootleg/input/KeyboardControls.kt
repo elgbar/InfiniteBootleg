@@ -145,7 +145,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     }
   }
 
-  private fun updateTorch(player: Player) {
+  private fun updateTorchDirection(player: Player) {
     val angle: Float = tmpVec.set(Main.inst().mouse).sub(player.position).angleDeg()
     synchronized(WorldRender.LIGHT_LOCK) {
       val torchLight = player.torchLight
@@ -177,7 +177,15 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     }
 
     if (controlled is Player) {
-      updateTorch(controlled as Player)
+      val player = controlled as Player
+
+
+      if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        player.toggleTorch()
+      }
+      if (player.torchLight.isActive) {
+        updateTorchDirection(player)
+      }
     }
 
     if (update) {
