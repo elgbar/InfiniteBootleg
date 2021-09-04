@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
+import no.elg.infiniteBootleg.util.Savable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class Block implements Disposable, HUDDebuggable {
+public class Block implements Disposable, HUDDebuggable, Savable<Proto.BlockOrBuilder> {
 
     public static final int BLOCK_SIZE = 16;
 
@@ -135,6 +136,7 @@ public class Block implements Disposable, HUDDebuggable {
         chunk.setBlock(localX, localY, (Block) null, updateTexture);
     }
 
+    @Override
     public Proto.Block.Builder save() {
         return Proto.Block.newBuilder().setMaterialOrdinal(material.ordinal());
     }

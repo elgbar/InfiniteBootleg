@@ -26,6 +26,7 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.Proto;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
+import no.elg.infiniteBootleg.util.Savable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -45,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The position of each entity is recorded in world coordinates and is centered in the middle of the entity.
  */
-public abstract class Entity implements Ticking, Disposable, ContactHandler, HUDDebuggable {
+public abstract class Entity implements Ticking, Disposable, ContactHandler, HUDDebuggable, Savable<Proto.EntityOrBuilder> {
 
     public static final float GROUND_CHECK_OFFSET = 0.1f;
 
@@ -621,6 +622,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         }
     }
 
+    @Override
     public Proto.Entity.Builder save() {
         final Proto.Entity.Builder builder = Proto.Entity.newBuilder();
 
