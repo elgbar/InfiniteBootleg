@@ -160,9 +160,7 @@ public class Player extends LivingEntity {
     public void tick() {
         super.tick();
         Vector2 pos = getPhysicsPosition();
-        synchronized (LIGHT_LOCK) {
-            torchLight.setPosition(pos);
-        }
+        torchLight.setPosition(pos);
     }
 
     @Override
