@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
@@ -111,29 +110,42 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         Main.inst().getInputMultiplexer().removeProcessor(this);
     }
 
+    /**
+     * @return We are following a non-null, valid target, and is locked on
+     */
+    private boolean hasValidLockOn() {
+        return following != null && !following.isInvalid() && lockedOn;
+    }
+
     private void cameraFollowUpdate() {
         OrthographicCamera camera = worldRender.getCamera();
-        if (following != null && !following.isInvalid() && lockedOn) {
+        if (hasValidLockOn()) {
+            assert following != null;
             final Vector2 position = following.getPhysicsPosition();
             float x = position.x * Block.BLOCK_SIZE;
             float y = position.y * Block.BLOCK_SIZE;
 
-            if (Settings.enableCameraFollowLerp) {
-                float dx = (x - camera.position.x) * CAMERA_LERP;
-                float dy = (y - camera.position.y) * CAMERA_LERP;
+            float dx = (x - camera.position.x) * CAMERA_LERP;
+            float dy = (y - camera.position.y) * CAMERA_LERP;
 
-                if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
-                    camera.position.x += dx * Gdx.graphics.getDeltaTime();
-                    camera.position.y += dy * Gdx.graphics.getDeltaTime();
-                }
-            }
-            else {
-                camera.position.x = x;
-                camera.position.y = y;
+            if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
+                camera.position.x += dx * Gdx.graphics.getDeltaTime();
+                camera.position.y += dy * Gdx.graphics.getDeltaTime();
             }
             worldRender.update();
         }
+    }
 
+    private void teleportCamera() {
+        OrthographicCamera camera = worldRender.getCamera();
+        if (hasValidLockOn()) {
+            assert following != null;
+            final Vector2 position = following.getPhysicsPosition();
+
+            camera.position.x = position.x * Block.BLOCK_SIZE;
+            camera.position.y = position.y * Block.BLOCK_SIZE;
+            worldRender.update();
+        }
     }
 
     @Override
@@ -166,7 +178,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
 
     /**
-     * Change who to follow, does not change if the camera <i>is</i> locked on
+     * Change who to follow, also automatically lock on and move the camera to the new following entity
      *
      * @param following
      *     What to follow, null if none
@@ -176,7 +188,14 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
             Main.inst().getConsoleLogger().error("World Input", "Cannot pass a non-null invalid entity!");
             return;
         }
+        //always update locked on status
+        lockedOn = true;
+        if (following == this.following) {
+            //Do not teleport the camera, it looks very janky
+            return;
+        }
         this.following = following;
+        teleportCamera();
     }
 
     /**
