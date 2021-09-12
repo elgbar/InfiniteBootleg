@@ -275,6 +275,10 @@ public class Main extends ApplicationAdapter {
                     }
                 }
                 mainPlayer = player;
+                if (Settings.renderGraphic) {
+                    assert world.getInput() != null;
+                    world.getInput().setFollowing(mainPlayer);
+                }
                 logger().debug("PLR", "Changing main player to " + player);
             }
             final WorldInputHandler worldInput = world.getInput();
