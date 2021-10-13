@@ -661,7 +661,7 @@ public class World implements Disposable, Resizable {
      * @return All currently loaded chunks
      */
     public Collection<Chunk> getLoadedChunks() {
-        return chunks.values().stream().filter(it -> !it.isLoaded()).collect(Collectors.toUnmodifiableSet());
+        return chunks.values().stream().filter(Chunk::isLoaded).collect(Collectors.toUnmodifiableSet());
     }
 
 
