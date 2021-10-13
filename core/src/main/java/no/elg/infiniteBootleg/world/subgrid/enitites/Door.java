@@ -101,12 +101,14 @@ public class Door extends MaterialEntity {
             int oldContacts = contacts.getAndIncrement();
             if (oldContacts == 0) {
                 setFilter(TRANSPARENT_BLOCK_ENTITY_FILTER);
+                Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
             }
         }
         else if (type == ContactType.END_CONTACT) {
             int newContacts = contacts.decrementAndGet();
             if (newContacts == 0) {
                 setFilter(BLOCK_ENTITY_FILTER);
+                Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
             }
         }
         final int cont = contacts.get();
