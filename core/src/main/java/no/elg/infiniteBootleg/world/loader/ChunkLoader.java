@@ -1,12 +1,14 @@
 package no.elg.infiniteBootleg.world.loader;
 
 import com.badlogic.gdx.files.FileHandle;
+import java.io.File;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Handle saving and loading of chunks.
@@ -19,12 +21,22 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ChunkLoader {
 
+    public static final String CHUNK_FOLDER = "chunks";
     private final World world;
     private final ChunkGenerator generator;
 
     public ChunkLoader(@NotNull World world, @NotNull ChunkGenerator generator) {
         this.world = world;
         this.generator = generator;
+    }
+
+    @Nullable
+    public static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
+        FileHandle worldFile = world.getWorldFolder();
+        if (worldFile == null) {
+            return null;
+        }
+        return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY);
     }
 
     /**
@@ -40,8 +52,8 @@ public class ChunkLoader {
     public Chunk load(int chunkX, int chunkY) {
         if (existsOnDisk(chunkX, chunkY)) {
             ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
-            //noinspection ConstantConditions checked in existsOnDisk
-            if (chunk.assemble(chunk.getChunkFile().readBytes())) {
+            final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
+            if (chunk.assemble(chunkFile.readBytes())) {
                 chunk.finishLoading();
                 return chunk;
             }
@@ -62,18 +74,17 @@ public class ChunkLoader {
         if (!Settings.loadWorldFromDisk) {
             return false;
         }
-        FileHandle chunkFile = Chunk.getChunkFile(world, chunkX, chunkY);
+        FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
         return chunkFile != null && chunkFile.exists();
     }
 
     public void save(@NotNull Chunk chunk) {
         if (Settings.loadWorldFromDisk && chunk.shouldSave() && chunk.isLoaded()) {
             //only save if valid and changed
-            FileHandle fh = chunk.getChunkFile();
+            FileHandle fh = getChunkFile(world, chunk.getChunkX(), chunk.getChunkY());
             if (fh == null) {
                 return;
             }
-
             fh.writeBytes(chunk.disassemble(), false);
         }
     }

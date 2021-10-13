@@ -2,12 +2,10 @@ package no.elg.infiniteBootleg.world;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import java.io.File;
 import java.util.stream.Stream;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
@@ -30,16 +28,6 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, D
     int CHUNK_SIZE = 32;
     int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
     int CHUNK_SIZE_SHIFT = (int) (Math.log(CHUNK_SIZE) / Math.log(2));
-    String CHUNK_FOLDER = "chunks";
-
-    @Nullable
-    static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
-        FileHandle worldFile = world.getWorldFolder();
-        if (worldFile == null) {
-            return null;
-        }
-        return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY);
-    }
 
     /**
      * Set a block and update all blocks around it
@@ -231,8 +219,6 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, D
     @NotNull Block getBlock(int localX, int localY);
 
     Array<Entity> getEntities();
-
-    @Nullable FileHandle getChunkFile();
 
     @NotNull ChunkBody getChunkBody();
 

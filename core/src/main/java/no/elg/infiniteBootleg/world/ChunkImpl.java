@@ -491,15 +491,6 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    @Nullable
-    public FileHandle getChunkFile() {
-        if (chunkFile == null) {
-            chunkFile = Chunk.getChunkFile(world, chunkX, chunkY);
-        }
-        return chunkFile;
-    }
-
-    @Override
     @NotNull
     public ChunkBody getChunkBody() {
         return chunkBody;
