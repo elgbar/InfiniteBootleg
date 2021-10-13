@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -57,7 +57,7 @@ public class WorldLoader {
         return Gdx.files.external(Main.WORLD_FOLDER + uuid);
     }
 
-    public static ChunkGenerator generatorFromProto(@NotNull Proto.World protoWorld) {
+    public static ChunkGenerator generatorFromProto(@NotNull ProtoWorld.World protoWorld) {
         return switch (protoWorld.getGenerator()) {
             case PERLIN, UNRECOGNIZED -> new PerlinChunkGenerator(protoWorld.getSeed());
             case FLAT -> new FlatChunkGenerator();

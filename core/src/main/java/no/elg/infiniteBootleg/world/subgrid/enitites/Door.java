@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.util.concurrent.atomic.AtomicInteger;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Direction;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
@@ -37,7 +37,7 @@ public class Door extends MaterialEntity {
 
     private final AtomicInteger contacts = new AtomicInteger();
 
-    public Door(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+    public Door(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
         super(world, protoEntity);
     }
 

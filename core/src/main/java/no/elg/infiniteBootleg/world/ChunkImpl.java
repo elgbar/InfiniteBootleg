@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -541,8 +541,8 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public byte[] disassemble() {
-        final Proto.Chunk.Builder builder = Proto.Chunk.newBuilder();
-        builder.setPosition(Proto.Vector2i.newBuilder().setX(chunkX).setY(chunkY).build());
+        final ProtoWorld.Chunk.Builder builder = ProtoWorld.Chunk.newBuilder();
+        builder.setPosition(ProtoWorld.Vector2i.newBuilder().setX(chunkX).setY(chunkY).build());
 
         for (Block block : this) {
             builder.addBlocks(block.save());
@@ -560,15 +560,15 @@ public class ChunkImpl implements Chunk {
     @Override
     public boolean assemble(byte[] bytes) {
 
-        final Proto.Chunk protoChunk;
+        final ProtoWorld.Chunk protoChunk;
         try {
-            protoChunk = Proto.Chunk.parseFrom(bytes);
+            protoChunk = ProtoWorld.Chunk.parseFrom(bytes);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
             return false;
         }
 
-        final Proto.Vector2i chunkPosition = protoChunk.getPosition();
+        final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
         var posErrorMsg =
             "Invalid chunk coordinates given. Expected (" + chunkX + ", " + chunkY + ") but got (" + chunkPosition.getX() + ", " + chunkPosition.getY() + ")";
         Preconditions.checkArgument(chunkPosition.getX() == chunkX, posErrorMsg);
@@ -595,7 +595,7 @@ public class ChunkImpl implements Chunk {
             }
         }
 
-        for (Proto.Entity protoEntity : protoChunk.getEntitiesList()) {
+        for (ProtoWorld.Entity protoEntity : protoChunk.getEntitiesList()) {
             Entity entity = null;
             switch (protoEntity.getType()) {
                 case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
@@ -603,7 +603,7 @@ public class ChunkImpl implements Chunk {
                 case PLAYER -> entity = new Player(world, protoEntity);
                 case BLOCK -> {
                     Preconditions.checkArgument(protoEntity.hasMaterial());
-                    final Proto.Entity.Material entityBlock = protoEntity.getMaterial();
+                    final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
                     final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
                     material.createEntity(world, protoEntity, this);
                     continue; //Entity added in createEntity method

@@ -1,9 +1,9 @@
 syntax = "proto3";
-package world;
+package persistence;
 
 option java_multiple_files = false;
 option java_package = "no.elg.infiniteBootleg.protobuf";
-option java_outer_classname = "Proto";
+option java_outer_classname = "ProtoWorld";
 
 message Vector2f{
   float x = 1;

@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
@@ -29,11 +29,11 @@ public class FallingBlock extends Entity {
 
     private volatile boolean crashed;
 
-    public FallingBlock(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+    public FallingBlock(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
         super(world, protoEntity);
 
         Preconditions.checkArgument(protoEntity.hasMaterial());
-        final Proto.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
+        final ProtoWorld.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
 
         material = Material.fromOrdinal(protoEntityMaterial.getMaterialOrdinal());
         region = new TextureRegion(material.getTextureRegion());
@@ -122,14 +122,14 @@ public class FallingBlock extends Entity {
     }
 
     @Override
-    protected @NotNull Proto.Entity.EntityType getEntityType() {
-        return Proto.Entity.EntityType.FALLING_BLOCK;
+    protected @NotNull ProtoWorld.Entity.EntityType getEntityType() {
+        return ProtoWorld.Entity.EntityType.FALLING_BLOCK;
     }
 
     @Override
-    public Proto.Entity.Builder save() {
-        final Proto.Entity.Builder builder = super.save();
-        final Proto.Entity.Material.Builder materialBuilder = Proto.Entity.Material.newBuilder();
+    public ProtoWorld.Entity.Builder save() {
+        final ProtoWorld.Entity.Builder builder = super.save();
+        final ProtoWorld.Entity.Material.Builder materialBuilder = ProtoWorld.Entity.Material.newBuilder();
 
         materialBuilder.setMaterialOrdinal(material.ordinal());
 

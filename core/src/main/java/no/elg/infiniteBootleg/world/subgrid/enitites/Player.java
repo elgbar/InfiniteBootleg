@@ -14,7 +14,7 @@ import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -33,14 +33,14 @@ public class Player extends LivingEntity {
     @NotNull
     private final Light torchLight;
 
-    public Player(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+    public Player(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
         super(world, protoEntity);
         if (isInvalid()) {
             return;
         }
 
         Preconditions.checkArgument(protoEntity.hasPlayer(), "Player does not contain player data");
-        final Proto.Entity.Player protoPlayer = protoEntity.getPlayer();
+        final ProtoWorld.Entity.Player protoPlayer = protoEntity.getPlayer();
         setTorchAngle(protoPlayer.getTorchAngleDeg());
         if (protoPlayer.getControlled()) {
             Main.inst().getScheduler().executeSync(() -> {
@@ -124,9 +124,9 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public Proto.Entity.Builder save() {
-        final Proto.Entity.Builder builder = super.save();
-        final Proto.Entity.Player.Builder playerBuilder = Proto.Entity.Player.newBuilder();
+    public ProtoWorld.Entity.Builder save() {
+        final ProtoWorld.Entity.Builder builder = super.save();
+        final ProtoWorld.Entity.Player.Builder playerBuilder = ProtoWorld.Entity.Player.newBuilder();
 
         playerBuilder.setTorchAngleDeg(torchLight.getDirection());
         playerBuilder.setControlled(hasControls());
@@ -172,7 +172,7 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    protected @NotNull Proto.Entity.EntityType getEntityType() {
-        return Proto.Entity.EntityType.PLAYER;
+    protected @NotNull ProtoWorld.Entity.EntityType getEntityType() {
+        return ProtoWorld.Entity.EntityType.PLAYER;
     }
 }

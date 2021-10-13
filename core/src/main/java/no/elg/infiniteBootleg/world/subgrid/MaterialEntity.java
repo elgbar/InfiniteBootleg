@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 
 import com.google.common.base.Preconditions;
 import java.util.UUID;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -10,15 +10,15 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MaterialEntity extends Entity implements Removable {
 
-    public MaterialEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+    public MaterialEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
         super(world, protoEntity);
         if (isInvalid()) {
             return;
         }
-        Preconditions.checkArgument(protoEntity.getType() == Proto.Entity.EntityType.BLOCK);
+        Preconditions.checkArgument(protoEntity.getType() == ProtoWorld.Entity.EntityType.BLOCK);
 
         Preconditions.checkArgument(protoEntity.hasMaterial());
-        final Proto.Entity.Material entityBlock = protoEntity.getMaterial();
+        final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
 
         final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
         Preconditions.checkArgument(material == getMaterial(), "Different materials");
@@ -41,8 +41,8 @@ public abstract class MaterialEntity extends Entity implements Removable {
     }
 
     @Override
-    protected @NotNull Proto.Entity.EntityType getEntityType() {
-        return Proto.Entity.EntityType.BLOCK;
+    protected @NotNull ProtoWorld.Entity.EntityType getEntityType() {
+        return ProtoWorld.Entity.EntityType.BLOCK;
     }
 
     @NotNull
@@ -50,9 +50,9 @@ public abstract class MaterialEntity extends Entity implements Removable {
 
 
     @Override
-    public Proto.Entity.Builder save() {
-        final Proto.Entity.Builder builder = super.save();
-        final Proto.Entity.Material.Builder materialBuilder = Proto.Entity.Material.newBuilder();
+    public ProtoWorld.Entity.Builder save() {
+        final ProtoWorld.Entity.Builder builder = super.save();
+        final ProtoWorld.Entity.Material.Builder materialBuilder = ProtoWorld.Entity.Material.newBuilder();
 
         materialBuilder.setMaterialOrdinal(getMaterial().ordinal());
 

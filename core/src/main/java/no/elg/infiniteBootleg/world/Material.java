@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.items.ItemType;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.EntityBlock;
@@ -90,7 +90,7 @@ public enum Material {
                                             name() + " does not have " + MaterialEntity.class.getSimpleName() + " as a super class");
                 try {
                     constructor = impl.getConstructor(World.class, float.class, float.class);
-                    constructorProtoBuf = impl.getConstructor(World.class, Proto.Entity.class);
+                    constructorProtoBuf = impl.getConstructor(World.class, ProtoWorld.Entity.class);
                 } catch (NoSuchMethodException e) {
                     throw new IllegalStateException("There is no constructor of " + impl.getSimpleName() + " with the arguments World, float, float");
                 }
@@ -173,7 +173,7 @@ public enum Material {
     }
 
     @Nullable
-    public MaterialEntity createEntity(@NotNull World world, @NotNull Proto.Entity protoEntity, @NotNull Chunk chunk) {
+    public MaterialEntity createEntity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity, @NotNull Chunk chunk) {
         Preconditions.checkArgument(itemType == ItemType.ENTITY);
         Preconditions.checkNotNull(constructorProtoBuf, "Constructor of entity cannot be null");
         MaterialEntity entity;

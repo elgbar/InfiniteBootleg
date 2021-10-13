@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.math.Vector2;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -47,12 +47,12 @@ public class Location {
         return new Location(x + dir.dx, y + dir.dy);
     }
 
-    public static Location fromVector2i(@NotNull Proto.Vector2i vector2i) {
+    public static Location fromVector2i(@NotNull ProtoWorld.Vector2i vector2i) {
         return new Location(vector2i.getX(), vector2i.getY());
     }
 
-    public Proto.Vector2i toVector2i() {
-        return Proto.Vector2i.newBuilder().setX(x).setY(y).build();
+    public ProtoWorld.Vector2i toVector2i() {
+        return ProtoWorld.Vector2i.newBuilder().setX(x).setY(y).build();
     }
 
     @Override

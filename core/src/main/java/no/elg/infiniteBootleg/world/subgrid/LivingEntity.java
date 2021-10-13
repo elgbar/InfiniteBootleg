@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.input.EntityControls;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,13 +17,13 @@ public abstract class LivingEntity extends Entity implements Updatable {
     private int maxHealth = DEFAULT_MAX_HEALTH;
     private String name = DEFAULT_NAME;
 
-    public LivingEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+    public LivingEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
         super(world, protoEntity);
         if (isInvalid()) {
             return;
         }
         Preconditions.checkArgument(protoEntity.hasLiving(), "Living entity does not contain living data");
-        final Proto.Entity.Living protoLiving = protoEntity.getLiving();
+        final ProtoWorld.Entity.Living protoLiving = protoEntity.getLiving();
         name = protoLiving.getName();
         health = protoLiving.getHealth();
         maxHealth = protoLiving.getMaxHealth();
@@ -77,9 +77,9 @@ public abstract class LivingEntity extends Entity implements Updatable {
     public abstract EntityControls getControls();
 
     @Override
-    public Proto.Entity.Builder save() {
-        final Proto.Entity.Builder builder = super.save();
-        final Proto.Entity.Living.Builder livingBuilder = Proto.Entity.Living.newBuilder();
+    public ProtoWorld.Entity.Builder save() {
+        final ProtoWorld.Entity.Builder builder = super.save();
+        final ProtoWorld.Entity.Living.Builder livingBuilder = ProtoWorld.Entity.Living.newBuilder();
 
         livingBuilder.setHealth(health);
         livingBuilder.setMaxHealth(maxHealth);

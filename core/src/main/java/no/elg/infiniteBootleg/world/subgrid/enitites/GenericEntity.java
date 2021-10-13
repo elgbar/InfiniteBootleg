@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -16,7 +16,7 @@ public class GenericEntity extends Entity implements Removable {
     private int width;
     private int height;
 
-    public GenericEntity(@NotNull World world, Proto.@NotNull Entity protoEntity) {
+    public GenericEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
         super(world, protoEntity);
         if (isInvalid()) {
             return;
@@ -25,7 +25,7 @@ public class GenericEntity extends Entity implements Removable {
         Preconditions.checkArgument(protoEntity.hasGeneric());
         var protoGeneric = protoEntity.getGeneric();
 
-        final Proto.Vector2i protoSize = protoGeneric.getSize();
+        final ProtoWorld.Vector2i protoSize = protoGeneric.getSize();
         width = protoSize.getX();
         height = protoSize.getY();
     }
@@ -50,11 +50,11 @@ public class GenericEntity extends Entity implements Removable {
     }
 
     @Override
-    public Proto.Entity.Builder save() {
-        final Proto.Entity.Builder builder = super.save();
-        final Proto.Entity.Generic.Builder genericBuilder = Proto.Entity.Generic.newBuilder();
+    public ProtoWorld.Entity.Builder save() {
+        final ProtoWorld.Entity.Builder builder = super.save();
+        final ProtoWorld.Entity.Generic.Builder genericBuilder = ProtoWorld.Entity.Generic.newBuilder();
 
-        genericBuilder.setSize(Proto.Vector2i.newBuilder().setX(width).setY(height).build());
+        genericBuilder.setSize(ProtoWorld.Vector2i.newBuilder().setX(width).setY(height).build());
 
         builder.setGeneric(genericBuilder.build());
         return builder;
@@ -77,7 +77,7 @@ public class GenericEntity extends Entity implements Removable {
     }
 
     @Override
-    protected @NotNull Proto.Entity.EntityType getEntityType() {
-        return Proto.Entity.EntityType.GENERIC_ENTITY;
+    protected @NotNull ProtoWorld.Entity.EntityType getEntityType() {
+        return ProtoWorld.Entity.EntityType.GENERIC_ENTITY;
     }
 }

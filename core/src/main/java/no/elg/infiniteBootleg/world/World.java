@@ -1,10 +1,10 @@
 package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
-import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.EMPTY;
-import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.FLAT;
-import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.PERLIN;
-import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.UNRECOGNIZED;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOGNIZED;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
@@ -140,7 +140,7 @@ public class World implements Disposable, Resizable {
     private Location spawn;
     private final Lock loadLock = new ReentrantLock();
 
-    public World(@NotNull Proto.World protoWorld) {
+    public World(@NotNull ProtoWorld.World protoWorld) {
         this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), true, protoWorld.getName());
     }
 
@@ -196,9 +196,9 @@ public class World implements Disposable, Resizable {
 
         var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
 
-        final Proto.World protoWorld;
+        final ProtoWorld.World protoWorld;
         try {
-            protoWorld = Proto.World.parseFrom(worldInfoFile.readBytes());
+            protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
             return;
@@ -228,7 +228,7 @@ public class World implements Disposable, Resizable {
             chunkLoader.save(chunk);
         }
 
-        var builder = Proto.World.newBuilder();
+        var builder = ProtoWorld.World.newBuilder();
         builder.setName(name);
         builder.setSeed(seed);
         builder.setTime(worldTime.getTime());
@@ -274,7 +274,7 @@ public class World implements Disposable, Resizable {
         return WorldLoader.getWorldZip(getWorldFolder());
     }
 
-    private Proto.World.Generator getGeneratorType() {
+    private ProtoWorld.World.Generator getGeneratorType() {
         final ChunkGenerator generator = chunkLoader.getGenerator();
         if (generator instanceof PerlinChunkGenerator) {
             return PERLIN;

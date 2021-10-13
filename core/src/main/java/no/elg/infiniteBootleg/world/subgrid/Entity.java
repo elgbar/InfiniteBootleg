@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
-import no.elg.infiniteBootleg.protobuf.Proto;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Savable;
@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The position of each entity is recorded in world coordinates and is centered in the middle of the entity.
  */
-public abstract class Entity implements Ticking, Disposable, ContactHandler, HUDDebuggable, Savable<Proto.EntityOrBuilder> {
+public abstract class Entity implements Ticking, Disposable, ContactHandler, HUDDebuggable, Savable<ProtoWorld.EntityOrBuilder> {
 
     public static final float GROUND_CHECK_OFFSET = 0.1f;
 
@@ -64,14 +64,14 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     private volatile boolean valid = true;
 
 
-    public Entity(@NotNull World world, @NotNull Proto.Entity protoEntity) {
+    public Entity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
         this(world, protoEntity.getPosition().getX(), protoEntity.getPosition().getY(), false, UUID.fromString(protoEntity.getUuid()), false);
 
         Preconditions.checkArgument(protoEntity.getType() == getEntityType());
         if (protoEntity.getFlying()) {
             setFlying(true);
         }
-        final Proto.Vector2f velocity = protoEntity.getVelocity();
+        final ProtoWorld.Vector2f velocity = protoEntity.getVelocity();
         synchronized (BOX2D_LOCK) {
             if (isInvalid()) {
                 return;
@@ -621,14 +621,14 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     }
 
     @Override
-    public Proto.Entity.Builder save() {
-        final Proto.Entity.Builder builder = Proto.Entity.newBuilder();
+    public ProtoWorld.Entity.Builder save() {
+        final ProtoWorld.Entity.Builder builder = ProtoWorld.Entity.newBuilder();
 
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
                 updatePos();
-                builder.setPosition(Proto.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
-                builder.setVelocity(Proto.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
+                builder.setPosition(ProtoWorld.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
+                builder.setVelocity(ProtoWorld.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
             }
         }
         builder.setUuid(uuid.toString());
@@ -639,7 +639,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     }
 
     @NotNull
-    protected abstract Proto.Entity.EntityType getEntityType();
+    protected abstract ProtoWorld.Entity.EntityType getEntityType();
 
     public boolean isInvalid() {
         return !valid;
