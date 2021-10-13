@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Assemble;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Dissemble;
+import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.Contract;
@@ -162,6 +163,8 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, D
     @NotNull Block[][] getBlocks();
 
     @Nullable Block getRawBlock(int localX, int localY);
+
+    @NotNull Array<TickingBlock> getTickingBlocks();
 
     /**
      * Might cause a call to {@link #updateTextureIfDirty()} if the chunk is marked as dirty

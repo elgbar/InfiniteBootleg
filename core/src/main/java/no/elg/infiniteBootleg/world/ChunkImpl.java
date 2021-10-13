@@ -282,6 +282,12 @@ public class ChunkImpl implements Chunk {
         return blocks;
     }
 
+    @NotNull
+    @Override
+    public Array<@NotNull TickingBlock> getTickingBlocks() {
+        return tickingBlocks;
+    }
+
     @Override
     @Nullable
     public Block getRawBlock(int localX, int localY) {
