@@ -24,8 +24,8 @@ public abstract class LightBlock extends TickingBlock {
     private void createLight() {
         if (Settings.renderLight && light == null && getChunk().getChunkBody().hasBody()) {
             light = PointLightPool.getPool(getWorld()).obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
-            setShouldTick(true);
         }
+        setShouldTick(true);
     }
 
     /**
@@ -34,6 +34,9 @@ public abstract class LightBlock extends TickingBlock {
     @Nullable
     public Light getLight() {
         createLight();
+        if (light == null) {
+            setShouldTick(true);
+        }
         return light;
     }
 
@@ -41,10 +44,8 @@ public abstract class LightBlock extends TickingBlock {
     public void tick() {
         var gotLight = getLight();
         if (gotLight != null) {
-            gotLight.setXray(false);
-        }
-        else {
-            setShouldTick(true);
+            //Cannot access update light method directly, so this is a hack to force the light mesh to be updated
+            gotLight.setStaticLight(true);
         }
     }
 
