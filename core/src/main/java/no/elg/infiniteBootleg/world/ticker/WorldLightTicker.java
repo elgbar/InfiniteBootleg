@@ -35,6 +35,7 @@ public class WorldLightTicker implements Ticking {
         if (Settings.dayTicking) {
             time.setTime(time.getTime() - timeChangePerTick * time.getTimeScale());
             if (Settings.renderGraphic) {
+
                 DirectionalLight skylight = wr.getSkylight();
                 float currTime = time.getTime();
                 if (time.normalizedTime() >= 180) {
@@ -45,7 +46,7 @@ public class WorldLightTicker implements Ticking {
                     Color newColor = tmpColor.set(time.getBaseColor()).mul(brightness, brightness, brightness, 1);
                     skylight.setColor(newColor);
                 }
-                else {
+                else if (!skylight.getColor().equals(Color.BLACK)) {
                     skylight.setColor(Color.BLACK);
                 }
             }

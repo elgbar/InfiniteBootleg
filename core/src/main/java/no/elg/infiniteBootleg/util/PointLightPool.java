@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +55,6 @@ public final class PointLightPool extends Pool<PointLight> {
     @NotNull
     public PointLight obtain(float worldX, float worldY) {
         var light = obtain();
-        Main.logger().log("Obtaining light @ " + worldX + ", " + worldY);
         light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
         return light;
     }
@@ -79,7 +77,6 @@ public final class PointLightPool extends Pool<PointLight> {
     public void free(PointLight light) {
 
         final Vector2 position = light.getPosition();
-        Main.logger().log("Freeing light @ " + position.x + ", " + position.y);
         synchronized (LIGHT_LOCK) {
             light.setActive(false);
         }

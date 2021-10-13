@@ -60,9 +60,6 @@ public class WorldTime {
         if (dir <= 180) {
             return 0;
         }
-        else if (dir == 0) {
-            gray = 0.5f;
-        }
         else if (dir > 360 - WorldTime.TWILIGHT_DEGREES && dir < 360) {
             gray = (360 - dir) / (WorldTime.TWILIGHT_DEGREES);
         }

@@ -29,6 +29,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
   private var disposed = false
 
   //make there is only one delayed check for this chunk
+  @field:Volatile
   private var unsureFixture = false
 
   /**calculate the shape of the chunk (box2d)*/

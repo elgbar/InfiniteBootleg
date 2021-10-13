@@ -89,7 +89,6 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     val input = world.input
     if (input != null) {
       input.following = controlled
-      input.isLockedOn = true
     }
   }
 

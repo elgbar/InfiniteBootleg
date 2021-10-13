@@ -33,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class TntBlock extends TickingBlock {
 
-
     /**
      * Maximum explosion radius
      */
