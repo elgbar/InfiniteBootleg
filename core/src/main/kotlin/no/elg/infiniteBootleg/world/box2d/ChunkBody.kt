@@ -186,6 +186,9 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     }
   }
 
+  fun hasBody(): Boolean = box2dBody != null
+
+
   companion object {
     const val INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L
     const val UNSURE_FIXTURE_RELOAD_DELAY = 100L

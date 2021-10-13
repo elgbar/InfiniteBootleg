@@ -9,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A block that lights up the surrounding area
  */
-public class Torch extends StaticLightBlock {
+public class Torch extends LightBlock {
 
     public Torch(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
         Light light = getLight();
         if (light != null) {
-            light.setColor(244 / 255f, 178 / 255f, 153 / 255f, 1);
+            light.setColor(244 / 255f, 178 / 255f, 153 / 255f, .75f);
         }
     }
 }

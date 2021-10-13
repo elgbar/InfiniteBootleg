@@ -2,28 +2,29 @@ package no.elg.infiniteBootleg.world.blocks;
 
 import box2dLight.Light;
 import box2dLight.PointLight;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.util.PointLightPool;
-import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class StaticLightBlock extends Block {
+public abstract class LightBlock extends TickingBlock {
 
     @Nullable
     private PointLight light;
 
-    public StaticLightBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
+    public LightBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         super(world, chunk, localX, localY, material);
-        createLight();
+        Main.inst().getScheduler().executeSync(this::createLight);
     }
 
     private void createLight() {
-        if (Settings.renderLight && light == null) {
+        if (Settings.renderLight && light == null && getChunk().getChunkBody().hasBody()) {
             light = PointLightPool.getPool(getWorld()).obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
+            setShouldTick(true);
         }
     }
 
@@ -34,6 +35,17 @@ public abstract class StaticLightBlock extends Block {
     public Light getLight() {
         createLight();
         return light;
+    }
+
+    @Override
+    public void tick() {
+        var gotLight = getLight();
+        if (gotLight != null) {
+            gotLight.setXray(false);
+        }
+        else {
+            setShouldTick(true);
+        }
     }
 
     @Override
