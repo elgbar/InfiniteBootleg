@@ -35,6 +35,7 @@ import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
+import no.elg.infiniteBootleg.world.blocks.LightBlock;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -552,6 +553,19 @@ public class World implements Disposable, Resizable {
             Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
             if (rel instanceof TickingBlock tickingBlock) {
                 tickingBlock.setShouldTick(true);
+            }
+        }
+    }
+
+    /**
+     * Update all light sources currently loaded
+     */
+    public void updateLights() {
+        for (Chunk chunk : getLoadedChunks()) {
+            for (TickingBlock block : chunk.getTickingBlocks()) {
+                if (block instanceof LightBlock) {
+                    block.setShouldTick(true);
+                }
             }
         }
     }

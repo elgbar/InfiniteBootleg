@@ -132,7 +132,10 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
         return
       }
     }
-    Main.inst().scheduler.executeAsync { chunk.world.render.update() }
+    Main.inst().scheduler.executeAsync {
+      chunk.world.updateLights()
+      chunk.world.render.update()
+    }
     var potentiallyDirty = false
 
     //TODO Try to optimize this (ie select what directions to recalculate)
