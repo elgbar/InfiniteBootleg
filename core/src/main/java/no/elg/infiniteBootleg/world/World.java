@@ -7,7 +7,6 @@ import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.PERLIN;
 import static no.elg.infiniteBootleg.protobuf.Proto.World.Generator.UNRECOGNIZED;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -20,7 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,6 +42,7 @@ import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
+import no.elg.infiniteBootleg.world.loader.WorldLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -82,8 +81,6 @@ public class World implements Disposable, Resizable {
 
     public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
     public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
-
-    public static final String WORLD_INFO_LOCATION = "world.dat";
 
     static {
         //base filter for entities
@@ -143,7 +140,7 @@ public class World implements Disposable, Resizable {
     private final Lock loadLock = new ReentrantLock();
 
     public World(@NotNull Proto.World protoWorld) {
-        this(generatorFromProto(protoWorld), protoWorld.getSeed(), true, protoWorld.getName());
+        this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), true, protoWorld.getName());
     }
 
     /**
@@ -160,7 +157,7 @@ public class World implements Disposable, Resizable {
     public World(@NotNull ChunkGenerator generator, long seed, boolean tick, @NotNull String worldName) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
-        uuid = getUUIDFromSeed(seed);
+        uuid = WorldLoader.getUUIDFromSeed(seed);
 
         name = worldName;
 
@@ -180,32 +177,6 @@ public class World implements Disposable, Resizable {
         }
     }
 
-    private static UUID getUUIDFromSeed(long seed) {
-        byte[] uuidSeed = new byte[128];
-        var random = new Random(seed);
-        random.nextBytes(uuidSeed);
-        return UUID.nameUUIDFromBytes(uuidSeed);
-    }
-
-    @Nullable
-    private static World loadWorld(long seed) {
-        var uuid = getUUIDFromSeed(seed);
-        var worldFolder = getWorldFolder(uuid);
-        FileHandle worldZip = getWorldZip(worldFolder);
-
-        if (!Settings.loadWorldFromDisk || worldFolder == null) {
-            return null;
-        }
-        if (worldZip == null || !worldZip.exists()) {
-            Main.logger().log("No world save found");
-            return null;
-        }
-        worldFolder.deleteDirectory();
-        ZipUtils.unzip(worldFolder, worldZip);
-
-        return null;
-    }
-
     public void load() {
         FileHandle worldFolder = getWorldFolder();
         FileHandle worldZip = getWorldZip();
@@ -222,7 +193,7 @@ public class World implements Disposable, Resizable {
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
 
-        var worldInfoFile = worldFolder.child(WORLD_INFO_LOCATION);
+        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
 
         final Proto.World protoWorld;
         try {
@@ -267,9 +238,9 @@ public class World implements Disposable, Resizable {
             builder.setPlayer(player.save());
         }
 
-        var worldInfoFile = worldFolder.child(WORLD_INFO_LOCATION);
+        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
         if (worldInfoFile.exists()) {
-            worldInfoFile.moveTo(worldFolder.child(WORLD_INFO_LOCATION + ".old"));
+            worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
         }
         worldInfoFile.writeBytes(builder.build().toByteArray(), false);
 
@@ -289,7 +260,7 @@ public class World implements Disposable, Resizable {
     public FileHandle getWorldFolder() {
         if (Settings.loadWorldFromDisk) {
             if (worldFile == null) {
-                worldFile = getWorldFolder(uuid);
+                worldFile = WorldLoader.getWorldFolder(uuid);
             }
             return worldFile;
         }
@@ -299,23 +270,7 @@ public class World implements Disposable, Resizable {
     }
 
     protected FileHandle getWorldZip() {
-        return getWorldZip(getWorldFolder());
-    }
-
-    public static FileHandle getWorldZip(FileHandle folder) {
-        return folder != null ? folder.parent().child(folder.name() + ".zip") : null;
-    }
-
-    public static FileHandle getWorldFolder(@NotNull UUID uuid) {
-        return Gdx.files.external(Main.WORLD_FOLDER + uuid);
-    }
-
-    private static ChunkGenerator generatorFromProto(@NotNull Proto.World protoWorld) {
-        return switch (protoWorld.getGenerator()) {
-            case PERLIN, UNRECOGNIZED -> new PerlinChunkGenerator(protoWorld.getSeed());
-            case FLAT -> new FlatChunkGenerator();
-            case EMPTY -> new EmptyChunkGenerator();
-        };
+        return WorldLoader.getWorldZip(getWorldFolder());
     }
 
     private Proto.World.Generator getGeneratorType() {
