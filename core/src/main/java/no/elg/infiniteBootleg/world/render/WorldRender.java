@@ -113,20 +113,31 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
             RayHandler.useDiffuseLight(true);
             rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
             rayHandler.setBlurNum(2);
-            rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1);
-            resetSkylight();
+            rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 0f);
+            Main.inst().getScheduler().executeSync(this::resetSkylight);
         }
     }
 
     public void resetSkylight() {
-        synchronized (LIGHT_LOCK) {
-            if (skylight != null) {
-                skylight.remove();
+
+        synchronized (BOX2D_LOCK) {
+            synchronized (LIGHT_LOCK) {
+                if (skylight != null) {
+                    skylight.remove();
+                }
+                skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.SUNRISE_TIME);
+                skylight.setStaticLight(true);
+                skylight.setContactFilter(World.LIGHT_FILTER);
+                skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
+                
+
+                rayHandler.setAmbientLight(0, 0, 0, 1);
+                rayHandler.updateAndRender();
+
+                //Re-render at once otherwise a quick flickering might happen
+                update();
+                render();
             }
-            skylight = new DirectionalLight(rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.SUNRISE_TIME);
-            skylight.setStaticLight(true);
-            skylight.setContactFilter(World.LIGHT_FILTER);
-            skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
         }
     }
 
@@ -142,6 +153,15 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         chunkRenderer.render();
         if (Gdx.graphics.getFramesPerSecond() > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
             //only render more chunks when the computer isn't struggling with the rendering
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
+            chunkRenderer.render();
             chunkRenderer.render();
             chunkRenderer.render();
             chunkRenderer.render();
