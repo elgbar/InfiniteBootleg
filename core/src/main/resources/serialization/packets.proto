@@ -1,0 +1,104 @@
+syntax = "proto3";
+package packets;
+
+import "serialization/persistence.proto";
+
+option java_multiple_files = false;
+option java_package = "no.elg.infiniteBootleg.protobuf";
+option java_outer_classname = "Packets";
+
+message Packet {
+  enum Type {
+    HEARTBEAT = 0; //empty packet without any info
+    LOGIN = 1;
+    MOVE_ENTITY = 2;
+    BLOCK_UPDATE = 3;
+    START_GAME = 4;
+    UPDATE_CHUNK = 5;
+  }
+
+  enum Direction {
+    SERVER = 0;
+    CLIENT = 1;
+  }
+
+  Type type = 1;
+  Direction direction = 2;
+
+  //very frequent packets
+  optional Heartbeat heartbeat = 8; //dual
+  optional MoveEntity moveEntity = 9; //dual
+
+  //more rare packets
+  optional UpdateBlock blockUpdate = 16; //dual
+  optional Login loginPacker = 17; //server bound
+  optional StartGame startGame = 18; //client bound
+  optional UpdateChunk updateChunk = 19; //client bound
+}
+
+////////////////
+// DUAL BOUND //
+////////////////
+
+// Server send this every tick (??), client must respond with another heartbeat packet with the name keepAliveId
+message Heartbeat {
+  string keepAliveId = 1;
+}
+
+message UpdateBlock {
+  .persistence.Vector2i pos = 1;
+  .persistence.Block block = 2;
+}
+
+message MoveEntity {
+  //Id of entity to move
+  string uuid = 1;
+  // How much to move by
+  .persistence.Vector2f delta = 2;
+}
+
+//////////////////
+// CLIENT BOUND //
+//////////////////
+
+message StartGame {
+  //The entity the client is controlling
+  .persistence.Entity controlling = 1;
+
+  // the world info of the server
+  .persistence.World world = 2;
+}
+
+// Update all blocks in a chunk
+message UpdateChunk {
+  // position in chunk coordinates
+  .persistence.Vector2i position = 1;
+  // blocks in the chunk, must be CHUNK_SIZE * CHUNK_SIZE in length
+  repeated .persistence.Block blocks = 2;
+}
+
+message LoginStatus{
+  enum Status {
+    //Player login ok, chunks will be sent
+    PROCEED_LOGIN = 0;
+    //Someone with the given uuid or name is already logged in
+    ALREADY_LOGGED_IN = 1;
+    //The server is full
+    FULL_SERVER = 2;
+
+    //Fully logged in, spawn player
+    LOGIN_SUCCESS = 3;
+  }
+  Status status = 1;
+}
+
+//////////////////
+// SERVER BOUND //
+//////////////////
+
+message Login {
+  string uuid = 1;
+  string username = 2;
+  //client version
+  string version = 3;
+}
