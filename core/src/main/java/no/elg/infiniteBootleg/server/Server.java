@@ -4,11 +4,15 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.Packets;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 public class Server {
 
     public void start() throws InterruptedException {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap(); // (2)
@@ -28,7 +32,12 @@ public class Server {
                  @Override
                  public void initChannel(@NotNull SocketChannel ch) {
 
-                     ch.pipeline().addLast().addLast(new ProtobufDecoder(Packets.Packet.getDefaultInstance()), new ServerInboundHandler());
+                     final ChannelPipeline pipeline = ch.pipeline();
+                     pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
+                     pipeline.addLast("protobufDecoder", new ProtobufDecoder(Packets.Packet.getDefaultInstance()));
+                     pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
+                     pipeline.addLast("protobufEncoder", new ProtobufEncoder());
+                     pipeline.addLast("ServerHandler", new ServerInboundHandler());
                  }
              }).option(ChannelOption.SO_BACKLOG, 128)          // (5)
              .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)

@@ -1,20 +1,32 @@
 package no.elg.infiniteBootleg.server;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.protobuf.Packets;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
  */
 public class Client {
 
-    public void connect(String host, int port) throws InterruptedException {
+    @Nullable
+    public Channel channel;
+
+    public void connect(@NotNull String host, int port, @Nullable Runnable onConnect) throws InterruptedException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap(); // (1)
@@ -23,16 +35,24 @@ public class Client {
             b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new ClientInbountHandler());
+                public void initChannel(@NotNull SocketChannel ch) {
+
+                    final ChannelPipeline pipeline = ch.pipeline();
+                    pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
+                    pipeline.addLast("protobufDecoder", new ProtobufDecoder(Packets.Packet.getDefaultInstance()));
+                    pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
+                    pipeline.addLast("protobufEncoder", new ProtobufEncoder());
+                    pipeline.addLast("ClientHandler", new ClientBoundHandler());
                 }
             });
 
             // Start the client.
-            ChannelFuture f = b.connect(host, port).sync(); // (5)
-
+            channel = b.connect(host, port).sync().channel();
+            if (onConnect != null) {
+                Main.inst().getScheduler().executeSync(onConnect);
+            }
             // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
+            channel.closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
         }
