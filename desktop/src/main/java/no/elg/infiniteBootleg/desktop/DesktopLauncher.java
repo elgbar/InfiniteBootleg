@@ -18,7 +18,7 @@ public class DesktopLauncher {
         new ProgramArgs(args);
 
         try {
-            if (Settings.renderGraphic) {
+            if (Settings.client) {
 
                 LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
                 if (SCALE > 1) {

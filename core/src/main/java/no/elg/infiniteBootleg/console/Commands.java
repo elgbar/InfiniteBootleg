@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
+import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
@@ -50,7 +51,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
     public void skyColor(String colorName) {
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
             try {
                 Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
@@ -151,7 +152,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = {"World x coordinate", "World y coordinate"})
     public void tp(float worldX, float worldY) {
-        if (!Settings.renderGraphic) {
+        if (!Settings.client) {
             return;
         }
         WorldRender render = Main.inst().getWorld().getRender();
@@ -190,12 +191,19 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Set how much information to show", paramDescriptions = "normal (default), debug or none")
     public void hud(String modusName) {
+        var screen = Main.inst().getScreen();
+        if (!(screen instanceof WorldScreen)) {
+            logger.log(LogLevel.ERROR, "Not currently in a world, cannot change hud");
+            return;
+        }
+
         try {
             HUDRenderer.HUDModus modus = HUDRenderer.HUDModus.valueOf(modusName.toUpperCase());
-            Main.inst().getHud().setModus(modus);
+            ((WorldScreen) screen).getHud().setModus(modus);
         } catch (IllegalArgumentException e) {
             logger.log(LogLevel.ERROR, "Unknown HUD modus '" + modusName + "'");
         }
+
     }
 
     @CmdArgNames({"zoom level"})

@@ -141,35 +141,35 @@ public class World implements Disposable, Resizable {
     private final Lock loadLock = new ReentrantLock();
 
     public World(@NotNull ProtoWorld.World protoWorld) {
-        this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), true, protoWorld.getName());
+        this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
     }
 
     /**
      * Generate a world with a random seed
      */
     public World(@NotNull ChunkGenerator generator) {
-        this(generator, MathUtils.random(Long.MAX_VALUE), true);
+        this(generator, MathUtils.random(Long.MAX_VALUE));
     }
 
-    public World(@NotNull ChunkGenerator generator, long seed, boolean tick) {
-        this(generator, seed, tick, "World");
+    public World(@NotNull ChunkGenerator generator, long seed) {
+        this(generator, seed, "World");
     }
 
-    public World(@NotNull ChunkGenerator generator, long seed, boolean tick, @NotNull String worldName) {
+    public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
         uuid = WorldLoader.getUUIDFromSeed(seed);
 
         name = worldName;
 
-        worldTicker = new WorldTicker(this, tick);
+        worldTicker = new WorldTicker(this, false);
 
         chunkLoader = new ChunkLoader(this, generator);
         worldBody = new WorldBody(this);
         worldTime = new WorldTime(this);
         spawn = new Location(0, 0);
 
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             render = new WorldRender(this);
             input = new WorldInputHandler(render);
         }
@@ -207,12 +207,15 @@ public class World implements Disposable, Resizable {
         spawn = Location.fromVector2i(protoWorld.getSpawn());
         worldTime.setTime(protoWorld.getTime());
 
-        if (protoWorld.hasPlayer()) {
+        if (Settings.client && protoWorld.hasPlayer()) {
             final Player newPlayer = new Player(this, protoWorld.getPlayer());
             if (!newPlayer.isInvalid()) {
                 addEntity(newPlayer, false);
                 Main.inst().setPlayer(newPlayer);
             }
+        }
+        if (!worldTicker.isStarted()) {
+            worldTicker.start();
         }
     }
 
@@ -234,9 +237,11 @@ public class World implements Disposable, Resizable {
         builder.setTime(worldTime.getTime());
         builder.setSpawn(spawn.toVector2i());
         builder.setGenerator(getGeneratorType());
-        final Player player = Main.inst().getPlayer();
-        if (player != null) {
-            builder.setPlayer(player.save());
+        if (Settings.client) {
+            final Player player = Main.inst().getPlayer();
+            if (player != null) {
+                builder.setPlayer(player.save());
+            }
         }
 
         var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
@@ -887,7 +892,7 @@ public class World implements Disposable, Resizable {
 
     @Override
     public void resize(int width, int height) {
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             render.resize(width, height);
         }
     }
@@ -1005,8 +1010,9 @@ public class World implements Disposable, Resizable {
 
     @Override
     public void dispose() {
-        render.dispose();
         getWorldTicker().stop();
+        getInput().dispose();
+        render.dispose();
         if (input != null) {
             input.dispose();
         }

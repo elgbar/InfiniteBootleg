@@ -29,7 +29,7 @@ public abstract class LightBlock extends TickingBlock {
     }
 
     /**
-     * @return The light of this block, might be null if {@link Settings#renderGraphic} is true
+     * @return The light of this block, might be null if {@link Settings#client} is true
      */
     @Nullable
     public Light getLight() {

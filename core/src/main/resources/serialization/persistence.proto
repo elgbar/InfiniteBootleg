@@ -29,7 +29,6 @@ message World {
     FLAT = 1;
     EMPTY = 2;
   }
-
 }
 
 message Block {

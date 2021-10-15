@@ -11,6 +11,7 @@ import static com.badlogic.gdx.Input.Keys.UP;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -18,6 +19,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
+import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.World;
@@ -53,12 +55,15 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         World world = Main.inst().getWorld();
         switch (keycode) {
             case F3:
-                HUDRenderer hud = Main.inst().getHud();
-                if (hud.getModus() == HUDModus.DEBUG) {
-                    hud.setModus(HUDModus.NORMAL);
-                }
-                else {
-                    hud.setModus(HUDModus.DEBUG);
+                Screen screen = Main.inst().getScreen();
+                if (screen instanceof WorldScreen worldScreen) {
+                    HUDRenderer hud = worldScreen.getHud();
+                    if (hud.getModus() == HUDModus.DEBUG) {
+                        hud.setModus(HUDModus.NORMAL);
+                    }
+                    else {
+                        hud.setModus(HUDModus.DEBUG);
+                    }
                 }
                 break;
             case F5:

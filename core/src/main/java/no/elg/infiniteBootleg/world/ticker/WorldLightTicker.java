@@ -34,7 +34,7 @@ public class WorldLightTicker implements Ticking {
         //update light direction
         if (Settings.dayTicking) {
             time.setTime(time.getTime() - timeChangePerTick * time.getTimeScale());
-            if (Settings.renderGraphic) {
+            if (Settings.client) {
 
                 DirectionalLight skylight = wr.getSkylight();
                 float currTime = time.getTime();
@@ -52,7 +52,7 @@ public class WorldLightTicker implements Ticking {
             }
         }
 
-        if (Settings.renderGraphic && Settings.renderLight) {
+        if (Settings.client && Settings.renderLight) {
             synchronized (WorldRender.BOX2D_LOCK) {
                 synchronized (WorldRender.LIGHT_LOCK) {
                     wr.getRayHandler().update();

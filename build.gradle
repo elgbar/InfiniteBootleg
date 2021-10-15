@@ -1,18 +1,7 @@
-import java.nio.charset.StandardCharsets
-
-def getGitVersion() {
-  def file = new File(project.projectDir, "core/assets/version")
-  if (!file.exists() || !file.canRead()) {
-    System.err.println("Failed to read version from file " + file.absolutePath)
-    return "UNKNOWN"
-  }
-  return file.readLines(StandardCharsets.UTF_8.toString())[0]
-}
-
-
 buildscript {
+      
   ext {
-    kotlin_version = "1.5.30"
+    kotlin_version = "1.5.31"
     appName = "InfiniteBootleg"
     gdxVersion = '1.10.0'
     roboVMVersion = '2.3.6'
@@ -21,6 +10,7 @@ buildscript {
     aiVersion = '1.8.2'
     powermockVersion = '2.0.2'
     visVersion = '1.5.0'
+    ktxVersion = "1.10.0-b1"
   }
 
   repositories {
@@ -40,6 +30,15 @@ tasks.named('wrapper') {
   distributionType = Wrapper.DistributionType.ALL
 }
 
+def getGitVersion() {
+  def file = new File(project.projectDir, "core/assets/version")
+  if (!file.exists() || !file.canRead()) {
+    System.err.println("Failed to read version from file " + file.absolutePath)
+    return "UNKNOWN"
+  }
+  return file.readLines("UTF_8")[0]
+}
+
 allprojects {
   apply plugin: "java"
   apply plugin: 'idea'
@@ -51,6 +50,7 @@ allprojects {
 test {
   failFast = true
 }
+
 
 subprojects {
 
@@ -103,6 +103,16 @@ project(":core") {
     implementation "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
+
+    api "io.github.libktx:ktx-app:$ktxVersion"
+    implementation "io.github.libktx:ktx-vis:$ktxVersion"
+    implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
+    implementation "io.github.libktx:ktx-style:$ktxVersion"
+    implementation "io.github.libktx:ktx-actors:$ktxVersion"
+    implementation "io.github.libktx:ktx-collections:$ktxVersion"
+    implementation "io.github.libktx:ktx-graphics:$ktxVersion"
+    implementation "io.github.libktx:ktx-async:$ktxVersion"
+    implementation "io.github.libktx:ktx-assets:$ktxVersion"
 
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation 'com.google.guava:guava:30.1.1-jre'

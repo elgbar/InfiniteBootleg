@@ -46,7 +46,7 @@ public class Door extends MaterialEntity {
     }
 
     static {
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             openDoorRegion = Main.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
             closedDoorRegion = Main.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
         }

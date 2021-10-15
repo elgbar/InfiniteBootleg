@@ -233,7 +233,7 @@ public class ChunkImpl implements Chunk {
                 }
             }
         }
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             world.getRender().getChunkRenderer().queueRendering(this, prioritize);
             prioritize = false;
         }

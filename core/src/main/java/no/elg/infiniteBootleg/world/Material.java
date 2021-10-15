@@ -108,7 +108,7 @@ public enum Material {
         this.blocksLight = blocksLight;
         this.placable = placable;
         this.hardness = hardness;
-        if (Settings.renderGraphic && itemType != ItemType.AIR) {
+        if (Settings.client && itemType != ItemType.AIR) {
             texture = Main.inst().getBlockAtlas().findRegion(name().toLowerCase());
             if (texture == null) {
                 throw new NullPointerException("Failed to find a texture for " + name());

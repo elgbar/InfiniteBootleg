@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -26,11 +27,11 @@ public class Player extends LivingEntity {
 
     public static final String PLAYER_REGION_NAME = "player";
 
-    @NotNull
+    @Nullable
     private static final TextureRegion TEXTURE_REGION;
     @Nullable
     private EntityControls controls;
-    @NotNull
+    @Nullable
     private final Light torchLight;
 
     public Player(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
@@ -60,15 +61,25 @@ public class Player extends LivingEntity {
     }
 
     static {
-        TEXTURE_REGION = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
+        if (Settings.client) {
+            TEXTURE_REGION = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
+        }
+        else {
+            TEXTURE_REGION = null;
+        }
     }
 
     {
-        synchronized (LIGHT_LOCK) {
-            torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
-            torchLight.setStaticLight(true);
-            torchLight.setContactFilter(World.LIGHT_FILTER);
-            torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+        if (Settings.client) {
+            synchronized (LIGHT_LOCK) {
+                torchLight = new ConeLight(Main.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
+                torchLight.setStaticLight(true);
+                torchLight.setContactFilter(World.LIGHT_FILTER);
+                torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+            }
+        }
+        else {
+            torchLight = null;
         }
     }
 
@@ -114,13 +125,17 @@ public class Player extends LivingEntity {
     }
 
     public void toggleTorch() {
-        synchronized (LIGHT_LOCK) {
-            torchLight.setActive(!torchLight.isActive());
+        if (torchLight != null) {
+            synchronized (LIGHT_LOCK) {
+                torchLight.setActive(!torchLight.isActive());
+            }
         }
     }
 
     public void setTorchAngle(float angleDeg) {
-        torchLight.setDirection(angleDeg);
+        if (torchLight != null) {
+            torchLight.setDirection(angleDeg);
+        }
     }
 
     @Override
@@ -128,7 +143,9 @@ public class Player extends LivingEntity {
         final ProtoWorld.Entity.Builder builder = super.save();
         final ProtoWorld.Entity.Player.Builder playerBuilder = ProtoWorld.Entity.Player.newBuilder();
 
-        playerBuilder.setTorchAngleDeg(torchLight.getDirection());
+        if (torchLight != null) {
+            playerBuilder.setTorchAngleDeg(torchLight.getDirection());
+        }
         playerBuilder.setControlled(hasControls());
 
         builder.setPlayer(playerBuilder.build());
@@ -144,8 +161,10 @@ public class Player extends LivingEntity {
         if (hasControls()) {
             removeControls();
         }
-        synchronized (LIGHT_LOCK) {
-            torchLight.remove();
+        if (torchLight != null) {
+            synchronized (LIGHT_LOCK) {
+                torchLight.remove();
+            }
         }
     }
 
@@ -155,6 +174,7 @@ public class Player extends LivingEntity {
     }
 
     public @NotNull Light getTorchLight() {
+        Preconditions.checkNotNull(torchLight);
         return torchLight;
     }
 
@@ -162,7 +182,9 @@ public class Player extends LivingEntity {
     public void tick() {
         super.tick();
         Vector2 pos = getPhysicsPosition();
-        torchLight.setPosition(pos);
+        if (torchLight != null) {
+            torchLight.setPosition(pos);
+        }
     }
 
     @Override

@@ -103,7 +103,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
      */
     @Argument(value = "Disable rendering of graphics", alt = 'h')
     private void headless(String val) {
-        Settings.renderGraphic = false;
+        Settings.client = false;
         log("Graphics is disabled");
     }
 
@@ -217,5 +217,20 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
             }
         }
         System.exit(0);
+    }
+
+    public boolean server(String val) {
+        Settings.client = false;
+        try {
+            int port = Integer.parseInt(val);
+            if (port < 0 || port >= 65535) {
+                log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0 and less than 65535, got " + val);
+                return false;
+            }
+            Settings.port = port;
+        } catch (NumberFormatException e) {
+            Settings.port = 8558;
+        }
+        return true;
     }
 }

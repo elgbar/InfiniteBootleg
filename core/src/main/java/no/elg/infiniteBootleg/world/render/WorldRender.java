@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -70,18 +71,29 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
     public static final Object LIGHT_LOCK = new Object();
     public static final Object BOX2D_LOCK = new Object();
 
+    @NotNull
     public final World world;
+    @NotNull
     private final Rectangle viewBound;
+    @NotNull
     private final ChunkViewed chunksInView;
+    @NotNull
     private final Matrix4 m4 = new Matrix4();
-    OrderedMap<Chunk, TextureRegion> draw;
+    @NotNull OrderedMap<Chunk, TextureRegion> draw;
+    @Nullable
     private PublicRayHandler rayHandler;
     private EntityRenderer entityRenderer;
+    @Nullable
     private SpriteBatch batch;
+    @Nullable
     private OrthographicCamera camera;
+    @Nullable
     private ChunkRenderer chunkRenderer;
+    @Nullable
     private Box2DDebugRenderer box2DDebugRenderer;
+    @Nullable
     private DebugChunkRenderer chunkDebugRenderer;
+    @Nullable
     private DirectionalLight skylight;
     private float lastZoom;
 
@@ -92,7 +104,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         draw = new OrderedMap<>();
         draw.orderedKeys().ordered = false; //improve remove
 
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             chunkRenderer = new ChunkRenderer(this);
             entityRenderer = new EntityRenderer(this);
 
@@ -129,7 +141,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                 skylight.setStaticLight(true);
                 skylight.setContactFilter(World.LIGHT_FILTER);
                 skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
-                
+
 
                 rayHandler.setAmbientLight(0, 0, 0, 1);
                 rayHandler.updateAndRender();

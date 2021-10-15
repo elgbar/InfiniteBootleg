@@ -30,7 +30,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     private final CommandExecutor exec;
 
     public ConsoleHandler() {
-        this(Settings.renderGraphic);
+        this(Settings.client);
     }
 
     public ConsoleHandler(boolean inGameConsole) {
@@ -158,7 +158,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
                         // to next function
                         continue;
                     }
-                    if (isClientsideOnly(m) && !Settings.renderGraphic) {
+                    if (isClientsideOnly(m) && !Settings.client) {
                         log(LogLevel.ERROR, "This command can only be executed client side");
                         return true;
                     }

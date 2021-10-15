@@ -13,9 +13,9 @@ public class ProgramArgsTest extends TestGraphic {
 
     @Test
     public void headless() {
-        Settings.renderGraphic = true;
+        Settings.client = true;
         new ProgramArgs(new String[] {"--headless"});
-        Assert.assertFalse(Settings.renderGraphic);
+        Assert.assertFalse(Settings.client);
     }
 
     @Test
@@ -33,9 +33,9 @@ public class ProgramArgsTest extends TestGraphic {
 
     @Test
     public void handlesRandomCasing() {
-        Settings.renderGraphic = true;
+        Settings.client = true;
         new ProgramArgs(new String[] {"--hEadlESS"});
-        Assert.assertFalse(Settings.renderGraphic);
+        Assert.assertFalse(Settings.client);
     }
 
     @Test

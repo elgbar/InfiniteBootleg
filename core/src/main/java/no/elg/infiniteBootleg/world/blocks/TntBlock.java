@@ -53,7 +53,7 @@ public class TntBlock extends TickingBlock {
     private static final TextureRegion whiteTexture;
 
     static {
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             Pixmap pixmap = new Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444);
             pixmap.setColor(Color.WHITE);
             pixmap.fill();
@@ -154,7 +154,7 @@ public class TntBlock extends TickingBlock {
             glowing = !glowing;
         }
 
-        if (old != glowing && Settings.renderGraphic) {
+        if (old != glowing && Settings.client) {
 
             synchronized (LIGHT_LOCK) {
                 if (light == null) {

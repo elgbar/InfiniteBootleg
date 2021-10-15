@@ -12,7 +12,7 @@ public class TestGraphic {
 
     static {
         Settings.schedulerThreads = 0;
-        Settings.renderGraphic = false;
+        Settings.client = false;
         Settings.loadWorldFromDisk = false;
         Settings.debug = true;
         new Main(true);
@@ -23,7 +23,7 @@ public class TestGraphic {
     //
     @Before
     public void createNewWorld() {
-        world = new World(new EmptyChunkGenerator(), 0, false);
+        world = new World(new EmptyChunkGenerator(), 0);
         Main.inst().setWorld(world);
     }
 

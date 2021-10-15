@@ -79,6 +79,8 @@ public class Ticker implements Runnable {
      */
     private long lastTickNagged;
 
+    private volatile boolean started;
+
 
     /**
      * Use {@link #DEFAULT_TICKS_PER_SECOND} for {@code #tps} and {@link #DEFAULT_NAG_DELAY} for nag delay
@@ -150,7 +152,7 @@ public class Ticker implements Runnable {
 
         if (start) {
             //Do not begin ticking until the render thread is initialized
-            Main.inst().getScheduler().executeSync(tickerThread::start);
+            start();
         }
     }
 
@@ -235,6 +237,18 @@ public class Ticker implements Runnable {
      */
     public long getTpsDelta() {
         return tpsDelta;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void start() {
+        if (started) {
+            throw new IllegalStateException("Ticker thread has already been started");
+        }
+        started = true;
+        Main.inst().getScheduler().executeSync(tickerThread::start);
     }
 
     /**

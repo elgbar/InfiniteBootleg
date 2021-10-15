@@ -83,6 +83,13 @@ public class WorldTicker extends Ticker {
         }
     }
 
+    @Override
+    public void start() {
+        super.start();
+        lightTicker.getTicker().start();
+        box2DTicker.getTicker().start();
+    }
+
     /**
      * Stop this ticker, the tickers thread will not be called anymore
      */

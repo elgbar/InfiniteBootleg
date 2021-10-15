@@ -6,6 +6,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -20,8 +21,10 @@ import java.io.File;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
-import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
+import no.elg.infiniteBootleg.screens.MainMenuScreen;
+import no.elg.infiniteBootleg.screens.WorldScreen;
+import no.elg.infiniteBootleg.server.Server;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.World;
@@ -56,15 +59,22 @@ public class Main extends ApplicationAdapter {
 
     private TextureAtlas blockAtlas;
     private TextureAtlas entityAtlas;
-    @NotNull
+    @Nullable
     private World world;
+    @NotNull
     private ConsoleHandler console;
-    private HUDRenderer hud;
+    @Nullable
     private ScreenRenderer screenRenderer;
     private int mouseBlockX;
     private int mouseBlockY;
     private float mouseX;
     private float mouseY;
+
+    @Nullable
+    private Screen screen;
+
+    @Nullable
+    public Server server;
 
     private volatile Player mainPlayer;
 
@@ -75,19 +85,20 @@ public class Main extends ApplicationAdapter {
             }
             inst = this;
         }
-
         this.test = test;
-        console = new ConsoleHandler(false);
         scheduler = new CancellableThreadScheduler(Settings.schedulerThreads);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            world.save();
-            final FileHandle worldFolder = world.getWorldFolder();
-            if (worldFolder != null) {
-
-                worldFolder.deleteDirectory();
+            if (world != null) {
+                world.save();
+                final FileHandle worldFolder = world.getWorldFolder();
+                if (worldFolder != null) {
+                    worldFolder.deleteDirectory();
+                }
             }
             scheduler.shutdown(); // we want make sure this thread is dead
         }));
+
+        console = new ConsoleHandler(false);
         inputMultiplexer = new InputMultiplexer();
     }
 
@@ -107,96 +118,129 @@ public class Main extends ApplicationAdapter {
     public void create() {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             if (SCALE > 1) {
                 VisUI.load(VisUI.SkinScale.X2);
             }
             else {
                 VisUI.load(VisUI.SkinScale.X1);
             }
+            KAssets.INSTANCE.load();
         }
 
         console = new ConsoleHandler();
         console.setAlpha(0.85f);
         console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
-
-        console.log("Controls:\n" + //
-                    "  WASD to control the camera\n" + //
-                    "  arrow-keys to control the player\n" +//
-                    "  T to teleport player to current mouse pos\n" + //
-                    "  Apostrophe (') to open console (type help for help)");
         console.log("You can also start the program with arguments for '--help' or '-?' as arg to see all possible options");
-
 
         Gdx.app.setApplicationLogger(console);
         Gdx.app.setLogLevel(test || Settings.debug ? Application.LOG_DEBUG : Application.LOG_INFO);
         //use unique iterators
         Collections.allocateIterators = true;
 
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
+            console.log("Controls:\n" + //
+                        "  WASD to control the camera\n" + //
+                        "  arrow-keys to control the player\n" +//
+                        "  T to teleport player to current mouse pos\n" + //
+                        "  Apostrophe (') to open console (type help for help)");
             screenRenderer = new ScreenRenderer();
-            hud = new HUDRenderer();
-
             blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
             entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
+            setScreen(MainMenuScreen.INSTANCE);
         }
+        else {
+            server = new Server();
+            final Thread thread = new Thread(() -> {
+                try {
+                    server.start();
+                } catch (InterruptedException e) {
+                    console.log("SERVER", "Server interruption received", e);
+                    Gdx.app.exit();
+                }
+            }, "Server");
+            thread.setDaemon(true);
+            thread.start();
+            console.log("SERVER", "Starting server on port " + Settings.port);
 
-        world = new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, !test);
-        world.load();
+            setScreen(new WorldScreen(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed)));
+        }
     }
 
     @Override
     public void resize(int width, int height) {
-        if (Settings.renderGraphic) {
-            world.resize(width, height);
-            screenRenderer.resize(width, height);
+        if (Settings.client) {
+            getScreen().resize(width, height);
             console.resize(width, height);
         }
     }
 
     @Override
     public void render() {
-        if (!Settings.renderGraphic) {
+        if (!Settings.client) {
             return;
         }
         Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        mouseVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        world.getRender().getCamera().unproject(mouseVec);
-        final WorldBody worldBody = world.getWorldBody();
-        mouseX = mouseVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
-        mouseY = mouseVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
-        mouse.set(mouseX, mouseY);
+        if (screen instanceof WorldScreen worldScreen) {
+            final World world = worldScreen.getWorld();
+            mouseVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            world.getRender().getCamera().unproject(mouseVec);
+            final WorldBody worldBody = world.getWorldBody();
+            mouseX = mouseVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
+            mouseY = mouseVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
+            mouse.set(mouseX, mouseY);
 
-        mouseBlockX = MathUtils.floor(mouseX);
-        mouseBlockY = MathUtils.floor(mouseY);
-
-        //noinspection ConstantConditions
-        world.getInput().update();
-        if (!world.getWorldTicker().isPaused()) {
-            //only update controls when we're not paused
-            for (LivingEntity entity : world.getLivingEntities()) {
-                entity.update();
-            }
+            mouseBlockX = MathUtils.floor(mouseX);
+            mouseBlockY = MathUtils.floor(mouseY);
         }
-        world.getRender().render();
 
-
-        hud.render();
-        console.draw();
+        if (screen != null) {
+            screen.render(Gdx.graphics.getDeltaTime());
+        }
     }
 
     @Override
     public void dispose() {
-        if (Settings.renderGraphic) {
+        if (Settings.client) {
             screenRenderer.dispose();
             blockAtlas.dispose();
             entityAtlas.dispose();
             VisUI.dispose();
         }
-        world.dispose();
+        if (screen != null) {
+            screen.dispose();
+        }
         console.dispose();
+    }
+
+    public void setScreen(@NotNull Screen screen) {
+        Screen old = this.screen;
+        if (old != null) {
+            old.hide();
+        }
+
+        // clean up any mess the previous screen have made
+        inputMultiplexer.clear();
+        Gdx.input.setOnscreenKeyboardVisible(false);
+
+        Gdx.app.debug("SCREEN", "Loading new screen " + screen.getClass().getSimpleName());
+        this.screen = screen;
+        screen.show();
+        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    }
+
+    @NotNull
+    public Screen getScreen() {
+        if (screen == null) {
+            if (Settings.client) { throw new IllegalStateException("Server does not have screens"); }
+            else {
+
+                throw new IllegalStateException("Client has no screen!");
+            }
+        }
+        return screen;
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -275,7 +319,7 @@ public class Main extends ApplicationAdapter {
                     }
                 }
                 mainPlayer = player;
-                if (Settings.renderGraphic) {
+                if (Settings.client) {
                     assert world.getInput() != null;
                     world.getInput().setFollowing(mainPlayer);
                 }
@@ -290,10 +334,18 @@ public class Main extends ApplicationAdapter {
 
     @NotNull
     public World getWorld() {
+        if (world == null) {
+            if (getScreen() instanceof WorldScreen) {
+                throw new IllegalStateException("No world found when in world screen");
+            }
+            else {
+                throw new IllegalStateException("There is no world when not in world screen");
+            }
+        }
         return world;
     }
 
-    public void setWorld(@NotNull World world) {
+    public void setWorld(@Nullable World world) {
         synchronized (INST_LOCK) {
             this.world = world;
         }
@@ -301,10 +353,6 @@ public class Main extends ApplicationAdapter {
 
     public ConsoleHandler getConsole() {
         return console;
-    }
-
-    public HUDRenderer getHud() {
-        return hud;
     }
 
     public CancellableThreadScheduler getScheduler() {
