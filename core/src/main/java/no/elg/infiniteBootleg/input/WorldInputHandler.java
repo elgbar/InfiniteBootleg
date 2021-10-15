@@ -44,7 +44,6 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     public WorldInputHandler(@NotNull WorldRender world) {
         worldRender = world;
-        Main.inst().getInputMultiplexer().addProcessor(this);
     }
 
     @Override

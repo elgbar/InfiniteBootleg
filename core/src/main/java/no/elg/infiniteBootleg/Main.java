@@ -163,7 +163,7 @@ public class Main extends ApplicationAdapter {
             thread.start();
             console.log("SERVER", "Starting server on port " + Settings.port);
 
-            setScreen(new WorldScreen(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed)));
+            setScreen(new WorldScreen(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed), true));
         }
     }
 
@@ -236,7 +236,6 @@ public class Main extends ApplicationAdapter {
         if (screen == null) {
             if (Settings.client) { throw new IllegalStateException("Server does not have screens"); }
             else {
-
                 throw new IllegalStateException("Client has no screen!");
             }
         }
@@ -281,6 +280,10 @@ public class Main extends ApplicationAdapter {
 
     @Nullable
     public Player getPlayer() {
+        if (!Settings.client) {
+            //server does not have a main player
+            return null;
+        }
         synchronized (INST_LOCK) {
             if (mainPlayer == null || mainPlayer.isInvalid()) {
                 for (LivingEntity entity : world.getLivingEntities()) {
@@ -298,6 +301,10 @@ public class Main extends ApplicationAdapter {
     }
 
     public void setPlayer(@Nullable Player player) {
+        if (!Settings.client) {
+            //server does not have a main player
+            return;
+        }
         if (player != null && player.isInvalid()) {
             logger().error("PLR", "Tried to set main player to an invalid entity");
             return;

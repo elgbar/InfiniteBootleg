@@ -8,13 +8,21 @@ option java_package = "no.elg.infiniteBootleg.protobuf";
 option java_outer_classname = "Packets";
 
 message Packet {
+  // There are three types of packets
+  // 1. DX (duplex) Sent both to server and to client
+  // 2. SB (Server Bound) Only sent to server
+  // 3. CB (Client Bound) Only sent to server
   enum Type {
-    HEARTBEAT = 0; //empty packet without any info
-    LOGIN = 1;
-    MOVE_ENTITY = 2;
-    BLOCK_UPDATE = 3;
-    START_GAME = 4;
-    UPDATE_CHUNK = 5;
+    DX_HEARTBEAT = 0;
+    SB_LOGIN = 1;
+    DX_MOVE_ENTITY = 2;
+    DX_BLOCK_UPDATE = 3;
+    CB_START_GAME = 4;
+    CB_UPDATE_CHUNK = 5;
+    CB_LOGIN_STATUS = 6;
+    SB_CLIENT_WORLD_LOADED = 7; //no message associated
+    SB_CHUNK_REQUEST = 8;
+    DX_DISCONNECT = 9;
   }
 
   enum Direction {
@@ -28,12 +36,15 @@ message Packet {
   //very frequent packets
   optional Heartbeat heartbeat = 8; //dual
   optional MoveEntity moveEntity = 9; //dual
+  optional UpdateChunk updateChunk = 10; //client bound
+  optional ChunkRequest chunkRequest = 11; //server bound
 
   //more rare packets
   optional UpdateBlock blockUpdate = 16; //dual
-  optional Login loginPacker = 17; //server bound
+  optional Login login = 17; //server bound
   optional StartGame startGame = 18; //client bound
-  optional UpdateChunk updateChunk = 19; //client bound
+  optional ServerLoginStatus serverLoginStatus = 20; //client bound
+  optional Disconnect disconnect = 21;
 }
 
 ////////////////
@@ -57,6 +68,10 @@ message MoveEntity {
   .persistence.Vector2f delta = 2;
 }
 
+message Disconnect {
+  string reason = 1;
+}
+
 //////////////////
 // CLIENT BOUND //
 //////////////////
@@ -71,14 +86,11 @@ message StartGame {
 
 // Update all blocks in a chunk
 message UpdateChunk {
-  // position in chunk coordinates
-  .persistence.Vector2i position = 1;
-  // blocks in the chunk, must be CHUNK_SIZE * CHUNK_SIZE in length
-  repeated .persistence.Block blocks = 2;
+  .persistence.Chunk chunk = 1;
 }
 
-message LoginStatus{
-  enum Status {
+message ServerLoginStatus {
+  enum ServerStatus {
     //Player login ok, chunks will be sent
     PROCEED_LOGIN = 0;
     //Someone with the given uuid or name is already logged in
@@ -89,7 +101,7 @@ message LoginStatus{
     //Fully logged in, spawn player
     LOGIN_SUCCESS = 3;
   }
-  Status status = 1;
+  ServerStatus status = 1;
 }
 
 //////////////////
@@ -101,4 +113,8 @@ message Login {
   string username = 2;
   //client version
   string version = 3;
+}
+
+message ChunkRequest {
+  .persistence.Vector2i chunkLocation = 1;
 }

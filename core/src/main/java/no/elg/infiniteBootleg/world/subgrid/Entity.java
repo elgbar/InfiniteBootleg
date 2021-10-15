@@ -50,6 +50,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
 
     public static final float GROUND_CHECK_OFFSET = 0.1f;
 
+    @NotNull
     private final World world;
     private final UUID uuid;
 

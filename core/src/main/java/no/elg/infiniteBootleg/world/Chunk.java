@@ -9,9 +9,8 @@ import com.badlogic.gdx.utils.Disposable;
 import java.util.stream.Stream;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
-import no.elg.infiniteBootleg.util.Assemble;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.Dissemble;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -24,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, Dissemble {
+public interface Chunk extends Iterable<Block>, Ticking, Disposable {
 
     int CHUNK_SIZE = 32;
     int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
@@ -226,4 +225,9 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable, Assemble, D
     @NotNull ChunkBody getChunkBody();
 
     boolean isDirty();
+
+    boolean load(ProtoWorld.Chunk protoChunk);
+
+    ProtoWorld.Chunk save();
+
 }

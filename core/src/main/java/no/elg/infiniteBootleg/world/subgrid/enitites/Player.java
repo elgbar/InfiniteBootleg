@@ -87,6 +87,7 @@ public class Player extends LivingEntity {
         if (controls == null) {
             Main.inst().getConsoleLogger().debug("PLR", "Giving control to " + hudDebug());
             controls = new KeyboardControls(getWorld().getRender(), this);
+            Main.inst().getInputMultiplexer().addProcessor(controls);
         }
         else {
             Main.inst().getConsoleLogger().warn("PLR", "Tried to give control to a player already with control " + hudDebug());

@@ -20,7 +20,7 @@ object MainMenuScreen : StageScreen() {
         row()
         visTextButton("Multiplayer") {
           onInteract(stage, Keys.NUM_1) {
-            Main.inst().screen = ConnectScreen
+            Main.inst().screen = ServerScreen
           }
         }
       }

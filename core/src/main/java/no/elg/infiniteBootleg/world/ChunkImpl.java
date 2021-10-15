@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.google.common.base.Preconditions;
-import com.google.protobuf.InvalidProtocolBufferException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
@@ -540,7 +539,7 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public byte[] disassemble() {
+    public ProtoWorld.Chunk save() {
         final ProtoWorld.Chunk.Builder builder = ProtoWorld.Chunk.newBuilder();
         builder.setPosition(ProtoWorld.Vector2i.newBuilder().setX(chunkX).setY(chunkY).build());
 
@@ -554,19 +553,11 @@ public class ChunkImpl implements Chunk {
             }
             builder.addEntities(entity.save());
         }
-        return builder.build().toByteArray();
+        return builder.build();
     }
 
     @Override
-    public boolean assemble(byte[] bytes) {
-
-        final ProtoWorld.Chunk protoChunk;
-        try {
-            protoChunk = ProtoWorld.Chunk.parseFrom(bytes);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean load(ProtoWorld.Chunk protoChunk) {
 
         final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
         var posErrorMsg =

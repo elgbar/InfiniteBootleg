@@ -18,7 +18,6 @@ public abstract class AbstractEntityControls extends InputAdapter implements Ent
     public AbstractEntityControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
         this.worldRender = worldRender;
         this.entity = entity;
-        Main.inst().getInputMultiplexer().addProcessor(this);
     }
 
     @Override

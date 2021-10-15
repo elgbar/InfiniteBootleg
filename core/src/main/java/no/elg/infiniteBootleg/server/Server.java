@@ -37,7 +37,7 @@ public class Server {
                      pipeline.addLast("protobufDecoder", new ProtobufDecoder(Packets.Packet.getDefaultInstance()));
                      pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
                      pipeline.addLast("protobufEncoder", new ProtobufEncoder());
-                     pipeline.addLast("ServerHandler", new ServerInboundHandler());
+                     pipeline.addLast("ServerHandler", new ServerBoundHandler());
                  }
              }).option(ChannelOption.SO_BACKLOG, 128)          // (5)
              .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)

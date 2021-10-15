@@ -30,6 +30,8 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.server.Client;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
@@ -139,9 +141,13 @@ public class World implements Disposable, Resizable {
 
     private Location spawn;
     private final Lock loadLock = new ReentrantLock();
+    @Nullable
+    private Client client;
 
-    public World(@NotNull ProtoWorld.World protoWorld) {
+
+    public World(@NotNull ProtoWorld.World protoWorld, @Nullable Client client) {
         this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
+        this.client = client;
     }
 
     /**
@@ -203,6 +209,14 @@ public class World implements Disposable, Resizable {
             e.printStackTrace();
             return;
         }
+        serverLoad(protoWorld);
+
+        if (!worldTicker.isStarted()) {
+            worldTicker.start();
+        }
+    }
+
+    public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
 
         spawn = Location.fromVector2i(protoWorld.getSpawn());
         worldTime.setTime(protoWorld.getTime());
@@ -213,9 +227,6 @@ public class World implements Disposable, Resizable {
                 addEntity(newPlayer, false);
                 Main.inst().setPlayer(newPlayer);
             }
-        }
-        if (!worldTicker.isStarted()) {
-            worldTicker.start();
         }
     }
 
@@ -231,6 +242,25 @@ public class World implements Disposable, Resizable {
             chunkLoader.save(chunk);
         }
 
+        var builder = toProtobuf();
+
+        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
+        if (worldInfoFile.exists()) {
+            worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
+        }
+        worldInfoFile.writeBytes(builder.toByteArray(), false);
+
+        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
+        try {
+            ZipUtils.zip(worldFolder, worldZip);
+            Main.logger().log("World", "World saved!");
+        } catch (IOException e) {
+            Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
+        }
+    }
+
+    @NotNull
+    public ProtoWorld.World toProtobuf() {
         var builder = ProtoWorld.World.newBuilder();
         builder.setName(name);
         builder.setSeed(seed);
@@ -243,20 +273,7 @@ public class World implements Disposable, Resizable {
                 builder.setPlayer(player.save());
             }
         }
-
-        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
-        if (worldInfoFile.exists()) {
-            worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
-        }
-        worldInfoFile.writeBytes(builder.build().toByteArray(), false);
-
-        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        try {
-            ZipUtils.zip(worldFolder, worldZip);
-            Main.logger().log("World", "World saved!");
-        } catch (IOException e) {
-            Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
-        }
+        return builder.build();
     }
 
     /**
@@ -307,24 +324,31 @@ public class World implements Disposable, Resizable {
         return getChunk(new Location(chunkX, chunkY));
     }
 
+    public void updateChunk(@NotNull Chunk chunk) {
+        Preconditions.checkState(chunk.isValid());
+        chunks.put(new Location(chunk.getChunkX(), chunk.getChunkY()), chunk);
+    }
+
     @Nullable
     public Chunk getChunk(@NotNull Location chunkLoc) {
         loadLock.lock();
-        Chunk chunk = chunks.get(chunkLoc);
         try {
+            Chunk chunk = chunks.get(chunkLoc);
             if (chunk == null || !chunk.isLoaded()) {
                 if (getWorldTicker().isPaused()) {
                     return null;
                 }
+                if (client != null) {
+                    client.ctx.writeAndFlush(PacketExtraKt.chunkRequestPacket(chunkLoc));
+                }
                 chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
                 Preconditions.checkState(chunk.isValid());
                 chunks.put(chunkLoc, chunk);
-
             }
+            return chunk;
         } finally {
             loadLock.unlock();
         }
-        return chunk;
     }
 
     /**
@@ -963,6 +987,15 @@ public class World implements Disposable, Resizable {
         return livingEntities;
     }
 
+    public boolean hasLivingEntity(@NotNull UUID uuid) {
+        for (LivingEntity entity : getLivingEntities()) {
+            if (entity.getUuid().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public @NotNull ChunkLoader getChunkLoader() {
         return chunkLoader;
     }
@@ -971,6 +1004,7 @@ public class World implements Disposable, Resizable {
     public WorldBody getWorldBody() {
         return worldBody;
     }
+
 
 
     public @NotNull WorldTime getWorldTime() {

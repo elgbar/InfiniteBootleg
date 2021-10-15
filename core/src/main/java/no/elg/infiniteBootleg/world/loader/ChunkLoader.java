@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.world.loader;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.File;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.World;
@@ -53,13 +55,35 @@ public class ChunkLoader {
         if (existsOnDisk(chunkX, chunkY)) {
             ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
             final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
-            if (chunk.assemble(chunkFile.readBytes())) {
-                chunk.finishLoading();
-                return chunk;
+
+            try {
+                ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
+                var loaded = load(chunk, protoChunk);
+                if (loaded != null) {
+                    return loaded;
+                }
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
             }
             //Failed to assemble, generate new chunk
         }
         return generator.generate(world, chunkX, chunkY);
+    }
+
+    @Nullable
+    public Chunk load(@NotNull ProtoWorld.Chunk protoChunk) {
+        final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
+        ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
+        return load(chunk, protoChunk);
+    }
+
+    @Nullable
+    public Chunk load(@NotNull ChunkImpl chunk, @NotNull ProtoWorld.Chunk protoChunk) {
+        if (chunk.load(protoChunk)) {
+            chunk.finishLoading();
+            return chunk;
+        }
+        return null;
     }
 
     /**
@@ -85,7 +109,7 @@ public class ChunkLoader {
             if (fh == null) {
                 return;
             }
-            fh.writeBytes(chunk.disassemble(), false);
+            fh.writeBytes(chunk.save().toByteArray(), false);
         }
     }
 

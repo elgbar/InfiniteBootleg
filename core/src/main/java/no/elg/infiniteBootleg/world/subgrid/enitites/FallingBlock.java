@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
@@ -21,10 +22,12 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FallingBlock extends Entity {
 
     private final Material material;
+    @Nullable
     private final TextureRegion region;
 
     private volatile boolean crashed;
@@ -36,13 +39,23 @@ public class FallingBlock extends Entity {
         final ProtoWorld.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
 
         material = Material.fromOrdinal(protoEntityMaterial.getMaterialOrdinal());
-        region = new TextureRegion(material.getTextureRegion());
+        if (Settings.client) {
+            region = new TextureRegion(material.getTextureRegion());
+        }
+        else {
+            region = null;
+        }
     }
 
     public FallingBlock(@NotNull World world, float worldX, float worldY, @NotNull Material material) {
         super(world, worldX + 0.5f, worldY + 0.5f, false, UUID.randomUUID());
         this.material = material;
-        region = new TextureRegion(material.getTextureRegion());
+        if (Settings.client) {
+            region = new TextureRegion(material.getTextureRegion());
+        }
+        else {
+            region = null;
+        }
     }
 
     @Override

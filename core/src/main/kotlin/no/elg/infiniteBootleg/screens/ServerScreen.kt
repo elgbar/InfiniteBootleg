@@ -12,23 +12,31 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.protobuf.Packets
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
 import no.elg.infiniteBootleg.server.Client
-import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.server.ClientChannel
+import no.elg.infiniteBootleg.server.loginPacket
 
 /**
  * @author Elg
  */
-object ConnectScreen : StageScreen() {
+object ServerScreen : StageScreen() {
   init {
     rootTable {
       visTable(defaultSpacing = true) {
 
+        val nameField = VisTextField("Elg")
         val hostField = VisTextField("localhost")
         val portSpinner = IntSpinnerModel(8558, 0, Char.MAX_VALUE.code)
 
+
+        horizontalGroup {
+          space(10f)
+          visLabel("Name: ")
+          addActor(
+            actor(nameField)
+          )
+        }
+        row()
         horizontalGroup {
           space(10f)
           visLabel("Host: ")
@@ -47,21 +55,14 @@ object ConnectScreen : StageScreen() {
 
         visTextButton("Connect") {
           onInteract(stage, Keys.NUM_0) {
-            val client = Client()
+            ConnectingScreen.info = "Connecting..."
+            Main.inst().screen = ConnectingScreen
+
+            val client = ClientChannel(Client(nameField.text))
             val runnable = Runnable {
-              println("Connected")
               val channel = client.channel ?: error("Could not connect to server")
-
-              val packet = Packets.Packet.newBuilder()
-                .setDirection(SERVER)
-                .setType(Type.LOGIN)
-                .setLoginPacker(
-                  Packets.Login.newBuilder()
-                    .setUsername("elg_")
-                    .setUuid(UUID.randomUUID().toString())
-                    .setVersion(Util.getVersion())
-                ).build()
-
+              ConnectingScreen.channel = channel
+              val packet = loginPacket(nameField.text, UUID.randomUUID())
               channel.writeAndFlush(packet)
             }
             val thread = Thread({

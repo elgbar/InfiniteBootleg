@@ -38,7 +38,6 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
         if (inGameConsole) {
             console = new CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
             console.setLoggingToSystem(true);
-            Main.inst().getInputMultiplexer().addProcessor(console.getInputProcessor());
         }
         else {
             console = new StdConsole(this);
@@ -221,5 +220,9 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     @Override
     public void resize(int width, int height) {
         console.refresh();
+    }
+
+    public void addToInputMultiplexer() {
+        Main.inst().getInputMultiplexer().addProcessor(console.getInputProcessor());
     }
 }

@@ -15,16 +15,21 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.Packets;
+import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
  */
-public class Client {
+public class ClientChannel {
 
     @Nullable
-    public Channel channel;
+    private Channel channel;
+    @NotNull
+    private Client client;
+
+    public ClientChannel(@NotNull Client client) { this.client = client; }
 
     public void connect(@NotNull String host, int port, @Nullable Runnable onConnect) throws InterruptedException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -42,12 +47,17 @@ public class Client {
                     pipeline.addLast("protobufDecoder", new ProtobufDecoder(Packets.Packet.getDefaultInstance()));
                     pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
                     pipeline.addLast("protobufEncoder", new ProtobufEncoder());
-                    pipeline.addLast("ClientHandler", new ClientBoundHandler());
+                    pipeline.addLast("ClientHandler", new ClientBoundHandler(client));
                 }
             });
 
             // Start the client.
-            channel = b.connect(host, port).sync().channel();
+            try {
+                channel = b.connect(host, port).sync().channel();
+            } catch (Exception e) {
+                ConnectingScreen.INSTANCE.setInfo(e.getClass().getSimpleName() + ": " + e.getMessage());
+                return;
+            }
             if (onConnect != null) {
                 Main.inst().getScheduler().executeSync(onConnect);
             }
@@ -56,5 +66,15 @@ public class Client {
         } finally {
             workerGroup.shutdownGracefully();
         }
+    }
+
+    @Nullable
+    public Channel getChannel() {
+        return channel;
+    }
+
+    @NotNull
+    public Client getClient() {
+        return client;
     }
 }

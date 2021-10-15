@@ -3,13 +3,14 @@ package no.elg.infiniteBootleg.screens
 import com.badlogic.gdx.ScreenAdapter
 import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.world.World
 
 /**
  * @author Elg
  */
-class WorldScreen(val world: World) : ScreenAdapter() {
+class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() {
 
   var hud: HUDRenderer = HUDRenderer()
     private set
@@ -26,6 +27,7 @@ class WorldScreen(val world: World) : ScreenAdapter() {
     }
     world.render.render()
     hud.render()
+    Main.inst().console.draw()
   }
 
   override fun resize(width: Int, height: Int) {
@@ -34,7 +36,14 @@ class WorldScreen(val world: World) : ScreenAdapter() {
 
   override fun show() {
     Main.inst().setWorld(world)
-    world.load()
+
+    if (load) {
+      world.load()
+    }
+    if (Settings.client) {
+      Main.inst().console.addToInputMultiplexer()
+    }
+    world.input?.also { Main.inst().inputMultiplexer.addProcessor(it) }
   }
 
   override fun hide() {
