@@ -68,6 +68,8 @@ public class Door extends MaterialEntity {
                 }
                 return true;
             });
+            //Make sure to get the correct lights
+            Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
         }
     }
 
