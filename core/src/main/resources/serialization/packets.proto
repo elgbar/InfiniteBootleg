@@ -23,6 +23,7 @@ message Packet {
     SB_CLIENT_WORLD_LOADED = 7; //no message associated
     SB_CHUNK_REQUEST = 8;
     DX_DISCONNECT = 9;
+    DX_SECRET_EXCHANGE = 10;
   }
 
   enum Direction {
@@ -32,6 +33,7 @@ message Packet {
 
   Type type = 1;
   Direction direction = 2;
+  optional string secret = 3; //Only optional before sharing the secret
 
   //very frequent packets
   optional Heartbeat heartbeat = 8; //dual
@@ -45,6 +47,7 @@ message Packet {
   optional StartGame startGame = 18; //client bound
   optional ServerLoginStatus serverLoginStatus = 20; //client bound
   optional Disconnect disconnect = 21;
+  optional SecretExchange secretExchange = 22;
 }
 
 ////////////////
@@ -58,7 +61,7 @@ message Heartbeat {
 
 message UpdateBlock {
   .persistence.Vector2i pos = 1;
-  .persistence.Block block = 2;
+  optional .persistence.Block block = 2;
 }
 
 message MoveEntity {
@@ -70,6 +73,11 @@ message MoveEntity {
 
 message Disconnect {
   string reason = 1;
+}
+
+message SecretExchange{
+  string entityUUID = 1;
+  string secret = 2;
 }
 
 //////////////////

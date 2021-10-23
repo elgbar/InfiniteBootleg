@@ -3,10 +3,15 @@ package no.elg.infiniteBootleg.world.loader;
 import com.badlogic.gdx.files.FileHandle;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.File;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.server.Client;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +32,8 @@ public class ChunkLoader {
     private final World world;
     private final ChunkGenerator generator;
 
+    private final Set<Location> requestedChunks = ConcurrentHashMap.newKeySet();
+
     public ChunkLoader(@NotNull World world, @NotNull ChunkGenerator generator) {
         this.world = world;
         this.generator = generator;
@@ -44,14 +51,23 @@ public class ChunkLoader {
     /**
      * Load the chunk at the given chunk location
      *
-     * @param chunkX
-     *     The y coordinate of the chunk (in chunk view)
-     * @param chunkY
-     *     The x coordinate of the chunk (in chunk view)
+     * @param chunkLoc
+     *     The coordinates of the chunk (in chunk view)
      *
      * @return The loaded chunk
      */
-    public Chunk load(int chunkX, int chunkY) {
+    @Nullable
+    public Chunk load(@NotNull Location chunkLoc) {
+        final Client client = world.getClient();
+        if (client != null && !requestedChunks.contains(chunkLoc)) {
+            requestedChunks.remove(chunkLoc);
+            System.out.println("requesting update for chunk " + chunkLoc);
+            client.ctx.writeAndFlush(PacketExtraKt.chunkRequestPacket(client, chunkLoc));
+            return null;
+        }
+        int chunkX = chunkLoc.x;
+        int chunkY = chunkLoc.y;
+
         if (existsOnDisk(chunkX, chunkY)) {
             ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
             final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
@@ -71,10 +87,12 @@ public class ChunkLoader {
     }
 
     @Nullable
-    public Chunk load(@NotNull ProtoWorld.Chunk protoChunk) {
+    public Chunk clientLoad(@NotNull ProtoWorld.Chunk protoChunk) {
         final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
         ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
-        return load(chunk, protoChunk);
+        final Chunk loaded = load(chunk, protoChunk);
+        requestedChunks.remove(Location.fromVector2i(chunkPosition));
+        return loaded;
     }
 
     @Nullable

@@ -32,7 +32,7 @@ class WorldBody(private val world: World) : Ticking {
    *
    * @return The underlying box2d world
    */
-  val box2dWorld: Box2dWorld
+  lateinit var box2dWorld: Box2dWorld
 
   private var timeStep = 0f
   var worldOffsetX = 0f
@@ -181,10 +181,12 @@ class WorldBody(private val world: World) : Ticking {
   }
 
   init {
-    synchronized(BOX2D_LOCK) {
-      box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
-      box2dWorld.setContactListener(ContactManager(world))
-      timeStep = world.worldTicker.secondsDelayBetweenTicks
+    if (Main.inst().isNotTest) {
+      synchronized(BOX2D_LOCK) {
+        box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
+        box2dWorld.setContactListener(ContactManager(world))
+        timeStep = world.worldTicker.secondsDelayBetweenTicks
+      }
     }
   }
 }

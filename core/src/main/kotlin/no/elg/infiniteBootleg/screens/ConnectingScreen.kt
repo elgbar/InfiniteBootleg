@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.Main
 object ConnectingScreen : StageScreen() {
 
   var channel: Channel? = null
-  private val field: VisLabel
+  private val field: VisLabel = VisLabel("...")
 
   var info: String
     get() = ConnectingScreen.field.text.toString()
@@ -24,20 +24,19 @@ object ConnectingScreen : StageScreen() {
     }
 
   init {
-    rootTable {
-      visTable(defaultSpacing = true) {
-        field = VisLabel("...")
-        addActor(actor(field))
-      }
-      row()
-      visTextButton("Back") {
-        onInteract(stage, Keys.ESCAPE, Keys.BACK) {
-          channel?.close()
-          Main.inst().screen = MainMenuScreen
+    if (Main.inst().isNotTest) {
+      rootTable {
+        visTable(defaultSpacing = true) {
+          addActor(actor(field))
+        }
+        row()
+        visTextButton("Back") {
+          onInteract(stage, Keys.ESCAPE, Keys.BACK) {
+            channel?.close()
+            Main.inst().screen = ServerScreen
+          }
         }
       }
     }
   }
-
-
 }

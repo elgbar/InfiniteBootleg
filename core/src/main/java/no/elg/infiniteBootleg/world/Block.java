@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
+import static no.elg.infiniteBootleg.world.Material.AIR;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
@@ -7,6 +9,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Savable;
+import no.elg.infiniteBootleg.world.blocks.traits.Trait;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +38,20 @@ public class Block implements Disposable, HUDDebuggable, Savable<ProtoWorld.Bloc
         this.material = material;
         this.world = world;
         this.chunk = chunk;
+    }
+
+    @Nullable
+    public static Block fromProto(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @Nullable ProtoWorld.Block protoBlock) {
+        if (protoBlock == null) {
+            return null;
+        }
+        Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
+        if (mat == AIR || mat.isEntity()) {
+            return null;
+        }
+        final Block block = mat.createBlock(world, chunk, localX, localY);
+        block.load(protoBlock);
+        return block;
     }
 
     @Nullable

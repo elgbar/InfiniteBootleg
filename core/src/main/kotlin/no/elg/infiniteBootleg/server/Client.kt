@@ -12,6 +12,7 @@ class Client(
   var world: World? = null,
   var controllingEntity: Entity? = null
 ) {
-  
+
   lateinit var ctx: ChannelHandlerContext
+  lateinit var credentials: ConnectionCredentials
 }

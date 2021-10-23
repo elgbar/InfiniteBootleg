@@ -48,7 +48,9 @@ public class Settings {
     @NotNull
     public static String host = "";
 
-    public static boolean stageDebug = false;
+    public static boolean stageDebug;
+
+    public static int chunkRadius = 10; //ish max chunks when fully zoomed out
 
     private Settings() { }
 

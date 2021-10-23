@@ -86,6 +86,9 @@ public class Main extends ApplicationAdapter {
             inst = this;
         }
         this.test = test;
+        if (test) {
+            VisUI.load(VisUI.SkinScale.X1);
+        }
         scheduler = new CancellableThreadScheduler(Settings.schedulerThreads);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (world != null) {
@@ -286,7 +289,7 @@ public class Main extends ApplicationAdapter {
         }
         synchronized (INST_LOCK) {
             if (mainPlayer == null || mainPlayer.isInvalid()) {
-                for (LivingEntity entity : world.getLivingEntities()) {
+                for (LivingEntity entity : world.getPlayers()) {
                     if (entity instanceof Player player && !entity.isInvalid() && player.getControls() != null) {
                         setPlayer(player);
                         return mainPlayer;
@@ -364,5 +367,9 @@ public class Main extends ApplicationAdapter {
 
     public CancellableThreadScheduler getScheduler() {
         return scheduler;
+    }
+
+    public boolean isNotTest() {
+        return !test;
     }
 }

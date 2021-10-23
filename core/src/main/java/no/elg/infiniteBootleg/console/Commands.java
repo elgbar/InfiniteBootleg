@@ -416,8 +416,7 @@ public class Commands extends CommandExecutor {
 
     @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
     public void spawnPlayer() {
-        World world = Main.inst().getWorld();
-        world.addEntity(new Player(world, world.getSpawn().x, world.getSpawn().y));
+        Main.inst().getWorld().createNewPlayer();
     }
 }
 

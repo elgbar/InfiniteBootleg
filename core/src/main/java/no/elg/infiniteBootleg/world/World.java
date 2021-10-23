@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +50,6 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
@@ -128,7 +128,7 @@ public class World implements Disposable, Resizable {
     @NotNull
     private final Set<@NotNull Entity> entities = ConcurrentHashMap.newKeySet(); //all entities in this world (including living entities)
     @NotNull
-    private final Set<@NotNull LivingEntity> livingEntities = ConcurrentHashMap.newKeySet(); //all player in this world
+    private final Map<@NotNull UUID, @NotNull Player> players = new ConcurrentHashMap<>(); //all player in this world
     @NotNull
     private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks = new ConcurrentHashMap<>();
     @Nullable
@@ -143,7 +143,6 @@ public class World implements Disposable, Resizable {
     private final Lock loadLock = new ReentrantLock();
     @Nullable
     private Client client;
-
 
     public World(@NotNull ProtoWorld.World protoWorld, @Nullable Client client) {
         this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
@@ -214,6 +213,14 @@ public class World implements Disposable, Resizable {
         if (!worldTicker.isStarted()) {
             worldTicker.start();
         }
+    }
+
+    @NotNull
+    public Player createNewPlayer() {
+        Player player = new Player(this, spawn.x, spawn.y);
+        Preconditions.checkState(!player.isInvalid());
+        addEntity(player);
+        return player;
     }
 
     public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
@@ -338,10 +345,10 @@ public class World implements Disposable, Resizable {
                 if (getWorldTicker().isPaused()) {
                     return null;
                 }
-                if (client != null) {
-                    client.ctx.writeAndFlush(PacketExtraKt.chunkRequestPacket(chunkLoc));
+                chunk = chunkLoader.load(chunkLoc);
+                if (chunk == null) {
+                    return null;
                 }
-                chunk = chunkLoader.load(chunkLoc.x, chunkLoc.y);
                 Preconditions.checkState(chunk.isValid());
                 chunks.put(chunkLoc, chunk);
             }
@@ -409,7 +416,10 @@ public class World implements Disposable, Resizable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
-            chunk.setBlock(localX, localY, material, updateTexture, prioritize);
+            var block = chunk.setBlock(localX, localY, material, updateTexture, prioritize);
+            if (isClient()) {
+                client.ctx.writeAndFlush(PacketExtraKt.serverBoundBlockUpdate(client, worldX, worldY, block));
+            }
         }
         return chunk;
     }
@@ -453,6 +463,20 @@ public class World implements Disposable, Resizable {
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
             chunk.setBlock(localX, localY, block, update);
+        }
+    }
+
+    public void setBlock(int worldX, int worldY, @Nullable ProtoWorld.Block protoBlock) {
+        int chunkX = CoordUtil.worldToChunk(worldX);
+        int chunkY = CoordUtil.worldToChunk(worldY);
+
+        int localX = CoordUtil.chunkOffset(worldX);
+        int localY = CoordUtil.chunkOffset(worldY);
+
+        Chunk chunk = getChunk(chunkX, chunkY);
+        if (chunk != null) {
+            var block = Block.fromProto(this, chunk, localX, localY, protoBlock);
+            chunk.setBlock(localX, localY, block, true);
         }
     }
 
@@ -669,7 +693,7 @@ public class World implements Disposable, Resizable {
         for (Entity entity : getEntities()) {
             removeEntity(entity);
         }
-        if (!entities.isEmpty() || !livingEntities.isEmpty()) {
+        if (!entities.isEmpty() || !players.isEmpty()) {
             throw new IllegalStateException("Failed to clear entities during reload");
         }
         //ok to include unloaded chunks as they will not cause an error when unloading again
@@ -797,8 +821,8 @@ public class World implements Disposable, Resizable {
         }
 
         entities.add(entity);
-        if (entity instanceof LivingEntity livingEntity) {
-            livingEntities.add(livingEntity);
+        if (entity instanceof Player player) {
+            players.put(player.getUuid(), player);
         }
     }
 
@@ -815,8 +839,8 @@ public class World implements Disposable, Resizable {
      */
     public void removeEntity(@NotNull Entity entity) {
         entities.remove(entity);
-        if (entity instanceof LivingEntity) {
-            livingEntities.remove(entity);
+        if (entity instanceof Player) {
+            players.remove(entity.getUuid());
         }
 
         if (!entity.isInvalid()) {
@@ -983,17 +1007,24 @@ public class World implements Disposable, Resizable {
         return entities;
     }
 
-    public @NotNull Set<LivingEntity> getLivingEntities() {
-        return livingEntities;
+    public @NotNull Collection<Player> getPlayers() {
+        return players.values();
     }
 
-    public boolean hasLivingEntity(@NotNull UUID uuid) {
-        for (LivingEntity entity : getLivingEntities()) {
-            if (entity.getUuid().equals(uuid)) {
-                return true;
-            }
+    public boolean hasPlayer(@NotNull UUID uuid) {
+        return players.containsKey(uuid);
+    }
+
+    public void removePlayer(@NotNull UUID uuid) {
+        final Player player = players.get(uuid);
+        if (player != null) {
+            removeEntity(player);
         }
-        return false;
+    }
+
+    @Nullable
+    public Player getPlayer(UUID uuid) {
+        return players.get(uuid);
     }
 
     public @NotNull ChunkLoader getChunkLoader() {
@@ -1050,5 +1081,30 @@ public class World implements Disposable, Resizable {
         if (input != null) {
             input.dispose();
         }
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    /**
+     * @return If this is a client of a server, meaning the server has the final say
+     */
+    public boolean isClient() {
+        return Settings.client && client != null;
+    }
+
+    /**
+     * @return If this is a server world
+     */
+    public boolean isServer() {
+        return !Settings.client;
+    }
+
+    /**
+     * @return If this is a singleplayer world
+     */
+    public boolean isSingleplayer() {
+        return Settings.client && client == null;
     }
 }

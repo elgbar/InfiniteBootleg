@@ -21,8 +21,8 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
     world.input?.update()
     if (!world.worldTicker.isPaused) {
       //only update controls when we're not paused
-      for (entity in world.livingEntities) {
-        entity.update()
+      for (player in world.players) {
+        player.update()
       }
     }
     world.render.render()

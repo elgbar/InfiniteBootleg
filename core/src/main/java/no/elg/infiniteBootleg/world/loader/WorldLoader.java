@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class WorldLoader {
 
     public static final String WORLD_INFO_PATH = "world.dat";
+    public static final String PLAYERS_PATH = "players";
 
     public static UUID getUUIDFromSeed(long seed) {
         byte[] uuidSeed = new byte[128];
@@ -45,8 +47,49 @@ public class WorldLoader {
         }
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
-
         return null;
+    }
+
+    @Nullable
+    public static FileHandle getServerPlayerFile(@NotNull World world, @NotNull UUID playerId) {
+        FileHandle fileHandle = world.getWorldFolder();
+        if (fileHandle != null) {
+            fileHandle = fileHandle.child(PLAYERS_PATH).child(playerId.toString());
+        }
+        return fileHandle;
+    }
+
+    @NotNull
+    public static Player getServerPlayer(@NotNull World world, @NotNull UUID playerId) {
+        FileHandle fileHandle = getServerPlayerFile(world, playerId);
+        if (fileHandle != null && fileHandle.exists()) {
+            try {
+                var proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes());
+                Player player = new Player(world, proto);
+                if (!player.isInvalid()) {
+                    world.addEntity(player);
+                    return player;
+                }
+                else {
+                    Main.inst().getConsoleLogger().error("SERVER", "Invalid player parsed");
+                    //fall through
+                }
+            } catch (Exception e) {
+                Main.inst().getConsoleLogger().error("SERVER", "Invalid entity protocol", e);
+                //fall through
+            }
+        }
+        //Invalid/non-existing player data
+        final Player player = world.createNewPlayer();
+        saveServerPlayer(player);
+        return player;
+    }
+
+    public static void saveServerPlayer(@NotNull Player player) {
+        FileHandle fileHandle = getServerPlayerFile(player.getWorld(), player.getUuid());
+        if (fileHandle != null) {
+            fileHandle.writeBytes(player.save().build().toByteArray(), false);
+        }
     }
 
     public static FileHandle getWorldZip(FileHandle folder) {

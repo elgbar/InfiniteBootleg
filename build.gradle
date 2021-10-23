@@ -1,5 +1,5 @@
 buildscript {
-      
+
   ext {
     kotlin_version = "1.5.31"
     appName = "InfiniteBootleg"
@@ -75,6 +75,30 @@ subprojects {
   dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
   }
+
+  test {
+//    failFast = true
+//    finalizedBy jacocoTestReport
+    useJUnitPlatform {
+      includeEngines "junit-jupiter", "junit-vintage"
+    }
+    jvmArgs = ["--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED",
+               "--add-opens", "java.xml/jdk.xml.internal=ALL-UNNAMED",
+               "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+               "--add-opens", "java.base/java.io=ALL-UNNAMED",
+               "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+               "--add-opens", "java.base/java.util.stream=ALL-UNNAMED",
+               "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+               "--add-opens", "java.base/java.security=ALL-UNNAMED",
+               "--add-opens", "java.base/sun.nio.fs=ALL-UNNAMED",
+               "--add-opens", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+               "--add-opens", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+               "--add-opens", "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+               "--add-opens", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+               "--add-opens", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+    ]
+  }
+
 }
 
 project(":desktop") {
@@ -124,7 +148,10 @@ project(":core") {
     implementation 'org.jetbrains:annotations:22.0.0'
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'io.mockk:mockk:1.12.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.8.1'
     testImplementation "org.mockito:mockito-all:1.9.+"
     testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }

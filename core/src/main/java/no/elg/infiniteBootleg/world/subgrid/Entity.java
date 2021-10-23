@@ -122,12 +122,14 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             }
         }
 
-        synchronized (BOX2D_LOCK) {
-            BodyDef def = createBodyDef(posCache.x, posCache.y);
-            body = world.getWorldBody().createBody(def);
-            createFixture(body);
-            body.setGravityScale(2f);
-            body.setUserData(this);
+        if (Main.inst().isNotTest()) {
+            synchronized (BOX2D_LOCK) {
+                BodyDef def = createBodyDef(posCache.x, posCache.y);
+                body = world.getWorldBody().createBody(def);
+                createFixture(body);
+                body.setGravityScale(2f);
+                body.setUserData(this);
+            }
         }
 
         //Sanity check
@@ -481,8 +483,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             synchronized (this) {
                 if (isInvalid()) { return; }
                 final WorldBody worldBody = world.getWorldBody();
-                posCache.set(this.body.getPosition()).sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
-                velCache.set(this.body.getLinearVelocity());
+
+                final Body body = this.body;
+                if (body != null) {
+                    posCache.set(body.getPosition()).sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
+                    velCache.set(body.getLinearVelocity());
+                }
             }
         }
     }
@@ -643,7 +649,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     protected abstract ProtoWorld.Entity.EntityType getEntityType();
 
     public boolean isInvalid() {
-        return !valid;
+        return !valid || body == null;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.server
 
+import io.netty.channel.ChannelHandlerContext
+import java.util.UUID
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
@@ -9,8 +11,10 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
+import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.StartGame
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
@@ -51,11 +55,17 @@ fun Client.handleClientBoundPackets(packet: Packets.Packet) {
     DX_MOVE_ENTITY -> TODO()
     DX_BLOCK_UPDATE -> TODO()
 
+    DX_SECRET_EXCHANGE -> {
+      if (packet.hasSecretExchange()) {
+        handleSecretExchange(ctx, packet.secretExchange)
+      }
+    }
+
     DX_DISCONNECT -> {
       if (packet.hasDisconnect()) {
         ConnectingScreen.info = "Disconnected: ${packet.disconnect.reason}"
       } else {
-        ConnectingScreen.info = "Disconnected: For unknown reason"
+        ConnectingScreen.info = "Disconnected: Unknown reason"
       }
       ctx.close()
     }
@@ -69,8 +79,19 @@ fun Client.handleClientBoundPackets(packet: Packets.Packet) {
   }
 }
 
+private fun Client.handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
+  val uuid = try {
+    UUID.fromString(secretExchange.entityUUID)
+  } catch (e: IllegalArgumentException) {
+    ctx.fatal("Failed to decode entity UUID ${secretExchange.entityUUID}")
+    return
+  }
+  credentials = ConnectionCredentials(uuid, secretExchange.secret)
+  ctx.writeAndFlush(clientSecretResponse(credentials))
+}
+
 fun Client.updateChunk(updateChunk: UpdateChunk) {
-  val chunk = world?.chunkLoader?.load(updateChunk.chunk) ?: return
+  val chunk = world?.chunkLoader?.clientLoad(updateChunk.chunk) ?: return
   world?.updateChunk(chunk)
 }
 

@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.Settings
 /** @author Elg */
 open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false) {
 
-  val stage = Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
+  private val stage by lazy { Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)) }
   lateinit var rootTable: KVisTable
     private set
 
@@ -32,16 +32,18 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   }
 
   init {
-    if (Settings.stageDebug) {
-      stage.isDebugAll = true
-    }
-    if (useRootTable) {
-      stage.actors {
-        rootTable = visTable {
-          defaults().pad(20f)
-          defaults().space(20f)
-          setFillParent(true)
-          setRound(false)
+    if (Main.inst().isNotTest) {
+      if (Settings.stageDebug) {
+        stage.isDebugAll = true
+      }
+      if (useRootTable) {
+        stage.actors {
+          rootTable = visTable {
+            defaults().pad(20f)
+            defaults().space(20f)
+            setFillParent(true)
+            setRound(false)
+          }
         }
       }
     }
