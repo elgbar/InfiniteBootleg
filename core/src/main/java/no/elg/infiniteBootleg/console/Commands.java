@@ -9,6 +9,7 @@ import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
+import java.util.UUID;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.ServerMain;
@@ -18,6 +19,7 @@ import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
@@ -443,8 +445,7 @@ public class Commands extends CommandExecutor {
     public void disconnect() {
         final ServerClient client = ClientMain.inst().getServerClient();
         if (client != null) {
-            client.ctx.close();
-            ClientMain.inst().setServerClient(null);
+            client.ctx.writeAndFlush(PacketExtraKt.serverBoundClientDisconnectPacket(client, "Disconnect command"));
         }
         ConnectingScreen.INSTANCE.setInfo("Disconnected");
         Main.inst().getScheduler().scheduleSync(() -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE), 50L);
