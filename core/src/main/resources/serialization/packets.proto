@@ -42,7 +42,7 @@ message Packet {
   optional ChunkRequest chunkRequest = 11; //server bound
 
   //more rare packets
-  optional UpdateBlock blockUpdate = 16; //dual
+  optional UpdateBlock updateBlock = 16; //dual
   optional Login login = 17; //server bound
   optional StartGame startGame = 18; //client bound
   optional ServerLoginStatus serverLoginStatus = 20; //client bound

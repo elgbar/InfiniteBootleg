@@ -57,8 +57,8 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
       }
     }
     DX_BLOCK_UPDATE -> {
-      if (packet.hasBlockUpdate()) {
-        handleBlockUpdate(packet.blockUpdate)
+      if (packet.hasUpdateBlock()) {
+        handleBlockUpdate(packet.updateBlock)
       }
     }
     DX_DISCONNECT -> {
@@ -133,7 +133,7 @@ private fun handleLoginStatusPacket(ctx: ChannelHandlerContext) {
     ctx.fatal("Player not loaded")
     return
   }
-  
+
   //Send chunk packets to client
   val ix = CoordUtil.worldToChunk(player.blockX)
   val iy = CoordUtil.worldToChunk(player.blockY)

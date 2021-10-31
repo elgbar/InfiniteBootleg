@@ -59,8 +59,8 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       }
     }
     DX_BLOCK_UPDATE -> {
-      if (packet.hasBlockUpdate()) {
-        handleBlockUpdate(packet.blockUpdate)
+      if (packet.hasUpdateBlock()) {
+        handleBlockUpdate(packet.updateBlock)
       }
     }
 

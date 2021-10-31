@@ -182,27 +182,27 @@ public final class Packets {
      *more rare packets
      * </pre>
      *
-     * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
-     * @return Whether the blockUpdate field is set.
+     * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
+     * @return Whether the updateBlock field is set.
      */
-    boolean hasBlockUpdate();
+    boolean hasUpdateBlock();
     /**
      * <pre>
      *more rare packets
      * </pre>
      *
-     * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
-     * @return The blockUpdate.
+     * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
+     * @return The updateBlock.
      */
-    no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getBlockUpdate();
+    no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getUpdateBlock();
     /**
      * <pre>
      *more rare packets
      * </pre>
      *
-     * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+     * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
      */
-    no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder getBlockUpdateOrBuilder();
+    no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder getUpdateBlockOrBuilder();
 
     /**
      * <pre>
@@ -437,12 +437,12 @@ public final class Packets {
             case 130: {
               no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder subBuilder = null;
               if (((bitField0_ & 0x00000020) != 0)) {
-                subBuilder = blockUpdate_.toBuilder();
+                subBuilder = updateBlock_.toBuilder();
               }
-              blockUpdate_ = input.readMessage(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.parser(), extensionRegistry);
+              updateBlock_ = input.readMessage(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(blockUpdate_);
-                blockUpdate_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(updateBlock_);
+                updateBlock_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000020;
               break;
@@ -1105,18 +1105,18 @@ public final class Packets {
       return chunkRequest_ == null ? no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.getDefaultInstance() : chunkRequest_;
     }
 
-    public static final int BLOCKUPDATE_FIELD_NUMBER = 16;
-    private no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock blockUpdate_;
+    public static final int UPDATEBLOCK_FIELD_NUMBER = 16;
+    private no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock updateBlock_;
     /**
      * <pre>
      *more rare packets
      * </pre>
      *
-     * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
-     * @return Whether the blockUpdate field is set.
+     * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
+     * @return Whether the updateBlock field is set.
      */
     @java.lang.Override
-    public boolean hasBlockUpdate() {
+    public boolean hasUpdateBlock() {
       return ((bitField0_ & 0x00000020) != 0);
     }
     /**
@@ -1124,23 +1124,23 @@ public final class Packets {
      *more rare packets
      * </pre>
      *
-     * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
-     * @return The blockUpdate.
+     * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
+     * @return The updateBlock.
      */
     @java.lang.Override
-    public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getBlockUpdate() {
-      return blockUpdate_ == null ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : blockUpdate_;
+    public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getUpdateBlock() {
+      return updateBlock_ == null ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : updateBlock_;
     }
     /**
      * <pre>
      *more rare packets
      * </pre>
      *
-     * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+     * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
      */
     @java.lang.Override
-    public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder getBlockUpdateOrBuilder() {
-      return blockUpdate_ == null ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : blockUpdate_;
+    public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder getUpdateBlockOrBuilder() {
+      return updateBlock_ == null ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : updateBlock_;
     }
 
     public static final int LOGIN_FIELD_NUMBER = 17;
@@ -1345,7 +1345,7 @@ public final class Packets {
         output.writeMessage(11, getChunkRequest());
       }
       if (((bitField0_ & 0x00000020) != 0)) {
-        output.writeMessage(16, getBlockUpdate());
+        output.writeMessage(16, getUpdateBlock());
       }
       if (((bitField0_ & 0x00000040) != 0)) {
         output.writeMessage(17, getLogin());
@@ -1400,7 +1400,7 @@ public final class Packets {
       }
       if (((bitField0_ & 0x00000020) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, getBlockUpdate());
+          .computeMessageSize(16, getUpdateBlock());
       }
       if (((bitField0_ & 0x00000040) != 0)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1464,10 +1464,10 @@ public final class Packets {
         if (!getChunkRequest()
             .equals(other.getChunkRequest())) return false;
       }
-      if (hasBlockUpdate() != other.hasBlockUpdate()) return false;
-      if (hasBlockUpdate()) {
-        if (!getBlockUpdate()
-            .equals(other.getBlockUpdate())) return false;
+      if (hasUpdateBlock() != other.hasUpdateBlock()) return false;
+      if (hasUpdateBlock()) {
+        if (!getUpdateBlock()
+            .equals(other.getUpdateBlock())) return false;
       }
       if (hasLogin() != other.hasLogin()) return false;
       if (hasLogin()) {
@@ -1529,9 +1529,9 @@ public final class Packets {
         hash = (37 * hash) + CHUNKREQUEST_FIELD_NUMBER;
         hash = (53 * hash) + getChunkRequest().hashCode();
       }
-      if (hasBlockUpdate()) {
-        hash = (37 * hash) + BLOCKUPDATE_FIELD_NUMBER;
-        hash = (53 * hash) + getBlockUpdate().hashCode();
+      if (hasUpdateBlock()) {
+        hash = (37 * hash) + UPDATEBLOCK_FIELD_NUMBER;
+        hash = (53 * hash) + getUpdateBlock().hashCode();
       }
       if (hasLogin()) {
         hash = (37 * hash) + LOGIN_FIELD_NUMBER;
@@ -1685,12 +1685,13 @@ public final class Packets {
           getMoveEntityFieldBuilder();
           getUpdateChunkFieldBuilder();
           getChunkRequestFieldBuilder();
-          getBlockUpdateFieldBuilder();
+          getUpdateBlockFieldBuilder();
           getLoginFieldBuilder();
           getStartGameFieldBuilder();
           getServerLoginStatusFieldBuilder();
           getDisconnectFieldBuilder();
           getSecretExchangeFieldBuilder();
+          getSpawnEntityFieldBuilder();
         }
       }
       @java.lang.Override
@@ -1726,10 +1727,10 @@ public final class Packets {
           chunkRequestBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000010);
-        if (blockUpdateBuilder_ == null) {
-          blockUpdate_ = null;
+        if (updateBlockBuilder_ == null) {
+          updateBlock_ = null;
         } else {
-          blockUpdateBuilder_.clear();
+          updateBlockBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
         if (loginBuilder_ == null) {
@@ -1829,10 +1830,10 @@ public final class Packets {
           to_bitField0_ |= 0x00000010;
         }
         if (((from_bitField0_ & 0x00000020) != 0)) {
-          if (blockUpdateBuilder_ == null) {
-            result.blockUpdate_ = blockUpdate_;
+          if (updateBlockBuilder_ == null) {
+            result.updateBlock_ = updateBlock_;
           } else {
-            result.blockUpdate_ = blockUpdateBuilder_.build();
+            result.updateBlock_ = updateBlockBuilder_.build();
           }
           to_bitField0_ |= 0x00000020;
         }
@@ -1948,8 +1949,8 @@ public final class Packets {
         if (other.hasChunkRequest()) {
           mergeChunkRequest(other.getChunkRequest());
         }
-        if (other.hasBlockUpdate()) {
-          mergeBlockUpdate(other.getBlockUpdate());
+        if (other.hasUpdateBlock()) {
+          mergeUpdateBlock(other.getUpdateBlock());
         }
         if (other.hasLogin()) {
           mergeLogin(other.getLogin());
@@ -2835,18 +2836,18 @@ public final class Packets {
         return chunkRequestBuilder_;
       }
 
-      private no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock blockUpdate_;
+      private no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock updateBlock_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder> blockUpdateBuilder_;
+          no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder> updateBlockBuilder_;
       /**
        * <pre>
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
-       * @return Whether the blockUpdate field is set.
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
+       * @return Whether the updateBlock field is set.
        */
-      public boolean hasBlockUpdate() {
+      public boolean hasUpdateBlock() {
         return ((bitField0_ & 0x00000020) != 0);
       }
       /**
@@ -2854,14 +2855,14 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
-       * @return The blockUpdate.
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
+       * @return The updateBlock.
        */
-      public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getBlockUpdate() {
-        if (blockUpdateBuilder_ == null) {
-          return blockUpdate_ == null ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : blockUpdate_;
+      public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getUpdateBlock() {
+        if (updateBlockBuilder_ == null) {
+          return updateBlock_ == null ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : updateBlock_;
         } else {
-          return blockUpdateBuilder_.getMessage();
+          return updateBlockBuilder_.getMessage();
         }
       }
       /**
@@ -2869,17 +2870,17 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
-      public Builder setBlockUpdate(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock value) {
-        if (blockUpdateBuilder_ == null) {
+      public Builder setUpdateBlock(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock value) {
+        if (updateBlockBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          blockUpdate_ = value;
+          updateBlock_ = value;
           onChanged();
         } else {
-          blockUpdateBuilder_.setMessage(value);
+          updateBlockBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000020;
         return this;
@@ -2889,15 +2890,15 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
-      public Builder setBlockUpdate(
+      public Builder setUpdateBlock(
           no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder builderForValue) {
-        if (blockUpdateBuilder_ == null) {
-          blockUpdate_ = builderForValue.build();
+        if (updateBlockBuilder_ == null) {
+          updateBlock_ = builderForValue.build();
           onChanged();
         } else {
-          blockUpdateBuilder_.setMessage(builderForValue.build());
+          updateBlockBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000020;
         return this;
@@ -2907,21 +2908,21 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
-      public Builder mergeBlockUpdate(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock value) {
-        if (blockUpdateBuilder_ == null) {
+      public Builder mergeUpdateBlock(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock value) {
+        if (updateBlockBuilder_ == null) {
           if (((bitField0_ & 0x00000020) != 0) &&
-              blockUpdate_ != null &&
-              blockUpdate_ != no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance()) {
-            blockUpdate_ =
-              no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.newBuilder(blockUpdate_).mergeFrom(value).buildPartial();
+              updateBlock_ != null &&
+              updateBlock_ != no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance()) {
+            updateBlock_ =
+              no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.newBuilder(updateBlock_).mergeFrom(value).buildPartial();
           } else {
-            blockUpdate_ = value;
+            updateBlock_ = value;
           }
           onChanged();
         } else {
-          blockUpdateBuilder_.mergeFrom(value);
+          updateBlockBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000020;
         return this;
@@ -2931,14 +2932,14 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
-      public Builder clearBlockUpdate() {
-        if (blockUpdateBuilder_ == null) {
-          blockUpdate_ = null;
+      public Builder clearUpdateBlock() {
+        if (updateBlockBuilder_ == null) {
+          updateBlock_ = null;
           onChanged();
         } else {
-          blockUpdateBuilder_.clear();
+          updateBlockBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
@@ -2948,26 +2949,26 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
-      public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder getBlockUpdateBuilder() {
+      public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder getUpdateBlockBuilder() {
         bitField0_ |= 0x00000020;
         onChanged();
-        return getBlockUpdateFieldBuilder().getBuilder();
+        return getUpdateBlockFieldBuilder().getBuilder();
       }
       /**
        * <pre>
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
-      public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder getBlockUpdateOrBuilder() {
-        if (blockUpdateBuilder_ != null) {
-          return blockUpdateBuilder_.getMessageOrBuilder();
+      public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder getUpdateBlockOrBuilder() {
+        if (updateBlockBuilder_ != null) {
+          return updateBlockBuilder_.getMessageOrBuilder();
         } else {
-          return blockUpdate_ == null ?
-              no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : blockUpdate_;
+          return updateBlock_ == null ?
+              no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance() : updateBlock_;
         }
       }
       /**
@@ -2975,20 +2976,20 @@ public final class Packets {
        *more rare packets
        * </pre>
        *
-       * <code>optional .packets.UpdateBlock blockUpdate = 16;</code>
+       * <code>optional .packets.UpdateBlock updateBlock = 16;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder> 
-          getBlockUpdateFieldBuilder() {
-        if (blockUpdateBuilder_ == null) {
-          blockUpdateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          getUpdateBlockFieldBuilder() {
+        if (updateBlockBuilder_ == null) {
+          updateBlockBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder, no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder>(
-                  getBlockUpdate(),
+                  getUpdateBlock(),
                   getParentForChildren(),
                   isClean());
-          blockUpdate_ = null;
+          updateBlock_ = null;
         }
-        return blockUpdateBuilder_;
+        return updateBlockBuilder_;
       }
 
       private no.elg.infiniteBootleg.protobuf.Packets.Login login_;
