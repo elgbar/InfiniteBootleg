@@ -49,7 +49,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public boolean keyDown(int keycode) {
-        if (Main.inst().getConsole().isVisible() || Main.isMultiplayer()) {
+        if (Main.inst().getConsole().isVisible() || Main.isMultiplayer() && keycode != F3) {
             return false;
         }
         World world = ClientMain.inst().getWorld();
