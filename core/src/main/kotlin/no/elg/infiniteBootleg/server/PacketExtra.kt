@@ -155,12 +155,12 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packets.Packet {
 //////////////////
 
 
-private val AIR_BLOCK = Block.save(AIR)
+private val AIR_BLOCK_BUILDER = Block.save(AIR)
 
 fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packets.Packet {
   return clientBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
-      .setBlock(if (block != null) block.save() else AIR_BLOCK)
+      .setBlock(block?.save() ?: AIR_BLOCK_BUILDER)
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
   ).build()
 }

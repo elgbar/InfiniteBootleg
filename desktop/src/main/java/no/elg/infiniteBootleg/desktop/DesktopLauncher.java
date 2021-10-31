@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.desktop;
 
-import static no.elg.infiniteBootleg.ClientMain.SCALE;
+import static no.elg.infiniteBootleg.Main.SCALE;
 
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;

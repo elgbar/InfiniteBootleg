@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
 import static java.util.Spliterator.DISTINCT;
-import static java.util.Spliterator.NONNULL;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterator.SIZED;
 import static no.elg.infiniteBootleg.world.Material.AIR;
@@ -16,7 +15,6 @@ import com.badlogic.gdx.utils.Array;
 import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -38,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class ChunkImpl implements Chunk {
+
+    private static final ProtoWorld.Block.Builder AIR_BLOCK_BUILDER = Block.save(AIR);
 
     @NotNull
     private final World world;
@@ -152,9 +152,18 @@ public class ChunkImpl implements Chunk {
         synchronized (this) {
             Block currBlock = blocks[localX][localY];
 
-            //accounts for both being null also ofc
-            if (Objects.equals(currBlock, block)) {
+            if (currBlock == block) {
                 return currBlock;
+            }
+            //accounts for both being null also ofc
+            if (isMaterialEqual(currBlock, block)) {
+                //Ok to return here, only internal change
+                if (currBlock != null) {
+                    currBlock.dispose();
+                    blocks[localX][localY] = null;
+                    return null;
+                }
+                return block;
             }
 
             if (currBlock != null) {
@@ -176,26 +185,38 @@ public class ChunkImpl implements Chunk {
                 this.prioritize |= prioritize; //do not remove prioritization if it already is
             }
         }
-        if (Main.isServer()) {
-            Main.inst().getScheduler().executeAsync(() -> {
-                var packet = PacketExtraKt.clientBoundBlockUpdate(getWorldX(localX), getWorldY(localY), block);
-                PacketExtraKt.broadcast(null, packet);
-            });
-        }
-        else if (Main.isClient()) {
-            Main.inst().getScheduler().executeAsync(() -> {
-                var client = ClientMain.inst().getServerClient();
-                if (client != null) {
-                    var packet = PacketExtraKt.serverBoundBlockUpdate(client, getWorldX(localX), getWorldY(localY), block);
-                    client.ctx.writeAndFlush(packet);
-                }
-            });
+        if (isValid()) {
+            if (Main.isServer()) {
+                Main.inst().getScheduler().executeAsync(() -> {
+                    final int x = getWorldX(localX);
+                    final int y = getWorldY(localY);
+                    var packet = PacketExtraKt.clientBoundBlockUpdate(x, y, block);
+                    Main.logger().log("broadcasting block change @ " + x + "," + y + ": " + block);
+                    PacketExtraKt.broadcast(null, packet);
+                });
+            }
+            else if (Main.isClient()) {
+                Main.inst().getScheduler().executeAsync(() -> {
+                    var client = ClientMain.inst().getServerClient();
+                    if (client != null) {
+                        var packet = PacketExtraKt.serverBoundBlockUpdate(client, getWorldX(localX), getWorldY(localY), block);
+                        client.ctx.writeAndFlush(packet);
+                    }
+                });
+            }
         }
         if (updateTexture) {
             //TODO maybe this can be done async? (it was before)
             world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
         }
         return block;
+    }
+
+    private static boolean isMaterialEqual(@Nullable Block blockA, @Nullable Block blockB) {
+        return (blockA == null && blockB == null) //
+               || (blockA == null && blockB.getMaterial() == AIR) //
+               || (blockB == null && blockA.getMaterial() == AIR) //
+               || (blockB != null && blockA != null && blockA.getMaterial() == blockB.getMaterial());
     }
 
     @Override
@@ -405,14 +426,14 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Stream<Block> stream() {
-        Spliterator<Block> spliterator = Spliterators.spliterator(iterator(), (long) CHUNK_SIZE * CHUNK_SIZE, SIZED | DISTINCT | NONNULL | ORDERED);
+    public Stream<@Nullable Block> stream() {
+        Spliterator<@Nullable Block> spliterator = Spliterators.spliterator(iterator(), (long) CHUNK_SIZE * CHUNK_SIZE, SIZED | DISTINCT | ORDERED);
         return StreamSupport.stream(spliterator, false);
     }
 
     @NotNull
     @Override
-    public Iterator<Block> iterator() {
+    public Iterator<@Nullable Block> iterator() {
         return new Iterator<>() {
             int x;
             int y;
@@ -431,7 +452,7 @@ public class ChunkImpl implements Chunk {
                 if (y >= CHUNK_SIZE) {
                     throw new NoSuchElementException();
                 }
-                return getBlock(x++, y);
+                return getRawBlock(x++, y);
             }
         };
     }

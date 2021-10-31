@@ -55,7 +55,6 @@ import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.elg.infiniteBootleg.world.ticker.WorldTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -618,11 +617,8 @@ public class World implements Disposable, Resizable {
      * @param raw
      *
      * @return The block at the given x and y
-     *
-     * @see Chunk#getBlock(int, int)
      */
     @Nullable
-    @Contract("_, _, false -> !null")
     public Block getBlock(int worldX, int worldY, boolean raw) {
 
         int chunkX = CoordUtil.worldToChunk(worldX);
@@ -635,12 +631,7 @@ public class World implements Disposable, Resizable {
         if (chunk == null) {
             return null;
         }
-        if (raw) {
-            return chunk.getBlocks()[localX][localY];
-        }
-        else {
-            return chunk.getBlock(localX, localY);
-        }
+        return chunk.getRawBlock(localX, localY);
     }
 
     /**
@@ -1066,10 +1057,13 @@ public class World implements Disposable, Resizable {
     @Override
     public void dispose() {
         getWorldTicker().stop();
-        getInput().dispose();
-        render.dispose();
+        final WorldInputHandler input = getInput();
         if (input != null) {
             input.dispose();
+        }
+        render.dispose();
+        if (this.input != null) {
+            this.input.dispose();
         }
     }
 
