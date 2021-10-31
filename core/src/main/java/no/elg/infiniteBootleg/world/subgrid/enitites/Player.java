@@ -44,7 +44,7 @@ public class Player extends LivingEntity {
         Preconditions.checkArgument(protoEntity.hasPlayer(), "Player does not contain player data");
         final ProtoWorld.Entity.Player protoPlayer = protoEntity.getPlayer();
         setTorchAngle(protoPlayer.getTorchAngleDeg());
-        if (protoPlayer.getControlled()) {
+        if (protoPlayer.getControlled() && Main.isSingleplayer()) {
             Main.inst().getScheduler().executeSync(() -> {
                 if (!isInvalid()) {
                     ClientMain.inst().setPlayer(this);

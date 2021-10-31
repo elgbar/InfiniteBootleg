@@ -1072,24 +1072,4 @@ public class World implements Disposable, Resizable {
         }
     }
 
-    /**
-     * @return If this is a client of a server, meaning the server has the final say
-     */
-    public boolean isClient() {
-        return Settings.client && ClientMain.inst().getServerClient() != null;
-    }
-
-    /**
-     * @return If this is a server world
-     */
-    public boolean isServer() {
-        return !Settings.client;
-    }
-
-    /**
-     * @return If this is a singleplayer world
-     */
-    public boolean isSingleplayer() {
-        return Settings.client && ClientMain.inst().getServerClient() == null;
-    }
 }

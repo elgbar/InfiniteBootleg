@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.loader;
 import com.badlogic.gdx.files.FileHandle;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.File;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -52,7 +53,7 @@ public class ChunkLoader {
      */
     @Nullable
     public Chunk load(@NotNull Location chunkLoc) {
-        if (world.isClient()) {
+        if (Main.isClient()) {
             return null;
         }
         int chunkX = chunkLoc.x;

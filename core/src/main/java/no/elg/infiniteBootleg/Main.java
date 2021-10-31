@@ -32,6 +32,34 @@ public interface Main extends ApplicationListener {
         return CommonMain.inst();
     }
 
+    /**
+     * @return If this is a client of a server
+     */
+    static boolean isClient() {
+        return Settings.client && ClientMain.inst().getServerClient() != null;
+    }
+
+    /**
+     * @return If this is a server instance
+     */
+    static boolean isServer() {
+        return !Settings.client;
+    }
+
+    /**
+     * @return If this is a singleplayer instance
+     */
+    static boolean isSingleplayer() {
+        return Settings.client && ClientMain.inst().getServerClient() == null;
+    }
+
+    /**
+     * @return If the current instance is multiplayer (either as the server or a client of a server)
+     */
+    static boolean isMultiplayer() {
+        return !Settings.client || ClientMain.inst().getServerClient() != null;
+    }
+
     @NotNull ConsoleLogger getConsoleLogger();
 
     @NotNull ConsoleHandler getConsole();

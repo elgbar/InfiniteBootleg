@@ -176,13 +176,13 @@ public class ChunkImpl implements Chunk {
                 this.prioritize |= prioritize; //do not remove prioritization if it already is
             }
         }
-        if (world.isServer()) {
+        if (Main.isServer()) {
             Main.inst().getScheduler().executeAsync(() -> {
                 var packet = PacketExtraKt.clientBoundBlockUpdate(getWorldX(localX), getWorldY(localY), block);
                 PacketExtraKt.broadcast(null, packet);
             });
         }
-        else if (world.isClient()) {
+        else if (Main.isClient()) {
             Main.inst().getScheduler().executeAsync(() -> {
                 var client = ClientMain.inst().getServerClient();
                 if (client != null) {

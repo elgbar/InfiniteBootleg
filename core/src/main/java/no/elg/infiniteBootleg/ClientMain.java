@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
@@ -191,6 +192,35 @@ public class ClientMain extends CommonMain {
         return screen;
     }
 
+    /**
+     * @return Either the world we're connected to or the singleplayer world, whichever is more correct.
+     *
+     * @throws IllegalStateException
+     *     If there is a client, but no world attached.
+     * @throws IllegalStateException
+     *     If there is no client, and there is no singleplayer world
+     */
+    @NotNull
+    public World getWorld() {
+        final ServerClient client = ClientMain.inst().getServerClient();
+        if (client == null) {
+            return ClientMain.inst().getSingleplayerWorld();
+        }
+        else {
+            final World world = client.getWorld();
+            if (world == null) {
+                PacketExtraKt.fatal(client.ctx, "Failed to get client world when executing command");
+                throw new IllegalStateException("Failed to get client world when executing command");
+            }
+            return world;
+        }
+    }
+
+    /**
+     * @return Only use when singleplayer is guaranteed
+     *
+     * @see #getWorld()
+     */
     @NotNull
     public World getSingleplayerWorld() {
         if (singleplayerWorld == null) {

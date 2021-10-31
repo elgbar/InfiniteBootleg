@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
-import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
@@ -46,18 +45,7 @@ public class Commands extends CommandExecutor {
     @NotNull
     public World getWorld() {
         if (Settings.client) {
-            final ServerClient client = ClientMain.inst().getServerClient();
-            if (client == null) {
-                return ClientMain.inst().getSingleplayerWorld();
-            }
-            else {
-                final World world = client.getWorld();
-                if (world == null) {
-                    PacketExtraKt.fatal(client.ctx, "Failed to get client world when executing command");
-                    throw new IllegalStateException("Failed to get client world when executing command");
-                }
-                return world;
-            }
+            return ClientMain.inst().getWorld();
         }
         else {
             return ServerMain.inst().getServerWorld();

@@ -37,7 +37,7 @@ public class WorldTicker extends Ticker {
             WorldRender wr = world.getRender();
             long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
 
-            if (world.isSingleplayer()) {
+            if (Main.isSingleplayer()) {
                 //tick all chunks and blocks in chunks
                 long tick = world.getWorldTicker().getTickId();
                 for (Iterator<Chunk> iterator = world.getChunks().values().iterator(); iterator.hasNext(); ) {
