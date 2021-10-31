@@ -32,7 +32,9 @@ public class StdConsole extends HeadlessConsole implements Runnable {
         while (running) {
             try {
                 String read = in.readLine();
-                Main.inst().getScheduler().executeSync(() -> consoleHandler.execCommand(read));
+                if (read != null) {
+                    Main.inst().getScheduler().executeSync(() -> consoleHandler.execCommand(read));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
