@@ -15,6 +15,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
@@ -54,7 +55,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         World world = Main.inst().getWorld();
         switch (keycode) {
             case F3:
-                Screen screen = Main.inst().getScreen();
+                Screen screen = ClientMain.inst().getScreen();
                 if (screen instanceof WorldScreen worldScreen) {
                     HUDRenderer hud = worldScreen.getHud();
                     if (hud.getModus() == HUDModus.DEBUG) {
@@ -111,7 +112,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     @Override
     public void dispose() {
-        Main.inst().getInputMultiplexer().removeProcessor(this);
+        ClientMain.inst().getInputMultiplexer().removeProcessor(this);
     }
 
     /**
@@ -189,7 +190,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
      */
     public void setFollowing(@Nullable Entity following) {
         if (following != null && following.isInvalid()) {
-            Main.inst().getConsoleLogger().error("World Input", "Cannot pass a non-null invalid entity!");
+            Main.logger().error("World Input", "Cannot pass a non-null invalid entity!");
             return;
         }
         //always update locked on status

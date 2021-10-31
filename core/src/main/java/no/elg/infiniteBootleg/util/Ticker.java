@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.utils.PauseableThread;
 import com.badlogic.gdx.utils.TimeUtils;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import org.jetbrains.annotations.NotNull;

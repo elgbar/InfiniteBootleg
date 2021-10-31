@@ -19,7 +19,7 @@ import ktx.style.visImageTextButton
 import ktx.style.visTextButton
 import ktx.style.visTextField
 import ktx.style.window
-import no.elg.infiniteBootleg.Main.SCALE
+import no.elg.infiniteBootleg.ClientMain.SCALE
 import no.elg.infiniteBootleg.screen.ScreenRenderer
 
 /**
@@ -28,7 +28,7 @@ import no.elg.infiniteBootleg.screen.ScreenRenderer
 object KAssets {
 
   val font: BitmapFont by lazy {
-    val generator = FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER.toString() + "UbuntuMono-R.ttf"))
+    val generator = FreeTypeFontGenerator(Gdx.files.internal(ClientMain.FONTS_FOLDER.toString() + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()
     parameter.size = ScreenRenderer.FONT_SIZE * SCALE
 

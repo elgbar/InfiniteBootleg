@@ -16,7 +16,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
 import no.elg.infiniteBootleg.console.consoles.StdConsole;
@@ -223,6 +223,6 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     }
 
     public void addToInputMultiplexer() {
-        Main.inst().getInputMultiplexer().addProcessor(console.getInputProcessor());
+        ClientMain.inst().getInputMultiplexer().addProcessor(console.getInputProcessor());
     }
 }

@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.InputAdapter;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -31,11 +31,11 @@ public abstract class AbstractEntityControls extends InputAdapter implements Ent
     }
 
     public World getWorld() {
-        return worldRender.world;
+        return worldRender.getWorld();
     }
 
     @Override
     public void dispose() {
-        Main.inst().getInputMultiplexer().removeProcessor(this);
+        ClientMain.inst().getInputMultiplexer().removeProcessor(this);
     }
 }

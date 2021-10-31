@@ -6,6 +6,7 @@ import io.netty.channel.Channel
 import ktx.scene2d.actor
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 
 /**
@@ -19,7 +20,7 @@ object ConnectingScreen : StageScreen() {
   var info: String
     get() = ConnectingScreen.field.text.toString()
     set(value) {
-      Main.inst().consoleLogger.log("ConnectingScreen", value)
+      Main.logger().log("ConnectingScreen", value)
       ConnectingScreen.field.setText(value)
     }
 
@@ -33,7 +34,7 @@ object ConnectingScreen : StageScreen() {
         visTextButton("Back") {
           onInteract(stage, Keys.ESCAPE, Keys.BACK) {
             channel?.close()
-            Main.inst().screen = ServerScreen
+            ClientMain.inst().screen = ServerScreen
           }
         }
       }

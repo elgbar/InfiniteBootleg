@@ -10,6 +10,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.Packets.Packet;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
             }
         }
 
-        Main.inst().getConsoleLogger().log("Server bound packet " + packet.getType());
+        Main.logger().log("Server bound packet " + packet.getType());
         TowardsServerPacketsHandlerKt.handleServerBoundPackets(ctx, packet);
     }
 
@@ -54,7 +55,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
     @Override
     public void channelInactive(@NotNull ChannelHandlerContext ctx) {
         var client = clients.remove(ctx.channel());
-        Main.inst().getConsole().debug("SERVER", "client inactive (curr active " + clients.size() + " clients, " + channels.size() + " channels)");
+        Main.logger().debug("SERVER", "client inactive (curr active " + clients.size() + " clients, " + channels.size() + " channels)");
         if (client != null) {
             Main.inst().getWorld().removePlayer(client.getEntityUUID());
         }

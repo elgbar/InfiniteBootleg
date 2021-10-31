@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.screen;
 
-import static no.elg.infiniteBootleg.Main.SCALE;
+import static no.elg.infiniteBootleg.ClientMain.SCALE;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
@@ -8,6 +8,7 @@ import box2dLight.PublicRayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
@@ -18,7 +19,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
-import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.render.ChunksInView;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.time.WorldTime;
@@ -39,12 +40,13 @@ public class HUDRenderer implements Renderer {
         if (modus == HUDModus.NONE) {
             return;
         }
-        Main main = Main.inst();
+        ClientMain main = ClientMain.inst();
         World world = main.getWorld();
         int h = Gdx.graphics.getHeight();
 
-        LivingEntity player = Main.inst().getPlayer();
-        ScreenRenderer sr = Main.inst().getScreenRenderer();
+        LivingEntity player = ClientMain.inst().getPlayer();
+        ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
+        assert sr != null; // this method should not get called if we are not rendering
         if (modus == HUDModus.DEBUG) {
             int mouseBlockX = main.getMouseBlockX();
             int mouseBlockY = main.getMouseBlockY();
@@ -82,7 +84,7 @@ public class HUDRenderer implements Renderer {
         String nl = "\n    ";
         StringBuilder ents = new StringBuilder("E = ");
 
-        for (Entity entity : world.getEntities(Main.inst().getMouseX(), Main.inst().getMouseY())) {
+        for (Entity entity : world.getEntities(ClientMain.inst().getMouseX(), ClientMain.inst().getMouseY())) {
             ents.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl);
         }
         int index = ents.lastIndexOf(nl);
@@ -107,8 +109,8 @@ public class HUDRenderer implements Renderer {
 
         Block block = world.getBlock(mouseBlockX, mouseBlockY, true);
         Material material = block != null ? block.getMaterial() : Material.AIR;
-        float rawX = Main.inst().getMouseX();
-        float rawY = Main.inst().getMouseY();
+        float rawX = ClientMain.inst().getMouseX();
+        float rawY = ClientMain.inst().getMouseY();
         boolean exists = block != null;
         final String blockDebug = block != null ? block.hudDebug() : "";
 
@@ -143,7 +145,7 @@ public class HUDRenderer implements Renderer {
     }
 
     private String viewChunk(World world) {
-        WorldRender.ChunkViewed viewingChunks = world.getRender().getChunksInView();
+        ChunksInView viewingChunks = world.getRender().getChunksInView();
 
         int chunksHor = viewingChunks.getHorizontalLength();
         int chunksVer = viewingChunks.getVerticalLength();

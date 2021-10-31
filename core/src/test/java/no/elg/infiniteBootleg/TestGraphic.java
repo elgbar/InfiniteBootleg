@@ -19,7 +19,7 @@ public class TestGraphic {
         Settings.client = false;
         Settings.loadWorldFromDisk = false;
         Settings.debug = true;
-        new Main(true);
+        new ClientMain(true);
     }
 
     public World world;
@@ -27,7 +27,7 @@ public class TestGraphic {
     @NotNull
     public World createNewWorld() {
         world = new World(new EmptyChunkGenerator(), 0);
-        Main.inst().setWorld(world);
+        ClientMain.inst().setWorld(world);
         return world;
     }
 

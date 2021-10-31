@@ -20,6 +20,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -323,7 +324,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean isAllowingUnloading() {
-        var player = Main.inst().getPlayer();
+        var player = ClientMain.inst().getPlayer();
         if (player != null && this.equals(player.getChunk())) {
             return false;
         }

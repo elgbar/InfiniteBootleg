@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -206,7 +207,7 @@ public class Util {
         String calcHash = getLastGitCommitID(false) + VERSION_DELIMITER + commitCount();
         String savedHash;
         try {
-            savedHash = Gdx.files.internal(Main.VERSION_FILE).readString();
+            savedHash = Gdx.files.internal(ClientMain.VERSION_FILE).readString();
         } catch (final Exception e) {
             savedHash = FALLBACK_VERSION;
         }
@@ -215,7 +216,7 @@ public class Util {
             return FALLBACK_VERSION;
         }
         if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
-            FileHandle versionFile = Gdx.files.absolute(Main.VERSION_FILE);
+            FileHandle versionFile = Gdx.files.absolute(ClientMain.VERSION_FILE);
             try {
                 versionFile.writeString(calcHash, false);
             } catch (Exception ignore) {

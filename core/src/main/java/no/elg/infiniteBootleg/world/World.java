@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
@@ -47,6 +48,7 @@ import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.loader.WorldLoader;
+import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -175,7 +177,7 @@ public class World implements Disposable, Resizable {
         spawn = new Location(0, 0);
 
         if (Settings.client) {
-            render = new WorldRender(this);
+            render = new ClientWorldRender(this);
             input = new WorldInputHandler(render);
         }
         else {
@@ -194,7 +196,7 @@ public class World implements Disposable, Resizable {
             Main.logger().log("No world save found");
             return;
         }
-        Main.inst().getConsoleLogger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
+        Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
 
         worldFolder.deleteDirectory();
         ZipUtils.unzip(worldFolder, worldZip);
@@ -232,7 +234,7 @@ public class World implements Disposable, Resizable {
             final Player newPlayer = new Player(this, protoWorld.getPlayer());
             if (!newPlayer.isInvalid()) {
                 addEntity(newPlayer, false);
-                Main.inst().setPlayer(newPlayer);
+                ClientMain.inst().setPlayer(newPlayer);
             }
         }
     }
@@ -275,7 +277,7 @@ public class World implements Disposable, Resizable {
         builder.setSpawn(spawn.toVector2i());
         builder.setGenerator(getGeneratorType());
         if (Settings.client) {
-            final Player player = Main.inst().getPlayer();
+            final Player player = ClientMain.inst().getPlayer();
             if (player != null) {
                 builder.setPlayer(player.save());
             }

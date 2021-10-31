@@ -180,7 +180,7 @@ public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<Pro
     @Override
     public void dispose() {
         if (disposed) {
-            Main.inst().getConsoleLogger().warn("Disposed block " + getWorldX() + ", " + getWorldY() + " twice");
+            Main.logger().warn("Disposed block " + getWorldX() + ", " + getWorldY() + " twice");
         }
         disposed = true;
     }

@@ -4,6 +4,7 @@ import static no.elg.infiniteBootleg.server.TowardsClientPacketsHandlerKt.handle
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.Packets.Packet;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
@@ -26,16 +27,16 @@ public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     public void channelInactive(@NotNull ChannelHandlerContext ctx) {
-        Main.inst().getScheduler().executeSync(() -> Main.inst().setScreen(ConnectingScreen.INSTANCE));
+        Main.inst().getScheduler().executeSync(() -> ClientMain.inst().setScreen(ConnectingScreen.INSTANCE));
     }
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull Packet packet) {
         if (packet.getDirection() == Packet.Direction.SERVER || packet.getType().name().startsWith("SB_")) {
-            Main.inst().getConsoleLogger().error(TAG, "Client got a server packet");
+            Main.logger().error(TAG, "Client got a server packet");
             return;
         }
-        Main.inst().getConsoleLogger().log("Client bound packet " + packet.getType());
+        Main.logger().log("Client bound packet " + packet.getType());
         handleClientBoundPackets(client, packet);
     }
 

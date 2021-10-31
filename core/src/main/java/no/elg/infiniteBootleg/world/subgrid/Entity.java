@@ -135,7 +135,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         //Sanity check
         Main.inst().getScheduler().scheduleSync(() -> {
             if (!isInvalid() && !world.containsEntity(uuid)) {
-                Main.inst().getConsoleLogger().warn("Failed to find entity '" + hudDebug() + "' in the world '" + world + "'! Did you forget to add it?");
+                Main.logger().warn("Failed to find entity '" + hudDebug() + "' in the world '" + world + "'! Did you forget to add it?");
             }
         }, 10L);
     }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
@@ -46,7 +47,7 @@ public class Player extends LivingEntity {
         if (protoPlayer.getControlled()) {
             Main.inst().getScheduler().executeSync(() -> {
                 if (!isInvalid()) {
-                    Main.inst().setPlayer(this);
+                    ClientMain.inst().setPlayer(this);
                 }
             });
         }
@@ -57,12 +58,14 @@ public class Player extends LivingEntity {
         if (isInvalid()) {
             return;
         }
-        Main.inst().setPlayer(this);
+        if (Settings.client) {
+            ClientMain.inst().setPlayer(this);
+        }
     }
 
     static {
         if (Settings.client) {
-            TEXTURE_REGION = new TextureRegion(Main.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
+            TEXTURE_REGION = new TextureRegion(ClientMain.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
         }
         else {
             TEXTURE_REGION = null;
@@ -85,23 +88,23 @@ public class Player extends LivingEntity {
 
     public synchronized void giveControls() {
         if (controls == null) {
-            Main.inst().getConsoleLogger().debug("PLR", "Giving control to " + hudDebug());
+            Main.logger().debug("PLR", "Giving control to " + hudDebug());
             controls = new KeyboardControls(getWorld().getRender(), this);
-            Main.inst().getInputMultiplexer().addProcessor(controls);
+            ClientMain.inst().getInputMultiplexer().addProcessor(controls);
         }
         else {
-            Main.inst().getConsoleLogger().warn("PLR", "Tried to give control to a player already with control " + hudDebug());
+            Main.logger().warn("PLR", "Tried to give control to a player already with control " + hudDebug());
         }
     }
 
     public synchronized void removeControls() {
         if (controls != null) {
-            Main.inst().getConsoleLogger().debug("PLR", "Removing control from " + hudDebug());
+            Main.logger().debug("PLR", "Removing control from " + hudDebug());
             controls.dispose();
             controls = null;
         }
         else {
-            Main.inst().getConsoleLogger().warn("PLR", "Tried to remove control from a player without control " + hudDebug());
+            Main.logger().warn("PLR", "Tried to remove control from a player without control " + hudDebug());
         }
     }
 

@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.screens
 
 import com.badlogic.gdx.ScreenAdapter
 import ktx.assets.disposeSafely
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.screen.HUDRenderer
@@ -43,7 +44,7 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
     if (Settings.client) {
       Main.inst().console.addToInputMultiplexer()
     }
-    world.input?.also { Main.inst().inputMultiplexer.addProcessor(it) }
+    world.input?.also { ClientMain.inst().inputMultiplexer.addProcessor(it) }
   }
 
   override fun hide() {

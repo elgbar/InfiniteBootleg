@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.Array
 import kotlin.math.abs
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Ticking
@@ -88,7 +89,7 @@ class WorldBody(private val world: World) : Ticking {
 
     //TODO move to WorldRender, makes more sense to do this there
     synchronized(BOX2D_LOCK) {
-      val player = Main.inst().player ?: return
+      val player = ClientMain.inst().player ?: return
       if (player.isInvalid) {
         return
       }

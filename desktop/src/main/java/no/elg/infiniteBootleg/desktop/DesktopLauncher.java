@@ -1,24 +1,26 @@
 package no.elg.infiniteBootleg.desktop;
 
-import static no.elg.infiniteBootleg.Main.SCALE;
+import static no.elg.infiniteBootleg.ClientMain.SCALE;
 
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
+import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.ServerMain;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.args.ProgramArgs;
+import no.elg.infiniteBootleg.util.Ticker;
 
 public class DesktopLauncher {
 
     public static void main(String[] args) {
 
-        Main main = new Main(false);
-
         new ProgramArgs(args);
-
         try {
             if (Settings.client) {
+                Main main = new ClientMain(false);
 
                 LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
                 if (SCALE > 1) {
@@ -38,10 +40,13 @@ public class DesktopLauncher {
                 new LwjglApplication(main, config);
             }
             else {
-                new HeadlessApplication(main, null);
+                HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+                config.updatesPerSecond = (int) (Settings.tps < 0 ? Ticker.DEFAULT_TICKS_PER_SECOND : Settings.tps);
+                Main main = new ServerMain(false);
+                new HeadlessApplication(main, config);
             }
         } catch (Throwable t) {
-            System.out.println("Uncaught exception thrown: " + t.getClass().getSimpleName());
+            System.err.println("Uncaught exception thrown: " + t.getClass().getSimpleName());
             t.printStackTrace();
         }
     }

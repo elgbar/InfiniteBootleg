@@ -50,6 +50,11 @@ public class StdConsole extends HeadlessConsole implements Runnable {
     }
 
     @Override
+    public boolean isVisible() {
+        return true;
+    }
+
+    @Override
     public void dispose() {
         super.dispose();
         running = false;

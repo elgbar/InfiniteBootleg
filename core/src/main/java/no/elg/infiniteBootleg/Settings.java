@@ -18,6 +18,10 @@ public class Settings {
      */
     public static boolean client = true;
 
+    public static boolean isServer() {
+        return !client;
+    }
+
     /**
      * Seed of the world loaded
      */

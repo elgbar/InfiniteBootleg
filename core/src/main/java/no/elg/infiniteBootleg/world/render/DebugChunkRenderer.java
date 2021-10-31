@@ -5,7 +5,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.world.Block;
@@ -30,14 +30,14 @@ public class DebugChunkRenderer implements Renderer {
     @Override
     public void render() {
 
-        WorldRender.ChunkViewed chunksInView = worldRender.getChunksInView();
+        ChunksInView chunksInView = worldRender.getChunksInView();
 
         int yEnd = chunksInView.verticalEnd;
         int xEnd = chunksInView.horizontalEnd;
 
         lr.begin(ShapeRenderer.ShapeType.Line);
 
-        final WorldBody worldBody = worldRender.world.getWorldBody();
+        final WorldBody worldBody = worldRender.getWorld().getWorldBody();
         float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
         float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
         lr.setProjectionMatrix(camera.combined);
@@ -58,7 +58,7 @@ public class DebugChunkRenderer implements Renderer {
         }
 
         lr.end();
-        ScreenRenderer sr = Main.inst().getScreenRenderer();
+        ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
         sr.begin();
         sr.drawBottom("Debug Chunk outline legend", 5);
         sr.getFont().setColor(WITHIN_CAMERA_COLOR);

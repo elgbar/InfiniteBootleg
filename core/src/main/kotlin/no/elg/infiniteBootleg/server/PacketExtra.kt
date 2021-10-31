@@ -39,7 +39,7 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
     this.writeAndFlush(disconnectClientPacket(msg))
   }
   close()
-  Main.inst().consoleLogger.error("ERR", msg)
+  Main.logger().error("ERR", msg)
 }
 
 /**

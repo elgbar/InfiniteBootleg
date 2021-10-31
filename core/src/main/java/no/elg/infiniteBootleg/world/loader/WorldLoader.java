@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import java.util.Random;
 import java.util.UUID;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -71,11 +72,11 @@ public class WorldLoader {
                     return player;
                 }
                 else {
-                    Main.inst().getConsoleLogger().error("SERVER", "Invalid player parsed");
+                    Main.logger().error("SERVER", "Invalid player parsed");
                     //fall through
                 }
             } catch (Exception e) {
-                Main.inst().getConsoleLogger().error("SERVER", "Invalid entity protocol", e);
+                Main.logger().error("SERVER", "Invalid entity protocol", e);
                 //fall through
             }
         }
@@ -97,7 +98,7 @@ public class WorldLoader {
     }
 
     public static FileHandle getWorldFolder(@NotNull UUID uuid) {
-        return Gdx.files.external(Main.WORLD_FOLDER + uuid);
+        return Gdx.files.external(ClientMain.WORLD_FOLDER + uuid);
     }
 
     public static ChunkGenerator generatorFromProto(@NotNull ProtoWorld.World protoWorld) {

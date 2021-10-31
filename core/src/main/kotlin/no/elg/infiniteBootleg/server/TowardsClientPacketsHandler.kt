@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.server
 
 import io.netty.channel.ChannelHandlerContext
 import java.util.UUID
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
@@ -133,7 +134,7 @@ fun Client.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
       }
       ConnectingScreen.info = "Login success!"
       Main.inst().scheduler.executeSync {
-        Main.inst().screen = WorldScreen(world, false)
+        ClientMain.inst().screen = WorldScreen(world, false)
         val player = Player(world, entity)
         if (player.isInvalid) {
           ctx.fatal("Invalid player client side")

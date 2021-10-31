@@ -13,6 +13,7 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.visTable
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 
@@ -58,7 +59,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   }
 
   override fun show() {
-    Main.inst().inputMultiplexer.addProcessor(stage)
+    ClientMain.inst().inputMultiplexer.addProcessor(stage)
   }
 
   override fun resize(width: Int, height: Int) {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.stream.Stream;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
@@ -196,7 +196,7 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable {
     boolean isNeighborsLoaded();
 
     /**
-     * If {@link Main#getPlayer()} is in this chunk, unloading should never be allowed
+     * If {@link ClientMain#getPlayer()} is in this chunk, unloading should never be allowed
      *
      * @return If this chunk is allowed to be unloaded
      */

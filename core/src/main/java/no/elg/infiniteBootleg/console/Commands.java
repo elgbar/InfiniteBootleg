@@ -9,6 +9,7 @@ import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
@@ -38,7 +39,6 @@ public class Commands extends CommandExecutor {
     }
 
     @CmdArgNames({"red", "green", "blue", "alpha"})
-    @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1", paramDescriptions = {"red", "green", "blue", "alpha"})
     public void skyColor(float r, float g, float b, float a) {
         Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
@@ -48,7 +48,6 @@ public class Commands extends CommandExecutor {
 
 
     @CmdArgNames("color")
-    @ClientsideOnly
     @ConsoleDoc(description = "Set the color of the sky", paramDescriptions = {"Name of color"})
     public void skyColor(String colorName) {
         if (Settings.client) {
@@ -94,7 +93,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Toggle flight for player")
     public void fly() {
-        Player player = Main.inst().getPlayer();
+        Player player = ClientMain.inst().getPlayer();
         if (player == null) {
             logger.error("CMD", "Failed to find any players");
             return;
@@ -162,7 +161,7 @@ public class Commands extends CommandExecutor {
         render.update();
         logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY);
 
-        Player player = Main.inst().getPlayer();
+        Player player = ClientMain.inst().getPlayer();
         if (player == null) {
             logger.error("CMD", "Failed to find any players");
             return;
@@ -191,7 +190,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Set how much information to show", paramDescriptions = "normal (default), debug or none")
     public void hud(String modusName) {
-        var screen = Main.inst().getScreen();
+        var screen = ClientMain.inst().getScreen();
         if (!(screen instanceof WorldScreen)) {
             logger.log(LogLevel.ERROR, "Not currently in a world, cannot change hud");
             return;
@@ -223,7 +222,7 @@ public class Commands extends CommandExecutor {
     @HiddenCommand
     @ClientsideOnly
     public void paint() {
-        Player player = Main.inst().getPlayer();
+        Player player = ClientMain.inst().getPlayer();
         if (player == null) {
             logger.error("CMD", "Failed to find any players");
             return;
@@ -267,12 +266,12 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Get the brush sizes")
     public void brush() {
-        Player player = Main.inst().getPlayer();
+        Player player = ClientMain.inst().getPlayer();
         if (player == null) {
             logger.error("CMD", "Failed to find any players");
             return;
         }
-        EntityControls controls = Main.inst().getPlayer().getControls();
+        EntityControls controls = ClientMain.inst().getPlayer().getControls();
         if (controls == null) {
             logger.error("CMD", "The main player does not have any controls");
         }
@@ -287,12 +286,12 @@ public class Commands extends CommandExecutor {
     @ConsoleDoc(description = "Set the brush size of the mouse",
                 paramDescriptions = {"Type of brush to change, can be 'break' and 'place'", "New brush size, positive integer"})
     public void brush(String type, float size) {
-        Player player = Main.inst().getPlayer();
+        Player player = ClientMain.inst().getPlayer();
         if (player == null) {
             logger.error("CMD", "Failed to find any players");
             return;
         }
-        EntityControls controls = Main.inst().getPlayer().getControls();
+        EntityControls controls = ClientMain.inst().getPlayer().getControls();
         if (controls == null) {
             logger.error("CMD", "The main player does not have any controls");
             return;
@@ -363,7 +362,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Reset camera and zoom")
     public void reset() {
-        Player player = Main.inst().getPlayer();
+        Player player = ClientMain.inst().getPlayer();
         if (player == null) {
             logger.error("CMD", "Failed to find any players");
             return;

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.sign
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.WorldRender
@@ -30,10 +31,10 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   private val tmpVec = Vector2()
 
   private fun breakBlocks(): Boolean {
-    val blockX = Main.inst().mouseBlockX
-    val blockY = Main.inst().mouseBlockY
-    val rawX = Main.inst().mouseX
-    val rawY = Main.inst().mouseY
+    val blockX = ClientMain.inst().mouseBlockX
+    val blockY = ClientMain.inst().mouseBlockY
+    val rawX = ClientMain.inst().mouseX
+    val rawY = ClientMain.inst().mouseY
 
     if (breakBrushSize <= 1) {
       world.remove(blockX, blockY, true)
@@ -52,10 +53,10 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   }
 
   private fun placeBlocks(): Boolean {
-    val blockX = Main.inst().mouseBlockX
-    val blockY = Main.inst().mouseBlockY
-    val rawX = Main.inst().mouseX
-    val rawY = Main.inst().mouseY
+    val blockX = ClientMain.inst().mouseBlockX
+    val blockY = ClientMain.inst().mouseBlockY
+    val rawX = ClientMain.inst().mouseX
+    val rawY = ClientMain.inst().mouseY
 
     var update = false
     synchronized(BOX2D_LOCK) {
@@ -85,7 +86,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
 
   private fun teleport() {
     //teleport the player to the (last) location of the mouse
-    controlled.teleport(Main.inst().mouseX, Main.inst().mouseY, true)
+    controlled.teleport(ClientMain.inst().mouseX, ClientMain.inst().mouseY, true)
     val input = world.input
     if (input != null) {
       input.following = controlled
@@ -145,7 +146,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   }
 
   private fun updateTorchDirection(player: Player) {
-    val angle: Float = tmpVec.set(Main.inst().mouse).sub(player.position).angleDeg()
+    val angle: Float = tmpVec.set(ClientMain.inst().mouse).sub(player.position).angleDeg()
     synchronized(WorldRender.LIGHT_LOCK) {
       val torchLight = player.torchLight
       torchLight.direction = angle

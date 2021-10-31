@@ -21,7 +21,7 @@ public class EntityRenderer implements Renderer {
     @Override
     public void render() {
         Batch batch = worldRender.getBatch();
-        final WorldBody worldBody = worldRender.world.getWorldBody();
+        final WorldBody worldBody = worldRender.getWorld().getWorldBody();
         float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
         float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
         for (Entity entity : worldRender.getWorld().getEntities()) {

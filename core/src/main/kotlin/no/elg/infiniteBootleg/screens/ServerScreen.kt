@@ -11,6 +11,7 @@ import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.server.Client
 import no.elg.infiniteBootleg.server.ClientChannel
@@ -56,7 +57,7 @@ object ServerScreen : StageScreen() {
         visTextButton("Connect") {
           onInteract(stage, Keys.NUM_0) {
             ConnectingScreen.info = "Connecting..."
-            Main.inst().screen = ConnectingScreen
+            ClientMain.inst().screen = ConnectingScreen
 
             val client = ClientChannel(Client(nameField.text))
             val runnable = Runnable {
@@ -69,7 +70,7 @@ object ServerScreen : StageScreen() {
               try {
                 client.connect(hostField.text, portSpinner.value, runnable)
               } catch (e: InterruptedException) {
-                Main.inst().console.log("SERVER", "Server interruption received", e)
+                Main.logger().log("SERVER", "Server interruption received", e)
                 Gdx.app.exit()
               }
             }, "Server")
@@ -84,7 +85,7 @@ object ServerScreen : StageScreen() {
         row()
         visTextButton("Back") {
           onInteract(stage, Keys.ESCAPE, Keys.BACK) {
-            Main.inst().screen = MainMenuScreen
+            ClientMain.inst().screen = MainMenuScreen
           }
         }
       }

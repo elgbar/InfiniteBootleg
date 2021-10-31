@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.screens
 import com.badlogic.gdx.Input.Keys
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
@@ -17,7 +17,7 @@ object SelectWorldScreen : StageScreen() {
       visTable(defaultSpacing = true) {
         visTextButton("Load World '${Settings.worldSeed}'") {
           onInteract(stage, Keys.NUM_0) {
-            Main.inst().screen = WorldScreen(World(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong()))
+            ClientMain.inst().screen = WorldScreen(World(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong()))
           }
         }
 //        row()
@@ -30,7 +30,7 @@ object SelectWorldScreen : StageScreen() {
         row()
         visTextButton("Back") {
           onInteract(stage, Keys.ESCAPE, Keys.BACK) {
-            Main.inst().screen = MainMenuScreen
+            ClientMain.inst().screen = MainMenuScreen
           }
         }
       }

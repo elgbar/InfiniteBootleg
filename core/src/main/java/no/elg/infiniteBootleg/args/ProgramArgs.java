@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.args;
 
 import com.badlogic.gdx.utils.Disposable;
-import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
@@ -24,12 +24,10 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class ProgramArgs implements ConsoleLogger, Disposable {
 
-    private final CancellableThreadScheduler scheduler;
+    private final CancellableThreadScheduler scheduler = new CancellableThreadScheduler(1);
+    private final ConsoleHandler logger = new ConsoleHandler(false);
 
     public ProgramArgs(String[] args) {
-        Preconditions.checkNotNull(Main.inst(), "Main not initiated");
-        Preconditions.checkNotNull(Main.logger(), "The console logger should not be null");
-        scheduler = new CancellableThreadScheduler(1);
         Map<Pair<String, Boolean>, String> options = Util.interpreterArgs(args);
 
         for (Map.Entry<Pair<String, Boolean>, String> entry : options.entrySet()) {
@@ -50,7 +48,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
                     }
                 }
                 if (name == null) {
-                    Main.logger().logf(LogLevel.ERROR, "Failed to find a valid argument with with the alt '%s'", altKey);
+                    logger.logf(LogLevel.ERROR, "Failed to find a valid argument with with the alt '%s'", altKey);
                     continue;
                 }
             }
@@ -67,17 +65,18 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
     @Override
     public void log(@NotNull LogLevel level, @NotNull String msg) {
-        scheduler.scheduleAsync(() -> Main.logger().log(level, msg), 2);
+        scheduler.scheduleAsync(() -> logger.log(level, msg), 2);
     }
 
     @Override
     public void dispose() {
         scheduler.shutdown();
+        logger.dispose();
     }
 
     /*
      * Below this comment all arguments are computed.
-     * A argument parser has a couple of requirement
+     * An argument parser has a couple of requirement
      *
      * - It must NOT be static
      * - It must have String as its one and only argument
