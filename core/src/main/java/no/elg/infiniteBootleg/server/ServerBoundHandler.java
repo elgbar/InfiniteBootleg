@@ -11,6 +11,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.ServerMain;
 import no.elg.infiniteBootleg.protobuf.Packets.Packet;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +57,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
         var client = clients.remove(ctx.channel());
         Main.logger().debug(TAG, "client inactive (curr active " + clients.size() + " clients, " + channels.size() + " channels)");
         if (client != null) {
-            Main.inst().getWorld().removePlayer(client.getEntityUUID());
+            ServerMain.inst().getServerWorld().removePlayer(client.getEntityUUID());
         }
     }
 

@@ -23,7 +23,7 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ClientMain extends ServerMain {
+public class ClientMain extends CommonMain {
 
     private static ClientMain inst;
     @NotNull
@@ -48,6 +48,8 @@ public class ClientMain extends ServerMain {
     private volatile Player mainPlayer;
     @Nullable
     private ServerClient serverClient;
+    @Nullable
+    protected World singleplayerWorld;
 
     @NotNull
     public static ClientMain inst() {
@@ -137,6 +139,16 @@ public class ClientMain extends ServerMain {
     }
 
     @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
     public void dispose() {
         super.dispose();
         if (Settings.client) {
@@ -179,6 +191,20 @@ public class ClientMain extends ServerMain {
         return screen;
     }
 
+    @NotNull
+    public World getSingleplayerWorld() {
+        if (singleplayerWorld == null) {
+            throw new IllegalStateException("There is no world when not in world screen");
+        }
+        return singleplayerWorld;
+    }
+
+    public void setSingleplayerWorld(@Nullable World singleplayerWorld) {
+        synchronized (INST_LOCK) {
+            this.singleplayerWorld = singleplayerWorld;
+        }
+    }
+
     @Nullable
     public Player getPlayer() {
         if (!Settings.client) {
@@ -187,7 +213,7 @@ public class ClientMain extends ServerMain {
         }
         synchronized (INST_LOCK) {
             if (mainPlayer == null || mainPlayer.isInvalid()) {
-                for (LivingEntity entity : world.getPlayers()) {
+                for (LivingEntity entity : singleplayerWorld.getPlayers()) {
                     if (entity instanceof Player player && !entity.isInvalid() && player.getControls() != null) {
                         setPlayer(player);
                         return mainPlayer;
@@ -218,9 +244,9 @@ public class ClientMain extends ServerMain {
                     mainPlayer.removeControls();
                 }
                 if (player != null) {
-                    if (!world.containsEntity(player.getUuid())) {
+                    if (!singleplayerWorld.containsEntity(player.getUuid())) {
                         console.error("PLR", "Tried to set main player to an entity that's not in the world!");
-                        world.addEntity(player);
+                        singleplayerWorld.addEntity(player);
                     }
                     if (!player.hasControls()) {
                         player.giveControls();
@@ -228,12 +254,12 @@ public class ClientMain extends ServerMain {
                 }
                 mainPlayer = player;
                 if (Settings.client) {
-                    assert world.getInput() != null;
-                    world.getInput().setFollowing(mainPlayer);
+                    assert singleplayerWorld.getInput() != null;
+                    singleplayerWorld.getInput().setFollowing(mainPlayer);
                 }
                 console.debug("PLR", "Changing main player to " + player);
             }
-            final WorldInputHandler worldInput = world.getInput();
+            final WorldInputHandler worldInput = singleplayerWorld.getInput();
             if (worldInput != null) {
                 worldInput.setFollowing(player);
             }

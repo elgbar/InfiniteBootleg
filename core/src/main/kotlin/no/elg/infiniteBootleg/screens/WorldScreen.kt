@@ -36,7 +36,7 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
   }
 
   override fun show() {
-    Main.inst().setWorld(world)
+    ClientMain.inst().setSingleplayerWorld(world)
 
     if (load) {
       world.load()
@@ -49,7 +49,8 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
 
   override fun hide() {
     world.save()
-    Main.inst().setWorld(null)
+    world.dispose()
+    ClientMain.inst().setSingleplayerWorld(null)
     dispose()
   }
 

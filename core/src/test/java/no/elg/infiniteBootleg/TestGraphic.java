@@ -27,7 +27,7 @@ public class TestGraphic {
     @NotNull
     public World createNewWorld() {
         world = new World(new EmptyChunkGenerator(), 0);
-        ClientMain.inst().setWorld(world);
+        ClientMain.inst().setSingleplayerWorld(world);
         return world;
     }
 

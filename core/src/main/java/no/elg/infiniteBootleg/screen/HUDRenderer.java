@@ -41,7 +41,7 @@ public class HUDRenderer implements Renderer {
             return;
         }
         ClientMain main = ClientMain.inst();
-        World world = main.getWorld();
+        World world = main.getSingleplayerWorld();
         int h = Gdx.graphics.getHeight();
 
         LivingEntity player = ClientMain.inst().getPlayer();

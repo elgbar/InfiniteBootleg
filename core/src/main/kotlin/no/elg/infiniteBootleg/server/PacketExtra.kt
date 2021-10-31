@@ -61,7 +61,9 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
 fun ChannelHandlerContext?.broadcast(packet: Packets.Packet) {
   val channel = this?.channel()
   for ((client, _) in ServerBoundHandler.clients) {
-    if (client == channel) continue
+    if (client == channel) {
+      continue
+    }
     client.writeAndFlush(packet)
   }
 }

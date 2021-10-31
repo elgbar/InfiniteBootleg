@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext
 import java.security.SecureRandom
 import java.util.UUID
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
@@ -97,7 +98,7 @@ fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExcha
       ctx.fatal("Wrong secret returned!")
       return
     }
-    val world = Main.inst().world
+    val world = ServerMain.inst().serverWorld
     val player = world.getPlayer(uuid)
     if (player != null) {
       ctx.writeAndFlush(clientBoundStartGamePacket(player))
@@ -114,12 +115,12 @@ fun handleBlockUpdate(blockUpdate: UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-  Main.inst().world.setBlock(worldX, worldY, protoBlock)
+  ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock)
 }
 
 fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunkLoc = Location.fromVector2i(chunkRequest.chunkLocation)
-  val chunk = Main.inst().world.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
+  val chunk = ServerMain.inst().serverWorld.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
   val allowedUnload = chunk.isAllowingUnloading
   chunk.setAllowUnload(false)
   ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
@@ -127,7 +128,7 @@ fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
 }
 
 private fun handleLoginStatusPacket(ctx: ChannelHandlerContext) {
-  val world = Main.inst().world
+  val world = ServerMain.inst().serverWorld
   val player = ctx.getCurrentPlayer()
   if (player == null) {
     ctx.fatal("Player not loaded")
@@ -155,7 +156,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     return
   }
 
-  val world = Main.inst().world
+  val world = ServerMain.inst().serverWorld
   val uuid = try {
     UUID.fromString(login.uuid)
   } catch (e: IllegalArgumentException) {
@@ -193,5 +194,5 @@ fun ChannelHandlerContext.getClientCredentials(): ConnectionCredentials? {
 
 fun ChannelHandlerContext.getCurrentPlayer(): Player? {
   val uuid = getClientCredentials()?.entityUUID ?: return null
-  return Main.inst().world.getPlayer(uuid)
+  return ServerMain.inst().serverWorld.getPlayer(uuid)
 }
