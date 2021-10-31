@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
+import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -45,6 +46,8 @@ public class ClientMain extends ServerMain {
 
     @Nullable
     private volatile Player mainPlayer;
+    @Nullable
+    private ServerClient serverClient;
 
     @NotNull
     public static ClientMain inst() {
@@ -277,4 +280,12 @@ public class ClientMain extends ServerMain {
         return screenRenderer;
     }
 
+    @Nullable
+    public ServerClient getServerClient() {
+        return serverClient;
+    }
+
+    public void setServerClient(@Nullable ServerClient serverClient) {
+        this.serverClient = serverClient;
+    }
 }

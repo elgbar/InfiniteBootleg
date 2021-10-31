@@ -20,7 +20,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,8 +31,6 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.server.Client;
-import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
@@ -128,7 +125,7 @@ public class World implements Disposable, Resizable {
     @NotNull
     private final WorldTime worldTime;
     @NotNull
-    private final Set<@NotNull Entity> entities = ConcurrentHashMap.newKeySet(); //all entities in this world (including living entities)
+    private final Map<@NotNull UUID, @NotNull Entity> entities = new ConcurrentHashMap<>(); //all entities in this world (including living entities)
     @NotNull
     private final Map<@NotNull UUID, @NotNull Player> players = new ConcurrentHashMap<>(); //all player in this world
     @NotNull
@@ -143,19 +140,9 @@ public class World implements Disposable, Resizable {
 
     private Location spawn;
     private final Lock loadLock = new ReentrantLock();
-    @Nullable
-    private Client client;
 
-    public World(@NotNull ProtoWorld.World protoWorld, @Nullable Client client) {
+    public World(@NotNull ProtoWorld.World protoWorld) {
         this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
-        this.client = client;
-    }
-
-    /**
-     * Generate a world with a random seed
-     */
-    public World(@NotNull ChunkGenerator generator) {
-        this(generator, MathUtils.random(Long.MAX_VALUE));
     }
 
     public World(@NotNull ChunkGenerator generator, long seed) {
@@ -418,10 +405,7 @@ public class World implements Disposable, Resizable {
 
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
-            var block = chunk.setBlock(localX, localY, material, updateTexture, prioritize);
-            if (isClient()) {
-                client.ctx.writeAndFlush(PacketExtraKt.serverBoundBlockUpdate(client, worldX, worldY, block));
-            }
+            chunk.setBlock(localX, localY, material, updateTexture, prioritize);
         }
         return chunk;
     }
@@ -514,7 +498,7 @@ public class World implements Disposable, Resizable {
 
     public Array<Entity> getEntities(float worldX, float worldY) {
         Array<Entity> foundEntities = new Array<>(false, 4);
-        for (Entity entity : entities) {
+        for (Entity entity : entities.values()) {
             Vector2 pos = entity.getPosition();
             if (Util.isBetween(MathUtils.floor(pos.x - entity.getHalfBox2dWidth()), worldX, MathUtils.ceil(pos.x + entity.getHalfBox2dWidth())) && //
                 Util.isBetween(MathUtils.floor(pos.y - entity.getHalfBox2dHeight()), worldY, MathUtils.ceil(pos.y + entity.getHalfBox2dHeight()))) {
@@ -780,7 +764,12 @@ public class World implements Disposable, Resizable {
 
 
     public boolean containsEntity(@NotNull UUID uuid) {
-        return entities.stream().anyMatch(it -> uuid.equals(it.getUuid()));
+        return entities.containsKey(uuid);
+    }
+
+    @Nullable
+    public Entity getEntity(@NotNull UUID uuid) {
+        return entities.get(uuid);
     }
 
     /**
@@ -801,7 +790,7 @@ public class World implements Disposable, Resizable {
      * @param loadChunk
      */
     public void addEntity(@NotNull Entity entity, boolean loadChunk) {
-        if (entities.stream().anyMatch(it -> it == entity)) {
+        if (entities.values().stream().anyMatch(it -> it == entity)) {
             Main.logger().error("World", "Tried to add entity twice to world " + entity.simpleName() + " " + entity.hudDebug());
             return;
         }
@@ -822,7 +811,7 @@ public class World implements Disposable, Resizable {
             }
         }
 
-        entities.add(entity);
+        entities.put(entity.getUuid(), entity);
         if (entity instanceof Player player) {
             players.put(player.getUuid(), player);
         }
@@ -840,7 +829,7 @@ public class World implements Disposable, Resizable {
      *     if the given entity is not part of this world
      */
     public void removeEntity(@NotNull Entity entity) {
-        entities.remove(entity);
+        entities.remove(entity.getUuid());
         if (entity instanceof Player) {
             players.remove(entity.getUuid());
         }
@@ -906,7 +895,7 @@ public class World implements Disposable, Resizable {
      */
     @Nullable
     public Entity getEntity(float worldX, float worldY) {
-        for (Entity entity : entities) {
+        for (Entity entity : entities.values()) {
             Vector2 pos = entity.getPosition();
             if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
                 Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
@@ -1005,8 +994,8 @@ public class World implements Disposable, Resizable {
     /**
      * @return the current entities
      */
-    public @NotNull Set<Entity> getEntities() {
-        return entities;
+    public @NotNull Collection<Entity> getEntities() {
+        return entities.values();
     }
 
     public @NotNull Collection<Player> getPlayers() {
@@ -1025,7 +1014,7 @@ public class World implements Disposable, Resizable {
     }
 
     @Nullable
-    public Player getPlayer(UUID uuid) {
+    public Player getPlayer(@Nullable UUID uuid) {
         return players.get(uuid);
     }
 
@@ -1037,8 +1026,6 @@ public class World implements Disposable, Resizable {
     public WorldBody getWorldBody() {
         return worldBody;
     }
-
-
 
     public @NotNull WorldTime getWorldTime() {
         return worldTime;
@@ -1085,15 +1072,11 @@ public class World implements Disposable, Resizable {
         }
     }
 
-    public Client getClient() {
-        return client;
-    }
-
     /**
      * @return If this is a client of a server, meaning the server has the final say
      */
     public boolean isClient() {
-        return Settings.client && client != null;
+        return Settings.client && ClientMain.inst().getServerClient() != null;
     }
 
     /**
@@ -1107,6 +1090,6 @@ public class World implements Disposable, Resizable {
      * @return If this is a singleplayer world
      */
     public boolean isSingleplayer() {
-        return Settings.client && client == null;
+        return Settings.client && ClientMain.inst().getServerClient() == null;
     }
 }

@@ -14,7 +14,10 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
+import no.elg.infiniteBootleg.screens.ConnectingScreen;
+import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
+import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Material;
@@ -413,9 +416,27 @@ public class Commands extends CommandExecutor {
         }
     }
 
+    @ClientsideOnly
     @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
     public void spawnPlayer() {
         Main.inst().getWorld().createNewPlayer();
+    }
+
+    @ConsoleDoc(description = "Save the world server side")
+    public void save() {
+        Main.inst().getWorld().save();
+    }
+
+    @ClientsideOnly
+    @ConsoleDoc(description = "Disconnect from the server")
+    public void disconnect() {
+        final ServerClient client = ClientMain.inst().getServerClient();
+        if (client != null) {
+            client.ctx.close();
+            ClientMain.inst().setServerClient(null);
+        }
+        ConnectingScreen.INSTANCE.setInfo("Disconnected");
+        Main.inst().getScheduler().scheduleSync(() -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE), 50L);
     }
 }
 

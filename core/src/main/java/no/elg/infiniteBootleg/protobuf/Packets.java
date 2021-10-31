@@ -5187,31 +5187,34 @@ public final class Packets {
         getUuidBytes();
 
     /**
-     * <pre>
-     * How much to move by
-     * </pre>
-     *
-     * <code>.persistence.Vector2f delta = 2;</code>
-     * @return Whether the delta field is set.
+     * <code>.persistence.Vector2f velocity = 2;</code>
+     * @return Whether the velocity field is set.
      */
-    boolean hasDelta();
+    boolean hasVelocity();
     /**
-     * <pre>
-     * How much to move by
-     * </pre>
-     *
-     * <code>.persistence.Vector2f delta = 2;</code>
-     * @return The delta.
+     * <code>.persistence.Vector2f velocity = 2;</code>
+     * @return The velocity.
      */
-    no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getDelta();
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getVelocity();
     /**
-     * <pre>
-     * How much to move by
-     * </pre>
-     *
-     * <code>.persistence.Vector2f delta = 2;</code>
+     * <code>.persistence.Vector2f velocity = 2;</code>
      */
-    no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getDeltaOrBuilder();
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder();
+
+    /**
+     * <code>.persistence.Vector2f position = 3;</code>
+     * @return Whether the position field is set.
+     */
+    boolean hasPosition();
+    /**
+     * <code>.persistence.Vector2f position = 3;</code>
+     * @return The position.
+     */
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getPosition();
+    /**
+     * <code>.persistence.Vector2f position = 3;</code>
+     */
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder();
   }
   /**
    * Protobuf type {@code packets.MoveEntity}
@@ -5267,13 +5270,26 @@ public final class Packets {
             }
             case 18: {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder subBuilder = null;
-              if (delta_ != null) {
-                subBuilder = delta_.toBuilder();
+              if (velocity_ != null) {
+                subBuilder = velocity_.toBuilder();
               }
-              delta_ = input.readMessage(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.parser(), extensionRegistry);
+              velocity_ = input.readMessage(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(delta_);
-                delta_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(velocity_);
+                velocity_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder subBuilder = null;
+              if (position_ != null) {
+                subBuilder = position_.toBuilder();
+              }
+              position_ = input.readMessage(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(position_);
+                position_ = subBuilder.buildPartial();
               }
 
               break;
@@ -5356,42 +5372,56 @@ public final class Packets {
       }
     }
 
-    public static final int DELTA_FIELD_NUMBER = 2;
-    private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f delta_;
+    public static final int VELOCITY_FIELD_NUMBER = 2;
+    private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f velocity_;
     /**
-     * <pre>
-     * How much to move by
-     * </pre>
-     *
-     * <code>.persistence.Vector2f delta = 2;</code>
-     * @return Whether the delta field is set.
+     * <code>.persistence.Vector2f velocity = 2;</code>
+     * @return Whether the velocity field is set.
      */
     @java.lang.Override
-    public boolean hasDelta() {
-      return delta_ != null;
+    public boolean hasVelocity() {
+      return velocity_ != null;
     }
     /**
-     * <pre>
-     * How much to move by
-     * </pre>
-     *
-     * <code>.persistence.Vector2f delta = 2;</code>
-     * @return The delta.
+     * <code>.persistence.Vector2f velocity = 2;</code>
+     * @return The velocity.
      */
     @java.lang.Override
-    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getDelta() {
-      return delta_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : delta_;
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getVelocity() {
+      return velocity_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : velocity_;
     }
     /**
-     * <pre>
-     * How much to move by
-     * </pre>
-     *
-     * <code>.persistence.Vector2f delta = 2;</code>
+     * <code>.persistence.Vector2f velocity = 2;</code>
      */
     @java.lang.Override
-    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getDeltaOrBuilder() {
-      return getDelta();
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder() {
+      return getVelocity();
+    }
+
+    public static final int POSITION_FIELD_NUMBER = 3;
+    private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f position_;
+    /**
+     * <code>.persistence.Vector2f position = 3;</code>
+     * @return Whether the position field is set.
+     */
+    @java.lang.Override
+    public boolean hasPosition() {
+      return position_ != null;
+    }
+    /**
+     * <code>.persistence.Vector2f position = 3;</code>
+     * @return The position.
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getPosition() {
+      return position_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : position_;
+    }
+    /**
+     * <code>.persistence.Vector2f position = 3;</code>
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder() {
+      return getPosition();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5411,8 +5441,11 @@ public final class Packets {
       if (!getUuidBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
-      if (delta_ != null) {
-        output.writeMessage(2, getDelta());
+      if (velocity_ != null) {
+        output.writeMessage(2, getVelocity());
+      }
+      if (position_ != null) {
+        output.writeMessage(3, getPosition());
       }
       unknownFields.writeTo(output);
     }
@@ -5426,9 +5459,13 @@ public final class Packets {
       if (!getUuidBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
-      if (delta_ != null) {
+      if (velocity_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getDelta());
+          .computeMessageSize(2, getVelocity());
+      }
+      if (position_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getPosition());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5447,10 +5484,15 @@ public final class Packets {
 
       if (!getUuid()
           .equals(other.getUuid())) return false;
-      if (hasDelta() != other.hasDelta()) return false;
-      if (hasDelta()) {
-        if (!getDelta()
-            .equals(other.getDelta())) return false;
+      if (hasVelocity() != other.hasVelocity()) return false;
+      if (hasVelocity()) {
+        if (!getVelocity()
+            .equals(other.getVelocity())) return false;
+      }
+      if (hasPosition() != other.hasPosition()) return false;
+      if (hasPosition()) {
+        if (!getPosition()
+            .equals(other.getPosition())) return false;
       }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -5465,9 +5507,13 @@ public final class Packets {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + UUID_FIELD_NUMBER;
       hash = (53 * hash) + getUuid().hashCode();
-      if (hasDelta()) {
-        hash = (37 * hash) + DELTA_FIELD_NUMBER;
-        hash = (53 * hash) + getDelta().hashCode();
+      if (hasVelocity()) {
+        hash = (37 * hash) + VELOCITY_FIELD_NUMBER;
+        hash = (53 * hash) + getVelocity().hashCode();
+      }
+      if (hasPosition()) {
+        hash = (37 * hash) + POSITION_FIELD_NUMBER;
+        hash = (53 * hash) + getPosition().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -5604,11 +5650,17 @@ public final class Packets {
         super.clear();
         uuid_ = "";
 
-        if (deltaBuilder_ == null) {
-          delta_ = null;
+        if (velocityBuilder_ == null) {
+          velocity_ = null;
         } else {
-          delta_ = null;
-          deltaBuilder_ = null;
+          velocity_ = null;
+          velocityBuilder_ = null;
+        }
+        if (positionBuilder_ == null) {
+          position_ = null;
+        } else {
+          position_ = null;
+          positionBuilder_ = null;
         }
         return this;
       }
@@ -5637,10 +5689,15 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.MoveEntity buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.MoveEntity result = new no.elg.infiniteBootleg.protobuf.Packets.MoveEntity(this);
         result.uuid_ = uuid_;
-        if (deltaBuilder_ == null) {
-          result.delta_ = delta_;
+        if (velocityBuilder_ == null) {
+          result.velocity_ = velocity_;
         } else {
-          result.delta_ = deltaBuilder_.build();
+          result.velocity_ = velocityBuilder_.build();
+        }
+        if (positionBuilder_ == null) {
+          result.position_ = position_;
+        } else {
+          result.position_ = positionBuilder_.build();
         }
         onBuilt();
         return result;
@@ -5694,8 +5751,11 @@ public final class Packets {
           uuid_ = other.uuid_;
           onChanged();
         }
-        if (other.hasDelta()) {
-          mergeDelta(other.getDelta());
+        if (other.hasVelocity()) {
+          mergeVelocity(other.getVelocity());
+        }
+        if (other.hasPosition()) {
+          mergePosition(other.getPosition());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -5822,159 +5882,242 @@ public final class Packets {
         return this;
       }
 
-      private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f delta_;
+      private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f velocity_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder> deltaBuilder_;
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder> velocityBuilder_;
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
-       * @return Whether the delta field is set.
+       * <code>.persistence.Vector2f velocity = 2;</code>
+       * @return Whether the velocity field is set.
        */
-      public boolean hasDelta() {
-        return deltaBuilder_ != null || delta_ != null;
+      public boolean hasVelocity() {
+        return velocityBuilder_ != null || velocity_ != null;
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
-       * @return The delta.
+       * <code>.persistence.Vector2f velocity = 2;</code>
+       * @return The velocity.
        */
-      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getDelta() {
-        if (deltaBuilder_ == null) {
-          return delta_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : delta_;
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getVelocity() {
+        if (velocityBuilder_ == null) {
+          return velocity_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : velocity_;
         } else {
-          return deltaBuilder_.getMessage();
+          return velocityBuilder_.getMessage();
         }
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
-      public Builder setDelta(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
-        if (deltaBuilder_ == null) {
+      public Builder setVelocity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
+        if (velocityBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          delta_ = value;
+          velocity_ = value;
           onChanged();
         } else {
-          deltaBuilder_.setMessage(value);
+          velocityBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
-      public Builder setDelta(
+      public Builder setVelocity(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder builderForValue) {
-        if (deltaBuilder_ == null) {
-          delta_ = builderForValue.build();
+        if (velocityBuilder_ == null) {
+          velocity_ = builderForValue.build();
           onChanged();
         } else {
-          deltaBuilder_.setMessage(builderForValue.build());
+          velocityBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
-      public Builder mergeDelta(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
-        if (deltaBuilder_ == null) {
-          if (delta_ != null) {
-            delta_ =
-              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.newBuilder(delta_).mergeFrom(value).buildPartial();
+      public Builder mergeVelocity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
+        if (velocityBuilder_ == null) {
+          if (velocity_ != null) {
+            velocity_ =
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.newBuilder(velocity_).mergeFrom(value).buildPartial();
           } else {
-            delta_ = value;
+            velocity_ = value;
           }
           onChanged();
         } else {
-          deltaBuilder_.mergeFrom(value);
+          velocityBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
-      public Builder clearDelta() {
-        if (deltaBuilder_ == null) {
-          delta_ = null;
+      public Builder clearVelocity() {
+        if (velocityBuilder_ == null) {
+          velocity_ = null;
           onChanged();
         } else {
-          delta_ = null;
-          deltaBuilder_ = null;
+          velocity_ = null;
+          velocityBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
-      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getDeltaBuilder() {
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getVelocityBuilder() {
         
         onChanged();
-        return getDeltaFieldBuilder().getBuilder();
+        return getVelocityFieldBuilder().getBuilder();
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
-      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getDeltaOrBuilder() {
-        if (deltaBuilder_ != null) {
-          return deltaBuilder_.getMessageOrBuilder();
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder() {
+        if (velocityBuilder_ != null) {
+          return velocityBuilder_.getMessageOrBuilder();
         } else {
-          return delta_ == null ?
-              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : delta_;
+          return velocity_ == null ?
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : velocity_;
         }
       }
       /**
-       * <pre>
-       * How much to move by
-       * </pre>
-       *
-       * <code>.persistence.Vector2f delta = 2;</code>
+       * <code>.persistence.Vector2f velocity = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder> 
-          getDeltaFieldBuilder() {
-        if (deltaBuilder_ == null) {
-          deltaBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          getVelocityFieldBuilder() {
+        if (velocityBuilder_ == null) {
+          velocityBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder>(
-                  getDelta(),
+                  getVelocity(),
                   getParentForChildren(),
                   isClean());
-          delta_ = null;
+          velocity_ = null;
         }
-        return deltaBuilder_;
+        return velocityBuilder_;
+      }
+
+      private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f position_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder> positionBuilder_;
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       * @return Whether the position field is set.
+       */
+      public boolean hasPosition() {
+        return positionBuilder_ != null || position_ != null;
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       * @return The position.
+       */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getPosition() {
+        if (positionBuilder_ == null) {
+          return position_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : position_;
+        } else {
+          return positionBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      public Builder setPosition(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
+        if (positionBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          position_ = value;
+          onChanged();
+        } else {
+          positionBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      public Builder setPosition(
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder builderForValue) {
+        if (positionBuilder_ == null) {
+          position_ = builderForValue.build();
+          onChanged();
+        } else {
+          positionBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      public Builder mergePosition(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
+        if (positionBuilder_ == null) {
+          if (position_ != null) {
+            position_ =
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.newBuilder(position_).mergeFrom(value).buildPartial();
+          } else {
+            position_ = value;
+          }
+          onChanged();
+        } else {
+          positionBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      public Builder clearPosition() {
+        if (positionBuilder_ == null) {
+          position_ = null;
+          onChanged();
+        } else {
+          position_ = null;
+          positionBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getPositionBuilder() {
+        
+        onChanged();
+        return getPositionFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder() {
+        if (positionBuilder_ != null) {
+          return positionBuilder_.getMessageOrBuilder();
+        } else {
+          return position_ == null ?
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance() : position_;
+        }
+      }
+      /**
+       * <code>.persistence.Vector2f position = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder> 
+          getPositionFieldBuilder() {
+        if (positionBuilder_ == null) {
+          positionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder>(
+                  getPosition(),
+                  getParentForChildren(),
+                  isClean());
+          position_ = null;
+        }
+        return positionBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11190,23 +11333,24 @@ public final class Packets {
       "nectB\021\n\017_secretExchange\" \n\tHeartbeat\022\023\n\013" +
       "keepAliveId\030\001 \001(\t\"c\n\013UpdateBlock\022\"\n\003pos\030" +
       "\001 \001(\0132\025.persistence.Vector2i\022&\n\005block\030\002 " +
-      "\001(\0132\022.persistence.BlockH\000\210\001\001B\010\n\006_block\"@" +
-      "\n\nMoveEntity\022\014\n\004uuid\030\001 \001(\t\022$\n\005delta\030\002 \001(" +
-      "\0132\025.persistence.Vector2f\"\034\n\nDisconnect\022\016" +
-      "\n\006reason\030\001 \001(\t\"4\n\016SecretExchange\022\022\n\nenti" +
-      "tyUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n\tStartGam" +
-      "e\022(\n\013controlling\030\001 \001(\0132\023.persistence.Ent" +
-      "ity\022!\n\005world\030\002 \001(\0132\022.persistence.World\"0" +
-      "\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022.persisten" +
-      "ce.Chunk\"\252\001\n\021ServerLoginStatus\0227\n\006status" +
-      "\030\001 \001(\0162\'.packets.ServerLoginStatus.Serve" +
-      "rStatus\"\\\n\014ServerStatus\022\021\n\rPROCEED_LOGIN" +
-      "\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_SERVER" +
-      "\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"8\n\005Login\022\014\n\004uuid\030\001" +
-      " \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 \001(\t\"" +
-      "<\n\014ChunkRequest\022,\n\rchunkLocation\030\001 \001(\0132\025" +
-      ".persistence.Vector2iB,\n\037no.elg.infinite" +
-      "Bootleg.protobufB\007PacketsP\000b\006proto3"
+      "\001(\0132\022.persistence.BlockH\000\210\001\001B\010\n\006_block\"l" +
+      "\n\nMoveEntity\022\014\n\004uuid\030\001 \001(\t\022\'\n\010velocity\030\002" +
+      " \001(\0132\025.persistence.Vector2f\022\'\n\010position\030" +
+      "\003 \001(\0132\025.persistence.Vector2f\"\034\n\nDisconne" +
+      "ct\022\016\n\006reason\030\001 \001(\t\"4\n\016SecretExchange\022\022\n\n" +
+      "entityUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n\tStar" +
+      "tGame\022(\n\013controlling\030\001 \001(\0132\023.persistence" +
+      ".Entity\022!\n\005world\030\002 \001(\0132\022.persistence.Wor" +
+      "ld\"0\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022.persi" +
+      "stence.Chunk\"\252\001\n\021ServerLoginStatus\0227\n\006st" +
+      "atus\030\001 \001(\0162\'.packets.ServerLoginStatus.S" +
+      "erverStatus\"\\\n\014ServerStatus\022\021\n\rPROCEED_L" +
+      "OGIN\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_SE" +
+      "RVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"8\n\005Login\022\014\n\004uu" +
+      "id\030\001 \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 " +
+      "\001(\t\"<\n\014ChunkRequest\022,\n\rchunkLocation\030\001 \001" +
+      "(\0132\025.persistence.Vector2iB,\n\037no.elg.infi" +
+      "niteBootleg.protobufB\007PacketsP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -11236,7 +11380,7 @@ public final class Packets {
     internal_static_packets_MoveEntity_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_packets_MoveEntity_descriptor,
-        new java.lang.String[] { "Uuid", "Delta", });
+        new java.lang.String[] { "Uuid", "Velocity", "Position", });
     internal_static_packets_Disconnect_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_packets_Disconnect_fieldAccessorTable = new

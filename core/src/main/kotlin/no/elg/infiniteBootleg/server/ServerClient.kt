@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.world.World
 /**
  * @author Elg
  */
-class Client(
+class ServerClient(
   val name: String,
   var world: World? = null,
   var controllingEntity: Entity? = null

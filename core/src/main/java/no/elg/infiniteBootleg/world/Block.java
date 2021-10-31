@@ -92,6 +92,13 @@ public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<Pro
         return localY;
     }
 
+    /**
+     * @return {@code new Location(getWorldX(), getLocalY())}
+     */
+    public Location getLocation() {
+        return new Location(getWorldX(), getLocalY());
+    }
+
     @NotNull
     @Override
     public Block getBlock() {
@@ -163,6 +170,10 @@ public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<Pro
 
     @Override
     public ProtoWorld.Block.Builder save() {
+        return Block.save(material);
+    }
+
+    public static ProtoWorld.Block.Builder save(Material material) {
         return ProtoWorld.Block.newBuilder().setMaterialOrdinal(material.ordinal());
     }
 
@@ -177,10 +188,14 @@ public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<Pro
         dispose();
     }
 
+    public boolean isDisposed() {
+        return disposed;
+    }
+
     @Override
     public void dispose() {
         if (disposed) {
-            Main.logger().warn("Disposed block " + getWorldX() + ", " + getWorldY() + " twice");
+            Main.logger().warn("Disposed block " + getClass().getSimpleName() + " (" + getWorldX() + ", " + getWorldY() + ") twice");
         }
         disposed = true;
     }

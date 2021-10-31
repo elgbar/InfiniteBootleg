@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -24,6 +25,7 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -153,7 +155,7 @@ public class ChunkImpl implements Chunk {
             Block currBlock = blocks[localX][localY];
 
             //accounts for both being null also ofc
-            if (currBlock == block) {
+            if (Objects.equals(currBlock, block)) {
                 return currBlock;
             }
 
@@ -175,6 +177,21 @@ public class ChunkImpl implements Chunk {
                 dirty = true;
                 this.prioritize |= prioritize; //do not remove prioritization if it already is
             }
+        }
+        if (world.isServer()) {
+            Main.inst().getScheduler().executeAsync(() -> {
+                var packet = PacketExtraKt.clientBoundBlockUpdate(getWorldX(localX), getWorldY(localY), block);
+                PacketExtraKt.broadcast(null, packet);
+            });
+        }
+        else if (world.isClient()) {
+            Main.inst().getScheduler().executeAsync(() -> {
+                var client = ClientMain.inst().getServerClient();
+                if (client != null) {
+                    var packet = PacketExtraKt.serverBoundBlockUpdate(client, getWorldX(localX), getWorldY(localY), block);
+                    client.ctx.writeAndFlush(packet);
+                }
+            });
         }
         if (updateTexture) {
             //TODO maybe this can be done async? (it was before)
@@ -324,9 +341,11 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean isAllowingUnloading() {
-        var player = ClientMain.inst().getPlayer();
-        if (player != null && this.equals(player.getChunk())) {
-            return false;
+        if (Settings.client) {
+            var player = ClientMain.inst().getPlayer();
+            if (player != null && this.equals(player.getChunk())) {
+                return false;
+            }
         }
         return allowUnload;
     }

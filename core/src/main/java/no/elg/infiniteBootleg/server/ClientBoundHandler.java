@@ -16,9 +16,9 @@ import org.jetbrains.annotations.NotNull;
 public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
     public static final String TAG = "CLIENT";
-    private final Client client;
+    private final ServerClient client;
 
-    public ClientBoundHandler(Client client) { this.client = client; }
+    public ClientBoundHandler(ServerClient client) { this.client = client; }
 
     @Override
     public void channelActive(@NotNull ChannelHandlerContext ctx) {
@@ -32,16 +32,17 @@ public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull Packet packet) {
+//        Main.logger().log("Client bound packet " + packet.getType());
         if (packet.getDirection() == Packet.Direction.SERVER || packet.getType().name().startsWith("SB_")) {
             Main.logger().error(TAG, "Client got a server packet");
             return;
         }
-        Main.logger().log("Client bound packet " + packet.getType());
         handleClientBoundPackets(client, packet);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        ConnectingScreen.INSTANCE.setInfo("Exception caught, " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
         cause.printStackTrace();
         ctx.close();
     }

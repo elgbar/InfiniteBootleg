@@ -159,7 +159,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     public void dispose() {
         super.dispose();
         if (block != null) {
-            block.dispose();
+            block.tryDispose();
             block = null;
         }
         if (light != null) {

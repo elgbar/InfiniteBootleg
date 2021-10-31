@@ -3,12 +3,8 @@ package no.elg.infiniteBootleg.world.loader;
 import com.badlogic.gdx.files.FileHandle;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.File;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.server.Client;
-import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.Location;
@@ -31,8 +27,6 @@ public class ChunkLoader {
     public static final String CHUNK_FOLDER = "chunks";
     private final World world;
     private final ChunkGenerator generator;
-
-    private final Set<Location> requestedChunks = ConcurrentHashMap.newKeySet();
 
     public ChunkLoader(@NotNull World world, @NotNull ChunkGenerator generator) {
         this.world = world;
@@ -58,11 +52,7 @@ public class ChunkLoader {
      */
     @Nullable
     public Chunk load(@NotNull Location chunkLoc) {
-        final Client client = world.getClient();
-        if (client != null && !requestedChunks.contains(chunkLoc)) {
-            requestedChunks.remove(chunkLoc);
-            System.out.println("requesting update for chunk " + chunkLoc);
-            client.ctx.writeAndFlush(PacketExtraKt.chunkRequestPacket(client, chunkLoc));
+        if (world.isClient()) {
             return null;
         }
         int chunkX = chunkLoc.x;
@@ -71,15 +61,16 @@ public class ChunkLoader {
         if (existsOnDisk(chunkX, chunkY)) {
             ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
             final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
-
-            try {
-                ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
-                var loaded = load(chunk, protoChunk);
-                if (loaded != null) {
-                    return loaded;
+            if (chunkFile != null) {
+                try {
+                    ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
+                    var loaded = load(chunk, protoChunk);
+                    if (loaded != null) {
+                        return loaded;
+                    }
+                } catch (InvalidProtocolBufferException e) {
+                    e.printStackTrace();
                 }
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
             }
             //Failed to assemble, generate new chunk
         }
@@ -90,9 +81,7 @@ public class ChunkLoader {
     public Chunk clientLoad(@NotNull ProtoWorld.Chunk protoChunk) {
         final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
         ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
-        final Chunk loaded = load(chunk, protoChunk);
-        requestedChunks.remove(Location.fromVector2i(chunkPosition));
-        return loaded;
+        return load(chunk, protoChunk);
     }
 
     @Nullable

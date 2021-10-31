@@ -10,9 +10,9 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.Packets.Packet;
+import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -27,6 +27,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull Packet packet) {
+//        Main.logger().log("Server bound packet " + packet.getType());
         if (packet.getDirection() == Packet.Direction.CLIENT || packet.getType().name().startsWith("CB_")) {
             fatal(ctx, "Server got a client packet");
             return;
@@ -42,8 +43,6 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
                 return;
             }
         }
-
-        Main.logger().log("Server bound packet " + packet.getType());
         TowardsServerPacketsHandlerKt.handleServerBoundPackets(ctx, packet);
     }
 
@@ -55,7 +54,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
     @Override
     public void channelInactive(@NotNull ChannelHandlerContext ctx) {
         var client = clients.remove(ctx.channel());
-        Main.logger().debug("SERVER", "client inactive (curr active " + clients.size() + " clients, " + channels.size() + " channels)");
+        Main.logger().debug(TAG, "client inactive (curr active " + clients.size() + " clients, " + channels.size() + " channels)");
         if (client != null) {
             Main.inst().getWorld().removePlayer(client.getEntityUUID());
         }
@@ -64,6 +63,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
+        ConnectingScreen.INSTANCE.setInfo("Exception caught, " + cause.getClass().getSimpleName() + ": " + cause.getMessage());
         ctx.close();
     }
 }

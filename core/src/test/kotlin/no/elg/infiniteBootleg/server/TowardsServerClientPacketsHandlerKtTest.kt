@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Test
  */
 
 
-class TowardsClientPacketsHandlerKtTest : TestGraphic() {
+class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
 
   lateinit var ctx: ChannelHandlerContext
   lateinit var channel: Channel
 
-  fun getClient(): Client {
-    return Client(CLIENT_NAME).also {
+  fun getClient(): ServerClient {
+    return ServerClient(CLIENT_NAME).also {
       it.ctx = ctx
     }
   }

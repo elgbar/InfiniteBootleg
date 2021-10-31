@@ -1,10 +1,10 @@
 package no.elg.infiniteBootleg.server
 
-import io.netty.channel.ChannelHandlerContext
 import java.util.UUID
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
@@ -22,13 +22,14 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
+import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 /**
  * @author Elg
  */
-fun Client.handleClientBoundPackets(packet: Packets.Packet) {
+fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     CB_LOGIN_STATUS -> {
       if (packet.hasServerLoginStatus()) {
@@ -49,16 +50,23 @@ fun Client.handleClientBoundPackets(packet: Packets.Packet) {
 
     DX_HEARTBEAT -> {
       if (packet.hasHeartbeat()) {
-        //very simple to implement!
         ctx.writeAndFlush(packet)
       }
     }
-    DX_MOVE_ENTITY -> TODO()
-    DX_BLOCK_UPDATE -> TODO()
+    DX_MOVE_ENTITY -> {
+      if (packet.hasMoveEntity()) {
+        handleMoveEntity(packet.moveEntity)
+      }
+    }
+    DX_BLOCK_UPDATE -> {
+      if (packet.hasBlockUpdate()) {
+        handleBlockUpdate(packet.blockUpdate)
+      }
+    }
 
     DX_SECRET_EXCHANGE -> {
       if (packet.hasSecretExchange()) {
-        handleSecretExchange(ctx, packet.secretExchange)
+        handleSecretExchange(packet.secretExchange)
       }
     }
 
@@ -80,7 +88,7 @@ fun Client.handleClientBoundPackets(packet: Packets.Packet) {
   }
 }
 
-private fun Client.handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
+private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   val uuid = try {
     UUID.fromString(secretExchange.entityUUID)
   } catch (e: IllegalArgumentException) {
@@ -88,19 +96,21 @@ private fun Client.handleSecretExchange(ctx: ChannelHandlerContext, secretExchan
     return
   }
   credentials = ConnectionCredentials(uuid, secretExchange.secret)
-  ctx.writeAndFlush(clientSecretResponse(credentials))
+  ctx.writeAndFlush(serverBoundClientSecretResponse(credentials))
 }
 
-fun Client.updateChunk(updateChunk: UpdateChunk) {
-  val chunk = world?.chunkLoader?.clientLoad(updateChunk.chunk) ?: return
-  world?.updateChunk(chunk)
+fun ServerClient.updateChunk(updateChunk: UpdateChunk) {
+  Main.inst().scheduler.executeSync {
+    val chunk = world?.chunkLoader?.clientLoad(updateChunk.chunk) ?: return@executeSync
+    world?.updateChunk(chunk)
+  }
 }
 
 
-fun Client.startGame(startGame: StartGame) {
+fun ServerClient.startGame(startGame: StartGame) {
   val protoWorld = startGame.world
   Main.inst().scheduler.executeSync {
-    this.world = World(protoWorld, this).apply {
+    this.world = World(protoWorld).apply {
       serverLoad(protoWorld)
     }
     if (startGame.controlling.type != PLAYER) {
@@ -112,7 +122,7 @@ fun Client.startGame(startGame: StartGame) {
   }
 }
 
-fun Client.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
+fun ServerClient.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
   when (loginStatus) {
     ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN -> {
       ctx.fatal("You are already logged in!")
@@ -153,3 +163,27 @@ fun Client.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
   }
 }
 
+fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
+  val uuid = fromUUIDOrNull(moveEntity.uuid)
+  if (uuid == null) {
+    ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
+    return
+  }
+  if (uuid == this.credentials.entityUUID) {
+    //Don't move ourselves
+    return
+  }
+  val world = world
+  if (world == null) {
+    Main.logger().warn("Failed to find world")
+    //will be spammed when logging in
+    return
+  }
+  val entity = world.getEntity(uuid)
+  if (entity == null) {
+//    ctx.fatal("Cannot move unknown entity '${moveEntity.uuid}'")
+    Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
+    return
+  }
+  entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, false)
+}

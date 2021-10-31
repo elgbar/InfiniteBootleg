@@ -186,6 +186,10 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     }
 
     public void teleport(float worldX, float worldY, boolean validate) {
+        translate(worldX, worldY, 0, 0, validate);
+    }
+
+    public void translate(float worldX, float worldY, float velX, float velY, boolean validate) {
         if (isInvalid()) {
             return;
         }
@@ -217,14 +221,14 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
                 }
                 body.setTransform(physicsWorldX, physicsWorldY, 0);
                 body.setAngularVelocity(0);
-                body.setLinearVelocity(0, 0);
+                body.setLinearVelocity(velX, velY);
                 body.setAwake(true);
             }
         }
         posCache.x = worldX;
         posCache.y = worldY;
-        velCache.x = 0;
-        velCache.y = 0;
+        velCache.x = velX;
+        velCache.y = velY;
     }
 
     /**
@@ -521,6 +525,9 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
                 }
             }
         }
+//        if (world.isServer() && !getVelocity().isZero(0.01f)) {
+//            PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundMoveEntity(this));
+//        }
     }
 
     /**

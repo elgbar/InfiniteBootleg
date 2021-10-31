@@ -67,8 +67,8 @@ message UpdateBlock {
 message MoveEntity {
   //Id of entity to move
   string uuid = 1;
-  // How much to move by
-  .persistence.Vector2f delta = 2;
+  .persistence.Vector2f velocity = 2;
+  .persistence.Vector2f position = 3;
 }
 
 message Disconnect {

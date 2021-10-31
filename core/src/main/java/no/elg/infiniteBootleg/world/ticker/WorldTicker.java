@@ -37,29 +37,29 @@ public class WorldTicker extends Ticker {
             WorldRender wr = world.getRender();
             long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
 
-            //tick all chunks and blocks in chunks
-            long tick = world.getWorldTicker().getTickId();
-            for (Iterator<Chunk> iterator = world.getChunks().values().iterator(); iterator.hasNext(); ) {
-                Chunk chunk = iterator.next();
+            if (world.isSingleplayer()) {
+                //tick all chunks and blocks in chunks
+                long tick = world.getWorldTicker().getTickId();
+                for (Iterator<Chunk> iterator = world.getChunks().values().iterator(); iterator.hasNext(); ) {
+                    Chunk chunk = iterator.next();
 
-                //clean up dead chunks
-                if (!chunk.isLoaded()) {
-                    iterator.remove();
-                    continue;
-                }
-                //Unload chunks not seen for CHUNK_UNLOAD_TIME
-                if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
+                    //clean up dead chunks
+                    if (!chunk.isLoaded()) {
+                        iterator.remove();
+                        continue;
+                    }
+                    //Unload chunks not seen for CHUNK_UNLOAD_TIME
+                    if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
-                    world.unloadChunk(chunk);
-                    iterator.remove();
-                    continue;
+                        world.unloadChunk(chunk);
+                        iterator.remove();
+                        continue;
+                    }
+                    chunk.tick();
                 }
-                chunk.tick();
             }
 
-            for (Iterator<Entity> iterator = world.getEntities().iterator(); iterator.hasNext(); ) {
-                Entity entity = iterator.next();
-
+            for (Entity entity : world.getEntities()) {
                 if (entity.isInvalid()) {
                     Main.logger().debug("WORLD", "Invalid entity in world entities (" + entity.simpleName() + ": " + entity.hudDebug() + ")");
                     world.removeEntity(entity);

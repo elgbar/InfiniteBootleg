@@ -13,9 +13,9 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.server.Client
 import no.elg.infiniteBootleg.server.ClientChannel
-import no.elg.infiniteBootleg.server.loginPacket
+import no.elg.infiniteBootleg.server.ServerClient
+import no.elg.infiniteBootleg.server.serverBoundLoginPacket
 
 /**
  * @author Elg
@@ -59,16 +59,18 @@ object ServerScreen : StageScreen() {
             ConnectingScreen.info = "Connecting..."
             ClientMain.inst().screen = ConnectingScreen
 
-            val client = ClientChannel(Client(nameField.text))
+            val serverClient = ServerClient(nameField.text)
+            ClientMain.inst().serverClient = serverClient
+            val clientChannel = ClientChannel(serverClient)
             val runnable = Runnable {
-              val channel = client.channel ?: error("Could not connect to server")
+              val channel = clientChannel.channel ?: error("Could not connect to server")
               ConnectingScreen.channel = channel
-              val packet = loginPacket(nameField.text, UUID.randomUUID())
+              val packet = serverBoundLoginPacket(nameField.text, UUID.randomUUID())
               channel.writeAndFlush(packet)
             }
             val thread = Thread({
               try {
-                client.connect(hostField.text, portSpinner.value, runnable)
+                clientChannel.connect(hostField.text, portSpinner.value, runnable)
               } catch (e: InterruptedException) {
                 Main.logger().log("SERVER", "Server interruption received", e)
                 Gdx.app.exit()
@@ -76,9 +78,6 @@ object ServerScreen : StageScreen() {
             }, "Server")
             thread.isDaemon = true
             thread.start()
-
-
-//            Main.inst().screen = WorldScreen(World(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong()))
           }
         }
         row()

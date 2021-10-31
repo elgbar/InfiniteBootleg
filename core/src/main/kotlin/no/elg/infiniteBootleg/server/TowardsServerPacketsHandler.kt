@@ -4,8 +4,10 @@ import io.netty.channel.ChannelHandlerContext
 import java.security.SecureRandom
 import java.util.UUID
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
+import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
@@ -18,9 +20,11 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
+import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.loader.WorldLoader
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 private val secureRandom = SecureRandom.getInstanceStrong()
 
@@ -47,17 +51,37 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
       }
     }
     DX_HEARTBEAT -> TODO()
-    DX_MOVE_ENTITY -> TODO()
+    DX_MOVE_ENTITY -> {
+      if (packet.hasMoveEntity()) {
+        handlePlayerUpdate(ctx, packet.moveEntity)
+      }
+    }
     DX_BLOCK_UPDATE -> {
       if (packet.hasBlockUpdate()) {
         handleBlockUpdate(packet.blockUpdate)
       }
     }
-    DX_DISCONNECT -> ctx.close()
+    DX_DISCONNECT -> {
+      Main.logger().log("Client sent disconnect packet. Reason: " + if (packet.hasDisconnect()) packet.disconnect?.reason else "No reason given")
+      ctx.close()
+    }
 
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received")
     else -> ctx.fatal("Cannot handle packet of type " + packet.type)
   }
+}
+
+fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntity) {
+  val player = ctx.getCurrentPlayer()
+  if (player == null) {
+    ctx.fatal("No server side player found!")
+    return
+  }
+  if (player.uuid.toString() != moveEntity.uuid) {
+    ctx.fatal("Client tried to update someone else")
+    return
+  }
+  player.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, false)
 }
 
 fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
@@ -73,11 +97,12 @@ fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExcha
       ctx.fatal("Wrong secret returned!")
       return
     }
-    val player = Main.inst().world.getPlayer(uuid)
-    if (player == null) {
-      ctx.fatal("Failed secret response")
+    val world = Main.inst().world
+    val player = world.getPlayer(uuid)
+    if (player != null) {
+      ctx.writeAndFlush(clientBoundStartGamePacket(player))
     } else {
-      ctx.writeAndFlush(startGamePacket(player))
+      ctx.fatal("Failed secret response")
     }
   } catch (e: Exception) {
     ctx.fatal("Failed to parse entity in secret")
@@ -97,16 +122,30 @@ fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunk = Main.inst().world.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
   val allowedUnload = chunk.isAllowingUnloading
   chunk.setAllowUnload(false)
-  ctx.writeAndFlush(updateChunkPacket(chunk))
+  ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
   chunk.setAllowUnload(allowedUnload)
 }
 
 private fun handleLoginStatusPacket(ctx: ChannelHandlerContext) {
   val world = Main.inst().world
-  for (chunk in world.loadedChunks) {
-    ctx.writeAndFlush(updateChunkPacket(chunk))
+  val player = ctx.getCurrentPlayer()
+  if (player == null) {
+    ctx.fatal("Player not loaded")
+    return
   }
-  ctx.writeAndFlush(serverLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
+  
+  //Send chunk packets to client
+  val ix = CoordUtil.worldToChunk(player.blockX)
+  val iy = CoordUtil.worldToChunk(player.blockY)
+  for (cx in -Settings.chunkRadius..Settings.chunkRadius) {
+    for (cy in -Settings.chunkRadius..Settings.chunkRadius) {
+      val chunk = world.getChunk(ix + cx, iy + cy) ?: continue
+      ctx.write(clientBoundUpdateChunkPacket(chunk))
+    }
+    ctx.flush()
+  }
+
+  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {
@@ -125,12 +164,12 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   }
 
   if (world.hasPlayer(uuid)) {
-    ctx.writeAndFlush(serverLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
+    ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
     ctx.close()
     return
   }
-  ctx.writeAndFlush(serverLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
-
+  //Client is good to login
+  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
   val player = WorldLoader.getServerPlayer(world, uuid)
   if (player.isInvalid) {
     ctx.fatal("Failed to spawn player server side")
@@ -144,5 +183,15 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   val connectionCredentials = ConnectionCredentials(player.uuid, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = connectionCredentials
 
-  ctx.writeAndFlush(serverSecretExchange(connectionCredentials))
+  //Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
+  ctx.writeAndFlush(clientBoundSecretExchange(connectionCredentials))
+}
+
+fun ChannelHandlerContext.getClientCredentials(): ConnectionCredentials? {
+  return ServerBoundHandler.clients[this.channel()]
+}
+
+fun ChannelHandlerContext.getCurrentPlayer(): Player? {
+  val uuid = getClientCredentials()?.entityUUID ?: return null
+  return Main.inst().world.getPlayer(uuid)
 }

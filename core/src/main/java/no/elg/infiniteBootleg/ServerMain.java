@@ -126,7 +126,7 @@ public class ServerMain implements Main {
             thread.start();
             console.log("SERVER", "Starting server on port " + Settings.port);
 
-            setWorld(new World(new PerlinChunkGenerator(Settings.worldSeed)));
+            setWorld(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed));
             getWorld().load();
         }
     }

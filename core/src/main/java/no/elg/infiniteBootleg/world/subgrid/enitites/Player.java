@@ -189,6 +189,12 @@ public class Player extends LivingEntity {
         if (torchLight != null) {
             torchLight.setPosition(pos);
         }
+//        if (getWorld().isClient() && hasControls() && !getVelocity().isZero(0.01f)) {
+//            final ServerClient client = ClientMain.inst().getServerClient();
+//            if (client != null) {
+//                client.ctx.writeAndFlush(PacketExtraKt.serverBoundMoveEntityPacket(client, this));
+//            }
+//        }
     }
 
     @Override

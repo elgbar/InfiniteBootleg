@@ -27,9 +27,9 @@ public class ClientChannel {
     @Nullable
     private Channel channel;
     @NotNull
-    private Client client;
+    private ServerClient client;
 
-    public ClientChannel(@NotNull Client client) { this.client = client; }
+    public ClientChannel(@NotNull ServerClient client) { this.client = client; }
 
     public void connect(@NotNull String host, int port, @Nullable Runnable onConnect) throws InterruptedException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -74,7 +74,7 @@ public class ClientChannel {
     }
 
     @NotNull
-    public Client getClient() {
+    public ServerClient getClient() {
         return client;
     }
 }

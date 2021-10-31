@@ -28,6 +28,9 @@ interface FallingTrait : TickingTrait {
         falling = true
 
         Main.inst().scheduler.executeSync {
+          if (block.isDisposed) {
+            return@executeSync
+          }
           //Do not update world straight away as if there are sand blocks above this it will begin to fall on the same tick
           val fallingBlock = FallingBlockEntity(world, block)
           if (fallingBlock.isInvalid) {
