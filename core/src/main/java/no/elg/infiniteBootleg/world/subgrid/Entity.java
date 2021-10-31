@@ -37,6 +37,9 @@ import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
+import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlockEntity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -650,6 +653,37 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         builder.setFlying(flying);
 
         return builder;
+    }
+
+    @Nullable
+    public static Entity load(@NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
+        Entity entity;
+        switch (protoEntity.getType()) {
+            case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
+            case FALLING_BLOCK -> entity = new FallingBlockEntity(world, chunk, protoEntity);
+            case PLAYER -> entity = new Player(world, protoEntity);
+            case BLOCK -> {
+                Preconditions.checkArgument(protoEntity.hasMaterial());
+                final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
+                final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
+                return material.createEntity(world, chunk, protoEntity);
+            }
+
+            case UNRECOGNIZED -> {
+                Main.logger().error("LOAD", "Failed to load entity due to UNRECOGNIZED type");
+                return null;
+            }
+            default -> {
+                Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
+                return null;
+            }
+        }
+
+        if (entity.isInvalid()) {
+            return null;
+        }
+        world.addEntity(entity, false);
+        return entity;
     }
 
     @NotNull

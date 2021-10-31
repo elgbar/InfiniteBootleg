@@ -31,8 +31,6 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlockEntity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -602,27 +600,7 @@ public class ChunkImpl implements Chunk {
         }
 
         for (ProtoWorld.Entity protoEntity : protoChunk.getEntitiesList()) {
-            Entity entity = null;
-            switch (protoEntity.getType()) {
-                case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
-                case FALLING_BLOCK -> entity = new FallingBlockEntity(world, this, protoEntity);
-                case PLAYER -> entity = new Player(world, protoEntity);
-                case BLOCK -> {
-                    Preconditions.checkArgument(protoEntity.hasMaterial());
-                    final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
-                    final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
-                    material.createEntity(world, this, protoEntity);
-                    continue; //Entity added in createEntity method
-                }
-                case UNRECOGNIZED -> {
-                    Main.logger().error("LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
-                    continue;
-                }
-            }
-            if (entity == null || entity.isInvalid()) {
-                continue;
-            }
-            world.addEntity(entity, false);
+            Entity.load(world, this, protoEntity);
         }
         return true;
     }
