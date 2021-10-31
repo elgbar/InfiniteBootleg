@@ -24,6 +24,7 @@ message Packet {
     SB_CHUNK_REQUEST = 8;
     DX_DISCONNECT = 9;
     DX_SECRET_EXCHANGE = 10;
+    CB_SPAWN_ENTITY = 11;
   }
 
   enum Direction {
@@ -48,6 +49,7 @@ message Packet {
   optional ServerLoginStatus serverLoginStatus = 20; //client bound
   optional Disconnect disconnect = 21;
   optional SecretExchange secretExchange = 22;
+  optional SpawnEntity spawnEntity = 23;
 }
 
 ////////////////
@@ -110,6 +112,10 @@ message ServerLoginStatus {
     LOGIN_SUCCESS = 3;
   }
   ServerStatus status = 1;
+}
+
+message SpawnEntity {
+  .persistence.Entity entity = 1;
 }
 
 //////////////////

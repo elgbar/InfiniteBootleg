@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
@@ -18,12 +19,15 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.StartGame
+import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.util.fromUUIDOrNull
+import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 /**
@@ -45,6 +49,12 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_UPDATE_CHUNK -> {
       if (packet.hasUpdateChunk()) {
         updateChunk(packet.updateChunk)
+      }
+    }
+
+    CB_SPAWN_ENTITY -> {
+      if (packet.hasSpawnEntity()) {
+        handleSpawnEntity(packet.spawnEntity)
       }
     }
 
@@ -88,6 +98,25 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   }
 }
 
+fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
+  Main.inst().scheduler.executeSync {
+    val world = this.world ?: return@executeSync
+    val worldX = blockUpdate.pos.x
+    val worldY = blockUpdate.pos.y
+    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
+    world.setBlock(worldX, worldY, protoBlock)
+  }
+}
+
+fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
+  Main.inst().scheduler.executeSync {
+    val world = this.world ?: return@executeSync
+    val pos = spawnEntity.entity.position.toLocation()
+    val chunk = world.getChunk(pos) ?: return@executeSync
+    Entity.load(world, chunk, spawnEntity.entity)
+  }
+}
+
 private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   val uuid = try {
     UUID.fromString(secretExchange.entityUUID)
@@ -95,17 +124,18 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
     ctx.fatal("Failed to decode entity UUID ${secretExchange.entityUUID}")
     return
   }
-  credentials = ConnectionCredentials(uuid, secretExchange.secret)
-  ctx.writeAndFlush(serverBoundClientSecretResponse(credentials))
+  val connectionCredentials = ConnectionCredentials(uuid, secretExchange.secret)
+  credentials = connectionCredentials
+  ctx.writeAndFlush(serverBoundClientSecretResponse(connectionCredentials))
 }
 
 fun ServerClient.updateChunk(updateChunk: UpdateChunk) {
   Main.inst().scheduler.executeSync {
-    val chunk = world?.chunkLoader?.clientLoad(updateChunk.chunk) ?: return@executeSync
-    world?.updateChunk(chunk)
+    val world = this.world ?: return@executeSync
+    val chunk = world.chunkLoader.clientLoad(updateChunk.chunk) ?: return@executeSync
+    world.updateChunk(chunk)
   }
 }
-
 
 fun ServerClient.startGame(startGame: StartGame) {
   val protoWorld = startGame.world
@@ -145,6 +175,7 @@ fun ServerClient.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
       ConnectingScreen.info = "Login success!"
       Main.inst().scheduler.executeSync {
         ClientMain.inst().screen = WorldScreen(world, false)
+        world.removePlayer(UUID.fromString(entity.uuid))
         val player = Player(world, entity)
         if (player.isInvalid) {
           ctx.fatal("Invalid player client side")
@@ -169,7 +200,7 @@ fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
     return
   }
-  if (uuid == this.credentials.entityUUID) {
+  if (uuid == this.credentials?.entityUUID) {
     //Don't move ourselves
     return
   }

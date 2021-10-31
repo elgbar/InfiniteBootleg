@@ -228,6 +228,10 @@ public interface Chunk extends Iterable<Block>, Ticking, Disposable {
 
     boolean load(ProtoWorld.Chunk protoChunk);
 
-    ProtoWorld.Chunk save();
+    default ProtoWorld.Chunk save() {
+        return save(true);
+    }
+
+    ProtoWorld.Chunk save(boolean excludePlayers);
 
 }

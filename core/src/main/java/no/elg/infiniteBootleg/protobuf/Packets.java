@@ -314,6 +314,21 @@ public final class Packets {
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      */
     no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder getSecretExchangeOrBuilder();
+
+    /**
+     * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+     * @return Whether the spawnEntity field is set.
+     */
+    boolean hasSpawnEntity();
+    /**
+     * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+     * @return The spawnEntity.
+     */
+    no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getSpawnEntity();
+    /**
+     * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+     */
+    no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder();
   }
   /**
    * Protobuf type {@code packets.Packet}
@@ -512,6 +527,19 @@ public final class Packets {
               bitField0_ |= 0x00000400;
               break;
             }
+            case 186: {
+              no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000800) != 0)) {
+                subBuilder = spawnEntity_.toBuilder();
+              }
+              spawnEntity_ = input.readMessage(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(spawnEntity_);
+                spawnEntity_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000800;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -604,6 +632,10 @@ public final class Packets {
        * <code>DX_SECRET_EXCHANGE = 10;</code>
        */
       DX_SECRET_EXCHANGE(10),
+      /**
+       * <code>CB_SPAWN_ENTITY = 11;</code>
+       */
+      CB_SPAWN_ENTITY(11),
       UNRECOGNIZED(-1),
       ;
 
@@ -655,6 +687,10 @@ public final class Packets {
        * <code>DX_SECRET_EXCHANGE = 10;</code>
        */
       public static final int DX_SECRET_EXCHANGE_VALUE = 10;
+      /**
+       * <code>CB_SPAWN_ENTITY = 11;</code>
+       */
+      public static final int CB_SPAWN_ENTITY_VALUE = 11;
 
 
       public final int getNumber() {
@@ -692,6 +728,7 @@ public final class Packets {
           case 8: return SB_CHUNK_REQUEST;
           case 9: return DX_DISCONNECT;
           case 10: return DX_SECRET_EXCHANGE;
+          case 11: return CB_SPAWN_ENTITY;
           default: return null;
         }
       }
@@ -1309,6 +1346,32 @@ public final class Packets {
       return secretExchange_ == null ? no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.getDefaultInstance() : secretExchange_;
     }
 
+    public static final int SPAWNENTITY_FIELD_NUMBER = 23;
+    private no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity spawnEntity_;
+    /**
+     * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+     * @return Whether the spawnEntity field is set.
+     */
+    @java.lang.Override
+    public boolean hasSpawnEntity() {
+      return ((bitField0_ & 0x00000800) != 0);
+    }
+    /**
+     * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+     * @return The spawnEntity.
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getSpawnEntity() {
+      return spawnEntity_ == null ? no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance() : spawnEntity_;
+    }
+    /**
+     * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder() {
+      return spawnEntity_ == null ? no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance() : spawnEntity_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1361,6 +1424,9 @@ public final class Packets {
       }
       if (((bitField0_ & 0x00000400) != 0)) {
         output.writeMessage(22, getSecretExchange());
+      }
+      if (((bitField0_ & 0x00000800) != 0)) {
+        output.writeMessage(23, getSpawnEntity());
       }
       unknownFields.writeTo(output);
     }
@@ -1421,6 +1487,10 @@ public final class Packets {
       if (((bitField0_ & 0x00000400) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(22, getSecretExchange());
+      }
+      if (((bitField0_ & 0x00000800) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(23, getSpawnEntity());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1494,6 +1564,11 @@ public final class Packets {
         if (!getSecretExchange()
             .equals(other.getSecretExchange())) return false;
       }
+      if (hasSpawnEntity() != other.hasSpawnEntity()) return false;
+      if (hasSpawnEntity()) {
+        if (!getSpawnEntity()
+            .equals(other.getSpawnEntity())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1552,6 +1627,10 @@ public final class Packets {
       if (hasSecretExchange()) {
         hash = (37 * hash) + SECRETEXCHANGE_FIELD_NUMBER;
         hash = (53 * hash) + getSecretExchange().hashCode();
+      }
+      if (hasSpawnEntity()) {
+        hash = (37 * hash) + SPAWNENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getSpawnEntity().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1763,6 +1842,12 @@ public final class Packets {
           secretExchangeBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000400);
+        if (spawnEntityBuilder_ == null) {
+          spawnEntity_ = null;
+        } else {
+          spawnEntityBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -1877,6 +1962,14 @@ public final class Packets {
           }
           to_bitField0_ |= 0x00000400;
         }
+        if (((from_bitField0_ & 0x00000800) != 0)) {
+          if (spawnEntityBuilder_ == null) {
+            result.spawnEntity_ = spawnEntity_;
+          } else {
+            result.spawnEntity_ = spawnEntityBuilder_.build();
+          }
+          to_bitField0_ |= 0x00000800;
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1966,6 +2059,9 @@ public final class Packets {
         }
         if (other.hasSecretExchange()) {
           mergeSecretExchange(other.getSecretExchange());
+        }
+        if (other.hasSpawnEntity()) {
+          mergeSpawnEntity(other.getSpawnEntity());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3698,6 +3794,126 @@ public final class Packets {
           secretExchange_ = null;
         }
         return secretExchangeBuilder_;
+      }
+
+      private no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity spawnEntity_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder> spawnEntityBuilder_;
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       * @return Whether the spawnEntity field is set.
+       */
+      public boolean hasSpawnEntity() {
+        return ((bitField0_ & 0x00000800) != 0);
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       * @return The spawnEntity.
+       */
+      public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getSpawnEntity() {
+        if (spawnEntityBuilder_ == null) {
+          return spawnEntity_ == null ? no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance() : spawnEntity_;
+        } else {
+          return spawnEntityBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      public Builder setSpawnEntity(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity value) {
+        if (spawnEntityBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          spawnEntity_ = value;
+          onChanged();
+        } else {
+          spawnEntityBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      public Builder setSpawnEntity(
+          no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder builderForValue) {
+        if (spawnEntityBuilder_ == null) {
+          spawnEntity_ = builderForValue.build();
+          onChanged();
+        } else {
+          spawnEntityBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      public Builder mergeSpawnEntity(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity value) {
+        if (spawnEntityBuilder_ == null) {
+          if (((bitField0_ & 0x00000800) != 0) &&
+              spawnEntity_ != null &&
+              spawnEntity_ != no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance()) {
+            spawnEntity_ =
+              no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.newBuilder(spawnEntity_).mergeFrom(value).buildPartial();
+          } else {
+            spawnEntity_ = value;
+          }
+          onChanged();
+        } else {
+          spawnEntityBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      public Builder clearSpawnEntity() {
+        if (spawnEntityBuilder_ == null) {
+          spawnEntity_ = null;
+          onChanged();
+        } else {
+          spawnEntityBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder getSpawnEntityBuilder() {
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return getSpawnEntityFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder() {
+        if (spawnEntityBuilder_ != null) {
+          return spawnEntityBuilder_.getMessageOrBuilder();
+        } else {
+          return spawnEntity_ == null ?
+              no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance() : spawnEntity_;
+        }
+      }
+      /**
+       * <code>optional .packets.SpawnEntity spawnEntity = 23;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder> 
+          getSpawnEntityFieldBuilder() {
+        if (spawnEntityBuilder_ == null) {
+          spawnEntityBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder>(
+                  getSpawnEntity(),
+                  getParentForChildren(),
+                  isClean());
+          spawnEntity_ = null;
+        }
+        return spawnEntityBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -9715,6 +9931,627 @@ public final class Packets {
 
   }
 
+  public interface SpawnEntityOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:packets.SpawnEntity)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.persistence.Entity entity = 1;</code>
+     * @return Whether the entity field is set.
+     */
+    boolean hasEntity();
+    /**
+     * <code>.persistence.Entity entity = 1;</code>
+     * @return The entity.
+     */
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntity();
+    /**
+     * <code>.persistence.Entity entity = 1;</code>
+     */
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder();
+  }
+  /**
+   * Protobuf type {@code packets.SpawnEntity}
+   */
+  public static final class SpawnEntity extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:packets.SpawnEntity)
+      SpawnEntityOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use SpawnEntity.newBuilder() to construct.
+    private SpawnEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private SpawnEntity() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new SpawnEntity();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private SpawnEntity(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder subBuilder = null;
+              if (entity_ != null) {
+                subBuilder = entity_.toBuilder();
+              }
+              entity_ = input.readMessage(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(entity_);
+                entity_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return no.elg.infiniteBootleg.protobuf.Packets.internal_static_packets_SpawnEntity_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return no.elg.infiniteBootleg.protobuf.Packets.internal_static_packets_SpawnEntity_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.class, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder.class);
+    }
+
+    public static final int ENTITY_FIELD_NUMBER = 1;
+    private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity entity_;
+    /**
+     * <code>.persistence.Entity entity = 1;</code>
+     * @return Whether the entity field is set.
+     */
+    @java.lang.Override
+    public boolean hasEntity() {
+      return entity_ != null;
+    }
+    /**
+     * <code>.persistence.Entity entity = 1;</code>
+     * @return The entity.
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntity() {
+      return entity_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance() : entity_;
+    }
+    /**
+     * <code>.persistence.Entity entity = 1;</code>
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder() {
+      return getEntity();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (entity_ != null) {
+        output.writeMessage(1, getEntity());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (entity_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getEntity());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity)) {
+        return super.equals(obj);
+      }
+      no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity other = (no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity) obj;
+
+      if (hasEntity() != other.hasEntity()) return false;
+      if (hasEntity()) {
+        if (!getEntity()
+            .equals(other.getEntity())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasEntity()) {
+        hash = (37 * hash) + ENTITY_FIELD_NUMBER;
+        hash = (53 * hash) + getEntity().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code packets.SpawnEntity}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:packets.SpawnEntity)
+        no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return no.elg.infiniteBootleg.protobuf.Packets.internal_static_packets_SpawnEntity_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return no.elg.infiniteBootleg.protobuf.Packets.internal_static_packets_SpawnEntity_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.class, no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder.class);
+      }
+
+      // Construct using no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (entityBuilder_ == null) {
+          entity_ = null;
+        } else {
+          entity_ = null;
+          entityBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return no.elg.infiniteBootleg.protobuf.Packets.internal_static_packets_SpawnEntity_descriptor;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getDefaultInstanceForType() {
+        return no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity build() {
+        no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity buildPartial() {
+        no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity result = new no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity(this);
+        if (entityBuilder_ == null) {
+          result.entity_ = entity_;
+        } else {
+          result.entity_ = entityBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity) {
+          return mergeFrom((no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity other) {
+        if (other == no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance()) return this;
+        if (other.hasEntity()) {
+          mergeEntity(other.getEntity());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity entity_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder> entityBuilder_;
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       * @return Whether the entity field is set.
+       */
+      public boolean hasEntity() {
+        return entityBuilder_ != null || entity_ != null;
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       * @return The entity.
+       */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntity() {
+        if (entityBuilder_ == null) {
+          return entity_ == null ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance() : entity_;
+        } else {
+          return entityBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      public Builder setEntity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
+        if (entityBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          entity_ = value;
+          onChanged();
+        } else {
+          entityBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      public Builder setEntity(
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
+        if (entityBuilder_ == null) {
+          entity_ = builderForValue.build();
+          onChanged();
+        } else {
+          entityBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      public Builder mergeEntity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
+        if (entityBuilder_ == null) {
+          if (entity_ != null) {
+            entity_ =
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.newBuilder(entity_).mergeFrom(value).buildPartial();
+          } else {
+            entity_ = value;
+          }
+          onChanged();
+        } else {
+          entityBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      public Builder clearEntity() {
+        if (entityBuilder_ == null) {
+          entity_ = null;
+          onChanged();
+        } else {
+          entity_ = null;
+          entityBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder getEntityBuilder() {
+        
+        onChanged();
+        return getEntityFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder() {
+        if (entityBuilder_ != null) {
+          return entityBuilder_.getMessageOrBuilder();
+        } else {
+          return entity_ == null ?
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance() : entity_;
+        }
+      }
+      /**
+       * <code>.persistence.Entity entity = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder> 
+          getEntityFieldBuilder() {
+        if (entityBuilder_ == null) {
+          entityBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder, no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>(
+                  getEntity(),
+                  getParentForChildren(),
+                  isClean());
+          entity_ = null;
+        }
+        return entityBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:packets.SpawnEntity)
+    }
+
+    // @@protoc_insertion_point(class_scope:packets.SpawnEntity)
+    private static final no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity();
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<SpawnEntity>
+        PARSER = new com.google.protobuf.AbstractParser<SpawnEntity>() {
+      @java.lang.Override
+      public SpawnEntity parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SpawnEntity(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<SpawnEntity> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SpawnEntity> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface LoginOrBuilder extends
       // @@protoc_insertion_point(interface_extends:packets.Login)
       com.google.protobuf.MessageOrBuilder {
@@ -11286,6 +12123,11 @@ public final class Packets {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_packets_ServerLoginStatus_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_packets_SpawnEntity_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_packets_SpawnEntity_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_packets_Login_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -11305,7 +12147,7 @@ public final class Packets {
   static {
     java.lang.String[] descriptorData = {
       "\n\033serialization/packets.proto\022\007packets\032\037" +
-      "serialization/persistence.proto\"\205\010\n\006Pack" +
+      "serialization/persistence.proto\"\332\010\n\006Pack" +
       "et\022\"\n\004type\030\001 \001(\0162\024.packets.Packet.Type\022," +
       "\n\tdirection\030\002 \001(\0162\031.packets.Packet.Direc" +
       "tion\022\023\n\006secret\030\003 \001(\tH\000\210\001\001\022*\n\theartbeat\030\010" +
@@ -11313,45 +12155,49 @@ public final class Packets {
       "ity\030\t \001(\0132\023.packets.MoveEntityH\002\210\001\001\022.\n\013u" +
       "pdateChunk\030\n \001(\0132\024.packets.UpdateChunkH\003" +
       "\210\001\001\0220\n\014chunkRequest\030\013 \001(\0132\025.packets.Chun" +
-      "kRequestH\004\210\001\001\022.\n\013blockUpdate\030\020 \001(\0132\024.pac" +
+      "kRequestH\004\210\001\001\022.\n\013updateBlock\030\020 \001(\0132\024.pac" +
       "kets.UpdateBlockH\005\210\001\001\022\"\n\005login\030\021 \001(\0132\016.p" +
       "ackets.LoginH\006\210\001\001\022*\n\tstartGame\030\022 \001(\0132\022.p" +
       "ackets.StartGameH\007\210\001\001\022:\n\021serverLoginStat" +
       "us\030\024 \001(\0132\032.packets.ServerLoginStatusH\010\210\001" +
       "\001\022,\n\ndisconnect\030\025 \001(\0132\023.packets.Disconne" +
       "ctH\t\210\001\001\0224\n\016secretExchange\030\026 \001(\0132\027.packet" +
-      "s.SecretExchangeH\n\210\001\001\"\351\001\n\004Type\022\020\n\014DX_HEA" +
-      "RTBEAT\020\000\022\014\n\010SB_LOGIN\020\001\022\022\n\016DX_MOVE_ENTITY" +
-      "\020\002\022\023\n\017DX_BLOCK_UPDATE\020\003\022\021\n\rCB_START_GAME" +
-      "\020\004\022\023\n\017CB_UPDATE_CHUNK\020\005\022\023\n\017CB_LOGIN_STAT" +
-      "US\020\006\022\032\n\026SB_CLIENT_WORLD_LOADED\020\007\022\024\n\020SB_C" +
-      "HUNK_REQUEST\020\010\022\021\n\rDX_DISCONNECT\020\t\022\026\n\022DX_" +
-      "SECRET_EXCHANGE\020\n\"#\n\tDirection\022\n\n\006SERVER" +
-      "\020\000\022\n\n\006CLIENT\020\001B\t\n\007_secretB\014\n\n_heartbeatB" +
-      "\r\n\013_moveEntityB\016\n\014_updateChunkB\017\n\r_chunk" +
-      "RequestB\016\n\014_blockUpdateB\010\n\006_loginB\014\n\n_st" +
-      "artGameB\024\n\022_serverLoginStatusB\r\n\013_discon" +
-      "nectB\021\n\017_secretExchange\" \n\tHeartbeat\022\023\n\013" +
-      "keepAliveId\030\001 \001(\t\"c\n\013UpdateBlock\022\"\n\003pos\030" +
-      "\001 \001(\0132\025.persistence.Vector2i\022&\n\005block\030\002 " +
-      "\001(\0132\022.persistence.BlockH\000\210\001\001B\010\n\006_block\"l" +
-      "\n\nMoveEntity\022\014\n\004uuid\030\001 \001(\t\022\'\n\010velocity\030\002" +
-      " \001(\0132\025.persistence.Vector2f\022\'\n\010position\030" +
-      "\003 \001(\0132\025.persistence.Vector2f\"\034\n\nDisconne" +
-      "ct\022\016\n\006reason\030\001 \001(\t\"4\n\016SecretExchange\022\022\n\n" +
-      "entityUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n\tStar" +
-      "tGame\022(\n\013controlling\030\001 \001(\0132\023.persistence" +
-      ".Entity\022!\n\005world\030\002 \001(\0132\022.persistence.Wor" +
-      "ld\"0\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022.persi" +
-      "stence.Chunk\"\252\001\n\021ServerLoginStatus\0227\n\006st" +
-      "atus\030\001 \001(\0162\'.packets.ServerLoginStatus.S" +
-      "erverStatus\"\\\n\014ServerStatus\022\021\n\rPROCEED_L" +
-      "OGIN\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_SE" +
-      "RVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"8\n\005Login\022\014\n\004uu" +
-      "id\030\001 \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 " +
-      "\001(\t\"<\n\014ChunkRequest\022,\n\rchunkLocation\030\001 \001" +
-      "(\0132\025.persistence.Vector2iB,\n\037no.elg.infi" +
-      "niteBootleg.protobufB\007PacketsP\000b\006proto3"
+      "s.SecretExchangeH\n\210\001\001\022.\n\013spawnEntity\030\027 \001" +
+      "(\0132\024.packets.SpawnEntityH\013\210\001\001\"\376\001\n\004Type\022\020" +
+      "\n\014DX_HEARTBEAT\020\000\022\014\n\010SB_LOGIN\020\001\022\022\n\016DX_MOV" +
+      "E_ENTITY\020\002\022\023\n\017DX_BLOCK_UPDATE\020\003\022\021\n\rCB_ST" +
+      "ART_GAME\020\004\022\023\n\017CB_UPDATE_CHUNK\020\005\022\023\n\017CB_LO" +
+      "GIN_STATUS\020\006\022\032\n\026SB_CLIENT_WORLD_LOADED\020\007" +
+      "\022\024\n\020SB_CHUNK_REQUEST\020\010\022\021\n\rDX_DISCONNECT\020" +
+      "\t\022\026\n\022DX_SECRET_EXCHANGE\020\n\022\023\n\017CB_SPAWN_EN" +
+      "TITY\020\013\"#\n\tDirection\022\n\n\006SERVER\020\000\022\n\n\006CLIEN" +
+      "T\020\001B\t\n\007_secretB\014\n\n_heartbeatB\r\n\013_moveEnt" +
+      "ityB\016\n\014_updateChunkB\017\n\r_chunkRequestB\016\n\014" +
+      "_updateBlockB\010\n\006_loginB\014\n\n_startGameB\024\n\022" +
+      "_serverLoginStatusB\r\n\013_disconnectB\021\n\017_se" +
+      "cretExchangeB\016\n\014_spawnEntity\" \n\tHeartbea" +
+      "t\022\023\n\013keepAliveId\030\001 \001(\t\"c\n\013UpdateBlock\022\"\n" +
+      "\003pos\030\001 \001(\0132\025.persistence.Vector2i\022&\n\005blo" +
+      "ck\030\002 \001(\0132\022.persistence.BlockH\000\210\001\001B\010\n\006_bl" +
+      "ock\"l\n\nMoveEntity\022\014\n\004uuid\030\001 \001(\t\022\'\n\010veloc" +
+      "ity\030\002 \001(\0132\025.persistence.Vector2f\022\'\n\010posi" +
+      "tion\030\003 \001(\0132\025.persistence.Vector2f\"\034\n\nDis" +
+      "connect\022\016\n\006reason\030\001 \001(\t\"4\n\016SecretExchang" +
+      "e\022\022\n\nentityUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n" +
+      "\tStartGame\022(\n\013controlling\030\001 \001(\0132\023.persis" +
+      "tence.Entity\022!\n\005world\030\002 \001(\0132\022.persistenc" +
+      "e.World\"0\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022." +
+      "persistence.Chunk\"\252\001\n\021ServerLoginStatus\022" +
+      "7\n\006status\030\001 \001(\0162\'.packets.ServerLoginSta" +
+      "tus.ServerStatus\"\\\n\014ServerStatus\022\021\n\rPROC" +
+      "EED_LOGIN\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FU" +
+      "LL_SERVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"2\n\013SpawnE" +
+      "ntity\022#\n\006entity\030\001 \001(\0132\023.persistence.Enti" +
+      "ty\"8\n\005Login\022\014\n\004uuid\030\001 \001(\t\022\020\n\010username\030\002 " +
+      "\001(\t\022\017\n\007version\030\003 \001(\t\"<\n\014ChunkRequest\022,\n\r" +
+      "chunkLocation\030\001 \001(\0132\025.persistence.Vector" +
+      "2iB,\n\037no.elg.infiniteBootleg.protobufB\007P" +
+      "acketsP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -11363,7 +12209,7 @@ public final class Packets {
     internal_static_packets_Packet_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_packets_Packet_descriptor,
-        new java.lang.String[] { "Type", "Direction", "Secret", "Heartbeat", "MoveEntity", "UpdateChunk", "ChunkRequest", "BlockUpdate", "Login", "StartGame", "ServerLoginStatus", "Disconnect", "SecretExchange", "Secret", "Heartbeat", "MoveEntity", "UpdateChunk", "ChunkRequest", "BlockUpdate", "Login", "StartGame", "ServerLoginStatus", "Disconnect", "SecretExchange", });
+        new java.lang.String[] { "Type", "Direction", "Secret", "Heartbeat", "MoveEntity", "UpdateChunk", "ChunkRequest", "UpdateBlock", "Login", "StartGame", "ServerLoginStatus", "Disconnect", "SecretExchange", "SpawnEntity", "Secret", "Heartbeat", "MoveEntity", "UpdateChunk", "ChunkRequest", "UpdateBlock", "Login", "StartGame", "ServerLoginStatus", "Disconnect", "SecretExchange", "SpawnEntity", });
     internal_static_packets_Heartbeat_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_packets_Heartbeat_fieldAccessorTable = new
@@ -11412,14 +12258,20 @@ public final class Packets {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_packets_ServerLoginStatus_descriptor,
         new java.lang.String[] { "Status", });
-    internal_static_packets_Login_descriptor =
+    internal_static_packets_SpawnEntity_descriptor =
       getDescriptor().getMessageTypes().get(9);
+    internal_static_packets_SpawnEntity_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_packets_SpawnEntity_descriptor,
+        new java.lang.String[] { "Entity", });
+    internal_static_packets_Login_descriptor =
+      getDescriptor().getMessageTypes().get(10);
     internal_static_packets_Login_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_packets_Login_descriptor,
         new java.lang.String[] { "Uuid", "Username", "Version", });
     internal_static_packets_ChunkRequest_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_packets_ChunkRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_packets_ChunkRequest_descriptor,

@@ -81,7 +81,7 @@ public class WorldLoader {
             }
         }
         //Invalid/non-existing player data
-        final Player player = world.createNewPlayer();
+        final Player player = world.createNewPlayer(playerId);
         saveServerPlayer(player);
         return player;
     }

@@ -48,7 +48,7 @@ public class ClientMain extends CommonMain {
     @Nullable
     private volatile Player mainPlayer;
     @Nullable
-    private ServerClient serverClient;
+    private volatile ServerClient serverClient;
     @Nullable
     protected World singleplayerWorld;
 
@@ -203,7 +203,7 @@ public class ClientMain extends CommonMain {
     @NotNull
     public World getWorld() {
         final ServerClient client = ClientMain.inst().getServerClient();
-        if (client == null) {
+        if (Main.isSingleplayer()) {
             return ClientMain.inst().getSingleplayerWorld();
         }
         else {
@@ -230,6 +230,9 @@ public class ClientMain extends CommonMain {
     }
 
     public void setSingleplayerWorld(@Nullable World singleplayerWorld) {
+        if (Main.isMultiplayer()) {
+            throw new IllegalStateException("Cannot set the singleplayer world when in multiplayer!");
+        }
         synchronized (INST_LOCK) {
             this.singleplayerWorld = singleplayerWorld;
         }
@@ -237,7 +240,7 @@ public class ClientMain extends CommonMain {
 
     @Nullable
     public Player getPlayer() {
-        if (!Settings.client) {
+        if (Main.isMultiplayer()) {
             //server does not have a main player
             return null;
         }
@@ -258,7 +261,7 @@ public class ClientMain extends CommonMain {
     }
 
     public void setPlayer(@Nullable Player player) {
-        if (!Settings.client) {
+        if (Main.isMultiplayer()) {
             //server does not have a main player
             return;
         }

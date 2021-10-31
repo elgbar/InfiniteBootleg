@@ -44,7 +44,13 @@ public class HUDRenderer implements Renderer {
         World world = main.getWorld();
         int h = Gdx.graphics.getHeight();
 
-        LivingEntity player = ClientMain.inst().getPlayer();
+        LivingEntity player = null;
+        try {
+            player = ClientMain.inst().getPlayer();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
         ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
         assert sr != null; // this method should not get called if we are not rendering
         if (modus == HUDModus.DEBUG) {

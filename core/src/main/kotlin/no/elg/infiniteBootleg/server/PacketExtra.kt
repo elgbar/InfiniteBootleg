@@ -78,7 +78,7 @@ fun ChannelHandlerContext?.broadcast(packet: Packets.Packet) {
 fun ServerClient.serverBoundPacket(type: Type): Packets.Packet.Builder {
   return Packets.Packet.newBuilder()
     .setDirection(SERVER)
-    .setSecret(credentials.secret)
+    .setSecret(credentials!!.secret) //FIXME
     .setType(type)
 }
 
@@ -174,6 +174,13 @@ fun clientBoundMoveEntity(entity: Entity): Packets.Packet {
   ).build()
 }
 
+fun clientBoundSpawnEntity(entity: Entity): Packets.Packet {
+  return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
+    SpawnEntity.newBuilder()
+      .setEntity(entity.save())
+  ).build()
+}
+
 fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packets.Packet {
   return clientBoundPacket(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
 }
@@ -187,7 +194,7 @@ fun clientBoundStartGamePacket(player: Player): Packets.Packet {
 }
 
 fun clientBoundUpdateChunkPacket(chunk: Chunk): Packets.Packet {
-  return clientBoundPacket(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.save())).build()
+  return clientBoundPacket(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.save(false))).build()
 }
 
 fun clientBoundDisconnectPlayerPacket(reason: String?): Packets.Packet {

@@ -37,6 +37,7 @@ public class Player extends LivingEntity {
 
     public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
         super(world, protoEntity);
+        Main.logger().log("creating protoplayer inv? " + isInvalid() + " uuid " + protoEntity.getUuid());
         if (isInvalid()) {
             return;
         }
@@ -54,7 +55,11 @@ public class Player extends LivingEntity {
     }
 
     public Player(@NotNull World world, float worldX, float worldY) {
-        super(world, worldX, worldY, UUID.randomUUID());
+        this(world, worldX, worldY, UUID.randomUUID());
+    }
+
+    public Player(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
+        super(world, worldX, worldY, uuid);
         if (isInvalid()) {
             return;
         }
@@ -89,6 +94,9 @@ public class Player extends LivingEntity {
     public synchronized void giveControls() {
         if (controls == null) {
             Main.logger().debug("PLR", "Giving control to " + hudDebug());
+            if (Main.isClient() && !getUuid().equals(ClientMain.inst().getServerClient().getUuid())) {
+                throw new IllegalCallerException("Cannot give controls to others than " + getUuid());
+            }
             controls = new KeyboardControls(getWorld().getRender(), this);
             ClientMain.inst().getInputMultiplexer().addProcessor(controls);
         }
@@ -150,7 +158,7 @@ public class Player extends LivingEntity {
         if (torchLight != null) {
             playerBuilder.setTorchAngleDeg(torchLight.getDirection());
         }
-        playerBuilder.setControlled(hasControls());
+        playerBuilder.setControlled(!Main.isMultiplayer() && hasControls());
 
         builder.setPlayer(playerBuilder.build());
         return builder;

@@ -97,6 +97,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         velCache = new Vector2();
 
         if (world.containsEntity(uuid)) {
+            Main.logger().warn("World already contains entity with uuid " + uuid);
             valid = false;
             return;
         }
