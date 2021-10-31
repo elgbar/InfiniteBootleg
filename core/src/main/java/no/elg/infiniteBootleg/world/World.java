@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
@@ -152,7 +153,7 @@ public class World implements Disposable, Resizable {
     public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
         this.seed = seed;
         MathUtils.random.setSeed(seed);
-        uuid = WorldLoader.getUUIDFromSeed(seed);
+        uuid = ExtraKt.randomUUIDFromString("" + seed);
 
         name = worldName;
 
@@ -205,8 +206,8 @@ public class World implements Disposable, Resizable {
     }
 
     @NotNull
-    public Player createNewPlayer() {
-        Player player = new Player(this, spawn.x, spawn.y);
+    public Player createNewPlayer(@NotNull UUID playerId) {
+        Player player = new Player(this, spawn.x, spawn.y, playerId);
         Preconditions.checkState(!player.isInvalid());
         addEntity(player);
         return player;

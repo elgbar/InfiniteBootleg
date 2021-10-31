@@ -14,5 +14,7 @@ class ServerClient(
 ) {
 
   lateinit var ctx: ChannelHandlerContext
-  lateinit var credentials: ConnectionCredentials
+  var credentials: ConnectionCredentials? = null
+
+  val uuid get() = credentials!!.entityUUID //FIXME
 }

@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
+import java.util.UUID
 import no.elg.infiniteBootleg.TestGraphic
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.FULL_SERVER
@@ -70,7 +71,7 @@ class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
     val newWorld = createNewWorld()
     val client = getClient()
     client.world = newWorld
-    client.controllingEntity = Player(newWorld, 0f, 0f).save().build()
+    client.controllingEntity = Player(newWorld, 0f, 0f, UUID.randomUUID()).save().build()
     client.loginStatus(LOGIN_SUCCESS)
     verify(exactly = 0) { ctx.close() }
   }

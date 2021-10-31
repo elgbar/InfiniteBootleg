@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.kotcrab.vis.ui.widget.VisTextField
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
-import java.util.UUID
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
@@ -16,6 +15,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.server.ClientChannel
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
+import no.elg.infiniteBootleg.util.randomUUIDFromString
 
 /**
  * @author Elg
@@ -65,8 +65,7 @@ object ServerScreen : StageScreen() {
             val runnable = Runnable {
               val channel = clientChannel.channel ?: error("Could not connect to server")
               ConnectingScreen.channel = channel
-              val packet = serverBoundLoginPacket(nameField.text, UUID.randomUUID())
-              channel.writeAndFlush(packet)
+              channel.writeAndFlush(serverBoundLoginPacket(nameField.text, randomUUIDFromString(nameField.text)))
             }
             val thread = Thread({
               try {

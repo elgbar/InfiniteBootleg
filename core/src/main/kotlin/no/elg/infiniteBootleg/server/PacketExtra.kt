@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
@@ -21,6 +22,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
+import no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.StartGame
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
@@ -43,15 +45,17 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
   if (Settings.client) {
     ConnectingScreen.info = msg
     val serverClient = ClientMain.inst().serverClient
-    if (serverClient != null) {
+    if (serverClient?.credentials != null) {
       this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
-      ClientMain.inst().serverClient = null
     }
   } else {
     this.writeAndFlush(clientBoundDisconnectPlayerPacket(msg))
   }
   Main.logger().error("IO FATAL", msg)
-  Main.inst().scheduler.scheduleSync({ close() }, 50L)
+  Main.inst().scheduler.scheduleSync({
+    close()
+    ClientMain.inst().serverClient = null
+  }, 50L)
 }
 
 

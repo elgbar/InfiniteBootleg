@@ -430,7 +430,7 @@ public class Commands extends CommandExecutor {
     @ClientsideOnly
     @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
     public void spawnPlayer() {
-        getWorld().createNewPlayer();
+        getWorld().createNewPlayer(UUID.randomUUID());
     }
 
     @ConsoleDoc(description = "Save the world server side")

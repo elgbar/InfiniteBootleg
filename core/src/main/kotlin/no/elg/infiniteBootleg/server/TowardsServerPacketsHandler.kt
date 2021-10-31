@@ -176,6 +176,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     ctx.fatal("Failed to spawn player server side")
     return
   }
+  require(player.uuid == uuid)
   player.name = login.username
   WorldLoader.saveServerPlayer(player)
 
