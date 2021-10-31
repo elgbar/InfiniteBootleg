@@ -5,7 +5,6 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -47,16 +46,18 @@ public final class PointLightPool extends Pool<PointLight> {
         PointLight light;
         synchronized (LIGHT_LOCK) {
             light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, Float.MAX_VALUE, Float.MAX_VALUE);
+            reset(light);
         }
-        reset(light);
         return light;
     }
 
     @NotNull
     public PointLight obtain(float worldX, float worldY) {
-        var light = obtain();
-        light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
-        return light;
+        synchronized (LIGHT_LOCK) {
+            var light = obtain();
+            light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
+            return light;
+        }
     }
 
     /**
@@ -65,18 +66,15 @@ public final class PointLightPool extends Pool<PointLight> {
     @Deprecated
     @Override
     public PointLight obtain() {
-        PointLight light = super.obtain();
-
         synchronized (LIGHT_LOCK) {
+            PointLight light = super.obtain();
             light.setActive(true);
+            return light;
         }
-        return light;
     }
 
     @Override
     public void free(PointLight light) {
-
-        final Vector2 position = light.getPosition();
         synchronized (LIGHT_LOCK) {
             light.setActive(false);
         }
@@ -93,6 +91,7 @@ public final class PointLightPool extends Pool<PointLight> {
     @Override
     protected void reset(PointLight light) {
         synchronized (LIGHT_LOCK) {
+            light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
             light.setStaticLight(true);
             light.setXray(false);
             light.setSoft(true);
@@ -100,7 +99,6 @@ public final class PointLightPool extends Pool<PointLight> {
             light.setDistance(POINT_LIGHT_DISTANCE);
             light.setColor(Color.WHITE);
             light.setContactFilter(World.LIGHT_FILTER);
-            light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
         }
     }
 }

@@ -62,7 +62,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
     private int groundContacts;
     private Filter filter;
 
-    private volatile boolean valid = true;
+    protected volatile boolean valid = true;
 
 
     public Entity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {

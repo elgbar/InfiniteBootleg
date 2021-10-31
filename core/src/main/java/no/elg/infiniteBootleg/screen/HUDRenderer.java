@@ -4,6 +4,7 @@ import static no.elg.infiniteBootleg.Main.SCALE;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
+import box2dLight.PublicRayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -55,7 +56,8 @@ public class HUDRenderer implements Renderer {
             sr.drawTop(viewChunk(world), 7);
             sr.drawTop(pos(player), 9);
             sr.drawTop(time(world), 11);
-            sr.drawTop(ents(world), 13);
+            sr.drawTop(lights(world), 13);
+            sr.drawTop(ents(world), 15);
         }
         else {
             sr.begin();
@@ -69,6 +71,11 @@ public class HUDRenderer implements Renderer {
             }
         }
         sr.end();
+    }
+
+    private String lights(World world) {
+        final PublicRayHandler handler = world.getRender().getRayHandler();
+        return "Active Lights:" + (handler != null ? handler.getEnabledLights().size : "Lights not enabled");
     }
 
     private String ents(World world) {

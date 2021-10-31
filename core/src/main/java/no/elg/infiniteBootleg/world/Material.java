@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.EntityBlock;
-import no.elg.infiniteBootleg.world.blocks.SandBlock;
+import no.elg.infiniteBootleg.world.blocks.FallingBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import no.elg.infiniteBootleg.world.blocks.Torch;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -31,7 +31,7 @@ public enum Material {
     DIRT(1f),
     GRASS(0.8f),
     TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true),
-    SAND(SandBlock.class, 1f),
+    SAND(FallingBlock.class, 1f),
     TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true),
     GLASS(null, ItemType.BLOCK, 0.1f, true, false, true),
     DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true),
@@ -173,7 +173,7 @@ public enum Material {
     }
 
     @Nullable
-    public MaterialEntity createEntity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity, @NotNull Chunk chunk) {
+    public MaterialEntity createEntity(@NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
         Preconditions.checkArgument(itemType == ItemType.ENTITY);
         Preconditions.checkNotNull(constructorProtoBuf, "Constructor of entity cannot be null");
         MaterialEntity entity;
@@ -246,5 +246,12 @@ public enum Material {
 
     public float getHardness() {
         return hardness;
+    }
+
+    public boolean isSuperclassOf(Class<?> interfaze) {
+        if (constructor == null) {
+            return false;
+        }
+        return interfaze.isAssignableFrom(constructor.getDeclaringClass());
     }
 }

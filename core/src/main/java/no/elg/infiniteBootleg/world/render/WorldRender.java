@@ -260,15 +260,15 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
                chunk.getChunkY() < chunksInView.verticalStart || chunk.getChunkY() >= chunksInView.verticalEnd;
     }
 
-    public ChunkViewed getChunksInView() {
+    public @NotNull ChunkViewed getChunksInView() {
         return chunksInView;
     }
 
-    public OrthographicCamera getCamera() {
+    public @Nullable OrthographicCamera getCamera() {
         return camera;
     }
 
-    public ChunkRenderer getChunkRenderer() {
+    public @Nullable ChunkRenderer getChunkRenderer() {
         return chunkRenderer;
     }
 
@@ -276,15 +276,16 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         return entityRenderer;
     }
 
-    public SpriteBatch getBatch() {
+    public @Nullable SpriteBatch getBatch() {
         return batch;
     }
 
-    public PublicRayHandler getRayHandler() {
+
+    public @Nullable PublicRayHandler getRayHandler() {
         return rayHandler;
     }
 
-    public DirectionalLight getSkylight() {
+    public @Nullable DirectionalLight getSkylight() {
         return skylight;
     }
 
@@ -342,7 +343,7 @@ public class WorldRender implements Updatable, Renderer, Disposable, Resizable {
         }
     }
 
-    public World getWorld() {
+    public @NotNull World getWorld() {
         return world;
     }
 

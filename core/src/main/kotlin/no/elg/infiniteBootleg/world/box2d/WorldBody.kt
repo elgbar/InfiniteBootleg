@@ -130,18 +130,19 @@ class WorldBody(private val world: World) : Ticking {
       }
 
       val rayHandler = world.render.rayHandler
-      for (light in rayHandler.enabledLights) {
-        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
-      }
-      //TODO enable if needed
+      if (rayHandler != null) {
+        for (light in rayHandler.enabledLights) {
+          light.position = light.position.add(deltaOffsetX, deltaOffsetY)
+        }
+        //TODO enable if needed
 //      for (light in rayHandler.disabledLights) {
 //        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
 //      }
-      rayHandler.update()
-
+        rayHandler.update()
+      }
 
       //test logic only, move to world render when possible
-      world.render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
+      world.render.camera?.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
       world.render.update()
     }
   }

@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.Material.AIR;
 import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
 
+import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -15,47 +15,52 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FallingBlock extends Entity {
+public class FallingBlockEntity extends Entity implements LightTrait {
 
     private final Material material;
     @Nullable
     private final TextureRegion region;
 
+    @Nullable
+    private Block block;
+
+    @Nullable
+    private PointLight light;
+
     private volatile boolean crashed;
 
-    public FallingBlock(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+    public FallingBlockEntity(@NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
         super(world, protoEntity);
 
         Preconditions.checkArgument(protoEntity.hasMaterial());
         final ProtoWorld.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
 
         material = Material.fromOrdinal(protoEntityMaterial.getMaterialOrdinal());
-        if (Settings.client) {
-            region = new TextureRegion(material.getTextureRegion());
-        }
-        else {
-            region = null;
-        }
+        region = Settings.client ? new TextureRegion(material.getTextureRegion()) : null;
     }
 
-    public FallingBlock(@NotNull World world, float worldX, float worldY, @NotNull Material material) {
-        super(world, worldX + 0.5f, worldY + 0.5f, false, UUID.randomUUID());
-        this.material = material;
-        if (Settings.client) {
-            region = new TextureRegion(material.getTextureRegion());
-        }
-        else {
-            region = null;
-        }
+    public FallingBlockEntity(@NotNull World world, @NotNull Block block) {
+        super(world, block.getWorldX() + 0.5f, block.getWorldY() - 0.5f, false, UUID.randomUUID());
+        this.block = block;
+        this.material = block.getMaterial();
+        region = Settings.client ? new TextureRegion(material.getTextureRegion()) : null;
+    }
+
+    @Override
+    public boolean canCreateLight() {
+        return !isInvalid();
     }
 
     @Override
@@ -80,21 +85,21 @@ public class FallingBlock extends Entity {
                 int newX = getBlockX();
                 int newY = getBlockY();
 
-                var deltaY = 0;
-                while (true) {
-                    Block block = world.getBlock(newX, newY + deltaY, true);
-                    if (block == null || block.getMaterial() == AIR) {
-                        break;
-                    }
+                int deltaY = 0;
+                while (!world.isAirBlock(newX, newY + deltaY)) {
                     deltaY++;
                 }
                 world.removeEntity(this);
                 world.setBlock(newX, newY + deltaY, material, true);
-//                else{
-//                    //TODO drop as an item
-//                }
+//              //TODO drop as an item
             });
         }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        LightTrait.Companion.tryCreateLight(this);
     }
 
     @Override
@@ -148,5 +153,57 @@ public class FallingBlock extends Entity {
 
         builder.setMaterial(materialBuilder.build());
         return builder;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (block != null) {
+            block.dispose();
+            block = null;
+        }
+        if (light != null) {
+            PointLightPool.getPool(getWorld()).free(light);
+            light = null;
+        }
+    }
+
+    @Nullable
+    @Override
+    public PointLight getLight() {
+        return light;
+    }
+
+    @NotNull
+    @Override
+    public Block getBlock() {
+        return block;
+    }
+
+    @Override
+    public void setLight(@Nullable PointLight light) {
+        if (this.light != null) {
+            PointLightPool.getPool(getWorld()).free(this.light);
+        }
+        this.light = light;
+    }
+
+    @Override
+    public void customizeLight(@NotNull PointLight light) {
+        final Chunk chunk = getChunk();
+        if (chunk == null) {
+            return;
+        }
+        if (block == null) {
+            block = material.createBlock(getWorld(), chunk, CoordUtil.chunkOffset(getBlockX()), CoordUtil.chunkOffset(getBlockY()));
+        }
+        if (block instanceof LightTrait lightTrait) {
+            //FIXME Somehow block and light are the same!?!?!?!
+            lightTrait.customizeLight(light);
+            light.setStaticLight(false);
+            light.attachToBody(getBody());
+        }
+        block.tryDispose();
+        block = null;
     }
 }

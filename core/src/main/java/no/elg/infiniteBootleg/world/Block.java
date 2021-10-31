@@ -5,11 +5,12 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Savable;
-import no.elg.infiniteBootleg.world.blocks.traits.Trait;
+import no.elg.infiniteBootleg.world.blocks.traits.BlockTrait;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class Block implements Disposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
+public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
 
     public static final int BLOCK_SIZE = 16;
 
@@ -30,6 +31,7 @@ public class Block implements Disposable, HUDDebuggable, Savable<ProtoWorld.Bloc
 
     private final int localX;
     private final int localY;
+    private boolean disposed;
 
     public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
         this.localX = localX;
@@ -88,6 +90,12 @@ public class Block implements Disposable, HUDDebuggable, Savable<ProtoWorld.Bloc
      */
     public int getLocalY() {
         return localY;
+    }
+
+    @NotNull
+    @Override
+    public Block getBlock() {
+        return this;
     }
 
     /**
@@ -162,9 +170,23 @@ public class Block implements Disposable, HUDDebuggable, Savable<ProtoWorld.Bloc
         Preconditions.checkArgument(protoBlock.getMaterialOrdinal() == material.ordinal());
     }
 
+    public void tryDispose() {
+        if (disposed) {
+            return;
+        }
+        dispose();
+    }
+
     @Override
     public void dispose() {
-        //Nothing to dispose by default
+        if (disposed) {
+            Main.inst().getConsoleLogger().warn("Disposed block " + getWorldX() + ", " + getWorldY() + " twice");
+        }
+        disposed = true;
+    }
+
+    protected boolean getDisposed() {
+        return disposed;
     }
 
     @Override

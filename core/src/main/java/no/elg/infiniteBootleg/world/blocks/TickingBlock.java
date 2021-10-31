@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.blocks.traits.TickingTrait;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * @see Chunk
  * @see TntBlock TntBlock (for change of ticking behaviour)
  */
-public abstract class TickingBlock extends Block implements Ticking {
+public abstract class TickingBlock extends Block implements TickingTrait {
 
     private volatile long minimumTick;
     private volatile boolean shouldTick;

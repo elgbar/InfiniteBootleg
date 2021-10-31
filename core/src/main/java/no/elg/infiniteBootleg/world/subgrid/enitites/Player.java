@@ -34,7 +34,7 @@ public class Player extends LivingEntity {
     @Nullable
     private final Light torchLight;
 
-    public Player(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+    public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
         super(world, protoEntity);
         if (isInvalid()) {
             return;

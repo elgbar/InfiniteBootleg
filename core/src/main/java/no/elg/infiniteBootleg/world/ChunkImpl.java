@@ -28,7 +28,7 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlock;
+import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlockEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
@@ -575,13 +575,8 @@ public class ChunkImpl implements Chunk {
                         throw new IllegalStateException("Double assemble");
                     }
                     var protoBlock = protoBlocks.get(index++);
-                    Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
-                    if (mat == AIR || mat.isEntity()) {
-                        continue;
-                    }
-                    final Block block = mat.createBlock(world, this, x, y);
-                    block.load(protoBlock);
-                    blocks[x][y] = block;
+
+                    blocks[x][y] = Block.fromProto(world, this, x, y, protoBlock);
                 }
             }
         }
@@ -590,13 +585,13 @@ public class ChunkImpl implements Chunk {
             Entity entity = null;
             switch (protoEntity.getType()) {
                 case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
-                case FALLING_BLOCK -> entity = new FallingBlock(world, protoEntity);
+                case FALLING_BLOCK -> entity = new FallingBlockEntity(world, this, protoEntity);
                 case PLAYER -> entity = new Player(world, protoEntity);
                 case BLOCK -> {
                     Preconditions.checkArgument(protoEntity.hasMaterial());
                     final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
                     final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
-                    material.createEntity(world, protoEntity, this);
+                    material.createEntity(world, this, protoEntity);
                     continue; //Entity added in createEntity method
                 }
                 case UNRECOGNIZED -> {

@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class TntBlock extends TickingBlock {
+public class TntBlock extends TickingBlock implements LightTrait {
 
     /**
      * Maximum explosion radius
@@ -82,17 +83,8 @@ public class TntBlock extends TickingBlock {
         startTick = getWorld().getTick();
 
         if (Settings.renderLight) {
-            createLight();
+            LightTrait.Companion.createLight(this);
         }
-    }
-
-    private void createLight() {
-        Preconditions.checkState(light == null);
-        light = PointLightPool.getPool(getWorld()).obtain(getWorldX() + 0.5f, getWorldY() + 0.5f);
-        light.setColor(Color.RED);
-        light.setXray(false);
-        light.setSoft(false);
-        light.setDistance(16);
     }
 
     @Override
@@ -101,10 +93,20 @@ public class TntBlock extends TickingBlock {
     }
 
     @Override
+    public void customizeLight(@NotNull PointLight light) {
+        light.setColor(Color.RED);
+        light.setXray(false);
+        light.setSoft(false);
+        light.setDistance(16);
+    }
+
+    @Override
     public void tick() {
         if (exploded) {
             return;
         }
+
+        LightTrait.Companion.createLight(this);
         long ticked = getWorld().getTick() - startTick;
         if (ticked > fuseDurationTicks) {
             exploded = true;
@@ -157,11 +159,9 @@ public class TntBlock extends TickingBlock {
         if (old != glowing && Settings.client) {
 
             synchronized (LIGHT_LOCK) {
-                if (light == null) {
-                    createLight();
+                if (light != null) {
+                    light.setActive(glowing);
                 }
-                assert light != null;
-                light.setActive(glowing);
             }
             getChunk().updateTexture(true);
         }
@@ -241,8 +241,25 @@ public class TntBlock extends TickingBlock {
 
     @Override
     public void dispose() {
+        super.dispose();
         if (light != null) {
             PointLightPool.getPool(getWorld()).free(light);
         }
+    }
+
+    @Nullable
+    @Override
+    public PointLight getLight() {
+        return light;
+    }
+
+    @Override
+    public void setLight(@Nullable PointLight light) {
+        this.light = light;
+    }
+
+    @Override
+    public boolean canCreateLight() {
+        return true;
     }
 }
