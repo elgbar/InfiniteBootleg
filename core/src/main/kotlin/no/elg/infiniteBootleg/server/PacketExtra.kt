@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import java.util.UUID
 import no.elg.infiniteBootleg.ClientMain
@@ -8,6 +9,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
+import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
@@ -62,13 +64,13 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
 /**
  * Broadcast to all other channels than [this]
  */
-fun ChannelHandlerContext?.broadcast(packet: Packets.Packet) {
-  val channel = this?.channel()
-  for ((client, _) in ServerBoundHandler.clients) {
-    if (client == channel) {
+fun ChannelHandlerContext?.broadcast(packet: Packet, filter: ((Channel, ConnectionCredentials) -> Boolean)? = null) {
+  val thisChannel = this?.channel()
+  for ((channel, creds) in ServerBoundHandler.clients) {
+    if (channel == thisChannel || (filter != null && !filter(channel, creds))) {
       continue
     }
-    client.writeAndFlush(packet)
+    channel.writeAndFlush(packet)
   }
 }
 
