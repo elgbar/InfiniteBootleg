@@ -104,7 +104,7 @@ fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
     val worldX = blockUpdate.pos.x
     val worldY = blockUpdate.pos.y
     val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-    world.setBlock(worldX, worldY, protoBlock)
+    world.setBlock(worldX, worldY, protoBlock, false)
   }
 }
 

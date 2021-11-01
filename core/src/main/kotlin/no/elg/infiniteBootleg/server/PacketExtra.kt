@@ -110,11 +110,7 @@ fun ServerClient.serverBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?)
   return serverBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
-      .also {
-        if (block != null) {
-          it.setBlock(block.save())
-        }
-      }
+      .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
   ).build()
 }
 
@@ -155,12 +151,12 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packets.Packet {
 //////////////////
 
 
-private val AIR_BLOCK_BUILDER = Block.save(AIR)
+private val PROTO_AIR_BLOCK = Block.save(AIR).build()
 
 fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packets.Packet {
   return clientBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
-      .setBlock(block?.save() ?: AIR_BLOCK_BUILDER)
+      .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
   ).build()
 }

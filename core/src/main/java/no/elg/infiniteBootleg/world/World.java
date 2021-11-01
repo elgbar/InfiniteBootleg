@@ -452,7 +452,7 @@ public class World implements Disposable, Resizable {
         }
     }
 
-    public void setBlock(int worldX, int worldY, @Nullable ProtoWorld.Block protoBlock) {
+    public void setBlock(int worldX, int worldY, @Nullable ProtoWorld.Block protoBlock, boolean sendUpdatePacket) {
         int chunkX = CoordUtil.worldToChunk(worldX);
         int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -462,7 +462,7 @@ public class World implements Disposable, Resizable {
         Chunk chunk = getChunk(chunkX, chunkY);
         if (chunk != null) {
             var block = Block.fromProto(this, chunk, localX, localY, protoBlock);
-            chunk.setBlock(localX, localY, block, true);
+            chunk.setBlock(localX, localY, block, true, false, sendUpdatePacket);
         }
     }
 

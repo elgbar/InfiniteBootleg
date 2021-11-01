@@ -115,7 +115,7 @@ fun handleBlockUpdate(blockUpdate: UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-  ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock)
+  ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
 }
 
 fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {

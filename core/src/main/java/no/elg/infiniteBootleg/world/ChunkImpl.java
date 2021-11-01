@@ -142,6 +142,11 @@ public class ChunkImpl implements Chunk {
     @Override
     @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
     public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture, boolean prioritize) {
+        return setBlock(localX, localY, block, updateTexture, prioritize, true);
+    }
+
+    @Override
+    public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture, boolean prioritize, boolean sendUpdatePacket) {
         Preconditions.checkState(loaded, "Chunk is not loaded");
 
         if (block != null) {
@@ -185,7 +190,7 @@ public class ChunkImpl implements Chunk {
                 this.prioritize |= prioritize; //do not remove prioritization if it already is
             }
         }
-        if (isValid()) {
+        if (sendUpdatePacket && isValid()) {
             if (Main.isServer()) {
                 Main.inst().getScheduler().executeAsync(() -> {
                     final int x = getWorldX(localX);
@@ -215,8 +220,8 @@ public class ChunkImpl implements Chunk {
     private static boolean isMaterialEqual(@Nullable Block blockA, @Nullable Block blockB) {
         return (blockA == null && blockB == null) //
                || (blockA == null && blockB.getMaterial() == AIR) //
-               || (blockB == null && blockA.getMaterial() == AIR) //
-               || (blockB != null && blockA != null && blockA.getMaterial() == blockB.getMaterial());
+               || (blockB == null && blockA.getMaterial() == AIR); //
+//               || (blockB != null && blockA != null && blockA.getMaterial() == blockB.getMaterial());
     }
 
     @Override

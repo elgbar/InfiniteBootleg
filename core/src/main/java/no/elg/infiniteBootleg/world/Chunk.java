@@ -106,6 +106,9 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
     @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
     Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture, boolean prioritize);
 
+    @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
+    Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture, boolean prioritize, boolean sendUpdatePacket);
+
     /**
      * @param localX
      *     The local chunk x coordinate
