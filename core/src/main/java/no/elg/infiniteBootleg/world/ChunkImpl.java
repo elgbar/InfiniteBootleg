@@ -582,20 +582,33 @@ public class ChunkImpl implements Chunk {
         }
     }
 
+    @NotNull
     @Override
-    public ProtoWorld.Chunk save(boolean excludePlayers) {
+    public ProtoWorld.Chunk save() {
+        return save(true);
+    }
+
+    @NotNull
+    @Override
+    public ProtoWorld.Chunk saveBlocksOnly() {
+        return save(false);
+    }
+
+    @NotNull
+    private ProtoWorld.Chunk save(boolean includeEntities) {
         final ProtoWorld.Chunk.Builder builder = ProtoWorld.Chunk.newBuilder();
         builder.setPosition(ProtoWorld.Vector2i.newBuilder().setX(chunkX).setY(chunkY).build());
 
         for (Block block : this) {
             builder.addBlocks(block != null ? block.save() : AIR_BLOCK_BUILDER);
         }
-        for (Entity entity : getEntities()) {
-            if (excludePlayers && entity instanceof Player) {
-                //Do not persist players in singleplayer
-                continue;
+        if (includeEntities) {
+            for (Entity entity : getEntities()) {
+                if (entity instanceof Player) {
+                    continue;
+                }
+                builder.addEntities(entity.save());
             }
-            builder.addEntities(entity.save());
         }
         return builder.build();
     }

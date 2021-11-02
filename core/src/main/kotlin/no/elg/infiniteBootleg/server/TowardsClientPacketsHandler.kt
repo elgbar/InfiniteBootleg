@@ -24,6 +24,8 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
+import no.elg.infiniteBootleg.server.ClientBoundHandler.TAG
+import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.World
@@ -48,7 +50,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     }
     CB_UPDATE_CHUNK -> {
       if (packet.hasUpdateChunk()) {
-        updateChunk(packet.updateChunk)
+        handleUpdateChunk(packet.updateChunk)
       }
     }
 
@@ -100,7 +102,11 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
 
 fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
   Main.inst().scheduler.executeSync {
-    val world = this.world ?: return@executeSync
+    val world = this.world
+    if (world == null) {
+      Main.logger().warn("handleBlockUpdate", "Failed to find world")
+      return@executeSync
+    }
     val worldX = blockUpdate.pos.x
     val worldY = blockUpdate.pos.y
     val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
@@ -129,12 +135,31 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   ctx.writeAndFlush(serverBoundClientSecretResponse(connectionCredentials))
 }
 
-fun ServerClient.updateChunk(updateChunk: UpdateChunk) {
-  Main.inst().scheduler.executeSync {
-    val world = this.world ?: return@executeSync
-    val chunk = world.chunkLoader.clientLoad(updateChunk.chunk) ?: return@executeSync
+fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
+  val e = updateChunk.chunk.entitiesCount
+  if (e > 0) {
+    Main.logger().warn(TAG, "Got $e entities in chunk update")
+  }
+
+  fun tryUpdateChunk() {
+    val world = this.world
+    if (world == null) {
+      Main.logger().warn(TAG, "Failed to find the world to update chunk ${updateChunk.chunk.position}")
+      Main.inst().scheduler.executeSync { tryUpdateChunk() }
+      return
+    }
+    val chunk = world.chunkLoader.clientLoad(updateChunk.chunk)
+    if (chunk == null) {
+      Main.logger().warn(TAG, "Failed to load the chunk from proto")
+      return
+    }
     world.updateChunk(chunk)
   }
+
+  val exec = Runnable {
+    tryUpdateChunk()
+  }
+  Main.inst().scheduler.executeSync(exec)
 }
 
 fun ServerClient.startGame(startGame: StartGame) {

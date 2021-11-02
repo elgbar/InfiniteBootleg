@@ -231,10 +231,8 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
 
     boolean load(ProtoWorld.Chunk protoChunk);
 
-    default ProtoWorld.Chunk save() {
-        return save(true);
-    }
+    @NotNull ProtoWorld.Chunk save();
 
-    ProtoWorld.Chunk save(boolean excludePlayers);
+    @NotNull ProtoWorld.Chunk saveBlocksOnly();
 
 }

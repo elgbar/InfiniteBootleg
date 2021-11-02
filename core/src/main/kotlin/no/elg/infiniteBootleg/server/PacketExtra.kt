@@ -192,7 +192,7 @@ fun clientBoundStartGamePacket(player: Player): Packets.Packet {
 }
 
 fun clientBoundUpdateChunkPacket(chunk: Chunk): Packets.Packet {
-  return clientBoundPacket(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.save(false))).build()
+  return clientBoundPacket(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.saveBlocksOnly())).build()
 }
 
 fun clientBoundDisconnectPlayerPacket(reason: String?): Packets.Packet {

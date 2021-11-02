@@ -138,13 +138,24 @@ private fun handleLoginStatusPacket(ctx: ChannelHandlerContext) {
   //Send chunk packets to client
   val ix = CoordUtil.worldToChunk(player.blockX)
   val iy = CoordUtil.worldToChunk(player.blockY)
+//  val entities = GdxArray<Entity>()
   for (cx in -Settings.chunkRadius..Settings.chunkRadius) {
     for (cy in -Settings.chunkRadius..Settings.chunkRadius) {
       val chunk = world.getChunk(ix + cx, iy + cy) ?: continue
       ctx.write(clientBoundUpdateChunkPacket(chunk))
+//      entities.addAll(chunk.entities) //FIXME can be optimized (use AABB search for entities)
     }
     ctx.flush()
   }
+
+  for (entity in world.entities) {
+//    if (entity == player) {
+//      continue
+//    }
+    Main.logger().log("Sending " + entity.hudDebug() + " to client")
+    ctx.write(clientBoundSpawnEntity(entity))
+  }
+  ctx.flush()
 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
   Main.logger().log("Player " + player.hudDebug() + " joined")
