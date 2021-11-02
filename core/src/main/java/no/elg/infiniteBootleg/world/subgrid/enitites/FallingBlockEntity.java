@@ -85,6 +85,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     if (!crashed && type == ContactType.BEGIN_CONTACT) {
       crashed = true;
 
+      freeze();
       if (Main.isAuthoritative()) {
         Main.inst()
             .getScheduler()
@@ -102,8 +103,6 @@ public class FallingBlockEntity extends Entity implements LightTrait {
                   world.setBlock(newX, newY + deltaY, material, true);
                   //              //TODO drop as an item
                 });
-      } else {
-        freeze();
       }
     }
   }
