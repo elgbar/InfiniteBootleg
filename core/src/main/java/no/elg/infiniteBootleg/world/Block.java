@@ -15,221 +15,243 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A block in the world each block is a part of a chunk which is a part of a world. Each block know its world location
- * and its
- * location within the parent chunk.
+ * A block in the world each block is a part of a chunk which is a part of a world. Each block know
+ * its world location and its location within the parent chunk.
  *
  * @author Elg
  */
-public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
+public class Block
+    implements BlockTrait, Disposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
 
-    public static final int BLOCK_SIZE = 16;
+  public static final int BLOCK_SIZE = 16;
 
-    private final Material material;
-    private final World world;
-    private final Chunk chunk;
+  private final Material material;
+  private final World world;
+  private final Chunk chunk;
 
-    private final int localX;
-    private final int localY;
-    private boolean disposed;
+  private final int localX;
+  private final int localY;
+  private boolean disposed;
 
-    public Block(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @NotNull Material material) {
-        this.localX = localX;
-        this.localY = localY;
+  public Block(
+      @NotNull World world,
+      @NotNull Chunk chunk,
+      int localX,
+      int localY,
+      @NotNull Material material) {
+    this.localX = localX;
+    this.localY = localY;
 
-        this.material = material;
-        this.world = world;
-        this.chunk = chunk;
+    this.material = material;
+    this.world = world;
+    this.chunk = chunk;
+  }
+
+  @Nullable
+  public static Block fromProto(
+      @NotNull World world,
+      @NotNull Chunk chunk,
+      int localX,
+      int localY,
+      @Nullable ProtoWorld.Block protoBlock) {
+    if (protoBlock == null) {
+      return null;
+    }
+    Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
+    if (mat == AIR || mat.isEntity()) {
+      return null;
+    }
+    final Block block = mat.createBlock(world, chunk, localX, localY);
+    block.load(protoBlock);
+    return block;
+  }
+
+  @Nullable
+  public TextureRegion getTexture() {
+    return getMaterial().getTextureRegion();
+  }
+
+  @NotNull
+  public Material getMaterial() {
+    return material;
+  }
+
+  @NotNull
+  public Chunk getChunk() {
+    return chunk;
+  }
+
+  /** @return World this block exists in */
+  public World getWorld() {
+    return world;
+  }
+
+  /** @return The offset/local position of this block within its chunk */
+  public int getLocalX() {
+    return localX;
+  }
+
+  /** @return The offset/local position of this block within its chunk */
+  public int getLocalY() {
+    return localY;
+  }
+
+  /** @return {@code new Location(getWorldX(), getLocalY())} */
+  public Location getLocation() {
+    return new Location(getWorldX(), getLocalY());
+  }
+
+  @NotNull
+  @Override
+  public Block getBlock() {
+    return this;
+  }
+
+  /**
+   * @param dir The relative direction
+   * @return The relative block in the given location
+   * @see World#getBlock(int, int, boolean)
+   */
+  @Nullable
+  public Block getRelative(@NotNull Direction dir) {
+    return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
+  }
+
+  /** @return World location of this block */
+  public int getWorldX() {
+    return chunk.getWorldX(localX);
+  }
+
+  /** @return World location of this block */
+  public int getWorldY() {
+    return chunk.getWorldY(localY);
+  }
+
+  /**
+   * @param dir The relative direction
+   * @return The relative raw block in the given location
+   * @see World#getBlock(int, int, boolean)
+   */
+  @Nullable
+  public Block getRawRelative(@NotNull Direction dir) {
+    int newWorldX = getWorldX() + dir.dx;
+    int newWorldY = getWorldY() + dir.dy;
+    if (CoordUtil.worldToChunk(newWorldX) == chunk.getChunkX()
+        && //
+        CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
+      return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
+    }
+    return world.getBlock(newWorldX, newWorldY, true);
+  }
+
+  public Block setBlock(@NotNull Material material) {
+    return setBlock(material, true);
+  }
+
+  public Block setBlock(@NotNull Material material, boolean update) {
+    return chunk.setBlock(localX, localY, material, update);
+  }
+
+  /**
+   * Remove this block from the world
+   *
+   * @param updateTexture
+   */
+  public void destroy(boolean updateTexture) {
+    chunk.setBlock(localX, localY, (Block) null, updateTexture);
+  }
+
+  @Override
+  public ProtoWorld.Block.Builder save() {
+    return Block.save(material);
+  }
+
+  public static ProtoWorld.Block.Builder save(Material material) {
+    return ProtoWorld.Block.newBuilder().setMaterialOrdinal(material.ordinal());
+  }
+
+  public void load(ProtoWorld.Block protoBlock) {
+    Preconditions.checkArgument(protoBlock.getMaterialOrdinal() == material.ordinal());
+  }
+
+  public void tryDispose() {
+    if (disposed) {
+      return;
+    }
+    dispose();
+  }
+
+  public boolean isDisposed() {
+    return disposed;
+  }
+
+  @Override
+  public void dispose() {
+    if (disposed) {
+      Main.logger()
+          .warn(
+              "Disposed block "
+                  + getClass().getSimpleName()
+                  + " ("
+                  + getWorldX()
+                  + ", "
+                  + getWorldY()
+                  + ") twice");
+    }
+    disposed = true;
+  }
+
+  protected boolean getDisposed() {
+    return disposed;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = material.hashCode();
+    result = 31 * result + world.hashCode();
+    result = 31 * result + chunk.hashCode();
+    result = 31 * result + localX;
+    result = 31 * result + localY;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    @Nullable
-    public static Block fromProto(@NotNull World world, @NotNull Chunk chunk, int localX, int localY, @Nullable ProtoWorld.Block protoBlock) {
-        if (protoBlock == null) {
-            return null;
-        }
-        Material mat = Material.fromOrdinal(protoBlock.getMaterialOrdinal());
-        if (mat == AIR || mat.isEntity()) {
-            return null;
-        }
-        final Block block = mat.createBlock(world, chunk, localX, localY);
-        block.load(protoBlock);
-        return block;
+    Block block = (Block) o;
+
+    if (localX != block.localX) {
+      return false;
     }
-
-    @Nullable
-    public TextureRegion getTexture() {
-        return getMaterial().getTextureRegion();
+    if (localY != block.localY) {
+      return false;
     }
-
-    @NotNull
-    public Material getMaterial() {
-        return material;
+    if (material != block.material) {
+      return false;
     }
-
-    @NotNull
-    public Chunk getChunk() {
-        return chunk;
+    if (!world.equals(block.world)) {
+      return false;
     }
+    return chunk.equals(block.chunk);
+  }
 
-    /**
-     * @return World this block exists in
-     */
-    public World getWorld() {
-        return world;
-    }
-
-    /**
-     * @return The offset/local position of this block within its chunk
-     */
-    public int getLocalX() {
-        return localX;
-    }
-
-    /**
-     * @return The offset/local position of this block within its chunk
-     */
-    public int getLocalY() {
-        return localY;
-    }
-
-    /**
-     * @return {@code new Location(getWorldX(), getLocalY())}
-     */
-    public Location getLocation() {
-        return new Location(getWorldX(), getLocalY());
-    }
-
-    @NotNull
-    @Override
-    public Block getBlock() {
-        return this;
-    }
-
-    /**
-     * @param dir
-     *     The relative direction
-     *
-     * @return The relative block in the given location
-     *
-     * @see World#getBlock(int, int, boolean)
-     */
-    @Nullable
-    public Block getRelative(@NotNull Direction dir) {
-        return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
-    }
-
-    /**
-     * @return World location of this block
-     */
-    public int getWorldX() {
-        return chunk.getWorldX(localX);
-    }
-
-    /**
-     * @return World location of this block
-     */
-    public int getWorldY() {
-        return chunk.getWorldY(localY);
-    }
-
-    /**
-     * @param dir
-     *     The relative direction
-     *
-     * @return The relative raw block in the given location
-     *
-     * @see World#getBlock(int, int, boolean)
-     */
-    @Nullable
-    public Block getRawRelative(@NotNull Direction dir) {
-        int newWorldX = getWorldX() + dir.dx;
-        int newWorldY = getWorldY() + dir.dy;
-        if (CoordUtil.worldToChunk(newWorldX) == chunk.getChunkX() && //
-            CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
-            return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
-        }
-        return world.getBlock(newWorldX, newWorldY, true);
-    }
-
-    public Block setBlock(@NotNull Material material) {
-        return setBlock(material, true);
-    }
-
-    public Block setBlock(@NotNull Material material, boolean update) {
-        return chunk.setBlock(localX, localY, material, update);
-    }
-
-    /**
-     * Remove this block from the world
-     *
-     * @param updateTexture
-     */
-    public void destroy(boolean updateTexture) {
-        chunk.setBlock(localX, localY, (Block) null, updateTexture);
-    }
-
-    @Override
-    public ProtoWorld.Block.Builder save() {
-        return Block.save(material);
-    }
-
-    public static ProtoWorld.Block.Builder save(Material material) {
-        return ProtoWorld.Block.newBuilder().setMaterialOrdinal(material.ordinal());
-    }
-
-    public void load(ProtoWorld.Block protoBlock) {
-        Preconditions.checkArgument(protoBlock.getMaterialOrdinal() == material.ordinal());
-    }
-
-    public void tryDispose() {
-        if (disposed) {
-            return;
-        }
-        dispose();
-    }
-
-    public boolean isDisposed() {
-        return disposed;
-    }
-
-    @Override
-    public void dispose() {
-        if (disposed) {
-            Main.logger().warn("Disposed block " + getClass().getSimpleName() + " (" + getWorldX() + ", " + getWorldY() + ") twice");
-        }
-        disposed = true;
-    }
-
-    protected boolean getDisposed() {
-        return disposed;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = material.hashCode();
-        result = 31 * result + world.hashCode();
-        result = 31 * result + chunk.hashCode();
-        result = 31 * result + localX;
-        result = 31 * result + localY;
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-
-        Block block = (Block) o;
-
-        if (localX != block.localX) { return false; }
-        if (localY != block.localY) { return false; }
-        if (material != block.material) { return false; }
-        if (!world.equals(block.world)) { return false; }
-        return chunk.equals(block.chunk);
-    }
-
-    @Override
-    public String toString() {
-        return "Block{" + "material=" + material + ", chunk=" + chunk + ", worldX=" + getWorldX() + ", worldY=" + getWorldY() + '}';
-    }
+  @Override
+  public String toString() {
+    return "Block{"
+        + "material="
+        + material
+        + ", chunk="
+        + chunk
+        + ", worldX="
+        + getWorldX()
+        + ", worldY="
+        + getWorldY()
+        + '}';
+  }
 }

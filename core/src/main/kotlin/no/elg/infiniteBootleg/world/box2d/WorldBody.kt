@@ -1,12 +1,10 @@
 package no.elg.infiniteBootleg.world.box2d
 
-import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.Array
-import kotlin.math.abs
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
@@ -17,6 +15,8 @@ import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
+import kotlin.math.abs
+import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 
 /**
  * Wrapper for [com.badlogic.gdx.physics.box2d.World1] for asynchronous reasons
@@ -83,11 +83,11 @@ class WorldBody(private val world: World) : Ticking {
 
   override fun tickRare() {
     if (!Settings.client) {
-      //We only short because of the light, no point is shifting when there is no client
+      // We only short because of the light, no point is shifting when there is no client
       return
     }
 
-    //TODO move to WorldRender, makes more sense to do this there
+    // TODO move to WorldRender, makes more sense to do this there
     synchronized(BOX2D_LOCK) {
       val player = ClientMain.inst().player ?: return
       if (player.isInvalid) {
@@ -99,7 +99,7 @@ class WorldBody(private val world: World) : Ticking {
       val shiftY = calculateShift(physicsPosition.y)
 
       if (shiftX == 0f && shiftY == 0f) {
-        //Still in-bounds
+        // Still in-bounds
         return
       }
       // the toShift method assumes no offset, so we must subtract the old offset from the new
@@ -135,14 +135,14 @@ class WorldBody(private val world: World) : Ticking {
         for (light in rayHandler.enabledLights) {
           light.position = light.position.add(deltaOffsetX, deltaOffsetY)
         }
-        //TODO enable if needed
+        // TODO enable if needed
 //      for (light in rayHandler.disabledLights) {
 //        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
 //      }
         rayHandler.update()
       }
 
-      //test logic only, move to world render when possible
+      // test logic only, move to world render when possible
       world.render.camera?.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
       world.render.update()
     }

@@ -1,9 +1,7 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
-/**
- * Marks this class as removable from f.eks the world
- */
+/** Marks this class as removable from f.eks the world */
 public interface Removable {
 
-    default void onRemove() { }
+  default void onRemove() {}
 }

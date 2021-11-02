@@ -13,7 +13,7 @@ interface LightTrait : BlockTrait, Disposable {
   var light: PointLight?
 
   fun customizeLight(light: PointLight) {
-    //Default point light
+    // Default point light
   }
 
   fun canCreateLight(): Boolean = true
@@ -43,5 +43,4 @@ interface LightTrait : BlockTrait, Disposable {
       }
     }
   }
-
 }

@@ -25,126 +25,126 @@ import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public class Door extends MaterialEntity {
 
-    public static final String OPEN_DOOR_REGION_NAME = "door_open";
-    public static final String CLOSED_DOOR_REGION_NAME = "door_closed";
+  public static final String OPEN_DOOR_REGION_NAME = "door_open";
+  public static final String CLOSED_DOOR_REGION_NAME = "door_closed";
 
-    private static final TextureRegion openDoorRegion;
-    private static final TextureRegion closedDoorRegion;
+  private static final TextureRegion openDoorRegion;
+  private static final TextureRegion closedDoorRegion;
 
-    private final AtomicInteger contacts = new AtomicInteger();
+  private final AtomicInteger contacts = new AtomicInteger();
 
-    public Door(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
-        super(world, protoEntity);
+  public Door(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+    super(world, protoEntity);
+  }
+
+  public Door(@NotNull World world, float worldX, float worldY) {
+    super(world, worldX, worldY);
+  }
+
+  static {
+    if (Settings.client) {
+      openDoorRegion = ClientMain.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
+      closedDoorRegion = ClientMain.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
+    } else {
+      openDoorRegion = null;
+      closedDoorRegion = null;
     }
+  }
 
-    public Door(@NotNull World world, float worldX, float worldY) {
-        super(world, worldX, worldY);
-    }
-
-    static {
-        if (Settings.client) {
-            openDoorRegion = ClientMain.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
-            closedDoorRegion = ClientMain.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
-        }
-        else {
-            openDoorRegion = null;
-            closedDoorRegion = null;
-        }
-    }
-
-    {
-        if (!isInvalid()) {
-            //Wake up all bodies to get an accurate contacts count
-            final Vector2 position = getBody().getPosition();
-            final WorldBody worldBody = getWorld().getWorldBody();
-            worldBody.queryAABB(position.x, position.y, position.x + getHalfBox2dWidth() * 2, position.y + getHalfBox2dHeight() * 2, fixture -> {
-                final Body body = fixture.getBody();
-                if (body != null && body.getUserData() != this) {
-                    body.setAwake(true);
-                }
-                return true;
-            });
-            //Make sure to get the correct lights
-            Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
-        }
-    }
-
-    @NotNull
-    @Override
-    public Material getMaterial() {
-        return Material.DOOR;
-    }
-
-    @NotNull
-    @Override
-    protected BodyDef createBodyDef(float worldX, float worldY) {
-        BodyDef def = super.createBodyDef(worldX, worldY);
-        def.type = BodyDef.BodyType.StaticBody;
-        return def;
-    }
-
-    @Override
-    protected void createFixture(@NotNull Body body) {
-        PolygonShape box = new PolygonShape();
-        box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
-        Fixture fix = body.createFixture(box, 0.0f);
-        fix.setFilterData(BLOCK_ENTITY_FILTER);
-        fix.setSensor(true);
-        box.dispose();
-    }
-
-    @Override
-    public void contact(@NotNull ContactType type, @NotNull Contact contact) {
-        if (type == ContactType.BEGIN_CONTACT) {
-            int oldContacts = contacts.getAndIncrement();
-            if (oldContacts == 0) {
-                setFilter(TRANSPARENT_BLOCK_ENTITY_FILTER);
-                Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
+  {
+    if (!isInvalid()) {
+      // Wake up all bodies to get an accurate contacts count
+      final Vector2 position = getBody().getPosition();
+      final WorldBody worldBody = getWorld().getWorldBody();
+      worldBody.queryAABB(
+          position.x,
+          position.y,
+          position.x + getHalfBox2dWidth() * 2,
+          position.y + getHalfBox2dHeight() * 2,
+          fixture -> {
+            final Body body = fixture.getBody();
+            if (body != null && body.getUserData() != this) {
+              body.setAwake(true);
             }
-        }
-        else if (type == ContactType.END_CONTACT) {
-            int newContacts = contacts.decrementAndGet();
-            if (newContacts == 0) {
-                setFilter(BLOCK_ENTITY_FILTER);
-                Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
-            }
-        }
-        final int cont = contacts.get();
-        if (cont < 0) {
-            Main.logger().error("DOOR", "Negative contacts! (" + cont + ")");
-            contacts.set(0);
-        }
+            return true;
+          });
+      // Make sure to get the correct lights
+      Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
     }
+  }
 
-    @Override
-    public boolean isOnGround() {
-        //it's on the ground if the block below is not air
-        return !getWorld().isAirBlock(Location.relative(getBlockX(), getBlockY(), Direction.SOUTH));
+  @NotNull
+  @Override
+  public Material getMaterial() {
+    return Material.DOOR;
+  }
+
+  @NotNull
+  @Override
+  protected BodyDef createBodyDef(float worldX, float worldY) {
+    BodyDef def = super.createBodyDef(worldX, worldY);
+    def.type = BodyDef.BodyType.StaticBody;
+    return def;
+  }
+
+  @Override
+  protected void createFixture(@NotNull Body body) {
+    PolygonShape box = new PolygonShape();
+    box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
+    Fixture fix = body.createFixture(box, 0.0f);
+    fix.setFilterData(BLOCK_ENTITY_FILTER);
+    fix.setSensor(true);
+    box.dispose();
+  }
+
+  @Override
+  public void contact(@NotNull ContactType type, @NotNull Contact contact) {
+    if (type == ContactType.BEGIN_CONTACT) {
+      int oldContacts = contacts.getAndIncrement();
+      if (oldContacts == 0) {
+        setFilter(TRANSPARENT_BLOCK_ENTITY_FILTER);
+        Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
+      }
+    } else if (type == ContactType.END_CONTACT) {
+      int newContacts = contacts.decrementAndGet();
+      if (newContacts == 0) {
+        setFilter(BLOCK_ENTITY_FILTER);
+        Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
+      }
     }
-
-    @Override
-    public TextureRegion getTextureRegion() {
-        return contacts.get() == 0 ? closedDoorRegion : openDoorRegion;
+    final int cont = contacts.get();
+    if (cont < 0) {
+      Main.logger().error("DOOR", "Negative contacts! (" + cont + ")");
+      contacts.set(0);
     }
+  }
 
-    @Override
-    public @NotNull String hudDebug() {
-        return "contacts: " + contacts;
-    }
+  @Override
+  public boolean isOnGround() {
+    // it's on the ground if the block below is not air
+    return !getWorld().isAirBlock(Location.relative(getBlockX(), getBlockY(), Direction.SOUTH));
+  }
 
-    @Override
-    public int getWidth() {
-        return 2 * BLOCK_SIZE;
-    }
+  @Override
+  public TextureRegion getTextureRegion() {
+    return contacts.get() == 0 ? closedDoorRegion : openDoorRegion;
+  }
 
-    @Override
-    public int getHeight() {
-        return 4 * BLOCK_SIZE;
-    }
+  @Override
+  public @NotNull String hudDebug() {
+    return "contacts: " + contacts;
+  }
 
+  @Override
+  public int getWidth() {
+    return 2 * BLOCK_SIZE;
+  }
+
+  @Override
+  public int getHeight() {
+    return 4 * BLOCK_SIZE;
+  }
 }

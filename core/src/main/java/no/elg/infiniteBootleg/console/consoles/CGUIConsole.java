@@ -14,26 +14,39 @@ import org.jetbrains.annotations.NotNull;
 
 public class CGUIConsole extends GUIConsole {
 
-    private final ConsoleHandler consoleHandler;
+  private final ConsoleHandler consoleHandler;
 
-    public CGUIConsole(@NotNull ConsoleHandler consoleHandler, @NotNull Skin skin, boolean useMultiplexer, int keyID) {
-        super(skin, useMultiplexer, keyID, VisWindow.class, VisTable.class, "default-pane", TextField.class, VisTextButton.class, VisLabel.class,
-              VisScrollPane.class);
-        this.consoleHandler = consoleHandler;
-    }
+  public CGUIConsole(
+      @NotNull ConsoleHandler consoleHandler,
+      @NotNull Skin skin,
+      boolean useMultiplexer,
+      int keyID) {
+    super(
+        skin,
+        useMultiplexer,
+        keyID,
+        VisWindow.class,
+        VisTable.class,
+        "default-pane",
+        TextField.class,
+        VisTextButton.class,
+        VisLabel.class,
+        VisScrollPane.class);
+    this.consoleHandler = consoleHandler;
+  }
 
-    @Override
-    public void printHelp(String command) {
-        HelpfulConsoleHelpUtil.printHelp(this, exec, command);
-    }
+  @Override
+  public void printHelp(String command) {
+    HelpfulConsoleHelpUtil.printHelp(this, exec, command);
+  }
 
-    @Override
-    public void printCommands() {
-        HelpfulConsoleHelpUtil.printCommands(this, exec);
-    }
+  @Override
+  public void printCommands() {
+    HelpfulConsoleHelpUtil.printCommands(this, exec);
+  }
 
-    @Override
-    public void execCommand(String command) {
-        consoleHandler.execCommand(command);
-    }
+  @Override
+  public void execCommand(String command) {
+    consoleHandler.execCommand(command);
+  }
 }

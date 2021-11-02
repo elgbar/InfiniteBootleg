@@ -31,10 +31,10 @@ interface FallingTrait : TickingTrait {
           if (block.isDisposed) {
             return@executeSync
           }
-          //Do not update world straight away as if there are sand blocks above this it will begin to fall on the same tick
+          // Do not update world straight away as if there are sand blocks above this it will begin to fall on the same tick
           val fallingBlock = FallingBlockEntity(world, block)
           if (fallingBlock.isInvalid) {
-            falling = false //try again later
+            falling = false // try again later
             return@executeSync
           }
           world.addEntity(fallingBlock)
@@ -42,7 +42,7 @@ interface FallingTrait : TickingTrait {
 
           val relative = block.getRelative(Direction.NORTH)
           if (relative is TickingBlock) {
-            //Wait a bit to let the falling block gain some momentum
+            // Wait a bit to let the falling block gain some momentum
             relative.delayedShouldTick(1)
           }
         }

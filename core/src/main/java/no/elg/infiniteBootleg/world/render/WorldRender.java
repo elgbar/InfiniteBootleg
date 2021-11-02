@@ -14,71 +14,74 @@ import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public interface WorldRender extends Updatable, Renderer, Disposable, Resizable {
 
-    float MIN_ZOOM = 0.25f;
-    float MAX_ZOOM = 1.75f;
-    float AMBIENT_LIGHT = 0.026f;
-    int RAYS_PER_BLOCK = 200;
-    /**
-     * How many chunks around extra should be included.
-     * <p>
-     * One of the these chunks comes from the need that the player should not see that a chunks loads in.
-     */
-    int CHUNKS_IN_VIEW_PADDING_RENDER = 1;
-    /**
-     * How many chunks to the sides extra should be included.
-     * <p>
-     * This is the for light during twilight to stop light bleeding into the sides of the screen when moving.
-     */
-    int CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS = CHUNKS_IN_VIEW_PADDING_RENDER + 1;
-    /**
-     * How much must the player zoom to trigger a skylight reset
-     *
-     * @see #resetSkylight()
-     */
-    float SKYLIGHT_ZOOM_THRESHOLD = 0.25f;
-    /**
-     * How many {@link Graphics#getFramesPerSecond()} should there be when rendering multiple chunks
-     */
-    int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
-    Object LIGHT_LOCK = new Object();
-    Object BOX2D_LOCK = new Object();
+  float MIN_ZOOM = 0.25f;
+  float MAX_ZOOM = 1.75f;
+  float AMBIENT_LIGHT = 0.026f;
+  int RAYS_PER_BLOCK = 200;
+  /**
+   * How many chunks around extra should be included.
+   *
+   * <p>One of the these chunks comes from the need that the player should not see that a chunks
+   * loads in.
+   */
+  int CHUNKS_IN_VIEW_PADDING_RENDER = 1;
+  /**
+   * How many chunks to the sides extra should be included.
+   *
+   * <p>This is the for light during twilight to stop light bleeding into the sides of the screen
+   * when moving.
+   */
+  int CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS = CHUNKS_IN_VIEW_PADDING_RENDER + 1;
+  /**
+   * How much must the player zoom to trigger a skylight reset
+   *
+   * @see #resetSkylight()
+   */
+  float SKYLIGHT_ZOOM_THRESHOLD = 0.25f;
+  /**
+   * How many {@link Graphics#getFramesPerSecond()} should there be when rendering multiple chunks
+   */
+  int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
 
-    void resetSkylight();
+  Object LIGHT_LOCK = new Object();
+  Object BOX2D_LOCK = new Object();
 
-    /**
-     * @return How many blocks there currently are horizontally on screen
-     */
-    int blocksHorizontally();
+  void resetSkylight();
 
-    /**
-     * @param chunk
-     *     The chunk to check
-     *
-     * @return {@code true} if the given chunk is outside the view of the camera
-     */
-    boolean isOutOfView(@NotNull Chunk chunk);
+  /** @return How many blocks there currently are horizontally on screen */
+  int blocksHorizontally();
 
-    @NotNull ChunksInView getChunksInView();
+  /**
+   * @param chunk The chunk to check
+   * @return {@code true} if the given chunk is outside the view of the camera
+   */
+  boolean isOutOfView(@NotNull Chunk chunk);
 
-    @Nullable OrthographicCamera getCamera();
+  @NotNull
+  ChunksInView getChunksInView();
 
-    @Nullable ChunkRenderer getChunkRenderer();
+  @Nullable
+  OrthographicCamera getCamera();
 
-    EntityRenderer getEntityRenderer();
+  @Nullable
+  ChunkRenderer getChunkRenderer();
 
-    @Nullable SpriteBatch getBatch();
+  EntityRenderer getEntityRenderer();
 
-    @Nullable PublicRayHandler getRayHandler();
+  @Nullable
+  SpriteBatch getBatch();
 
-    @Nullable DirectionalLight getSkylight();
+  @Nullable
+  PublicRayHandler getRayHandler();
 
-    @NotNull World getWorld();
+  @Nullable
+  DirectionalLight getSkylight();
 
-    void reload();
+  @NotNull
+  World getWorld();
 
+  void reload();
 }

@@ -1,12 +1,8 @@
 package no.elg.infiniteBootleg;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public interface Renderer {
 
-    /**
-     * Render the frame. Called every frame.
-     */
-    void render();
+  /** Render the frame. Called every frame. */
+  void render();
 }

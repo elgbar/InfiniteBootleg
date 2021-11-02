@@ -9,56 +9,54 @@ import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * A console that reads input from standard in
- */
+/** A console that reads input from standard in */
 public class StdConsole extends HeadlessConsole implements Runnable {
 
-    private final ConsoleHandler consoleHandler;
-    private boolean running;
+  private final ConsoleHandler consoleHandler;
+  private boolean running;
 
-    public StdConsole(@NotNull ConsoleHandler consoleHandler) {
-        this.consoleHandler = consoleHandler;
-        running = true;
+  public StdConsole(@NotNull ConsoleHandler consoleHandler) {
+    this.consoleHandler = consoleHandler;
+    running = true;
 
-        Thread thread = new Thread(this, "Headless Console Reader Thread");
-        thread.setDaemon(true);
-        thread.start();
-    }
+    Thread thread = new Thread(this, "Headless Console Reader Thread");
+    thread.setDaemon(true);
+    thread.start();
+  }
 
-    @Override
-    public void run() {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        while (running) {
-            try {
-                String read = in.readLine();
-                if (read != null) {
-                    Main.inst().getScheduler().executeSync(() -> consoleHandler.execCommand(read));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+  @Override
+  public void run() {
+    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    while (running) {
+      try {
+        String read = in.readLine();
+        if (read != null) {
+          Main.inst().getScheduler().executeSync(() -> consoleHandler.execCommand(read));
         }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
+  }
 
-    @Override
-    public void printHelp(String command) {
-        HelpfulConsoleHelpUtil.printHelp(this, exec, command);
-    }
+  @Override
+  public void printHelp(String command) {
+    HelpfulConsoleHelpUtil.printHelp(this, exec, command);
+  }
 
-    @Override
-    public void printCommands() {
-        HelpfulConsoleHelpUtil.printCommands(this, exec);
-    }
+  @Override
+  public void printCommands() {
+    HelpfulConsoleHelpUtil.printCommands(this, exec);
+  }
 
-    @Override
-    public boolean isVisible() {
-        return true;
-    }
+  @Override
+  public boolean isVisible() {
+    return true;
+  }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        running = false;
-    }
+  @Override
+  public void dispose() {
+    super.dispose();
+    running = false;
+  }
 }

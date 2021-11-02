@@ -14,25 +14,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @TestInstance(PER_CLASS)
 public class TestGraphic {
 
-    static {
-        Settings.schedulerThreads = 0;
-        Settings.client = false;
-        Settings.loadWorldFromDisk = false;
-        Settings.debug = true;
-        new ClientMain(true);
-    }
+  static {
+    Settings.schedulerThreads = 0;
+    Settings.client = false;
+    Settings.loadWorldFromDisk = false;
+    Settings.debug = true;
+    new ClientMain(true);
+  }
 
-    public World world;
+  public World world;
 
-    @NotNull
-    public World createNewWorld() {
-        world = new World(new EmptyChunkGenerator(), 0);
-        ClientMain.inst().setSingleplayerWorld(world);
-        return world;
-    }
+  @NotNull
+  public World createNewWorld() {
+    world = new World(new EmptyChunkGenerator(), 0);
+    ClientMain.inst().setSingleplayerWorld(world);
+    return world;
+  }
 
-    @Test
-    public void dummy() {
-        //This dummy test is needed for @RunWith(GdxTestRunner.class) to work
-    }
+  @Test
+  public void dummy() {
+    // This dummy test is needed for @RunWith(GdxTestRunner.class) to work
+  }
 }

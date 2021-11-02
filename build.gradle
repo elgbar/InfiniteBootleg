@@ -3,7 +3,7 @@ plugins {
   id "idea"
   id "org.jetbrains.kotlin.jvm" version "$kotlin_version" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlin_version" apply false
-  id "com.diffplug.spotless" version "5.15.0"
+  id "com.diffplug.spotless" version "5.17.1"
 }
 
 tasks.named('wrapper') {
@@ -36,16 +36,11 @@ allprojects {
   }
 }
 
-//test {
-//  failFast = true
-//}
-
 
 subprojects {
 
   apply plugin: "idea"
   apply plugin: "java"
-  apply plugin: "jacoco"
   apply plugin: "org.jetbrains.kotlin.jvm"
   apply plugin: "com.diffplug.spotless"
 
@@ -68,7 +63,7 @@ subprojects {
     }
     java {
       removeUnusedImports()
-      googleJavaFormat("1.11.0")
+      googleJavaFormat("1.12.0")
     }
     kotlin {
       ktlint("0.42.1").userData([

@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.tryCreate
  */
 class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material) : LightBlock(world, chunk, localX, localY, material), FallingTrait {
   override var falling = false
-  
+
   override fun customizeLight(light: PointLight) {
     light.setColor(244 / 255f, 178 / 255f, 153 / 255f, .75f)
   }

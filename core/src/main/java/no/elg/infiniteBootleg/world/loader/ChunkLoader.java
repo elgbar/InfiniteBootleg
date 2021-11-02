@@ -16,112 +16,107 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Handle saving and loading of chunks.
- * <p>
- * If a chunk is saved to disk then that chunk will be loaded (assuming {@link Settings#loadWorldFromDisk} is {@code
- * true}) Otherwise
- * it will be generated with the given {@link ChunkGenerator}
+ *
+ * <p>If a chunk is saved to disk then that chunk will be loaded (assuming {@link
+ * Settings#loadWorldFromDisk} is {@code true}) Otherwise it will be generated with the given {@link
+ * ChunkGenerator}
  *
  * @author Elg
  */
 public class ChunkLoader {
 
-    public static final String CHUNK_FOLDER = "chunks";
-    private final World world;
-    private final ChunkGenerator generator;
+  public static final String CHUNK_FOLDER = "chunks";
+  private final World world;
+  private final ChunkGenerator generator;
 
-    public ChunkLoader(@NotNull World world, @NotNull ChunkGenerator generator) {
-        this.world = world;
-        this.generator = generator;
+  public ChunkLoader(@NotNull World world, @NotNull ChunkGenerator generator) {
+    this.world = world;
+    this.generator = generator;
+  }
+
+  @Nullable
+  public static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
+    FileHandle worldFile = world.getWorldFolder();
+    if (worldFile == null) {
+      return null;
     }
+    return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY);
+  }
 
-    @Nullable
-    public static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
-        FileHandle worldFile = world.getWorldFolder();
-        if (worldFile == null) {
-            return null;
+  /**
+   * Load the chunk at the given chunk location
+   *
+   * @param chunkLoc The coordinates of the chunk (in chunk view)
+   * @return The loaded chunk
+   */
+  @Nullable
+  public Chunk load(@NotNull Location chunkLoc) {
+    if (Main.isClient()) {
+      return null;
+    }
+    int chunkX = chunkLoc.x;
+    int chunkY = chunkLoc.y;
+
+    if (existsOnDisk(chunkX, chunkY)) {
+      ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
+      final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
+      if (chunkFile != null) {
+        try {
+          ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
+          var loaded = load(chunk, protoChunk);
+          if (loaded != null) {
+            return loaded;
+          }
+        } catch (InvalidProtocolBufferException e) {
+          e.printStackTrace();
         }
-        return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY);
+      }
+      // Failed to assemble, generate new chunk
     }
+    return generator.generate(world, chunkX, chunkY);
+  }
 
-    /**
-     * Load the chunk at the given chunk location
-     *
-     * @param chunkLoc
-     *     The coordinates of the chunk (in chunk view)
-     *
-     * @return The loaded chunk
-     */
-    @Nullable
-    public Chunk load(@NotNull Location chunkLoc) {
-        if (Main.isClient()) {
-            return null;
-        }
-        int chunkX = chunkLoc.x;
-        int chunkY = chunkLoc.y;
+  @Nullable
+  public Chunk clientLoad(@NotNull ProtoWorld.Chunk protoChunk) {
+    final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
+    ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
+    return load(chunk, protoChunk);
+  }
 
-        if (existsOnDisk(chunkX, chunkY)) {
-            ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
-            final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
-            if (chunkFile != null) {
-                try {
-                    ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
-                    var loaded = load(chunk, protoChunk);
-                    if (loaded != null) {
-                        return loaded;
-                    }
-                } catch (InvalidProtocolBufferException e) {
-                    e.printStackTrace();
-                }
-            }
-            //Failed to assemble, generate new chunk
-        }
-        return generator.generate(world, chunkX, chunkY);
+  @Nullable
+  public Chunk load(@NotNull ChunkImpl chunk, @NotNull ProtoWorld.Chunk protoChunk) {
+    if (chunk.load(protoChunk)) {
+      chunk.finishLoading();
+      return chunk;
     }
+    return null;
+  }
 
-    @Nullable
-    public Chunk clientLoad(@NotNull ProtoWorld.Chunk protoChunk) {
-        final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
-        ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
-        return load(chunk, protoChunk);
+  /**
+   * @param chunkX The y coordinate of the chunk (in chunk view)
+   * @param chunkY The x coordinate of the chunk (in chunk view)
+   * @return If a chunk at the given location exists
+   */
+  public boolean existsOnDisk(int chunkX, int chunkY) {
+    if (!Settings.loadWorldFromDisk) {
+      return false;
     }
+    FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
+    return chunkFile != null && chunkFile.exists();
+  }
 
-    @Nullable
-    public Chunk load(@NotNull ChunkImpl chunk, @NotNull ProtoWorld.Chunk protoChunk) {
-        if (chunk.load(protoChunk)) {
-            chunk.finishLoading();
-            return chunk;
-        }
-        return null;
+  public void save(@NotNull Chunk chunk) {
+    if (Settings.loadWorldFromDisk && chunk.shouldSave() && chunk.isLoaded()) {
+      // only save if valid and changed
+      FileHandle fh = getChunkFile(world, chunk.getChunkX(), chunk.getChunkY());
+      if (fh == null) {
+        return;
+      }
+      fh.writeBytes(chunk.save().toByteArray(), false);
     }
+  }
 
-    /**
-     * @param chunkX
-     *     The y coordinate of the chunk (in chunk view)
-     * @param chunkY
-     *     The x coordinate of the chunk (in chunk view)
-     *
-     * @return If a chunk at the given location exists
-     */
-    public boolean existsOnDisk(int chunkX, int chunkY) {
-        if (!Settings.loadWorldFromDisk) {
-            return false;
-        }
-        FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
-        return chunkFile != null && chunkFile.exists();
-    }
-
-    public void save(@NotNull Chunk chunk) {
-        if (Settings.loadWorldFromDisk && chunk.shouldSave() && chunk.isLoaded()) {
-            //only save if valid and changed
-            FileHandle fh = getChunkFile(world, chunk.getChunkX(), chunk.getChunkY());
-            if (fh == null) {
-                return;
-            }
-            fh.writeBytes(chunk.save().toByteArray(), false);
-        }
-    }
-
-    public ChunkGenerator getGenerator() {
-        return generator;
-    }
+  public ChunkGenerator getGenerator() {
+    return generator;
+  }
 }

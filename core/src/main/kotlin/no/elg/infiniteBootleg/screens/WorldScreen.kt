@@ -21,7 +21,7 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
     //noinspection ConstantConditions
     world.input?.update()
     if (!world.worldTicker.isPaused) {
-      //only update controls when we're not paused
+      // only update controls when we're not paused
       for (player in world.players) {
         player.update()
       }

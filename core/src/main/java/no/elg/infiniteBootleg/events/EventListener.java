@@ -1,9 +1,4 @@
 package no.elg.infiniteBootleg.events;
 
-/**
- *
- */
-public interface EventListener {
-
-
-}
+/** */
+public interface EventListener {}

@@ -7,33 +7,25 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public interface EntityControls extends InputProcessor, Updatable, Disposable {
 
+  /** @return The living entity to control */
+  @NotNull
+  LivingEntity getControlled();
 
-    /**
-     * @return The living entity to control
-     */
-    @NotNull LivingEntity getControlled();
+  /** @return The selected material for this entity */
+  @NotNull
+  Material getSelected();
 
-    /**
-     * @return The selected material for this entity
-     */
-    @NotNull Material getSelected();
+  /** @param selected The new selected material */
+  void setSelected(@NotNull Material selected);
 
-    /**
-     * @param selected
-     *     The new selected material
-     */
-    void setSelected(@NotNull Material selected);
+  float getBreakBrushSize();
 
-    float getBreakBrushSize();
+  void setBreakBrushSize(float breakBrushSize);
 
-    void setBreakBrushSize(float breakBrushSize);
+  float getPlaceBrushSize();
 
-    float getPlaceBrushSize();
-
-    void setPlaceBrushSize(float breakBrushSize);
+  void setPlaceBrushSize(float breakBrushSize);
 }

@@ -14,80 +14,78 @@ import no.elg.infiniteBootleg.TestGraphic;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public class ChunkTest extends TestGraphic {
 
-    private ChunkImpl chunk;
+  private ChunkImpl chunk;
 
-    @Before
-    public void setUp() {
-        chunk = new ChunkImpl(world, 0, 0);
-        chunk.finishLoading();
+  @Before
+  public void setUp() {
+    chunk = new ChunkImpl(world, 0, 0);
+    chunk.finishLoading();
+  }
+
+  @Test
+  public void invalidBlocksWidth() {
+    assertEquals(CHUNK_SIZE, chunk.getBlocks().length);
+  }
+
+  @Test
+  public void invalidBlocksHeight() {
+    assertEquals(CHUNK_SIZE, chunk.getBlocks()[0].length);
+  }
+
+  @Test
+  public void correctSizeOfIterable() {
+    assertEquals(CHUNK_SIZE * CHUNK_SIZE, chunk.stream().count());
+  }
+
+  @Test
+  public void allBlocksIterated() {
+    List<Block> itrBlocks = chunk.stream().collect(Collectors.toList());
+    Set<Block> rawBlocks = new HashSet<>();
+    for (Block[] blocks : chunk.getBlocks()) {
+      rawBlocks.addAll(Arrays.asList(blocks));
     }
 
-    @Test
-    public void invalidBlocksWidth() {
-        assertEquals(CHUNK_SIZE, chunk.getBlocks().length);
+    assertTrue(itrBlocks.containsAll(rawBlocks));
+    assertTrue(rawBlocks.containsAll(itrBlocks));
+  }
+
+  @Test
+  public void checkAllAirModified() {
+    chunk.setBlock(0, 0, Material.AIR, false);
+    chunk.updateTextureIfDirty();
+    assertTrue(chunk.isAllAir());
+    chunk.setBlock(0, 0, Material.STONE, false);
+    chunk.updateTextureIfDirty();
+    assertFalse(chunk.isAllAir());
+    chunk.setBlock(0, 0, Material.AIR, false);
+    chunk.updateTextureIfDirty();
+    assertTrue(chunk.isAllAir());
+  }
+
+  @Test
+  public void setAndGetCorrectBlock() {
+    assertEquals(Material.AIR, chunk.getBlock(0, 0).getMaterial());
+    chunk.setBlock(0, 0, Material.STONE, false);
+
+    assertEquals(Material.STONE, chunk.getBlock(0, 0).getMaterial());
+    assertEquals(Material.STONE, chunk.getBlock(0, 0).getMaterial());
+
+    chunk.setBlock(0, 0, Material.AIR, false);
+    assertEquals(Material.AIR, chunk.getBlock(0, 0).getMaterial());
+  }
+
+  @Test
+  public void locationMatch() {
+    chunk.setBlock(0, 0, Material.AIR, false);
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+      for (int y = 0; y < CHUNK_SIZE; y++) {
+        Block b = chunk.getBlock(x, y);
+        assertEquals(x, b.getWorldX());
+        assertEquals(y, b.getWorldY());
+      }
     }
-
-    @Test
-    public void invalidBlocksHeight() {
-        assertEquals(CHUNK_SIZE, chunk.getBlocks()[0].length);
-    }
-
-    @Test
-    public void correctSizeOfIterable() {
-        assertEquals(CHUNK_SIZE * CHUNK_SIZE, chunk.stream().count());
-    }
-
-    @Test
-    public void allBlocksIterated() {
-        List<Block> itrBlocks = chunk.stream().collect(Collectors.toList());
-        Set<Block> rawBlocks = new HashSet<>();
-        for (Block[] blocks : chunk.getBlocks()) {
-            rawBlocks.addAll(Arrays.asList(blocks));
-        }
-
-        assertTrue(itrBlocks.containsAll(rawBlocks));
-        assertTrue(rawBlocks.containsAll(itrBlocks));
-    }
-
-    @Test
-    public void checkAllAirModified() {
-        chunk.setBlock(0, 0, Material.AIR, false);
-        chunk.updateTextureIfDirty();
-        assertTrue(chunk.isAllAir());
-        chunk.setBlock(0, 0, Material.STONE, false);
-        chunk.updateTextureIfDirty();
-        assertFalse(chunk.isAllAir());
-        chunk.setBlock(0, 0, Material.AIR, false);
-        chunk.updateTextureIfDirty();
-        assertTrue(chunk.isAllAir());
-    }
-
-    @Test
-    public void setAndGetCorrectBlock() {
-        assertEquals(Material.AIR, chunk.getBlock(0, 0).getMaterial());
-        chunk.setBlock(0, 0, Material.STONE, false);
-
-        assertEquals(Material.STONE, chunk.getBlock(0, 0).getMaterial());
-        assertEquals(Material.STONE, chunk.getBlock(0, 0).getMaterial());
-
-        chunk.setBlock(0, 0, Material.AIR, false);
-        assertEquals(Material.AIR, chunk.getBlock(0, 0).getMaterial());
-    }
-
-    @Test
-    public void locationMatch() {
-        chunk.setBlock(0, 0, Material.AIR, false);
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                Block b = chunk.getBlock(x, y);
-                assertEquals(x, b.getWorldX());
-                assertEquals(y, b.getWorldY());
-            }
-        }
-    }
+  }
 }

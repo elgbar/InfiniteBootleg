@@ -3,9 +3,6 @@ package no.elg.infiniteBootleg.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
-import kotlin.math.abs
-import kotlin.math.min
-import kotlin.math.sign
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
@@ -14,6 +11,9 @@ import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
+import kotlin.math.abs
+import kotlin.math.min
+import kotlin.math.sign
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -23,7 +23,7 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : AbstractEntityControls(worldRender, entity) {
   private var selected: Material = Material.STONE
 
-  //if objects can be placed on non-air blocks
+  // if objects can be placed on non-air blocks
   var replacePlacement = false
   private var breakBrushSize = 2f
   private var placeBrushSize = 1f
@@ -61,7 +61,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     var update = false
     synchronized(BOX2D_LOCK) {
       if (!world.getEntities(rawX, rawY).isEmpty) {
-        //cannot place on an entity
+        // cannot place on an entity
         return false
       }
 
@@ -85,7 +85,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
   }
 
   private fun teleport() {
-    //teleport the player to the (last) location of the mouse
+    // teleport the player to the (last) location of the mouse
     controlled.teleport(ClientMain.inst().mouseX, ClientMain.inst().mouseY, true)
     val input = world.input
     if (input != null) {
@@ -179,7 +179,6 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     if (controlled is Player) {
       val player = controlled as Player
 
-
       if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
         player.toggleTorch()
       }
@@ -252,8 +251,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
     const val JUMP_VERTICAL_VEL = 20f
     const val FLY_VEL = .075f
 
-    const val MAX_X_VEL = 15f //ie target velocity
+    const val MAX_X_VEL = 15f // ie target velocity
     const val MAX_Y_VEL = 100f
-
   }
 }

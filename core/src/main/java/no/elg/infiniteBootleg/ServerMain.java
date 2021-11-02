@@ -8,86 +8,87 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public class ServerMain extends CommonMain implements Main {
 
-    private static ServerMain inst;
+  private static ServerMain inst;
 
-    @Nullable
-    protected World serverWorld;
+  @Nullable protected World serverWorld;
 
-    @Nullable
-    public Server server;
+  @Nullable public Server server;
 
-    public ServerMain(boolean test) {
-        super(test);
-        synchronized (INST_LOCK) {
-            if (inst != null) {
-                throw new IllegalStateException("A main instance have already be declared");
-            }
-            inst = this;
-        }
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (serverWorld != null) {
-                serverWorld.save();
-                final FileHandle worldFolder = serverWorld.getWorldFolder();
-                if (worldFolder != null) {
-                    worldFolder.deleteDirectory();
-                }
-            }
-            scheduler.shutdown(); // make sure scheduler threads are dead
-        }));
+  public ServerMain(boolean test) {
+    super(test);
+    synchronized (INST_LOCK) {
+      if (inst != null) {
+        throw new IllegalStateException("A main instance have already be declared");
+      }
+      inst = this;
     }
 
-    @NotNull
-    public static ServerMain inst() {
-        return inst;
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  if (serverWorld != null) {
+                    serverWorld.save();
+                    final FileHandle worldFolder = serverWorld.getWorldFolder();
+                    if (worldFolder != null) {
+                      worldFolder.deleteDirectory();
+                    }
+                  }
+                  scheduler.shutdown(); // make sure scheduler threads are dead
+                }));
+  }
+
+  @NotNull
+  public static ServerMain inst() {
+    return inst;
+  }
+
+  @NotNull
+  public World getServerWorld() {
+    if (serverWorld == null) {
+      throw new IllegalStateException("There is no world when not in world screen");
     }
+    return serverWorld;
+  }
 
-
-    @NotNull
-    public World getServerWorld() {
-        if (serverWorld == null) {
-            throw new IllegalStateException("There is no world when not in world screen");
-        }
-        return serverWorld;
+  public void setServerWorld(@Nullable World serverWorld) {
+    synchronized (INST_LOCK) {
+      this.serverWorld = serverWorld;
     }
+  }
 
-    public void setServerWorld(@Nullable World serverWorld) {
-        synchronized (INST_LOCK) {
-            this.serverWorld = serverWorld;
-        }
-    }
+  @Override
+  public void create() {
+    super.create();
 
-    @Override
-    public void create() {
-        super.create();
-
-        server = new Server();
-        final Thread thread = new Thread(() -> {
-            try {
+    server = new Server();
+    final Thread thread =
+        new Thread(
+            () -> {
+              try {
                 server.start();
-            } catch (InterruptedException e) {
+              } catch (InterruptedException e) {
                 console.log("SERVER", "Server interruption received", e);
                 Gdx.app.exit();
-            }
-        }, "Server");
-        thread.setDaemon(true);
-        thread.start();
-        console.log("SERVER", "Starting server on port " + Settings.port);
+              }
+            },
+            "Server");
+    thread.setDaemon(true);
+    thread.start();
+    console.log("SERVER", "Starting server on port " + Settings.port);
 
-        setServerWorld(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed));
-        getServerWorld().load();
-    }
+    setServerWorld(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed));
+    getServerWorld().load();
+  }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (serverWorld != null) {
-            serverWorld.dispose();
-        }
+  @Override
+  public void dispose() {
+    super.dispose();
+    if (serverWorld != null) {
+      serverWorld.dispose();
     }
+  }
 }

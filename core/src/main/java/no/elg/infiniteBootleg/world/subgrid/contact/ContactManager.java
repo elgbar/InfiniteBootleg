@@ -13,36 +13,36 @@ import org.jetbrains.annotations.NotNull;
 
 public class ContactManager implements ContactListener {
 
-    private final World world;
+  private final World world;
 
-    public ContactManager(@NotNull World world) {
-        this.world = world;
+  public ContactManager(@NotNull World world) {
+    this.world = world;
+  }
+
+  private void handleContact(ContactType type, Contact contact) {
+    // Must be within a box2d lock to make sure the contact is valid
+    synchronized (BOX2D_LOCK) {
+      final Body body = contact.getFixtureB().getBody();
+      final Object data = body.getUserData();
+      if (body != null && data != null && data instanceof Entity entity && !entity.isInvalid()) {
+        entity.contact(type, contact);
+      }
     }
+  }
 
-    private void handleContact(ContactType type, Contact contact) {
-        //Must be within a box2d lock to make sure the contact is valid
-        synchronized (BOX2D_LOCK) {
-            final Body body = contact.getFixtureB().getBody();
-            final Object data = body.getUserData();
-            if (body != null && data != null && data instanceof Entity entity && !entity.isInvalid()) {
-                entity.contact(type, contact);
-            }
-        }
-    }
+  @Override
+  public void beginContact(Contact contact) {
+    handleContact(ContactType.BEGIN_CONTACT, contact);
+  }
 
-    @Override
-    public void beginContact(Contact contact) {
-        handleContact(ContactType.BEGIN_CONTACT, contact);
-    }
+  @Override
+  public void endContact(Contact contact) {
+    handleContact(ContactType.END_CONTACT, contact);
+  }
 
-    @Override
-    public void endContact(Contact contact) {
-        handleContact(ContactType.END_CONTACT, contact);
-    }
+  @Override
+  public void preSolve(Contact contact, Manifold oldManifold) {}
 
-    @Override
-    public void preSolve(Contact contact, Manifold oldManifold) { }
-
-    @Override
-    public void postSolve(Contact contact, ContactImpulse impulse) { }
+  @Override
+  public void postSolve(Contact contact, ContactImpulse impulse) {}
 }

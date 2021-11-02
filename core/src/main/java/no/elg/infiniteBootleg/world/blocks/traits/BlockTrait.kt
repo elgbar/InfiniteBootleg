@@ -8,5 +8,4 @@ import no.elg.infiniteBootleg.world.Block
 interface BlockTrait {
 
   val block: Block
-
 }

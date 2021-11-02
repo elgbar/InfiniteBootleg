@@ -64,1018 +64,978 @@ import org.jetbrains.annotations.Nullable;
  * Different kind of views
  *
  * <ul>
- * <li>Chunk view: One unit in chunk view is {@link Chunk#CHUNK_SIZE} times larger than a unit in world view</li>
- * <li>World view: One unit in world view is {@link Block#BLOCK_SIZE} times larger than a unit in Box2D view</li>
- * <li>Box2D view: 1 (ie base unit)</li>
+ *   <li>Chunk view: One unit in chunk view is {@link Chunk#CHUNK_SIZE} times larger than a unit in
+ *       world view
+ *   <li>World view: One unit in world view is {@link Block#BLOCK_SIZE} times larger than a unit in
+ *       Box2D view
+ *   <li>Box2D view: 1 (ie base unit)
  * </ul>
  *
  * @author Elg
  */
 public class World implements Disposable, Resizable {
 
-    public static final short GROUND_CATEGORY = 0x1;
-    public static final short LIGHTS_CATEGORY = 0x2;
-    public static final short ENTITY_CATEGORY = 0x4;
+  public static final short GROUND_CATEGORY = 0x1;
+  public static final short LIGHTS_CATEGORY = 0x2;
+  public static final short ENTITY_CATEGORY = 0x4;
 
-    public static final Filter FALLING_BLOCK_ENTITY_FILTER;
-    public static final Filter TRANSPARENT_BLOCK_ENTITY_FILTER;
-    public static final Filter ENTITY_FILTER;
-    public static final Filter LIGHT_FILTER;
-    public static final Filter BLOCK_ENTITY_FILTER;
+  public static final Filter FALLING_BLOCK_ENTITY_FILTER;
+  public static final Filter TRANSPARENT_BLOCK_ENTITY_FILTER;
+  public static final Filter ENTITY_FILTER;
+  public static final Filter LIGHT_FILTER;
+  public static final Filter BLOCK_ENTITY_FILTER;
 
-    public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
-    public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
+  public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
+  public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
 
-    static {
-        //base filter for entities
-        ENTITY_FILTER = new Filter();
-        ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-        ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+  static {
+    // base filter for entities
+    ENTITY_FILTER = new Filter();
+    ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
+    ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
-        //How light should collide
-        LIGHT_FILTER = new Filter();
-        LIGHT_FILTER.categoryBits = LIGHTS_CATEGORY;
-        LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+    // How light should collide
+    LIGHT_FILTER = new Filter();
+    LIGHT_FILTER.categoryBits = LIGHTS_CATEGORY;
+    LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
-        //for falling blocks
-        FALLING_BLOCK_ENTITY_FILTER = new Filter();
-        FALLING_BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-        FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
+    // for falling blocks
+    FALLING_BLOCK_ENTITY_FILTER = new Filter();
+    FALLING_BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
+    FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
 
-        //ie glass
-        TRANSPARENT_BLOCK_ENTITY_FILTER = new Filter();
-        TRANSPARENT_BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
-        TRANSPARENT_BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+    // ie glass
+    TRANSPARENT_BLOCK_ENTITY_FILTER = new Filter();
+    TRANSPARENT_BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
+    TRANSPARENT_BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
 
-        //closed door
-        BLOCK_ENTITY_FILTER = new Filter();
-        BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
-        BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
+    // closed door
+    BLOCK_ENTITY_FILTER = new Filter();
+    BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
+    BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
+  }
+
+  @NotNull private final UUID uuid;
+  private final long seed;
+  @NotNull private final WorldTicker worldTicker;
+  @NotNull private final ChunkLoader chunkLoader;
+  @NotNull private final WorldRender render;
+  @NotNull private final WorldBody worldBody;
+  @NotNull private final WorldTime worldTime;
+
+  @NotNull
+  private final Map<@NotNull UUID, @NotNull Entity> entities =
+      new ConcurrentHashMap<>(); // all entities in this world (including living entities)
+
+  @NotNull
+  private final Map<@NotNull UUID, @NotNull Player> players =
+      new ConcurrentHashMap<>(); // all player in this world
+
+  @NotNull
+  private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks = new ConcurrentHashMap<>();
+
+  @Nullable private volatile FileHandle worldFile;
+  // only exists when graphics exits
+  @Nullable private WorldInputHandler input;
+  @NotNull private String name;
+
+  private Location spawn;
+  private final Lock loadLock = new ReentrantLock();
+
+  public World(@NotNull ProtoWorld.World protoWorld) {
+    this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
+  }
+
+  public World(@NotNull ChunkGenerator generator, long seed) {
+    this(generator, seed, "World");
+  }
+
+  public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
+    this.seed = seed;
+    MathUtils.random.setSeed(seed);
+    uuid = ExtraKt.randomUUIDFromString("" + seed);
+
+    name = worldName;
+
+    worldTicker = new WorldTicker(this, false);
+
+    chunkLoader = new ChunkLoader(this, generator);
+    worldBody = new WorldBody(this);
+    worldTime = new WorldTime(this);
+    spawn = new Location(0, 0);
+
+    if (Settings.client) {
+      render = new ClientWorldRender(this);
+      input = new WorldInputHandler(render);
+    } else {
+      render = new HeadlessWorldRenderer(this);
+    }
+  }
+
+  public void load() {
+    FileHandle worldFolder = getWorldFolder();
+    FileHandle worldZip = getWorldZip();
+
+    if (!Settings.loadWorldFromDisk || worldFolder == null) {
+      return;
+    }
+    if (worldZip == null || !worldZip.exists()) {
+      Main.logger().log("No world save found");
+      return;
+    }
+    Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
+
+    worldFolder.deleteDirectory();
+    ZipUtils.unzip(worldFolder, worldZip);
+
+    var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
+
+    final ProtoWorld.World protoWorld;
+    try {
+      protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
+    } catch (InvalidProtocolBufferException e) {
+      e.printStackTrace();
+      return;
+    }
+    serverLoad(protoWorld);
+
+    if (!worldTicker.isStarted()) {
+      worldTicker.start();
+    }
+  }
+
+  @NotNull
+  public Player createNewPlayer(@NotNull UUID playerId) {
+    Player player = new Player(this, spawn.x, spawn.y, playerId);
+    Preconditions.checkState(!player.isInvalid());
+    addEntity(player);
+    return player;
+  }
+
+  public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
+
+    spawn = Location.fromVector2i(protoWorld.getSpawn());
+    worldTime.setTime(protoWorld.getTime());
+
+    if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
+      final Player newPlayer = new Player(this, protoWorld.getPlayer());
+      if (!newPlayer.isInvalid()) {
+        addEntity(newPlayer, false);
+        ClientMain.inst().setPlayer(newPlayer);
+      }
+    }
+  }
+
+  public void save() {
+    if (!Settings.loadWorldFromDisk) {
+      return;
+    }
+    FileHandle worldFolder = getWorldFolder();
+    if (worldFolder == null) {
+      return;
+    }
+    for (Chunk chunk : getChunks().values()) {
+      chunkLoader.save(chunk);
     }
 
-    @NotNull
-    private final UUID uuid;
-    private final long seed;
-    @NotNull
-    private final WorldTicker worldTicker;
-    @NotNull
-    private final ChunkLoader chunkLoader;
-    @NotNull
-    private final WorldRender render;
-    @NotNull
-    private final WorldBody worldBody;
-    @NotNull
-    private final WorldTime worldTime;
-    @NotNull
-    private final Map<@NotNull UUID, @NotNull Entity> entities = new ConcurrentHashMap<>(); //all entities in this world (including living entities)
-    @NotNull
-    private final Map<@NotNull UUID, @NotNull Player> players = new ConcurrentHashMap<>(); //all player in this world
-    @NotNull
-    private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks = new ConcurrentHashMap<>();
-    @Nullable
-    private volatile FileHandle worldFile;
-    //only exists when graphics exits
-    @Nullable
-    private WorldInputHandler input;
-    @NotNull
-    private String name;
+    var builder = toProtobuf();
 
-    private Location spawn;
-    private final Lock loadLock = new ReentrantLock();
-
-    public World(@NotNull ProtoWorld.World protoWorld) {
-        this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
+    var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
+    if (worldInfoFile.exists()) {
+      worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
     }
+    worldInfoFile.writeBytes(builder.toByteArray(), false);
 
-    public World(@NotNull ChunkGenerator generator, long seed) {
-        this(generator, seed, "World");
+    FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
+    try {
+      ZipUtils.zip(worldFolder, worldZip);
+      Main.logger().log("World", "World saved!");
+    } catch (IOException e) {
+      Main.logger()
+          .error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
     }
+  }
 
-    public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
-        this.seed = seed;
-        MathUtils.random.setSeed(seed);
-        uuid = ExtraKt.randomUUIDFromString("" + seed);
-
-        name = worldName;
-
-        worldTicker = new WorldTicker(this, false);
-
-        chunkLoader = new ChunkLoader(this, generator);
-        worldBody = new WorldBody(this);
-        worldTime = new WorldTime(this);
-        spawn = new Location(0, 0);
-
-        if (Settings.client) {
-            render = new ClientWorldRender(this);
-            input = new WorldInputHandler(render);
-        }
-        else {
-            render = new HeadlessWorldRenderer(this);
-        }
+  @NotNull
+  public ProtoWorld.World toProtobuf() {
+    var builder = ProtoWorld.World.newBuilder();
+    builder.setName(name);
+    builder.setSeed(seed);
+    builder.setTime(worldTime.getTime());
+    builder.setSpawn(spawn.toVector2i());
+    builder.setGenerator(getGeneratorType());
+    if (Settings.client) {
+      final Player player = ClientMain.inst().getPlayer();
+      if (player != null) {
+        builder.setPlayer(player.save());
+      }
     }
+    return builder.build();
+  }
 
-    public void load() {
-        FileHandle worldFolder = getWorldFolder();
-        FileHandle worldZip = getWorldZip();
-
-        if (!Settings.loadWorldFromDisk || worldFolder == null) {
-            return;
-        }
-        if (worldZip == null || !worldZip.exists()) {
-            Main.logger().log("No world save found");
-            return;
-        }
-        Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
-
-        worldFolder.deleteDirectory();
-        ZipUtils.unzip(worldFolder, worldZip);
-
-        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
-
-        final ProtoWorld.World protoWorld;
-        try {
-            protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-            return;
-        }
-        serverLoad(protoWorld);
-
-        if (!worldTicker.isStarted()) {
-            worldTicker.start();
-        }
+  /** @return The current folder of the world or {@code null} if no disk should be used */
+  @Nullable
+  public FileHandle getWorldFolder() {
+    if (Settings.loadWorldFromDisk) {
+      if (worldFile == null) {
+        worldFile = WorldLoader.getWorldFolder(uuid);
+      }
+      return worldFile;
+    } else {
+      return null;
     }
+  }
 
-    @NotNull
-    public Player createNewPlayer(@NotNull UUID playerId) {
-        Player player = new Player(this, spawn.x, spawn.y, playerId);
-        Preconditions.checkState(!player.isInvalid());
-        addEntity(player);
-        return player;
+  protected FileHandle getWorldZip() {
+    return WorldLoader.getWorldZip(getWorldFolder());
+  }
+
+  private ProtoWorld.World.Generator getGeneratorType() {
+    final ChunkGenerator generator = chunkLoader.getGenerator();
+    if (generator instanceof PerlinChunkGenerator) {
+      return PERLIN;
+    } else if (generator instanceof FlatChunkGenerator) {
+      return FLAT;
+    } else if (generator instanceof EmptyChunkGenerator) {
+      return EMPTY;
+    } else {
+      return UNRECOGNIZED;
     }
+  }
 
-    public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
+  @Nullable
+  public Chunk getChunkFromWorld(int worldX, int worldY) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+    return getChunk(chunkX, chunkY);
+  }
 
-        spawn = Location.fromVector2i(protoWorld.getSpawn());
-        worldTime.setTime(protoWorld.getTime());
+  @Nullable
+  public Chunk getChunk(int chunkX, int chunkY) {
+    return getChunk(new Location(chunkX, chunkY));
+  }
 
-        if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
-            final Player newPlayer = new Player(this, protoWorld.getPlayer());
-            if (!newPlayer.isInvalid()) {
-                addEntity(newPlayer, false);
-                ClientMain.inst().setPlayer(newPlayer);
-            }
+  public void updateChunk(@NotNull Chunk chunk) {
+    Preconditions.checkState(chunk.isValid());
+    chunks.put(new Location(chunk.getChunkX(), chunk.getChunkY()), chunk);
+  }
+
+  @Nullable
+  public Chunk getChunk(@NotNull Location chunkLoc) {
+    loadLock.lock();
+    try {
+      Chunk chunk = chunks.get(chunkLoc);
+      if (chunk == null || !chunk.isLoaded()) {
+        if (getWorldTicker().isPaused()) {
+          return null;
         }
-    }
-
-    public void save() {
-        if (!Settings.loadWorldFromDisk) {
-            return;
+        chunk = chunkLoader.load(chunkLoc);
+        if (chunk == null) {
+          return null;
         }
-        FileHandle worldFolder = getWorldFolder();
-        if (worldFolder == null) {
-            return;
-        }
-        for (Chunk chunk : getChunks().values()) {
-            chunkLoader.save(chunk);
-        }
-
-        var builder = toProtobuf();
-
-        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
-        if (worldInfoFile.exists()) {
-            worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
-        }
-        worldInfoFile.writeBytes(builder.toByteArray(), false);
-
-        FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-        try {
-            ZipUtils.zip(worldFolder, worldZip);
-            Main.logger().log("World", "World saved!");
-        } catch (IOException e) {
-            Main.logger().error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
-        }
-    }
-
-    @NotNull
-    public ProtoWorld.World toProtobuf() {
-        var builder = ProtoWorld.World.newBuilder();
-        builder.setName(name);
-        builder.setSeed(seed);
-        builder.setTime(worldTime.getTime());
-        builder.setSpawn(spawn.toVector2i());
-        builder.setGenerator(getGeneratorType());
-        if (Settings.client) {
-            final Player player = ClientMain.inst().getPlayer();
-            if (player != null) {
-                builder.setPlayer(player.save());
-            }
-        }
-        return builder.build();
-    }
-
-    /**
-     * @return The current folder of the world or {@code null} if no disk should be used
-     */
-    @Nullable
-    public FileHandle getWorldFolder() {
-        if (Settings.loadWorldFromDisk) {
-            if (worldFile == null) {
-                worldFile = WorldLoader.getWorldFolder(uuid);
-            }
-            return worldFile;
-        }
-        else {
-            return null;
-        }
-    }
-
-    protected FileHandle getWorldZip() {
-        return WorldLoader.getWorldZip(getWorldFolder());
-    }
-
-    private ProtoWorld.World.Generator getGeneratorType() {
-        final ChunkGenerator generator = chunkLoader.getGenerator();
-        if (generator instanceof PerlinChunkGenerator) {
-            return PERLIN;
-        }
-        else if (generator instanceof FlatChunkGenerator) {
-            return FLAT;
-        }
-        else if (generator instanceof EmptyChunkGenerator) {
-            return EMPTY;
-        }
-        else {
-            return UNRECOGNIZED;
-        }
-    }
-
-    @Nullable
-    public Chunk getChunkFromWorld(int worldX, int worldY) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-        return getChunk(chunkX, chunkY);
-    }
-
-    @Nullable
-    public Chunk getChunk(int chunkX, int chunkY) {
-        return getChunk(new Location(chunkX, chunkY));
-    }
-
-    public void updateChunk(@NotNull Chunk chunk) {
         Preconditions.checkState(chunk.isValid());
-        chunks.put(new Location(chunk.getChunkX(), chunk.getChunkY()), chunk);
+        chunks.put(chunkLoc, chunk);
+      }
+      return chunk;
+    } finally {
+      loadLock.unlock();
+    }
+  }
+
+  /**
+   * Set a block at a given location and update the textures
+   *
+   * @param worldLoc The location in world coordinates
+   * @param material The new material to at given location
+   * @see Chunk#setBlock(int, int, Material, boolean)
+   */
+  public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material) {
+    return setBlock(worldLoc, material, true);
+  }
+
+  /**
+   * Set a block at a given location
+   *
+   * @param worldLoc The location in world coordinates
+   * @param material The new material to at given location
+   * @param update If the texture of the corresponding chunk should be updated
+   * @see Chunk#setBlock(int, int, Material, boolean)
+   */
+  public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material, boolean update) {
+    return setBlock(worldLoc.x, worldLoc.y, material, update);
+  }
+
+  /**
+   * Set a block at a given location
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @param material The new material to at given location
+   * @param updateTexture If the texture of the corresponding chunk should be updated
+   * @see Chunk#setBlock(int, int, Material, boolean)
+   */
+  @Nullable
+  public Chunk setBlock(
+      int worldX, int worldY, @Nullable Material material, boolean updateTexture) {
+    return setBlock(worldX, worldY, material, updateTexture, false);
+  }
+
+  public Chunk setBlock(
+      int worldX,
+      int worldY,
+      @Nullable Material material,
+      boolean updateTexture,
+      boolean prioritize) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+    int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk != null) {
+      chunk.setBlock(localX, localY, material, updateTexture, prioritize);
+    }
+    return chunk;
+  }
+
+  /**
+   * Set a block at a given location and update the textures
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @param material The new material to at given location
+   * @see Chunk#setBlock(int, int, Material, boolean)
+   */
+  public Chunk setBlock(int worldX, int worldY, @Nullable Material material) {
+    return setBlock(worldX, worldY, material, true);
+  }
+
+  /**
+   * Set a block at a given location
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @param block The block at the given location
+   * @param update If the texture of the corresponding chunk should be updated
+   */
+  public void setBlock(int worldX, int worldY, @Nullable Block block, boolean update) {
+
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = CoordUtil.chunkOffset(worldX);
+    int localY = CoordUtil.chunkOffset(worldY);
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk != null) {
+      chunk.setBlock(localX, localY, block, update);
+    }
+  }
+
+  public void setBlock(
+      int worldX, int worldY, @Nullable ProtoWorld.Block protoBlock, boolean sendUpdatePacket) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = CoordUtil.chunkOffset(worldX);
+    int localY = CoordUtil.chunkOffset(worldY);
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk != null) {
+      var block = Block.fromProto(this, chunk, localX, localY, protoBlock);
+      chunk.setBlock(localX, localY, block, true, false, sendUpdatePacket);
+    }
+  }
+
+  /**
+   * Remove anything that is at the given location be it a {@link Block} or {@link MaterialEntity}
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @param update If the texture of the corresponding chunk should be updated
+   */
+  public void remove(int worldX, int worldY, boolean update) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = CoordUtil.chunkOffset(worldX);
+    int localY = CoordUtil.chunkOffset(worldY);
+
+    for (Entity entity : getEntities(worldX, worldY)) {
+      if (entity instanceof Removable) {
+        removeEntity(entity);
+      }
     }
 
-    @Nullable
-    public Chunk getChunk(@NotNull Location chunkLoc) {
-        loadLock.lock();
-        try {
-            Chunk chunk = chunks.get(chunkLoc);
-            if (chunk == null || !chunk.isLoaded()) {
-                if (getWorldTicker().isPaused()) {
-                    return null;
-                }
-                chunk = chunkLoader.load(chunkLoc);
-                if (chunk == null) {
-                    return null;
-                }
-                Preconditions.checkState(chunk.isValid());
-                chunks.put(chunkLoc, chunk);
-            }
-            return chunk;
-        } finally {
-            loadLock.unlock();
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk != null) {
+      chunk.setBlock(localX, localY, (Block) null, update);
+    }
+  }
+
+  public Array<Entity> getEntities(float worldX, float worldY) {
+    Array<Entity> foundEntities = new Array<>(false, 4);
+    for (Entity entity : entities.values()) {
+      Vector2 pos = entity.getPosition();
+      if (Util.isBetween(
+              MathUtils.floor(pos.x - entity.getHalfBox2dWidth()),
+              worldX,
+              MathUtils.ceil(pos.x + entity.getHalfBox2dWidth()))
+          && //
+          Util.isBetween(
+              MathUtils.floor(pos.y - entity.getHalfBox2dHeight()),
+              worldY,
+              MathUtils.ceil(pos.y + entity.getHalfBox2dHeight()))) {
+
+        foundEntities.add(entity);
+      }
+    }
+    return foundEntities;
+  }
+
+  /**
+   * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists)
+   * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
+   * the {@link #getBlock(int, int, boolean)} method might createBlock and store a new air block at
+   * the given location
+   *
+   * <p><b>note</b> this does not if there are entities at this location
+   *
+   * @param worldLoc The world location to check
+   * @return If the block at the given location is air.
+   */
+  public boolean isAirBlock(@NotNull Location worldLoc) {
+    return isAirBlock(worldLoc.x, worldLoc.y);
+  }
+
+  /**
+   * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist)
+   * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
+   * the {@link #getBlock(int, int, boolean)} method might create a Block and store a new air block
+   * at the given location.
+   *
+   * <p>If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent
+   * teleportation and other actions that depend on an empty space.
+   *
+   * <p><b>note</b> this does not if there are entities at this location
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @return If the block at the given location is air.
+   */
+  public boolean isAirBlock(int worldX, int worldY) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+    int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk == null) {
+      // What should we return here? we don't really know as it does not exist.
+      // Return false to prevent teleportation and other actions that depend on an empty space.
+      return false;
+    }
+
+    Block b = chunk.getBlocks()[localX][localY];
+    return b == null || b.getMaterial() == Material.AIR;
+  }
+
+  public boolean canPassThrough(int worldX, int worldY) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+    int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk == null) {
+      // What should we return here? we don't really know as it does not exist.
+      // Return false to prevent teleportation and other actions that depend on an empty space.
+      return false;
+    }
+
+    Block b = chunk.getBlocks()[localX][localY];
+    return b == null || !b.getMaterial().isSolid();
+  }
+
+  /**
+   * Set all blocks in all cardinal directions around a given block to be updated. Given location
+   * not included
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   */
+  public void updateBlocksAround(int worldX, int worldY) {
+    for (Direction dir : Direction.CARDINAL) {
+      Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
+      if (rel instanceof TickingBlock tickingBlock) {
+        tickingBlock.setShouldTick(true);
+      }
+    }
+  }
+
+  /** Update all light sources currently loaded */
+  public void updateLights() {
+    for (Chunk chunk : getLoadedChunks()) {
+      for (TickingBlock block : chunk.getTickingBlocks()) {
+        if (block instanceof LightBlock) {
+          block.setShouldTick(true);
         }
+      }
+    }
+  }
+
+  /**
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @param raw
+   * @return The block at the given x and y
+   */
+  @Nullable
+  public Block getBlock(int worldX, int worldY, boolean raw) {
+
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+    int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk == null) {
+      return null;
+    }
+    return chunk.getRawBlock(localX, localY);
+  }
+
+  /** @return If the given chunk is loaded in memory */
+  public boolean isChunkLoaded(int chunkX, int chunkY) {
+    return isChunkLoaded(new Location(chunkX, chunkY));
+  }
+
+  /**
+   * @param chunkLoc Chunk location in chunk coordinates
+   * @return If the given chunk is loaded in memory
+   */
+  public boolean isChunkLoaded(@NotNull Location chunkLoc) {
+    Chunk chunk = chunks.get(chunkLoc);
+    return chunk != null && chunk.isLoaded();
+  }
+
+  /**
+   * Unload and save all chunks in this world.
+   *
+   * <p>Must be called on main thread!
+   *
+   * @param force If the chunks will be forced to unload
+   */
+  public void reload(boolean force) {
+    var wasNotPaused = !worldTicker.isPaused();
+    if (wasNotPaused) {
+      worldTicker.pause();
+    }
+    Main.inst().getScheduler().waitForTasks();
+
+    // remove all entities to speed up unloading
+    for (Entity entity : getEntities()) {
+      removeEntity(entity);
+    }
+    if (!entities.isEmpty() || !players.isEmpty()) {
+      throw new IllegalStateException("Failed to clear entities during reload");
+    }
+    // ok to include unloaded chunks as they will not cause an error when unloading again
+    for (Chunk chunk : chunks.values()) {
+      unloadChunk(chunk, force, false);
+    }
+    if (!chunks.isEmpty()) {
+      throw new IllegalStateException("Failed to clear chunks during reload");
+    }
+    synchronized (BOX2D_LOCK) {
+      var bodies = new Array<@NotNull Body>(false, worldBody.getBox2dWorld().getBodyCount());
+      worldBody.getBox2dWorld().getBodies(bodies);
+      if (!bodies.isEmpty()) {
+        Main.logger().error("BOX2D", "There existed dangling bodies after reload!");
+      }
+      for (Body body : bodies) {
+        worldBody.destroyBody(body);
+      }
     }
 
-    /**
-     * Set a block at a given location and update the textures
-     *
-     * @param worldLoc
-     *     The location in world coordinates
-     * @param material
-     *     The new material to at given location
-     *
-     * @see Chunk#setBlock(int, int, Material, boolean)
-     */
-    public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material) {
-        return setBlock(worldLoc, material, true);
+    render.reload();
+
+    load();
+
+    if (wasNotPaused) {
+      worldTicker.resume();
+    }
+    Main.logger().log("World", "World reloaded last save");
+  }
+
+  /** @return All currently loaded chunks */
+  public Collection<Chunk> getLoadedChunks() {
+    return chunks.values().stream().filter(Chunk::isLoaded).collect(Collectors.toUnmodifiableSet());
+  }
+
+  /**
+   * Unload the given chunks and save it to disk
+   *
+   * @param chunk The chunk to unload
+   */
+  public void unloadChunk(@Nullable Chunk chunk) {
+    unloadChunk(chunk, false, true);
+  }
+
+  /**
+   * Unload the given chunks and save it to disk
+   *
+   * @param chunk The chunk to unload
+   * @param force If the chunk will be forced to unload
+   * @param save If the chunk will be saved
+   */
+  public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
+    if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
+      if (save) {
+        chunkLoader.save(chunk);
+      }
+      for (Entity entity : chunk.getEntities()) {
+        removeEntity(entity);
+      }
+      chunk.dispose();
+      chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
+    }
+  }
+
+  /**
+   * @param worldLoc The world location of this chunk
+   * @return The chunk at the given world location
+   */
+  @Nullable
+  public Chunk getChunkFromWorld(@NotNull Location worldLoc) {
+    return getChunk(CoordUtil.worldToChunk(worldLoc));
+  }
+
+  public boolean containsEntity(@NotNull UUID uuid) {
+    return entities.containsKey(uuid);
+  }
+
+  @Nullable
+  public Entity getEntity(@NotNull UUID uuid) {
+    return entities.get(uuid);
+  }
+
+  /**
+   * Add the given entity to entities in the world. <b>NOTE</b> this is NOT automatically done when
+   * creating a new entity instance.
+   *
+   * @param entity The entity to add
+   */
+  public void addEntity(@NotNull Entity entity) {
+    addEntity(entity, true);
+  }
+
+  /**
+   * Add the given entity to entities in the world. <b>NOTE</b> this is NOT automatically done when
+   * creating a new entity instance.
+   *
+   * @param entity The entity to add
+   * @param loadChunk
+   */
+  public void addEntity(@NotNull Entity entity, boolean loadChunk) {
+    if (entities.values().stream().anyMatch(it -> it == entity)) {
+      Main.logger()
+          .error(
+              "World",
+              "Tried to add entity twice to world "
+                  + entity.simpleName()
+                  + " "
+                  + entity.hudDebug());
+      return;
+    }
+    if (containsEntity(entity.getUuid())) {
+      Main.logger()
+          .error(
+              "World",
+              "Tried to add duplicate entity to world "
+                  + entity.simpleName()
+                  + " "
+                  + entity.hudDebug());
+      removeEntity(entity);
+      return;
     }
 
-    /**
-     * Set a block at a given location
-     *
-     * @param worldLoc
-     *     The location in world coordinates
-     * @param material
-     *     The new material to at given location
-     * @param update
-     *     If the texture of the corresponding chunk should be updated
-     *
-     * @see Chunk#setBlock(int, int, Material, boolean)
-     */
-    public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material, boolean update) {
-        return setBlock(worldLoc.x, worldLoc.y, material, update);
+    if (loadChunk) {
+      // Load chunk of entity
+      var chunk =
+          getChunk(
+              CoordUtil.worldToChunk(entity.getBlockX()),
+              CoordUtil.worldToChunk(entity.getBlockY()));
+      if (chunk == null) {
+        // Failed to load chunk, remove entity
+        Main.logger()
+            .error(
+                "World",
+                "Failed to add entity to world, as its spawning chunk could not be loaded");
+        removeEntity(entity);
+        return;
+      }
     }
 
-    /**
-     * Set a block at a given location
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param material
-     *     The new material to at given location
-     * @param updateTexture
-     *     If the texture of the corresponding chunk should be updated
-     *
-     * @see Chunk#setBlock(int, int, Material, boolean)
-     */
-    @Nullable
-    public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean updateTexture) {
-        return setBlock(worldX, worldY, material, updateTexture, false);
+    entities.put(entity.getUuid(), entity);
+    if (entity instanceof Player player) {
+      players.put(player.getUuid(), player);
     }
 
-    public Chunk setBlock(int worldX, int worldY, @Nullable Material material, boolean updateTexture, boolean prioritize) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
-        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk != null) {
-            chunk.setBlock(localX, localY, material, updateTexture, prioritize);
-        }
-        return chunk;
-    }
-
-    /**
-     * Set a block at a given location and update the textures
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param material
-     *     The new material to at given location
-     *
-     * @see Chunk#setBlock(int, int, Material, boolean)
-     */
-    public Chunk setBlock(int worldX, int worldY, @Nullable Material material) {
-        return setBlock(worldX, worldY, material, true);
-    }
-
-    /**
-     * Set a block at a given location
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param block
-     *     The block at the given location
-     * @param update
-     *     If the texture of the corresponding chunk should be updated
-     */
-    public void setBlock(int worldX, int worldY, @Nullable Block block, boolean update) {
-
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = CoordUtil.chunkOffset(worldX);
-        int localY = CoordUtil.chunkOffset(worldY);
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk != null) {
-            chunk.setBlock(localX, localY, block, update);
-        }
-    }
-
-    public void setBlock(int worldX, int worldY, @Nullable ProtoWorld.Block protoBlock, boolean sendUpdatePacket) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = CoordUtil.chunkOffset(worldX);
-        int localY = CoordUtil.chunkOffset(worldY);
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk != null) {
-            var block = Block.fromProto(this, chunk, localX, localY, protoBlock);
-            chunk.setBlock(localX, localY, block, true, false, sendUpdatePacket);
-        }
-    }
-
-    /**
-     * Remove anything that is at the given location be it a {@link Block} or {@link MaterialEntity}
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param update
-     *     If the texture of the corresponding chunk should be updated
-     */
-    public void remove(int worldX, int worldY, boolean update) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = CoordUtil.chunkOffset(worldX);
-        int localY = CoordUtil.chunkOffset(worldY);
-
-
-        for (Entity entity : getEntities(worldX, worldY)) {
-            if (entity instanceof Removable) {
-                removeEntity(entity);
-            }
-        }
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk != null) {
-            chunk.setBlock(localX, localY, (Block) null, update);
-        }
-    }
-
-    public Array<Entity> getEntities(float worldX, float worldY) {
-        Array<Entity> foundEntities = new Array<>(false, 4);
-        for (Entity entity : entities.values()) {
-            Vector2 pos = entity.getPosition();
-            if (Util.isBetween(MathUtils.floor(pos.x - entity.getHalfBox2dWidth()), worldX, MathUtils.ceil(pos.x + entity.getHalfBox2dWidth())) && //
-                Util.isBetween(MathUtils.floor(pos.y - entity.getHalfBox2dHeight()), worldY, MathUtils.ceil(pos.y + entity.getHalfBox2dHeight()))) {
-
-                foundEntities.add(entity);
-            }
-        }
-        return foundEntities;
-    }
-
-    /**
-     * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists) this is faster
-     * than a
-     * standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int, boolean)}
-     * method might createBlock and store a new air block at the given location
-     * <p>
-     * <b>note</b> this does not if there are entities at this location
-     *
-     * @param worldLoc
-     *     The world location to check
-     *
-     * @return If the block at the given location is air.
-     */
-    public boolean isAirBlock(@NotNull Location worldLoc) {
-        return isAirBlock(worldLoc.x, worldLoc.y);
-    }
-
-    /**
-     * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist) this is faster
-     * than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as the {@link #getBlock(int, int,
-     * boolean)} method might create a Block and store a new air block at the given location.
-     * <p>
-     * If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent teleportation and
-     * other actions that depend on an empty space.
-     * <p>
-     * <b>note</b> this does not if there are entities at this location
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     *
-     * @return If the block at the given location is air.
-     */
-    public boolean isAirBlock(int worldX, int worldY) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
-        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk == null) {
-            //What should we return here? we don't really know as it does not exist.
-            //Return false to prevent teleportation and other actions that depend on an empty space.
-            return false;
-        }
-
-        Block b = chunk.getBlocks()[localX][localY];
-        return b == null || b.getMaterial() == Material.AIR;
-    }
-
-    public boolean canPassThrough(int worldX, int worldY) {
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
-        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk == null) {
-            //What should we return here? we don't really know as it does not exist.
-            //Return false to prevent teleportation and other actions that depend on an empty space.
-            return false;
-        }
-
-        Block b = chunk.getBlocks()[localX][localY];
-        return b == null || !b.getMaterial().isSolid();
-    }
-
-    /**
-     * Set all blocks in all cardinal directions around a given block to be updated. Given location not included
-     *
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     */
-    public void updateBlocksAround(int worldX, int worldY) {
-        for (Direction dir : Direction.CARDINAL) {
-            Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
-            if (rel instanceof TickingBlock tickingBlock) {
-                tickingBlock.setShouldTick(true);
-            }
-        }
-    }
-
-    /**
-     * Update all light sources currently loaded
-     */
-    public void updateLights() {
-        for (Chunk chunk : getLoadedChunks()) {
-            for (TickingBlock block : chunk.getTickingBlocks()) {
-                if (block instanceof LightBlock) {
-                    block.setShouldTick(true);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param worldX
-     *     The x coordinate from world view
-     * @param worldY
-     *     The y coordinate from world view
-     * @param raw
-     *
-     * @return The block at the given x and y
-     */
-    @Nullable
-    public Block getBlock(int worldX, int worldY, boolean raw) {
-
-        int chunkX = CoordUtil.worldToChunk(worldX);
-        int chunkY = CoordUtil.worldToChunk(worldY);
-
-        int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
-        int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
-
-        Chunk chunk = getChunk(chunkX, chunkY);
-        if (chunk == null) {
-            return null;
-        }
-        return chunk.getRawBlock(localX, localY);
-    }
-
-    /**
-     * @return If the given chunk is loaded in memory
-     */
-    public boolean isChunkLoaded(int chunkX, int chunkY) {
-        return isChunkLoaded(new Location(chunkX, chunkY));
-    }
-
-    /**
-     * @param chunkLoc
-     *     Chunk location in chunk coordinates
-     *
-     * @return If the given chunk is loaded in memory
-     */
-    public boolean isChunkLoaded(@NotNull Location chunkLoc) {
-        Chunk chunk = chunks.get(chunkLoc);
-        return chunk != null && chunk.isLoaded();
-    }
-
-    /**
-     * Unload and save all chunks in this world.
-     * <p>
-     * Must be called on main thread!
-     *
-     * @param force
-     *     If the chunks will be forced to unload
-     */
-    public void reload(boolean force) {
-        var wasNotPaused = !worldTicker.isPaused();
-        if (wasNotPaused) {
-            worldTicker.pause();
-        }
-        Main.inst().getScheduler().waitForTasks();
-
-        //remove all entities to speed up unloading
-        for (Entity entity : getEntities()) {
-            removeEntity(entity);
-        }
-        if (!entities.isEmpty() || !players.isEmpty()) {
-            throw new IllegalStateException("Failed to clear entities during reload");
-        }
-        //ok to include unloaded chunks as they will not cause an error when unloading again
-        for (Chunk chunk : chunks.values()) {
-            unloadChunk(chunk, force, false);
-        }
-        if (!chunks.isEmpty()) {
-            throw new IllegalStateException("Failed to clear chunks during reload");
-        }
-        synchronized (BOX2D_LOCK) {
-            var bodies = new Array<@NotNull Body>(false, worldBody.getBox2dWorld().getBodyCount());
-            worldBody.getBox2dWorld().getBodies(bodies);
-            if (!bodies.isEmpty()) {
-                Main.logger().error("BOX2D", "There existed dangling bodies after reload!");
-            }
-            for (Body body : bodies) {
-                worldBody.destroyBody(body);
-            }
-        }
-
-        render.reload();
-
-        load();
-
-        if (wasNotPaused) {
-            worldTicker.resume();
-        }
-        Main.logger().log("World", "World reloaded last save");
-    }
-
-    /**
-     * @return All currently loaded chunks
-     */
-    public Collection<Chunk> getLoadedChunks() {
-        return chunks.values().stream().filter(Chunk::isLoaded).collect(Collectors.toUnmodifiableSet());
-    }
-
-
-    /**
-     * Unload the given chunks and save it to disk
-     *
-     * @param chunk
-     *     The chunk to unload
-     */
-    public void unloadChunk(@Nullable Chunk chunk) {
-        unloadChunk(chunk, false, true);
-    }
-
-    /**
-     * Unload the given chunks and save it to disk
-     *
-     * @param chunk
-     *     The chunk to unload
-     * @param force
-     *     If the chunk will be forced to unload
-     * @param save
-     *     If the chunk will be saved
-     */
-    public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
-        if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
-            if (save) {
-                chunkLoader.save(chunk);
-            }
-            for (Entity entity : chunk.getEntities()) {
-                removeEntity(entity);
-            }
-            chunk.dispose();
-            chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
-        }
-    }
-
-    /**
-     * @param worldLoc
-     *     The world location of this chunk
-     *
-     * @return The chunk at the given world location
-     */
-    @Nullable
-    public Chunk getChunkFromWorld(@NotNull Location worldLoc) {
-        return getChunk(CoordUtil.worldToChunk(worldLoc));
-    }
-
-
-    public boolean containsEntity(@NotNull UUID uuid) {
-        return entities.containsKey(uuid);
-    }
-
-    @Nullable
-    public Entity getEntity(@NotNull UUID uuid) {
-        return entities.get(uuid);
-    }
-
-    /**
-     * Add the given entity to entities in the world.
-     * <b>NOTE</b> this is NOT automatically done when creating a new entity instance.
-     *
-     * @param entity
-     *     The entity to add
-     */
-    public void addEntity(@NotNull Entity entity) { addEntity(entity, true); }
-
-    /**
-     * Add the given entity to entities in the world.
-     * <b>NOTE</b> this is NOT automatically done when creating a new entity instance.
-     *
-     * @param entity
-     *     The entity to add
-     * @param loadChunk
-     */
-    public void addEntity(@NotNull Entity entity, boolean loadChunk) {
-        if (entities.values().stream().anyMatch(it -> it == entity)) {
-            Main.logger().error("World", "Tried to add entity twice to world " + entity.simpleName() + " " + entity.hudDebug());
-            return;
-        }
-        if (containsEntity(entity.getUuid())) {
-            Main.logger().error("World", "Tried to add duplicate entity to world " + entity.simpleName() + " " + entity.hudDebug());
-            removeEntity(entity);
-            return;
-        }
-
-        if (loadChunk) {
-            //Load chunk of entity
-            var chunk = getChunk(CoordUtil.worldToChunk(entity.getBlockX()), CoordUtil.worldToChunk(entity.getBlockY()));
-            if (chunk == null) {
-                //Failed to load chunk, remove entity
-                Main.logger().error("World", "Failed to add entity to world, as its spawning chunk could not be loaded");
-                removeEntity(entity);
-                return;
-            }
-        }
-
-        entities.put(entity.getUuid(), entity);
-        if (entity instanceof Player player) {
-            players.put(player.getUuid(), player);
-        }
-
-        if (Main.isServer()) {
-            Main.inst().getScheduler().executeAsync(() -> {
+    if (Main.isServer()) {
+      Main.inst()
+          .getScheduler()
+          .executeAsync(
+              () -> {
                 PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundSpawnEntity(entity), null);
-            });
+              });
+    }
+  }
+
+  /**
+   * Remove and disposes the given entity.
+   *
+   * <p>Even if the given entity is not a part of this world, it will be disposed
+   *
+   * @param entity The entity to remove
+   * @throws IllegalArgumentException if the given entity is not part of this world
+   */
+  public void removeEntity(@NotNull Entity entity) {
+    var existed = entities.remove(entity.getUuid()) != null;
+    if (entity instanceof Player) {
+      players.remove(entity.getUuid());
+    }
+
+    if (!entity.isInvalid()) {
+      // even if we do not know of this entity, dispose it
+      entity.dispose();
+    }
+    if (Main.isServer() && existed) {
+      Main.inst()
+          .getScheduler()
+          .executeAsync(
+              () ->
+                  PacketExtraKt.broadcast(
+                      null, PacketExtraKt.clientBoundDespawnEntity(entity, UNKNOWN), null));
+    }
+  }
+
+  /**
+   * @param worldX X center (center of each block
+   * @param worldY Y center
+   * @param radius Radius to be equal or less from center
+   * @param raw If blocks should be generated, if false this will return no null blocks
+   * @return Set of blocks within the given radius
+   */
+  @NotNull
+  public ObjectSet<Block> getBlocksWithin(float worldX, float worldY, float radius, boolean raw) {
+    Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number");
+    ObjectSet<Block> blocks = new ObjectSet<>();
+    float radiusSquare = radius * radius;
+    for (Block block : getBlocksAABB(worldX, worldY, radius, radius, raw)) {
+      if (abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f))
+          <= radiusSquare) {
+        blocks.add(block);
+      }
+    }
+
+    return blocks;
+  }
+
+  @NotNull
+  public Array<Block> getBlocksAABB(
+      float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
+    int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
+    Array<Block> blocks = new Array<>(true, capacity);
+    int x = MathUtils.floor(worldX - offsetX);
+    float maxX = worldX + offsetX;
+    float maxY = worldY + offsetY;
+    for (; x <= maxX; x++) {
+      for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
+        Block b = getBlock(x, y, raw);
+        if (b == null) {
+          continue;
         }
+        blocks.add(b);
+      }
+    }
+    return blocks;
+  }
+
+  /**
+   * @param worldX The x coordinate in world view
+   * @param worldY The y coordinate in world view
+   * @return The first entity found within the given coordinates
+   */
+  @Nullable
+  public Entity getEntity(float worldX, float worldY) {
+    for (Entity entity : entities.values()) {
+      Vector2 pos = entity.getPosition();
+      if (Util.isBetween(
+              pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth())
+          && //
+          Util.isBetween(
+              pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
+        return entity;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param worldX The x coordinate in world view
+   * @param worldY The y coordinate in world view
+   * @return The material at the given location
+   */
+  @NotNull
+  public Material getMaterial(int worldX, int worldY) {
+    Block block = getBlock(worldX, worldY, true);
+    if (block != null) {
+      return block.getMaterial();
     }
 
-    /**
-     * Remove and disposes the given entity.
-     * <p>
-     * Even if the given entity is not a part of this world, it will be disposed
-     *
-     * @param entity
-     *     The entity to remove
-     *
-     * @throws IllegalArgumentException
-     *     if the given entity is not part of this world
-     */
-    public void removeEntity(@NotNull Entity entity) {
-        var existed = entities.remove(entity.getUuid()) != null;
-        if (entity instanceof Player) {
-            players.remove(entity.getUuid());
-        }
+    for (Entity entity : getEntities(worldX, worldY)) {
+      if (entity instanceof MaterialEntity materialEntity) {
+        return materialEntity.getMaterial();
+      }
+    }
+    return Material.AIR;
+  }
 
-        if (!entity.isInvalid()) {
-            //even if we do not know of this entity, dispose it
-            entity.dispose();
-        }
-        if (Main.isServer() && existed) {
-            Main.inst().getScheduler().executeAsync(() -> PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundDespawnEntity(entity, UNKNOWN), null));
-        }
+  @Override
+  public void resize(int width, int height) {
+    if (Settings.client) {
+      render.resize(width, height);
+    }
+  }
+
+  @Nullable
+  public WorldInputHandler getInput() {
+    return input;
+  }
+
+  /** @return Backing map of chunks */
+  public @NotNull ConcurrentMap<Location, Chunk> getChunks() {
+    return chunks;
+  }
+
+  /** @return The random seed of this world */
+  public long getSeed() {
+    return seed;
+  }
+
+  /** @return The name of the world */
+  public @NotNull String getName() {
+    return name;
+  }
+
+  public void setName(@NotNull String name) {
+    this.name = name;
+  }
+
+  /** @return Unique identification of this world */
+  public @NotNull UUID getUuid() {
+    return uuid;
+  }
+
+  /** @return The current world tick */
+  public long getTick() {
+    return worldTicker.getTickId();
+  }
+
+  @NotNull
+  public WorldRender getRender() {
+    return render;
+  }
+
+  @NotNull
+  public Ticker getWorldTicker() {
+    return worldTicker;
+  }
+
+  /** @return the current entities */
+  public @NotNull Collection<Entity> getEntities() {
+    return entities.values();
+  }
+
+  public @NotNull Collection<Player> getPlayers() {
+    return players.values();
+  }
+
+  public boolean hasPlayer(@NotNull UUID uuid) {
+    return players.containsKey(uuid);
+  }
+
+  public void removePlayer(@NotNull UUID uuid) {
+    final Player player = players.get(uuid);
+    if (player != null) {
+      removeEntity(player);
+    }
+  }
+
+  @Nullable
+  public Player getPlayer(@Nullable UUID uuid) {
+    return players.get(uuid);
+  }
+
+  public @NotNull ChunkLoader getChunkLoader() {
+    return chunkLoader;
+  }
+
+  @NotNull
+  public WorldBody getWorldBody() {
+    return worldBody;
+  }
+
+  public @NotNull WorldTime getWorldTime() {
+    return worldTime;
+  }
+
+  public Location getSpawn() {
+    return spawn;
+  }
+
+  public void setSpawn(Location spawn) {
+    this.spawn = spawn;
+  }
+
+  @Override
+  public int hashCode() {
+    return uuid.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    /**
-     * @param worldX
-     *     X center (center of each block
-     * @param worldY
-     *     Y center
-     * @param radius
-     *     Radius to be equal or less from center
-     * @param raw
-     *     If blocks should be generated, if false this will return no null blocks
-     *
-     * @return Set of blocks within the given radius
-     */
-    @NotNull
-    public ObjectSet<Block> getBlocksWithin(float worldX, float worldY, float radius, boolean raw) {
-        Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number");
-        ObjectSet<Block> blocks = new ObjectSet<>();
-        float radiusSquare = radius * radius;
-        for (Block block : getBlocksAABB(worldX, worldY, radius, radius, raw)) {
-            if (abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f)) <= radiusSquare) {
-                blocks.add(block);
-            }
-        }
+    World world = (World) o;
+    return uuid.equals(world.uuid);
+  }
 
-        return blocks;
+  @Override
+  public String toString() {
+    return "World{" + "name='" + name + '\'' + ", uuid=" + uuid + '}';
+  }
+
+  @Override
+  public void dispose() {
+    getWorldTicker().stop();
+    final WorldInputHandler input = getInput();
+    if (input != null) {
+      input.dispose();
     }
-
-    @NotNull
-    public Array<Block> getBlocksAABB(float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
-        int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
-        Array<Block> blocks = new Array<>(true, capacity);
-        int x = MathUtils.floor(worldX - offsetX);
-        float maxX = worldX + offsetX;
-        float maxY = worldY + offsetY;
-        for (; x <= maxX; x++) {
-            for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
-                Block b = getBlock(x, y, raw);
-                if (b == null) {
-                    continue;
-                }
-                blocks.add(b);
-            }
-        }
-        return blocks;
+    render.dispose();
+    if (this.input != null) {
+      this.input.dispose();
     }
-
-    /**
-     * @param worldX
-     *     The x coordinate in world view
-     * @param worldY
-     *     The y coordinate in world view
-     *
-     * @return The first entity found within the given coordinates
-     */
-    @Nullable
-    public Entity getEntity(float worldX, float worldY) {
-        for (Entity entity : entities.values()) {
-            Vector2 pos = entity.getPosition();
-            if (Util.isBetween(pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth()) && //
-                Util.isBetween(pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
-                return entity;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param worldX
-     *     The x coordinate in world view
-     * @param worldY
-     *     The y coordinate in world view
-     *
-     * @return The material at the given location
-     */
-    @NotNull
-    public Material getMaterial(int worldX, int worldY) {
-        Block block = getBlock(worldX, worldY, true);
-        if (block != null) {
-            return block.getMaterial();
-        }
-
-        for (Entity entity : getEntities(worldX, worldY)) {
-            if (entity instanceof MaterialEntity materialEntity) {
-                return materialEntity.getMaterial();
-            }
-        }
-        return Material.AIR;
-    }
-
-
-    @Override
-    public void resize(int width, int height) {
-        if (Settings.client) {
-            render.resize(width, height);
-        }
-    }
-
-    @Nullable
-    public WorldInputHandler getInput() {
-        return input;
-    }
-
-    /**
-     * @return Backing map of chunks
-     */
-    public @NotNull ConcurrentMap<Location, Chunk> getChunks() {
-        return chunks;
-    }
-
-
-    /**
-     * @return The random seed of this world
-     */
-    public long getSeed() {
-        return seed;
-    }
-
-    /**
-     * @return The name of the world
-     */
-    public @NotNull String getName() {
-        return name;
-    }
-
-    public void setName(@NotNull String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return Unique identification of this world
-     */
-    public @NotNull UUID getUuid() {
-        return uuid;
-    }
-
-    /**
-     * @return The current world tick
-     */
-    public long getTick() {
-        return worldTicker.getTickId();
-    }
-
-    @NotNull
-    public WorldRender getRender() {
-        return render;
-    }
-
-    @NotNull
-    public Ticker getWorldTicker() {
-        return worldTicker;
-    }
-
-    /**
-     * @return the current entities
-     */
-    public @NotNull Collection<Entity> getEntities() {
-        return entities.values();
-    }
-
-    public @NotNull Collection<Player> getPlayers() {
-        return players.values();
-    }
-
-    public boolean hasPlayer(@NotNull UUID uuid) {
-        return players.containsKey(uuid);
-    }
-
-    public void removePlayer(@NotNull UUID uuid) {
-        final Player player = players.get(uuid);
-        if (player != null) {
-            removeEntity(player);
-        }
-    }
-
-    @Nullable
-    public Player getPlayer(@Nullable UUID uuid) {
-        return players.get(uuid);
-    }
-
-    public @NotNull ChunkLoader getChunkLoader() {
-        return chunkLoader;
-    }
-
-    @NotNull
-    public WorldBody getWorldBody() {
-        return worldBody;
-    }
-
-    public @NotNull WorldTime getWorldTime() {
-        return worldTime;
-    }
-
-    public Location getSpawn() {
-        return spawn;
-    }
-
-    public void setSpawn(Location spawn) {
-        this.spawn = spawn;
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        World world = (World) o;
-        return uuid.equals(world.uuid);
-    }
-
-    @Override
-    public String toString() {
-        return "World{" + "name='" + name + '\'' + ", uuid=" + uuid + '}';
-    }
-
-    @Override
-    public void dispose() {
-        getWorldTicker().stop();
-        final WorldInputHandler input = getInput();
-        if (input != null) {
-            input.dispose();
-        }
-        render.dispose();
-        if (this.input != null) {
-            this.input.dispose();
-        }
-    }
-
+  }
 }

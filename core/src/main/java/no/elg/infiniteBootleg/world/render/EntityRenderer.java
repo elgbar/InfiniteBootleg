@@ -11,25 +11,26 @@ import org.jetbrains.annotations.NotNull;
 
 public class EntityRenderer implements Renderer {
 
-    private final WorldRender worldRender;
+  private final WorldRender worldRender;
 
-    public EntityRenderer(@NotNull WorldRender worldRender) {
-        this.worldRender = worldRender;
+  public EntityRenderer(@NotNull WorldRender worldRender) {
+    this.worldRender = worldRender;
+  }
+
+  @Override
+  public void render() {
+    Batch batch = worldRender.getBatch();
+    final WorldBody worldBody = worldRender.getWorld().getWorldBody();
+    float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
+    float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
+    for (Entity entity : worldRender.getWorld().getEntities()) {
+      TextureRegion textureRegion = entity.getTextureRegion();
+      if (textureRegion == null) {
+        continue;
+      }
+      float x = (entity.getPosition().x - entity.getHalfBox2dWidth()) * BLOCK_SIZE + worldOffsetX;
+      float y = (entity.getPosition().y - entity.getHalfBox2dHeight()) * BLOCK_SIZE + worldOffsetY;
+      batch.draw(textureRegion, x, y, entity.getWidth(), entity.getHeight());
     }
-
-
-    @Override
-    public void render() {
-        Batch batch = worldRender.getBatch();
-        final WorldBody worldBody = worldRender.getWorld().getWorldBody();
-        float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
-        float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
-        for (Entity entity : worldRender.getWorld().getEntities()) {
-            TextureRegion textureRegion = entity.getTextureRegion();
-            if (textureRegion == null) { continue; }
-            float x = (entity.getPosition().x - entity.getHalfBox2dWidth()) * BLOCK_SIZE + worldOffsetX;
-            float y = (entity.getPosition().y - entity.getHalfBox2dHeight()) * BLOCK_SIZE + worldOffsetY;
-            batch.draw(textureRegion, x, y, entity.getWidth(), entity.getHeight());
-        }
-    }
+  }
 }

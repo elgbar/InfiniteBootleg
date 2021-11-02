@@ -7,35 +7,33 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public abstract class AbstractEntityControls extends InputAdapter implements EntityControls {
 
-    private final WorldRender worldRender;
-    private final LivingEntity entity;
+  private final WorldRender worldRender;
+  private final LivingEntity entity;
 
-    public AbstractEntityControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
-        this.worldRender = worldRender;
-        this.entity = entity;
-    }
+  public AbstractEntityControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
+    this.worldRender = worldRender;
+    this.entity = entity;
+  }
 
-    @Override
-    @NotNull
-    public LivingEntity getControlled() {
-        return entity;
-    }
+  @Override
+  @NotNull
+  public LivingEntity getControlled() {
+    return entity;
+  }
 
-    public WorldRender getWorldRender() {
-        return worldRender;
-    }
+  public WorldRender getWorldRender() {
+    return worldRender;
+  }
 
-    public World getWorld() {
-        return worldRender.getWorld();
-    }
+  public World getWorld() {
+    return worldRender.getWorld();
+  }
 
-    @Override
-    public void dispose() {
-        ClientMain.inst().getInputMultiplexer().removeProcessor(this);
-    }
+  @Override
+  public void dispose() {
+    ClientMain.inst().getInputMultiplexer().removeProcessor(this);
+  }
 }

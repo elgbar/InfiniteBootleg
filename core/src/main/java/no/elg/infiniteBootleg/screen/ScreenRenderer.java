@@ -15,67 +15,70 @@ import no.elg.infiniteBootleg.util.Resizable;
 
 public class ScreenRenderer implements Disposable, Resizable {
 
-    public static final int FONT_SIZE = 20;
+  public static final int FONT_SIZE = 20;
 
-    private final int spacing;
-    private final BitmapFont font;
-    private final SpriteBatch batch;
+  private final int spacing;
+  private final BitmapFont font;
+  private final SpriteBatch batch;
 
-    public ScreenRenderer() {
+  public ScreenRenderer() {
 
-        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
-        final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = FONT_SIZE * SCALE;
+    final FreeTypeFontGenerator generator =
+        new FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
+    final FreeTypeFontGenerator.FreeTypeFontParameter parameter =
+        new FreeTypeFontGenerator.FreeTypeFontParameter();
+    parameter.size = FONT_SIZE * SCALE;
 
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        font = generator.generateFont(parameter);
+    parameter.minFilter = Texture.TextureFilter.Linear;
+    font = generator.generateFont(parameter);
 
-        spacing = (FONT_SIZE * SCALE) / 2;
+    spacing = (FONT_SIZE * SCALE) / 2;
 
-        batch = new SpriteBatch();
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-    }
+    batch = new SpriteBatch();
+    batch.setProjectionMatrix(
+        new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+  }
 
-    public void drawTop(String text, float line) {
-        font.draw(batch, text, spacing, Gdx.graphics.getHeight() - spacing * line);
-    }
+  public void drawTop(String text, float line) {
+    font.draw(batch, text, spacing, Gdx.graphics.getHeight() - spacing * line);
+  }
 
-    public void drawBottom(String text, float line) {
-        font.draw(batch, text, spacing, spacing * (line + 1f));
-    }
+  public void drawBottom(String text, float line) {
+    font.draw(batch, text, spacing, spacing * (line + 1f));
+  }
 
-    public void begin() {
-        batch.begin();
-    }
+  public void begin() {
+    batch.begin();
+  }
 
-    public void end() {
-        batch.end();
-    }
+  public void end() {
+    batch.end();
+  }
 
-    public SpriteBatch getBatch() {
-        return batch;
-    }
+  public SpriteBatch getBatch() {
+    return batch;
+  }
 
-    public BitmapFont getFont() {
-        return font;
-    }
+  public BitmapFont getFont() {
+    return font;
+  }
 
-    public void resetFontColor() {
-        font.setColor(Color.WHITE);
-    }
+  public void resetFontColor() {
+    font.setColor(Color.WHITE);
+  }
 
-    public int getSpacing() {
-        return spacing;
-    }
+  public int getSpacing() {
+    return spacing;
+  }
 
-    @Override
-    public void dispose() {
-        batch.dispose();
-        font.dispose();
-    }
+  @Override
+  public void dispose() {
+    batch.dispose();
+    font.dispose();
+  }
 
-    @Override
-    public void resize(int width, int height) {
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
-    }
+  @Override
+  public void resize(int width, int height) {
+    batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, width, height));
+  }
 }

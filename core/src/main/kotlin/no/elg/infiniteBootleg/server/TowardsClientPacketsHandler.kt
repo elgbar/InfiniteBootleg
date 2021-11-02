@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.server
 
-import java.util.UUID
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -32,6 +31,7 @@ import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.subgrid.Entity
+import java.util.UUID
 
 /**
  * @author Elg

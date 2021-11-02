@@ -1,13 +1,8 @@
 package no.elg.infiniteBootleg;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public interface Updatable {
 
-    /**
-     * Update the state, might be called every frame
-     */
-    void update();
-
+  /** Update the state, might be called every frame */
+  void update();
 }

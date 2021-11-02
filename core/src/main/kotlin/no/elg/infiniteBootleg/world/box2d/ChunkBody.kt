@@ -28,7 +28,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
   @field:Volatile
   private var disposed = false
 
-  //make there is only one delayed check for this chunk
+  // make there is only one delayed check for this chunk
   @field:Volatile
   private var unsureFixture = false
 
@@ -73,7 +73,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
         for ((dir, edgeDelta) in EDGE_DEF) {
 
-          //FIXME only check the chunk if the local coordinates are outside this chunk
+          // FIXME only check the chunk if the local coordinates are outside this chunk
           if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && !chunk.world.isChunkLoaded(
               CoordUtil.worldToChunk(worldX + dir.dx),
               CoordUtil.worldToChunk(worldY + dir.dy)
@@ -91,12 +91,12 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
             relChunk.blocks[relOffsetX][relOffsetY]
           }
 
-          if (rel == null
-            || !rel.material.isSolid
-            || dir == NORTH && localY == CHUNK_SIZE - 1 //always render top of chunk
-            || dir == EAST && localX == CHUNK_SIZE - 1 //and the east side
-            || dir == WEST && localX == 0 //and the west side
-            || (!rel.material.blocksLight() && block.material.blocksLight()) //prevent leaking of light
+          if (rel == null ||
+            !rel.material.isSolid ||
+            dir == NORTH && localY == CHUNK_SIZE - 1 || // always render top of chunk
+            dir == EAST && localX == CHUNK_SIZE - 1 || // and the east side
+            dir == WEST && localX == 0 || // and the west side
+            (!rel.material.blocksLight() && block.material.blocksLight()) // prevent leaking of light
           ) {
 
             edgeShape.set(
@@ -108,7 +108,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
             val fix = synchronized(BOX2D_LOCK) {
               if (!tmpBody.isActive) {
-                //tmp body was disposed somewhere else (probably in a reload)
+                // tmp body was disposed somewhere else (probably in a reload)
                 return
               }
               tmpBody.createFixture(edgeShape, 0f)
@@ -126,7 +126,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
       destroyCurrentBody()
       box2dBody = tmpBody
 
-      //we got disposed while creating the new chunk fixture, this is the easiest cleanup solution
+      // we got disposed while creating the new chunk fixture, this is the easiest cleanup solution
       if (disposed) {
         destroyCurrentBody()
         return
@@ -138,7 +138,7 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     }
     var potentiallyDirty = false
 
-    //TODO Try to optimize this (ie select what directions to recalculate)
+    // TODO Try to optimize this (ie select what directions to recalculate)
     for (direction in Direction.values()) {
       val relChunk: Location = Location.relative(chunk.chunkX, chunk.chunkY, direction)
       if (chunk.world.isChunkLoaded(relChunk)) {
@@ -172,55 +172,55 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
         }
       }
     }, if (initial) INITIAL_UNSURE_FIXTURE_RELOAD_DELAY else UNSURE_FIXTURE_RELOAD_DELAY)
-  }
+    }
 
-  private fun destroyCurrentBody() {
-    synchronized(BOX2D_LOCK) {
-      val currentBody = box2dBody ?: return
-      chunk.world.worldBody.destroyBody(currentBody)
-      box2dBody = null
+    private fun destroyCurrentBody() {
+      synchronized(BOX2D_LOCK) {
+        val currentBody = box2dBody ?: return
+        chunk.world.worldBody.destroyBody(currentBody)
+        box2dBody = null
+      }
+    }
+
+    override fun dispose() {
+      synchronized(BOX2D_LOCK) {
+        if (disposed) return
+        disposed = true
+        destroyCurrentBody()
+      }
+    }
+
+    fun hasBody(): Boolean = box2dBody != null
+
+    companion object {
+      const val INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L
+      const val UNSURE_FIXTURE_RELOAD_DELAY = 100L
+
+      /**
+       * represent the direction to look and if no solid block there how to create a fixture at that location (ie
+       * two relative vectors)
+       * the value of the pair is as follows `dxStart`, `dyStart`, `dxEnd`, `dyEnd`
+       * this can be visually represented with a cube:
+       *
+       * ```
+       * (0,1)---(1,1)
+       *  |         |
+       *  |         |
+       *  |         |
+       *  |         |
+       * (0,0)---(1,0)
+       * ```
+       *
+       * * Where `d` stands for delta
+       * * `x`/`y` is if this is the `x` or `y` component of the coordinate
+       * * `end`/`start` is if this is the start or end vector
+       */
+      val EDGE_DEF: Array<Pair<Direction, ByteArray>> = arrayOf(
+        NORTH to byteArrayOf(0, 1, 1, 1),
+        EAST to byteArrayOf(1, 0, 1, 1),
+        SOUTH to byteArrayOf(0, 0, 1, 0),
+        WEST to byteArrayOf(0, 0, 0, 1)
+      )
     }
   }
-
-  override fun dispose() {
-    synchronized(BOX2D_LOCK) {
-      if (disposed) return
-      disposed = true
-      destroyCurrentBody()
-    }
-  }
-
-  fun hasBody(): Boolean = box2dBody != null
-
-
-  companion object {
-    const val INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L
-    const val UNSURE_FIXTURE_RELOAD_DELAY = 100L
-
-    /**
-     * represent the direction to look and if no solid block there how to create a fixture at that location (ie
-     * two relative vectors)
-     * the value of the pair is as follows `dxStart`, `dyStart`, `dxEnd`, `dyEnd`
-     * this can be visually represented with a cube:
-     *
-     * ```
-     * (0,1)---(1,1)
-     *  |         |
-     *  |         |
-     *  |         |
-     *  |         |
-     * (0,0)---(1,0)
-     * ```
-     *
-     * * Where `d` stands for delta
-     * * `x`/`y` is if this is the `x` or `y` component of the coordinate
-     * * `end`/`start` is if this is the start or end vector
-     */
-    val EDGE_DEF: Array<Pair<Direction, ByteArray>> = arrayOf(
-      NORTH to byteArrayOf(0, 1, 1, 1),
-      EAST to byteArrayOf(1, 0, 1, 1),
-      SOUTH to byteArrayOf(0, 0, 1, 0),
-      WEST to byteArrayOf(0, 0, 0, 1)
-    )
-  }
-}
+  

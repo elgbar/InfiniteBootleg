@@ -5,13 +5,12 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 
 public enum EntityType {
+  FALLING_BLOCK(FallingBlockEntity.class),
+  PLAYER(Player.class);
 
-    FALLING_BLOCK(FallingBlockEntity.class),
-    PLAYER(Player.class);
+  private final Class<? extends Entity> impl;
 
-    private final Class<? extends Entity> impl;
-
-    EntityType(@NotNull Class<? extends Entity> impl) {
-        this.impl = impl;
-    }
+  EntityType(@NotNull Class<? extends Entity> impl) {
+    this.impl = impl;
+  }
 }

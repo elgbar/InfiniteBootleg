@@ -20,87 +20,91 @@ import no.elg.infiniteBootleg.world.Chunk;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public class ChunkRenderer implements Renderer, Disposable {
 
-    private final SpriteBatch batch;
-    private final SetUniqueList<Chunk> renderQueue;
-    private final WorldRender worldRender;
+  private final SpriteBatch batch;
+  private final SetUniqueList<Chunk> renderQueue;
+  private final WorldRender worldRender;
 
-    //current rendering chunk
-    private Chunk curr;
+  // current rendering chunk
+  private Chunk curr;
 
-    private static final Object QUEUE_LOCK = new Object();
+  private static final Object QUEUE_LOCK = new Object();
 
-    public ChunkRenderer(@NotNull WorldRender worldRender) {
-        this.worldRender = worldRender;
-        batch = new SpriteBatch();
-        //use linked list for fast adding to end and beginning
-        List<Chunk> chunkList = new LinkedList<>();
-        renderQueue = SetUniqueList.setUniqueList(chunkList);
-        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
+  public ChunkRenderer(@NotNull WorldRender worldRender) {
+    this.worldRender = worldRender;
+    batch = new SpriteBatch();
+    // use linked list for fast adding to end and beginning
+    List<Chunk> chunkList = new LinkedList<>();
+    renderQueue = SetUniqueList.setUniqueList(chunkList);
+    batch.setProjectionMatrix(
+        new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
+  }
+
+  public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
+    synchronized (QUEUE_LOCK) {
+      // do not queue the chunk we're currently rendering
+      if (chunk != curr && !renderQueue.contains(chunk)) {
+        Main.inst().getScheduler().executeSync(() -> chunk.getChunkBody().update(true));
+        if (prioritize) {
+          renderQueue.add(0, chunk);
+        } else {
+          renderQueue.add(chunk);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void render() {
+    // get the first valid chunk to render
+    Chunk chunk;
+    synchronized (QUEUE_LOCK) {
+      do {
+        if (renderQueue.isEmpty()) {
+          return;
+        } // nothing to render
+        chunk = renderQueue.remove(0);
+      } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
+      curr = chunk;
     }
 
-    public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
-        synchronized (QUEUE_LOCK) {
-            //do not queue the chunk we're currently rendering
-            if (chunk != curr && !renderQueue.contains(chunk)) {
-                Main.inst().getScheduler().executeSync(() -> chunk.getChunkBody().update(true));
-                if (prioritize) { renderQueue.add(0, chunk); }
-                else { renderQueue.add(chunk); }
-            }
+    FrameBuffer fbo = chunk.getFbo();
+
+    // this is the main render function
+    Block[][] blocks = chunk.getBlocks();
+    fbo.begin();
+    batch.begin();
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+      for (int y = 0; y < CHUNK_SIZE; y++) {
+        Block block = blocks[x][y];
+        if (block == null || block.getMaterial() == AIR || block.getMaterial().isEntity()) {
+          continue;
         }
+        int dx = block.getLocalX() * BLOCK_SIZE;
+        int dy = block.getLocalY() * BLOCK_SIZE;
+
+        batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+      }
     }
 
-    @Override
-    public void render() {
-        //get the first valid chunk to render
-        Chunk chunk;
-        synchronized (QUEUE_LOCK) {
-            do {
-                if (renderQueue.isEmpty()) { return; } //nothing to render
-                chunk = renderQueue.remove(0);
-            } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
-            curr = chunk;
-        }
+    batch.end();
+    fbo.end();
+    Main.inst().getScheduler().executeAsync(worldRender::update);
 
-        FrameBuffer fbo = chunk.getFbo();
-
-        // this is the main render function
-        Block[][] blocks = chunk.getBlocks();
-        fbo.begin();
-        batch.begin();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                Block block = blocks[x][y];
-                if (block == null || block.getMaterial() == AIR || block.getMaterial().isEntity()) {
-                    continue;
-                }
-                int dx = block.getLocalX() * BLOCK_SIZE;
-                int dy = block.getLocalY() * BLOCK_SIZE;
-
-                batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
-            }
-        }
-
-        batch.end();
-        fbo.end();
-        Main.inst().getScheduler().executeAsync(worldRender::update);
-
-        synchronized (QUEUE_LOCK) {
-            curr = null;
-        }
+    synchronized (QUEUE_LOCK) {
+      curr = null;
     }
+  }
 
-    @Override
-    public void dispose() {
-        batch.dispose();
-        synchronized (QUEUE_LOCK) {
-            renderQueue.clear();
-        }
+  @Override
+  public void dispose() {
+    batch.dispose();
+    synchronized (QUEUE_LOCK) {
+      renderQueue.clear();
     }
+  }
 }

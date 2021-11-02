@@ -17,5 +17,4 @@ class FallingBlock(
 ) : TickingBlock(world, chunk, localX, localY, material), FallingTrait {
 
   override var falling = false
-  
 }

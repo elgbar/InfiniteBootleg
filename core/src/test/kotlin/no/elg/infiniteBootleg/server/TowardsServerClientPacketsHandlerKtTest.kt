@@ -5,7 +5,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
-import java.util.UUID
 import no.elg.infiniteBootleg.TestGraphic
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.FULL_SERVER
@@ -14,11 +13,11 @@ import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.PR
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 /**
  * @author Elg
  */
-
 
 class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
 
@@ -40,12 +39,10 @@ class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
 
   @Test
   fun updateChunk() {
-
   }
 
   @Test
   fun startGame() {
-
   }
 
   @Test

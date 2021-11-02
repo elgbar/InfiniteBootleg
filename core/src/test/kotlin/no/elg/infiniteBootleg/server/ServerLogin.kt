@@ -9,6 +9,5 @@ import org.junit.jupiter.api.Test
 class ServerLogin : TestGraphic() {
   @Test
   internal fun login() {
-    
   }
 }

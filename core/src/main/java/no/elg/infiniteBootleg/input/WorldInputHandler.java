@@ -29,191 +29,178 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
-    public static final float SCROLL_SPEED = 0.25f;
-    public static final float CAMERA_LERP = 2.5f;
-    public static final float LERP_CUTOFF = 5f;
-    private static final int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
-    private final WorldRender worldRender;
-    @Nullable
-    private Entity following;
-    private boolean lockedOn = true;
+  public static final float SCROLL_SPEED = 0.25f;
+  public static final float CAMERA_LERP = 2.5f;
+  public static final float LERP_CUTOFF = 5f;
+  private static final int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
+  private final WorldRender worldRender;
+  @Nullable private Entity following;
+  private boolean lockedOn = true;
 
-    public WorldInputHandler(@NotNull WorldRender world) {
-        worldRender = world;
+  public WorldInputHandler(@NotNull WorldRender world) {
+    worldRender = world;
+  }
+
+  @Override
+  public boolean keyDown(int keycode) {
+    if (Main.inst().getConsole().isVisible() || Main.isMultiplayer() && keycode != F3) {
+      return false;
     }
-
-    @Override
-    public boolean keyDown(int keycode) {
-        if (Main.inst().getConsole().isVisible() || Main.isMultiplayer() && keycode != F3) {
-            return false;
+    World world = ClientMain.inst().getWorld();
+    switch (keycode) {
+      case F3:
+        Screen screen = ClientMain.inst().getScreen();
+        if (screen instanceof WorldScreen worldScreen) {
+          HUDRenderer hud = worldScreen.getHud();
+          if (hud.getModus() == HUDModus.DEBUG) {
+            hud.setModus(HUDModus.NORMAL);
+          } else {
+            hud.setModus(HUDModus.DEBUG);
+          }
         }
-        World world = ClientMain.inst().getWorld();
-        switch (keycode) {
-            case F3:
-                Screen screen = ClientMain.inst().getScreen();
-                if (screen instanceof WorldScreen worldScreen) {
-                    HUDRenderer hud = worldScreen.getHud();
-                    if (hud.getModus() == HUDModus.DEBUG) {
-                        hud.setModus(HUDModus.NORMAL);
-                    }
-                    else {
-                        hud.setModus(HUDModus.DEBUG);
-                    }
-                }
-                break;
-            case F5:
-                world.save();
-                break;
-            case F9:
-                world.reload(true);
-                break;
-            case F12:
-                Ticker ticker = world.getWorldTicker();
-                if (ticker.isPaused()) {
-                    ticker.resume();
-                    Main.logger().log("World", "Ticker resumed by F12");
-                }
-                else {
-                    ticker.pause();
-                    Main.logger().log("World", "Ticker paused by F12");
-                }
-                break;
-            default:
-                return false;
+        break;
+      case F5:
+        world.save();
+        break;
+      case F9:
+        world.reload(true);
+        break;
+      case F12:
+        Ticker ticker = world.getWorldTicker();
+        if (ticker.isPaused()) {
+          ticker.resume();
+          Main.logger().log("World", "Ticker resumed by F12");
+        } else {
+          ticker.pause();
+          Main.logger().log("World", "Ticker paused by F12");
         }
-        return true;
+        break;
+      default:
+        return false;
+    }
+    return true;
+  }
+
+  @Override
+  public boolean scrolled(float amountX, float amountY) {
+    if (Main.inst().getConsole().isVisible()) {
+      return false;
+    }
+    OrthographicCamera camera = worldRender.getCamera();
+    camera.zoom += ((amountX + amountY) / 2) * SCROLL_SPEED;
+    if (camera.zoom < WorldRender.MIN_ZOOM) {
+      camera.zoom = WorldRender.MIN_ZOOM;
+    } else if (camera.zoom > WorldRender.MAX_ZOOM) {
+      camera.zoom = WorldRender.MAX_ZOOM;
+    }
+    worldRender.update();
+    return true;
+  }
+
+  public World getWorld() {
+    return worldRender.getWorld();
+  }
+
+  @Override
+  public void dispose() {
+    ClientMain.inst().getInputMultiplexer().removeProcessor(this);
+  }
+
+  /** @return We are following a non-null, valid target, and is locked on */
+  private boolean hasValidLockOn() {
+    return following != null && !following.isInvalid() && lockedOn;
+  }
+
+  private void cameraFollowUpdate() {
+    OrthographicCamera camera = worldRender.getCamera();
+    if (hasValidLockOn()) {
+      assert following != null;
+      final Vector2 position = following.getPhysicsPosition();
+      float x = position.x * Block.BLOCK_SIZE;
+      float y = position.y * Block.BLOCK_SIZE;
+
+      float dx = (x - camera.position.x) * CAMERA_LERP;
+      float dy = (y - camera.position.y) * CAMERA_LERP;
+
+      if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
+        camera.position.x += dx * Gdx.graphics.getDeltaTime();
+        camera.position.y += dy * Gdx.graphics.getDeltaTime();
+      }
+      worldRender.update();
+    }
+  }
+
+  private void teleportCamera() {
+    OrthographicCamera camera = worldRender.getCamera();
+    if (hasValidLockOn()) {
+      assert following != null;
+      final Vector2 position = following.getPhysicsPosition();
+
+      camera.position.x = position.x * Block.BLOCK_SIZE;
+      camera.position.y = position.y * Block.BLOCK_SIZE;
+      worldRender.update();
+    }
+  }
+
+  @Override
+  public void update() {
+    if (Main.inst().getConsole().isVisible()) {
+      // keep following even when console is visible
+      cameraFollowUpdate();
+      return;
     }
 
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        if (Main.inst().getConsole().isVisible()) {
-            return false;
-        }
-        OrthographicCamera camera = worldRender.getCamera();
-        camera.zoom += ((amountX + amountY) / 2) * SCROLL_SPEED;
-        if (camera.zoom < WorldRender.MIN_ZOOM) {
-            camera.zoom = WorldRender.MIN_ZOOM;
-        }
-        else if (camera.zoom > WorldRender.MAX_ZOOM) {
-            camera.zoom = WorldRender.MAX_ZOOM;
-        }
-        worldRender.update();
-        return true;
+    int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
+    int horizontal =
+        (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
+
+    if (vertical == 0 && horizontal == 0) {
+      // No input, we're still following the current entity
+      cameraFollowUpdate();
+    } else {
+      OrthographicCamera camera = worldRender.getCamera();
+      camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
+      camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
+      lockedOn = false;
+      worldRender.update();
     }
+  }
 
-    public World getWorld() {
-        return worldRender.getWorld();
+  public Entity getFollowing() {
+    return following;
+  }
+
+  /**
+   * Change who to follow, also automatically lock on and move the camera to the new following
+   * entity
+   *
+   * @param following What to follow, null if none
+   */
+  public void setFollowing(@Nullable Entity following) {
+    if (following != null && following.isInvalid()) {
+      Main.logger().error("World Input", "Cannot pass a non-null invalid entity!");
+      return;
     }
-
-    @Override
-    public void dispose() {
-        ClientMain.inst().getInputMultiplexer().removeProcessor(this);
+    // always update locked on status
+    lockedOn = true;
+    if (following == this.following) {
+      // Do not teleport the camera, it looks very janky
+      return;
     }
+    this.following = following;
+    teleportCamera();
+  }
 
-    /**
-     * @return We are following a non-null, valid target, and is locked on
-     */
-    private boolean hasValidLockOn() {
-        return following != null && !following.isInvalid() && lockedOn;
-    }
+  /** Only applies if {@link #getFollowing()} is not {@code null} */
+  public boolean isLockedOn() {
+    return lockedOn;
+  }
 
-    private void cameraFollowUpdate() {
-        OrthographicCamera camera = worldRender.getCamera();
-        if (hasValidLockOn()) {
-            assert following != null;
-            final Vector2 position = following.getPhysicsPosition();
-            float x = position.x * Block.BLOCK_SIZE;
-            float y = position.y * Block.BLOCK_SIZE;
-
-            float dx = (x - camera.position.x) * CAMERA_LERP;
-            float dy = (y - camera.position.y) * CAMERA_LERP;
-
-            if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
-                camera.position.x += dx * Gdx.graphics.getDeltaTime();
-                camera.position.y += dy * Gdx.graphics.getDeltaTime();
-            }
-            worldRender.update();
-        }
-    }
-
-    private void teleportCamera() {
-        OrthographicCamera camera = worldRender.getCamera();
-        if (hasValidLockOn()) {
-            assert following != null;
-            final Vector2 position = following.getPhysicsPosition();
-
-            camera.position.x = position.x * Block.BLOCK_SIZE;
-            camera.position.y = position.y * Block.BLOCK_SIZE;
-            worldRender.update();
-        }
-    }
-
-    @Override
-    public void update() {
-        if (Main.inst().getConsole().isVisible()) {
-            //keep following even when console is visible
-            cameraFollowUpdate();
-            return;
-        }
-
-        int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
-        int horizontal = (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
-
-        if (vertical == 0 && horizontal == 0) {
-            //No input, we're still following the current entity
-            cameraFollowUpdate();
-        }
-        else {
-            OrthographicCamera camera = worldRender.getCamera();
-            camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
-            camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
-            lockedOn = false;
-            worldRender.update();
-        }
-    }
-
-    public Entity getFollowing() {
-        return following;
-    }
-
-
-    /**
-     * Change who to follow, also automatically lock on and move the camera to the new following entity
-     *
-     * @param following
-     *     What to follow, null if none
-     */
-    public void setFollowing(@Nullable Entity following) {
-        if (following != null && following.isInvalid()) {
-            Main.logger().error("World Input", "Cannot pass a non-null invalid entity!");
-            return;
-        }
-        //always update locked on status
-        lockedOn = true;
-        if (following == this.following) {
-            //Do not teleport the camera, it looks very janky
-            return;
-        }
-        this.following = following;
-        teleportCamera();
-    }
-
-    /**
-     * Only applies if {@link #getFollowing()} is not {@code null}
-     */
-    public boolean isLockedOn() {
-        return lockedOn;
-    }
-
-    /**
-     * Only applies if {@link #getFollowing()} is not {@code null}
-     */
-    public void setLockedOn(boolean lockedOn) {
-        this.lockedOn = lockedOn;
-    }
+  /** Only applies if {@link #getFollowing()} is not {@code null} */
+  public void setLockedOn(boolean lockedOn) {
+    this.lockedOn = lockedOn;
+  }
 }

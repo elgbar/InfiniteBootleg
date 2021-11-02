@@ -13,71 +13,70 @@ import org.jetbrains.annotations.NotNull;
 
 public class GenericEntity extends Entity implements Removable {
 
-    private int width;
-    private int height;
+  private int width;
+  private int height;
 
-    public GenericEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
-        super(world, protoEntity);
-        if (isInvalid()) {
-            return;
-        }
-
-        Preconditions.checkArgument(protoEntity.hasGeneric());
-        var protoGeneric = protoEntity.getGeneric();
-
-        final ProtoWorld.Vector2i protoSize = protoGeneric.getSize();
-        width = protoSize.getX();
-        height = protoSize.getY();
+  public GenericEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+    super(world, protoEntity);
+    if (isInvalid()) {
+      return;
     }
 
-    public GenericEntity(@NotNull World world, float worldX, float worldY) {
-        this(world, worldX, worldY, 1, 1);
-    }
+    Preconditions.checkArgument(protoEntity.hasGeneric());
+    var protoGeneric = protoEntity.getGeneric();
 
-    public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height) {
-        super(world, worldX, worldY, true, UUID.randomUUID());
+    final ProtoWorld.Vector2i protoSize = protoGeneric.getSize();
+    width = protoSize.getX();
+    height = protoSize.getY();
+  }
 
-        this.width = width * Block.BLOCK_SIZE;
-        this.height = height * Block.BLOCK_SIZE;
-    }
+  public GenericEntity(@NotNull World world, float worldX, float worldY) {
+    this(world, worldX, worldY, 1, 1);
+  }
 
-    @Override
-    @NotNull
-    protected BodyDef createBodyDef(float worldX, float worldY) {
-        BodyDef def = super.createBodyDef(worldX, worldY);
-        def.type = BodyDef.BodyType.StaticBody;
-        return def;
-    }
+  public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height) {
+    super(world, worldX, worldY, true, UUID.randomUUID());
 
-    @Override
-    public ProtoWorld.Entity.Builder save() {
-        final ProtoWorld.Entity.Builder builder = super.save();
-        final ProtoWorld.Entity.Generic.Builder genericBuilder = ProtoWorld.Entity.Generic.newBuilder();
+    this.width = width * Block.BLOCK_SIZE;
+    this.height = height * Block.BLOCK_SIZE;
+  }
 
-        genericBuilder.setSize(ProtoWorld.Vector2i.newBuilder().setX(width).setY(height).build());
+  @Override
+  @NotNull
+  protected BodyDef createBodyDef(float worldX, float worldY) {
+    BodyDef def = super.createBodyDef(worldX, worldY);
+    def.type = BodyDef.BodyType.StaticBody;
+    return def;
+  }
 
-        builder.setGeneric(genericBuilder.build());
-        return builder;
+  @Override
+  public ProtoWorld.Entity.Builder save() {
+    final ProtoWorld.Entity.Builder builder = super.save();
+    final ProtoWorld.Entity.Generic.Builder genericBuilder = ProtoWorld.Entity.Generic.newBuilder();
 
-    }
+    genericBuilder.setSize(ProtoWorld.Vector2i.newBuilder().setX(width).setY(height).build());
 
-    @Override
-    public TextureRegion getTextureRegion() {
-        return null;
-    }
+    builder.setGeneric(genericBuilder.build());
+    return builder;
+  }
 
-    @Override
-    public int getWidth() {
-        return width;
-    }
+  @Override
+  public TextureRegion getTextureRegion() {
+    return null;
+  }
 
-    @Override
-    public int getHeight() {
-        return height;
-    }
+  @Override
+  public int getWidth() {
+    return width;
+  }
 
-    @Override
-    protected @NotNull ProtoWorld.Entity.EntityType getEntityType() {
-        return ProtoWorld.Entity.EntityType.GENERIC_ENTITY;
-    }
+  @Override
+  public int getHeight() {
+    return height;
+  }
+
+  @Override
+  protected @NotNull ProtoWorld.Entity.EntityType getEntityType() {
+    return ProtoWorld.Entity.EntityType.GENERIC_ENTITY;
+  }
 }

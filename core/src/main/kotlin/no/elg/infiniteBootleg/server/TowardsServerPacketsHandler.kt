@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.server
 
 import io.netty.channel.ChannelHandlerContext
-import java.security.SecureRandom
-import java.util.UUID
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
@@ -26,6 +24,8 @@ import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
+import java.security.SecureRandom
+import java.util.UUID
 
 private val secureRandom = SecureRandom.getInstanceStrong()
 
@@ -135,7 +135,7 @@ private fun handleLoginStatusPacket(ctx: ChannelHandlerContext) {
     return
   }
 
-  //Send chunk packets to client
+  // Send chunk packets to client
   val ix = CoordUtil.worldToChunk(player.blockX)
   val iy = CoordUtil.worldToChunk(player.blockY)
 //  val entities = GdxArray<Entity>()
@@ -182,7 +182,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     ctx.close()
     return
   }
-  //Client is good to login
+  // Client is good to login
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
   val player = WorldLoader.getServerPlayer(world, uuid)
   if (player.isInvalid) {
@@ -198,7 +198,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   val connectionCredentials = ConnectionCredentials(player.uuid, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = connectionCredentials
 
-  //Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
+  // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
   ctx.writeAndFlush(clientBoundSecretExchange(connectionCredentials))
 }
 

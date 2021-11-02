@@ -12,22 +12,22 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Config implements Metadata {
 
-    private final Map<String, Object> config = new ConcurrentHashMap<>();
+  private final Map<String, Object> config = new ConcurrentHashMap<>();
 
-    @Nullable
-    @Override
-    public <T> T get(@NotNull String key, @Nullable T defaultVal) {
-        Object obj = config.getOrDefault(key, defaultVal);
-        try {
-            //noinspection unchecked we are literaly in a try catch block
-            return (T) obj;
-        } catch (ClassCastException e) {
-            throw new IllegalStateException("Failed to cast object to type T", e);
-        }
+  @Nullable
+  @Override
+  public <T> T get(@NotNull String key, @Nullable T defaultVal) {
+    Object obj = config.getOrDefault(key, defaultVal);
+    try {
+      //noinspection unchecked we are literaly in a try catch block
+      return (T) obj;
+    } catch (ClassCastException e) {
+      throw new IllegalStateException("Failed to cast object to type T", e);
     }
+  }
 
-    @Override
-    public <T> void set(@NotNull String key, T value) {
-        config.put(key, value);
-    }
+  @Override
+  public <T> void set(@NotNull String key, T value) {
+    config.put(key, value);
+  }
 }

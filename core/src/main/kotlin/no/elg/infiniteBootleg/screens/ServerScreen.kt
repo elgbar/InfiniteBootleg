@@ -29,7 +29,6 @@ object ServerScreen : StageScreen() {
         val hostField = VisTextField("localhost")
         val portSpinner = IntSpinnerModel(8558, 0, Char.MAX_VALUE.code)
 
-
         horizontalGroup {
           space(10f)
           visLabel("Name: ")

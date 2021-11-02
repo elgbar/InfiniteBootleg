@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.server
 
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
-import java.util.UUID
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
@@ -40,11 +39,11 @@ import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material.AIR
 import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
+import java.util.UUID
 
-
-////////////////////
+// //////////////////
 // util functions //
-////////////////////
+// //////////////////
 
 internal fun ChannelHandlerContext.fatal(msg: String) {
   if (Settings.client) {
@@ -62,7 +61,6 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
     ClientMain.inst().serverClient = null
   }, 50L)
 }
-
 
 /**
  * Broadcast to all other channels than [this]
@@ -83,7 +81,7 @@ fun ChannelHandlerContext?.broadcast(packet: Packet, filter: ((Channel, Connecti
 fun ServerClient.serverBoundPacket(type: Type): Packet.Builder {
   return Packet.newBuilder()
     .setDirection(SERVER)
-    .setSecret(credentials!!.secret) //FIXME
+    .setSecret(credentials!!.secret) // FIXME
     .setType(type)
 }
 
@@ -93,11 +91,9 @@ fun clientBoundPacket(type: Type): Packet.Builder {
     .setType(type)
 }
 
-
-//////////////////
+// ////////////////
 // server bound //
-//////////////////
-
+// ////////////////
 
 fun serverBoundLoginPacket(name: String, uuid: UUID): Packet {
   return Packet.newBuilder()
@@ -127,11 +123,9 @@ fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: Connecti
   ).build()
 }
 
-
-//fun Client.chunkRequestPacket(chunkLocation: Location): Packets.Packet {
+// fun Client.chunkRequestPacket(chunkLocation: Location): Packets.Packet {
 //  return serverBoundPacket(SB_CHUNK_REQUEST).setChunkRequest(ChunkRequest.newBuilder().setChunkLocation(chunkLocation.toVector2i())).build()
-//}
-
+// }
 
 fun ServerClient.serverBoundClientDisconnectPacket(reason: String?): Packet {
   return serverBoundPacket(DX_DISCONNECT).let {
@@ -151,10 +145,9 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   ).build()
 }
 
-//////////////////
+// ////////////////
 // client bound //
-//////////////////
-
+// ////////////////
 
 private val PROTO_AIR_BLOCK = Block.save(AIR).build()
 
@@ -222,4 +215,3 @@ fun clientBoundSecretExchange(connectionCredentials: ConnectionCredentials): Pac
       .setEntityUUID(connectionCredentials.entityUUID.toString())
   ).build()
 }
-

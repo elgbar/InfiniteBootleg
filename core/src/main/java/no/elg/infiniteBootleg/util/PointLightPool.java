@@ -19,86 +19,91 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class PointLightPool extends Pool<PointLight> {
 
-    public static final int POINT_LIGHT_RAYS = 64;
-    public static final int POINT_LIGHT_DISTANCE = 32;
-    private final RayHandler rayHandler;
-    private final WorldBody worldBody;
+  public static final int POINT_LIGHT_RAYS = 64;
+  public static final int POINT_LIGHT_DISTANCE = 32;
+  private final RayHandler rayHandler;
+  private final WorldBody worldBody;
 
-    private static final ConcurrentMap<World, PointLightPool> poolMap = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<World, PointLightPool> poolMap = new ConcurrentHashMap<>();
 
-    private PointLightPool(@NotNull World world) {
-        rayHandler = world.getRender().getRayHandler();
-        worldBody = world.getWorldBody();
+  private PointLightPool(@NotNull World world) {
+    rayHandler = world.getRender().getRayHandler();
+    worldBody = world.getWorldBody();
+  }
+
+  public static PointLightPool getPool(@NotNull World world) {
+    return poolMap.computeIfAbsent(world, PointLightPool::new);
+  }
+
+  public static void clearAllPools() {
+    synchronized (poolMap) {
+      poolMap.clear();
     }
+  }
 
-    public static PointLightPool getPool(@NotNull World world) {
-        return poolMap.computeIfAbsent(world, PointLightPool::new);
+  @Override
+  protected PointLight newObject() {
+    PointLight light;
+    synchronized (LIGHT_LOCK) {
+      light =
+          new PointLight(
+              rayHandler,
+              POINT_LIGHT_RAYS,
+              Color.WHITE,
+              POINT_LIGHT_DISTANCE,
+              Float.MAX_VALUE,
+              Float.MAX_VALUE);
+      reset(light);
     }
+    return light;
+  }
 
-    public static void clearAllPools() {
-        synchronized (poolMap) {
-            poolMap.clear();
-        }
+  @NotNull
+  public PointLight obtain(float worldX, float worldY) {
+    synchronized (LIGHT_LOCK) {
+      var light = obtain();
+      light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
+      return light;
     }
+  }
 
-    @Override
-    protected PointLight newObject() {
-        PointLight light;
-        synchronized (LIGHT_LOCK) {
-            light = new PointLight(rayHandler, POINT_LIGHT_RAYS, Color.WHITE, POINT_LIGHT_DISTANCE, Float.MAX_VALUE, Float.MAX_VALUE);
-            reset(light);
-        }
-        return light;
+  /** @deprecated Use {@link #obtain(float, float)} to correctly calculate any world offset */
+  @Deprecated
+  @Override
+  public PointLight obtain() {
+    synchronized (LIGHT_LOCK) {
+      PointLight light = super.obtain();
+      light.setActive(true);
+      return light;
     }
+  }
 
-    @NotNull
-    public PointLight obtain(float worldX, float worldY) {
-        synchronized (LIGHT_LOCK) {
-            var light = obtain();
-            light.setPosition(worldX + worldBody.getWorldOffsetX(), worldY + worldBody.getWorldOffsetY());
-            return light;
-        }
+  @Override
+  public void free(PointLight light) {
+    synchronized (LIGHT_LOCK) {
+      light.setActive(false);
     }
+    super.free(light);
+  }
 
-    /**
-     * @deprecated Use {@link #obtain(float, float)} to correctly calculate any world offset
-     */
-    @Deprecated
-    @Override
-    public PointLight obtain() {
-        synchronized (LIGHT_LOCK) {
-            PointLight light = super.obtain();
-            light.setActive(true);
-            return light;
-        }
+  @Override
+  protected void discard(PointLight light) {
+    synchronized (LIGHT_LOCK) {
+      light.remove(true);
     }
+  }
 
-    @Override
-    public void free(PointLight light) {
-        synchronized (LIGHT_LOCK) {
-            light.setActive(false);
-        }
-        super.free(light);
+  @Override
+  protected void reset(PointLight light) {
+    synchronized (LIGHT_LOCK) {
+      light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
+      light.setStaticLight(true);
+      light.setXray(false);
+      light.setSoft(true);
+      light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+      light.setDistance(POINT_LIGHT_DISTANCE);
+      light.setColor(Color.WHITE);
+      light.setContactFilter(World.LIGHT_FILTER);
     }
-
-    @Override
-    protected void discard(PointLight light) {
-        synchronized (LIGHT_LOCK) {
-            light.remove(true);
-        }
-    }
-
-    @Override
-    protected void reset(PointLight light) {
-        synchronized (LIGHT_LOCK) {
-            light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
-            light.setStaticLight(true);
-            light.setXray(false);
-            light.setSoft(true);
-            light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-            light.setDistance(POINT_LIGHT_DISTANCE);
-            light.setColor(Color.WHITE);
-            light.setContactFilter(World.LIGHT_FILTER);
-        }
-    }
+  }
 }

@@ -19,62 +19,63 @@ import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public class ClientChannel {
 
-    @Nullable
-    private Channel channel;
-    @NotNull
-    private ServerClient client;
+  @Nullable private Channel channel;
+  @NotNull private ServerClient client;
 
-    public ClientChannel(@NotNull ServerClient client) { this.client = client; }
+  public ClientChannel(@NotNull ServerClient client) {
+    this.client = client;
+  }
 
-    public void connect(@NotNull String host, int port, @Nullable Runnable onConnect) throws InterruptedException {
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            Bootstrap b = new Bootstrap(); // (1)
-            b.group(workerGroup); // (2)
-            b.channel(NioSocketChannel.class); // (3)
-            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-            b.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(@NotNull SocketChannel ch) {
+  public void connect(@NotNull String host, int port, @Nullable Runnable onConnect)
+      throws InterruptedException {
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    try {
+      Bootstrap b = new Bootstrap(); // (1)
+      b.group(workerGroup); // (2)
+      b.channel(NioSocketChannel.class); // (3)
+      b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+      b.handler(
+          new ChannelInitializer<SocketChannel>() {
+            @Override
+            public void initChannel(@NotNull SocketChannel ch) {
 
-                    final ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
-                    pipeline.addLast("protobufDecoder", new ProtobufDecoder(Packets.Packet.getDefaultInstance()));
-                    pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
-                    pipeline.addLast("protobufEncoder", new ProtobufEncoder());
-                    pipeline.addLast("ClientHandler", new ClientBoundHandler(client));
-                }
-            });
-
-            // Start the client.
-            try {
-                channel = b.connect(host, port).sync().channel();
-            } catch (Exception e) {
-                ConnectingScreen.INSTANCE.setInfo(e.getClass().getSimpleName() + ": " + e.getMessage());
-                return;
+              final ChannelPipeline pipeline = ch.pipeline();
+              pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
+              pipeline.addLast(
+                  "protobufDecoder", new ProtobufDecoder(Packets.Packet.getDefaultInstance()));
+              pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
+              pipeline.addLast("protobufEncoder", new ProtobufEncoder());
+              pipeline.addLast("ClientHandler", new ClientBoundHandler(client));
             }
-            if (onConnect != null) {
-                Main.inst().getScheduler().executeSync(onConnect);
-            }
-            // Wait until the connection is closed.
-            channel.closeFuture().sync();
-        } finally {
-            workerGroup.shutdownGracefully();
-        }
-    }
+          });
 
-    @Nullable
-    public Channel getChannel() {
-        return channel;
+      // Start the client.
+      try {
+        channel = b.connect(host, port).sync().channel();
+      } catch (Exception e) {
+        ConnectingScreen.INSTANCE.setInfo(e.getClass().getSimpleName() + ": " + e.getMessage());
+        return;
+      }
+      if (onConnect != null) {
+        Main.inst().getScheduler().executeSync(onConnect);
+      }
+      // Wait until the connection is closed.
+      channel.closeFuture().sync();
+    } finally {
+      workerGroup.shutdownGracefully();
     }
+  }
 
-    @NotNull
-    public ServerClient getClient() {
-        return client;
-    }
+  @Nullable
+  public Channel getChannel() {
+    return channel;
+  }
+
+  @NotNull
+  public ServerClient getClient() {
+    return client;
+  }
 }

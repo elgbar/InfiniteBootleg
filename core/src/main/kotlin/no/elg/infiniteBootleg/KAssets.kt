@@ -36,7 +36,6 @@ object KAssets {
     generator.generateFont(parameter)
   }
 
-
   fun load() {
 
     with(VisUI.getSkin() as Skin) {

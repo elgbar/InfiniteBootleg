@@ -12,5 +12,4 @@ interface TickingTrait : BlockTrait, Ticking {
   fun setShouldTick(boolean: Boolean)
 
   fun delayedShouldTick(delayTicks: Long)
-
 }

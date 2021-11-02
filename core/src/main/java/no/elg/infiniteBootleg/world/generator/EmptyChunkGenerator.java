@@ -13,20 +13,20 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EmptyChunkGenerator implements ChunkGenerator {
 
-    @Override
-    public @NotNull Biome getBiome(int worldX) {
-        return Biome.PLAINS;
-    }
+  @Override
+  public @NotNull Biome getBiome(int worldX) {
+    return Biome.PLAINS;
+  }
 
-    @Override
-    public int getHeight(int worldX) {
-        return 0;
-    }
+  @Override
+  public int getHeight(int worldX) {
+    return 0;
+  }
 
-    @Override
-    public @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY) {
-        ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
-        chunk.finishLoading();
-        return chunk;
-    }
+  @Override
+  public @NotNull Chunk generate(@NotNull World world, int chunkX, int chunkY) {
+    ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
+    chunk.finishLoading();
+    return chunk;
+  }
 }

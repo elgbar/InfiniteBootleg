@@ -9,94 +9,80 @@ import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Elg
- */
+/** @author Elg */
 public record HeadlessWorldRenderer(World world) implements WorldRender {
 
-    private static final ChunksInView HEADLESS_CHUNK_VIEWED = new ChunksInView();
+  private static final ChunksInView HEADLESS_CHUNK_VIEWED = new ChunksInView();
 
-    public HeadlessWorldRenderer(@NotNull World world) {
-        this.world = world;
-    }
+  public HeadlessWorldRenderer(@NotNull World world) {
+    this.world = world;
+  }
 
-    @Override
-    public void render() {
+  @Override
+  public void render() {}
 
-    }
+  @Override
+  public void dispose() {}
 
-    @Override
-    public void dispose() {
+  @Override
+  public void resize(int width, int height) {}
 
-    }
+  @Override
+  public void update() {}
 
-    @Override
-    public void resize(int width, int height) {
+  @Override
+  public void resetSkylight() {}
 
-    }
+  @Override
+  public int blocksHorizontally() {
+    return 0;
+  }
 
-    @Override
-    public void update() {
+  @Override
+  public boolean isOutOfView(@NotNull Chunk chunk) {
+    return false;
+  }
 
-    }
+  @Override
+  public @NotNull ChunksInView getChunksInView() {
+    return HEADLESS_CHUNK_VIEWED;
+  }
 
-    @Override
-    public void resetSkylight() {
+  @Override
+  public @Nullable OrthographicCamera getCamera() {
+    return null;
+  }
 
-    }
+  @Override
+  public @Nullable ChunkRenderer getChunkRenderer() {
+    return null;
+  }
 
-    @Override
-    public int blocksHorizontally() {
-        return 0;
-    }
+  @Override
+  public EntityRenderer getEntityRenderer() {
+    return null;
+  }
 
-    @Override
-    public boolean isOutOfView(@NotNull Chunk chunk) {
-        return false;
-    }
+  @Override
+  public @Nullable SpriteBatch getBatch() {
+    return null;
+  }
 
-    @Override
-    public @NotNull ChunksInView getChunksInView() {
-        return HEADLESS_CHUNK_VIEWED;
-    }
+  @Override
+  public @Nullable PublicRayHandler getRayHandler() {
+    return null;
+  }
 
-    @Override
-    public @Nullable OrthographicCamera getCamera() {
-        return null;
-    }
+  @Override
+  public @Nullable DirectionalLight getSkylight() {
+    return null;
+  }
 
-    @Override
-    public @Nullable ChunkRenderer getChunkRenderer() {
-        return null;
-    }
+  @Override
+  public @NotNull World getWorld() {
+    return world;
+  }
 
-    @Override
-    public EntityRenderer getEntityRenderer() {
-        return null;
-    }
-
-    @Override
-    public @Nullable SpriteBatch getBatch() {
-        return null;
-    }
-
-    @Override
-    public @Nullable PublicRayHandler getRayHandler() {
-        return null;
-    }
-
-    @Override
-    public @Nullable DirectionalLight getSkylight() {
-        return null;
-    }
-
-    @Override
-    public @NotNull World getWorld() {
-        return world;
-    }
-
-    @Override
-    public void reload() {
-
-    }
+  @Override
+  public void reload() {}
 }

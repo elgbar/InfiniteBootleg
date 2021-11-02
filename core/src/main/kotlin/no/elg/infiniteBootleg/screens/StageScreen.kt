@@ -6,9 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import com.kotcrab.vis.ui.widget.VisWindow
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind.EXACTLY_ONCE
-import kotlin.contracts.contract
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisTable
@@ -16,6 +13,9 @@ import ktx.scene2d.vis.visTable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind.EXACTLY_ONCE
+import kotlin.contracts.contract
 
 /** @author Elg */
 open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false) {

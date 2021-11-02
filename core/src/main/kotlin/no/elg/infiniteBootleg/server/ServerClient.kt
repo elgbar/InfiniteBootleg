@@ -24,10 +24,10 @@ class ServerClient(
 
   private var backingPlayer: Player? = null
 
-  val uuid get() = credentials!!.entityUUID //FIXME
+  val uuid get() = credentials!!.entityUUID // FIXME
   val player: Player?
     get() {
-      //FIXME
+      // FIXME
       if (backingPlayer == null || backingPlayer!!.isInvalid) {
         backingPlayer = world!!.getPlayer(uuid)
       }
