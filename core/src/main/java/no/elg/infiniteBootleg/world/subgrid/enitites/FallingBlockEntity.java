@@ -140,13 +140,13 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     int chunkX = CoordUtil.worldToChunk(getBlockX());
     int chunkY = CoordUtil.worldToChunk(getBlockY());
 
-    if (Main.isAuthoritative()) {
-      // remove entity if it no longer falling and have not become a true block for some reason
-      if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
+    if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
+      if (Main.isAuthoritative()) {
+        // remove entity if it no longer falling and have not become a true block for some reason
         Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
+      } else {
+        freeze();
       }
-    } else {
-      freeze();
     }
   }
 
