@@ -113,7 +113,7 @@ public class Block implements BlockTrait, Disposable, HUDDebuggable, Savable<Pro
      *
      * @see World#getBlock(int, int, boolean)
      */
-    @NotNull
+    @Nullable
     public Block getRelative(@NotNull Direction dir) {
         return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
     }
