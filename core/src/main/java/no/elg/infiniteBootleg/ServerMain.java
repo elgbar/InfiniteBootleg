@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** @author Elg */
-public class ServerMain extends CommonMain implements Main {
+public class ServerMain extends CommonMain {
 
   private static ServerMain inst;
 
@@ -49,7 +49,7 @@ public class ServerMain extends CommonMain implements Main {
   @NotNull
   public World getServerWorld() {
     if (serverWorld == null) {
-      throw new IllegalStateException("There is no world when not in world screen");
+      throw new IllegalStateException("There is no server world!");
     }
     return serverWorld;
   }
@@ -58,6 +58,12 @@ public class ServerMain extends CommonMain implements Main {
     synchronized (INST_LOCK) {
       this.serverWorld = serverWorld;
     }
+  }
+
+  @Override
+  public void render() {
+    //noinspection ConstantConditions Should be not null here
+    serverWorld.getRender().render();
   }
 
   @Override

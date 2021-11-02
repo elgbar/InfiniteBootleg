@@ -27,7 +27,7 @@ interface LightTrait : BlockTrait, Disposable {
   companion object {
 
     fun LightTrait.createLight() {
-      if (Settings.renderLight && light == null && block.chunk.chunkBody.hasBody() && canCreateLight()) {
+      if (Settings.renderLight && Settings.client && light == null && block.chunk.chunkBody.hasBody() && canCreateLight()) {
         light = PointLightPool.getPool(block.world).obtain(block.worldX + 0.5f, block.worldY + 0.5f).also {
           it.isStaticLight = true
           customizeLight(it)
@@ -38,7 +38,7 @@ interface LightTrait : BlockTrait, Disposable {
     }
 
     fun LightTrait.tryCreateLight() {
-      if (light == null) {
+      if (light == null && block is LightTrait) {
         createLight()
       }
     }

@@ -60,7 +60,7 @@ public abstract class Entity
         Savable<ProtoWorld.EntityOrBuilder> {
 
   public static final float GROUND_CHECK_OFFSET = 0.1f;
-  public static final float TELEPORT_DIFFERENCE_THRESHOLD = 0.1f;
+  public static final float TELEPORT_DIFFERENCE_THRESHOLD = 0.5f;
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
 
@@ -85,7 +85,9 @@ public abstract class Entity
         false,
         UUID.fromString(protoEntity.getUuid()),
         false);
-
+    if (isInvalid()) {
+      return;
+    }
     Preconditions.checkArgument(protoEntity.getType() == getEntityType());
     if (protoEntity.getFlying()) {
       setFlying(true);

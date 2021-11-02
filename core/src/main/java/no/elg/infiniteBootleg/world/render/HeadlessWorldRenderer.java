@@ -19,7 +19,13 @@ public record HeadlessWorldRenderer(World world) implements WorldRender {
   }
 
   @Override
-  public void render() {}
+  public void render() {
+    for (Chunk chunk : world.getLoadedChunks()) {
+      if (chunk.isDirty()) {
+        chunk.getChunkBody().update(true);
+      }
+    }
+  }
 
   @Override
   public void dispose() {}

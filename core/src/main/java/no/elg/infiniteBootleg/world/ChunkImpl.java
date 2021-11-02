@@ -278,7 +278,9 @@ public class ChunkImpl implements Chunk {
         }
       }
     }
-    if (Settings.client) {
+    if (Main.isServer()) {
+      Main.inst().getScheduler().executeSync(() -> this.getChunkBody().update(true));
+    } else {
       world.getRender().getChunkRenderer().queueRendering(this, prioritize);
       prioritize = false;
     }
