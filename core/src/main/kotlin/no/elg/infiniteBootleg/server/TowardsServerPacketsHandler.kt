@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
 import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
@@ -42,7 +43,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
         handleLoginPacket(ctx, packet.login)
       }
     }
-    SB_CLIENT_WORLD_LOADED -> handleLoginStatusPacket(ctx)
+    SB_CLIENT_WORLD_LOADED -> handleClientsWorldLoaded(ctx)
     SB_CHUNK_REQUEST -> {
       if (packet.hasChunkRequest()) {
         handleChunkRequest(ctx, packet.chunkRequest)
@@ -135,32 +136,28 @@ private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRe
   chunk.setAllowUnload(allowedUnload)
 }
 
-private fun handleLoginStatusPacket(ctx: ChannelHandlerContext) {
+private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   val world = ServerMain.inst().serverWorld
   val player = ctx.getCurrentPlayer()
   if (player == null) {
-    ctx.fatal("Player not loaded")
+    ctx.fatal("Player not loaded server-side")
     return
   }
 
   // Send chunk packets to client
   val ix = CoordUtil.worldToChunk(player.blockX)
   val iy = CoordUtil.worldToChunk(player.blockY)
-//  val entities = GdxArray<Entity>()
   for (cx in -Settings.chunkRadius..Settings.chunkRadius) {
     for (cy in -Settings.chunkRadius..Settings.chunkRadius) {
       val chunk = world.getChunk(ix + cx, iy + cy) ?: continue
       ctx.write(clientBoundUpdateChunkPacket(chunk))
-//      entities.addAll(chunk.entities) //FIXME can be optimized (use AABB search for entities)
     }
     ctx.flush()
   }
+  ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
 
   for (entity in world.entities) {
-//    if (entity == player) {
-//      continue
-//    }
-    Main.logger().log("Sending " + entity.hudDebug() + " to client")
+    Main.logger().log("Sending ${entity.simpleName()}: ${entity.hudDebug()} to client")
     ctx.write(clientBoundSpawnEntity(entity))
   }
   ctx.flush()

@@ -27,6 +27,7 @@ message Packet {
     CB_SPAWN_ENTITY = 11;
     CB_DESPAWN_ENTITY = 12;
     SB_ENTITY_REQUEST = 13;
+    CB_INITIAL_CHUNKS_SENT = 14; //no message associated
   }
 
   enum Direction {

@@ -21,6 +21,7 @@ class ServerClient(
    * If the client is fully initiated
    */
   var started: Boolean = false
+  var chunksLoaded: Boolean = false
 
   private var backingPlayer: Player? = null
 

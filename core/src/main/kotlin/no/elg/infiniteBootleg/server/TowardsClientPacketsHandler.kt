@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
@@ -62,11 +63,11 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     }
 
     CB_SPAWN_ENTITY -> {
-      if (packet.hasSpawnEntity()) {
+      if (packet.hasSpawnEntity() && chunksLoaded) {
         handleSpawnEntity(packet.spawnEntity)
       }
     }
-
+    CB_INITIAL_CHUNKS_SENT -> chunksLoaded = true
     DX_HEARTBEAT -> {
       if (packet.hasHeartbeat()) {
         ctx.writeAndFlush(packet)
@@ -78,7 +79,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       }
     }
     DX_BLOCK_UPDATE -> {
-      if (packet.hasUpdateBlock()) {
+      if (packet.hasUpdateBlock() && chunksLoaded) {
         handleBlockUpdate(packet.updateBlock)
       }
     }
@@ -134,6 +135,7 @@ fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
       Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
       return@executeSync
     }
+    Main.logger().log("Will spawn entity ${spawnEntity.entity.uuid} " + spawnEntity.entity.type)
     val loaded = Entity.load(world, chunk, spawnEntity.entity)
     if (loaded is LivingEntity && uuid == loaded.uuid) {
       // it's us!
@@ -155,9 +157,9 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
 }
 
 fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
-  val e = updateChunk.chunk.entitiesCount
-  if (e > 0) {
-    Main.logger().warn(TAG, "Got $e entities in chunk update")
+  val entities = updateChunk.chunk.entitiesCount
+  if (entities > 0) {
+    Main.logger().warn(TAG, "Got $entities entities in chunk update")
   }
 
   fun tryUpdateChunk() {

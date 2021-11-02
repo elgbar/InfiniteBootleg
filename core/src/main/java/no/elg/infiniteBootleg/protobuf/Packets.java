@@ -805,6 +805,8 @@ public final class Packets {
       CB_DESPAWN_ENTITY(12),
       /** <code>SB_ENTITY_REQUEST = 13;</code> */
       SB_ENTITY_REQUEST(13),
+      /** <code>CB_INITIAL_CHUNKS_SENT = 14;</code> */
+      CB_INITIAL_CHUNKS_SENT(14),
       UNRECOGNIZED(-1),
       ;
 
@@ -844,6 +846,8 @@ public final class Packets {
       public static final int CB_DESPAWN_ENTITY_VALUE = 12;
       /** <code>SB_ENTITY_REQUEST = 13;</code> */
       public static final int SB_ENTITY_REQUEST_VALUE = 13;
+      /** <code>CB_INITIAL_CHUNKS_SENT = 14;</code> */
+      public static final int CB_INITIAL_CHUNKS_SENT_VALUE = 14;
 
       public final int getNumber() {
         if (this == UNRECOGNIZED) {
@@ -897,6 +901,8 @@ public final class Packets {
             return CB_DESPAWN_ENTITY;
           case 13:
             return SB_ENTITY_REQUEST;
+          case 14:
+            return CB_INITIAL_CHUNKS_SENT;
           default:
             return null;
         }
@@ -15272,7 +15278,7 @@ public final class Packets {
   static {
     java.lang.String[] descriptorData = {
       "\n\033serialization/packets.proto\022\007packets\032\037"
-          + "serialization/persistence.proto\"\224\n\n\006Pack"
+          + "serialization/persistence.proto\"\260\n\n\006Pack"
           + "et\022\"\n\004type\030\001 \001(\0162\024.packets.Packet.Type\022,"
           + "\n\tdirection\030\002 \001(\0162\031.packets.Packet.Direc"
           + "tion\022\023\n\006secret\030\003 \001(\tH\000\210\001\001\022*\n\theartbeat\030\010"
@@ -15291,48 +15297,49 @@ public final class Packets {
           + "(\0132\024.packets.SpawnEntityH\013\210\001\001\0222\n\rdespawn"
           + "Entity\030\030 \001(\0132\026.packets.DespawnEntityH\014\210\001"
           + "\001\0222\n\rentityRequest\030\031 \001(\0132\026.packets.Entit"
-          + "yRequestH\r\210\001\001\"\254\002\n\004Type\022\020\n\014DX_HEARTBEAT\020\000"
+          + "yRequestH\r\210\001\001\"\310\002\n\004Type\022\020\n\014DX_HEARTBEAT\020\000"
           + "\022\014\n\010SB_LOGIN\020\001\022\022\n\016DX_MOVE_ENTITY\020\002\022\023\n\017DX"
           + "_BLOCK_UPDATE\020\003\022\021\n\rCB_START_GAME\020\004\022\023\n\017CB"
           + "_UPDATE_CHUNK\020\005\022\023\n\017CB_LOGIN_STATUS\020\006\022\032\n\026"
           + "SB_CLIENT_WORLD_LOADED\020\007\022\024\n\020SB_CHUNK_REQ"
           + "UEST\020\010\022\021\n\rDX_DISCONNECT\020\t\022\026\n\022DX_SECRET_E"
           + "XCHANGE\020\n\022\023\n\017CB_SPAWN_ENTITY\020\013\022\025\n\021CB_DES"
-          + "PAWN_ENTITY\020\014\022\025\n\021SB_ENTITY_REQUEST\020\r\"#\n\t"
-          + "Direction\022\n\n\006SERVER\020\000\022\n\n\006CLIENT\020\001B\t\n\007_se"
-          + "cretB\014\n\n_heartbeatB\r\n\013_moveEntityB\016\n\014_up"
-          + "dateChunkB\017\n\r_chunkRequestB\016\n\014_updateBlo"
-          + "ckB\010\n\006_loginB\014\n\n_startGameB\024\n\022_serverLog"
-          + "inStatusB\r\n\013_disconnectB\021\n\017_secretExchan"
-          + "geB\016\n\014_spawnEntityB\020\n\016_despawnEntityB\020\n\016"
-          + "_entityRequest\" \n\tHeartbeat\022\023\n\013keepAlive"
-          + "Id\030\001 \001(\t\"c\n\013UpdateBlock\022\"\n\003pos\030\001 \001(\0132\025.p"
-          + "ersistence.Vector2i\022&\n\005block\030\002 \001(\0132\022.per"
-          + "sistence.BlockH\000\210\001\001B\010\n\006_block\"\202\001\n\nMoveEn"
-          + "tity\022\014\n\004uuid\030\001 \001(\t\022\'\n\010velocity\030\002 \001(\0132\025.p"
-          + "ersistence.Vector2f\022\'\n\010position\030\003 \001(\0132\025."
-          + "persistence.Vector2f\022\024\n\014lookAngleDeg\030\004 \001"
-          + "(\002\"\034\n\nDisconnect\022\016\n\006reason\030\001 \001(\t\"4\n\016Secr"
-          + "etExchange\022\022\n\nentityUUID\030\001 \001(\t\022\016\n\006secret"
-          + "\030\002 \001(\t\"X\n\tStartGame\022(\n\013controlling\030\001 \001(\013"
-          + "2\023.persistence.Entity\022!\n\005world\030\002 \001(\0132\022.p"
-          + "ersistence.World\"0\n\013UpdateChunk\022!\n\005chunk"
-          + "\030\001 \001(\0132\022.persistence.Chunk\"\252\001\n\021ServerLog"
-          + "inStatus\0227\n\006status\030\001 \001(\0162\'.packets.Serve"
-          + "rLoginStatus.ServerStatus\"\\\n\014ServerStatu"
-          + "s\022\021\n\rPROCEED_LOGIN\020\000\022\025\n\021ALREADY_LOGGED_I"
-          + "N\020\001\022\017\n\013FULL_SERVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\""
-          + "@\n\013SpawnEntity\022#\n\006entity\030\001 \001(\0132\023.persist"
-          + "ence.Entity\022\014\n\004uuid\030\002 \001(\t\"\242\001\n\rDespawnEnt"
-          + "ity\022\014\n\004uuid\030\001 \001(\t\022;\n\rdespawnReason\030\002 \001(\016"
-          + "2$.packets.DespawnEntity.DespawnReason\"F"
-          + "\n\rDespawnReason\022\013\n\007UNKNOWN\020\000\022\n\n\006KILLED\020\001"
-          + "\022\010\n\004QUIT\020\002\022\022\n\016CHUNK_UNLOADED\020\003\"8\n\005Login\022"
-          + "\014\n\004uuid\030\001 \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007versi"
-          + "on\030\003 \001(\t\"<\n\014ChunkRequest\022,\n\rchunkLocatio"
-          + "n\030\001 \001(\0132\025.persistence.Vector2i\"\035\n\rEntity"
-          + "Request\022\014\n\004uuid\030\001 \001(\tB,\n\037no.elg.infinite"
-          + "Bootleg.protobufB\007PacketsP\000b\006proto3"
+          + "PAWN_ENTITY\020\014\022\025\n\021SB_ENTITY_REQUEST\020\r\022\032\n\026"
+          + "CB_INITIAL_CHUNKS_SENT\020\016\"#\n\tDirection\022\n\n"
+          + "\006SERVER\020\000\022\n\n\006CLIENT\020\001B\t\n\007_secretB\014\n\n_hea"
+          + "rtbeatB\r\n\013_moveEntityB\016\n\014_updateChunkB\017\n"
+          + "\r_chunkRequestB\016\n\014_updateBlockB\010\n\006_login"
+          + "B\014\n\n_startGameB\024\n\022_serverLoginStatusB\r\n\013"
+          + "_disconnectB\021\n\017_secretExchangeB\016\n\014_spawn"
+          + "EntityB\020\n\016_despawnEntityB\020\n\016_entityReque"
+          + "st\" \n\tHeartbeat\022\023\n\013keepAliveId\030\001 \001(\t\"c\n\013"
+          + "UpdateBlock\022\"\n\003pos\030\001 \001(\0132\025.persistence.V"
+          + "ector2i\022&\n\005block\030\002 \001(\0132\022.persistence.Blo"
+          + "ckH\000\210\001\001B\010\n\006_block\"\202\001\n\nMoveEntity\022\014\n\004uuid"
+          + "\030\001 \001(\t\022\'\n\010velocity\030\002 \001(\0132\025.persistence.V"
+          + "ector2f\022\'\n\010position\030\003 \001(\0132\025.persistence."
+          + "Vector2f\022\024\n\014lookAngleDeg\030\004 \001(\002\"\034\n\nDiscon"
+          + "nect\022\016\n\006reason\030\001 \001(\t\"4\n\016SecretExchange\022\022"
+          + "\n\nentityUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n\tSt"
+          + "artGame\022(\n\013controlling\030\001 \001(\0132\023.persisten"
+          + "ce.Entity\022!\n\005world\030\002 \001(\0132\022.persistence.W"
+          + "orld\"0\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022.per"
+          + "sistence.Chunk\"\252\001\n\021ServerLoginStatus\0227\n\006"
+          + "status\030\001 \001(\0162\'.packets.ServerLoginStatus"
+          + ".ServerStatus\"\\\n\014ServerStatus\022\021\n\rPROCEED"
+          + "_LOGIN\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_"
+          + "SERVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"@\n\013SpawnEnti"
+          + "ty\022#\n\006entity\030\001 \001(\0132\023.persistence.Entity\022"
+          + "\014\n\004uuid\030\002 \001(\t\"\242\001\n\rDespawnEntity\022\014\n\004uuid\030"
+          + "\001 \001(\t\022;\n\rdespawnReason\030\002 \001(\0162$.packets.D"
+          + "espawnEntity.DespawnReason\"F\n\rDespawnRea"
+          + "son\022\013\n\007UNKNOWN\020\000\022\n\n\006KILLED\020\001\022\010\n\004QUIT\020\002\022\022"
+          + "\n\016CHUNK_UNLOADED\020\003\"8\n\005Login\022\014\n\004uuid\030\001 \001("
+          + "\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 \001(\t\"<\n\014"
+          + "ChunkRequest\022,\n\rchunkLocation\030\001 \001(\0132\025.pe"
+          + "rsistence.Vector2i\"\035\n\rEntityRequest\022\014\n\004u"
+          + "uid\030\001 \001(\tB,\n\037no.elg.infiniteBootleg.prot"
+          + "obufB\007PacketsP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
