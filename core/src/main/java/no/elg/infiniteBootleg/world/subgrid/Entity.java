@@ -249,6 +249,7 @@ public abstract class Entity
     final WorldBody worldBody = world.getWorldBody();
     float physicsWorldX = worldX + worldBody.getWorldOffsetX();
     float physicsWorldY = worldY + worldBody.getWorldOffsetY();
+    boolean sendMovePacket = false;
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
         if (isInvalid() || body == null) {
@@ -266,6 +267,7 @@ public abstract class Entity
                       + " dy "
                       + Math.abs(physicsWorldY - posCache.y));
           body.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
+          sendMovePacket = true;
         }
         body.setAngularVelocity(0);
         body.setLinearVelocity(velX, velY);
@@ -276,6 +278,14 @@ public abstract class Entity
     posCache.y = worldY;
     velCache.x = velX;
     velCache.y = velY;
+    if (Main.isServer() && sendMovePacket) {
+      Main.inst()
+          .getScheduler()
+          .executeAsync(
+              () -> {
+                PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundMoveEntity(this), null);
+              });
+    }
   }
 
   /** @return An unordered collection of all the blocks this entity is currently touching */
