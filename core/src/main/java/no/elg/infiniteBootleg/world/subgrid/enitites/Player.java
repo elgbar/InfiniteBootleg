@@ -36,8 +36,6 @@ public class Player extends LivingEntity {
 
   public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
-    Main.logger()
-        .log("creating protoplayer inv? " + isInvalid() + " uuid " + protoEntity.getUuid());
     if (isInvalid()) {
       return;
     }

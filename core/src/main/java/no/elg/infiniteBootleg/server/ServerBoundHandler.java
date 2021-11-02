@@ -29,7 +29,9 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
     //        Main.logger().log("Server bound packet " + packet.getType());
     if (packet.getDirection() == Packet.Direction.CLIENT
         || packet.getType().name().startsWith("CB_")) {
-      fatal(ctx, "Server got a client packet");
+      fatal(
+          ctx,
+          "Server got a client packet " + packet.getType() + " direction " + packet.getDirection());
       return;
     } else if (packet.getType() != Packet.Type.SB_LOGIN) {
       var expectedSecret = clients.get(ctx.channel());

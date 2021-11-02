@@ -37,7 +37,9 @@ public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
     //        Main.logger().log("Client bound packet " + packet.getType());
     if (packet.getDirection() == Packet.Direction.SERVER
         || packet.getType().name().startsWith("SB_")) {
-      Main.logger().error(TAG, "Client got a server packet");
+      PacketExtraKt.fatal(
+          ctx,
+          "Client got a server packet " + packet.getType() + " direction " + packet.getDirection());
       return;
     }
     handleClientBoundPackets(client, packet);
