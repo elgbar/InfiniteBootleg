@@ -111,7 +111,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   @Override
   public boolean isOnGround() {
-    return false;
+    return crashed;
   }
 
   @Override
