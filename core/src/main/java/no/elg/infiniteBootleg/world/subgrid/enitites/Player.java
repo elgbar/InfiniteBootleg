@@ -106,7 +106,8 @@ public class Player extends LivingEntity {
   public synchronized void giveControls() {
     if (controls == null) {
       Main.logger().debug("PLR", "Giving control to " + hudDebug());
-      if (Main.isClient() && !getUuid().equals(ClientMain.inst().getServerClient().getUuid())) {
+      if (Main.isServerClient()
+          && !getUuid().equals(ClientMain.inst().getServerClient().getUuid())) {
         throw new IllegalCallerException("Cannot give controls to others than " + getUuid());
       }
       controls = new KeyboardControls(getWorld().getRender(), this);
@@ -215,7 +216,7 @@ public class Player extends LivingEntity {
     if (torchLight != null) {
       torchLight.setPosition(pos);
     }
-    if (Main.isClient() && hasControls()) {
+    if (Main.isServerClient() && hasControls()) {
       final ServerClient client = ClientMain.inst().getServerClient();
       if (client != null) {
         client.ctx.writeAndFlush(PacketExtraKt.serverBoundMoveEntityPacket(client, this));

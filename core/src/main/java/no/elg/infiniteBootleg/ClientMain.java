@@ -229,7 +229,7 @@ public class ClientMain extends CommonMain {
 
   @Nullable
   public Player getPlayer() {
-    if (Main.isClient()) {
+    if (Main.isServerClient()) {
       return serverClient.getPlayer();
     }
     synchronized (INST_LOCK) {

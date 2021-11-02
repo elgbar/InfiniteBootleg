@@ -19,7 +19,7 @@ interface FallingTrait : TickingTrait {
 
   companion object {
     fun FallingTrait.tryFall() {
-      if (falling) {
+      if (falling || Main.isServerClient()) {
         return
       }
       val south = Location.relative(block.worldX, block.worldY, Direction.SOUTH)

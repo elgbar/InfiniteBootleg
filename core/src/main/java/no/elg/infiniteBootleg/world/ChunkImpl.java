@@ -157,7 +157,7 @@ public class ChunkImpl implements Chunk {
         return currBlock;
       }
       // accounts for both being null also ofc
-      if (isMaterialEqual(currBlock, block)) {
+      if (isAirish(currBlock, block)) {
         // Ok to return here, only internal change
         if (currBlock != null) {
           currBlock.dispose();
@@ -198,7 +198,7 @@ public class ChunkImpl implements Chunk {
                   Main.logger().log("broadcasting block change @ " + x + "," + y + ": " + block);
                   PacketExtraKt.broadcast(null, packet, null);
                 });
-      } else if (Main.isClient()) {
+      } else if (Main.isServerClient()) {
         Main.inst()
             .getScheduler()
             .executeAsync(
@@ -220,12 +220,10 @@ public class ChunkImpl implements Chunk {
     return block;
   }
 
-  private static boolean isMaterialEqual(@Nullable Block blockA, @Nullable Block blockB) {
+  private static boolean isAirish(@Nullable Block blockA, @Nullable Block blockB) {
     return (blockA == null && blockB == null) //
         || (blockA == null && blockB.getMaterial() == AIR) //
-        || (blockB == null && blockA.getMaterial() == AIR); //
-    //               || (blockB != null && blockA != null && blockA.getMaterial() ==
-    // blockB.getMaterial());
+        || (blockB == null && blockA.getMaterial() == AIR);
   }
 
   @Override

@@ -31,7 +31,7 @@ public interface Main extends ApplicationListener {
   }
 
   /** @return If this is a client of a server */
-  static boolean isClient() {
+  static boolean isServerClient() {
     return Settings.client && ClientMain.inst().getServerClient() != null;
   }
 

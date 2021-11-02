@@ -51,7 +51,7 @@ public class ChunkLoader {
    */
   @Nullable
   public Chunk load(@NotNull Location chunkLoc) {
-    if (Main.isClient()) {
+    if (Main.isServerClient()) {
       return null;
     }
     int chunkX = chunkLoc.x;
