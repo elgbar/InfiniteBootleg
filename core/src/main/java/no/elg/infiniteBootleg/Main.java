@@ -52,6 +52,11 @@ public interface Main extends ApplicationListener {
     return !Settings.client || ClientMain.inst().getServerClient() != null;
   }
 
+  /** @return If this instance is authoritative (i.e., have the final say) */
+  static boolean isAuthoritative() {
+    return isServer() || isSingleplayer();
+  }
+
   @NotNull
   ConsoleLogger getConsoleLogger();
 

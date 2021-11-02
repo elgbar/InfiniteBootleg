@@ -32,7 +32,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   private final Material material;
   @Nullable private final TextureRegion region;
 
-  @Nullable private Block block;
+  @NotNull private Block block;
 
   @Nullable private PointLight light;
 
@@ -80,22 +80,26 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     if (!crashed && type == ContactType.BEGIN_CONTACT) {
       crashed = true;
 
-      Main.inst()
-          .getScheduler()
-          .executeSync(
-              () -> {
-                World world = getWorld();
-                int newX = getBlockX();
-                int newY = getBlockY();
+      if (Main.isAuthoritative()) {
+        Main.inst()
+            .getScheduler()
+            .executeSync(
+                () -> {
+                  World world = getWorld();
+                  int newX = getBlockX();
+                  int newY = getBlockY();
 
-                int deltaY = 0;
-                while (!world.isAirBlock(newX, newY + deltaY)) {
-                  deltaY++;
-                }
-                world.removeEntity(this);
-                world.setBlock(newX, newY + deltaY, material, true);
-                //              //TODO drop as an item
-              });
+                  int deltaY = 0;
+                  while (!world.isAirBlock(newX, newY + deltaY)) {
+                    deltaY++;
+                  }
+                  world.removeEntity(this);
+                  world.setBlock(newX, newY + deltaY, material, true);
+                  //              //TODO drop as an item
+                });
+      } else {
+        freeze();
+      }
     }
   }
 
@@ -136,9 +140,13 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     int chunkX = CoordUtil.worldToChunk(getBlockX());
     int chunkY = CoordUtil.worldToChunk(getBlockY());
 
-    // remove entity if it no longer falling and have not become a true block for some reason
-    if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
-      Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
+    if (Main.isAuthoritative()) {
+      // remove entity if it no longer falling and have not become a true block for some reason
+      if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
+        Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
+      }
+    } else {
+      freeze();
     }
   }
 
@@ -207,7 +215,6 @@ public class FallingBlockEntity extends Entity implements LightTrait {
               CoordUtil.chunkOffset(getBlockY()));
     }
     if (block instanceof LightTrait lightTrait) {
-      // FIXME Somehow block and light are the same!?!?!?!
       lightTrait.customizeLight(light);
       light.setStaticLight(false);
       light.attachToBody(getBody());

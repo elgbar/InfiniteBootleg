@@ -84,6 +84,7 @@ public class World implements Disposable, Resizable {
   public static final Filter ENTITY_FILTER;
   public static final Filter LIGHT_FILTER;
   public static final Filter BLOCK_ENTITY_FILTER;
+  public static final Filter NON_INTERACTIVE_FILTER;
 
   public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
   public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
@@ -113,6 +114,11 @@ public class World implements Disposable, Resizable {
     BLOCK_ENTITY_FILTER = new Filter();
     BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
     BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
+
+    // Frozen body, should not interact with anything
+    NON_INTERACTIVE_FILTER = new Filter();
+    NON_INTERACTIVE_FILTER.categoryBits = 0;
+    NON_INTERACTIVE_FILTER.maskBits = 0;
   }
 
   @NotNull private final UUID uuid;

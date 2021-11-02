@@ -4,6 +4,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
+import static no.elg.infiniteBootleg.world.World.NON_INTERACTIVE_FILTER;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -61,6 +62,7 @@ public abstract class Entity
   public static final float GROUND_CHECK_OFFSET = 0.1f;
   public static final float TELEPORT_DIFFERENCE_THRESHOLD = 0.1f;
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
+  public static final float DEFAULT_GRAVITY_SCALE = 2f;
 
   @NotNull private final World world;
   private final UUID uuid;
@@ -157,7 +159,7 @@ public abstract class Entity
         BodyDef def = createBodyDef(posCache.x, posCache.y);
         body = world.getWorldBody().createBody(def);
         createFixture(body);
-        body.setGravityScale(2f);
+        body.setGravityScale(DEFAULT_GRAVITY_SCALE);
         body.setUserData(this);
       }
     }
@@ -592,6 +594,16 @@ public abstract class Entity
     }
   }
 
+  /** Freeze the entity, it will not interact with the world anymore */
+  public void freeze() {
+    if (isInvalid()) {
+      return;
+    }
+    setFilter(NON_INTERACTIVE_FILTER);
+    body.setLinearVelocity(0, 0);
+    body.setGravityScale(0f);
+  }
+
   /** @return The texture of this entity */
   @Nullable
   public abstract TextureRegion getTextureRegion();
@@ -641,7 +653,7 @@ public abstract class Entity
           body.setLinearVelocity(0, 0);
           body.setGravityScale(0);
         } else {
-          body.setGravityScale(1);
+          body.setGravityScale(DEFAULT_GRAVITY_SCALE);
           body.setAwake(true);
         }
       }
