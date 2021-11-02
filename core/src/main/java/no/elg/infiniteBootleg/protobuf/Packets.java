@@ -420,6 +420,21 @@ public final class Packets {
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity getDespawnEntity();
     /** <code>optional .packets.DespawnEntity despawnEntity = 24;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder getDespawnEntityOrBuilder();
+
+    /**
+     * <code>optional .packets.EntityRequest entityRequest = 25;</code>
+     *
+     * @return Whether the entityRequest field is set.
+     */
+    boolean hasEntityRequest();
+    /**
+     * <code>optional .packets.EntityRequest entityRequest = 25;</code>
+     *
+     * @return The entityRequest.
+     */
+    no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getEntityRequest();
+    /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+    no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder getEntityRequestOrBuilder();
   }
   /** Protobuf type {@code packets.Packet} */
   public static final class Packet extends com.google.protobuf.GeneratedMessageV3
@@ -692,6 +707,23 @@ public final class Packets {
                 bitField0_ |= 0x00001000;
                 break;
               }
+            case 202:
+              {
+                no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder subBuilder = null;
+                if (((bitField0_ & 0x00002000) != 0)) {
+                  subBuilder = entityRequest_.toBuilder();
+                }
+                entityRequest_ =
+                    input.readMessage(
+                        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.parser(),
+                        extensionRegistry);
+                if (subBuilder != null) {
+                  subBuilder.mergeFrom(entityRequest_);
+                  entityRequest_ = subBuilder.buildPartial();
+                }
+                bitField0_ |= 0x00002000;
+                break;
+              }
             default:
               {
                 if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
@@ -771,6 +803,8 @@ public final class Packets {
       CB_SPAWN_ENTITY(11),
       /** <code>CB_DESPAWN_ENTITY = 12;</code> */
       CB_DESPAWN_ENTITY(12),
+      /** <code>SB_ENTITY_REQUEST = 13;</code> */
+      SB_ENTITY_REQUEST(13),
       UNRECOGNIZED(-1),
       ;
 
@@ -808,6 +842,8 @@ public final class Packets {
       public static final int CB_SPAWN_ENTITY_VALUE = 11;
       /** <code>CB_DESPAWN_ENTITY = 12;</code> */
       public static final int CB_DESPAWN_ENTITY_VALUE = 12;
+      /** <code>SB_ENTITY_REQUEST = 13;</code> */
+      public static final int SB_ENTITY_REQUEST_VALUE = 13;
 
       public final int getNumber() {
         if (this == UNRECOGNIZED) {
@@ -859,6 +895,8 @@ public final class Packets {
             return CB_SPAWN_ENTITY;
           case 12:
             return CB_DESPAWN_ENTITY;
+          case 13:
+            return SB_ENTITY_REQUEST;
           default:
             return null;
         }
@@ -1648,6 +1686,37 @@ public final class Packets {
           : despawnEntity_;
     }
 
+    public static final int ENTITYREQUEST_FIELD_NUMBER = 25;
+    private no.elg.infiniteBootleg.protobuf.Packets.EntityRequest entityRequest_;
+    /**
+     * <code>optional .packets.EntityRequest entityRequest = 25;</code>
+     *
+     * @return Whether the entityRequest field is set.
+     */
+    @java.lang.Override
+    public boolean hasEntityRequest() {
+      return ((bitField0_ & 0x00002000) != 0);
+    }
+    /**
+     * <code>optional .packets.EntityRequest entityRequest = 25;</code>
+     *
+     * @return The entityRequest.
+     */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getEntityRequest() {
+      return entityRequest_ == null
+          ? no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()
+          : entityRequest_;
+    }
+    /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder
+        getEntityRequestOrBuilder() {
+      return entityRequest_ == null
+          ? no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()
+          : entityRequest_;
+    }
+
     private byte memoizedIsInitialized = -1;
 
     @java.lang.Override
@@ -1708,6 +1777,9 @@ public final class Packets {
       if (((bitField0_ & 0x00001000) != 0)) {
         output.writeMessage(24, getDespawnEntity());
       }
+      if (((bitField0_ & 0x00002000) != 0)) {
+        output.writeMessage(25, getEntityRequest());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1763,6 +1835,9 @@ public final class Packets {
       }
       if (((bitField0_ & 0x00001000) != 0)) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(24, getDespawnEntity());
+      }
+      if (((bitField0_ & 0x00002000) != 0)) {
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(25, getEntityRequest());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1834,6 +1909,10 @@ public final class Packets {
       if (hasDespawnEntity()) {
         if (!getDespawnEntity().equals(other.getDespawnEntity())) return false;
       }
+      if (hasEntityRequest() != other.hasEntityRequest()) return false;
+      if (hasEntityRequest()) {
+        if (!getEntityRequest().equals(other.getEntityRequest())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1900,6 +1979,10 @@ public final class Packets {
       if (hasDespawnEntity()) {
         hash = (37 * hash) + DESPAWNENTITY_FIELD_NUMBER;
         hash = (53 * hash) + getDespawnEntity().hashCode();
+      }
+      if (hasEntityRequest()) {
+        hash = (37 * hash) + ENTITYREQUEST_FIELD_NUMBER;
+        hash = (53 * hash) + getEntityRequest().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -2045,6 +2128,7 @@ public final class Packets {
           getSecretExchangeFieldBuilder();
           getSpawnEntityFieldBuilder();
           getDespawnEntityFieldBuilder();
+          getEntityRequestFieldBuilder();
         }
       }
 
@@ -2129,6 +2213,12 @@ public final class Packets {
           despawnEntityBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00001000);
+        if (entityRequestBuilder_ == null) {
+          entityRequest_ = null;
+        } else {
+          entityRequestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
 
@@ -2259,6 +2349,14 @@ public final class Packets {
           }
           to_bitField0_ |= 0x00001000;
         }
+        if (((from_bitField0_ & 0x00002000) != 0)) {
+          if (entityRequestBuilder_ == null) {
+            result.entityRequest_ = entityRequest_;
+          } else {
+            result.entityRequest_ = entityRequestBuilder_.build();
+          }
+          to_bitField0_ |= 0x00002000;
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2358,6 +2456,9 @@ public final class Packets {
         }
         if (other.hasDespawnEntity()) {
           mergeDespawnEntity(other.getDespawnEntity());
+        }
+        if (other.hasEntityRequest()) {
+          mergeEntityRequest(other.getEntityRequest());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4693,6 +4794,134 @@ public final class Packets {
           despawnEntity_ = null;
         }
         return despawnEntityBuilder_;
+      }
+
+      private no.elg.infiniteBootleg.protobuf.Packets.EntityRequest entityRequest_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.Packets.EntityRequest,
+              no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder,
+              no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder>
+          entityRequestBuilder_;
+      /**
+       * <code>optional .packets.EntityRequest entityRequest = 25;</code>
+       *
+       * @return Whether the entityRequest field is set.
+       */
+      public boolean hasEntityRequest() {
+        return ((bitField0_ & 0x00002000) != 0);
+      }
+      /**
+       * <code>optional .packets.EntityRequest entityRequest = 25;</code>
+       *
+       * @return The entityRequest.
+       */
+      public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getEntityRequest() {
+        if (entityRequestBuilder_ == null) {
+          return entityRequest_ == null
+              ? no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()
+              : entityRequest_;
+        } else {
+          return entityRequestBuilder_.getMessage();
+        }
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      public Builder setEntityRequest(no.elg.infiniteBootleg.protobuf.Packets.EntityRequest value) {
+        if (entityRequestBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          entityRequest_ = value;
+          onChanged();
+        } else {
+          entityRequestBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00002000;
+        return this;
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      public Builder setEntityRequest(
+          no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder builderForValue) {
+        if (entityRequestBuilder_ == null) {
+          entityRequest_ = builderForValue.build();
+          onChanged();
+        } else {
+          entityRequestBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00002000;
+        return this;
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      public Builder mergeEntityRequest(
+          no.elg.infiniteBootleg.protobuf.Packets.EntityRequest value) {
+        if (entityRequestBuilder_ == null) {
+          if (((bitField0_ & 0x00002000) != 0)
+              && entityRequest_ != null
+              && entityRequest_
+                  != no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()) {
+            entityRequest_ =
+                no.elg
+                    .infiniteBootleg
+                    .protobuf
+                    .Packets
+                    .EntityRequest
+                    .newBuilder(entityRequest_)
+                    .mergeFrom(value)
+                    .buildPartial();
+          } else {
+            entityRequest_ = value;
+          }
+          onChanged();
+        } else {
+          entityRequestBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00002000;
+        return this;
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      public Builder clearEntityRequest() {
+        if (entityRequestBuilder_ == null) {
+          entityRequest_ = null;
+          onChanged();
+        } else {
+          entityRequestBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00002000);
+        return this;
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder
+          getEntityRequestBuilder() {
+        bitField0_ |= 0x00002000;
+        onChanged();
+        return getEntityRequestFieldBuilder().getBuilder();
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      public no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder
+          getEntityRequestOrBuilder() {
+        if (entityRequestBuilder_ != null) {
+          return entityRequestBuilder_.getMessageOrBuilder();
+        } else {
+          return entityRequest_ == null
+              ? no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()
+              : entityRequest_;
+        }
+      }
+      /** <code>optional .packets.EntityRequest entityRequest = 25;</code> */
+      private com.google.protobuf.SingleFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.Packets.EntityRequest,
+              no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder,
+              no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder>
+          getEntityRequestFieldBuilder() {
+        if (entityRequestBuilder_ == null) {
+          entityRequestBuilder_ =
+              new com.google.protobuf.SingleFieldBuilderV3<
+                  no.elg.infiniteBootleg.protobuf.Packets.EntityRequest,
+                  no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder,
+                  no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder>(
+                  getEntityRequest(), getParentForChildren(), isClean());
+          entityRequest_ = null;
+        }
+        return entityRequestBuilder_;
       }
 
       @java.lang.Override
@@ -11169,6 +11398,19 @@ public final class Packets {
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntity();
     /** <code>.persistence.Entity entity = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder();
+
+    /**
+     * <code>string uuid = 2;</code>
+     *
+     * @return The uuid.
+     */
+    java.lang.String getUuid();
+    /**
+     * <code>string uuid = 2;</code>
+     *
+     * @return The bytes for uuid.
+     */
+    com.google.protobuf.ByteString getUuidBytes();
   }
   /** Protobuf type {@code packets.SpawnEntity} */
   public static final class SpawnEntity extends com.google.protobuf.GeneratedMessageV3
@@ -11181,7 +11423,9 @@ public final class Packets {
       super(builder);
     }
 
-    private SpawnEntity() {}
+    private SpawnEntity() {
+      uuid_ = "";
+    }
 
     @java.lang.Override
     @SuppressWarnings({"unused"})
@@ -11227,6 +11471,13 @@ public final class Packets {
                   entity_ = subBuilder.buildPartial();
                 }
 
+                break;
+              }
+            case 18:
+              {
+                java.lang.String s = input.readStringRequireUtf8();
+
+                uuid_ = s;
                 break;
               }
             default:
@@ -11289,6 +11540,43 @@ public final class Packets {
       return getEntity();
     }
 
+    public static final int UUID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object uuid_;
+    /**
+     * <code>string uuid = 2;</code>
+     *
+     * @return The uuid.
+     */
+    @java.lang.Override
+    public java.lang.String getUuid() {
+      java.lang.Object ref = uuid_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        uuid_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string uuid = 2;</code>
+     *
+     * @return The bytes for uuid.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getUuidBytes() {
+      java.lang.Object ref = uuid_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+        uuid_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
 
     @java.lang.Override
@@ -11306,6 +11594,9 @@ public final class Packets {
       if (entity_ != null) {
         output.writeMessage(1, getEntity());
       }
+      if (!getUuidBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, uuid_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -11317,6 +11608,9 @@ public final class Packets {
       size = 0;
       if (entity_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, getEntity());
+      }
+      if (!getUuidBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, uuid_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11338,6 +11632,7 @@ public final class Packets {
       if (hasEntity()) {
         if (!getEntity().equals(other.getEntity())) return false;
       }
+      if (!getUuid().equals(other.getUuid())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -11353,6 +11648,8 @@ public final class Packets {
         hash = (37 * hash) + ENTITY_FIELD_NUMBER;
         hash = (53 * hash) + getEntity().hashCode();
       }
+      hash = (37 * hash) + UUID_FIELD_NUMBER;
+      hash = (53 * hash) + getUuid().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11501,6 +11798,8 @@ public final class Packets {
           entity_ = null;
           entityBuilder_ = null;
         }
+        uuid_ = "";
+
         return this;
       }
 
@@ -11536,6 +11835,7 @@ public final class Packets {
         } else {
           result.entity_ = entityBuilder_.build();
         }
+        result.uuid_ = uuid_;
         onBuilt();
         return result;
       }
@@ -11590,6 +11890,10 @@ public final class Packets {
           return this;
         if (other.hasEntity()) {
           mergeEntity(other.getEntity());
+        }
+        if (!other.getUuid().isEmpty()) {
+          uuid_ = other.uuid_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11742,6 +12046,82 @@ public final class Packets {
           entity_ = null;
         }
         return entityBuilder_;
+      }
+
+      private java.lang.Object uuid_ = "";
+      /**
+       * <code>string uuid = 2;</code>
+       *
+       * @return The uuid.
+       */
+      public java.lang.String getUuid() {
+        java.lang.Object ref = uuid_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          uuid_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string uuid = 2;</code>
+       *
+       * @return The bytes for uuid.
+       */
+      public com.google.protobuf.ByteString getUuidBytes() {
+        java.lang.Object ref = uuid_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+          uuid_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string uuid = 2;</code>
+       *
+       * @param value The uuid to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUuid(java.lang.String value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+
+        uuid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string uuid = 2;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearUuid() {
+
+        uuid_ = getDefaultInstance().getUuid();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string uuid = 2;</code>
+       *
+       * @param value The bytes for uuid to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUuidBytes(com.google.protobuf.ByteString value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        checkByteStringIsUtf8(value);
+
+        uuid_ = value;
+        onChanged();
+        return this;
       }
 
       @java.lang.Override
@@ -14235,6 +14615,597 @@ public final class Packets {
     }
   }
 
+  public interface EntityRequestOrBuilder
+      extends
+      // @@protoc_insertion_point(interface_extends:packets.EntityRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string uuid = 1;</code>
+     *
+     * @return The uuid.
+     */
+    java.lang.String getUuid();
+    /**
+     * <code>string uuid = 1;</code>
+     *
+     * @return The bytes for uuid.
+     */
+    com.google.protobuf.ByteString getUuidBytes();
+  }
+  /** Protobuf type {@code packets.EntityRequest} */
+  public static final class EntityRequest extends com.google.protobuf.GeneratedMessageV3
+      implements
+      // @@protoc_insertion_point(message_implements:packets.EntityRequest)
+      EntityRequestOrBuilder {
+    private static final long serialVersionUID = 0L;
+    // Use EntityRequest.newBuilder() to construct.
+    private EntityRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+
+    private EntityRequest() {
+      uuid_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
+      return new EntityRequest();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    private EntityRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10:
+              {
+                java.lang.String s = input.readStringRequireUtf8();
+
+                uuid_ = s;
+                break;
+              }
+            default:
+              {
+                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+      return no.elg
+          .infiniteBootleg
+          .protobuf
+          .Packets
+          .internal_static_packets_EntityRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return no.elg.infiniteBootleg.protobuf.Packets
+          .internal_static_packets_EntityRequest_fieldAccessorTable.ensureFieldAccessorsInitialized(
+          no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.class,
+          no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder.class);
+    }
+
+    public static final int UUID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object uuid_;
+    /**
+     * <code>string uuid = 1;</code>
+     *
+     * @return The uuid.
+     */
+    @java.lang.Override
+    public java.lang.String getUuid() {
+      java.lang.Object ref = uuid_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        uuid_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string uuid = 1;</code>
+     *
+     * @return The bytes for uuid.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getUuidBytes() {
+      java.lang.Object ref = uuid_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+        uuid_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+      if (!getUuidBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getUuidBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+        return true;
+      }
+      if (!(obj instanceof no.elg.infiniteBootleg.protobuf.Packets.EntityRequest)) {
+        return super.equals(obj);
+      }
+      no.elg.infiniteBootleg.protobuf.Packets.EntityRequest other =
+          (no.elg.infiniteBootleg.protobuf.Packets.EntityRequest) obj;
+
+      if (!getUuid().equals(other.getUuid())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + UUID_FIELD_NUMBER;
+      hash = (53 * hash) + getUuid().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        java.nio.ByteBuffer data) throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        java.nio.ByteBuffer data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        byte[] data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        java.io.InputStream input) throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(PARSER, input);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(
+          PARSER, input, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseDelimitedFrom(
+        java.io.InputStream input) throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseDelimitedFrom(
+        java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseDelimitedWithIOException(
+          PARSER, input, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(PARSER, input);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(
+          PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(
+        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /** Protobuf type {@code packets.EntityRequest} */
+    public static final class Builder
+        extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
+        implements
+        // @@protoc_insertion_point(builder_implements:packets.EntityRequest)
+        no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+        return no.elg
+            .infiniteBootleg
+            .protobuf
+            .Packets
+            .internal_static_packets_EntityRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return no.elg.infiniteBootleg.protobuf.Packets
+            .internal_static_packets_EntityRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.class,
+                no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder.class);
+      }
+
+      // Construct using no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
+      }
+
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        uuid_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+        return no.elg
+            .infiniteBootleg
+            .protobuf
+            .Packets
+            .internal_static_packets_EntityRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getDefaultInstanceForType() {
+        return no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest build() {
+        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest buildPartial() {
+        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest result =
+            new no.elg.infiniteBootleg.protobuf.Packets.EntityRequest(this);
+        result.uuid_ = uuid_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
+        return super.setField(field, value);
+      }
+
+      @java.lang.Override
+      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+
+      @java.lang.Override
+      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index,
+          java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof no.elg.infiniteBootleg.protobuf.Packets.EntityRequest) {
+          return mergeFrom((no.elg.infiniteBootleg.protobuf.Packets.EntityRequest) other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(no.elg.infiniteBootleg.protobuf.Packets.EntityRequest other) {
+        if (other == no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance())
+          return this;
+        if (!other.getUuid().isEmpty()) {
+          uuid_ = other.uuid_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage =
+              (no.elg.infiniteBootleg.protobuf.Packets.EntityRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object uuid_ = "";
+      /**
+       * <code>string uuid = 1;</code>
+       *
+       * @return The uuid.
+       */
+      public java.lang.String getUuid() {
+        java.lang.Object ref = uuid_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          uuid_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string uuid = 1;</code>
+       *
+       * @return The bytes for uuid.
+       */
+      public com.google.protobuf.ByteString getUuidBytes() {
+        java.lang.Object ref = uuid_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+          uuid_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string uuid = 1;</code>
+       *
+       * @param value The uuid to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUuid(java.lang.String value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+
+        uuid_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string uuid = 1;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearUuid() {
+
+        uuid_ = getDefaultInstance().getUuid();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string uuid = 1;</code>
+       *
+       * @param value The bytes for uuid to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUuidBytes(com.google.protobuf.ByteString value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        checkByteStringIsUtf8(value);
+
+        uuid_ = value;
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+      // @@protoc_insertion_point(builder_scope:packets.EntityRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:packets.EntityRequest)
+    private static final no.elg.infiniteBootleg.protobuf.Packets.EntityRequest DEFAULT_INSTANCE;
+
+    static {
+      DEFAULT_INSTANCE = new no.elg.infiniteBootleg.protobuf.Packets.EntityRequest();
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<EntityRequest> PARSER =
+        new com.google.protobuf.AbstractParser<EntityRequest>() {
+          @java.lang.Override
+          public EntityRequest parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new EntityRequest(input, extensionRegistry);
+          }
+        };
+
+    public static com.google.protobuf.Parser<EntityRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EntityRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
       internal_static_packets_Packet_descriptor;
   private static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -14287,6 +15258,10 @@ public final class Packets {
       internal_static_packets_ChunkRequest_descriptor;
   private static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_packets_ChunkRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_packets_EntityRequest_descriptor;
+  private static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_packets_EntityRequest_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
     return descriptor;
@@ -14297,7 +15272,7 @@ public final class Packets {
   static {
     java.lang.String[] descriptorData = {
       "\n\033serialization/packets.proto\022\007packets\032\037"
-          + "serialization/persistence.proto\"\267\t\n\006Pack"
+          + "serialization/persistence.proto\"\224\n\n\006Pack"
           + "et\022\"\n\004type\030\001 \001(\0162\024.packets.Packet.Type\022,"
           + "\n\tdirection\030\002 \001(\0162\031.packets.Packet.Direc"
           + "tion\022\023\n\006secret\030\003 \001(\tH\000\210\001\001\022*\n\theartbeat\030\010"
@@ -14315,46 +15290,49 @@ public final class Packets {
           + "s.SecretExchangeH\n\210\001\001\022.\n\013spawnEntity\030\027 \001"
           + "(\0132\024.packets.SpawnEntityH\013\210\001\001\0222\n\rdespawn"
           + "Entity\030\030 \001(\0132\026.packets.DespawnEntityH\014\210\001"
-          + "\001\"\225\002\n\004Type\022\020\n\014DX_HEARTBEAT\020\000\022\014\n\010SB_LOGIN"
-          + "\020\001\022\022\n\016DX_MOVE_ENTITY\020\002\022\023\n\017DX_BLOCK_UPDAT"
-          + "E\020\003\022\021\n\rCB_START_GAME\020\004\022\023\n\017CB_UPDATE_CHUN"
-          + "K\020\005\022\023\n\017CB_LOGIN_STATUS\020\006\022\032\n\026SB_CLIENT_WO"
-          + "RLD_LOADED\020\007\022\024\n\020SB_CHUNK_REQUEST\020\010\022\021\n\rDX"
-          + "_DISCONNECT\020\t\022\026\n\022DX_SECRET_EXCHANGE\020\n\022\023\n"
-          + "\017CB_SPAWN_ENTITY\020\013\022\025\n\021CB_DESPAWN_ENTITY\020"
-          + "\014\"#\n\tDirection\022\n\n\006SERVER\020\000\022\n\n\006CLIENT\020\001B\t"
-          + "\n\007_secretB\014\n\n_heartbeatB\r\n\013_moveEntityB\016"
-          + "\n\014_updateChunkB\017\n\r_chunkRequestB\016\n\014_upda"
-          + "teBlockB\010\n\006_loginB\014\n\n_startGameB\024\n\022_serv"
-          + "erLoginStatusB\r\n\013_disconnectB\021\n\017_secretE"
-          + "xchangeB\016\n\014_spawnEntityB\020\n\016_despawnEntit"
-          + "y\" \n\tHeartbeat\022\023\n\013keepAliveId\030\001 \001(\t\"c\n\013U"
-          + "pdateBlock\022\"\n\003pos\030\001 \001(\0132\025.persistence.Ve"
-          + "ctor2i\022&\n\005block\030\002 \001(\0132\022.persistence.Bloc"
-          + "kH\000\210\001\001B\010\n\006_block\"\202\001\n\nMoveEntity\022\014\n\004uuid\030"
-          + "\001 \001(\t\022\'\n\010velocity\030\002 \001(\0132\025.persistence.Ve"
-          + "ctor2f\022\'\n\010position\030\003 \001(\0132\025.persistence.V"
-          + "ector2f\022\024\n\014lookAngleDeg\030\004 \001(\002\"\034\n\nDisconn"
-          + "ect\022\016\n\006reason\030\001 \001(\t\"4\n\016SecretExchange\022\022\n"
-          + "\nentityUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n\tSta"
-          + "rtGame\022(\n\013controlling\030\001 \001(\0132\023.persistenc"
-          + "e.Entity\022!\n\005world\030\002 \001(\0132\022.persistence.Wo"
-          + "rld\"0\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022.pers"
-          + "istence.Chunk\"\252\001\n\021ServerLoginStatus\0227\n\006s"
-          + "tatus\030\001 \001(\0162\'.packets.ServerLoginStatus."
-          + "ServerStatus\"\\\n\014ServerStatus\022\021\n\rPROCEED_"
-          + "LOGIN\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_S"
-          + "ERVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"2\n\013SpawnEntit"
-          + "y\022#\n\006entity\030\001 \001(\0132\023.persistence.Entity\"\242"
-          + "\001\n\rDespawnEntity\022\014\n\004uuid\030\001 \001(\t\022;\n\rdespaw"
-          + "nReason\030\002 \001(\0162$.packets.DespawnEntity.De"
-          + "spawnReason\"F\n\rDespawnReason\022\013\n\007UNKNOWN\020"
-          + "\000\022\n\n\006KILLED\020\001\022\010\n\004QUIT\020\002\022\022\n\016CHUNK_UNLOADE"
-          + "D\020\003\"8\n\005Login\022\014\n\004uuid\030\001 \001(\t\022\020\n\010username\030\002"
-          + " \001(\t\022\017\n\007version\030\003 \001(\t\"<\n\014ChunkRequest\022,\n"
-          + "\rchunkLocation\030\001 \001(\0132\025.persistence.Vecto"
-          + "r2iB,\n\037no.elg.infiniteBootleg.protobufB\007"
-          + "PacketsP\000b\006proto3"
+          + "\001\0222\n\rentityRequest\030\031 \001(\0132\026.packets.Entit"
+          + "yRequestH\r\210\001\001\"\254\002\n\004Type\022\020\n\014DX_HEARTBEAT\020\000"
+          + "\022\014\n\010SB_LOGIN\020\001\022\022\n\016DX_MOVE_ENTITY\020\002\022\023\n\017DX"
+          + "_BLOCK_UPDATE\020\003\022\021\n\rCB_START_GAME\020\004\022\023\n\017CB"
+          + "_UPDATE_CHUNK\020\005\022\023\n\017CB_LOGIN_STATUS\020\006\022\032\n\026"
+          + "SB_CLIENT_WORLD_LOADED\020\007\022\024\n\020SB_CHUNK_REQ"
+          + "UEST\020\010\022\021\n\rDX_DISCONNECT\020\t\022\026\n\022DX_SECRET_E"
+          + "XCHANGE\020\n\022\023\n\017CB_SPAWN_ENTITY\020\013\022\025\n\021CB_DES"
+          + "PAWN_ENTITY\020\014\022\025\n\021SB_ENTITY_REQUEST\020\r\"#\n\t"
+          + "Direction\022\n\n\006SERVER\020\000\022\n\n\006CLIENT\020\001B\t\n\007_se"
+          + "cretB\014\n\n_heartbeatB\r\n\013_moveEntityB\016\n\014_up"
+          + "dateChunkB\017\n\r_chunkRequestB\016\n\014_updateBlo"
+          + "ckB\010\n\006_loginB\014\n\n_startGameB\024\n\022_serverLog"
+          + "inStatusB\r\n\013_disconnectB\021\n\017_secretExchan"
+          + "geB\016\n\014_spawnEntityB\020\n\016_despawnEntityB\020\n\016"
+          + "_entityRequest\" \n\tHeartbeat\022\023\n\013keepAlive"
+          + "Id\030\001 \001(\t\"c\n\013UpdateBlock\022\"\n\003pos\030\001 \001(\0132\025.p"
+          + "ersistence.Vector2i\022&\n\005block\030\002 \001(\0132\022.per"
+          + "sistence.BlockH\000\210\001\001B\010\n\006_block\"\202\001\n\nMoveEn"
+          + "tity\022\014\n\004uuid\030\001 \001(\t\022\'\n\010velocity\030\002 \001(\0132\025.p"
+          + "ersistence.Vector2f\022\'\n\010position\030\003 \001(\0132\025."
+          + "persistence.Vector2f\022\024\n\014lookAngleDeg\030\004 \001"
+          + "(\002\"\034\n\nDisconnect\022\016\n\006reason\030\001 \001(\t\"4\n\016Secr"
+          + "etExchange\022\022\n\nentityUUID\030\001 \001(\t\022\016\n\006secret"
+          + "\030\002 \001(\t\"X\n\tStartGame\022(\n\013controlling\030\001 \001(\013"
+          + "2\023.persistence.Entity\022!\n\005world\030\002 \001(\0132\022.p"
+          + "ersistence.World\"0\n\013UpdateChunk\022!\n\005chunk"
+          + "\030\001 \001(\0132\022.persistence.Chunk\"\252\001\n\021ServerLog"
+          + "inStatus\0227\n\006status\030\001 \001(\0162\'.packets.Serve"
+          + "rLoginStatus.ServerStatus\"\\\n\014ServerStatu"
+          + "s\022\021\n\rPROCEED_LOGIN\020\000\022\025\n\021ALREADY_LOGGED_I"
+          + "N\020\001\022\017\n\013FULL_SERVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\""
+          + "@\n\013SpawnEntity\022#\n\006entity\030\001 \001(\0132\023.persist"
+          + "ence.Entity\022\014\n\004uuid\030\002 \001(\t\"\242\001\n\rDespawnEnt"
+          + "ity\022\014\n\004uuid\030\001 \001(\t\022;\n\rdespawnReason\030\002 \001(\016"
+          + "2$.packets.DespawnEntity.DespawnReason\"F"
+          + "\n\rDespawnReason\022\013\n\007UNKNOWN\020\000\022\n\n\006KILLED\020\001"
+          + "\022\010\n\004QUIT\020\002\022\022\n\016CHUNK_UNLOADED\020\003\"8\n\005Login\022"
+          + "\014\n\004uuid\030\001 \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007versi"
+          + "on\030\003 \001(\t\"<\n\014ChunkRequest\022,\n\rchunkLocatio"
+          + "n\030\001 \001(\0132\025.persistence.Vector2i\"\035\n\rEntity"
+          + "Request\022\014\n\004uuid\030\001 \001(\tB,\n\037no.elg.infinite"
+          + "Bootleg.protobufB\007PacketsP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
@@ -14382,6 +15360,7 @@ public final class Packets {
               "SecretExchange",
               "SpawnEntity",
               "DespawnEntity",
+              "EntityRequest",
               "Secret",
               "Heartbeat",
               "MoveEntity",
@@ -14395,6 +15374,7 @@ public final class Packets {
               "SecretExchange",
               "SpawnEntity",
               "DespawnEntity",
+              "EntityRequest",
             });
     internal_static_packets_Heartbeat_descriptor = getDescriptor().getMessageTypes().get(1);
     internal_static_packets_Heartbeat_fieldAccessorTable =
@@ -14457,7 +15437,7 @@ public final class Packets {
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_packets_SpawnEntity_descriptor,
             new java.lang.String[] {
-              "Entity",
+              "Entity", "Uuid",
             });
     internal_static_packets_DespawnEntity_descriptor = getDescriptor().getMessageTypes().get(10);
     internal_static_packets_DespawnEntity_fieldAccessorTable =
@@ -14479,6 +15459,13 @@ public final class Packets {
             internal_static_packets_ChunkRequest_descriptor,
             new java.lang.String[] {
               "ChunkLocation",
+            });
+    internal_static_packets_EntityRequest_descriptor = getDescriptor().getMessageTypes().get(13);
+    internal_static_packets_EntityRequest_fieldAccessorTable =
+        new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+            internal_static_packets_EntityRequest_descriptor,
+            new java.lang.String[] {
+              "Uuid",
             });
     no.elg.infiniteBootleg.protobuf.ProtoWorld.getDescriptor();
   }
