@@ -1234,6 +1234,13 @@ public final class ProtoWorld {
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder();
 
     /**
+     * <code>float timeScale = 5;</code>
+     *
+     * @return The timeScale.
+     */
+    float getTimeScale();
+
+    /**
      * <code>.persistence.World.Generator generator = 16;</code>
      *
      * @return The enum numeric value on the wire for generator.
@@ -1339,6 +1346,11 @@ public final class ProtoWorld {
                   spawn_ = subBuilder.buildPartial();
                 }
 
+                break;
+              }
+            case 45:
+              {
+                timeScale_ = input.readFloat();
                 break;
               }
             case 128:
@@ -1599,6 +1611,18 @@ public final class ProtoWorld {
       return getSpawn();
     }
 
+    public static final int TIMESCALE_FIELD_NUMBER = 5;
+    private float timeScale_;
+    /**
+     * <code>float timeScale = 5;</code>
+     *
+     * @return The timeScale.
+     */
+    @java.lang.Override
+    public float getTimeScale() {
+      return timeScale_;
+    }
+
     public static final int GENERATOR_FIELD_NUMBER = 16;
     private int generator_;
     /**
@@ -1681,6 +1705,9 @@ public final class ProtoWorld {
       if (spawn_ != null) {
         output.writeMessage(4, getSpawn());
       }
+      if (timeScale_ != 0F) {
+        output.writeFloat(5, timeScale_);
+      }
       if (generator_
           != no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN.getNumber()) {
         output.writeEnum(16, generator_);
@@ -1708,6 +1735,9 @@ public final class ProtoWorld {
       }
       if (spawn_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(4, getSpawn());
+      }
+      if (timeScale_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream.computeFloatSize(5, timeScale_);
       }
       if (generator_
           != no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN.getNumber()) {
@@ -1740,6 +1770,8 @@ public final class ProtoWorld {
       if (hasSpawn()) {
         if (!getSpawn().equals(other.getSpawn())) return false;
       }
+      if (java.lang.Float.floatToIntBits(getTimeScale())
+          != java.lang.Float.floatToIntBits(other.getTimeScale())) return false;
       if (generator_ != other.generator_) return false;
       if (hasPlayer() != other.hasPlayer()) return false;
       if (hasPlayer()) {
@@ -1766,6 +1798,8 @@ public final class ProtoWorld {
         hash = (37 * hash) + SPAWN_FIELD_NUMBER;
         hash = (53 * hash) + getSpawn().hashCode();
       }
+      hash = (37 * hash) + TIMESCALE_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(getTimeScale());
       hash = (37 * hash) + GENERATOR_FIELD_NUMBER;
       hash = (53 * hash) + generator_;
       if (hasPlayer()) {
@@ -1927,6 +1961,8 @@ public final class ProtoWorld {
           spawn_ = null;
           spawnBuilder_ = null;
         }
+        timeScale_ = 0F;
+
         generator_ = 0;
 
         if (playerBuilder_ == null) {
@@ -1975,6 +2011,7 @@ public final class ProtoWorld {
         } else {
           result.spawn_ = spawnBuilder_.build();
         }
+        result.timeScale_ = timeScale_;
         result.generator_ = generator_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           if (playerBuilder_ == null) {
@@ -2049,6 +2086,9 @@ public final class ProtoWorld {
         }
         if (other.hasSpawn()) {
           mergeSpawn(other.getSpawn());
+        }
+        if (other.getTimeScale() != 0F) {
+          setTimeScale(other.getTimeScale());
         }
         if (other.generator_ != 0) {
           setGeneratorValue(other.getGeneratorValue());
@@ -2353,6 +2393,40 @@ public final class ProtoWorld {
           spawn_ = null;
         }
         return spawnBuilder_;
+      }
+
+      private float timeScale_;
+      /**
+       * <code>float timeScale = 5;</code>
+       *
+       * @return The timeScale.
+       */
+      @java.lang.Override
+      public float getTimeScale() {
+        return timeScale_;
+      }
+      /**
+       * <code>float timeScale = 5;</code>
+       *
+       * @param value The timeScale to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTimeScale(float value) {
+
+        timeScale_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float timeScale = 5;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearTimeScale() {
+
+        timeScale_ = 0F;
+        onChanged();
+        return this;
       }
 
       private int generator_ = 0;
@@ -4020,16 +4094,16 @@ public final class ProtoWorld {
     /** <code>repeated .persistence.Block blocks = 2;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlocksOrBuilder(int index);
 
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity> getEntitiesList();
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntities(int index);
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     int getEntitiesCount();
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     java.util.List<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
         getEntitiesOrBuilderList();
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntitiesOrBuilder(int index);
   }
   /** Protobuf type {@code persistence.Chunk} */
@@ -4108,7 +4182,7 @@ public final class ProtoWorld {
                         extensionRegistry));
                 break;
               }
-            case 130:
+            case 26:
               {
                 if (!((mutable_bitField0_ & 0x00000002) != 0)) {
                   entities_ =
@@ -4220,30 +4294,30 @@ public final class ProtoWorld {
       return blocks_.get(index);
     }
 
-    public static final int ENTITIES_FIELD_NUMBER = 16;
+    public static final int ENTITIES_FIELD_NUMBER = 3;
     private java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity> entities_;
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     @java.lang.Override
     public java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity> getEntitiesList() {
       return entities_;
     }
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     @java.lang.Override
     public java.util.List<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
         getEntitiesOrBuilderList() {
       return entities_;
     }
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     @java.lang.Override
     public int getEntitiesCount() {
       return entities_.size();
     }
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntities(int index) {
       return entities_.get(index);
     }
-    /** <code>repeated .persistence.Entity entities = 16;</code> */
+    /** <code>repeated .persistence.Entity entities = 3;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntitiesOrBuilder(
         int index) {
@@ -4271,7 +4345,7 @@ public final class ProtoWorld {
         output.writeMessage(2, blocks_.get(i));
       }
       for (int i = 0; i < entities_.size(); i++) {
-        output.writeMessage(16, entities_.get(i));
+        output.writeMessage(3, entities_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -4289,7 +4363,7 @@ public final class ProtoWorld {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(2, blocks_.get(i));
       }
       for (int i = 0; i < entities_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(16, entities_.get(i));
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(3, entities_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5042,7 +5116,7 @@ public final class ProtoWorld {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
           entitiesBuilder_;
 
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity> getEntitiesList() {
         if (entitiesBuilder_ == null) {
           return java.util.Collections.unmodifiableList(entities_);
@@ -5050,7 +5124,7 @@ public final class ProtoWorld {
           return entitiesBuilder_.getMessageList();
         }
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public int getEntitiesCount() {
         if (entitiesBuilder_ == null) {
           return entities_.size();
@@ -5058,7 +5132,7 @@ public final class ProtoWorld {
           return entitiesBuilder_.getCount();
         }
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntities(int index) {
         if (entitiesBuilder_ == null) {
           return entities_.get(index);
@@ -5066,7 +5140,7 @@ public final class ProtoWorld {
           return entitiesBuilder_.getMessage(index);
         }
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder setEntities(
           int index, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entitiesBuilder_ == null) {
@@ -5081,7 +5155,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder setEntities(
           int index, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
         if (entitiesBuilder_ == null) {
@@ -5093,7 +5167,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder addEntities(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entitiesBuilder_ == null) {
           if (value == null) {
@@ -5107,7 +5181,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder addEntities(
           int index, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entitiesBuilder_ == null) {
@@ -5122,7 +5196,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder addEntities(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
         if (entitiesBuilder_ == null) {
@@ -5134,7 +5208,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder addEntities(
           int index, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
         if (entitiesBuilder_ == null) {
@@ -5146,7 +5220,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder addAllEntities(
           java.lang.Iterable<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity> values) {
         if (entitiesBuilder_ == null) {
@@ -5158,7 +5232,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder clearEntities() {
         if (entitiesBuilder_ == null) {
           entities_ = java.util.Collections.emptyList();
@@ -5169,7 +5243,7 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public Builder removeEntities(int index) {
         if (entitiesBuilder_ == null) {
           ensureEntitiesIsMutable();
@@ -5180,12 +5254,12 @@ public final class ProtoWorld {
         }
         return this;
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder getEntitiesBuilder(
           int index) {
         return getEntitiesFieldBuilder().getBuilder(index);
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntitiesOrBuilder(
           int index) {
         if (entitiesBuilder_ == null) {
@@ -5194,7 +5268,7 @@ public final class ProtoWorld {
           return entitiesBuilder_.getMessageOrBuilder(index);
         }
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public java.util.List<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
           getEntitiesOrBuilderList() {
         if (entitiesBuilder_ != null) {
@@ -5203,19 +5277,19 @@ public final class ProtoWorld {
           return java.util.Collections.unmodifiableList(entities_);
         }
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder addEntitiesBuilder() {
         return getEntitiesFieldBuilder()
             .addBuilder(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance());
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder addEntitiesBuilder(
           int index) {
         return getEntitiesFieldBuilder()
             .addBuilder(
                 index, no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance());
       }
-      /** <code>repeated .persistence.Entity entities = 16;</code> */
+      /** <code>repeated .persistence.Entity entities = 3;</code> */
       public java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder>
           getEntitiesBuilderList() {
         return getEntitiesFieldBuilder().getBuilderList();
@@ -5638,8 +5712,8 @@ public final class ProtoWorld {
       FALLING_BLOCK(1),
       /** <code>BLOCK = 2;</code> */
       BLOCK(2),
-      /** <code>PLAYER = 16;</code> */
-      PLAYER(16),
+      /** <code>PLAYER = 3;</code> */
+      PLAYER(3),
       UNRECOGNIZED(-1),
       ;
 
@@ -5657,8 +5731,8 @@ public final class ProtoWorld {
       public static final int FALLING_BLOCK_VALUE = 1;
       /** <code>BLOCK = 2;</code> */
       public static final int BLOCK_VALUE = 2;
-      /** <code>PLAYER = 16;</code> */
-      public static final int PLAYER_VALUE = 16;
+      /** <code>PLAYER = 3;</code> */
+      public static final int PLAYER_VALUE = 3;
 
       public final int getNumber() {
         if (this == UNRECOGNIZED) {
@@ -5690,7 +5764,7 @@ public final class ProtoWorld {
             return FALLING_BLOCK;
           case 2:
             return BLOCK;
-          case 16:
+          case 3:
             return PLAYER;
           default:
             return null;
@@ -10239,38 +10313,38 @@ public final class ProtoWorld {
     java.lang.String[] descriptorData = {
       "\n\037serialization/persistence.proto\022\013persi"
           + "stence\" \n\010Vector2f\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
-          + "\" \n\010Vector2i\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 \001(\021\"\353\001\n\005W"
+          + "\" \n\010Vector2i\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 \001(\021\"\376\001\n\005W"
           + "orld\022\014\n\004seed\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\022\014\n\004time"
           + "\030\003 \001(\002\022$\n\005spawn\030\004 \001(\0132\025.persistence.Vect"
-          + "or2i\022/\n\tgenerator\030\020 \001(\0162\034.persistence.Wo"
-          + "rld.Generator\022(\n\006player\030\021 \001(\0132\023.persiste"
-          + "nce.EntityH\000\210\001\001\",\n\tGenerator\022\n\n\006PERLIN\020\000"
-          + "\022\010\n\004FLAT\020\001\022\t\n\005EMPTY\020\002B\t\n\007_player\"n\n\005Bloc"
-          + "k\022\030\n\020material_ordinal\030\001 \001(\005\022(\n\003tnt\030\020 \001(\013"
-          + "2\026.persistence.Block.TNTH\000\210\001\001\032\031\n\003TNT\022\022\n\n"
-          + "ticks_left\030\001 \001(\003B\006\n\004_tnt\"{\n\005Chunk\022\'\n\010pos"
-          + "ition\030\001 \001(\0132\025.persistence.Vector2i\022\"\n\006bl"
-          + "ocks\030\002 \003(\0132\022.persistence.Block\022%\n\010entiti"
-          + "es\030\020 \003(\0132\023.persistence.Entity\"\264\005\n\006Entity"
-          + "\022,\n\004type\030\001 \001(\0162\036.persistence.Entity.Enti"
-          + "tyType\022\'\n\010position\030\002 \001(\0132\025.persistence.V"
-          + "ector2f\022\'\n\010velocity\030\003 \001(\0132\025.persistence."
-          + "Vector2f\022\014\n\004uuid\030\004 \001(\t\022\016\n\006flying\030\005 \001(\010\022/"
-          + "\n\006living\030\020 \001(\0132\032.persistence.Entity.Livi"
-          + "ngH\000\210\001\001\0223\n\010material\030\021 \001(\0132\034.persistence."
-          + "Entity.MaterialH\001\210\001\001\022/\n\006player\030\022 \001(\0132\032.p"
-          + "ersistence.Entity.PlayerH\002\210\001\001\0221\n\007generic"
-          + "\030\023 \001(\0132\033.persistence.Entity.GenericH\003\210\001\001"
-          + "\032:\n\006Living\022\014\n\004name\030\001 \001(\t\022\016\n\006health\030\002 \001(\005"
-          + "\022\022\n\nmax_health\030\003 \001(\005\032$\n\010Material\022\030\n\020mate"
-          + "rial_ordinal\030\001 \001(\005\0325\n\006Player\022\027\n\017torch_an"
-          + "gle_deg\030\001 \001(\002\022\022\n\ncontrolled\030\002 \001(\010\032.\n\007Gen"
-          + "eric\022#\n\004size\030\001 \001(\0132\025.persistence.Vector2"
-          + "i\"J\n\nEntityType\022\022\n\016GENERIC_ENTITY\020\000\022\021\n\rF"
-          + "ALLING_BLOCK\020\001\022\t\n\005BLOCK\020\002\022\n\n\006PLAYER\020\020B\t\n"
-          + "\007_livingB\013\n\t_materialB\t\n\007_playerB\n\n\010_gen"
-          + "ericB/\n\037no.elg.infiniteBootleg.protobufB"
-          + "\nProtoWorldP\000b\006proto3"
+          + "or2i\022\021\n\ttimeScale\030\005 \001(\002\022/\n\tgenerator\030\020 \001"
+          + "(\0162\034.persistence.World.Generator\022(\n\006play"
+          + "er\030\021 \001(\0132\023.persistence.EntityH\000\210\001\001\",\n\tGe"
+          + "nerator\022\n\n\006PERLIN\020\000\022\010\n\004FLAT\020\001\022\t\n\005EMPTY\020\002"
+          + "B\t\n\007_player\"n\n\005Block\022\030\n\020material_ordinal"
+          + "\030\001 \001(\005\022(\n\003tnt\030\020 \001(\0132\026.persistence.Block."
+          + "TNTH\000\210\001\001\032\031\n\003TNT\022\022\n\nticks_left\030\001 \001(\003B\006\n\004_"
+          + "tnt\"{\n\005Chunk\022\'\n\010position\030\001 \001(\0132\025.persist"
+          + "ence.Vector2i\022\"\n\006blocks\030\002 \003(\0132\022.persiste"
+          + "nce.Block\022%\n\010entities\030\003 \003(\0132\023.persistenc"
+          + "e.Entity\"\264\005\n\006Entity\022,\n\004type\030\001 \001(\0162\036.pers"
+          + "istence.Entity.EntityType\022\'\n\010position\030\002 "
+          + "\001(\0132\025.persistence.Vector2f\022\'\n\010velocity\030\003"
+          + " \001(\0132\025.persistence.Vector2f\022\014\n\004uuid\030\004 \001("
+          + "\t\022\016\n\006flying\030\005 \001(\010\022/\n\006living\030\020 \001(\0132\032.pers"
+          + "istence.Entity.LivingH\000\210\001\001\0223\n\010material\030\021"
+          + " \001(\0132\034.persistence.Entity.MaterialH\001\210\001\001\022"
+          + "/\n\006player\030\022 \001(\0132\032.persistence.Entity.Pla"
+          + "yerH\002\210\001\001\0221\n\007generic\030\023 \001(\0132\033.persistence."
+          + "Entity.GenericH\003\210\001\001\032:\n\006Living\022\014\n\004name\030\001 "
+          + "\001(\t\022\016\n\006health\030\002 \001(\005\022\022\n\nmax_health\030\003 \001(\005\032"
+          + "$\n\010Material\022\030\n\020material_ordinal\030\001 \001(\005\0325\n"
+          + "\006Player\022\027\n\017torch_angle_deg\030\001 \001(\002\022\022\n\ncont"
+          + "rolled\030\002 \001(\010\032.\n\007Generic\022#\n\004size\030\001 \001(\0132\025."
+          + "persistence.Vector2i\"J\n\nEntityType\022\022\n\016GE"
+          + "NERIC_ENTITY\020\000\022\021\n\rFALLING_BLOCK\020\001\022\t\n\005BLO"
+          + "CK\020\002\022\n\n\006PLAYER\020\003B\t\n\007_livingB\013\n\t_material"
+          + "B\t\n\007_playerB\n\n\010_genericB/\n\037no.elg.infini"
+          + "teBootleg.protobufB\nProtoWorldP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
@@ -10294,7 +10368,7 @@ public final class ProtoWorld {
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_persistence_World_descriptor,
             new java.lang.String[] {
-              "Seed", "Name", "Time", "Spawn", "Generator", "Player", "Player",
+              "Seed", "Name", "Time", "Spawn", "TimeScale", "Generator", "Player", "Player",
             });
     internal_static_persistence_Block_descriptor = getDescriptor().getMessageTypes().get(3);
     internal_static_persistence_Block_fieldAccessorTable =

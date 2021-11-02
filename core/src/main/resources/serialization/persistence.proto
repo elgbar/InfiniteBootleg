@@ -5,17 +5,18 @@ option java_multiple_files = false;
 option java_package = "no.elg.infiniteBootleg.protobuf";
 option java_outer_classname = "ProtoWorld";
 
-message Vector2f{
+message Vector2f {
   float x = 1;
   float y = 2;
 }
 
-message Vector2i{
+message Vector2i {
   sint32 x = 1;
   sint32 y = 2;
 }
 
 message World {
+
   int64 seed = 1;
   string name = 2;
   float time = 3;
@@ -24,7 +25,7 @@ message World {
   Generator generator = 16;
   optional Entity player = 17;
 
-  enum Generator{
+  enum Generator {
     PERLIN = 0;
     FLAT = 1;
     EMPTY = 2;
@@ -36,7 +37,7 @@ message Block {
 
   optional TNT tnt = 16; //TntBlock, only applicable if material is TNT
 
-  message TNT{
+  message TNT {
     int64 ticks_left = 1;
   }
 }
@@ -44,7 +45,7 @@ message Block {
 message Chunk {
   Vector2i position = 1;
   repeated Block blocks = 2;
-  repeated Entity entities = 16;
+  repeated Entity entities = 3;
 }
 
 message Entity {
@@ -54,11 +55,11 @@ message Entity {
   string uuid = 4;
   bool flying = 5;
 
-  enum EntityType{
+  enum EntityType {
     GENERIC_ENTITY = 0; // default
     FALLING_BLOCK = 1;
     BLOCK = 2;
-    PLAYER = 16;
+    PLAYER = 3;
   }
 
   optional Living living = 16;
@@ -66,22 +67,22 @@ message Entity {
   optional Player player = 18;
   optional Generic generic = 19;
 
-  message Living{
+  message Living {
     string name = 1;
     int32 health = 2;
     int32 max_health = 3;
   }
 
-  message Material{
+  message Material {
     int32 material_ordinal = 1; //ordinal from Material enum
   }
 
-  message Player{
+  message Player {
     float torch_angle_deg = 1;
     bool controlled = 2;
   }
 
-  message Generic{
+  message Generic {
     Vector2i size = 1; //x = width, y = height
   }
 

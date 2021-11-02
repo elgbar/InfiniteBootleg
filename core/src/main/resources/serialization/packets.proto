@@ -11,7 +11,7 @@ message Packet {
   // There are three types of packets
   // 1. DX (duplex) Sent both to server and to client
   // 2. SB (Server Bound) Only sent to server
-  // 3. CB (Client Bound) Only sent to server
+  // 3. CB (Client Bound) Only sent to client
   enum Type {
     DX_HEARTBEAT = 0;
     SB_LOGIN = 1;
@@ -43,17 +43,18 @@ message Packet {
   optional Heartbeat heartbeat = 8; //dual
   optional MoveEntity moveEntity = 9; //dual
   optional UpdateChunk updateChunk = 10; //client bound
-  optional ChunkRequest chunkRequest = 11; //server bound
+  optional SpawnEntity spawnEntity = 11;
+  optional DespawnEntity despawnEntity = 12;
+  optional UpdateBlock updateBlock = 13; //dual
 
   //more rare packets
-  optional UpdateBlock updateBlock = 16; //dual
   optional Login login = 17; //server bound
   optional StartGame startGame = 18; //client bound
   optional ServerLoginStatus serverLoginStatus = 20; //client bound
   optional Disconnect disconnect = 21;
   optional SecretExchange secretExchange = 22;
-  optional SpawnEntity spawnEntity = 23;
-  optional DespawnEntity despawnEntity = 24;
+  optional ChunkRequest chunkRequest = 23; //server bound
+  optional EntityRequest entityRequest = 24;
   optional EntityRequest entityRequest = 25;
 }
 
