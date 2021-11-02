@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.screen.HUDRenderer
+import no.elg.infiniteBootleg.util.PointLightPool
 import no.elg.infiniteBootleg.world.World
 
 /**
@@ -55,6 +56,7 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
       world.dispose()
       ClientMain.inst().setSingleplayerWorld(null)
     }
+    PointLightPool.clearAllPools()
     dispose()
   }
 
