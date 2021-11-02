@@ -568,7 +568,7 @@ public abstract class Entity
         }
       }
     }
-    if (Main.isServer() && !getVelocity().isZero(0.01f)) {
+    if (Main.isServer()) {
       PacketExtraKt.broadcast(
           null,
           PacketExtraKt.clientBoundMoveEntity(this),
