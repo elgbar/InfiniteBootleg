@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -114,13 +115,13 @@ public abstract class LivingEntity extends Entity implements Updatable {
   }
 
   public void disableGravity() {
-    if (!isInvalid()) {
+    if (!isInvalid() && Main.isServerClient()) {
       getBody().setGravityScale(0.0f);
     }
   }
 
   public void enableGravity() {
-    if (!isInvalid()) {
+    if (!isInvalid() && Main.isServerClient()) {
       getBody().setGravityScale(DEFAULT_GRAVITY_SCALE);
     }
   }
