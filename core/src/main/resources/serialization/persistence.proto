@@ -21,6 +21,7 @@ message World {
   string name = 2;
   float time = 3;
   Vector2i spawn = 4;
+  float timeScale = 5;
 
   Generator generator = 16;
   optional Entity player = 17;

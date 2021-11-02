@@ -223,6 +223,7 @@ public class World implements Disposable, Resizable {
 
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTime(protoWorld.getTime());
+    worldTime.setTimeScale(protoWorld.getTimeScale());
 
     if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
       final Player newPlayer = new Player(this, protoWorld.getPlayer());
@@ -275,6 +276,7 @@ public class World implements Disposable, Resizable {
     builder.setName(name);
     builder.setSeed(seed);
     builder.setTime(worldTime.getTime());
+    builder.setTimeScale(worldTime.getTimeScale());
     builder.setSpawn(spawn.toVector2i());
     builder.setGenerator(getGeneratorType());
     if (Settings.client) {
