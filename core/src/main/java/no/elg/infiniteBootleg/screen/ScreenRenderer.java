@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
-import no.elg.infiniteBootleg.ClientMain;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Resizable;
 
 public class ScreenRenderer implements Disposable, Resizable {
@@ -23,7 +23,7 @@ public class ScreenRenderer implements Disposable, Resizable {
 
     public ScreenRenderer() {
 
-        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(ClientMain.FONTS_FOLDER + "UbuntuMono-R.ttf"));
+        final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
         final FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = FONT_SIZE * SCALE;
 
@@ -36,12 +36,12 @@ public class ScreenRenderer implements Disposable, Resizable {
         batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
 
-    public void drawTop(String text, int line) {
+    public void drawTop(String text, float line) {
         font.draw(batch, text, spacing, Gdx.graphics.getHeight() - spacing * line);
     }
 
-    public void drawBottom(String text, int line) {
-        font.draw(batch, text, spacing, spacing * (line + 1));
+    public void drawBottom(String text, float line) {
+        font.draw(batch, text, spacing, spacing * (line + 1f));
     }
 
     public void begin() {

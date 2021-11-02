@@ -41,12 +41,12 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_LOGIN_STATUS -> {
       if (packet.hasServerLoginStatus()) {
         val loginStatus = packet.serverLoginStatus.status
-        loginStatus(loginStatus)
+        handleLoginStatus(loginStatus)
       }
     }
     CB_START_GAME -> {
       if (packet.hasStartGame()) {
-        startGame(packet.startGame)
+        handleStartGame(packet.startGame)
       }
     }
     CB_UPDATE_CHUNK -> {
@@ -176,7 +176,7 @@ fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
   Main.inst().scheduler.executeSync(exec)
 }
 
-fun ServerClient.startGame(startGame: StartGame) {
+fun ServerClient.handleStartGame(startGame: StartGame) {
   val protoWorld = startGame.world
   Main.inst().scheduler.executeSync {
     this.world = World(protoWorld).apply {
@@ -191,7 +191,7 @@ fun ServerClient.startGame(startGame: StartGame) {
   }
 }
 
-fun ServerClient.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
+fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
   when (loginStatus) {
     ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN -> {
       ctx.fatal("You are already logged in!")

@@ -50,19 +50,19 @@ class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
 
   @Test
   fun `disconnect when server full`() {
-    getClient().loginStatus(FULL_SERVER)
+    getClient().handleLoginStatus(FULL_SERVER)
     verify(exactly = 1) { ctx.close() }
   }
 
   @Test
   fun `disconnect when already logged in`() {
-    getClient().loginStatus(ALREADY_LOGGED_IN)
+    getClient().handleLoginStatus(ALREADY_LOGGED_IN)
     verify(exactly = 1) { ctx.close() }
   }
 
   @Test
   fun `do not disconnect when PROCEED_LOGIN`() {
-    getClient().loginStatus(PROCEED_LOGIN)
+    getClient().handleLoginStatus(PROCEED_LOGIN)
     verify(exactly = 0) { ctx.close() }
   }
 
@@ -72,7 +72,7 @@ class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
     val client = getClient()
     client.world = newWorld
     client.controllingEntity = Player(newWorld, 0f, 0f, UUID.randomUUID()).save().build()
-    client.loginStatus(LOGIN_SUCCESS)
+    client.handleLoginStatus(LOGIN_SUCCESS)
     verify(exactly = 0) { ctx.close() }
   }
 

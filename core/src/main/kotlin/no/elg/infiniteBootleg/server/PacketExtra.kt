@@ -80,15 +80,15 @@ fun ChannelHandlerContext?.broadcast(packet: Packet, filter: ((Channel, Connecti
 /**
  * @author Elg
  */
-fun ServerClient.serverBoundPacket(type: Type): Packets.Packet.Builder {
-  return Packets.Packet.newBuilder()
+fun ServerClient.serverBoundPacket(type: Type): Packet.Builder {
+  return Packet.newBuilder()
     .setDirection(SERVER)
     .setSecret(credentials!!.secret) //FIXME
     .setType(type)
 }
 
-fun clientBoundPacket(type: Type): Packets.Packet.Builder {
-  return Packets.Packet.newBuilder()
+fun clientBoundPacket(type: Type): Packet.Builder {
+  return Packet.newBuilder()
     .setDirection(CLIENT)
     .setType(type)
 }
@@ -99,8 +99,8 @@ fun clientBoundPacket(type: Type): Packets.Packet.Builder {
 //////////////////
 
 
-fun serverBoundLoginPacket(name: String, uuid: UUID): Packets.Packet {
-  return Packets.Packet.newBuilder()
+fun serverBoundLoginPacket(name: String, uuid: UUID): Packet {
+  return Packet.newBuilder()
     .setDirection(SERVER)
     .setType(SB_LOGIN)
     .setLogin(
@@ -111,7 +111,7 @@ fun serverBoundLoginPacket(name: String, uuid: UUID): Packets.Packet {
     ).build()
 }
 
-fun ServerClient.serverBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packets.Packet {
+fun ServerClient.serverBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packet {
   return serverBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
@@ -119,7 +119,7 @@ fun ServerClient.serverBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?)
   ).build()
 }
 
-fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: ConnectionCredentials): Packets.Packet {
+fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: ConnectionCredentials): Packet {
   return serverBoundPacket(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(connectionCredentials.secret)
@@ -133,7 +133,7 @@ fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: Connecti
 //}
 
 
-fun ServerClient.serverBoundClientDisconnectPacket(reason: String?): Packets.Packet {
+fun ServerClient.serverBoundClientDisconnectPacket(reason: String?): Packet {
   return serverBoundPacket(DX_DISCONNECT).let {
     if (!reason.isNullOrBlank()) {
       it.setDisconnect(Disconnect.newBuilder().setReason(reason))
@@ -142,7 +142,7 @@ fun ServerClient.serverBoundClientDisconnectPacket(reason: String?): Packets.Pac
   }
 }
 
-fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packets.Packet {
+fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   return serverBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
       .setUuid(entity.uuid.toString()) //
@@ -158,7 +158,7 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packets.Packet {
 
 private val PROTO_AIR_BLOCK = Block.save(AIR).build()
 
-fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packets.Packet {
+fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packet {
   return clientBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
@@ -166,7 +166,7 @@ fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packets.Pac
   ).build()
 }
 
-fun clientBoundMoveEntity(entity: Entity): Packets.Packet {
+fun clientBoundMoveEntity(entity: Entity): Packet {
   return clientBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
       .setUuid(entity.uuid.toString()) //
@@ -175,7 +175,7 @@ fun clientBoundMoveEntity(entity: Entity): Packets.Packet {
   ).build()
 }
 
-fun clientBoundSpawnEntity(entity: Entity): Packets.Packet {
+fun clientBoundSpawnEntity(entity: Entity): Packet {
   return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
       .setEntity(entity.save())
@@ -194,7 +194,7 @@ fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packet
   return clientBoundPacket(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
 }
 
-fun clientBoundStartGamePacket(player: Player): Packets.Packet {
+fun clientBoundStartGamePacket(player: Player): Packet {
   return clientBoundPacket(CB_START_GAME).setStartGame(
     StartGame.newBuilder()
       .setWorld(player.world.toProtobuf())
@@ -202,11 +202,11 @@ fun clientBoundStartGamePacket(player: Player): Packets.Packet {
   ).build()
 }
 
-fun clientBoundUpdateChunkPacket(chunk: Chunk): Packets.Packet {
+fun clientBoundUpdateChunkPacket(chunk: Chunk): Packet {
   return clientBoundPacket(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.saveBlocksOnly())).build()
 }
 
-fun clientBoundDisconnectPlayerPacket(reason: String?): Packets.Packet {
+fun clientBoundDisconnectPlayerPacket(reason: String?): Packet {
   return clientBoundPacket(DX_DISCONNECT).let {
     if (!reason.isNullOrBlank()) {
       it.setDisconnect(Disconnect.newBuilder().setReason(reason))
@@ -215,7 +215,7 @@ fun clientBoundDisconnectPlayerPacket(reason: String?): Packets.Packet {
   }
 }
 
-fun clientBoundSecretExchange(connectionCredentials: ConnectionCredentials): Packets.Packet {
+fun clientBoundSecretExchange(connectionCredentials: ConnectionCredentials): Packet {
   return clientBoundPacket(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(connectionCredentials.secret)

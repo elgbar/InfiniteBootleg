@@ -32,7 +32,7 @@ public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull Packet packet) {
-        Main.logger().log("Client bound packet " + packet.getType());
+//        Main.logger().log("Client bound packet " + packet.getType());
         if (packet.getDirection() == Packet.Direction.SERVER || packet.getType().name().startsWith("SB_")) {
             Main.logger().error(TAG, "Client got a server packet");
             return;

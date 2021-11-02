@@ -46,7 +46,6 @@ public class HUDRenderer implements Renderer {
 
         LivingEntity player = ClientMain.inst().getPlayer();
         ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
-        assert sr != null; // this method should not get called if we are not rendering
         if (modus == HUDModus.DEBUG) {
             int mouseBlockX = main.getMouseBlockX();
             int mouseBlockY = main.getMouseBlockY();

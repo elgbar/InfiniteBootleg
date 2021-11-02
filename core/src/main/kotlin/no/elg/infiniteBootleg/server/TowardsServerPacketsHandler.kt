@@ -72,7 +72,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
   }
 }
 
-fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntity) {
+private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntity) {
   val player = ctx.getCurrentPlayer()
   if (player == null) {
     ctx.fatal("No server side player found!")
@@ -85,7 +85,7 @@ fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntity) {
   player.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, false)
 }
 
-fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
+private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
   val cc = ServerBoundHandler.clients[ctx.channel()]
   if (cc == null) {
     ctx.fatal("No secret with this channel, send login request first")
@@ -111,14 +111,14 @@ fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExcha
   }
 }
 
-fun handleBlockUpdate(blockUpdate: UpdateBlock) {
+private fun handleBlockUpdate(blockUpdate: UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
   ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
 }
 
-fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
+private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunkLoc = Location.fromVector2i(chunkRequest.chunkLocation)
   val chunk = ServerMain.inst().serverWorld.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
   val allowedUnload = chunk.isAllowingUnloading
@@ -202,11 +202,11 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   ctx.writeAndFlush(clientBoundSecretExchange(connectionCredentials))
 }
 
-fun ChannelHandlerContext.getClientCredentials(): ConnectionCredentials? {
+private fun ChannelHandlerContext.getClientCredentials(): ConnectionCredentials? {
   return ServerBoundHandler.clients[this.channel()]
 }
 
-fun ChannelHandlerContext.getCurrentPlayer(): Player? {
+private fun ChannelHandlerContext.getCurrentPlayer(): Player? {
   val uuid = getClientCredentials()?.entityUUID ?: return null
   return ServerMain.inst().serverWorld.getPlayer(uuid)
 }
