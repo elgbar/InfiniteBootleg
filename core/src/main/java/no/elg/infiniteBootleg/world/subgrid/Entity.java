@@ -22,11 +22,13 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Savable;
 import no.elg.infiniteBootleg.world.Block;
@@ -60,7 +62,7 @@ public abstract class Entity
         Savable<ProtoWorld.EntityOrBuilder> {
 
   public static final float GROUND_CHECK_OFFSET = 0.1f;
-  public static final float TELEPORT_DIFFERENCE_THRESHOLD = 0.5f;
+  public static final float TELEPORT_DIFFERENCE_THRESHOLD = 1f;
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
 
@@ -264,14 +266,9 @@ public abstract class Entity
         updatePos();
         // If we're too far away teleport the entity to its correct location
         // and add a bit to the y coordinate, so we don't fall through the floor
-        if (Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
+        if ((Main.isServerClient() && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
+            || Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
             || Math.abs(physicsWorldY - posCache.y) > TELEPORT_DIFFERENCE_THRESHOLD) {
-          Main.logger()
-              .log(
-                  "OFF! dx: "
-                      + Math.abs(physicsWorldX - posCache.x)
-                      + " dy "
-                      + Math.abs(physicsWorldY - posCache.y));
           body.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
           sendMovePacket = true;
         }
@@ -286,6 +283,12 @@ public abstract class Entity
     velCache.x = velX;
     velCache.y = velY;
     if (Main.isServer() && sendMovePacket) {
+      Main.logger()
+          .log(
+              "OFF! dx: "
+                  + Math.abs(physicsWorldX - posCache.x)
+                  + " dy "
+                  + Math.abs(physicsWorldY - posCache.y));
       Main.inst()
           .getScheduler()
           .executeAsync(
