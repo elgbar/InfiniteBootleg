@@ -807,7 +807,7 @@ public class World implements Disposable, Resizable {
           .getScheduler()
           .executeAsync(
               () -> {
-                PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundSpawnEntity(entity), null);
+                PacketExtraKt.broadcast(PacketExtraKt.clientBoundSpawnEntity(entity), null);
               });
     }
   }
@@ -837,7 +837,7 @@ public class World implements Disposable, Resizable {
           .executeAsync(
               () ->
                   PacketExtraKt.broadcast(
-                      null, PacketExtraKt.clientBoundDespawnEntity(entityUuid, UNKNOWN), null));
+                      PacketExtraKt.clientBoundDespawnEntity(entityUuid, UNKNOWN), null));
     }
   }
 

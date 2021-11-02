@@ -164,7 +164,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
   Main.logger().log("Player " + player.hudDebug() + " joined")
-  ctx.broadcast(clientBoundSpawnEntity(player))
+  broadcast(clientBoundSpawnEntity(player)) { c, _ -> c != ctx.channel() }
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {

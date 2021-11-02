@@ -293,7 +293,7 @@ public abstract class Entity
           .getScheduler()
           .executeAsync(
               () -> {
-                PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundMoveEntity(this), null);
+                PacketExtraKt.broadcast(PacketExtraKt.clientBoundMoveEntity(this), null);
               });
     }
   }
@@ -590,7 +590,6 @@ public abstract class Entity
     }
     if (Main.isServer()) {
       PacketExtraKt.broadcast(
-          null,
           PacketExtraKt.clientBoundMoveEntity(this),
           (channel, credentials) -> {
             // don't send packet to the owning player

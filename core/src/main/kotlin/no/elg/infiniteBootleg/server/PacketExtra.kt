@@ -67,10 +67,9 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
 /**
  * Broadcast to all other channels than [this]
  */
-fun ChannelHandlerContext?.broadcast(packet: Packet, filter: ((Channel, ConnectionCredentials) -> Boolean)? = null) {
-  val thisChannel = this?.channel()
+fun broadcast(packet: Packet, filter: ((Channel, ConnectionCredentials) -> Boolean)? = null) {
   for ((channel, creds) in ServerBoundHandler.clients) {
-    if (channel == thisChannel || (filter != null && !filter(channel, creds))) {
+    if (filter != null && !filter(channel, creds)) {
       continue
     }
     channel.writeAndFlush(packet)
