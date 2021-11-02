@@ -17,6 +17,8 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
+import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -45,6 +47,7 @@ public class Player extends LivingEntity {
         Preconditions.checkArgument(protoEntity.hasPlayer(), "Player does not contain player data");
         final ProtoWorld.Entity.Player protoPlayer = protoEntity.getPlayer();
         setTorchAngle(protoPlayer.getTorchAngleDeg());
+
         if (protoPlayer.getControlled() && Main.isSingleplayer()) {
             Main.inst().getScheduler().executeSync(() -> {
                 if (!isInvalid()) {
@@ -78,16 +81,16 @@ public class Player extends LivingEntity {
     }
 
     {
-        if (Settings.client) {
+        if (isInvalid() || !Settings.client) {
+            torchLight = null;
+        }
+        else {
             synchronized (LIGHT_LOCK) {
                 torchLight = new ConeLight(ClientMain.inst().getWorld().getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
                 torchLight.setStaticLight(true);
                 torchLight.setContactFilter(World.LIGHT_FILTER);
                 torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
             }
-        }
-        else {
-            torchLight = null;
         }
     }
 
