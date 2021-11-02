@@ -109,6 +109,9 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   @Override
   public void tick() {
+    if (crashed) {
+      return;
+    }
     super.tick();
     LightTrait.Companion.tryCreateLight(this);
   }
@@ -176,7 +179,6 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     super.dispose();
     if (block != null) {
       block.tryDispose();
-      block = null;
     }
     if (light != null) {
       PointLightPool.getPool(getWorld()).free(light);
