@@ -1,0 +1,8 @@
+#!/bin/sh
+# To install move to .git/hooks
+echo "Running spotless check"
+./gradlew spotlessCheck --daemon
+status=$?
+# return 1 exit code if running checks fails
+[ $status -ne 0 ] && exit 1
+exit 0
