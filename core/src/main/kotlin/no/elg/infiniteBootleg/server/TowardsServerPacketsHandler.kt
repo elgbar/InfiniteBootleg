@@ -82,7 +82,7 @@ private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntit
     ctx.fatal("Client tried to update someone else")
     return
   }
-  player.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, false)
+  player.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
 }
 
 private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {

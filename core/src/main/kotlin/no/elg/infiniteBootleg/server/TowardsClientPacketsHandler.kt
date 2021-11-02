@@ -253,7 +253,7 @@ fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
     return
   }
-  entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, false)
+  entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
 }
 
 fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {

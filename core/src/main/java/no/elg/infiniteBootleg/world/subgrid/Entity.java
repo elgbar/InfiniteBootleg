@@ -71,6 +71,7 @@ public abstract class Entity
   private final Vector2 velCache;
   private int groundContacts;
   private Filter filter;
+  private float lookDeg;
 
   protected volatile boolean valid = true;
 
@@ -218,10 +219,11 @@ public abstract class Entity
   }
 
   public void teleport(float worldX, float worldY, boolean validate) {
-    translate(worldX, worldY, 0, 0, validate);
+    translate(worldX, worldY, 0, 0, 0f, validate);
   }
 
-  public void translate(float worldX, float worldY, float velX, float velY, boolean validate) {
+  public void translate(
+      float worldX, float worldY, float velX, float velY, float lookAngleDeg, boolean validate) {
     if (isInvalid()) {
       return;
     }
@@ -274,6 +276,7 @@ public abstract class Entity
         body.setAwake(true);
       }
     }
+    setLookDeg(lookAngleDeg);
     posCache.x = worldX;
     posCache.y = worldY;
     velCache.x = velX;
@@ -742,6 +745,14 @@ public abstract class Entity
 
   public boolean isInvalid() {
     return !valid || body == null;
+  }
+
+  public float getLookDeg() {
+    return lookDeg;
+  }
+
+  public void setLookDeg(float lookDeg) {
+    this.lookDeg = lookDeg;
   }
 
   @Override

@@ -6271,6 +6271,13 @@ public final class Packets {
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getPosition();
     /** <code>.persistence.Vector2f position = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder();
+
+    /**
+     * <code>float lookAngleDeg = 4;</code>
+     *
+     * @return The lookAngleDeg.
+     */
+    float getLookAngleDeg();
   }
   /** Protobuf type {@code packets.MoveEntity} */
   public static final class MoveEntity extends com.google.protobuf.GeneratedMessageV3
@@ -6355,6 +6362,11 @@ public final class Packets {
                   position_ = subBuilder.buildPartial();
                 }
 
+                break;
+              }
+            case 37:
+              {
+                lookAngleDeg_ = input.readFloat();
                 break;
               }
             default:
@@ -6494,6 +6506,18 @@ public final class Packets {
       return getPosition();
     }
 
+    public static final int LOOKANGLEDEG_FIELD_NUMBER = 4;
+    private float lookAngleDeg_;
+    /**
+     * <code>float lookAngleDeg = 4;</code>
+     *
+     * @return The lookAngleDeg.
+     */
+    @java.lang.Override
+    public float getLookAngleDeg() {
+      return lookAngleDeg_;
+    }
+
     private byte memoizedIsInitialized = -1;
 
     @java.lang.Override
@@ -6517,6 +6541,9 @@ public final class Packets {
       if (position_ != null) {
         output.writeMessage(3, getPosition());
       }
+      if (lookAngleDeg_ != 0F) {
+        output.writeFloat(4, lookAngleDeg_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -6534,6 +6561,9 @@ public final class Packets {
       }
       if (position_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(3, getPosition());
+      }
+      if (lookAngleDeg_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream.computeFloatSize(4, lookAngleDeg_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6560,6 +6590,8 @@ public final class Packets {
       if (hasPosition()) {
         if (!getPosition().equals(other.getPosition())) return false;
       }
+      if (java.lang.Float.floatToIntBits(getLookAngleDeg())
+          != java.lang.Float.floatToIntBits(other.getLookAngleDeg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6581,6 +6613,8 @@ public final class Packets {
         hash = (37 * hash) + POSITION_FIELD_NUMBER;
         hash = (53 * hash) + getPosition().hashCode();
       }
+      hash = (37 * hash) + LOOKANGLEDEG_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(getLookAngleDeg());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6736,6 +6770,8 @@ public final class Packets {
           position_ = null;
           positionBuilder_ = null;
         }
+        lookAngleDeg_ = 0F;
+
         return this;
       }
 
@@ -6777,6 +6813,7 @@ public final class Packets {
         } else {
           result.position_ = positionBuilder_.build();
         }
+        result.lookAngleDeg_ = lookAngleDeg_;
         onBuilt();
         return result;
       }
@@ -6838,6 +6875,9 @@ public final class Packets {
         }
         if (other.hasPosition()) {
           mergePosition(other.getPosition());
+        }
+        if (other.getLookAngleDeg() != 0F) {
+          setLookAngleDeg(other.getLookAngleDeg());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -7219,6 +7259,40 @@ public final class Packets {
           position_ = null;
         }
         return positionBuilder_;
+      }
+
+      private float lookAngleDeg_;
+      /**
+       * <code>float lookAngleDeg = 4;</code>
+       *
+       * @return The lookAngleDeg.
+       */
+      @java.lang.Override
+      public float getLookAngleDeg() {
+        return lookAngleDeg_;
+      }
+      /**
+       * <code>float lookAngleDeg = 4;</code>
+       *
+       * @param value The lookAngleDeg to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLookAngleDeg(float value) {
+
+        lookAngleDeg_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float lookAngleDeg = 4;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearLookAngleDeg() {
+
+        lookAngleDeg_ = 0F;
+        onChanged();
+        return this;
       }
 
       @java.lang.Override
@@ -14257,29 +14331,30 @@ public final class Packets {
           + "y\" \n\tHeartbeat\022\023\n\013keepAliveId\030\001 \001(\t\"c\n\013U"
           + "pdateBlock\022\"\n\003pos\030\001 \001(\0132\025.persistence.Ve"
           + "ctor2i\022&\n\005block\030\002 \001(\0132\022.persistence.Bloc"
-          + "kH\000\210\001\001B\010\n\006_block\"l\n\nMoveEntity\022\014\n\004uuid\030\001"
-          + " \001(\t\022\'\n\010velocity\030\002 \001(\0132\025.persistence.Vec"
-          + "tor2f\022\'\n\010position\030\003 \001(\0132\025.persistence.Ve"
-          + "ctor2f\"\034\n\nDisconnect\022\016\n\006reason\030\001 \001(\t\"4\n\016"
-          + "SecretExchange\022\022\n\nentityUUID\030\001 \001(\t\022\016\n\006se"
-          + "cret\030\002 \001(\t\"X\n\tStartGame\022(\n\013controlling\030\001"
-          + " \001(\0132\023.persistence.Entity\022!\n\005world\030\002 \001(\013"
-          + "2\022.persistence.World\"0\n\013UpdateChunk\022!\n\005c"
-          + "hunk\030\001 \001(\0132\022.persistence.Chunk\"\252\001\n\021Serve"
-          + "rLoginStatus\0227\n\006status\030\001 \001(\0162\'.packets.S"
-          + "erverLoginStatus.ServerStatus\"\\\n\014ServerS"
-          + "tatus\022\021\n\rPROCEED_LOGIN\020\000\022\025\n\021ALREADY_LOGG"
-          + "ED_IN\020\001\022\017\n\013FULL_SERVER\020\002\022\021\n\rLOGIN_SUCCES"
-          + "S\020\003\"2\n\013SpawnEntity\022#\n\006entity\030\001 \001(\0132\023.per"
-          + "sistence.Entity\"\242\001\n\rDespawnEntity\022\014\n\004uui"
-          + "d\030\001 \001(\t\022;\n\rdespawnReason\030\002 \001(\0162$.packets"
-          + ".DespawnEntity.DespawnReason\"F\n\rDespawnR"
-          + "eason\022\013\n\007UNKNOWN\020\000\022\n\n\006KILLED\020\001\022\010\n\004QUIT\020\002"
-          + "\022\022\n\016CHUNK_UNLOADED\020\003\"8\n\005Login\022\014\n\004uuid\030\001 "
-          + "\001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 \001(\t\"<"
-          + "\n\014ChunkRequest\022,\n\rchunkLocation\030\001 \001(\0132\025."
-          + "persistence.Vector2iB,\n\037no.elg.infiniteB"
-          + "ootleg.protobufB\007PacketsP\000b\006proto3"
+          + "kH\000\210\001\001B\010\n\006_block\"\202\001\n\nMoveEntity\022\014\n\004uuid\030"
+          + "\001 \001(\t\022\'\n\010velocity\030\002 \001(\0132\025.persistence.Ve"
+          + "ctor2f\022\'\n\010position\030\003 \001(\0132\025.persistence.V"
+          + "ector2f\022\024\n\014lookAngleDeg\030\004 \001(\002\"\034\n\nDisconn"
+          + "ect\022\016\n\006reason\030\001 \001(\t\"4\n\016SecretExchange\022\022\n"
+          + "\nentityUUID\030\001 \001(\t\022\016\n\006secret\030\002 \001(\t\"X\n\tSta"
+          + "rtGame\022(\n\013controlling\030\001 \001(\0132\023.persistenc"
+          + "e.Entity\022!\n\005world\030\002 \001(\0132\022.persistence.Wo"
+          + "rld\"0\n\013UpdateChunk\022!\n\005chunk\030\001 \001(\0132\022.pers"
+          + "istence.Chunk\"\252\001\n\021ServerLoginStatus\0227\n\006s"
+          + "tatus\030\001 \001(\0162\'.packets.ServerLoginStatus."
+          + "ServerStatus\"\\\n\014ServerStatus\022\021\n\rPROCEED_"
+          + "LOGIN\020\000\022\025\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_S"
+          + "ERVER\020\002\022\021\n\rLOGIN_SUCCESS\020\003\"2\n\013SpawnEntit"
+          + "y\022#\n\006entity\030\001 \001(\0132\023.persistence.Entity\"\242"
+          + "\001\n\rDespawnEntity\022\014\n\004uuid\030\001 \001(\t\022;\n\rdespaw"
+          + "nReason\030\002 \001(\0162$.packets.DespawnEntity.De"
+          + "spawnReason\"F\n\rDespawnReason\022\013\n\007UNKNOWN\020"
+          + "\000\022\n\n\006KILLED\020\001\022\010\n\004QUIT\020\002\022\022\n\016CHUNK_UNLOADE"
+          + "D\020\003\"8\n\005Login\022\014\n\004uuid\030\001 \001(\t\022\020\n\010username\030\002"
+          + " \001(\t\022\017\n\007version\030\003 \001(\t\"<\n\014ChunkRequest\022,\n"
+          + "\rchunkLocation\030\001 \001(\0132\025.persistence.Vecto"
+          + "r2iB,\n\037no.elg.infiniteBootleg.protobufB\007"
+          + "PacketsP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
@@ -14340,7 +14415,7 @@ public final class Packets {
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_packets_MoveEntity_descriptor,
             new java.lang.String[] {
-              "Uuid", "Velocity", "Position",
+              "Uuid", "Velocity", "Position", "LookAngleDeg",
             });
     internal_static_packets_Disconnect_descriptor = getDescriptor().getMessageTypes().get(4);
     internal_static_packets_Disconnect_fieldAccessorTable =

@@ -73,6 +73,7 @@ message MoveEntity {
   string uuid = 1;
   .persistence.Vector2f velocity = 2;
   .persistence.Vector2f position = 3;
+  float lookAngleDeg = 4;
 }
 
 message Disconnect {

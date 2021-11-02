@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
+import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
@@ -43,7 +44,7 @@ public class Player extends LivingEntity {
 
     Preconditions.checkArgument(protoEntity.hasPlayer(), "Player does not contain player data");
     final ProtoWorld.Entity.Player protoPlayer = protoEntity.getPlayer();
-    setTorchAngle(protoPlayer.getTorchAngleDeg());
+    setLookDeg(protoPlayer.getTorchAngleDeg());
 
     if (protoPlayer.getControlled() && Main.isSingleplayer()) {
       Main.inst()
@@ -110,6 +111,10 @@ public class Player extends LivingEntity {
       }
       controls = new KeyboardControls(getWorld().getRender(), this);
       ClientMain.inst().getInputMultiplexer().addProcessor(controls);
+      final WorldInputHandler input = getWorld().getInput();
+      if (input != null) {
+        input.setFollowing(this);
+      }
     } else {
       Main.logger()
           .warn("PLR", "Tried to give control to a player already with control " + hudDebug());
@@ -155,9 +160,11 @@ public class Player extends LivingEntity {
     }
   }
 
-  public void setTorchAngle(float angleDeg) {
+  @Override
+  public void setLookDeg(float lookDeg) {
+    super.setLookDeg(lookDeg);
     if (torchLight != null) {
-      torchLight.setDirection(angleDeg);
+      torchLight.setDirection(lookDeg);
     }
   }
 

@@ -147,10 +147,7 @@ class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : Abstrac
 
   private fun updateTorchDirection(player: Player) {
     val angle: Float = tmpVec.set(ClientMain.inst().mouse).sub(player.position).angleDeg()
-    synchronized(WorldRender.LIGHT_LOCK) {
-      val torchLight = player.torchLight
-      torchLight.direction = angle
-    }
+    player.lookDeg = angle
   }
 
   override fun update() {

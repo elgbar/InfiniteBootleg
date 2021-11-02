@@ -142,6 +142,7 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
       .setUuid(entity.uuid.toString()) //
       .setPosition(entity.position.toVector2f()) //
       .setVelocity(entity.velocity.toVector2f()) //
+      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
 
@@ -165,6 +166,7 @@ fun clientBoundMoveEntity(entity: Entity): Packet {
       .setUuid(entity.uuid.toString()) //
       .setPosition(entity.position.toVector2f()) //
       .setVelocity(entity.velocity.toVector2f()) //
+      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
 
