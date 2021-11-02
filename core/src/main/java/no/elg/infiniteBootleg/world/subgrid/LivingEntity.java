@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Updatable;
@@ -39,6 +40,13 @@ public abstract class LivingEntity extends Entity implements Updatable {
         if (controls != null) {
             controls.update();
         }
+    }
+
+    @Override
+    protected @NotNull BodyDef createBodyDef(float worldX, float worldY) {
+        var bodyDef = super.createBodyDef(worldX, worldY);
+        bodyDef.bullet = true;
+        return bodyDef;
     }
 
     /**
@@ -97,5 +105,11 @@ public abstract class LivingEntity extends Entity implements Updatable {
     @Override
     public String toString() {
         return "LivingEntity{name='" + name + "'} " + super.toString();
+    }
+
+    public void disableGravity() {
+        if (!isInvalid()) {
+            getBody().setGravityScale(0f);
+        }
     }
 }

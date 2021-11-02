@@ -30,7 +30,6 @@ import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.subgrid.Entity
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 /**
  * @author Elg
@@ -66,7 +65,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       }
     }
     DX_MOVE_ENTITY -> {
-      if (packet.hasMoveEntity()) {
+      if (packet.hasMoveEntity() && started) {
         handleMoveEntity(packet.moveEntity)
       }
     }
@@ -116,9 +115,17 @@ fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
 
 fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   Main.inst().scheduler.executeSync {
-    val world = this.world ?: return@executeSync
-    val pos = spawnEntity.entity.position.toLocation()
-    val chunk = world.getChunk(pos) ?: return@executeSync
+    val world = this.world
+    if (world == null) {
+      Main.logger().warn("handleSpawnEntity", "Failed to find world")
+      return@executeSync
+    }
+    val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
+    val chunk = world.getChunk(chunkPos)
+    if (chunk == null) {
+      Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
+      return@executeSync
+    }
     Entity.load(world, chunk, spawnEntity.entity)
   }
 }
@@ -199,16 +206,15 @@ fun ServerClient.loginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
       }
       ConnectingScreen.info = "Login success!"
       Main.inst().scheduler.executeSync {
-        ClientMain.inst().screen = WorldScreen(world, false)
-        world.removePlayer(UUID.fromString(entity.uuid))
-        val player = Player(world, entity)
-        if (player.isInvalid) {
-          ctx.fatal("Invalid player client side")
+
+        val player = world.getPlayer(UUID.fromString(entity.uuid))
+        if (player == null || player.isInvalid) {
+          ctx.fatal("Invalid player client side reason: ${if (player == null) "Player is null" else "Player invalid"}")
         } else {
-          player.name = name
-          world.addEntity(player)
           world.worldTicker.start()
+          ClientMain.inst().screen = WorldScreen(world, false)
           player.giveControls()
+          started = true
         }
       }
     }
@@ -225,19 +231,13 @@ fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
     return
   }
-  if (uuid == this.credentials?.entityUUID) {
-    //Don't move ourselves
-    return
-  }
   val world = world
   if (world == null) {
-    Main.logger().warn("Failed to find world")
-    //will be spammed when logging in
+    Main.logger().warn("handleMoveEntity", "Failed to find world")
     return
   }
   val entity = world.getEntity(uuid)
   if (entity == null) {
-//    ctx.fatal("Cannot move unknown entity '${moveEntity.uuid}'")
     Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
     return
   }

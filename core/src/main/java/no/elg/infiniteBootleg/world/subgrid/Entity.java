@@ -24,6 +24,7 @@ import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Savable;
@@ -52,6 +53,8 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Entity implements Ticking, Disposable, ContactHandler, HUDDebuggable, Savable<ProtoWorld.EntityOrBuilder> {
 
     public static final float GROUND_CHECK_OFFSET = 0.1f;
+    public static final float TELEPORT_DIFFERENCE_THRESHOLD = 10f;
+    public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.5f;
 
     @NotNull
     private final World world;
@@ -220,10 +223,17 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         float physicsWorldY = worldY + worldBody.getWorldOffsetY();
         synchronized (BOX2D_LOCK) {
             synchronized (this) {
-                if (isInvalid()) {
+                if (isInvalid() || body == null) {
                     return;
                 }
-                body.setTransform(physicsWorldX, physicsWorldY, 0);
+                updatePos();
+                //If we're too far away teleport the entity to its correct location
+                // and add a bit to the y coordinate, so we don't fall through the floor
+                if (Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD || Math.abs(physicsWorldY - posCache.y) >
+                                                                                            TELEPORT_DIFFERENCE_THRESHOLD) {
+                    Main.logger().log("OFF! dx: " + Math.abs(physicsWorldX - posCache.x) + " dy " + Math.abs(physicsWorldY - posCache.y));
+                    body.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
+                }
                 body.setAngularVelocity(0);
                 body.setLinearVelocity(velX, velY);
                 body.setAwake(true);
@@ -529,9 +539,12 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
                 }
             }
         }
-//        if (world.isServer() && !getVelocity().isZero(0.01f)) {
-//            PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundMoveEntity(this));
-//        }
+        if (Main.isServer() && !getVelocity().isZero(0.01f)) {
+            PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundMoveEntity(this), (channel, credentials) -> {
+                //don't send packet to the owning player
+                return credentials.getEntityUUID() != getUuid();
+            });
+        }
     }
 
     /**
@@ -662,7 +675,11 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
         switch (protoEntity.getType()) {
             case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
             case FALLING_BLOCK -> entity = new FallingBlockEntity(world, chunk, protoEntity);
-            case PLAYER -> entity = new Player(world, protoEntity);
+            case PLAYER -> {
+                var player = new Player(world, protoEntity);
+                player.disableGravity();
+                entity = player;
+            }
             case BLOCK -> {
                 Preconditions.checkArgument(protoEntity.hasMaterial());
                 final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
@@ -684,6 +701,7 @@ public abstract class Entity implements Ticking, Disposable, ContactHandler, HUD
             return null;
         }
         world.addEntity(entity, false);
+
         return entity;
     }
 

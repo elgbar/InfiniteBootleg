@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.util.Resizable;
@@ -217,7 +218,7 @@ public class World implements Disposable, Resizable {
         spawn = Location.fromVector2i(protoWorld.getSpawn());
         worldTime.setTime(protoWorld.getTime());
 
-        if (Settings.client && protoWorld.hasPlayer()) {
+        if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
             final Player newPlayer = new Player(this, protoWorld.getPlayer());
             if (!newPlayer.isInvalid()) {
                 addEntity(newPlayer, false);
