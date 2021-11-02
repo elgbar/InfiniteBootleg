@@ -251,6 +251,7 @@ fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
   val entity = world.getEntity(uuid)
   if (entity == null) {
     Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
+    ctx.writeAndFlush(serverBoundEntityRequest(uuid))
     return
   }
   entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)

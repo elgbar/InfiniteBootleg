@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
+import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
@@ -14,6 +15,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
@@ -65,6 +67,11 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
     DX_DISCONNECT -> {
       Main.logger().log("Client sent disconnect packet. Reason: " + if (packet.hasDisconnect()) packet.disconnect?.reason else "No reason given")
       ctx.close()
+    }
+    SB_ENTITY_REQUEST -> {
+      if (packet.hasEntityRequest()) {
+        handleEntityRequest(ctx, packet.entityRequest)
+      }
     }
 
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received")
@@ -200,6 +207,22 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
 
   // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
   ctx.writeAndFlush(clientBoundSecretExchange(connectionCredentials))
+}
+
+private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {
+  val world = ServerMain.inst().serverWorld
+  val uuid = try {
+    UUID.fromString(entityRequest.uuid)
+  } catch (e: IllegalArgumentException) {
+    Main.logger().warn("handleEntityRequest", "Failed to decode entity request UUID ${entityRequest.uuid}")
+    return
+  }
+  val entity = world.getEntity(uuid)
+  if (entity != null) {
+    ctx.writeAndFlush(clientBoundSpawnEntity(entity))
+  } else {
+    Main.logger().warn("handleEntityRequest", "Unknown entity requested UUID: ${entityRequest.uuid}")
+  }
 }
 
 private fun ChannelHandlerContext.getClientCredentials(): ConnectionCredentials? {

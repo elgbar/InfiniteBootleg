@@ -26,6 +26,7 @@ message Packet {
     DX_SECRET_EXCHANGE = 10;
     CB_SPAWN_ENTITY = 11;
     CB_DESPAWN_ENTITY = 12;
+    SB_ENTITY_REQUEST = 13;
   }
 
   enum Direction {
@@ -52,6 +53,7 @@ message Packet {
   optional SecretExchange secretExchange = 22;
   optional SpawnEntity spawnEntity = 23;
   optional DespawnEntity despawnEntity = 24;
+  optional EntityRequest entityRequest = 25;
 }
 
 ////////////////
@@ -119,6 +121,7 @@ message ServerLoginStatus {
 
 message SpawnEntity {
   .persistence.Entity entity = 1;
+  string uuid = 2;
 }
 
 message DespawnEntity {
@@ -145,4 +148,8 @@ message Login {
 
 message ChunkRequest {
   .persistence.Vector2i chunkLocation = 1;
+}
+
+message EntityRequest {
+  string uuid = 1;
 }

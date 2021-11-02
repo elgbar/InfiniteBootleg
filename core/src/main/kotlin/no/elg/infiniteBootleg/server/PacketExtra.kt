@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
+import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
@@ -23,6 +24,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
@@ -146,6 +148,13 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   ).build()
 }
 
+fun ServerClient.serverBoundEntityRequest(uuid: UUID): Packet {
+  return serverBoundPacket(SB_ENTITY_REQUEST).setEntityRequest(
+    EntityRequest.newBuilder()
+      .setUuid(uuid.toString())
+  ).build()
+}
+
 // ////////////////
 // client bound //
 // ////////////////
@@ -174,6 +183,7 @@ fun clientBoundSpawnEntity(entity: Entity): Packet {
   return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
       .setEntity(entity.save())
+      .setUuid(entity.uuid.toString())
   ).build()
 }
 
