@@ -20,7 +20,7 @@ public abstract class CommonMain extends ApplicationAdapter implements Main {
   @NotNull protected final CancellableThreadScheduler scheduler;
   @NotNull protected ConsoleHandler console;
 
-  public CommonMain(boolean test) {
+  protected CommonMain(boolean test) {
     synchronized (INST_LOCK) {
       if (inst != null) {
         throw new IllegalStateException("A main instance have already be declared");
