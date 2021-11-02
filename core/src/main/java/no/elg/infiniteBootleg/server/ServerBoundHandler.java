@@ -53,10 +53,13 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
   @Override
   public void channelInactive(@NotNull ChannelHandlerContext ctx) {
     var client = clients.remove(ctx.channel());
+    var playerId = client != null ? "" + client.getEntityUUID() : "<Unknown>";
     Main.logger()
         .debug(
             TAG,
-            "client inactive (curr active "
+            "client inactive (player "
+                + playerId
+                + ") (curr active "
                 + clients.size()
                 + " clients, "
                 + channels.size()

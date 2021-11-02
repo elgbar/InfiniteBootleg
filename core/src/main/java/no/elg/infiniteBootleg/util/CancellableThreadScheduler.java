@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.google.common.base.Preconditions;
-import com.strongjoshua.console.LogLevel;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -82,11 +81,7 @@ public class CancellableThreadScheduler {
       try {
         runnable.run();
       } catch (Exception e) {
-        Gdx.app.postRunnable(
-            () -> {
-              Main.logger().log(LogLevel.ERROR, "Exception caught on secondary thread");
-              e.printStackTrace();
-            });
+        Main.logger().log("SCHEDULER", "Exception caught on secondary thread", e);
       }
     };
   }

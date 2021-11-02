@@ -55,7 +55,7 @@ subprojects {
 
   spotless {
     format("misc") {
-      target("*.gradle", "**/*.md", ".gitignore", "**/*.xml", "**/*.qst*", "**/*.cnv*", "**/*.yml", "**/*.yaml")
+      target("*.gradle", "**/*.md", ".gitignore", "**/*.xml", "**/*.yml", "**/*.yaml", "**/*.proto")
 
       trimTrailingWhitespace()
       indentWithSpaces(2)

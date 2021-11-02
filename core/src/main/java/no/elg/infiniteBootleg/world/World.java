@@ -76,9 +76,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class World implements Disposable, Resizable {
 
-  public static final short GROUND_CATEGORY = 0x1;
-  public static final short LIGHTS_CATEGORY = 0x2;
-  public static final short ENTITY_CATEGORY = 0x4;
+  public static final short GROUND_CATEGORY = 0b0000_0000_0000_0001;
+  public static final short LIGHTS_CATEGORY = 0b0000_0000_0000_0010;
+  public static final short ENTITY_CATEGORY = 0b0000_0000_0000_0100;
 
   public static final Filter FALLING_BLOCK_ENTITY_FILTER;
   public static final Filter TRANSPARENT_BLOCK_ENTITY_FILTER;
@@ -989,6 +989,8 @@ public class World implements Disposable, Resizable {
     final Player player = players.get(uuid);
     if (player != null) {
       removeEntity(player);
+    } else {
+      Main.logger().warn("Failed to find player " + uuid + " to remove");
     }
   }
 

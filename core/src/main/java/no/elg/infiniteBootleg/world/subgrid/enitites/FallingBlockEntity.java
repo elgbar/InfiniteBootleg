@@ -29,8 +29,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class FallingBlockEntity extends Entity implements LightTrait {
 
-  private final Material material;
-  @Nullable private final TextureRegion region;
+  private Material material;
+  @Nullable private TextureRegion region;
 
   @NotNull private Block block;
 
@@ -41,7 +41,9 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   public FallingBlockEntity(
       @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
-
+    if (isInvalid()) {
+      return;
+    }
     Preconditions.checkArgument(protoEntity.hasMaterial());
     final ProtoWorld.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
 
@@ -53,6 +55,9 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   public FallingBlockEntity(@NotNull World world, @NotNull Block block) {
     super(world, block.getWorldX() + 0.5f, block.getWorldY() - 0.5f, false, UUID.randomUUID());
+    if (isInvalid()) {
+      return;
+    }
     this.block = block;
     this.material = block.getMaterial();
     region = Settings.client ? new TextureRegion(material.getTextureRegion()) : null;
@@ -202,24 +207,15 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   @Override
   public void customizeLight(@NotNull PointLight light) {
+    Preconditions.checkState(block instanceof LightTrait);
     final Chunk chunk = getChunk();
     if (chunk == null) {
       return;
-    }
-    if (block == null) {
-      block =
-          material.createBlock(
-              getWorld(),
-              chunk,
-              CoordUtil.chunkOffset(getBlockX()),
-              CoordUtil.chunkOffset(getBlockY()));
     }
     if (block instanceof LightTrait lightTrait) {
       lightTrait.customizeLight(light);
       light.setStaticLight(false);
       light.attachToBody(getBody());
     }
-    block.tryDispose();
-    block = null;
   }
 }
