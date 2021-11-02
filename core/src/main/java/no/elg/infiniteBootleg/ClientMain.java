@@ -240,9 +240,8 @@ public class ClientMain extends CommonMain {
 
     @Nullable
     public Player getPlayer() {
-        if (Main.isMultiplayer()) {
-            //server does not have a main player
-            return null;
+        if (Main.isClient()) {
+            return serverClient.getPlayer();
         }
         synchronized (INST_LOCK) {
             if (mainPlayer == null || mainPlayer.isInvalid()) {

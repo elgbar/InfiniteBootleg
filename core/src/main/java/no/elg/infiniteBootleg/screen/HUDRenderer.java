@@ -37,20 +37,14 @@ public class HUDRenderer implements Renderer {
 
     @Override
     public void render() {
-        if (modus == HUDModus.NONE) {
+        if (modus == HUDModus.NONE || !Settings.client) {
             return;
         }
         ClientMain main = ClientMain.inst();
         World world = main.getWorld();
         int h = Gdx.graphics.getHeight();
 
-        LivingEntity player = null;
-        try {
-            player = ClientMain.inst().getPlayer();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
+        LivingEntity player = ClientMain.inst().getPlayer();
         ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
         assert sr != null; // this method should not get called if we are not rendering
         if (modus == HUDModus.DEBUG) {
