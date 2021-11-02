@@ -115,7 +115,13 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
   public void disableGravity() {
     if (!isInvalid()) {
-      getBody().setGravityScale(0f);
+      getBody().setGravityScale(0.0f);
+    }
+  }
+
+  public void enableGravity() {
+    if (!isInvalid()) {
+      getBody().setGravityScale(2f);
     }
   }
 }

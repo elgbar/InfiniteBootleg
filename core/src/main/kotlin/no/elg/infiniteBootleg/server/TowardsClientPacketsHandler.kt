@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.subgrid.Entity
+import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.util.UUID
 
 /**
@@ -133,7 +134,11 @@ fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
       Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
       return@executeSync
     }
-    Entity.load(world, chunk, spawnEntity.entity)
+    val loaded = Entity.load(world, chunk, spawnEntity.entity)
+    if (loaded is LivingEntity && uuid == loaded.uuid) {
+      // it's us!
+      loaded.enableGravity()
+    }
   }
 }
 
