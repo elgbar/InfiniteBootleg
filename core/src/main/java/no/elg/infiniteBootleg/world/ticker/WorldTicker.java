@@ -37,17 +37,17 @@ public class WorldTicker extends Ticker {
             WorldRender wr = world.getRender();
             long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
 
-            if (Main.isSingleplayer()) {
-                //tick all chunks and blocks in chunks
-                long tick = world.getWorldTicker().getTickId();
-                for (Iterator<Chunk> iterator = world.getChunks().values().iterator(); iterator.hasNext(); ) {
-                    Chunk chunk = iterator.next();
+            //tick all chunks and blocks in chunks
+            long tick = world.getWorldTicker().getTickId();
+            for (Iterator<Chunk> iterator = world.getChunks().values().iterator(); iterator.hasNext(); ) {
+                Chunk chunk = iterator.next();
 
-                    //clean up dead chunks
-                    if (!chunk.isLoaded()) {
-                        iterator.remove();
-                        continue;
-                    }
+                //clean up dead chunks
+                if (!chunk.isLoaded()) {
+                    iterator.remove();
+                    continue;
+                }
+                if (Main.isSingleplayer()) {
                     //Unload chunks not seen for CHUNK_UNLOAD_TIME
                     if (chunk.isAllowingUnloading() && wr.isOutOfView(chunk) && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
@@ -55,8 +55,8 @@ public class WorldTicker extends Ticker {
                         iterator.remove();
                         continue;
                     }
-                    chunk.tick();
                 }
+                chunk.tick();
             }
 
             for (Entity entity : world.getEntities()) {
