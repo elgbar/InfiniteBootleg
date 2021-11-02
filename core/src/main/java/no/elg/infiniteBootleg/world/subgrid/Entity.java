@@ -721,6 +721,14 @@ public abstract class Entity
   @Nullable
   public static Entity load(
       @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
+    var uuid = ExtraKt.fromUUIDOrNull(protoEntity.getUuid());
+    if (uuid == null) {
+      Main.logger().warn(" " + protoEntity.getUuid());
+      return null;
+    } else if (world.containsEntity(uuid)) {
+      Main.logger().warn("World already contains entity with uuid " + uuid);
+      return null;
+    }
     Entity entity;
     switch (protoEntity.getType()) {
       case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
