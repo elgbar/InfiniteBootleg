@@ -110,7 +110,7 @@ public class TntBlock extends TickingBlock implements LightTrait {
 
     LightTrait.Companion.createLight(this);
     long ticked = getWorld().getTick() - startTick;
-    if (ticked > fuseDurationTicks) {
+    if (ticked > fuseDurationTicks && (Main.isServer() || Main.isSingleplayer())) {
       exploded = true;
       Main.inst()
           .getScheduler()
