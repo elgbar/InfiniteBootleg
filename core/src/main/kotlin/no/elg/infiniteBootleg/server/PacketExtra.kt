@@ -187,10 +187,10 @@ fun clientBoundSpawnEntity(entity: Entity): Packet {
   ).build()
 }
 
-fun clientBoundDespawnEntity(entity: Entity, reason: DespawnReason): Packet {
+fun clientBoundDespawnEntity(uuid: UUID, reason: DespawnReason): Packet {
   return clientBoundPacket(CB_DESPAWN_ENTITY).setDespawnEntity(
     DespawnEntity.newBuilder()
-      .setUuid(entity.uuid.toString())
+      .setUuid(uuid.toString())
       .setDespawnReason(reason)
   ).build()
 }

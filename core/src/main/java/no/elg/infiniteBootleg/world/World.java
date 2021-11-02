@@ -6,6 +6,7 @@ import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOGNIZED;
+import static no.elg.infiniteBootleg.world.loader.WorldLoader.saveServerPlayer;
 import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -240,6 +241,7 @@ public class World implements Disposable, Resizable {
     if (worldFolder == null) {
       return;
     }
+
     for (Chunk chunk : getChunks().values()) {
       chunkLoader.save(chunk);
     }
@@ -264,6 +266,11 @@ public class World implements Disposable, Resizable {
 
   @NotNull
   public ProtoWorld.World toProtobuf() {
+
+    for (Player player : players.values()) {
+      saveServerPlayer(player);
+    }
+
     var builder = ProtoWorld.World.newBuilder();
     builder.setName(name);
     builder.setSeed(seed);
@@ -790,6 +797,7 @@ public class World implements Disposable, Resizable {
     entities.put(entity.getUuid(), entity);
     if (entity instanceof Player player) {
       players.put(player.getUuid(), player);
+      saveServerPlayer(player);
     }
 
     if (Main.isServer()) {
@@ -811,22 +819,23 @@ public class World implements Disposable, Resizable {
    * @throws IllegalArgumentException if the given entity is not part of this world
    */
   public void removeEntity(@NotNull Entity entity) {
-    var existed = entities.remove(entity.getUuid()) != null;
-    if (entity instanceof Player) {
-      players.remove(entity.getUuid());
+    final UUID entityUuid = entity.getUuid();
+    entities.remove(entityUuid);
+    if (entity instanceof Player player) {
+      players.remove(entityUuid);
+      saveServerPlayer(player);
     }
-
     if (!entity.isInvalid()) {
       // even if we do not know of this entity, dispose it
       entity.dispose();
     }
-    if (Main.isServer() && existed) {
+    if (Main.isServer()) {
       Main.inst()
           .getScheduler()
           .executeAsync(
               () ->
                   PacketExtraKt.broadcast(
-                      null, PacketExtraKt.clientBoundDespawnEntity(entity, UNKNOWN), null));
+                      null, PacketExtraKt.clientBoundDespawnEntity(entityUuid, UNKNOWN), null));
     }
   }
 
