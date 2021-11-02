@@ -92,15 +92,14 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     for (int i = 0; i < methods.length; i++) {
       Method method = methods[i];
       if (method.getName().equalsIgnoreCase(methodName)
-          && //
-          ConsoleUtils.canExecuteCommand(console, method)) {
+          && ConsoleUtils.canExecuteCommand(console, method)) {
         possible.add(i);
       }
     }
 
     if (possible.size <= 0) {
-      if (potentialMethods.isEmpty()) {
-        log(LogLevel.ERROR, "Unknown command");
+      if (potentialMethods.isEmpty() || methodName.isBlank()) {
+        log(LogLevel.ERROR, "Unknown command: '" + methodName + "'");
       } else {
         log(LogLevel.ERROR, "Unknown command. Perhaps you meant");
         for (String methodSig : potentialMethods) {
