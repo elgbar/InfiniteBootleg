@@ -54,14 +54,14 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
     if (serverClient?.credentials != null) {
       this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
     }
+    Main.inst().scheduler.scheduleSync({
+      close()
+      ClientMain.inst().serverClient = null
+    }, 50L)
   } else {
     this.writeAndFlush(clientBoundDisconnectPlayerPacket(msg))
   }
   Main.logger().error("IO FATAL", msg)
-  Main.inst().scheduler.scheduleSync({
-    close()
-    ClientMain.inst().serverClient = null
-  }, 50L)
 }
 
 /**

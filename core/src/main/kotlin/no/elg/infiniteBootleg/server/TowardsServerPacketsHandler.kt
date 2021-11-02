@@ -110,10 +110,11 @@ private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: Sec
     if (player != null) {
       ctx.writeAndFlush(clientBoundStartGamePacket(player))
     } else {
-      ctx.fatal("Failed secret response")
+      ctx.fatal("handleSecretExchange: Failed secret response")
     }
   } catch (e: Exception) {
-    ctx.fatal("Failed to parse entity in secret")
+    ctx.fatal("handleSecretExchange: Failed to parse entity")
+    e.printStackTrace()
     return
   }
 }
