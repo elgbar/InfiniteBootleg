@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
@@ -23,6 +24,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.StartGame
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
+import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
@@ -83,13 +85,11 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
         handleBlockUpdate(packet.updateBlock)
       }
     }
-
     DX_SECRET_EXCHANGE -> {
       if (packet.hasSecretExchange()) {
         handleSecretExchange(packet.secretExchange)
       }
     }
-
     DX_DISCONNECT -> {
       if (packet.hasDisconnect()) {
         ConnectingScreen.info = "Disconnected: ${packet.disconnect.reason}"
@@ -97,6 +97,11 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
         ConnectingScreen.info = "Disconnected: Unknown reason"
       }
       ctx.close()
+    }
+    DX_WORLD_SETTINGS -> {
+      if (packet.hasWorldSettings()) {
+        handleWorldSettings(packet.worldSettings)
+      }
     }
 
     UNRECOGNIZED -> {
@@ -108,7 +113,25 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   }
 }
 
-fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
+private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
+  val world = this.world
+  if (world == null) {
+    Main.logger().warn("handleWorldSettings", "Failed to find world")
+    return
+  }
+  Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
+  if (worldSettings.hasSpawn()) {
+    world.spawn = worldSettings.spawn.toLocation()
+  }
+  if (worldSettings.hasTime()) {
+    world.worldTime.time = worldSettings.time
+  }
+  if (worldSettings.hasTimeScale()) {
+    world.worldTime.timeScale = worldSettings.timeScale
+  }
+}
+
+private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
   Main.inst().scheduler.executeSync {
     val world = this.world
     if (world == null) {
@@ -122,7 +145,7 @@ fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
   }
 }
 
-fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
+private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   Main.inst().scheduler.executeSync {
     val world = this.world
     if (world == null) {
@@ -156,7 +179,7 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   ctx.writeAndFlush(serverBoundClientSecretResponse(connectionCredentials))
 }
 
-fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
+private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
   val entities = updateChunk.chunk.entitiesCount
   if (entities > 0) {
     Main.logger().warn(TAG, "Got $entities entities in chunk update")
@@ -183,7 +206,7 @@ fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
   Main.inst().scheduler.executeSync(exec)
 }
 
-fun ServerClient.handleStartGame(startGame: StartGame) {
+private fun ServerClient.handleStartGame(startGame: StartGame) {
   val protoWorld = startGame.world
   Main.inst().scheduler.executeSync {
     this.world = World(protoWorld).apply {
@@ -198,7 +221,7 @@ fun ServerClient.handleStartGame(startGame: StartGame) {
   }
 }
 
-fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
+private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
   when (loginStatus) {
     ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN -> {
       ctx.fatal("You are already logged in!")
@@ -239,7 +262,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
   }
 }
 
-fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
+private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
   val uuid = fromUUIDOrNull(moveEntity.uuid)
   if (uuid == null) {
     ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
@@ -259,7 +282,7 @@ fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
   entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
 }
 
-fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
+private fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
   val world = world
   if (world == null) {
     Main.logger().warn("handleDespawnEntity", "Failed to find world")

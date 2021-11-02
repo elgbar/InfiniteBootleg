@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
@@ -22,8 +23,10 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
+import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
@@ -74,10 +77,38 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
         handleEntityRequest(ctx, packet.entityRequest)
       }
     }
+    DX_WORLD_SETTINGS -> {
+      if (packet.hasWorldSettings()) {
+        handleWorldSettings(ctx, packet.worldSettings)
+      }
+    }
 
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received")
     else -> ctx.fatal("Cannot handle packet of type " + packet.type)
   }
+}
+
+private fun handleWorldSettings(ctx: ChannelHandlerContext, worldSettings: WorldSettings) {
+  Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
+  val world = ServerMain.inst().serverWorld
+  var spawn: Location? = null
+  var time: Float? = null
+  var timeScale: Float? = null
+
+  if (worldSettings.hasSpawn()) {
+    world.spawn = worldSettings.spawn.toLocation()
+    spawn = world.spawn
+  }
+  if (worldSettings.hasTime()) {
+    world.worldTime.time = worldSettings.time
+    time = worldSettings.time
+  }
+  if (worldSettings.hasTimeScale()) {
+    world.worldTime.timeScale = worldSettings.timeScale
+    timeScale = worldSettings.timeScale
+  }
+  // Rebroadcast the packet to all clients to stay in sync
+  broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c, _ -> c != ctx.channel() }
 }
 
 private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntity) {

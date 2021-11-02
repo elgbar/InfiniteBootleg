@@ -28,6 +28,7 @@ message Packet {
     CB_DESPAWN_ENTITY = 12;
     SB_ENTITY_REQUEST = 13;
     CB_INITIAL_CHUNKS_SENT = 14; //no message associated
+    DX_WORLD_SETTINGS = 15;
   }
 
   enum Direction {
@@ -55,7 +56,7 @@ message Packet {
   optional SecretExchange secretExchange = 22;
   optional ChunkRequest chunkRequest = 23; //server bound
   optional EntityRequest entityRequest = 24;
-  optional EntityRequest entityRequest = 25;
+  optional WorldSettings worldSettings = 25;
 }
 
 ////////////////
@@ -87,6 +88,13 @@ message Disconnect {
 message SecretExchange{
   string entityUUID = 1;
   string secret = 2;
+}
+
+//if not present, do not update setting
+message WorldSettings {
+  optional float time = 1;
+  optional float timeScale = 2;
+  optional .persistence.Vector2i spawn = 3;
 }
 
 //////////////////

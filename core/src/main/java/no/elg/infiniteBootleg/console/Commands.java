@@ -357,12 +357,23 @@ public class Commands extends CommandExecutor {
     float old = getWorld().getWorldTime().getTimeScale();
     getWorld().getWorldTime().setTimeScale(scale);
     logger.success("Changed time scale from % .3f to % .3f", old, scale);
+
+    PacketExtraKt.sendDuplexPacket(
+        () -> PacketExtraKt.clientBoundWorldSettings(null, null, scale),
+        client -> PacketExtraKt.serverBoundWorldSettings(client, null, null, scale));
   }
 
   @ConsoleDoc(description = "Toggle if time ticks or not")
   public void toggleTime() {
     Settings.dayTicking = !Settings.dayTicking;
+
     logger.success("Time is now " + (Settings.dayTicking ? "" : "not ") + "ticking");
+
+    PacketExtraKt.sendDuplexPacket(
+        () -> PacketExtraKt.clientBoundWorldSettings(null, null, Settings.dayTicking ? 1f : 0f),
+        client ->
+            PacketExtraKt.serverBoundWorldSettings(
+                client, null, null, Settings.dayTicking ? 1f : 0f));
   }
 
   @CmdArgNames({"time of day"})
@@ -396,6 +407,10 @@ public class Commands extends CommandExecutor {
   public void time(float time) {
     float old = getWorld().getWorldTime().getTime();
     getWorld().getWorldTime().setTime(time);
+
+    PacketExtraKt.sendDuplexPacket(
+        () -> PacketExtraKt.clientBoundWorldSettings(null, time, null),
+        client -> PacketExtraKt.serverBoundWorldSettings(client, null, time, null));
     logger.success("Changed time from % .3f to % .3f", old, time);
   }
 

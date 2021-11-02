@@ -283,12 +283,7 @@ public abstract class Entity
     velCache.x = velX;
     velCache.y = velY;
     if (Main.isServer() && sendMovePacket) {
-      Main.logger()
-          .log(
-              "OFF! dx: "
-                  + Math.abs(physicsWorldX - posCache.x)
-                  + " dy "
-                  + Math.abs(physicsWorldY - posCache.y));
+      Main.logger().log("Force updating player packet");
       Main.inst()
           .getScheduler()
           .executeAsync(

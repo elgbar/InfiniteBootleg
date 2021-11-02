@@ -19,8 +19,8 @@ public class WorldTime {
   public static final float MIDNIGHT_TIME = -270;
   @NotNull private final World world;
   @NotNull private final Color baseColor = new Color(Color.WHITE);
-  private float time = WorldTime.MIDDAY_TIME;
-  private float timeScale = 1;
+  private volatile float time = WorldTime.MIDDAY_TIME;
+  private volatile float timeScale = 1f;
 
   public WorldTime(World world) {
     this.world = world;

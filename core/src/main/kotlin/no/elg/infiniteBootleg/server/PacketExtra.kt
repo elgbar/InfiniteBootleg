@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
@@ -32,12 +33,14 @@ import no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.StartGame
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
+import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.toVector2f
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
 import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
@@ -154,6 +157,10 @@ fun ServerClient.serverBoundEntityRequest(uuid: UUID): Packet {
   ).build()
 }
 
+fun ServerClient.serverBoundWorldSettings(spawn: Location?, time: Float?, timeScale: Float?): Packet {
+  return worldSettingsPacketBuilder(serverBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
+}
+
 // ////////////////
 // client bound //
 // ////////////////
@@ -224,5 +231,42 @@ fun clientBoundSecretExchange(connectionCredentials: ConnectionCredentials): Pac
     SecretExchange.newBuilder()
       .setSecret(connectionCredentials.secret)
       .setEntityUUID(connectionCredentials.entityUUID.toString())
+  ).build()
+}
+
+fun clientBoundWorldSettings(spawn: Location?, time: Float?, timeScale: Float?): Packet {
+  return worldSettingsPacketBuilder(clientBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
+}
+
+// ////////////
+//   DUAL   //
+// ////////////
+
+fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Packet) {
+  if (Main.isServer()) {
+    broadcast(ifIsServer())
+  } else if (Main.isServerClient()) {
+    val client = ClientMain.inst().serverClient ?: error("Server client null after check")
+    client.ctx.writeAndFlush(client.ifIsClient())
+  }
+}
+
+// /////////////////////
+//   DUAL Builders   //
+// /////////////////////
+
+private fun worldSettingsPacketBuilder(packet: Packet.Builder, spawn: Location?, time: Float?, timeScale: Float?): Packet {
+  return packet.setWorldSettings(
+    WorldSettings.newBuilder()?.also {
+      if (spawn != null) {
+        it.spawn = spawn.toVector2i()
+      }
+      if (time != null) {
+        it.time = time
+      }
+      if (timeScale != null) {
+        it.timeScale = timeScale
+      }
+    }
   ).build()
 }
