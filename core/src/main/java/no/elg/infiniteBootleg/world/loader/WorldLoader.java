@@ -68,6 +68,7 @@ public class WorldLoader {
                 var proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes());
                 Player player = new Player(world, proto);
                 if (!player.isInvalid()) {
+                    player.disableGravity();
                     world.addEntity(player);
                     return player;
                 }

@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
+import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
@@ -808,6 +809,12 @@ public class World implements Disposable, Resizable {
         if (entity instanceof Player player) {
             players.put(player.getUuid(), player);
         }
+
+        if (Main.isServer()) {
+            Main.inst().getScheduler().executeAsync(() -> {
+                PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundSpawnEntity(entity), null);
+            });
+        }
     }
 
     /**
@@ -822,7 +829,7 @@ public class World implements Disposable, Resizable {
      *     if the given entity is not part of this world
      */
     public void removeEntity(@NotNull Entity entity) {
-        entities.remove(entity.getUuid());
+        var existed = entities.remove(entity.getUuid()) != null;
         if (entity instanceof Player) {
             players.remove(entity.getUuid());
         }
@@ -830,6 +837,9 @@ public class World implements Disposable, Resizable {
         if (!entity.isInvalid()) {
             //even if we do not know of this entity, dispose it
             entity.dispose();
+        }
+        if (Main.isServer() && existed) {
+            Main.inst().getScheduler().executeAsync(() -> PacketExtraKt.broadcast(null, PacketExtraKt.clientBoundDespawnEntity(entity, UNKNOWN), null));
         }
     }
 

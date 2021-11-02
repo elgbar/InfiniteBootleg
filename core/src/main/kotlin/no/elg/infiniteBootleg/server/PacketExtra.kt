@@ -7,12 +7,15 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
@@ -179,7 +182,15 @@ fun clientBoundSpawnEntity(entity: Entity): Packets.Packet {
   ).build()
 }
 
-fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packets.Packet {
+fun clientBoundDespawnEntity(entity: Entity, reason: DespawnReason): Packet {
+  return clientBoundPacket(CB_DESPAWN_ENTITY).setDespawnEntity(
+    DespawnEntity.newBuilder()
+      .setUuid(entity.uuid.toString())
+      .setDespawnReason(reason)
+  ).build()
+}
+
+fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packet {
   return clientBoundPacket(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
 }
 

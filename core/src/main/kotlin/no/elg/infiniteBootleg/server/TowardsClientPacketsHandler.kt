@@ -4,7 +4,9 @@ import java.util.UUID
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
@@ -50,6 +52,11 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_UPDATE_CHUNK -> {
       if (packet.hasUpdateChunk()) {
         handleUpdateChunk(packet.updateChunk)
+      }
+    }
+    CB_DESPAWN_ENTITY -> {
+      if (packet.hasDespawnEntity()) {
+        handleDespawnEntity(packet.despawnEntity)
       }
     }
 
@@ -242,4 +249,15 @@ fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     return
   }
   entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, false)
+}
+
+fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
+  val world = world
+  if (world == null) {
+    Main.logger().warn("handleDespawnEntity", "Failed to find world")
+    return
+  }
+  val uuid = fromUUIDOrNull(despawnEntity.uuid) ?: return
+  val entity = world.getEntity(uuid) ?: return
+  world.removeEntity(entity)
 }

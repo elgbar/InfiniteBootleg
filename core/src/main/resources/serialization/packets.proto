@@ -25,6 +25,7 @@ message Packet {
     DX_DISCONNECT = 9;
     DX_SECRET_EXCHANGE = 10;
     CB_SPAWN_ENTITY = 11;
+    CB_DESPAWN_ENTITY = 12;
   }
 
   enum Direction {
@@ -50,6 +51,7 @@ message Packet {
   optional Disconnect disconnect = 21;
   optional SecretExchange secretExchange = 22;
   optional SpawnEntity spawnEntity = 23;
+  optional DespawnEntity despawnEntity = 24;
 }
 
 ////////////////
@@ -116,6 +118,17 @@ message ServerLoginStatus {
 
 message SpawnEntity {
   .persistence.Entity entity = 1;
+}
+
+message DespawnEntity {
+  enum DespawnReason{
+    UNKNOWN = 0;
+    KILLED = 1;
+    QUIT = 2; // players only
+    CHUNK_UNLOADED = 3;
+  }
+  string uuid = 1;
+  DespawnReason despawnReason = 2;
 }
 
 //////////////////
