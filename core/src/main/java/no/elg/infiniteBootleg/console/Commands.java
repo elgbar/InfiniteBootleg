@@ -471,6 +471,12 @@ public class Commands extends CommandExecutor {
 
   @ClientsideOnly
   @ConsoleDoc(description = "Disconnect from the server")
+  public void quit() {
+    disconnect();
+  }
+
+  @ClientsideOnly
+  @ConsoleDoc(description = "Disconnect from the server")
   public void disconnect() {
     final ServerClient client = ClientMain.inst().getServerClient();
     if (client != null) {
