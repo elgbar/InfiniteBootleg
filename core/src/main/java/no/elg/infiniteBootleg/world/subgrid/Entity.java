@@ -66,7 +66,7 @@ public abstract class Entity
   public static final float TELEPORT_DIFFERENCE_THRESHOLD = 1f;
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
-  public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L; 
+  public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
   @NotNull private final World world;
   private final UUID uuid;
 
@@ -175,9 +175,13 @@ public abstract class Entity
               if (!isInvalid() && !world.containsEntity(uuid)) {
                 Main.logger()
                     .warn(
-                        "Failed to find entity '"
+                        "Failed to find entity "
+                            + simpleName()
+                            + " '"
                             + hudDebug()
-                            + "' in the world '"
+                            + "' uuid "
+                            + uuid
+                            + " in the world '"
                             + world
                             + "'! Did you forget to add it?");
               }
@@ -282,7 +286,7 @@ public abstract class Entity
     velCache.x = velX;
     velCache.y = velY;
     if (Main.isServer() && sendMovePacket) {
-      Main.logger().log("Force updating player packet");
+      Main.logger().debug("server", "Force updating player packet");
       Main.inst()
           .getScheduler()
           .executeAsync(
@@ -293,7 +297,8 @@ public abstract class Entity
   }
 
   /** @return An unordered collection of all the blocks this entity is currently touching */
-  public ObjectSet<Block> touchingBlocks() {
+  @NotNull
+  public ObjectSet<@NotNull Block> touchingBlocks() {
     return touchingBlocks(posCache.x, posCache.y);
   }
 
@@ -304,7 +309,7 @@ public abstract class Entity
    *     located here
    */
   @NotNull
-  public ObjectSet<Block> touchingBlocks(float worldX, float worldY) {
+  public ObjectSet<@NotNull Block> touchingBlocks(float worldX, float worldY) {
     var locations = touchingLocations(worldX, worldY);
     ObjectSet<Block> blocks = new ObjectSet<>();
     for (Location location : locations) {
@@ -314,7 +319,8 @@ public abstract class Entity
   }
 
   /** @return An unordered collection of all the locations this entity is currently touching */
-  public ObjectSet<Location> touchingLocations() {
+  @NotNull
+  public ObjectSet<@NotNull Location> touchingLocations() {
     return touchingLocations(posCache.x, posCache.y);
   }
 
@@ -325,7 +331,7 @@ public abstract class Entity
    *     located here
    */
   @NotNull
-  public ObjectSet<Location> touchingLocations(float worldX, float worldY) {
+  public ObjectSet<@NotNull Location> touchingLocations(float worldX, float worldY) {
     ObjectSet<Location> blocks = new ObjectSet<>();
     int x = MathUtils.floor(worldX - getHalfBox2dWidth());
     float maxX = worldX + getHalfBox2dWidth();
@@ -406,7 +412,8 @@ public abstract class Entity
   }
 
   /** @return A set of all other entities (excluding this) this entity is touching */
-  public ObjectSet<Entity> touchingEntities() {
+  @NotNull
+  public ObjectSet<@NotNull Entity> touchingEntities() {
     return touchingEntities(posCache.x, posCache.y);
   }
 
@@ -415,7 +422,8 @@ public abstract class Entity
    * @param worldY World y coordinate to pretend the player is at
    * @return A set of all entites this entity would collide with if it was at the given location
    */
-  public ObjectSet<Entity> touchingEntities(float worldX, float worldY) {
+  @NotNull
+  public ObjectSet<@NotNull Entity> touchingEntities(float worldX, float worldY) {
     ObjectSet<Entity> entities = new ObjectSet<>();
 
     var rect = new Rectangle(worldX, worldY, getHalfBox2dWidth() * 2, getHalfBox2dHeight() * 2);
@@ -596,7 +604,6 @@ public abstract class Entity
                       }));
     }
   }
-
 
   /**
    * Freeze the entity, it will not interact with the world anymore

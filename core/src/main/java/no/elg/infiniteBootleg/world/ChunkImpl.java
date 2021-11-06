@@ -195,7 +195,6 @@ public class ChunkImpl implements Chunk {
                   final int x = getWorldX(localX);
                   final int y = getWorldY(localY);
                   var packet = PacketExtraKt.clientBoundBlockUpdate(x, y, block);
-                  Main.logger().log("broadcasting block change @ " + x + "," + y + ": " + block);
                   PacketExtraKt.broadcast(packet, null);
                 });
       } else if (Main.isServerClient()) {

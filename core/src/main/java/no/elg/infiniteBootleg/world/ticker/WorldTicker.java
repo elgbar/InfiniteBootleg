@@ -85,6 +85,11 @@ public class WorldTicker extends Ticker {
 
     @Override
     public void tickRare() {
+      //      if(Main.isServer()){
+      //        Main.logger().debug("PACKET INFO", "Server received " +
+      // ServerBoundHandler.packetsReceived+" packets");
+      //        ServerBoundHandler.packetsReceived = 0;
+      //      }
       for (Chunk chunk : world.getLoadedChunks()) {
         chunk.tickRare();
       }

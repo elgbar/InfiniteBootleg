@@ -23,10 +23,12 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
   public static final Map<Channel, ConnectionCredentials> clients = new ConcurrentHashMap<>();
 
   public static final String TAG = "SERVER";
+  public static long packetsReceived;
 
   @Override
   protected void channelRead0(@NotNull ChannelHandlerContext ctx, @NotNull Packet packet) {
     //        Main.logger().log("Server bound packet " + packet.getType());
+    packetsReceived++;
     if (packet.getDirection() == Packet.Direction.CLIENT
         || packet.getType().name().startsWith("CB_")) {
       fatal(
