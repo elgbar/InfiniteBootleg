@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
+import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
@@ -65,7 +66,7 @@ public abstract class Entity
   public static final float TELEPORT_DIFFERENCE_THRESHOLD = 1f;
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
-
+  public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L; 
   @NotNull private final World world;
   private final UUID uuid;
 
@@ -596,14 +597,46 @@ public abstract class Entity
     }
   }
 
-  /** Freeze the entity, it will not interact with the world anymore */
-  public void freeze() {
-    if (isInvalid()) {
-      return;
+
+  /**
+   * Freeze the entity, it will not interact with the world anymore
+   *
+   * @param despawnAfterTimeout Despawn if nothing have happened in {@link
+   *     #FREEZE_DESPAWN_TIMEOUT_MS} time
+   */
+  public void freeze(boolean despawnAfterTimeout) {
+    synchronized (BOX2D_LOCK) {
+      synchronized (this) {
+        if (isInvalid()) {
+          return;
+        }
+        setFilter(NON_INTERACTIVE_FILTER);
+        body.setLinearVelocity(0, 0);
+        body.setGravityScale(0f);
+      }
     }
-    setFilter(NON_INTERACTIVE_FILTER);
-    body.setLinearVelocity(0, 0);
-    body.setGravityScale(0f);
+    // Remove
+    if (despawnAfterTimeout) {
+
+      Main.inst()
+          .getScheduler()
+          .scheduleSync(
+              () -> {
+                if (isInvalid()) {
+                  return;
+                }
+                if (Main.isAuthoritative()) {
+                  world.removeEntity(this);
+                } else if (Main.isServerClient()) {
+                  // Ask the server about the entity
+                  final ServerClient client = ClientMain.inst().getServerClient();
+                  if (client != null) {
+                    client.ctx.writeAndFlush(PacketExtraKt.serverBoundEntityRequest(client, uuid));
+                  }
+                }
+              },
+              FREEZE_DESPAWN_TIMEOUT_MS);
+    }
   }
 
   /** @return The texture of this entity */
