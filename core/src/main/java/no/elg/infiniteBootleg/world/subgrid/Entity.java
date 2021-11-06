@@ -171,6 +171,7 @@ public abstract class Entity
     Main.inst()
         .getScheduler()
         .scheduleSync(
+            10L,
             () -> {
               if (!isInvalid() && !world.containsEntity(uuid)) {
                 Main.logger()
@@ -185,8 +186,7 @@ public abstract class Entity
                             + world
                             + "'! Did you forget to add it?");
               }
-            },
-            10L);
+            });
   }
 
   /** Always call while synchronized with {@link WorldRender#BOX2D_LOCK} */
@@ -628,6 +628,7 @@ public abstract class Entity
       Main.inst()
           .getScheduler()
           .scheduleSync(
+              FREEZE_DESPAWN_TIMEOUT_MS,
               () -> {
                 if (isInvalid()) {
                   return;
@@ -641,8 +642,7 @@ public abstract class Entity
                     client.ctx.writeAndFlush(PacketExtraKt.serverBoundEntityRequest(client, uuid));
                   }
                 }
-              },
-              FREEZE_DESPAWN_TIMEOUT_MS);
+              });
     }
   }
 

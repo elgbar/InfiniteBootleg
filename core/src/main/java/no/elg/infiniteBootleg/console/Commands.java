@@ -501,6 +501,6 @@ public class Commands extends CommandExecutor {
     ConnectingScreen.INSTANCE.setInfo("Disconnected");
     Main.inst()
         .getScheduler()
-        .scheduleSync(() -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE), 50L);
+        .scheduleSync(50L, () -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE));
   }
 }

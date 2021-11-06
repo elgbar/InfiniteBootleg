@@ -58,12 +58,12 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         e.printStackTrace();
       }
     }
-    scheduler.scheduleSync(this::dispose, 500);
+    scheduler.scheduleSync(500, this::dispose);
   }
 
   @Override
   public void log(@NotNull LogLevel level, @NotNull String msg) {
-    scheduler.scheduleAsync(() -> logger.log(level, msg), 2);
+    scheduler.scheduleAsync(2, () -> logger.log(level, msg));
   }
 
   @Override
@@ -89,12 +89,12 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     log("Running commands '" + val + "' as initial commands");
 
     scheduler.scheduleAsync(
+        10,
         () -> {
           for (String cmd : val.split(";")) {
             Main.inst().getConsole().execCommand(cmd);
           }
-        },
-        10);
+        });
   }
 
   /** Do not render the graphics */

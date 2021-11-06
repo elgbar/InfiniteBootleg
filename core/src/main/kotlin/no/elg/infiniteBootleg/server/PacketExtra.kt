@@ -57,10 +57,10 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
     if (serverClient?.credentials != null) {
       this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
     }
-    Main.inst().scheduler.scheduleSync({
+    Main.inst().scheduler.scheduleSync(50L) {
       close()
       ClientMain.inst().serverClient = null
-    }, 50L)
+    }
   } else {
     this.writeAndFlush(clientBoundDisconnectPlayerPacket(msg))
   }

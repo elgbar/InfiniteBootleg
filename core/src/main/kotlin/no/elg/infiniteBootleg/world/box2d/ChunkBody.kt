@@ -162,7 +162,8 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
       return
     }
     unsureFixture = true
-    Main.inst().scheduler.scheduleAsync({
+    val delay = if (initial) INITIAL_UNSURE_FIXTURE_RELOAD_DELAY else UNSURE_FIXTURE_RELOAD_DELAY
+    Main.inst().scheduler.scheduleAsync(delay) {
       synchronized(this@ChunkBody) {
         unsureFixture = false
         if (chunk.isNeighborsLoaded) {
@@ -171,56 +172,55 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
           scheduleFixtureReload(false)
         }
       }
-    }, if (initial) INITIAL_UNSURE_FIXTURE_RELOAD_DELAY else UNSURE_FIXTURE_RELOAD_DELAY)
-    }
-
-    private fun destroyCurrentBody() {
-      synchronized(BOX2D_LOCK) {
-        val currentBody = box2dBody ?: return
-        chunk.world.worldBody.destroyBody(currentBody)
-        box2dBody = null
-      }
-    }
-
-    override fun dispose() {
-      synchronized(BOX2D_LOCK) {
-        if (disposed) return
-        disposed = true
-        destroyCurrentBody()
-      }
-    }
-
-    fun hasBody(): Boolean = box2dBody != null
-
-    companion object {
-      const val INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L
-      const val UNSURE_FIXTURE_RELOAD_DELAY = 100L
-
-      /**
-       * represent the direction to look and if no solid block there how to create a fixture at that location (ie
-       * two relative vectors)
-       * the value of the pair is as follows `dxStart`, `dyStart`, `dxEnd`, `dyEnd`
-       * this can be visually represented with a cube:
-       *
-       * ```
-       * (0,1)---(1,1)
-       *  |         |
-       *  |         |
-       *  |         |
-       *  |         |
-       * (0,0)---(1,0)
-       * ```
-       *
-       * * Where `d` stands for delta
-       * * `x`/`y` is if this is the `x` or `y` component of the coordinate
-       * * `end`/`start` is if this is the start or end vector
-       */
-      val EDGE_DEF: Array<Pair<Direction, ByteArray>> = arrayOf(
-        NORTH to byteArrayOf(0, 1, 1, 1),
-        EAST to byteArrayOf(1, 0, 1, 1),
-        SOUTH to byteArrayOf(0, 0, 1, 0),
-        WEST to byteArrayOf(0, 0, 0, 1)
-      )
     }
   }
-  
+
+  private fun destroyCurrentBody() {
+    synchronized(BOX2D_LOCK) {
+      val currentBody = box2dBody ?: return
+      chunk.world.worldBody.destroyBody(currentBody)
+      box2dBody = null
+    }
+  }
+
+  override fun dispose() {
+    synchronized(BOX2D_LOCK) {
+      if (disposed) return
+      disposed = true
+      destroyCurrentBody()
+    }
+  }
+
+  fun hasBody(): Boolean = box2dBody != null
+
+  companion object {
+    const val INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L
+    const val UNSURE_FIXTURE_RELOAD_DELAY = 100L
+
+    /**
+     * represent the direction to look and if no solid block there how to create a fixture at that location (ie
+     * two relative vectors)
+     * the value of the pair is as follows `dxStart`, `dyStart`, `dxEnd`, `dyEnd`
+     * this can be visually represented with a cube:
+     *
+     * ```
+     * (0,1)---(1,1)
+     *  |         |
+     *  |         |
+     *  |         |
+     *  |         |
+     * (0,0)---(1,0)
+     * ```
+     *
+     * * Where `d` stands for delta
+     * * `x`/`y` is if this is the `x` or `y` component of the coordinate
+     * * `end`/`start` is if this is the start or end vector
+     */
+    val EDGE_DEF: Array<Pair<Direction, ByteArray>> = arrayOf(
+      NORTH to byteArrayOf(0, 1, 1, 1),
+      EAST to byteArrayOf(1, 0, 1, 1),
+      SOUTH to byteArrayOf(0, 0, 1, 0),
+      WEST to byteArrayOf(0, 0, 0, 1)
+    )
+  }
+}

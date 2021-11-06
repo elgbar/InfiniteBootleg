@@ -89,10 +89,10 @@ public class CancellableThreadScheduler {
   /**
    * Run a task in the future async
    *
-   * @param runnable What to do
    * @param ms How many milliseconds to wait before running the task
+   * @param runnable What to do
    */
-  public void scheduleAsync(@NotNull Runnable runnable, long ms) {
+  public void scheduleAsync(long ms, @NotNull Runnable runnable) {
     if (isAlwaysSync()) {
       executeSync(runnable);
       return;
@@ -103,10 +103,10 @@ public class CancellableThreadScheduler {
   /**
    * Run a task in the future on the main thread
    *
-   * @param runnable What to do
    * @param ms How many milliseconds to wait before running the task
+   * @param runnable What to do
    */
-  public void scheduleSync(@NotNull Runnable runnable, long ms) {
+  public void scheduleSync(long ms, @NotNull Runnable runnable) {
     executor.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS);
   }
 
