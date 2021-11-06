@@ -1,7 +1,10 @@
 package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
-import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN;
+import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED;
+import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.PLAYER_KICKED;
+import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.PLAYER_QUIT;
+import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_REASON;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
@@ -32,6 +35,7 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
+import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
@@ -247,6 +251,10 @@ public class World implements Disposable, Resizable {
       chunkLoader.save(chunk);
     }
 
+    for (Player player : players.values()) {
+      saveServerPlayer(player);
+    }
+
     var builder = toProtobuf();
 
     var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
@@ -267,11 +275,6 @@ public class World implements Disposable, Resizable {
 
   @NotNull
   public ProtoWorld.World toProtobuf() {
-
-    for (Player player : players.values()) {
-      saveServerPlayer(player);
-    }
-
     var builder = ProtoWorld.World.newBuilder();
     builder.setName(name);
     builder.setSeed(seed);
@@ -714,7 +717,7 @@ public class World implements Disposable, Resizable {
         chunkLoader.save(chunk);
       }
       for (Entity entity : chunk.getEntities()) {
-        removeEntity(entity);
+        removeEntity(entity, CHUNK_UNLOADED);
       }
       chunk.dispose();
       chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
