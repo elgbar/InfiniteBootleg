@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.Server;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
@@ -36,6 +37,10 @@ public class ServerMain extends CommonMain {
                     if (worldFolder != null) {
                       worldFolder.deleteDirectory();
                     }
+                  }
+                  if (server != null) {
+                    PacketExtraKt.broadcast(
+                        PacketExtraKt.clientBoundDisconnectPlayerPacket("Server closed"), null);
                   }
                   scheduler.shutdown(); // make sure scheduler threads are dead
                 }));
