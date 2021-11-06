@@ -805,10 +805,8 @@ public class World implements Disposable, Resizable {
     if (Main.isServer()) {
       Main.inst()
           .getScheduler()
-          .executeAsync(
-              () -> {
-                PacketExtraKt.broadcast(PacketExtraKt.clientBoundSpawnEntity(entity), null);
-              });
+          .executeSync(
+              () -> PacketExtraKt.broadcast(PacketExtraKt.clientBoundSpawnEntity(entity), null));
     }
   }
 

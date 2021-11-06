@@ -584,12 +584,16 @@ public abstract class Entity
       }
     }
     if (Main.isServer()) {
-      PacketExtraKt.broadcast(
-          PacketExtraKt.clientBoundMoveEntity(this),
-          (channel, credentials) -> {
-            // don't send packet to the owning player
-            return credentials.getEntityUUID() != getUuid();
-          });
+      Main.inst()
+          .getScheduler()
+          .executeSync(
+              () ->
+                  PacketExtraKt.broadcast(
+                      PacketExtraKt.clientBoundMoveEntity(this),
+                      (channel, credentials) -> {
+                        // don't send packet to the owning player
+                        return credentials.getEntityUUID() != getUuid();
+                      }));
     }
   }
 
