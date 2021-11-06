@@ -74,7 +74,7 @@ public abstract class Entity
   private final Vector2 posCache;
   private final Vector2 velCache;
   private int groundContacts;
-  private Filter filter;
+  @NotNull private Filter filter = World.ENTITY_FILTER;
   private float lookDeg;
 
   protected volatile boolean valid = true;
@@ -129,8 +129,6 @@ public abstract class Entity
       valid = false;
       return;
     }
-
-    filter = World.ENTITY_FILTER;
 
     if (center) {
       posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
@@ -447,6 +445,7 @@ public abstract class Entity
     return world.getChunk(chunkX, chunkY);
   }
 
+  @NotNull
   public synchronized Filter getFilter() {
     return filter;
   }
@@ -472,7 +471,7 @@ public abstract class Entity
    *
    * @param filter The type of filter to set
    */
-  public void setFilter(Filter filter) {
+  public void setFilter(@NotNull Filter filter) {
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
         if (isInvalid()) {

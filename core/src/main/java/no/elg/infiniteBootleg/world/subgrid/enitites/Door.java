@@ -36,7 +36,9 @@ public class Door extends MaterialEntity {
 
   private final AtomicInteger contacts = new AtomicInteger();
 
-  public Door(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+  private final Location southBlock = Location.relative(getBlockX(), getBlockY(), Direction.SOUTH);
+
+  public Door(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
   }
 
@@ -56,6 +58,8 @@ public class Door extends MaterialEntity {
 
   {
     if (!isInvalid()) {
+      setFilter(BLOCK_ENTITY_FILTER);
+
       // Wake up all bodies to get an accurate contacts count
       final Vector2 position = getBody().getPosition();
       final WorldBody worldBody = getWorld().getWorldBody();
@@ -110,7 +114,7 @@ public class Door extends MaterialEntity {
       }
     } else if (type == ContactType.END_CONTACT) {
       int newContacts = contacts.decrementAndGet();
-      if (newContacts == 0) {
+      if (newContacts <= 0) {
         setFilter(BLOCK_ENTITY_FILTER);
         Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
       }
@@ -125,7 +129,7 @@ public class Door extends MaterialEntity {
   @Override
   public boolean isOnGround() {
     // it's on the ground if the block below is not air
-    return !getWorld().isAirBlock(Location.relative(getBlockX(), getBlockY(), Direction.SOUTH));
+    return !getWorld().isAirBlock(southBlock);
   }
 
   @Override
