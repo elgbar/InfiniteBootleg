@@ -38,7 +38,7 @@ interface LightTrait : BlockTrait, Disposable {
     }
 
     fun LightTrait.tryCreateLight() {
-      if (light == null && block is LightTrait) {
+      if (light == null) {
         createLight()
       }
     }

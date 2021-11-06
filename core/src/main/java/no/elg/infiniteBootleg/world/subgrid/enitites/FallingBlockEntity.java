@@ -65,7 +65,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   @Override
   public boolean canCreateLight() {
-    return !isInvalid();
+    return block instanceof LightTrait && !isInvalid();
   }
 
   @Override
