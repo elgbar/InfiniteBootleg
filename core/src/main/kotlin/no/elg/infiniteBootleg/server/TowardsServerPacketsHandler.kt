@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
@@ -250,7 +251,8 @@ private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: Entit
   if (entity != null) {
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))
   } else {
-    Main.logger().warn("handleEntityRequest", "Unknown entity requested UUID: ${entityRequest.uuid}")
+    ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
+//    Main.logger().warn("handleEntityRequest", "Unknown entity requested UUID: ${entityRequest.uuid}")
   }
 }
 

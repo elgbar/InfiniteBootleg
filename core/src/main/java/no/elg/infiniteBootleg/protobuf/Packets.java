@@ -13452,8 +13452,15 @@ public final class Packets {
 
     /** Protobuf enum {@code packets.DespawnEntity.DespawnReason} */
     public enum DespawnReason implements com.google.protobuf.ProtocolMessageEnum {
-      /** <code>UNKNOWN = 0;</code> */
-      UNKNOWN(0),
+      /**
+       *
+       *
+       * <pre>
+       * </pre>
+       *
+       * <code>UNKNOWN_REASON = 0;</code>
+       */
+      UNKNOWN_REASON(0),
       /** <code>KILLED = 1;</code> */
       KILLED(1),
       /**
@@ -13463,16 +13470,43 @@ public final class Packets {
        * players only
        * </pre>
        *
-       * <code>QUIT = 2;</code>
+       * <code>PLAYER_QUIT = 2;</code>
        */
-      QUIT(2),
+      PLAYER_QUIT(2),
       /** <code>CHUNK_UNLOADED = 3;</code> */
       CHUNK_UNLOADED(3),
+      /**
+       *
+       *
+       * <pre>
+       * Unknown entity by the server
+       * </pre>
+       *
+       * <code>UNKNOWN_ENTITY = 4;</code>
+       */
+      UNKNOWN_ENTITY(4),
+      /**
+       *
+       *
+       * <pre>
+       * players only
+       * </pre>
+       *
+       * <code>PLAYER_KICKED = 5;</code>
+       */
+      PLAYER_KICKED(5),
       UNRECOGNIZED(-1),
       ;
 
-      /** <code>UNKNOWN = 0;</code> */
-      public static final int UNKNOWN_VALUE = 0;
+      /**
+       *
+       *
+       * <pre>
+       * </pre>
+       *
+       * <code>UNKNOWN_REASON = 0;</code>
+       */
+      public static final int UNKNOWN_REASON_VALUE = 0;
       /** <code>KILLED = 1;</code> */
       public static final int KILLED_VALUE = 1;
       /**
@@ -13482,11 +13516,31 @@ public final class Packets {
        * players only
        * </pre>
        *
-       * <code>QUIT = 2;</code>
+       * <code>PLAYER_QUIT = 2;</code>
        */
-      public static final int QUIT_VALUE = 2;
+      public static final int PLAYER_QUIT_VALUE = 2;
       /** <code>CHUNK_UNLOADED = 3;</code> */
       public static final int CHUNK_UNLOADED_VALUE = 3;
+      /**
+       *
+       *
+       * <pre>
+       * Unknown entity by the server
+       * </pre>
+       *
+       * <code>UNKNOWN_ENTITY = 4;</code>
+       */
+      public static final int UNKNOWN_ENTITY_VALUE = 4;
+      /**
+       *
+       *
+       * <pre>
+       * players only
+       * </pre>
+       *
+       * <code>PLAYER_KICKED = 5;</code>
+       */
+      public static final int PLAYER_KICKED_VALUE = 5;
 
       public final int getNumber() {
         if (this == UNRECOGNIZED) {
@@ -13513,13 +13567,17 @@ public final class Packets {
       public static DespawnReason forNumber(int value) {
         switch (value) {
           case 0:
-            return UNKNOWN;
+            return UNKNOWN_REASON;
           case 1:
             return KILLED;
           case 2:
-            return QUIT;
+            return PLAYER_QUIT;
           case 3:
             return CHUNK_UNLOADED;
+          case 4:
+            return UNKNOWN_ENTITY;
+          case 5:
+            return PLAYER_KICKED;
           default:
             return null;
         }
@@ -13664,7 +13722,7 @@ public final class Packets {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
       if (despawnReason_
-          != no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN
+          != no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_REASON
               .getNumber()) {
         output.writeEnum(2, despawnReason_);
       }
@@ -13681,7 +13739,7 @@ public final class Packets {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
       if (despawnReason_
-          != no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN
+          != no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_REASON
               .getNumber()) {
         size += com.google.protobuf.CodedOutputStream.computeEnumSize(2, despawnReason_);
       }
@@ -16482,16 +16540,17 @@ public final class Packets {
           + "\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_SERVER\020\002\022\021"
           + "\n\rLOGIN_SUCCESS\020\003\"@\n\013SpawnEntity\022#\n\006enti"
           + "ty\030\001 \001(\0132\023.persistence.Entity\022\014\n\004uuid\030\002 "
-          + "\001(\t\"\242\001\n\rDespawnEntity\022\014\n\004uuid\030\001 \001(\t\022;\n\rd"
+          + "\001(\t\"\327\001\n\rDespawnEntity\022\014\n\004uuid\030\001 \001(\t\022;\n\rd"
           + "espawnReason\030\002 \001(\0162$.packets.DespawnEnti"
-          + "ty.DespawnReason\"F\n\rDespawnReason\022\013\n\007UNK"
-          + "NOWN\020\000\022\n\n\006KILLED\020\001\022\010\n\004QUIT\020\002\022\022\n\016CHUNK_UN"
-          + "LOADED\020\003\"8\n\005Login\022\014\n\004uuid\030\001 \001(\t\022\020\n\010usern"
-          + "ame\030\002 \001(\t\022\017\n\007version\030\003 \001(\t\"<\n\014ChunkReque"
-          + "st\022,\n\rchunkLocation\030\001 \001(\0132\025.persistence."
-          + "Vector2i\"\035\n\rEntityRequest\022\014\n\004uuid\030\001 \001(\tB"
-          + ",\n\037no.elg.infiniteBootleg.protobufB\007Pack"
-          + "etsP\000b\006proto3"
+          + "ty.DespawnReason\"{\n\rDespawnReason\022\022\n\016UNK"
+          + "NOWN_REASON\020\000\022\n\n\006KILLED\020\001\022\017\n\013PLAYER_QUIT"
+          + "\020\002\022\022\n\016CHUNK_UNLOADED\020\003\022\022\n\016UNKNOWN_ENTITY"
+          + "\020\004\022\021\n\rPLAYER_KICKED\020\005\"8\n\005Login\022\014\n\004uuid\030\001"
+          + " \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 \001(\t\""
+          + "<\n\014ChunkRequest\022,\n\rchunkLocation\030\001 \001(\0132\025"
+          + ".persistence.Vector2i\"\035\n\rEntityRequest\022\014"
+          + "\n\004uuid\030\001 \001(\tB,\n\037no.elg.infiniteBootleg.p"
+          + "rotobufB\007PacketsP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(

@@ -85,7 +85,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     if (!crashed && type == ContactType.BEGIN_CONTACT) {
       crashed = true;
 
-      freeze();
+      freeze(true);
       if (Main.isAuthoritative()) {
         Main.inst()
             .getScheduler()
@@ -152,7 +152,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
         // remove entity if it no longer falling and have not become a true block for some reason
         Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
       } else {
-        freeze();
+        freeze(true);
       }
     }
   }

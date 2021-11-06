@@ -136,10 +136,12 @@ message SpawnEntity {
 
 message DespawnEntity {
   enum DespawnReason{
-    UNKNOWN = 0;
+    UNKNOWN_REASON = 0; //
     KILLED = 1;
-    QUIT = 2; // players only
+    PLAYER_QUIT = 2; // players only
     CHUNK_UNLOADED = 3;
+    UNKNOWN_ENTITY = 4; // Unknown entity by the server
+    PLAYER_KICKED = 5; // players only
   }
   string uuid = 1;
   DespawnReason despawnReason = 2;

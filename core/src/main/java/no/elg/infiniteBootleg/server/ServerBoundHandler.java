@@ -67,7 +67,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
                 + channels.size()
                 + " channels)");
     if (client != null) {
-      ServerMain.inst().getServerWorld().removePlayer(client.getEntityUUID());
+      ServerMain.inst().getServerWorld().disconnectPlayer(client.getEntityUUID(), false);
     }
   }
 

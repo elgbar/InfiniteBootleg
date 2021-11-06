@@ -821,6 +821,11 @@ public class World implements Disposable, Resizable {
    * @throws IllegalArgumentException if the given entity is not part of this world
    */
   public void removeEntity(@NotNull Entity entity) {
+    removeEntity(entity, UNKNOWN_REASON);
+  }
+
+  public void removeEntity(
+      @NotNull Entity entity, @NotNull Packets.DespawnEntity.DespawnReason reason) {
     final UUID entityUuid = entity.getUuid();
     entities.remove(entityUuid);
     if (entity instanceof Player player) {
@@ -834,10 +839,10 @@ public class World implements Disposable, Resizable {
     if (Main.isServer()) {
       Main.inst()
           .getScheduler()
-          .executeAsync(
+          .executeSync(
               () ->
                   PacketExtraKt.broadcast(
-                      PacketExtraKt.clientBoundDespawnEntity(entityUuid, UNKNOWN), null));
+                      PacketExtraKt.clientBoundDespawnEntity(entityUuid, reason), null));
     }
   }
 
@@ -987,10 +992,10 @@ public class World implements Disposable, Resizable {
     return players.containsKey(uuid);
   }
 
-  public void removePlayer(@NotNull UUID uuid) {
+  public void disconnectPlayer(@NotNull UUID uuid, boolean kicked) {
     final Player player = players.get(uuid);
     if (player != null) {
-      removeEntity(player);
+      removeEntity(player, kicked ? PLAYER_KICKED : PLAYER_QUIT);
     } else {
       Main.logger().warn("Failed to find player " + uuid + " to remove");
     }
