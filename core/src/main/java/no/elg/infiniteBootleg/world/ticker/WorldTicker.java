@@ -1,12 +1,14 @@
 package no.elg.infiniteBootleg.world.ticker;
 
-import java.util.Iterator;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -25,11 +27,10 @@ public class WorldTicker extends Ticker {
 
   @Nullable private final WorldLightTicker lightTicker;
   @NotNull private final WorldBox2DTicker box2DTicker;
-  private final float timeChangePerTick;
+
 
   public WorldTicker(@NotNull World<?> world, boolean tick) {
-    super(
-        new WorldTickee(world),
+    super(new WorldTickee(world),
         "World-" + world.getName(),
         tick,
         Settings.tps,
@@ -40,10 +41,17 @@ public class WorldTicker extends Ticker {
       lightTicker = null;
     }
     box2DTicker = new WorldBox2DTicker(world, tick);
-    timeChangePerTick = getSecondsDelayBetweenTicks() / 10;
   }
 
-  private record WorldTickee(World<?> world) implements Ticking {
+  private static class WorldTickee implements Ticking {
+
+    OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
+    @NotNull
+    private final World<?> world;
+
+    private WorldTickee(@NotNull World<?> world){
+      this.world = world;
+    }
 
     @Override
     public void tick() {
@@ -53,12 +61,18 @@ public class WorldTicker extends Ticker {
 
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
-      for (Iterator<Chunk> iterator = world.getChunks().values().iterator(); iterator.hasNext(); ) {
-        Chunk chunk = iterator.next();
+      if(chunkIterator == null){
+        chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
+      }else{
+      chunkIterator.reset();
+      }
+      while (chunkIterator.hasNext()) {
+        ObjectMap.Entry<Location,Chunk> c = chunkIterator.next();
+        Chunk chunk = c.value;
 
         // clean up dead chunks
         if (!chunk.isLoaded()) {
-          iterator.remove();
+          chunkIterator.remove();
           continue;
         }
         // Unload chunks not seen for CHUNK_UNLOAD_TIME
@@ -68,7 +82,7 @@ public class WorldTicker extends Ticker {
             && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
           world.unloadChunk(chunk);
-          iterator.remove();
+          chunkIterator.remove();
           continue;
         }
         chunk.tick();
