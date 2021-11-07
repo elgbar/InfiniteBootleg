@@ -19,7 +19,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
   private int maxHealth = DEFAULT_MAX_HEALTH;
   private String name = DEFAULT_NAME;
 
-  public LivingEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+  public LivingEntity(@NotNull World<?> world, ProtoWorld.@NotNull Entity protoEntity) {
     super(world, protoEntity);
     if (isInvalid()) {
       return;
@@ -32,7 +32,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
     maxHealth = protoLiving.getMaxHealth();
   }
 
-  public LivingEntity(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
+  public LivingEntity(@NotNull World<?> world, float worldX, float worldY, @NotNull UUID uuid) {
     super(world, worldX, worldY, uuid);
   }
 

@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.ZipUtils;
+import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
@@ -32,7 +33,7 @@ public class WorldLoader {
   }
 
   @Nullable
-  private static World loadWorld(long seed) {
+  private static World<?> loadWorld(long seed) {
     var uuid = getUUIDFromSeed(seed);
     var worldFolder = getWorldFolder(uuid);
     FileHandle worldZip = getWorldZip(worldFolder);
@@ -50,7 +51,7 @@ public class WorldLoader {
   }
 
   @Nullable
-  public static FileHandle getServerPlayerFile(@NotNull World world, @NotNull UUID playerId) {
+  public static FileHandle getServerPlayerFile(@NotNull World<?> world, @NotNull UUID playerId) {
     FileHandle fileHandle = world.getWorldFolder();
     if (fileHandle != null) {
       fileHandle = fileHandle.child(PLAYERS_PATH).child(playerId.toString());
@@ -59,7 +60,7 @@ public class WorldLoader {
   }
 
   @NotNull
-  public static Player getServerPlayer(@NotNull World world, @NotNull UUID playerId) {
+  public static Player getServerPlayer(@NotNull ServerWorld world, @NotNull UUID playerId) {
     FileHandle fileHandle = getServerPlayerFile(world, playerId);
     if (fileHandle != null && fileHandle.exists()) {
       try {

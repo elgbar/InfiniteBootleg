@@ -5,7 +5,7 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
 
 /**
@@ -17,7 +17,7 @@ object SelectWorldScreen : StageScreen() {
       visTable(defaultSpacing = true) {
         visTextButton("Load World '${Settings.worldSeed}'") {
           onInteract(stage, Keys.NUM_0) {
-            ClientMain.inst().screen = WorldScreen(World(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong()))
+            ClientMain.inst().screen = WorldScreen(ClientWorld(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong(), "World"))
           }
         }
 //        row()

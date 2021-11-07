@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.FallingTrait
  * A blocks that falls when ticked
  */
 class FallingBlock(
-  world: World,
+  world: World<*>,
   chunk: Chunk,
   localX: Int,
   localY: Int,

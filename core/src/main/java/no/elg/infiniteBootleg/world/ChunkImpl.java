@@ -28,6 +28,8 @@ import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
+import no.elg.infiniteBootleg.world.render.ClientWorldRender;
+import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
@@ -38,7 +40,7 @@ public class ChunkImpl implements Chunk {
 
   private static final ProtoWorld.Block.Builder AIR_BLOCK_BUILDER = Block.save(AIR);
 
-  @NotNull private final World world;
+  @NotNull private final World<?> world;
   @Nullable private final Block[][] blocks;
 
   private final int chunkX;
@@ -70,7 +72,7 @@ public class ChunkImpl implements Chunk {
    * @param chunkX The position x of this chunk the given world
    * @param chunkY The position y of this chunk the given world
    */
-  public ChunkImpl(@NotNull World world, int chunkX, int chunkY) {
+  public ChunkImpl(@NotNull World<?> world, int chunkX, int chunkY) {
     this(world, chunkX, chunkY, new Block[CHUNK_SIZE][CHUNK_SIZE]);
   }
 
@@ -81,7 +83,7 @@ public class ChunkImpl implements Chunk {
    * @param blocks The initial blocks of this chunk (note: must be {@link #CHUNK_SIZE}x{@link
    *     #CHUNK_SIZE})
    */
-  public ChunkImpl(@NotNull World world, int chunkX, int chunkY, @NotNull Block[][] blocks) {
+  public ChunkImpl(@NotNull World<?> world, int chunkX, int chunkY, @NotNull Block[][] blocks) {
     Preconditions.checkArgument(blocks.length == CHUNK_SIZE);
     Preconditions.checkArgument(blocks[0].length == CHUNK_SIZE);
     this.world = world;
@@ -278,7 +280,10 @@ public class ChunkImpl implements Chunk {
     if (Main.isServer()) {
       Main.inst().getScheduler().executeSync(() -> this.getChunkBody().update(true));
     } else {
-      world.getRender().getChunkRenderer().queueRendering(this, prioritize);
+      final WorldRender render = world.getRender();
+      if (render instanceof ClientWorldRender clientWorldRender) {
+        clientWorldRender.getChunkRenderer().queueRendering(this, prioritize);
+      }
       prioritize = false;
     }
   }
@@ -344,7 +349,6 @@ public class ChunkImpl implements Chunk {
     if (dirty) {
       updateTextureIfDirty();
     }
-
     return allAir;
   }
 
@@ -379,7 +383,7 @@ public class ChunkImpl implements Chunk {
 
   @Override
   @NotNull
-  public World getWorld() {
+  public World<?> getWorld() {
     return world;
   }
 

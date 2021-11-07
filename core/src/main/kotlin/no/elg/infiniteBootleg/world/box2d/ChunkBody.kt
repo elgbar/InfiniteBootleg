@@ -208,7 +208,6 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
      *  |         |
      *  |         |
      *  |         |
-     *  |         |
      * (0,0)---(1,0)
      * ```
      *

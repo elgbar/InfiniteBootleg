@@ -2,7 +2,8 @@ package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.InputAdapter;
 import no.elg.infiniteBootleg.ClientMain;
-import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
@@ -10,10 +11,11 @@ import org.jetbrains.annotations.NotNull;
 /** @author Elg */
 public abstract class AbstractEntityControls extends InputAdapter implements EntityControls {
 
-  private final WorldRender worldRender;
+  private final ClientWorldRender worldRender;
   private final LivingEntity entity;
 
-  public AbstractEntityControls(@NotNull WorldRender worldRender, @NotNull LivingEntity entity) {
+  public AbstractEntityControls(
+      @NotNull ClientWorldRender worldRender, @NotNull LivingEntity entity) {
     this.worldRender = worldRender;
     this.entity = entity;
   }
@@ -28,7 +30,7 @@ public abstract class AbstractEntityControls extends InputAdapter implements Ent
     return worldRender;
   }
 
-  public World getWorld() {
+  public ClientWorld getWorld() {
     return worldRender.getWorld();
   }
 

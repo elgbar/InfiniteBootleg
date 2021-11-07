@@ -175,7 +175,7 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
   boolean isAllowingUnloading();
 
   @NotNull
-  World getWorld();
+  World<?> getWorld();
 
   int getChunkX();
 

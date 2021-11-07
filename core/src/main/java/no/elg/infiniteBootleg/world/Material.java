@@ -135,7 +135,7 @@ public enum Material {
    * @return A block of this type
    */
   @NotNull
-  public Block createBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY) {
+  public Block createBlock(@NotNull World<?> world, @NotNull Chunk chunk, int localX, int localY) {
     Preconditions.checkArgument(isBlock());
     if (constructor == null) {
       return new Block(world, chunk, localX, localY, this);
@@ -151,11 +151,11 @@ public enum Material {
     return itemType == ItemType.BLOCK || itemType == ItemType.AIR;
   }
 
-  public boolean create(@NotNull World world, int worldX, int worldY) {
+  public boolean create(@NotNull World<?> world, int worldX, int worldY) {
     return create(world, worldX, worldY, false);
   }
 
-  public boolean create(@NotNull World world, int worldX, int worldY, boolean prioritize) {
+  public boolean create(@NotNull World<?> world, int worldX, int worldY, boolean prioritize) {
     if (world.getMaterial(worldX, worldY) == AIR) {
       if (isBlock()) {
         return world.setBlock(worldX, worldY, this, prioritize) != null;
@@ -174,7 +174,7 @@ public enum Material {
 
   @Nullable
   public MaterialEntity createEntity(
-      @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
+      @NotNull World<?> world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
     Preconditions.checkArgument(itemType == ItemType.ENTITY);
     Preconditions.checkNotNull(constructorProtoBuf, "Constructor of entity cannot be null");
     MaterialEntity entity;
@@ -187,7 +187,7 @@ public enum Material {
   }
 
   @Nullable
-  public MaterialEntity createEntity(@NotNull World world, float worldX, float worldY) {
+  public MaterialEntity createEntity(@NotNull World<?> world, float worldX, float worldY) {
     Preconditions.checkArgument(itemType == ItemType.ENTITY);
     Preconditions.checkNotNull(constructor, "Constructor of entity cannot be null");
     MaterialEntity entity;
@@ -202,7 +202,7 @@ public enum Material {
 
   @Nullable
   private MaterialEntity commonEntity(
-      @NotNull World world, @NotNull MaterialEntity entity, @Nullable Chunk chunk) {
+      @NotNull World<?> world, @NotNull MaterialEntity entity, @Nullable Chunk chunk) {
     if (entity.isInvalid()) {
       return null;
     }

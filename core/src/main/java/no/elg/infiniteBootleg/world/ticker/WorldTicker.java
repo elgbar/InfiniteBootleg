@@ -6,10 +6,13 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
+import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * There are multiple tickers for a single world internally, but the outside world should only see a
@@ -20,21 +23,27 @@ import org.jetbrains.annotations.NotNull;
  */
 public class WorldTicker extends Ticker {
 
-  @NotNull private final WorldLightTicker lightTicker;
-  private final WorldBox2DTicker box2DTicker;
+  @Nullable private final WorldLightTicker lightTicker;
+  @NotNull private final WorldBox2DTicker box2DTicker;
+  private final float timeChangePerTick;
 
-  public WorldTicker(@NotNull World world, boolean tick) {
+  public WorldTicker(@NotNull World<?> world, boolean tick) {
     super(
         new WorldTickee(world),
         "World-" + world.getName(),
         tick,
         Settings.tps,
         Ticker.DEFAULT_NAG_DELAY);
-    lightTicker = new WorldLightTicker(world, tick);
+    if (world instanceof ClientWorld clientWorld) {
+      lightTicker = new WorldLightTicker(clientWorld, tick);
+    } else {
+      lightTicker = null;
+    }
     box2DTicker = new WorldBox2DTicker(world, tick);
+    timeChangePerTick = getSecondsDelayBetweenTicks() / 10;
   }
 
-  private record WorldTickee(World world) implements Ticking {
+  private record WorldTickee(World<?> world) implements Ticking {
 
     @Override
     public void tick() {
@@ -52,16 +61,15 @@ public class WorldTicker extends Ticker {
           iterator.remove();
           continue;
         }
-        if (Main.isSingleplayer()) {
-          // Unload chunks not seen for CHUNK_UNLOAD_TIME
-          if (chunk.isAllowingUnloading()
-              && wr.isOutOfView(chunk)
-              && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
+        // Unload chunks not seen for CHUNK_UNLOAD_TIME
+        if (Main.isSingleplayer()
+            && chunk.isAllowingUnloading()
+            && wr.isOutOfView(chunk)
+            && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
-            world.unloadChunk(chunk);
-            iterator.remove();
-            continue;
-          }
+          world.unloadChunk(chunk);
+          iterator.remove();
+          continue;
         }
         chunk.tick();
       }
@@ -99,13 +107,20 @@ public class WorldTicker extends Ticker {
         }
         entity.tickRare();
       }
+
+      WorldTime time = world.getWorldTime();
+      time.setTime(
+          time.getTime()
+              - world.getWorldTicker().getSecondsDelayBetweenTicks() * time.getTimeScale());
     }
   }
 
   @Override
   public void start() {
     super.start();
-    lightTicker.getTicker().start();
+    if (lightTicker != null) {
+      lightTicker.getTicker().start();
+    }
     box2DTicker.getTicker().start();
   }
 
@@ -113,7 +128,9 @@ public class WorldTicker extends Ticker {
   @Override
   public void stop() {
     super.stop();
-    lightTicker.getTicker().stop();
+    if (lightTicker != null) {
+      lightTicker.getTicker().stop();
+    }
     box2DTicker.getTicker().stop();
   }
 
@@ -126,7 +143,9 @@ public class WorldTicker extends Ticker {
   @Override
   public void pause() {
     super.pause();
-    lightTicker.getTicker().pause();
+    if (lightTicker != null) {
+      lightTicker.getTicker().pause();
+    }
     box2DTicker.getTicker().pause();
   }
 
@@ -139,7 +158,9 @@ public class WorldTicker extends Ticker {
   @Override
   public void resume() {
     super.resume();
-    lightTicker.getTicker().resume();
+    if (lightTicker != null) {
+      lightTicker.getTicker().resume();
+    }
     box2DTicker.getTicker().resume();
   }
 }

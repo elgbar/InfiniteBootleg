@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
-import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
@@ -42,7 +42,7 @@ public class ClientMain extends CommonMain {
 
   @Nullable private volatile Player mainPlayer;
   @Nullable private volatile ServerClient serverClient;
-  @Nullable protected World singleplayerWorld;
+  @Nullable protected ClientWorld singleplayerWorld;
 
   @NotNull
   public static ClientMain inst() {
@@ -118,7 +118,7 @@ public class ClientMain extends CommonMain {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
     if (screen instanceof WorldScreen worldScreen) {
-      final World world = worldScreen.getWorld();
+      final ClientWorld world = worldScreen.getWorld();
       mouseVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
       world.getRender().getCamera().unproject(mouseVec);
       final WorldBody worldBody = world.getWorldBody();
@@ -192,12 +192,12 @@ public class ClientMain extends CommonMain {
    * @throws IllegalStateException If there is no client, and there is no singleplayer world
    */
   @NotNull
-  public World getWorld() {
+  public ClientWorld getWorld() {
     final ServerClient client = ClientMain.inst().getServerClient();
     if (Main.isSingleplayer()) {
       return ClientMain.inst().getSingleplayerWorld();
     } else {
-      final World world = client.getWorld();
+      final ClientWorld world = client.getWorld();
       if (world == null) {
         PacketExtraKt.fatal(client.ctx, "Failed to get client world when executing command");
         throw new IllegalStateException("Failed to get client world when executing command");
@@ -211,14 +211,14 @@ public class ClientMain extends CommonMain {
    * @see #getWorld()
    */
   @NotNull
-  public World getSingleplayerWorld() {
+  public ClientWorld getSingleplayerWorld() {
     if (singleplayerWorld == null) {
       throw new IllegalStateException("There is no world when not in world screen");
     }
     return singleplayerWorld;
   }
 
-  public void setSingleplayerWorld(@Nullable World singleplayerWorld) {
+  public void setSingleplayerWorld(@Nullable ClientWorld singleplayerWorld) {
     if (Main.isMultiplayer()) {
       throw new IllegalStateException("Cannot set the singleplayer world when in multiplayer!");
     }

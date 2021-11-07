@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.LightTrait
 import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.createLight
 
 abstract class LightBlock(
-  world: World,
+  world: World<*>,
   chunk: Chunk,
   localX: Int,
   localY: Int,
@@ -26,7 +26,7 @@ abstract class LightBlock(
     }
     set(value) {
       if (field != null) {
-        PointLightPool.getPool(world).free(field)
+        PointLightPool.getPool(world)?.free(field)
       }
       field = value
     }

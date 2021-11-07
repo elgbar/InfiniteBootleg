@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.Block.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
@@ -19,11 +20,11 @@ import kotlin.math.abs
 import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 
 /**
- * Wrapper for [com.badlogic.gdx.physics.box2d.World1] for asynchronous reasons
+ * Wrapper for [com.badlogic.gdx.physics.box2d.World] for asynchronous reasons
  *
  * @author Elg
  */
-class WorldBody(private val world: World) : Ticking {
+open class WorldBody(private val world: World<*>) : Ticking {
 
   /**
    * Use the returned object with care,
@@ -132,8 +133,9 @@ class WorldBody(private val world: World) : Ticking {
         entity.updatePos()
       }
 
-      val rayHandler = world.render.rayHandler
-      if (rayHandler != null) {
+      val render = world.render
+      if (render is ClientWorldRender) {
+        val rayHandler = render.rayHandler
         for (light in rayHandler.enabledLights) {
           light.position = light.position.add(deltaOffsetX, deltaOffsetY)
         }
@@ -142,11 +144,11 @@ class WorldBody(private val world: World) : Ticking {
 //        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
 //      }
         rayHandler.update()
-      }
 
-      // test logic only, move to world render when possible
-      world.render.camera?.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
-      world.render.update()
+        // test logic only, move to world render when possible
+        render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
+      }
+      render.update()
     }
   }
 

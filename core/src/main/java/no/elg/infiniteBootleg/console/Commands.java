@@ -23,8 +23,10 @@ import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
@@ -34,6 +36,7 @@ import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 /** @author Elg */
+@SuppressWarnings("unused")
 public class Commands extends CommandExecutor {
 
   private final ConsoleLogger logger;
@@ -43,7 +46,7 @@ public class Commands extends CommandExecutor {
   }
 
   @NotNull
-  public World getWorld() {
+  public World<?> getWorld() {
     if (Settings.client) {
       return ClientMain.inst().getWorld();
     } else {
@@ -138,7 +141,7 @@ public class Commands extends CommandExecutor {
           "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
               + " entity updates and chunks update")
   public void resume() {
-    World world = getWorld();
+    World<?> world = getWorld();
     Ticker ticker = getWorld().getWorldTicker();
     if (ticker.isPaused()) {
       world.getWorldTicker().resume();
@@ -177,7 +180,7 @@ public class Commands extends CommandExecutor {
     if (!Settings.client) {
       return;
     }
-    WorldRender render = getWorld().getRender();
+    ClientWorldRender render = ClientMain.inst().getWorld().getRender();
     var worldBody = getWorld().getWorldBody();
     render.getCamera().position.x = worldX * Block.BLOCK_SIZE + worldBody.getWorldOffsetX();
     render.getCamera().position.y = worldY * Block.BLOCK_SIZE + worldBody.getWorldOffsetY();
@@ -206,7 +209,7 @@ public class Commands extends CommandExecutor {
       logger.warn("Quality given is a negative number. It has been set to 0");
       quality = 0;
     }
-    getWorld().getRender().getRayHandler().setBlurNum(quality);
+    ClientMain.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
     logger.success("Light quality is now " + quality);
   }
 
@@ -241,7 +244,7 @@ public class Commands extends CommandExecutor {
           "Given zoom level (%.3f) is less than the minimum % .3f", zoom, WorldRender.MIN_ZOOM);
       zoom = WorldRender.MIN_ZOOM;
     }
-    WorldRender render = getWorld().getRender();
+    ClientWorldRender render = ClientMain.inst().getWorld().getRender();
     render.getCamera().zoom = Math.max(zoom, WorldRender.MIN_ZOOM);
     render.update();
     logger.success("Zoom level is now " + zoom);
@@ -266,7 +269,7 @@ public class Commands extends CommandExecutor {
           "Spawn a generic static entity at the given location with the given width and height",
       paramDescriptions = {"worldX", "worldY", "width", "height"})
   public void ent(float worldX, float worldY, int width, int height) {
-    final World world = getWorld();
+    final World<?> world = getWorld();
     var entity = new GenericEntity(world, worldX, worldY, width, height);
     if (entity.isInvalid()) {
       logger.error(
@@ -286,7 +289,7 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(description = "Kill all non-player entities")
   public void killall() {
-    World world = getWorld();
+    World<?> world = getWorld();
     int entities = 0;
     synchronized (BOX2D_LOCK) {
       for (Entity entity : world.getEntities()) {
@@ -422,14 +425,12 @@ public class Commands extends CommandExecutor {
       logger.error("CMD", "Failed to find any players");
       return;
     }
-    World world = getWorld();
-    WorldRender render = world.getRender();
+    ClientWorld world = ClientMain.inst().getWorld();
+    ClientWorldRender render = world.getRender();
     render.getCamera().zoom = 1f;
     render.getCamera().position.x = player.getPosition().x * Block.BLOCK_SIZE;
     render.getCamera().position.y = player.getPosition().y * Block.BLOCK_SIZE;
-    if (world.getInput() != null) {
-      world.getInput().setLockedOn(true);
-    }
+    world.getInput().setLockedOn(true);
     render.update();
   }
 

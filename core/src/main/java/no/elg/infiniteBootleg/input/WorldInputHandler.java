@@ -23,7 +23,8 @@ import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +37,11 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
   public static final float CAMERA_LERP = 2.5f;
   public static final float LERP_CUTOFF = 5f;
   private static final int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
-  private final WorldRender worldRender;
+  private final ClientWorldRender worldRender;
   @Nullable private Entity following;
   private boolean lockedOn = true;
 
-  public WorldInputHandler(@NotNull WorldRender world) {
+  public WorldInputHandler(@NotNull ClientWorldRender world) {
     worldRender = world;
   }
 
@@ -49,7 +50,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     if (Main.inst().getConsole().isVisible() || Main.isMultiplayer() && keycode != F3) {
       return false;
     }
-    World world = ClientMain.inst().getWorld();
+    ClientWorld world = ClientMain.inst().getWorld();
     switch (keycode) {
       case F3:
         Screen screen = ClientMain.inst().getScreen();
@@ -100,7 +101,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     return true;
   }
 
-  public World getWorld() {
+  public ClientWorld getWorld() {
     return worldRender.getWorld();
   }
 

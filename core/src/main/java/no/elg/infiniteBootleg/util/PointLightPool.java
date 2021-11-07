@@ -8,9 +8,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A pool for static xray point lights
@@ -24,14 +26,24 @@ public final class PointLightPool extends Pool<PointLight> {
   private final RayHandler rayHandler;
   private final WorldBody worldBody;
 
-  private static final ConcurrentMap<World, PointLightPool> poolMap = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<ClientWorld, PointLightPool> poolMap =
+      new ConcurrentHashMap<>();
 
-  private PointLightPool(@NotNull World world) {
+  private PointLightPool(@NotNull ClientWorld world) {
     rayHandler = world.getRender().getRayHandler();
     worldBody = world.getWorldBody();
   }
 
-  public static PointLightPool getPool(@NotNull World world) {
+  @Nullable
+  public static PointLightPool getPool(@NotNull World<?> world) {
+    if (world instanceof ClientWorld clientWorld) {
+      return getPool(clientWorld);
+    }
+    return null;
+  }
+
+  @NotNull
+  public static PointLightPool getPool(@NotNull ClientWorld world) {
     return poolMap.computeIfAbsent(world, PointLightPool::new);
   }
 

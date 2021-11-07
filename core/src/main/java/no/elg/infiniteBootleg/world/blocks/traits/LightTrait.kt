@@ -4,6 +4,7 @@ import box2dLight.PointLight
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.PointLightPool
+import no.elg.infiniteBootleg.world.ClientWorld
 
 /**
  * @author Elg
@@ -20,15 +21,16 @@ interface LightTrait : BlockTrait, Disposable {
 
   override fun dispose() {
     if (light != null) {
-      PointLightPool.getPool(block.world).free(light)
+      PointLightPool.getPool(block.world)?.free(light)
     }
   }
 
   companion object {
 
     fun LightTrait.createLight() {
-      if (Settings.renderLight && Settings.client && light == null && block.chunk.chunkBody.hasBody() && canCreateLight()) {
-        light = PointLightPool.getPool(block.world).obtain(block.worldX + 0.5f, block.worldY + 0.5f).also {
+      val world = block.world
+      if (Settings.renderLight && Settings.client && light == null && block.chunk.chunkBody.hasBody() && canCreateLight() && world is ClientWorld) {
+        light = PointLightPool.getPool(world).obtain(block.worldX + 0.5f, block.worldY + 0.5f).also {
           it.isStaticLight = true
           customizeLight(it)
         }

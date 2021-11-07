@@ -16,8 +16,8 @@ import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Material;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.render.ChunksInView;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -39,7 +39,7 @@ public class HUDRenderer implements Renderer {
       return;
     }
     ClientMain main = ClientMain.inst();
-    World world = main.getWorld();
+    ClientWorld world = main.getWorld();
     int h = Gdx.graphics.getHeight();
 
     LivingEntity player = ClientMain.inst().getPlayer();
@@ -52,7 +52,7 @@ public class HUDRenderer implements Renderer {
       sr.drawTop(fpsString(world), 1);
       sr.drawTop(pointing(mouseBlockX, mouseBlockY, world), 3);
       sr.drawTop(chunk(mouseBlockX, mouseBlockY, world), 5);
-      sr.drawTop(viewChunk(world), 7);
+      sr.drawTop(viewChunk(world, player), 7);
       sr.drawTop(pos(player), 9);
       sr.drawTop(time(world), 11);
       sr.drawTop(lights(world), 13);
@@ -76,13 +76,13 @@ public class HUDRenderer implements Renderer {
     sr.end();
   }
 
-  private String lights(World world) {
+  private String lights(ClientWorld world) {
     final PublicRayHandler handler = world.getRender().getRayHandler();
     return "Active Lights:"
         + (handler != null ? handler.getEnabledLights().size : "Lights not enabled");
   }
 
-  private String ents(World world) {
+  private String ents(ClientWorld world) {
     String nl = "\n    ";
     StringBuilder ents = new StringBuilder("E = ");
 
@@ -97,7 +97,7 @@ public class HUDRenderer implements Renderer {
     return ents.toString().trim();
   }
 
-  private String fpsString(World world) {
+  private String fpsString(ClientWorld world) {
     int activeThreads = Main.inst().getScheduler().getActiveThreads();
     long tpsDelta = TimeUtils.nanosToMillis(world.getWorldTicker().getTpsDelta());
     long realTPS = world.getWorldTicker().getRealTPS();
@@ -108,7 +108,7 @@ public class HUDRenderer implements Renderer {
     return String.format(format, tps, fpsDelta, realTPS, tpsDelta, activeThreads);
   }
 
-  private String pointing(int mouseBlockX, int mouseBlockY, World world) {
+  private String pointing(int mouseBlockX, int mouseBlockY, ClientWorld world) {
 
     Block block = world.getBlock(mouseBlockX, mouseBlockY, true);
     Material material = block != null ? block.getMaterial() : Material.AIR;
@@ -122,7 +122,7 @@ public class HUDRenderer implements Renderer {
         format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug);
   }
 
-  private String chunk(int mouseBlockX, int mouseBlockY, World world) {
+  private String chunk(int mouseBlockX, int mouseBlockY, ClientWorld world) {
 
     Chunk pc = world.getChunkFromWorld(mouseBlockX, mouseBlockY);
     int chunkY = CoordUtil.worldToChunk(mouseBlockY);
@@ -140,14 +140,14 @@ public class HUDRenderer implements Renderer {
     }
   }
 
-  private String time(World world) {
+  private String time(ClientWorld world) {
     WorldTime worldTime = world.getWorldTime();
     String format = "time: %.2f scale: %.2f sky brightness: %s";
     return String.format(
         format, worldTime.getTime(), worldTime.getTimeScale(), worldTime.getSkyBrightness());
   }
 
-  private String viewChunk(World world) {
+  private String viewChunk(ClientWorld world, Entity player) {
     ChunksInView viewingChunks = world.getRender().getChunksInView();
 
     int chunksHor = viewingChunks.getHorizontalLength();

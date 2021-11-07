@@ -28,7 +28,7 @@ public abstract class TickingBlock extends Block implements TickingTrait {
   private final Object tickLock = new Object();
 
   public TickingBlock(
-      @NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
+      @NotNull World<?> world, Chunk chunk, int localX, int localY, @NotNull Material material) {
     super(world, chunk, localX, localY, material);
     synchronized (tickLock) {
       shouldTick = true;
@@ -59,10 +59,12 @@ public abstract class TickingBlock extends Block implements TickingTrait {
     }
   }
 
+  @Override
   public boolean shouldTick() {
     return shouldTick;
   }
 
+  @Override
   public void setShouldTick(boolean shouldTick) {
     synchronized (tickLock) {
       if (this.shouldTick != shouldTick) {
@@ -72,6 +74,7 @@ public abstract class TickingBlock extends Block implements TickingTrait {
     }
   }
 
+  @Override
   public void delayedShouldTick(long delayTicks) {
     synchronized (tickLock) {
       setShouldTick(true);

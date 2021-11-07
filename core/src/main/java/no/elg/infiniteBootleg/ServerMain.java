@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.Server;
-import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +14,7 @@ public class ServerMain extends CommonMain {
 
   private static ServerMain inst;
 
-  @Nullable protected World serverWorld;
+  @Nullable protected ServerWorld serverWorld;
 
   @Nullable public Server server;
 
@@ -52,14 +52,14 @@ public class ServerMain extends CommonMain {
   }
 
   @NotNull
-  public World getServerWorld() {
+  public ServerWorld getServerWorld() {
     if (serverWorld == null) {
       throw new IllegalStateException("There is no server world!");
     }
     return serverWorld;
   }
 
-  public void setServerWorld(@Nullable World serverWorld) {
+  public void setServerWorld(@Nullable ServerWorld serverWorld) {
     synchronized (INST_LOCK) {
       this.serverWorld = serverWorld;
     }
@@ -91,7 +91,9 @@ public class ServerMain extends CommonMain {
     thread.start();
     console.log("SERVER", "Starting server on port " + Settings.port);
 
-    setServerWorld(new World(new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed));
+    setServerWorld(
+        new ServerWorld(
+            new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World"));
     getServerWorld().load();
   }
 

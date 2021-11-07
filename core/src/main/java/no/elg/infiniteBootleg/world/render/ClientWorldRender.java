@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.time.WorldTime;
@@ -32,56 +33,53 @@ import org.jetbrains.annotations.Nullable;
 /** @author Elg */
 public class ClientWorldRender implements WorldRender {
 
-  @NotNull public final World world;
+  @NotNull public final ClientWorld world;
   @NotNull private final Rectangle viewBound;
   @NotNull private final ChunksInView chunksInView;
   @NotNull private final Matrix4 m4 = new Matrix4();
   @NotNull OrderedMap<Chunk, TextureRegion> draw;
-  @Nullable private PublicRayHandler rayHandler;
-  private EntityRenderer entityRenderer;
-  @Nullable private SpriteBatch batch;
-  @Nullable private OrthographicCamera camera;
-  @Nullable private ChunkRenderer chunkRenderer;
-  @Nullable private Box2DDebugRenderer box2DDebugRenderer;
-  @Nullable private DebugChunkRenderer chunkDebugRenderer;
+  @NotNull private final PublicRayHandler rayHandler;
+  @NotNull private final EntityRenderer entityRenderer;
+  @NotNull private final SpriteBatch batch;
+  @NotNull private final OrthographicCamera camera;
+  @NotNull private final ChunkRenderer chunkRenderer;
+  @NotNull private final Box2DDebugRenderer box2DDebugRenderer;
+  @NotNull private final DebugChunkRenderer chunkDebugRenderer;
   @Nullable private DirectionalLight skylight;
   private float lastZoom;
 
-  public ClientWorldRender(@NotNull World world) {
+  public ClientWorldRender(@NotNull ClientWorld world) {
     viewBound = new Rectangle();
     chunksInView = new ChunksInView();
     this.world = world;
     draw = new OrderedMap<>();
     draw.orderedKeys().ordered = false; // improve remove
 
-    if (Settings.client) {
-      chunkRenderer = new ChunkRenderer(this);
-      entityRenderer = new EntityRenderer(this);
+    chunkRenderer = new ChunkRenderer(this);
+    entityRenderer = new EntityRenderer(this);
 
-      camera = new OrthographicCamera();
-      camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera = new OrthographicCamera();
+    camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-      camera.zoom = 1f;
-      camera.position.x = 0;
-      camera.position.y = 0;
+    camera.zoom = 1f;
+    camera.position.x = 0;
+    camera.position.y = 0;
 
-      batch = new SpriteBatch();
-      batch.setProjectionMatrix(camera.combined);
+    batch = new SpriteBatch();
+    batch.setProjectionMatrix(camera.combined);
 
-      chunkDebugRenderer = new DebugChunkRenderer(this);
-      box2DDebugRenderer = new Box2DDebugRenderer();
+    chunkDebugRenderer = new DebugChunkRenderer(this);
+    box2DDebugRenderer = new Box2DDebugRenderer();
 
-      RayHandler.setGammaCorrection(true);
-      RayHandler.useDiffuseLight(true);
-      rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
-      rayHandler.setBlurNum(2);
-      rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 0f);
-      Main.inst().getScheduler().executeSync(this::resetSkylight);
-    }
+    RayHandler.setGammaCorrection(true);
+    RayHandler.useDiffuseLight(true);
+    rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
+    rayHandler.setBlurNum(2);
+    rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 0f);
+    Main.inst().getScheduler().executeSync(this::resetSkylight);
   }
 
-  @Override
-  public void resetSkylight() {
+  private void resetSkylight() {
 
     synchronized (BOX2D_LOCK) {
       synchronized (LIGHT_LOCK) {
@@ -107,8 +105,7 @@ public class ClientWorldRender implements WorldRender {
       }
     }
   }
-
-  @Override
+  /** @return How many blocks there currently are horizontally on screen */
   public int blocksHorizontally() {
     return (int) Math.ceil(camera.viewportWidth * camera.zoom / BLOCK_SIZE) + 1;
   }
@@ -139,7 +136,7 @@ public class ClientWorldRender implements WorldRender {
     }
 
     draw.clear();
-    draw.ensureCapacity(chunksInView.getHorizontalLength() * chunksInView.getVerticalLength());
+    draw.ensureCapacity(chunksInView.getChunksInView());
 
     final WorldBody worldBody = world.getWorldBody();
     float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
@@ -205,43 +202,30 @@ public class ClientWorldRender implements WorldRender {
 
   @Override
   public boolean isOutOfView(@NotNull Chunk chunk) {
-    return chunk.getChunkX() < chunksInView.horizontalStart
-        || chunk.getChunkX() >= chunksInView.horizontalEnd
-        || chunk.getChunkY() < chunksInView.verticalStart
-        || chunk.getChunkY() >= chunksInView.verticalEnd;
+    return getChunksInView().isOutOfView(chunk.getChunkX(), chunk.getChunkY());
   }
 
-  @Override
-  public @NotNull ChunksInView getChunksInView() {
+  @NotNull
+  public ChunksInView getChunksInView() {
     return chunksInView;
   }
 
-  @Override
-  public @Nullable OrthographicCamera getCamera() {
+  public @NotNull OrthographicCamera getCamera() {
     return camera;
   }
 
-  @Override
-  public @Nullable ChunkRenderer getChunkRenderer() {
+  public @NotNull ChunkRenderer getChunkRenderer() {
     return chunkRenderer;
   }
 
-  @Override
-  public EntityRenderer getEntityRenderer() {
-    return entityRenderer;
-  }
-
-  @Override
-  public @Nullable SpriteBatch getBatch() {
+  public @NotNull SpriteBatch getBatch() {
     return batch;
   }
 
-  @Override
-  public @Nullable PublicRayHandler getRayHandler() {
+  public @NotNull PublicRayHandler getRayHandler() {
     return rayHandler;
   }
 
-  @Override
   public @Nullable DirectionalLight getSkylight() {
     return skylight;
   }
@@ -309,11 +293,10 @@ public class ClientWorldRender implements WorldRender {
   }
 
   @Override
-  public @NotNull World getWorld() {
+  public @NotNull ClientWorld getWorld() {
     return world;
   }
 
-  @Override
   public void reload() {
     synchronized (BOX2D_LOCK) {
       synchronized (LIGHT_LOCK) {

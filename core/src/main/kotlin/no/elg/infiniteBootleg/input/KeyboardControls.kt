@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
@@ -20,7 +20,7 @@ import kotlin.math.sign
  *
  * @author Elg
  */
-class KeyboardControls(worldRender: WorldRender, entity: LivingEntity) : AbstractEntityControls(worldRender, entity) {
+class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : AbstractEntityControls(worldRender, entity) {
   private var selected: Material = Material.STONE
 
   // if objects can be placed on non-air blocks

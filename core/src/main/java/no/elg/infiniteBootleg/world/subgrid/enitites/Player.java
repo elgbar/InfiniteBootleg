@@ -20,6 +20,7 @@ import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -34,7 +35,7 @@ public class Player extends LivingEntity {
   @Nullable private EntityControls controls;
   @Nullable private final Light torchLight;
 
-  public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
+  public Player(@NotNull World<?> world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
     if (isInvalid()) {
       return;
@@ -56,11 +57,11 @@ public class Player extends LivingEntity {
     }
   }
 
-  public Player(@NotNull World world, float worldX, float worldY) {
+  public Player(@NotNull World<?> world, float worldX, float worldY) {
     this(world, worldX, worldY, UUID.randomUUID());
   }
 
-  public Player(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
+  public Player(@NotNull World<?> world, float worldX, float worldY, @NotNull UUID uuid) {
     super(world, worldX, worldY, uuid);
     if (isInvalid()) {
       return;
@@ -102,18 +103,20 @@ public class Player extends LivingEntity {
   }
 
   public synchronized void giveControls() {
+    if (Main.isServer()) {
+      return;
+    }
+    ClientWorld world = (ClientWorld) getWorld();
     if (controls == null) {
       Main.logger().debug("PLR", "Giving control to " + hudDebug());
       if (Main.isServerClient()
           && !getUuid().equals(ClientMain.inst().getServerClient().getUuid())) {
         throw new IllegalCallerException("Cannot give controls to others than " + getUuid());
       }
-      controls = new KeyboardControls(getWorld().getRender(), this);
+      controls = new KeyboardControls(world.getRender(), this);
       ClientMain.inst().getInputMultiplexer().addProcessor(controls);
-      final WorldInputHandler input = getWorld().getInput();
-      if (input != null) {
-        input.setFollowing(this);
-      }
+      final WorldInputHandler input = world.getInput();
+      input.setFollowing(this);
     } else {
       Main.logger()
           .warn("PLR", "Tried to give control to a player already with control " + hudDebug());
@@ -121,6 +124,9 @@ public class Player extends LivingEntity {
   }
 
   public synchronized void removeControls() {
+    if (Main.isServer()) {
+      return;
+    }
     if (controls != null) {
       Main.logger().debug("PLR", "Removing control from " + hudDebug());
       controls.dispose();

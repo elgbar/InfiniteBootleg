@@ -67,7 +67,7 @@ public abstract class Entity
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
   public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
-  @NotNull private final World world;
+  @NotNull private final World<?> world;
   private final UUID uuid;
 
   @Nullable private Body body;
@@ -80,7 +80,7 @@ public abstract class Entity
 
   protected volatile boolean valid = true;
 
-  public Entity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
+  public Entity(@NotNull World<?> world, @NotNull ProtoWorld.Entity protoEntity) {
     this(
         world,
         protoEntity.getPosition().getX(),
@@ -104,17 +104,17 @@ public abstract class Entity
     }
   }
 
-  public Entity(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
+  public Entity(@NotNull World<?> world, float worldX, float worldY, @NotNull UUID uuid) {
     this(world, worldX, worldY, true, uuid);
   }
 
   public Entity(
-      @NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
+      @NotNull World<?> world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
     this(world, worldX, worldY, center, uuid, true);
   }
 
   private Entity(
-      @NotNull World world,
+      @NotNull World<?> world,
       float worldX,
       float worldY,
       boolean center,
@@ -290,9 +290,7 @@ public abstract class Entity
       Main.inst()
           .getScheduler()
           .executeAsync(
-              () -> {
-                PacketExtraKt.broadcast(PacketExtraKt.clientBoundMoveEntity(this), null);
-              });
+              () -> PacketExtraKt.broadcast(PacketExtraKt.clientBoundMoveEntity(this), null));
     }
   }
 
@@ -702,7 +700,7 @@ public abstract class Entity
     }
   }
 
-  public World getWorld() {
+  public World<?> getWorld() {
     return world;
   }
 
@@ -757,7 +755,7 @@ public abstract class Entity
 
   @Nullable
   public static Entity load(
-      @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
+      @NotNull World<?> world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
     var uuid = ExtraKt.fromUUIDOrNull(protoEntity.getUuid());
     if (uuid == null) {
       Main.logger().warn(" " + protoEntity.getUuid());

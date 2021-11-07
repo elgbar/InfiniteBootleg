@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class EntityRenderer implements Renderer {
 
-  private final WorldRender worldRender;
+  private final ClientWorldRender worldRender;
 
-  public EntityRenderer(@NotNull WorldRender worldRender) {
+  public EntityRenderer(@NotNull ClientWorldRender worldRender) {
     this.worldRender = worldRender;
   }
 

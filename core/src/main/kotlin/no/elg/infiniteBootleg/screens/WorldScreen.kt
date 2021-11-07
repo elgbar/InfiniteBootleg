@@ -7,12 +7,12 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.util.PointLightPool
-import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.ClientWorld
 
 /**
  * @author Elg
  */
-class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() {
+class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdapter() {
 
   var hud: HUDRenderer = HUDRenderer()
     private set
@@ -20,7 +20,7 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
   override fun render(delta: Float) {
 
     //noinspection ConstantConditions
-    world.input?.update()
+    world.input.update()
     if (!world.worldTicker.isPaused) {
       // only update controls when we're not paused
       for (player in world.players) {
@@ -47,7 +47,7 @@ class WorldScreen(val world: World, val load: Boolean = true) : ScreenAdapter() 
     if (Settings.client) {
       Main.inst().console.addToInputMultiplexer()
     }
-    world.input?.also { ClientMain.inst().inputMultiplexer.addProcessor(it) }
+    world.input.also { ClientMain.inst().inputMultiplexer.addProcessor(it) }
   }
 
   override fun hide() {

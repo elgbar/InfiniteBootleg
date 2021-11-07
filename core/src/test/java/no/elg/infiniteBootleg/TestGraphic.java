@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import de.tomgrill.gdxtesting.GdxTestRunner;
-import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -22,11 +22,11 @@ public class TestGraphic {
     new ClientMain(true);
   }
 
-  public World world;
+  public ClientWorld world;
 
   @NotNull
-  public World createNewWorld() {
-    world = new World(new EmptyChunkGenerator(), 0);
+  public ClientWorld createNewWorld() {
+    world = new ClientWorld(new EmptyChunkGenerator(), 0, "World");
     ClientMain.inst().setSingleplayerWorld(world);
     return world;
   }

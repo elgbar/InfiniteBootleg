@@ -2,8 +2,6 @@ package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
 import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED;
-import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.PLAYER_KICKED;
-import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.PLAYER_QUIT;
 import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_REASON;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
@@ -20,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
@@ -27,14 +26,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
@@ -53,8 +49,6 @@ import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.loader.WorldLoader;
-import no.elg.infiniteBootleg.world.render.ClientWorldRender;
-import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -78,7 +72,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class World implements Disposable, Resizable {
+public abstract class World<R extends WorldRender> implements Disposable, Resizable {
 
   public static final short GROUND_CATEGORY = 0b0000_0000_0000_0001;
   public static final short LIGHTS_CATEGORY = 0b0000_0000_0000_0010;
@@ -130,7 +124,6 @@ public class World implements Disposable, Resizable {
   private final long seed;
   @NotNull private final WorldTicker worldTicker;
   @NotNull private final ChunkLoader chunkLoader;
-  @NotNull private final WorldRender render;
   @NotNull private final WorldBody worldBody;
   @NotNull private final WorldTime worldTime;
 
@@ -143,11 +136,10 @@ public class World implements Disposable, Resizable {
       new ConcurrentHashMap<>(); // all player in this world
 
   @NotNull
-  private final ConcurrentMap<@NotNull Location, @NotNull Chunk> chunks = new ConcurrentHashMap<>();
+  protected final OrderedMap<@NotNull Location, @Nullable Chunk> chunks = new OrderedMap<>();
 
   @Nullable private volatile FileHandle worldFile;
   // only exists when graphics exits
-  @Nullable private WorldInputHandler input;
   @NotNull private String name;
 
   private Location spawn;
@@ -155,10 +147,6 @@ public class World implements Disposable, Resizable {
 
   public World(@NotNull ProtoWorld.World protoWorld) {
     this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
-  }
-
-  public World(@NotNull ChunkGenerator generator, long seed) {
-    this(generator, seed, "World");
   }
 
   public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
@@ -174,13 +162,7 @@ public class World implements Disposable, Resizable {
     worldBody = new WorldBody(this);
     worldTime = new WorldTime(this);
     spawn = new Location(0, 0);
-
-    if (Settings.client) {
-      render = new ClientWorldRender(this);
-      input = new WorldInputHandler(render);
-    } else {
-      render = new HeadlessWorldRenderer(this);
-    }
+    chunks.orderedKeys().ordered = false;
   }
 
   public void load() {
@@ -226,8 +208,8 @@ public class World implements Disposable, Resizable {
   public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
 
     spawn = Location.fromVector2i(protoWorld.getSpawn());
-    worldTime.setTime(protoWorld.getTime());
     worldTime.setTimeScale(protoWorld.getTimeScale());
+    worldTime.setTime(protoWorld.getTime());
 
     if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
       final Player newPlayer = new Player(this, protoWorld.getPlayer());
@@ -680,8 +662,6 @@ public class World implements Disposable, Resizable {
       }
     }
 
-    render.reload();
-
     load();
 
     if (wasNotPaused) {
@@ -691,8 +671,14 @@ public class World implements Disposable, Resizable {
   }
 
   /** @return All currently loaded chunks */
-  public Collection<Chunk> getLoadedChunks() {
-    return chunks.values().stream().filter(Chunk::isLoaded).collect(Collectors.toUnmodifiableSet());
+  public Array<Chunk> getLoadedChunks() {
+    var loadedChunks = new Array<Chunk>(chunks.size);
+    for (Chunk chunk : chunks.values()) {
+      if (chunk != null && chunk.isLoaded()) {
+        loadedChunks.add(chunk);
+      }
+    }
+    return loadedChunks;
   }
 
   /**
@@ -713,14 +699,19 @@ public class World implements Disposable, Resizable {
    */
   public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
     if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
-      if (save) {
-        chunkLoader.save(chunk);
+      loadLock.lock();
+      try {
+        if (save) {
+          chunkLoader.save(chunk);
+        }
+        for (Entity entity : chunk.getEntities()) {
+          removeEntity(entity, CHUNK_UNLOADED);
+        }
+        chunk.dispose();
+        chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
+      } finally {
+        loadLock.unlock();
       }
-      for (Entity entity : chunk.getEntities()) {
-        removeEntity(entity, CHUNK_UNLOADED);
-      }
-      chunk.dispose();
-      chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
     }
   }
 
@@ -803,13 +794,6 @@ public class World implements Disposable, Resizable {
     if (entity instanceof Player player) {
       players.put(player.getUuid(), player);
       saveServerPlayer(player);
-    }
-
-    if (Main.isServer()) {
-      Main.inst()
-          .getScheduler()
-          .executeSync(
-              () -> PacketExtraKt.broadcast(PacketExtraKt.clientBoundSpawnEntity(entity), null));
     }
   }
 
@@ -929,20 +913,8 @@ public class World implements Disposable, Resizable {
     return Material.AIR;
   }
 
-  @Override
-  public void resize(int width, int height) {
-    if (Settings.client) {
-      render.resize(width, height);
-    }
-  }
-
-  @Nullable
-  public WorldInputHandler getInput() {
-    return input;
-  }
-
   /** @return Backing map of chunks */
-  public @NotNull ConcurrentMap<Location, Chunk> getChunks() {
+  public @NotNull OrderedMap<Location, Chunk> getChunks() {
     return chunks;
   }
 
@@ -971,9 +943,7 @@ public class World implements Disposable, Resizable {
   }
 
   @NotNull
-  public WorldRender getRender() {
-    return render;
-  }
+  public abstract R getRender();
 
   @NotNull
   public Ticker getWorldTicker() {
@@ -991,15 +961,6 @@ public class World implements Disposable, Resizable {
 
   public boolean hasPlayer(@NotNull UUID uuid) {
     return players.containsKey(uuid);
-  }
-
-  public void disconnectPlayer(@NotNull UUID uuid, boolean kicked) {
-    final Player player = players.get(uuid);
-    if (player != null) {
-      removeEntity(player, kicked ? PLAYER_KICKED : PLAYER_QUIT);
-    } else {
-      Main.logger().warn("Failed to find player " + uuid + " to remove");
-    }
   }
 
   @Nullable
@@ -1042,9 +1003,12 @@ public class World implements Disposable, Resizable {
       return false;
     }
 
-    World world = (World) o;
+    World<?> world = (World<?>) o;
     return uuid.equals(world.uuid);
   }
+
+  @Override
+  public void resize(int width, int height) {}
 
   @Override
   public String toString() {
@@ -1054,13 +1018,5 @@ public class World implements Disposable, Resizable {
   @Override
   public void dispose() {
     getWorldTicker().stop();
-    final WorldInputHandler input = getInput();
-    if (input != null) {
-      input.dispose();
-    }
-    render.dispose();
-    if (this.input != null) {
-      this.input.dispose();
-    }
   }
 }

@@ -17,12 +17,12 @@ public class WorldTime {
   public static final float SUNRISE_TIME = 0;
   public static final float MIDDAY_TIME = -90;
   public static final float MIDNIGHT_TIME = -270;
-  @NotNull private final World world;
+  @NotNull private final World<?> world;
   @NotNull private final Color baseColor = new Color(Color.WHITE);
-  private volatile float time = WorldTime.MIDDAY_TIME;
+  private volatile float time = MIDDAY_TIME;
   private volatile float timeScale = 1f;
 
-  public WorldTime(World world) {
+  public WorldTime(World<?> world) {
     this.world = world;
   }
 
@@ -89,7 +89,7 @@ public class WorldTime {
     return baseColor;
   }
 
-  public World getWorld() {
+  public World<?> getWorld() {
     return world;
   }
 }

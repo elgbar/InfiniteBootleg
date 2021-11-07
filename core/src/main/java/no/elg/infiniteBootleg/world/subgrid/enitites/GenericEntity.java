@@ -16,7 +16,7 @@ public class GenericEntity extends Entity implements Removable {
   private int width;
   private int height;
 
-  public GenericEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+  public GenericEntity(@NotNull World<?> world, ProtoWorld.@NotNull Entity protoEntity) {
     super(world, protoEntity);
     if (isInvalid()) {
       return;
@@ -30,11 +30,11 @@ public class GenericEntity extends Entity implements Removable {
     height = protoSize.getY();
   }
 
-  public GenericEntity(@NotNull World world, float worldX, float worldY) {
+  public GenericEntity(@NotNull World<?> world, float worldX, float worldY) {
     this(world, worldX, worldY, 1, 1);
   }
 
-  public GenericEntity(@NotNull World world, float worldX, float worldY, int width, int height) {
+  public GenericEntity(@NotNull World<?> world, float worldX, float worldY, int width, int height) {
     super(world, worldX, worldY, true, UUID.randomUUID());
 
     this.width = width * Block.BLOCK_SIZE;

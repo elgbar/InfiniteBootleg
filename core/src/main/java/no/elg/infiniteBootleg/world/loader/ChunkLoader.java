@@ -26,16 +26,16 @@ import org.jetbrains.annotations.Nullable;
 public class ChunkLoader {
 
   public static final String CHUNK_FOLDER = "chunks";
-  private final World world;
+  private final World<?> world;
   private final ChunkGenerator generator;
 
-  public ChunkLoader(@NotNull World world, @NotNull ChunkGenerator generator) {
+  public ChunkLoader(@NotNull World<?> world, @NotNull ChunkGenerator generator) {
     this.world = world;
     this.generator = generator;
   }
 
   @Nullable
-  public static FileHandle getChunkFile(@NotNull World world, int chunkX, int chunkY) {
+  public static FileHandle getChunkFile(@NotNull World<?> world, int chunkX, int chunkY) {
     FileHandle worldFile = world.getWorldFolder();
     if (worldFile == null) {
       return null;

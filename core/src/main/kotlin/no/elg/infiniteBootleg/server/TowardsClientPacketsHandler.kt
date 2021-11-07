@@ -32,7 +32,7 @@ import no.elg.infiniteBootleg.server.ClientBoundHandler.TAG
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
-import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.util.UUID
@@ -207,7 +207,7 @@ private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   val protoWorld = startGame.world
   Main.inst().scheduler.executeSync {
-    this.world = World(protoWorld).apply {
+    this.world = ClientWorld(protoWorld).apply {
       serverLoad(protoWorld)
     }
     if (startGame.controlling.type != PLAYER) {

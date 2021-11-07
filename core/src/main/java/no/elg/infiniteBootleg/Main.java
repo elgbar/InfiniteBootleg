@@ -35,9 +35,14 @@ public interface Main extends ApplicationListener {
     return Settings.client && ClientMain.inst().getServerClient() != null;
   }
 
-  /** @return If this is a server instance */
+  /** @return If this is a server instance (i.e., is NOT rendering) */
   static boolean isServer() {
     return !Settings.client;
+  }
+
+  /** @return If this is a client instance (i.e., is rendering) */
+  static boolean isClient() {
+    return Settings.client;
   }
 
   /** @return If this is a singleplayer instance */

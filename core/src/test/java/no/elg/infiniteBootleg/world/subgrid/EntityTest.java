@@ -26,7 +26,7 @@ public class EntityTest extends TestGraphic {
   @Test
   public void touchingBlockMiddleOneOne() {
     Entity ent = new GenericEntity(world, 0.5f, 0.5f, 1, 1);
-    World world = ent.getWorld();
+    World<?> world = ent.getWorld();
 
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //

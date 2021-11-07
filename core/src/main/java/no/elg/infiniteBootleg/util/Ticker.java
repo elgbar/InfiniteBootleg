@@ -160,7 +160,7 @@ public class Ticker implements Runnable {
     long ms = msDelayBetweenTicks - TimeUtils.nanosToMillis(tpsDelta);
 
     if (ms > 0) {
-      int nano = (int) tpsDelta % 1_000_000; // There are one million nano second in a millisecond
+      int nano = (int) tpsDelta % 1_000_000; // There are one million nanosecond in a millisecond
       try {
         Thread.sleep(ms, nano);
       } catch (InterruptedException e) {
