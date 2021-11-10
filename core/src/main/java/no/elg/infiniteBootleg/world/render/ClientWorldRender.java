@@ -270,6 +270,15 @@ public class ClientWorldRender implements WorldRender {
                   (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE)
               + CHUNKS_IN_VIEW_PADDING_RENDER;
 
+      chunksInView.forEach(
+          world,
+          chunk -> {
+            if (!chunk.hasTextureRegion()) {
+              chunk.dirty();
+            }
+            return null;
+          });
+
       if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
         lastZoom = camera.zoom;
         resetSkylight();

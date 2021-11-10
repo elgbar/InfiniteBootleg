@@ -254,6 +254,11 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
+  public boolean hasTextureRegion() {
+    return fboRegion != null;
+  }
+
+  @Override
   public void updateTextureIfDirty() {
     if (initializing) {
       return;
@@ -562,6 +567,11 @@ public class ChunkImpl implements Chunk {
   @Override
   public synchronized boolean isDirty() {
     return dirty;
+  }
+
+  @Override
+  public synchronized void dirty() {
+    dirty = true;
   }
 
   /** Allow textures to be loaded. Only call once per chunk */

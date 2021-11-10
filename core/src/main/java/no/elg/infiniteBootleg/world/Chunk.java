@@ -123,6 +123,13 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
   TextureRegion getTextureRegion();
 
   /**
+   * Will not call {@link #updateTextureIfDirty()}
+   *
+   * @return If this chunk has a texture generated
+   */
+  boolean hasTextureRegion();
+
+  /**
    * Force update of texture and recalculate internal variables This is usually called when the
    * dirty flag of the chunk is set and either {@link #isAllAir()} or {@link #getTextureRegion()}
    * called.
@@ -199,7 +206,11 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
   @NotNull
   ChunkBody getChunkBody();
 
+  /** @return if this chunk is dirty */
   boolean isDirty();
+
+  /** Mark chunk as dirty */
+  void dirty();
 
   boolean load(ProtoWorld.Chunk protoChunk);
 
