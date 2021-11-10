@@ -115,24 +115,9 @@ public class ClientWorldRender implements WorldRender {
     chunkRenderer.render();
     if (Gdx.graphics.getFramesPerSecond() > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
       // only render more chunks when the computer isn't struggling with the rendering
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
-      chunkRenderer.render();
+      for (int i = 0; i < 20; i++) {
+        chunkRenderer.render();
+      }
     }
 
     draw.clear();
