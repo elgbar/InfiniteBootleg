@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.tryCreate
 /**
  * A block that lights up the surrounding area
  */
-class Torch(world: World<*>, chunk: Chunk, localX: Int, localY: Int, material: Material) : LightBlock(world, chunk, localX, localY, material), FallingTrait {
+class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material) : LightBlock(world, chunk, localX, localY, material), FallingTrait {
   override var falling = false
 
   override fun customizeLight(light: PointLight) {

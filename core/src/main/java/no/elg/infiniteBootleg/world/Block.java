@@ -26,7 +26,7 @@ public class Block
   public static final int BLOCK_SIZE = 16;
 
   private final Material material;
-  private final World<?> world;
+  private final World world;
   private final Chunk chunk;
 
   private final int localX;
@@ -34,7 +34,7 @@ public class Block
   private boolean disposed;
 
   public Block(
-      @NotNull World<?> world,
+      @NotNull World world,
       @NotNull Chunk chunk,
       int localX,
       int localY,
@@ -49,7 +49,7 @@ public class Block
 
   @Nullable
   public static Block fromProto(
-      @NotNull World<?> world,
+      @NotNull World world,
       @NotNull Chunk chunk,
       int localX,
       int localY,
@@ -82,7 +82,7 @@ public class Block
   }
 
   /** @return World this block exists in */
-  public World<?> getWorld() {
+  public World getWorld() {
     return world;
   }
 

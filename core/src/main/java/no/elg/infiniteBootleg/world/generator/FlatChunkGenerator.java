@@ -22,7 +22,7 @@ public class FlatChunkGenerator implements ChunkGenerator {
 
   @NotNull
   @Override
-  public Chunk generate(@NotNull World<?> world, int chunkX, int chunkY) {
+  public Chunk generate(@NotNull World world, int chunkX, int chunkY) {
     ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
     if (chunkY < 0) {
       for (int x = 0; x < Chunk.CHUNK_SIZE; x++) {

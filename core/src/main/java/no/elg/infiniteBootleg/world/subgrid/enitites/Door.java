@@ -38,11 +38,11 @@ public class Door extends MaterialEntity {
 
   private final Location southBlock = Location.relative(getBlockX(), getBlockY(), Direction.SOUTH);
 
-  public Door(@NotNull World<?> world, @NotNull ProtoWorld.Entity protoEntity) {
+  public Door(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
   }
 
-  public Door(@NotNull World<?> world, float worldX, float worldY) {
+  public Door(@NotNull World world, float worldX, float worldY) {
     super(world, worldX, worldY);
   }
 

@@ -35,7 +35,7 @@ public class Player extends LivingEntity {
   @Nullable private EntityControls controls;
   @Nullable private final Light torchLight;
 
-  public Player(@NotNull World<?> world, @NotNull ProtoWorld.Entity protoEntity) {
+  public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
     if (isInvalid()) {
       return;
@@ -57,11 +57,11 @@ public class Player extends LivingEntity {
     }
   }
 
-  public Player(@NotNull World<?> world, float worldX, float worldY) {
+  public Player(@NotNull World world, float worldX, float worldY) {
     this(world, worldX, worldY, UUID.randomUUID());
   }
 
-  public Player(@NotNull World<?> world, float worldX, float worldY, @NotNull UUID uuid) {
+  public Player(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
     super(world, worldX, worldY, uuid);
     if (isInvalid()) {
       return;

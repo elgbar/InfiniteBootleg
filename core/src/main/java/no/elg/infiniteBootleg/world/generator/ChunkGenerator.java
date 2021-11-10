@@ -32,5 +32,5 @@ public interface ChunkGenerator {
    * @return A valid chunk at the given offset in the given world
    */
   @NotNull
-  Chunk generate(@NotNull World<?> world, int chunkX, int chunkY);
+  Chunk generate(@NotNull World world, int chunkX, int chunkY);
 }

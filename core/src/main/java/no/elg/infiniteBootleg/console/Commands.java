@@ -46,7 +46,7 @@ public class Commands extends CommandExecutor {
   }
 
   @NotNull
-  public World<?> getWorld() {
+  public World getWorld() {
     if (Settings.client) {
       return ClientMain.inst().getWorld();
     } else {
@@ -141,7 +141,7 @@ public class Commands extends CommandExecutor {
           "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
               + " entity updates and chunks update")
   public void resume() {
-    World<?> world = getWorld();
+    World world = getWorld();
     Ticker ticker = getWorld().getWorldTicker();
     if (ticker.isPaused()) {
       world.getWorldTicker().resume();
@@ -269,7 +269,7 @@ public class Commands extends CommandExecutor {
           "Spawn a generic static entity at the given location with the given width and height",
       paramDescriptions = {"worldX", "worldY", "width", "height"})
   public void ent(float worldX, float worldY, int width, int height) {
-    final World<?> world = getWorld();
+    final World world = getWorld();
     var entity = new GenericEntity(world, worldX, worldY, width, height);
     if (entity.isInvalid()) {
       logger.error(
@@ -289,7 +289,7 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(description = "Kill all non-player entities")
   public void killall() {
-    World<?> world = getWorld();
+    World world = getWorld();
     int entities = 0;
     synchronized (BOX2D_LOCK) {
       for (Entity entity : world.getEntities()) {

@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import org.jetbrains.annotations.NotNull;
 
 /** @author Elg */
-public class ClientWorld extends World<ClientWorldRender> {
+public class ClientWorld extends World {
 
   private final ClientWorldRender render;
   private final WorldInputHandler input;

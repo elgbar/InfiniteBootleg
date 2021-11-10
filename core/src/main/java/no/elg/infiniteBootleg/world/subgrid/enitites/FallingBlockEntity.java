@@ -39,7 +39,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   private volatile boolean crashed;
 
   public FallingBlockEntity(
-      @NotNull World<?> world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
+      @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
     if (isInvalid()) {
       return;
@@ -53,7 +53,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     block = material.createBlock(world, chunk, (int) position.getX(), (int) position.getY());
   }
 
-  public FallingBlockEntity(@NotNull World<?> world, @NotNull Block block) {
+  public FallingBlockEntity(@NotNull World world, @NotNull Block block) {
     super(world, block.getWorldX() + 0.5f, block.getWorldY() - 0.5f, false, UUID.randomUUID());
     if (isInvalid()) {
       return;

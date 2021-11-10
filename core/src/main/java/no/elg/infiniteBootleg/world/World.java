@@ -72,7 +72,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public abstract class World<R extends WorldRender> implements Disposable, Resizable {
+public abstract class World implements Disposable, Resizable {
 
   public static final short GROUND_CATEGORY = 0b0000_0000_0000_0001;
   public static final short LIGHTS_CATEGORY = 0b0000_0000_0000_0010;
@@ -943,7 +943,7 @@ public abstract class World<R extends WorldRender> implements Disposable, Resiza
   }
 
   @NotNull
-  public abstract R getRender();
+  public abstract WorldRender getRender();
 
   @NotNull
   public Ticker getWorldTicker() {
@@ -1003,7 +1003,7 @@ public abstract class World<R extends WorldRender> implements Disposable, Resiza
       return false;
     }
 
-    World<?> world = (World<?>) o;
+    World world = (World) o;
     return uuid.equals(world.uuid);
   }
 

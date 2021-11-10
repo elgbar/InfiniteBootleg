@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MaterialEntity extends Entity implements Removable {
 
-  public MaterialEntity(@NotNull World<?> world, ProtoWorld.@NotNull Entity protoEntity) {
+  public MaterialEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
     super(world, protoEntity);
     if (isInvalid()) {
       return;
@@ -24,7 +24,7 @@ public abstract class MaterialEntity extends Entity implements Removable {
     Preconditions.checkArgument(material == getMaterial(), "Different materials");
   }
 
-  public MaterialEntity(@NotNull World<?> world, float worldX, float worldY) {
+  public MaterialEntity(@NotNull World world, float worldX, float worldY) {
     super(world, worldX, worldY, UUID.randomUUID());
   }
 

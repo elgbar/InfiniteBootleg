@@ -47,5 +47,5 @@ public interface WorldRender extends Updatable, Renderer, Disposable, Resizable 
   boolean isOutOfView(@NotNull Chunk chunk);
 
   @NotNull
-  World<?> getWorld();
+  World getWorld();
 }

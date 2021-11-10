@@ -63,7 +63,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
 
   @NotNull
   @Override
-  public Chunk generate(@NotNull World<?> world, int chunkX, int chunkY) {
+  public Chunk generate(@NotNull World world, int chunkX, int chunkY) {
 
     ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
     for (int localX = 0; localX < CHUNK_SIZE; localX++) {

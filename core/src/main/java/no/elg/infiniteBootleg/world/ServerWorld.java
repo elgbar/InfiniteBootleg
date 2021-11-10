@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author Elg
  */
-public class ServerWorld extends World<HeadlessWorldRenderer> {
+public class ServerWorld extends World {
 
   public ServerWorld(@NotNull ProtoWorld.World protoWorld) {
     super(protoWorld);

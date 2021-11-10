@@ -119,7 +119,7 @@ public class TntBlock extends TickingBlock implements LightTrait {
                 List<Block> destroyed = new ArrayList<>();
                 int worldX = getWorldX();
                 int worldY = getWorldY();
-                World<?> world = getWorld();
+                World world = getWorld();
                 for (int x = MathUtils.floor(worldX - strength); x < worldX + strength; x++) {
                   for (int y = MathUtils.floor(worldY - strength); y < worldY + strength; y++) {
                     Block b = world.getBlock(x, y, true);

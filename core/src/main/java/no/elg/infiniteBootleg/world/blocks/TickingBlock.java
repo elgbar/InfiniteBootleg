@@ -28,7 +28,7 @@ public abstract class TickingBlock extends Block implements TickingTrait {
   private final Object tickLock = new Object();
 
   public TickingBlock(
-      @NotNull World<?> world, Chunk chunk, int localX, int localY, @NotNull Material material) {
+      @NotNull World world, Chunk chunk, int localX, int localY, @NotNull Material material) {
     super(world, chunk, localX, localY, material);
     synchronized (tickLock) {
       shouldTick = true;

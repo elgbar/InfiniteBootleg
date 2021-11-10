@@ -35,7 +35,7 @@ public final class PointLightPool extends Pool<PointLight> {
   }
 
   @Nullable
-  public static PointLightPool getPool(@NotNull World<?> world) {
+  public static PointLightPool getPool(@NotNull World world) {
     if (world instanceof ClientWorld clientWorld) {
       return getPool(clientWorld);
     }

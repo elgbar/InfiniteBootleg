@@ -24,7 +24,7 @@ import com.badlogic.gdx.physics.box2d.World as Box2dWorld
  *
  * @author Elg
  */
-open class WorldBody(private val world: World<*>) : Ticking {
+open class WorldBody(private val world: World) : Ticking {
 
   /**
    * Use the returned object with care,

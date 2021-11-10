@@ -40,7 +40,7 @@ public class ChunkImpl implements Chunk {
 
   private static final ProtoWorld.Block.Builder AIR_BLOCK_BUILDER = Block.save(AIR);
 
-  @NotNull private final World<?> world;
+  @NotNull private final World world;
   @Nullable private final Block[][] blocks;
 
   private final int chunkX;
@@ -72,7 +72,7 @@ public class ChunkImpl implements Chunk {
    * @param chunkX The position x of this chunk the given world
    * @param chunkY The position y of this chunk the given world
    */
-  public ChunkImpl(@NotNull World<?> world, int chunkX, int chunkY) {
+  public ChunkImpl(@NotNull World world, int chunkX, int chunkY) {
     this(world, chunkX, chunkY, new Block[CHUNK_SIZE][CHUNK_SIZE]);
   }
 
@@ -83,7 +83,7 @@ public class ChunkImpl implements Chunk {
    * @param blocks The initial blocks of this chunk (note: must be {@link #CHUNK_SIZE}x{@link
    *     #CHUNK_SIZE})
    */
-  public ChunkImpl(@NotNull World<?> world, int chunkX, int chunkY, @NotNull Block[][] blocks) {
+  public ChunkImpl(@NotNull World world, int chunkX, int chunkY, @NotNull Block[][] blocks) {
     Preconditions.checkArgument(blocks.length == CHUNK_SIZE);
     Preconditions.checkArgument(blocks[0].length == CHUNK_SIZE);
     this.world = world;
@@ -383,7 +383,7 @@ public class ChunkImpl implements Chunk {
 
   @Override
   @NotNull
-  public World<?> getWorld() {
+  public World getWorld() {
     return world;
   }
 

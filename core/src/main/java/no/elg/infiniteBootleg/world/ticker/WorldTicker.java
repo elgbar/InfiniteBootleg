@@ -28,9 +28,9 @@ public class WorldTicker extends Ticker {
   @Nullable private final WorldLightTicker lightTicker;
   @NotNull private final WorldBox2DTicker box2DTicker;
 
-
-  public WorldTicker(@NotNull World<?> world, boolean tick) {
-    super(new WorldTickee(world),
+  public WorldTicker(@NotNull World world, boolean tick) {
+    super(
+        new WorldTickee(world),
         "World-" + world.getName(),
         tick,
         Settings.tps,
@@ -46,10 +46,9 @@ public class WorldTicker extends Ticker {
   private static class WorldTickee implements Ticking {
 
     OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
-    @NotNull
-    private final World<?> world;
+    @NotNull private final World world;
 
-    private WorldTickee(@NotNull World<?> world){
+    private WorldTickee(@NotNull World world) {
       this.world = world;
     }
 
@@ -61,13 +60,13 @@ public class WorldTicker extends Ticker {
 
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
-      if(chunkIterator == null){
+      if (chunkIterator == null) {
         chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
-      }else{
-      chunkIterator.reset();
+      } else {
+        chunkIterator.reset();
       }
       while (chunkIterator.hasNext()) {
-        ObjectMap.Entry<Location,Chunk> c = chunkIterator.next();
+        ObjectMap.Entry<Location, Chunk> c = chunkIterator.next();
         Chunk chunk = c.value;
 
         // clean up dead chunks

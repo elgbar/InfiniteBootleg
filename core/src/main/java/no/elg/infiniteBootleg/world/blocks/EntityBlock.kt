@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.world.subgrid.Removable
 /**
  * @author Elg
  */
-class EntityBlock(world: World<*>, chunk: Chunk, localX: Int, localY: Int, material: Material, val entity: MaterialEntity) :
+class EntityBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material, val entity: MaterialEntity) :
   Block(world, chunk, localX, localY, material),
   Removable {
   override fun hudDebug(): String {

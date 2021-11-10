@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.LightTrait
 import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.createLight
 
 abstract class LightBlock(
-  world: World<*>,
+  world: World,
   chunk: Chunk,
   localX: Int,
   localY: Int,
