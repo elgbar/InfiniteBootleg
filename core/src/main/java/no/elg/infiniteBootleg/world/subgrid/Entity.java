@@ -87,7 +87,7 @@ public abstract class Entity
         protoEntity.getPosition().getY(),
         false,
         UUID.fromString(protoEntity.getUuid()),
-        false);
+        true);
     if (isInvalid()) {
       return;
     }
