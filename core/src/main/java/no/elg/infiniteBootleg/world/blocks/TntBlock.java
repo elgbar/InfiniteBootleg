@@ -17,7 +17,6 @@ import java.util.Set;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -249,9 +248,7 @@ public class TntBlock extends TickingBlock implements LightTrait {
   @Override
   public void dispose() {
     super.dispose();
-    if (light != null) {
-      PointLightPool.getPool(getWorld()).free(light);
-    }
+    LightTrait.Companion.releaseLight(this);
   }
 
   @Nullable

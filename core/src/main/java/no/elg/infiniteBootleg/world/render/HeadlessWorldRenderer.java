@@ -36,7 +36,6 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public boolean isOutOfView(@NotNull Chunk chunk) {
-    // TODO
     return false;
   }
 

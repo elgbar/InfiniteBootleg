@@ -20,16 +20,23 @@ interface LightTrait : BlockTrait, Disposable {
   fun canCreateLight(): Boolean = true
 
   override fun dispose() {
-    if (light != null) {
-      PointLightPool.getPool(block.world)?.free(light)
-    }
+    releaseLight()
   }
 
   companion object {
 
+    fun LightTrait.recreateLight() {
+      releaseLight()
+      createLight()
+    }
+
     fun LightTrait.createLight() {
+      if (light != null && Settings.renderLight && Settings.client && light == null && block.chunk.chunkBody.hasBody() && canCreateLight()) {
+        return
+      }
       val world = block.world
-      if (Settings.renderLight && Settings.client && light == null && block.chunk.chunkBody.hasBody() && canCreateLight() && world is ClientWorld) {
+      if (world is ClientWorld && block is LightTrait) {
+        releaseLight()
         light = PointLightPool.getPool(world).obtain(block.worldX + 0.5f, block.worldY + 0.5f).also {
           it.isStaticLight = true
           customizeLight(it)
@@ -39,9 +46,13 @@ interface LightTrait : BlockTrait, Disposable {
       }
     }
 
-    fun LightTrait.tryCreateLight() {
-      if (light == null) {
-        createLight()
+    fun LightTrait.releaseLight() {
+      val pointLight = light
+      if (pointLight != null) {
+        synchronized(this) {
+          PointLightPool.getPool(block.world)?.free(pointLight)
+          light = null
+        }
       }
     }
   }

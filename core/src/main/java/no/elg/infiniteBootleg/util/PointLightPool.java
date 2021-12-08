@@ -93,7 +93,7 @@ public final class PointLightPool extends Pool<PointLight> {
 
   @Override
   public void free(@NotNull PointLight light) {
-    if (!light.isActive() && Settings.debug){
+    if (!light.isActive() && Settings.debug) {
       throw new IllegalStateException("Double light release!");
     }
     synchronized (LIGHT_LOCK) {

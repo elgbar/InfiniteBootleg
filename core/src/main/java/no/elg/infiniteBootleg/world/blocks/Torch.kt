@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.blocks.traits.FallingTrait
 import no.elg.infiniteBootleg.world.blocks.traits.FallingTrait.Companion.tryFall
-import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.tryCreateLight
+import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.createLight
 
 /**
  * A block that lights up the surrounding area
@@ -19,7 +19,7 @@ class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Mate
   }
 
   override fun tick() {
-    this.tryCreateLight()
+    this.createLight()
     this.tryFall()
   }
 }

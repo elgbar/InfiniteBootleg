@@ -40,8 +40,8 @@ import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
-import no.elg.infiniteBootleg.world.blocks.LightBlock;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
+import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
@@ -580,8 +580,8 @@ public abstract class World implements Disposable, Resizable {
   public void updateLights() {
     for (Chunk chunk : getLoadedChunks()) {
       for (TickingBlock block : chunk.getTickingBlocks()) {
-        if (block instanceof LightBlock) {
-          block.setShouldTick(true);
+        if (block instanceof LightTrait lightTrait) {
+          LightTrait.Companion.recreateLight(lightTrait);
         }
       }
     }

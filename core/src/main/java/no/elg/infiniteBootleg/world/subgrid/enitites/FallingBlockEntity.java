@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
@@ -113,7 +112,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
       return;
     }
     super.tick();
-    LightTrait.Companion.tryCreateLight(this);
+    LightTrait.Companion.createLight(this);
   }
 
   @Override
@@ -177,13 +176,8 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   @Override
   public void dispose() {
     super.dispose();
-    if (block != null) {
-      block.tryDispose();
-    }
-    if (light != null) {
-      PointLightPool.getPool(getWorld()).free(light);
-      light = null;
-    }
+    LightTrait.Companion.releaseLight(this);
+    block.tryDispose();
   }
 
   @Nullable
@@ -200,9 +194,6 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   @Override
   public void setLight(@Nullable PointLight light) {
-    if (this.light != null) {
-      PointLightPool.getPool(getWorld()).free(this.light);
-    }
     this.light = light;
   }
 
