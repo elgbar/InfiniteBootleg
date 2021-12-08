@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.server.ClientChannel
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
-import no.elg.infiniteBootleg.util.randomUUIDFromString
+import no.elg.infiniteBootleg.util.generateUUIDFromName
 
 /**
  * @author Elg
@@ -64,7 +64,7 @@ object ServerScreen : StageScreen() {
             val runnable = Runnable {
               val channel = clientChannel.channel ?: error("Could not connect to server")
               ConnectingScreen.channel = channel
-              channel.writeAndFlush(serverBoundLoginPacket(nameField.text, randomUUIDFromString(nameField.text)))
+              channel.writeAndFlush(serverBoundLoginPacket(nameField.text, generateUUIDFromName(nameField.text)))
             }
             val thread = Thread({
               try {

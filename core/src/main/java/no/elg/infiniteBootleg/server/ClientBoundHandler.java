@@ -42,7 +42,7 @@ public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
           "Client got a server packet " + packet.getType() + " direction " + packet.getDirection());
       return;
     }
-    handleClientBoundPackets(client, packet);
+    Main.inst().getScheduler().executeSync(() -> handleClientBoundPackets(client, packet));
   }
 
   @Override

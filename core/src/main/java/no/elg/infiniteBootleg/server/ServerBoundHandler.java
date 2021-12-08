@@ -46,7 +46,9 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
         return;
       }
     }
-    TowardsServerPacketsHandlerKt.handleServerBoundPackets(ctx, packet);
+    Main.inst()
+        .getScheduler()
+        .executeSync(() -> TowardsServerPacketsHandlerKt.handleServerBoundPackets(ctx, packet));
   }
 
   @Override

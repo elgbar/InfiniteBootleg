@@ -152,7 +152,7 @@ public abstract class World implements Disposable, Resizable {
   public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
     this.seed = seed;
     MathUtils.random.setSeed(seed);
-    uuid = ExtraKt.randomUUIDFromString("" + seed);
+    uuid = ExtraKt.generateUUIDFromName("" + seed);
 
     name = worldName;
 

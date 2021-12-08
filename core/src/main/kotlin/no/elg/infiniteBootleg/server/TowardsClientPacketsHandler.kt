@@ -41,6 +41,7 @@ import java.util.UUID
  * @author Elg
  */
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
+
   when (packet.type) {
     CB_LOGIN_STATUS -> {
       if (packet.hasServerLoginStatus()) {
@@ -132,37 +133,35 @@ private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
 }
 
 private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
-  Main.inst().scheduler.executeSync {
-    val world = this.world
-    if (world == null) {
-      Main.logger().warn("handleBlockUpdate", "Failed to find world")
-      return@executeSync
-    }
-    val worldX = blockUpdate.pos.x
-    val worldY = blockUpdate.pos.y
-    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-    world.setBlock(worldX, worldY, protoBlock, false)
+
+  val world = this.world
+  if (world == null) {
+    Main.logger().warn("handleBlockUpdate", "Failed to find world")
+    return
   }
+  val worldX = blockUpdate.pos.x
+  val worldY = blockUpdate.pos.y
+  val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
+  world.setBlock(worldX, worldY, protoBlock, false)
 }
 
 private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
-  Main.inst().scheduler.executeSync {
-    val world = this.world
-    if (world == null) {
-      Main.logger().warn("handleSpawnEntity", "Failed to find world")
-      return@executeSync
-    }
-    val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
-    val chunk = world.getChunk(chunkPos)
-    if (chunk == null) {
-      Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
-      return@executeSync
-    }
-    val loaded = Entity.load(world, chunk, spawnEntity.entity)
-    if (loaded is LivingEntity && uuid == loaded.uuid) {
-      // it's us!
-      loaded.enableGravity()
-    }
+
+  val world = this.world
+  if (world == null) {
+    Main.logger().warn("handleSpawnEntity", "Failed to find world")
+    return
+  }
+  val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
+  val chunk = world.getChunk(chunkPos)
+  if (chunk == null) {
+    Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
+    return
+  }
+  val loaded = Entity.load(world, chunk, spawnEntity.entity)
+  if (loaded is LivingEntity && uuid == loaded.uuid) {
+    // it's us!
+    loaded.enableGravity()
   }
 }
 
@@ -183,40 +182,29 @@ private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
   if (entities > 0) {
     Main.logger().warn(TAG, "Got $entities entities in chunk update")
   }
-
-  fun tryUpdateChunk() {
-    val world = this.world
-    if (world == null) {
-      Main.logger().warn(TAG, "Failed to find the world to update chunk ${updateChunk.chunk.position}")
-      Main.inst().scheduler.executeSync { tryUpdateChunk() }
-      return
-    }
-    val chunk = world.chunkLoader.clientLoad(updateChunk.chunk)
-    if (chunk == null) {
-      Main.logger().warn(TAG, "Failed to load the chunk from proto")
-      return
-    }
-    world.updateChunk(chunk)
+  val world = world
+  if (world == null) {
+    ctx.fatal("Tried to update chunk before world was sent")
+    return
   }
-
-  val exec = Runnable {
-    tryUpdateChunk()
+  val chunk = world.chunkLoader.clientLoad(updateChunk.chunk)
+  if (chunk == null) {
+    Main.logger().warn(TAG, "Failed to load the chunk from proto")
+    return
   }
-  Main.inst().scheduler.executeSync(exec)
+  world.updateChunk(chunk)
 }
 
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   val protoWorld = startGame.world
-  Main.inst().scheduler.executeSync {
-    this.world = ClientWorld(protoWorld).apply {
-      serverLoad(protoWorld)
-    }
-    if (startGame.controlling.type != PLAYER) {
-      ctx.fatal("Can only control a player, got ${startGame.controlling.type}")
-    } else {
-      this.controllingEntity = startGame.controlling
-      ctx.writeAndFlush(serverBoundPacket(SB_CLIENT_WORLD_LOADED))
-    }
+  this.world = ClientWorld(protoWorld).apply {
+    serverLoad(protoWorld)
+  }
+  if (startGame.controlling.type != PLAYER) {
+    ctx.fatal("Can only control a player, got ${startGame.controlling.type}")
+  } else {
+    this.controllingEntity = startGame.controlling
+    ctx.writeAndFlush(serverBoundPacket(SB_CLIENT_WORLD_LOADED))
   }
 }
 
@@ -241,17 +229,14 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.Server
         return
       }
       ConnectingScreen.info = "Login success!"
-      Main.inst().scheduler.executeSync {
-
-        val player = world.getPlayer(UUID.fromString(entity.uuid))
-        if (player == null || player.isInvalid) {
-          ctx.fatal("Invalid player client side reason: ${if (player == null) "Player is null" else "Player invalid"}")
-        } else {
-          world.worldTicker.start()
-          ClientMain.inst().screen = WorldScreen(world, false)
-          player.giveControls()
-          started = true
-        }
+      val player = world.getPlayer(UUID.fromString(entity.uuid))
+      if (player == null || player.isInvalid) {
+        ctx.fatal("Invalid player client side reason: ${if (player == null) "Player is null" else "Player invalid"}")
+      } else {
+        world.worldTicker.start()
+        ClientMain.inst().screen = WorldScreen(world, false)
+        player.giveControls()
+        started = true
       }
     }
     ServerLoginStatus.ServerStatus.UNRECOGNIZED -> {
