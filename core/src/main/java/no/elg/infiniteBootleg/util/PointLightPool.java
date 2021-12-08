@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
@@ -91,7 +92,10 @@ public final class PointLightPool extends Pool<PointLight> {
   }
 
   @Override
-  public void free(PointLight light) {
+  public void free(@NotNull PointLight light) {
+    if (!light.isActive() && Settings.debug){
+      throw new IllegalStateException("Double light release!");
+    }
     synchronized (LIGHT_LOCK) {
       light.setActive(false);
     }
