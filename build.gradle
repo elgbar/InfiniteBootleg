@@ -63,10 +63,10 @@ subprojects {
     }
     java {
       removeUnusedImports()
-      googleJavaFormat("1.12.0")
+      googleJavaFormat("1.13.0")
     }
     kotlin {
-      ktlint("0.42.1").userData([
+      ktlint("0.43.2").userData([
           "indent_size"             : "2",
           "continuation_indent_size": "2",
           "max_line_length"         : "180",
