@@ -269,7 +269,7 @@ public abstract class World implements Disposable, Resizable {
     builder.setTimeScale(worldTime.getTimeScale());
     builder.setSpawn(spawn.toVector2i());
     builder.setGenerator(getGeneratorType());
-    if (Settings.client) {
+    if (Main.isSingleplayer()) {
       final Player player = ClientMain.inst().getPlayer();
       if (player != null) {
         builder.setPlayer(player.save());

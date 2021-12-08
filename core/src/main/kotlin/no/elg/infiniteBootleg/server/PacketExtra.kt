@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
@@ -127,9 +128,13 @@ fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: Connecti
   ).build()
 }
 
-// fun Client.chunkRequestPacket(chunkLocation: Location): Packets.Packet {
-//  return serverBoundPacket(SB_CHUNK_REQUEST).setChunkRequest(ChunkRequest.newBuilder().setChunkLocation(chunkLocation.toVector2i())).build()
+// fun ServerClient.chunkRequestPacket(chunkLocation: Location): Packet {
+//  return chunkRequestPacket(chunkLocation.toVector2i())
 // }
+
+fun ServerClient.chunkRequestPacket(chunkLocation: Vector2i): Packet {
+  return serverBoundPacket(SB_CHUNK_REQUEST).setChunkRequest(Packets.ChunkRequest.newBuilder().setChunkLocation(chunkLocation)).build()
+}
 
 fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Packet {
   return serverBoundPacket(DX_DISCONNECT).let {

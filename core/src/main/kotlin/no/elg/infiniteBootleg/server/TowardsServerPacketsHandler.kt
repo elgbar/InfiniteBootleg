@@ -189,13 +189,13 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
 
   for (entity in world.entities) {
-    Main.logger().log("Sending ${entity.simpleName()}: ${entity.hudDebug()} to client")
+    Main.logger().log("Sending ${entity.simpleName()} ${entity.hudDebug()} to client")
     ctx.write(clientBoundSpawnEntity(entity))
   }
   ctx.flush()
 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
-  Main.logger().log("Player " + player.hudDebug() + " joined")
+  Main.logger().log("Player " + player.name + " joined")
   broadcast(clientBoundSpawnEntity(player)) { c, _ -> c != ctx.channel() }
 }
 
