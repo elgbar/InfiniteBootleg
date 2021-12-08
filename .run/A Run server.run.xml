@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="A Run server" type="Application" factoryName="Application">
+  <configuration default="false" name="A srv" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncher" />
     <module name="InfiniteBootleg.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="--server" />
