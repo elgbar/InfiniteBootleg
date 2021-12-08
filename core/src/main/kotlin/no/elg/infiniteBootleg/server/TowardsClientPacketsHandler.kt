@@ -119,7 +119,7 @@ private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
     Main.logger().warn("handleWorldSettings", "Failed to find world")
     return
   }
-  Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
+  Main.logger().debug("handleWorldSettings", "spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
   if (worldSettings.hasSpawn()) {
     world.spawn = worldSettings.spawn.toLocation()
   }

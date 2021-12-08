@@ -131,7 +131,7 @@ fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: Connecti
 //  return serverBoundPacket(SB_CHUNK_REQUEST).setChunkRequest(ChunkRequest.newBuilder().setChunkLocation(chunkLocation.toVector2i())).build()
 // }
 
-fun ServerClient.serverBoundClientDisconnectPacket(reason: String?): Packet {
+fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Packet {
   return serverBoundPacket(DX_DISCONNECT).let {
     if (!reason.isNullOrBlank()) {
       it.setDisconnect(Disconnect.newBuilder().setReason(reason))

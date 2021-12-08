@@ -275,7 +275,6 @@ public abstract class Entity
           body.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
           sendMovePacket = true;
         }
-        body.setAngularVelocity(0);
         body.setLinearVelocity(velX, velY);
         body.setAwake(true);
       }

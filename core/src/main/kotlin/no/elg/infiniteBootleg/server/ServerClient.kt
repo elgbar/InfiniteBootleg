@@ -6,6 +6,8 @@ import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 /**
+ * A client of a server
+ *
  * @author Elg
  */
 class ServerClient(

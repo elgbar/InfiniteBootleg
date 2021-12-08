@@ -29,11 +29,7 @@ public class ServerWorld extends World {
     super(generator, seed, worldName);
   }
 
-  private final HeadlessWorldRenderer render;
-
-  {
-    render = new HeadlessWorldRenderer(this);
-  }
+  private final HeadlessWorldRenderer render = new HeadlessWorldRenderer(this);
 
   public void disconnectPlayer(@NotNull UUID uuid, boolean kicked) {
     final Player player = getPlayer(uuid);
