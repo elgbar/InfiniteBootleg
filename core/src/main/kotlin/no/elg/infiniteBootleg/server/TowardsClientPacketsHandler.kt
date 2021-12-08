@@ -146,22 +146,23 @@ private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
 }
 
 private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
-//  Main.inst().scheduler.executeSync {
-  val world = this.world
-  if (world == null) {
-    Main.logger().warn("handleSpawnEntity", "Failed to find world")
-    return
-  }
-  val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
-  val chunk = world.getChunk(chunkPos)
-  if (chunk == null) {
-    Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
-    return
-  }
-  val loaded = Entity.load(world, chunk, spawnEntity.entity)
-  if (loaded is LivingEntity && uuid == loaded.uuid) {
-    // it's us!
-    loaded.enableGravity()
+  Main.inst().scheduler.executeSync {
+    val world = this.world
+    if (world == null) {
+      Main.logger().warn("handleSpawnEntity", "Failed to find world")
+      return@executeSync
+    }
+    val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
+    val chunk = world.getChunk(chunkPos)
+    if (chunk == null) {
+      Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
+      return@executeSync
+    }
+    val loaded = Entity.load(world, chunk, spawnEntity.entity)
+    if (loaded is LivingEntity && uuid == loaded.uuid) {
+      // it's us!
+      loaded.enableGravity()
+    }
   }
 }
 
