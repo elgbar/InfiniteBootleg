@@ -211,8 +211,13 @@ public abstract class World implements Disposable, Resizable {
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
 
-    if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
-      final Player newPlayer = new Player(this, protoWorld.getPlayer());
+    if (Main.isSingleplayer()) {
+      final Player newPlayer;
+      if (protoWorld.hasPlayer()) {
+        newPlayer = new Player(this, protoWorld.getPlayer());
+      } else {
+        newPlayer = new Player(this, spawn.x, spawn.y);
+      }
       if (!newPlayer.isInvalid()) {
         addEntity(newPlayer, false);
         ClientMain.inst().setPlayer(newPlayer);
