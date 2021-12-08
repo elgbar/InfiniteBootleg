@@ -5,6 +5,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -98,6 +99,26 @@ public class ClientMain extends CommonMain {
     blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
     entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
     setScreen(MainMenuScreen.INSTANCE);
+
+    Runnable onShutdown =
+        () -> {
+          if (Main.isSingleplayer() && screen instanceof WorldScreen worldScreen) {
+            var clientWorld = worldScreen.getWorld();
+            clientWorld.save();
+            final FileHandle worldFolder = clientWorld.getWorldFolder();
+            if (worldFolder != null) {
+              worldFolder.deleteDirectory();
+            }
+          } else if (Main.isClient()) {
+            var serverClient = this.serverClient;
+            if (serverClient != null && serverClient.ctx != null) {
+              serverClient.ctx.writeAndFlush(
+                  PacketExtraKt.serverBoundClientDisconnectPacket(serverClient, "Client shutdown"));
+            }
+          }
+          scheduler.shutdown(); // make sure scheduler threads are dead
+        };
+    Runtime.getRuntime().addShutdownHook(new Thread(onShutdown));
   }
 
   @Override

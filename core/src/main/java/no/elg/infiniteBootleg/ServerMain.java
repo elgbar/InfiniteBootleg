@@ -27,23 +27,22 @@ public class ServerMain extends CommonMain {
       inst = this;
     }
 
-    Runtime.getRuntime()
-        .addShutdownHook(
-            new Thread(
-                () -> {
-                  if (serverWorld != null) {
-                    serverWorld.save();
-                    final FileHandle worldFolder = serverWorld.getWorldFolder();
-                    if (worldFolder != null) {
-                      worldFolder.deleteDirectory();
-                    }
-                  }
-                  if (server != null) {
-                    PacketExtraKt.broadcast(
-                        PacketExtraKt.clientBoundDisconnectPlayerPacket("Server closed"), null);
-                  }
-                  scheduler.shutdown(); // make sure scheduler threads are dead
-                }));
+    Runnable onShutdown =
+        () -> {
+          if (server != null) {
+            PacketExtraKt.broadcast(
+                PacketExtraKt.clientBoundDisconnectPlayerPacket("Server closed"), null);
+          }
+          if (serverWorld != null) {
+            serverWorld.save();
+            final FileHandle worldFolder = serverWorld.getWorldFolder();
+            if (worldFolder != null) {
+              worldFolder.deleteDirectory();
+            }
+          }
+          scheduler.shutdown(); // make sure scheduler threads are dead
+        };
+    Runtime.getRuntime().addShutdownHook(new Thread(onShutdown));
   }
 
   @NotNull
