@@ -126,6 +126,7 @@ public class ClientMain extends CommonMain {
     if (Settings.client) {
       getScreen().resize(width, height);
       console.resize(width, height);
+      screenRenderer.resize(width, height);
     }
   }
 
