@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
@@ -28,15 +27,15 @@ public class ClientMain extends CommonMain {
 
   private static ClientMain inst;
   @NotNull private final InputMultiplexer inputMultiplexer;
-  private final Vector2 mouse = new Vector2();
-  private final Vector3 mouseVec = new Vector3();
+  private final Vector2 mouseWorldInput = new Vector2();
+  private final Vector3 screenInputVec = new Vector3();
   @NotNull private TextureAtlas blockAtlas;
   @NotNull private TextureAtlas entityAtlas;
   @NotNull private ScreenRenderer screenRenderer;
   private int mouseBlockX;
   private int mouseBlockY;
-  private float mouseX;
-  private float mouseY;
+  private float mouseWorldX;
+  private float mouseWorldY;
 
   @Nullable private Screen screen;
 
@@ -119,15 +118,20 @@ public class ClientMain extends CommonMain {
 
     if (screen instanceof WorldScreen worldScreen) {
       final ClientWorld world = worldScreen.getWorld();
-      mouseVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-      world.getRender().getCamera().unproject(mouseVec);
-      final WorldBody worldBody = world.getWorldBody();
-      mouseX = mouseVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
-      mouseY = mouseVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
-      mouse.set(mouseX, mouseY);
 
-      mouseBlockX = MathUtils.floor(mouseX);
-      mouseBlockY = MathUtils.floor(mouseY);
+      screenInputVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+      world.getRender().getCamera().unproject(screenInputVec);
+      // Whenever z is not zero unproject returns a very low number
+      // I don't know why this is the case, but checking for z to be zero seems to fix the bug
+      if (screenInputVec.z == 0f) {
+        final WorldBody worldBody = world.getWorldBody();
+        mouseWorldX = screenInputVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
+        mouseWorldY = screenInputVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
+        mouseWorldInput.set(mouseWorldX, mouseWorldY);
+
+        mouseBlockX = (int) Math.floor(mouseWorldX);
+        mouseBlockY = (int) Math.floor(mouseWorldY);
+      }
     }
 
     if (screen != null) {
@@ -311,16 +315,16 @@ public class ClientMain extends CommonMain {
   }
 
   public float getMouseX() {
-    return mouseX;
+    return mouseWorldX;
   }
 
   public float getMouseY() {
-    return mouseY;
+    return mouseWorldY;
   }
 
   @NotNull
   public Vector2 getMouse() {
-    return mouse;
+    return mouseWorldInput;
   }
 
   @NotNull
