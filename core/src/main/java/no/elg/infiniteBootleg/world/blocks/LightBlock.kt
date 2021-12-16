@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import box2dLight.PointLight
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
@@ -23,16 +22,18 @@ abstract class LightBlock(
       }
       return field
     }
+    set(value) {
+      if (field != null && value != null) error("Cannot set light before releasing old light")
+      field = value
+    }
+
+  override fun tick() {
+    this.createLight()
+  }
 
   override fun dispose() {
     if (disposed) return
     super<TickingBlock>.dispose()
     super<LightTrait>.dispose()
-  }
-
-  init {
-    Main.inst().scheduler.executeSync {
-      this.createLight()
-    }
   }
 }

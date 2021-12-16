@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
@@ -32,8 +33,6 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   @Nullable private TextureRegion region;
 
   @NotNull private Block block;
-
-  @Nullable private PointLight light;
 
   private volatile boolean crashed;
 
@@ -112,7 +111,9 @@ public class FallingBlockEntity extends Entity implements LightTrait {
       return;
     }
     super.tick();
-    LightTrait.Companion.createLight(this);
+    if (block instanceof LightTrait) {
+      LightTrait.Companion.createLight(this);
+    }
   }
 
   @Override
@@ -176,14 +177,16 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   @Override
   public void dispose() {
     super.dispose();
-    LightTrait.Companion.releaseLight(this);
     block.tryDispose();
   }
 
   @Nullable
   @Override
   public PointLight getLight() {
-    return light;
+    if (block instanceof LightTrait lightTrait) {
+      return lightTrait.getLight();
+    }
+    return null;
   }
 
   @NotNull
@@ -194,20 +197,28 @@ public class FallingBlockEntity extends Entity implements LightTrait {
 
   @Override
   public void setLight(@Nullable PointLight light) {
-    this.light = light;
+    if (block instanceof LightTrait lightTrait) {
+      lightTrait.setLight(light);
+    }
+    if (light != null) {
+      PointLightPool pool = PointLightPool.getPool(block.getWorld());
+      if (pool != null) {
+        pool.free(light);
+      }
+    }
   }
 
   @Override
   public void customizeLight(@NotNull PointLight light) {
     Preconditions.checkState(block instanceof LightTrait);
-    final Chunk chunk = getChunk();
-    if (chunk == null) {
-      return;
-    }
-    if (block instanceof LightTrait lightTrait) {
-      lightTrait.customizeLight(light);
-      light.setStaticLight(false);
-      light.attachToBody(getBody());
-    }
+    //    final Chunk chunk = getChunk();
+    //    if (chunk == null) {
+    //      return;
+    //    }
+    //    if (block instanceof LightTrait lightTrait) {
+    ((LightTrait) block).customizeLight(light);
+    light.setStaticLight(false);
+    light.attachToBody(getBody());
+    //    }
   }
 }
