@@ -49,6 +49,8 @@ public class TntBlock extends TickingBlock implements LightTrait {
   public static final int RESISTANCE = 8;
 
   public static final float FUSE_DURATION_SECONDS = 3f;
+  public static final float ON_DISTANCE = 16f;
+  public static final float OFF_DISTANCE = 0.1f;
 
   private static final TextureRegion whiteTexture;
 
@@ -82,10 +84,6 @@ public class TntBlock extends TickingBlock implements LightTrait {
     strength = EXPLOSION_STRENGTH;
     fuseDurationTicks = (int) (getWorld().getWorldTicker().getTPS() * FUSE_DURATION_SECONDS);
     startTick = getWorld().getTick();
-
-    if (Settings.renderLight) {
-      LightTrait.Companion.createLight(this);
-    }
   }
 
   @Override
@@ -98,7 +96,8 @@ public class TntBlock extends TickingBlock implements LightTrait {
     light.setColor(Color.RED);
     light.setXray(false);
     light.setSoft(false);
-    light.setDistance(16);
+    light.setStaticLight(true);
+    light.setDistance(ON_DISTANCE);
   }
 
   @Override
@@ -165,7 +164,8 @@ public class TntBlock extends TickingBlock implements LightTrait {
 
       synchronized (LIGHT_LOCK) {
         if (light != null) {
-          light.setActive(glowing);
+          light.setDistance(glowing ? ON_DISTANCE : OFF_DISTANCE);
+          light.update();
         }
       }
       getChunk().updateTexture(true);
@@ -259,10 +259,10 @@ public class TntBlock extends TickingBlock implements LightTrait {
 
   @Override
   public void setLight(@Nullable PointLight light) {
+    if (this.light != null && light != null) throw new IllegalArgumentException();
     this.light = light;
   }
 
-  @Override
   public boolean canCreateLight() {
     return true;
   }
