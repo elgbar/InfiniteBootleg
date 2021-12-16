@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Disposable;
 import com.google.common.base.Preconditions;
+import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Elg
  */
 public class Block
-    implements BlockTrait, Disposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
+    implements BlockTrait, CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
 
   public static final int BLOCK_SIZE = 16;
 
@@ -201,7 +201,8 @@ public class Block
     disposed = true;
   }
 
-  protected boolean getDisposed() {
+  @Override
+  public boolean getDisposed() {
     return disposed;
   }
 

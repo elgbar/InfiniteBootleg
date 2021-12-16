@@ -18,10 +18,10 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Ticking;
@@ -57,7 +57,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class Entity
     implements Ticking,
-        Disposable,
+        CheckableDisposable,
         ContactHandler,
         HUDDebuggable,
         Savable<ProtoWorld.EntityOrBuilder> {
@@ -732,6 +732,11 @@ public abstract class Entity
         }
       }
     }
+  }
+
+  @Override
+  public synchronized boolean getDisposed() {
+    return !valid;
   }
 
   @Override
