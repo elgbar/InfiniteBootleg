@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
@@ -85,7 +86,10 @@ public final class PointLightPool extends Pool<PointLight> {
   @Override
   public PointLight obtain() {
     synchronized (LIGHT_LOCK) {
-      PointLight light = super.obtain();
+      PointLight light;
+      do {
+        light = super.obtain();
+      } while (light == null);
       light.setActive(true);
       return light;
     }
@@ -93,33 +97,36 @@ public final class PointLightPool extends Pool<PointLight> {
 
   @Override
   public void free(@NotNull PointLight light) {
-    if (!light.isActive() && Settings.debug) {
-      throw new IllegalStateException("Double light release!");
-    }
     synchronized (LIGHT_LOCK) {
+      if (!light.isActive()) {
+        if (Settings.debug) {
+          throw new IllegalStateException("Double light release!");
+        } else {
+          Main.logger().error("PLP", "Tried to free inactive light");
+          return;
+        }
+      }
       light.setActive(false);
     }
     super.free(light);
   }
 
   @Override
-  protected void discard(PointLight light) {
+  protected void discard(@NotNull PointLight light) {
     synchronized (LIGHT_LOCK) {
       light.remove(true);
     }
   }
 
   @Override
-  protected void reset(PointLight light) {
-    synchronized (LIGHT_LOCK) {
-      light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
-      light.setStaticLight(true);
-      light.setXray(false);
-      light.setSoft(true);
-      light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-      light.setDistance(POINT_LIGHT_DISTANCE);
-      light.setColor(Color.WHITE);
-      light.setContactFilter(World.LIGHT_FILTER);
-    }
+  protected void reset(@NotNull PointLight light) {
+    light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
+    light.setStaticLight(true);
+    light.setXray(false);
+    light.setSoft(true);
+    light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+    light.setDistance(POINT_LIGHT_DISTANCE);
+    light.setColor(Color.WHITE);
+    light.setContactFilter(World.LIGHT_FILTER);
   }
 }
