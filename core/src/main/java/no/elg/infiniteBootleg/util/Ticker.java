@@ -26,7 +26,9 @@ public class Ticker implements Runnable {
   /** How low, in percent (0f..1f), the real tps must reach for the user to be warned */
   public static final float TPS_LOSS_PERCENTAGE = 0.94f;
 
-  /** How many ticks between each rare update. Currently each rare tick is the same as one second */
+  /**
+   * How many ticks between each rare update. Currently, each rare tick is the same as one second
+   */
   public final long tickRareRate;
 
   private final PauseableThread tickerThread;
@@ -160,11 +162,10 @@ public class Ticker implements Runnable {
     long ms = msDelayBetweenTicks - TimeUtils.nanosToMillis(tpsDelta);
 
     if (ms > 0) {
-      int nano = (int) tpsDelta % 1_000_000; // There are one million nanosecond in a millisecond
       try {
-        Thread.sleep(ms, nano);
+        Thread.sleep(ms);
       } catch (InterruptedException e) {
-        Main.logger().error(tag, "Ticker interrupted");
+        Main.logger().error(tag, "Ticker interrupted", e);
       }
     } else if (tickId - lastTickNagged >= nagDelayTicks && tpsWarnThreshold >= realTPS) {
       lastTickNagged = tickId;
