@@ -1,7 +1,10 @@
 package no.elg.infiniteBootleg.world.ticker;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
@@ -52,8 +55,10 @@ public class WorldTicker extends Ticker {
       this.world = world;
     }
 
+    private final Array<ForkJoinTask<?>> forks = new Array<>(false, 48);
+
     @Override
-    public void tick() {
+    public synchronized void tick() {
 
       WorldRender wr = world.getRender();
       long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
@@ -65,6 +70,8 @@ public class WorldTicker extends Ticker {
       } else {
         chunkIterator.reset();
       }
+      ForkJoinPool pool = ForkJoinPool.commonPool();
+
       while (chunkIterator.hasNext()) {
         ObjectMap.Entry<Location, Chunk> c = chunkIterator.next();
         Chunk chunk = c.value;
@@ -84,24 +91,34 @@ public class WorldTicker extends Ticker {
           chunkIterator.remove();
           continue;
         }
-        chunk.tick();
+        ForkJoinTask<?> task = pool.submit(chunk::tick);
+        forks.add(task);
+        task.fork();
       }
-
       for (Entity entity : world.getEntities()) {
         if (entity.isInvalid()) {
-          Main.logger()
-              .debug(
-                  "WORLD",
-                  "Invalid entity in world entities ("
-                      + entity.simpleName()
-                      + ": "
-                      + entity.hudDebug()
-                      + ")");
+          String message =
+              "Invalid entity in world entities ("
+                  + entity.simpleName()
+                  + ": "
+                  + entity.hudDebug()
+                  + ")";
+          Main.logger().debug("WORLD", message);
           world.removeEntity(entity);
           continue;
         }
-        entity.tick();
+        ForkJoinTask<?> task = pool.submit(entity::tick);
+        forks.add(task);
+        task.fork();
       }
+      for (ForkJoinTask<?> task : forks) {
+        try {
+          task.join();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+      forks.clear();
     }
 
     @Override
