@@ -20,8 +20,8 @@ public class CancellableThreadScheduler {
   private final int threads;
 
   /**
-   * @param threads The maximum number of threads this scheduler should have. If less than or equal
-   *     to zero the number of threads will be equal to {@link Runtime#availableProcessors()}
+   * @param threads The maximum number of threads this scheduler should have. If less than zero the
+   *     number of threads will be equal to {@link Runtime#availableProcessors()}
    */
   public CancellableThreadScheduler(int threads) {
     if (threads < 0) {
@@ -36,6 +36,7 @@ public class CancellableThreadScheduler {
    * any locks
    */
   public void waitForTasks() {
+    // FIXME do not allow to accept new tasks
     Preconditions.checkState(
         !Thread.currentThread().getName().contains("pool"),
         "Can only wait for tasks on main thread");

@@ -78,8 +78,7 @@ public class HUDRenderer implements Renderer {
 
   private String lights(ClientWorld world) {
     final PublicRayHandler handler = world.getRender().getRayHandler();
-    return "Active Lights:"
-        + (handler != null ? handler.getEnabledLights().size : "Lights not enabled");
+    return "Active Lights:" + handler.getEnabledLights().size;
   }
 
   private String ents(ClientWorld world) {

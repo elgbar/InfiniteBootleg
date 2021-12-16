@@ -77,7 +77,8 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
    * @param localY The local y ie a value between 0 and {@link #CHUNK_SIZE}
    * @param block The new block
    * @param updateTexture If the texture of this chunk should be updated
-   * @param prioritize
+   * @param prioritize If {@code updateTexture} is {@code true} then if this chunk be prioritized in
+   *     the rendering order
    * @return The given block, equal to the {@code block} parameter
    */
   @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
