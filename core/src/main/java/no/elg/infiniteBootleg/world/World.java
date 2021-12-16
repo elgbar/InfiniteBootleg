@@ -581,15 +581,25 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
+  private volatile boolean willUpdateLights = false;
+
   /** Update all light sources currently loaded */
   public void updateLights() {
-    for (Chunk chunk : getLoadedChunks()) {
-      for (TickingBlock block : chunk.getTickingBlocks()) {
-        if (block instanceof LightTrait lightTrait) {
-          LightTrait.Companion.recreateLight(lightTrait);
-        }
-      }
-    }
+    if (willUpdateLights) return;
+    willUpdateLights = true;
+    Main.inst()
+        .getScheduler()
+        .executeSync(
+            () -> {
+              for (Chunk chunk : getLoadedChunks()) {
+                for (TickingBlock block : chunk.getTickingBlocks()) {
+                  if (block instanceof LightTrait lightTrait) {
+                    LightTrait.Companion.recreateLight(lightTrait);
+                  }
+                }
+              }
+              willUpdateLights = false;
+            });
   }
 
   /**
