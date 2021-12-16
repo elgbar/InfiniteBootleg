@@ -59,7 +59,7 @@ public class ClientWorldRender implements WorldRender {
     entityRenderer = new EntityRenderer(this);
 
     camera = new OrthographicCamera();
-    camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    camera.setToOrtho(false);
 
     camera.zoom = 1f;
     camera.position.x = 0;
@@ -73,9 +73,10 @@ public class ClientWorldRender implements WorldRender {
 
     RayHandler.setGammaCorrection(true);
     RayHandler.useDiffuseLight(true);
-    rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld(), 200, 140);
-    rayHandler.setBlurNum(2);
+    rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld());
+    rayHandler.setBlurNum(1);
     rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 0f);
+    rayHandler.setCulling(true);
     Main.inst().getScheduler().executeSync(this::resetSkylight);
   }
 
@@ -97,7 +98,7 @@ public class ClientWorldRender implements WorldRender {
         skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
 
         rayHandler.setAmbientLight(0, 0, 0, 1);
-        rayHandler.updateAndRender();
+        rayHandler.update();
 
         // Re-render at once otherwise a quick flickering might happen
         update();
@@ -105,6 +106,7 @@ public class ClientWorldRender implements WorldRender {
       }
     }
   }
+
   /** @return How many blocks there currently are horizontally on screen */
   public int blocksHorizontally() {
     return (int) Math.ceil(camera.viewportWidth * camera.zoom / BLOCK_SIZE) + 1;
@@ -170,7 +172,6 @@ public class ClientWorldRender implements WorldRender {
     entityRenderer.render();
     batch.end();
     if (Settings.renderLight) {
-
       synchronized (BOX2D_LOCK) {
         synchronized (LIGHT_LOCK) {
           rayHandler.render();
