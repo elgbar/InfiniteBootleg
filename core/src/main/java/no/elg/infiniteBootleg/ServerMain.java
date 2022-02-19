@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.Server;
 import no.elg.infiniteBootleg.world.ServerWorld;
+import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,10 +91,16 @@ public class ServerMain extends CommonMain {
     thread.start();
     console.log("SERVER", "Starting server on port " + Settings.port);
 
+    // TODO load world name from some config
     setServerWorld(
         new ServerWorld(
             new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World"));
     getServerWorld().load();
+  }
+
+  @Override
+  public World getWorld() {
+    return serverWorld;
   }
 
   @Override

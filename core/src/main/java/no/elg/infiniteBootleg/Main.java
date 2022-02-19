@@ -5,6 +5,7 @@ import java.io.File;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
+import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
 /** @author Elg */
@@ -71,4 +72,6 @@ public interface Main extends ApplicationListener {
   CancellableThreadScheduler getScheduler();
 
   boolean isNotTest();
+
+  World getWorld();
 }

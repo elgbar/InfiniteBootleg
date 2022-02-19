@@ -12,7 +12,6 @@ import com.strongjoshua.console.annotation.HiddenCommand;
 import java.util.UUID;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.ServerMain;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
@@ -45,21 +44,12 @@ public class Commands extends CommandExecutor {
     this.logger = logger;
   }
 
-  @NotNull
-  public World getWorld() {
-    if (Settings.client) {
-      return ClientMain.inst().getWorld();
-    } else {
-      return ServerMain.inst().getServerWorld();
-    }
-  }
-
   @CmdArgNames({"red", "green", "blue", "alpha"})
   @ConsoleDoc(
       description = "Set the color of the sky. Params are expected to be between 0 and 1",
       paramDescriptions = {"red", "green", "blue", "alpha"})
   public void skyColor(float r, float g, float b, float a) {
-    Color skylight = getWorld().getWorldTime().getBaseColor();
+    Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
     skylight.set(r, g, b, a);
     logger.success("Sky color changed to " + skylight);
   }
@@ -70,7 +60,7 @@ public class Commands extends CommandExecutor {
       paramDescriptions = {"Name of color"})
   public void skyColor(String colorName) {
     if (Settings.client) {
-      Color skylight = getWorld().getWorldTime().getBaseColor();
+      Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
       try {
         Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
         skylight.set(color);
@@ -88,7 +78,7 @@ public class Commands extends CommandExecutor {
   public void lights() {
     Settings.renderLight = !Settings.renderLight;
     if (Settings.renderLight) {
-      getWorld().getRender().update();
+      Main.inst().getWorld().getRender().update();
     }
     logger.log(
         LogLevel.SUCCESS, "Lighting is now " + (Settings.renderLight ? "enabled" : "disabled"));
@@ -106,7 +96,7 @@ public class Commands extends CommandExecutor {
       description = "Reload all loaded chunks",
       paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
   public void reload(boolean force) {
-    getWorld().reload(force);
+    Main.inst().getWorld().reload(force);
     logger.log(LogLevel.SUCCESS, "All chunks have been reloaded");
   }
 
@@ -127,7 +117,7 @@ public class Commands extends CommandExecutor {
           "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
               + " entity updates and chunks update")
   public void pause() {
-    Ticker ticker = getWorld().getWorldTicker();
+    Ticker ticker = Main.inst().getWorld().getWorldTicker();
     if (ticker.isPaused()) {
       logger.log(LogLevel.ERROR, "World is already paused");
     } else {
@@ -141,8 +131,8 @@ public class Commands extends CommandExecutor {
           "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
               + " entity updates and chunks update")
   public void resume() {
-    World world = getWorld();
-    Ticker ticker = getWorld().getWorldTicker();
+    World world = Main.inst().getWorld();
+    Ticker ticker = Main.inst().getWorld().getWorldTicker();
     if (ticker.isPaused()) {
       world.getWorldTicker().resume();
       world.getRender().update();
@@ -177,11 +167,11 @@ public class Commands extends CommandExecutor {
       description = "Teleport to given world coordinate",
       paramDescriptions = {"World x coordinate", "World y coordinate"})
   public void tp(float worldX, float worldY) {
-    if (!Settings.client) {
+    if (Main.isServer()) {
       return;
     }
     ClientWorldRender render = ClientMain.inst().getWorld().getRender();
-    var worldBody = getWorld().getWorldBody();
+    var worldBody = Main.inst().getWorld().getWorldBody();
     render.getCamera().position.x = worldX * Block.BLOCK_SIZE + worldBody.getWorldOffsetX();
     render.getCamera().position.y = worldY * Block.BLOCK_SIZE + worldBody.getWorldOffsetY();
     render.update();
@@ -269,7 +259,7 @@ public class Commands extends CommandExecutor {
           "Spawn a generic static entity at the given location with the given width and height",
       paramDescriptions = {"worldX", "worldY", "width", "height"})
   public void ent(float worldX, float worldY, int width, int height) {
-    final World world = getWorld();
+    final World world = Main.inst().getWorld();
     var entity = new GenericEntity(world, worldX, worldY, width, height);
     if (entity.isInvalid()) {
       logger.error(
@@ -289,7 +279,7 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(description = "Kill all non-player entities")
   public void killall() {
-    World world = getWorld();
+    World world = Main.inst().getWorld();
     int entities = 0;
     synchronized (BOX2D_LOCK) {
       for (Entity entity : world.getEntities()) {
@@ -357,8 +347,8 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"scale"})
   @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
   public void timescale(float scale) {
-    float old = getWorld().getWorldTime().getTimeScale();
-    getWorld().getWorldTime().setTimeScale(scale);
+    float old = Main.inst().getWorld().getWorldTime().getTimeScale();
+    Main.inst().getWorld().getWorldTime().setTimeScale(scale);
     logger.success("Changed time scale from % .3f to % .3f", old, scale);
 
     PacketExtraKt.sendDuplexPacket(
@@ -408,8 +398,8 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"time"})
   @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
   public void time(float time) {
-    float old = getWorld().getWorldTime().getTime();
-    getWorld().getWorldTime().setTime(time);
+    float old = Main.inst().getWorld().getWorldTime().getTime();
+    Main.inst().getWorld().getWorldTime().setTime(time);
 
     PacketExtraKt.sendDuplexPacket(
         () -> PacketExtraKt.clientBoundWorldSettings(null, time, null),
@@ -439,14 +429,14 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"dx", "dy"})
   @ConsoleDoc(description = "Shift world offset")
   public void swo(float x, float y) {
-    getWorld().getWorldBody().shiftWorldOffset(x, y);
+    Main.inst().getWorld().getWorldBody().shiftWorldOffset(x, y);
   }
 
   @HiddenCommand
   @ConsoleDoc(description = "check dangling entities")
   public void cde() {
     synchronized (BOX2D_LOCK) {
-      var world = getWorld();
+      var world = Main.inst().getWorld();
       final com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
           world.getWorldBody().getBox2dWorld();
       var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
@@ -477,12 +467,12 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
   public void spawnPlayer() {
-    getWorld().createNewPlayer(UUID.randomUUID());
+    Main.inst().getWorld().createNewPlayer(UUID.randomUUID());
   }
 
   @ConsoleDoc(description = "Save the world server side")
   public void save() {
-    getWorld().save();
+    Main.inst().getWorld().save();
   }
 
   @ClientsideOnly
