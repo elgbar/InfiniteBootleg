@@ -128,11 +128,11 @@ fun ServerClient.serverBoundClientSecretResponse(connectionCredentials: Connecti
   ).build()
 }
 
-// fun ServerClient.chunkRequestPacket(chunkLocation: Location): Packet {
-//  return chunkRequestPacket(chunkLocation.toVector2i())
-// }
+fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Location): Packet {
+  return serverBoundChunkRequestPacket(chunkLocation.toVector2i())
+}
 
-fun ServerClient.chunkRequestPacket(chunkLocation: Vector2i): Packet {
+fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Vector2i): Packet {
   return serverBoundPacket(SB_CHUNK_REQUEST).setChunkRequest(Packets.ChunkRequest.newBuilder().setChunkLocation(chunkLocation)).build()
 }
 

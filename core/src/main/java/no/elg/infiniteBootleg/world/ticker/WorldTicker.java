@@ -73,8 +73,8 @@ public class WorldTicker extends Ticker {
       ForkJoinPool pool = ForkJoinPool.commonPool();
 
       while (chunkIterator.hasNext()) {
-        ObjectMap.Entry<Location, Chunk> c = chunkIterator.next();
-        Chunk chunk = c.value;
+        ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
+        Chunk chunk = entry.value;
 
         // clean up dead chunks
         if (!chunk.isLoaded()) {
@@ -82,7 +82,7 @@ public class WorldTicker extends Ticker {
           continue;
         }
         // Unload chunks not seen for CHUNK_UNLOAD_TIME
-        if (Main.isSingleplayer()
+        if (Main.isClient()
             && chunk.isAllowingUnloading()
             && wr.isOutOfView(chunk)
             && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
