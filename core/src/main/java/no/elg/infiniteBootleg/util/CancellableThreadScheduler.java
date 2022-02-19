@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.google.common.base.Preconditions;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -93,12 +94,12 @@ public class CancellableThreadScheduler {
    * @param ms How many milliseconds to wait before running the task
    * @param runnable What to do
    */
-  public void scheduleAsync(long ms, @NotNull Runnable runnable) {
+  @NotNull
+  public ScheduledFuture<?> scheduleAsync(long ms, @NotNull Runnable runnable) {
     if (isAlwaysSync()) {
-      executeSync(runnable);
-      return;
+      return scheduleSync(ms, runnable);
     }
-    executor.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS);
+    return executor.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -107,8 +108,9 @@ public class CancellableThreadScheduler {
    * @param ms How many milliseconds to wait before running the task
    * @param runnable What to do
    */
-  public void scheduleSync(long ms, @NotNull Runnable runnable) {
-    executor.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS);
+  @NotNull
+  public ScheduledFuture<?> scheduleSync(long ms, @NotNull Runnable runnable) {
+    return executor.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS);
   }
 
   /** Shut down the thread */
