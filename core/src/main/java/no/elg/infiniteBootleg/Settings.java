@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg;
 
+import java.awt.GraphicsEnvironment;
 import no.elg.infiniteBootleg.util.Ticker;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,8 +10,13 @@ public class Settings {
   /** If worlds should be loaded from disk */
   public static boolean loadWorldFromDisk = true;
 
-  /** If graphics should be rendered, false implies this should be a server */
-  public static boolean client = true;
+  /**
+   * If graphics should be rendered, false implies this should be a server
+   *
+   * <p>If {@link GraphicsEnvironment#isHeadless} is {@code false} this will always be {@code
+   * false}.
+   */
+  public static boolean client = !GraphicsEnvironment.isHeadless();
 
   public static boolean isServer() {
     return !client;

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
+import java.awt.Toolkit;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
@@ -25,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ClientMain extends CommonMain {
+
+  /** Only use this when a server is present */
+  public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
 
   private static ClientMain inst;
   @NotNull private final InputMultiplexer inputMultiplexer;

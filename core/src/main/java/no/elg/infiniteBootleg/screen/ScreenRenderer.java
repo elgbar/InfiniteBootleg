@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg.screen;
 
-import static no.elg.infiniteBootleg.ClientMain.SCALE;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
+import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Resizable;
 
@@ -27,12 +26,12 @@ public class ScreenRenderer implements Disposable, Resizable {
         new FreeTypeFontGenerator(Gdx.files.internal(Main.FONTS_FOLDER + "UbuntuMono-R.ttf"));
     final FreeTypeFontGenerator.FreeTypeFontParameter parameter =
         new FreeTypeFontGenerator.FreeTypeFontParameter();
-    parameter.size = FONT_SIZE * SCALE;
+    parameter.size = FONT_SIZE * ClientMain.SCALE;
 
     parameter.minFilter = Texture.TextureFilter.Linear;
     font = generator.generateFont(parameter);
 
-    spacing = (FONT_SIZE * SCALE) / 2;
+    spacing = (FONT_SIZE * ClientMain.SCALE) / 2;
 
     batch = new SpriteBatch();
     batch.setProjectionMatrix(

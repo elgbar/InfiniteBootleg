@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.screen;
 
-import static no.elg.infiniteBootleg.ClientMain.SCALE;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
@@ -67,10 +66,10 @@ public class HUDRenderer implements Renderer {
         sr.getBatch()
             .draw(
                 mat.getTextureRegion(),
-                Gdx.graphics.getWidth() - BLOCK_SIZE * 3f * SCALE,
-                h - BLOCK_SIZE * 3f * SCALE,
-                BLOCK_SIZE * 2f * SCALE,
-                BLOCK_SIZE * 2f * SCALE);
+                Gdx.graphics.getWidth() - BLOCK_SIZE * 3f * ClientMain.SCALE,
+                h - BLOCK_SIZE * 3f * ClientMain.SCALE,
+                BLOCK_SIZE * 2f * ClientMain.SCALE,
+                BLOCK_SIZE * 2f * ClientMain.SCALE);
       }
     }
     sr.end();

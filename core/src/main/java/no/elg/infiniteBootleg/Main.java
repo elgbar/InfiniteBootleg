@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg;
 
 import com.badlogic.gdx.ApplicationListener;
-import java.awt.Toolkit;
 import java.io.File;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
@@ -18,7 +17,7 @@ public interface Main extends ApplicationListener {
   String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
   String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
   String VERSION_FILE = "version";
-  int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
+
   Object INST_LOCK = new Object();
 
   static @NotNull ConsoleLogger logger() {
