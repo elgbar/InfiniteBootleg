@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.world.World
 
 class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
 
-  val ticker: Ticker = Ticker(this, "Box2DWorldLight-" + world.name, tick, Settings.tps, Double.MAX_VALUE)
+  val ticker: Ticker = Ticker(this, "Box2DWorld-" + world.name, tick, Settings.tps, Double.MAX_VALUE)
 
   override fun tick() {
     // tick all box2d elements
