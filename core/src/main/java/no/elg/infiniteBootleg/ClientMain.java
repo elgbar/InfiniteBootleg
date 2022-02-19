@@ -59,7 +59,7 @@ public class ClientMain extends CommonMain {
   public ClientMain(boolean test) {
     super(test);
 
-    if (!Settings.client) {
+    if (Main.isServer()) {
       throw new IllegalStateException("Cannot create client main as a server!");
     }
     synchronized (INST_LOCK) {
@@ -136,7 +136,7 @@ public class ClientMain extends CommonMain {
 
   @Override
   public void render() {
-    if (!Settings.client) {
+    if (Main.isServer()) {
       return;
     }
     Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);

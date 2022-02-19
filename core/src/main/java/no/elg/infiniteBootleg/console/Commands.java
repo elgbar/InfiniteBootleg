@@ -494,4 +494,15 @@ public class Commands extends CommandExecutor {
         .getScheduler()
         .scheduleSync(50L, () -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE));
   }
+
+  @ConsoleDoc(description = "Some some debug info")
+  public void debug_info() {
+    Main.logger().log("Debug Info");
+    var world = Main.inst().getWorld();
+    Main.logger().log("Total chunks: " + world.getChunks().size);
+    Main.logger().log("Loaded chunks: " + world.getLoadedChunks().size);
+    Main.logger().log("Entities: " + world.getEntities().size());
+    Main.logger()
+        .log("Players: " + world.getEntities().stream().filter(Player.class::isInstance).count());
+  }
 }

@@ -7,7 +7,6 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.Array
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.Block.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
@@ -83,7 +82,7 @@ open class WorldBody(private val world: World) : Ticking {
   }
 
   override fun tickRare() {
-    if (!Settings.client) {
+    if (Main.isServer()) {
       // We only short because of the light, no point is shifting when there is no client
       return
     }

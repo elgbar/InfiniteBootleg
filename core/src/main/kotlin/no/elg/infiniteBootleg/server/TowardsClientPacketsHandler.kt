@@ -208,7 +208,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
   }
 }
 
-private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
+fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) {
   when (loginStatus) {
     ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN -> {
       ctx.fatal("You are already logged in!")

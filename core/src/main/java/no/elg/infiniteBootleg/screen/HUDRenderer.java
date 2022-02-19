@@ -34,7 +34,7 @@ public class HUDRenderer implements Renderer {
 
   @Override
   public void render() {
-    if (modus == HUDModus.NONE || !Settings.client) {
+    if (modus == HUDModus.NONE || Main.isServer()) {
       return;
     }
     ClientMain main = ClientMain.inst();

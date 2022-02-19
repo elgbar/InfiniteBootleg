@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.loader.WorldLoader
@@ -162,10 +163,7 @@ private fun handleBlockUpdate(blockUpdate: UpdateBlock) {
 private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunkLoc = Location.fromVector2i(chunkRequest.chunkLocation)
   val chunk = ServerMain.inst().serverWorld.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
-  val allowedUnload = chunk.isAllowingUnloading
-  chunk.setAllowUnload(false)
   ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
-  chunk.setAllowUnload(allowedUnload)
 }
 
 private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
@@ -207,12 +205,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   }
 
   val world = ServerMain.inst().serverWorld
-  val uuid = try {
-    UUID.fromString(login.uuid)
-  } catch (e: IllegalArgumentException) {
-    ctx.fatal("Failed to decode login UUID ${login.uuid}")
-    return
-  }
+  val uuid = fromUUIDOrNull(login.uuid) ?: return
 
   if (world.hasPlayer(uuid)) {
     ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
@@ -241,12 +234,8 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
 
 private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {
   val world = ServerMain.inst().serverWorld
-  val uuid = try {
-    UUID.fromString(entityRequest.uuid)
-  } catch (e: IllegalArgumentException) {
-    Main.logger().warn("handleEntityRequest", "Failed to decode entity request UUID ${entityRequest.uuid}")
-    return
-  }
+
+  val uuid = fromUUIDOrNull(entityRequest.uuid) ?: return
   val entity = world.getEntity(uuid)
   if (entity != null) {
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))

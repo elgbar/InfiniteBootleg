@@ -81,7 +81,7 @@ public class Player extends LivingEntity {
   }
 
   {
-    if (isInvalid() || !Settings.client) {
+    if (isInvalid() || Main.isServer()) {
       torchLight = null;
     } else {
       synchronized (LIGHT_LOCK) {

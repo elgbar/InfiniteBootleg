@@ -53,6 +53,12 @@ subprojects {
   sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
   sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
 
+  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+      freeCompilerArgs += "-opt-in=org.mylibrary.OptInAnnotation"
+    }
+  }
+
   spotless {
     format("misc") {
       target("*.gradle", "**/*.md", ".gitignore", "**/*.xml", "**/*.yml", "**/*.yaml", "**/*.proto")

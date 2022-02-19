@@ -169,10 +169,10 @@ public abstract class World implements Disposable, Resizable {
     FileHandle worldFolder = getWorldFolder();
     FileHandle worldZip = getWorldZip();
 
-    if (!Settings.loadWorldFromDisk || worldFolder == null) {
+    if (!Settings.loadWorldFromDisk) {
       return;
     }
-    if (worldZip == null || !worldZip.exists()) {
+    if (worldFolder == null || worldZip == null || !worldZip.exists()) {
       Main.logger().log("No world save found");
       return;
     }
@@ -206,7 +206,6 @@ public abstract class World implements Disposable, Resizable {
   }
 
   public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
-
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
