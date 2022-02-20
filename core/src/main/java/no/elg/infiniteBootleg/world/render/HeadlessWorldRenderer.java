@@ -18,8 +18,8 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public void render() {
-    for (Chunk chunk : world.getLoadedChunks()) {
-      if (chunk.isDirty()) {
+    for (Chunk chunk : world.getChunks().values()) {
+      if (chunk.isValid() && chunk.isDirty()) {
         chunk.getChunkBody().update(true);
       }
     }
