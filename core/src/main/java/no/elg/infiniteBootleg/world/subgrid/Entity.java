@@ -310,7 +310,10 @@ public abstract class Entity
     var locations = touchingLocations(worldX, worldY);
     ObjectSet<Block> blocks = new ObjectSet<>();
     for (Location location : locations) {
-      blocks.add(world.getBlock(location.x, location.y, false));
+      Block block = world.getBlock(location.x, location.y, false);
+      if (block != null) {
+        blocks.add(block);
+      }
     }
     return blocks;
   }
