@@ -4,6 +4,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import static no.elg.infiniteBootleg.world.Material.AIR;
+import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_RENDER_THRESHOLD;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -52,6 +53,19 @@ public class ChunkRenderer implements Renderer, Disposable {
         } else {
           renderQueue.add(chunk);
         }
+      }
+    }
+  }
+
+  public void render(int times) {
+    render();
+    if (Gdx.graphics.getFramesPerSecond() > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
+      // only render more chunks when the computer isn't struggling with the rendering
+      for (int i = 0; i < times; i++) {
+        if (renderQueue.isEmpty()) {
+          return;
+        }
+        render();
       }
     }
   }
