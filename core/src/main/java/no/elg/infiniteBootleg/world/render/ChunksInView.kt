@@ -6,16 +6,16 @@ import no.elg.infiniteBootleg.world.World
 /** @author Elg
  */
 class ChunksInView {
-  @kotlin.jvm.JvmField
+  @JvmField
   var horizontalStart = 0
 
-  @kotlin.jvm.JvmField
+  @JvmField
   var horizontalEnd = 0
 
-  @kotlin.jvm.JvmField
+  @JvmField
   var verticalStart = 0
 
-  @kotlin.jvm.JvmField
+  @JvmField
   var verticalEnd = 0
 
   val horizontalLength: Int

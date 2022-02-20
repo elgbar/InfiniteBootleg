@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 /** @author Elg */
 public class HeadlessWorldRenderer implements WorldRender {
 
+  public static final int RENDER_DISTANCE_CHUNKS = 5;
+
   @NotNull public final ObjectMap<@NotNull UUID, ChunksInView> viewingChunks = new ObjectMap<>();
   @NotNull private final ServerWorld world;
 
@@ -36,6 +38,7 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public boolean isOutOfView(@NotNull Chunk chunk) {
+    // TODO only keep chunks which are within RENDER_DISTANCE_CHUNKS of a player
     return false;
   }
 
