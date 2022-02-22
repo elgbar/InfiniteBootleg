@@ -106,7 +106,11 @@ public abstract class LivingEntity extends Entity implements Updatable {
         + " has controls: "
         + hasControls()
         + " id: "
-        + getUuid();
+        + getUuid()
+        + " pos: "
+        + getPosition().x
+        + ", "
+        + getPosition().y;
   }
 
   @Override
