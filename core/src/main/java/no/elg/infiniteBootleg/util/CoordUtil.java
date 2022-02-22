@@ -100,4 +100,14 @@ public class CoordUtil {
   public static boolean isInsideChunk(int localX, int localY) {
     return localX >= 0 && localX < CHUNK_SIZE && localY >= 0 && localY < CHUNK_SIZE;
   }
+
+  /**
+   * @param worldX The world x coordinate
+   * @param worldY The world y coordinate
+   * @return The chunk location for the given world coordinates
+   */
+  @Contract(pure = true)
+  public static @NotNull Location worldXYtoChunkLoc(int worldX, int worldY) {
+    return new Location(worldToChunk(worldX), worldToChunk(worldY));
+  }
 }

@@ -248,14 +248,21 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
 }
 
 private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
-  val uuid = fromUUIDOrNull(moveEntity.uuid)
-  if (uuid == null) {
-    ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
-    return
-  }
   val world = world
   if (world == null) {
     Main.logger().warn("handleMoveEntity", "Failed to find world")
+    return
+  }
+  val chunkLoc = CoordUtil.worldXYtoChunkLoc(moveEntity.position.x.toInt(), moveEntity.position.y.toInt())
+  if (!world.isChunkLoaded(chunkLoc)) {
+    // Chunk is not loaded, so ignore this entity update
+    // TODO (from the server) only send entity packets of loaded chunks
+    return
+  }
+
+  val uuid = fromUUIDOrNull(moveEntity.uuid)
+  if (uuid == null) {
+    ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
     return
   }
   val entity = world.getEntity(uuid)
