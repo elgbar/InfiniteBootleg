@@ -63,7 +63,7 @@ public abstract class Entity
         Savable<ProtoWorld.EntityOrBuilder> {
 
   public static final float GROUND_CHECK_OFFSET = 0.1f;
-  public static final float TELEPORT_DIFFERENCE_THRESHOLD = 1f;
+  public static final float TELEPORT_DIFFERENCE_THRESHOLD = .5f;
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
   public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
@@ -269,9 +269,12 @@ public abstract class Entity
         updatePos();
         // If we're too far away teleport the entity to its correct location
         // and add a bit to the y coordinate, so we don't fall through the floor
+        //noinspection ConstantConditions
         if ((Main.isServerClient() && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
             || Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
             || Math.abs(physicsWorldY - posCache.y) > TELEPORT_DIFFERENCE_THRESHOLD) {
+          posCache.x = worldX;
+          posCache.y = worldY;
           body.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
           sendMovePacket = true;
         }
@@ -280,8 +283,6 @@ public abstract class Entity
       }
     }
     setLookDeg(lookAngleDeg);
-    posCache.x = worldX;
-    posCache.y = worldY;
     velCache.x = velX;
     velCache.y = velY;
     if (Main.isServer() && sendMovePacket) {
