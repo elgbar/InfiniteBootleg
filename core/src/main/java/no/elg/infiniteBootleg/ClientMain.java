@@ -262,6 +262,9 @@ public class ClientMain extends CommonMain {
     if (Main.isServerClient()) {
       return serverClient.getPlayer();
     }
+    if (singleplayerWorld == null) {
+      return null;
+    }
     synchronized (INST_LOCK) {
       if (mainPlayer == null || mainPlayer.isInvalid()) {
         for (LivingEntity entity : singleplayerWorld.getPlayers()) {
