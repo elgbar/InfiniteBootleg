@@ -10,6 +10,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.ServerMain;
 import no.elg.infiniteBootleg.protobuf.Packets.Packet;
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
   public static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-  public static final Map<Channel, ConnectionCredentials> clients = new ConcurrentHashMap<>();
+  public static final Map<Channel, SharedInformation> clients = new ConcurrentHashMap<>();
 
   public static final String TAG = "SERVER";
   public static long packetsReceived;
@@ -72,6 +73,10 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
                 + channels.size()
                 + " channels)");
     if (client != null) {
+      ScheduledFuture<?> task = client.getHeartbeatTask();
+      if (task != null) {
+        task.cancel(false);
+      }
       ServerMain.inst().getServerWorld().disconnectPlayer(client.getEntityUUID(), false);
     }
   }

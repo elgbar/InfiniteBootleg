@@ -62,8 +62,10 @@ public class ClientChannel {
       if (onConnect != null) {
         Main.inst().getScheduler().executeSync(onConnect);
       }
-      // Wait until the connection is closed.
-      channel.closeFuture().sync();
+      if (channel != null) {
+        // Wait until the connection is closed.
+        channel.closeFuture().sync();
+      }
     } finally {
       workerGroup.shutdownGracefully();
     }

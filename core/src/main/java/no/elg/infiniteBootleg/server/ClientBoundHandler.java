@@ -29,7 +29,20 @@ public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
   public void channelInactive(@NotNull ChannelHandlerContext ctx) {
     Main.inst()
         .getScheduler()
-        .executeSync(() -> ClientMain.inst().setScreen(ConnectingScreen.INSTANCE));
+        .executeSync(
+            () -> {
+              var serverClient = ClientMain.inst().getServerClient();
+              if (serverClient != null) {
+                var sharedInformation = serverClient.getSharedInformation();
+                if (sharedInformation != null) {
+                  var task = sharedInformation.getHeartbeatTask();
+                  if (task != null) {
+                    task.cancel(false);
+                  }
+                }
+              }
+              ClientMain.inst().setScreen(ConnectingScreen.INSTANCE);
+            });
   }
 
   @Override

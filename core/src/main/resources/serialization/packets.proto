@@ -63,7 +63,7 @@ message Packet {
 // DUAL BOUND //
 ////////////////
 
-// Server send this every tick (??), client must respond with another heartbeat packet with the name keepAliveId
+// Server send this every so often, client must respond with another heartbeat packet with the name keepAliveId
 message Heartbeat {
   string keepAliveId = 1;
 }

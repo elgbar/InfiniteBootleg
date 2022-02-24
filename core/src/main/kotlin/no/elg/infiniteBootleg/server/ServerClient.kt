@@ -17,7 +17,7 @@ class ServerClient(
 ) {
 
   lateinit var ctx: ChannelHandlerContext
-  var credentials: ConnectionCredentials? = null
+  var sharedInformation: SharedInformation? = null
 
   /**
    * If the client is fully initiated
@@ -27,7 +27,7 @@ class ServerClient(
 
   private var backingPlayer: Player? = null
 
-  val uuid get() = credentials!!.entityUUID // FIXME
+  val uuid get() = sharedInformation!!.entityUUID // FIXME
   val player: Player?
     get() {
       // FIXME

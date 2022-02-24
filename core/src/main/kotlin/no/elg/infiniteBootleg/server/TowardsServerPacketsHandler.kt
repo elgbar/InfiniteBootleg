@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
+import no.elg.infiniteBootleg.protobuf.Packets.Heartbeat
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
@@ -25,6 +26,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
+import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.fromUUIDOrNull
@@ -34,6 +36,7 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import java.security.SecureRandom
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 private val secureRandom = SecureRandom.getInstanceStrong()
 
@@ -59,7 +62,11 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
         handleSecretExchange(ctx, packet.secretExchange)
       }
     }
-    DX_HEARTBEAT -> TODO()
+    DX_HEARTBEAT -> {
+      if (packet.hasHeartbeat()) {
+        handleHeartbeat(ctx, packet.heartbeat)
+      }
+    }
     DX_MOVE_ENTITY -> {
       if (packet.hasMoveEntity()) {
         handlePlayerUpdate(ctx, packet.moveEntity)
@@ -163,7 +170,7 @@ private fun handleBlockUpdate(blockUpdate: UpdateBlock) {
 private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunkLoc = Location.fromVector2i(chunkRequest.chunkLocation)
   val serverWorld = ServerMain.inst().serverWorld
-  val uuid = ctx.getClientCredentials()?.entityUUID ?: return
+  val uuid = ctx.getSharedInformation()?.entityUUID ?: return
   val chunksInView = serverWorld.render.getClient(uuid) ?: return
 
   // Only send chunks which the player is allowed to see
@@ -175,8 +182,9 @@ private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRe
 
 private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   val world = ServerMain.inst().serverWorld
+  val shared = ctx.getSharedInformation()
   val player = ctx.getCurrentPlayer()
-  if (player == null) {
+  if (player == null || shared == null) {
     ctx.fatal("Player not loaded server-side")
     return
   }
@@ -202,6 +210,15 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
   Main.logger().log("Player " + player.name + " joined")
   broadcastToInView(clientBoundSpawnEntity(player), player.blockX, player.blockY) { c, _ -> c != ctx.channel() }
+
+  shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
+//    Main.logger().log("Sending heartbeat to client")
+    ctx.writeAndFlush(clientBoundHeartbeat())
+    if (shared.lostConnection()) {
+      Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
+      ctx.close()
+    }
+  }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {
@@ -232,11 +249,11 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
 
   val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
 
-  val connectionCredentials = ConnectionCredentials(player.uuid, secret.toString())
-  ServerBoundHandler.clients[ctx.channel()] = connectionCredentials
+  val sharedInformation = SharedInformation(player.uuid, secret.toString())
+  ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
   // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
-  ctx.writeAndFlush(clientBoundSecretExchange(connectionCredentials))
+  ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
 }
 
 private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {
@@ -248,15 +265,19 @@ private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: Entit
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))
   } else {
     ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
-//    Main.logger().warn("handleEntityRequest", "Unknown entity requested UUID: ${entityRequest.uuid}")
   }
 }
 
-private fun ChannelHandlerContext.getClientCredentials(): ConnectionCredentials? {
+private fun handleHeartbeat(ctx: ChannelHandlerContext, heartbeat: Heartbeat) {
+//  Main.logger().debug("Heartbeat","Server got client (" + ctx.getCurrentPlayer()?.name + ") heartbeat: " + heartbeat.keepAliveId)
+  ctx.getSharedInformation()?.beat()
+}
+
+private fun ChannelHandlerContext.getSharedInformation(): SharedInformation? {
   return ServerBoundHandler.clients[this.channel()]
 }
 
 private fun ChannelHandlerContext.getCurrentPlayer(): Player? {
-  val uuid = getClientCredentials()?.entityUUID ?: return null
+  val uuid = getSharedInformation()?.entityUUID ?: return null
   return ServerMain.inst().serverWorld.getPlayer(uuid)
 }

@@ -29,6 +29,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ClientBoundHandler.TAG
+import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
@@ -36,6 +37,7 @@ import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Elg
@@ -43,6 +45,11 @@ import java.util.UUID
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
 
   when (packet.type) {
+    DX_HEARTBEAT -> {
+      if (packet.hasHeartbeat()) {
+        handleHeartbeat(packet.heartbeat)
+      }
+    }
     CB_LOGIN_STATUS -> {
       if (packet.hasServerLoginStatus()) {
         val loginStatus = packet.serverLoginStatus.status
@@ -176,9 +183,9 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
     ctx.fatal("Failed to decode entity UUID ${secretExchange.entityUUID}")
     return
   }
-  val connectionCredentials = ConnectionCredentials(uuid, secretExchange.secret)
-  credentials = connectionCredentials
-  ctx.writeAndFlush(serverBoundClientSecretResponse(connectionCredentials))
+  val sharedInformation = SharedInformation(uuid, secretExchange.secret)
+  this.sharedInformation = sharedInformation
+  ctx.writeAndFlush(serverBoundClientSecretResponse(sharedInformation))
 }
 
 private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
@@ -241,6 +248,15 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
         ClientMain.inst().screen = WorldScreen(world, false)
         player.giveControls()
         started = true
+
+        val sharedInformation = sharedInformation!!
+        sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
+//          Main.logger().log("Sending heartbeat to server")
+          ctx.writeAndFlush(clientBoundHeartbeat())
+          if (sharedInformation.lostConnection()) {
+            ctx.fatal("Server stopped responding, heartbeats not received")
+          }
+        }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
       }
     }
     ServerLoginStatus.ServerStatus.UNRECOGNIZED -> {
@@ -286,4 +302,9 @@ private fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
   val uuid = fromUUIDOrNull(despawnEntity.uuid) ?: return
   val entity = world.getEntity(uuid) ?: return
   world.removeEntity(entity)
+}
+
+private fun handleHeartbeat(heartbeat: Packets.Heartbeat) {
+//  Main.logger().debug("Heartbeat","Client got server heartbeat: " + heartbeat.keepAliveId)
+  ClientMain.inst().serverClient?.sharedInformation?.beat()
 }
