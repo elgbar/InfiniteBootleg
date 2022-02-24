@@ -57,6 +57,7 @@ object ServerScreen : StageScreen() {
           onInteract(stage, Keys.NUM_0) {
             ConnectingScreen.info = "Connecting..."
             ClientMain.inst().screen = ConnectingScreen
+            ConnectingScreen.startLivelinessTest()
 
             val serverClient = ServerClient(nameField.text)
             ClientMain.inst().serverClient = serverClient

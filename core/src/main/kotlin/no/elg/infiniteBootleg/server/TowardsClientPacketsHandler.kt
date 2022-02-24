@@ -224,7 +224,6 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
     }
     ServerLoginStatus.ServerStatus.PROCEED_LOGIN -> {
       ConnectingScreen.info = "Logging in..."
-      ConnectingScreen.startLivelinessTest()
     }
     ServerLoginStatus.ServerStatus.LOGIN_SUCCESS -> {
       val world = world
