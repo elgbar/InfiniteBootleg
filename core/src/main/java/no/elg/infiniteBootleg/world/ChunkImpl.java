@@ -194,10 +194,10 @@ public class ChunkImpl implements Chunk {
             .getScheduler()
             .executeAsync(
                 () -> {
-                  final int x = getWorldX(localX);
-                  final int y = getWorldY(localY);
-                  var packet = PacketExtraKt.clientBoundBlockUpdate(x, y, block);
-                  PacketExtraKt.broadcast(packet, null);
+                  final int worldX = getWorldX(localX);
+                  final int worldY = getWorldY(localY);
+                  var packet = PacketExtraKt.clientBoundBlockUpdate(worldX, worldY, block);
+                  PacketExtraKt.broadcastToInView(packet, worldX, worldY, null);
                 });
       } else if (Main.isServerClient()) {
         Main.inst()
@@ -705,5 +705,11 @@ public class ChunkImpl implements Chunk {
         + ", loaded="
         + loaded
         + '}';
+  }
+
+  @Override
+  public int compareTo(@NotNull Chunk o) {
+    int compare = Integer.compare(chunkX, o.getChunkX());
+    return compare != 0 ? compare : Integer.compare(chunkY, o.getChunkY());
   }
 }

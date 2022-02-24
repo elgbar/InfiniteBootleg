@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.util;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
+import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import org.jetbrains.annotations.Contract;
@@ -25,12 +26,31 @@ public class CoordUtil {
   }
 
   /**
+   * @param worldLocation A location in world view
+   * @return The location in chunk view
+   */
+  @NotNull
+  @Contract("_ -> new")
+  public static Location worldToChunk(@NotNull Vector2 worldLocation) {
+    return new Location(worldToChunk((int) worldLocation.x), worldToChunk((int) worldLocation.y));
+  }
+
+  /**
    * @param worldCoord The world coordinate to convert
    * @return The chunk coordinate the given coordinate is in
    */
   @Contract(pure = true)
   public static int worldToChunk(int worldCoord) {
     return worldCoord >> Chunk.CHUNK_SIZE_SHIFT;
+  }
+
+  /**
+   * @param worldCoord The world coordinate to convert
+   * @return The chunk coordinate the given coordinate is in
+   */
+  @Contract(pure = true)
+  public static int worldToChunk(float worldCoord) {
+    return worldToChunk((int) worldCoord);
   }
 
   /**
@@ -52,6 +72,17 @@ public class CoordUtil {
   @Contract(pure = true)
   public static int chunkToWorld(int chunkCoord) {
     return chunkCoord << Chunk.CHUNK_SIZE_SHIFT;
+  }
+
+  /**
+   * Convert a chunk coordinate to world coordinate
+   *
+   * @param chunkCoord The chunk coordinate to convert
+   * @return The chunk coordinate in world view
+   */
+  @Contract(pure = true)
+  public static int chunkToWorld(float chunkCoord) {
+    return chunkToWorld((int) chunkCoord);
   }
 
   /**

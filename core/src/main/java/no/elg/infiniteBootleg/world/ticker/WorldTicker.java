@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 public class WorldTicker extends Ticker {
 
   @Nullable private final WorldLightTicker lightTicker;
+  @Nullable private final ServerRendererTicker serverRendererTicker;
   @NotNull private final WorldBox2DTicker box2DTicker;
 
   public WorldTicker(@NotNull World world, boolean tick) {
@@ -40,8 +42,13 @@ public class WorldTicker extends Ticker {
         Ticker.DEFAULT_NAG_DELAY);
     if (world instanceof ClientWorld clientWorld) {
       lightTicker = new WorldLightTicker(clientWorld, tick);
+      serverRendererTicker = null;
+    } else if (world instanceof ServerWorld serverWorld) {
+      lightTicker = null;
+      serverRendererTicker = new ServerRendererTicker(serverWorld, tick);
     } else {
       lightTicker = null;
+      serverRendererTicker = null;
     }
     box2DTicker = new WorldBox2DTicker(world, tick);
   }
@@ -81,9 +88,7 @@ public class WorldTicker extends Ticker {
           chunkIterator.remove();
           continue;
         }
-        // Unload chunks not seen for CHUNK_UNLOAD_TIME
-        if (Main.isClient()
-            && chunk.isAllowingUnloading()
+        if (chunk.isAllowingUnloading()
             && wr.isOutOfView(chunk)
             && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
@@ -151,6 +156,9 @@ public class WorldTicker extends Ticker {
     if (lightTicker != null) {
       lightTicker.getTicker().start();
     }
+    if (serverRendererTicker != null) {
+      serverRendererTicker.getTicker().start();
+    }
     box2DTicker.getTicker().start();
   }
 
@@ -160,6 +168,9 @@ public class WorldTicker extends Ticker {
     super.stop();
     if (lightTicker != null) {
       lightTicker.getTicker().stop();
+    }
+    if (serverRendererTicker != null) {
+      serverRendererTicker.getTicker().stop();
     }
     box2DTicker.getTicker().stop();
   }
@@ -176,6 +187,9 @@ public class WorldTicker extends Ticker {
     if (lightTicker != null) {
       lightTicker.getTicker().pause();
     }
+    if (serverRendererTicker != null) {
+      serverRendererTicker.getTicker().pause();
+    }
     box2DTicker.getTicker().pause();
   }
 
@@ -190,6 +204,9 @@ public class WorldTicker extends Ticker {
     super.resume();
     if (lightTicker != null) {
       lightTicker.getTicker().resume();
+    }
+    if (serverRendererTicker != null) {
+      serverRendererTicker.getTicker().resume();
     }
     box2DTicker.getTicker().resume();
   }

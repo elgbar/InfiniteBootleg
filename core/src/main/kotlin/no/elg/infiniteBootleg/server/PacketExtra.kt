@@ -4,6 +4,7 @@ import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
@@ -37,6 +38,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
+import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.toVector2f
 import no.elg.infiniteBootleg.world.Block
@@ -77,6 +79,23 @@ fun broadcast(packet: Packet, filter: ((Channel, ConnectionCredentials) -> Boole
       continue
     }
     channel.writeAndFlush(packet)
+  }
+}
+
+/**
+ * Broadcast a packet to players which have the given [worldPosition] location loaded.
+ *
+ * Can only be used by a server instance
+ */
+fun broadcastToInView(packet: Packet, worldX: Int, worldY: Int, filter: ((Channel, ConnectionCredentials) -> Boolean)? = null) {
+  require(Main.isServer()) { "This broadcasting methods can only be used by servers" }
+  val world = ServerMain.inst().serverWorld
+  val renderer = world.render
+  val chunkX = CoordUtil.worldToChunk(worldX)
+  val chunkY = CoordUtil.worldToChunk(worldY)
+  broadcast(packet) { c, cc ->
+    val viewing = renderer.getClient(cc.entityUUID) ?: return@broadcast false
+    return@broadcast viewing.isInView(chunkX, chunkY) && (filter == null || filter(c, cc))
   }
 }
 

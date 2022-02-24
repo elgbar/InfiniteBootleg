@@ -50,7 +50,7 @@ public class Settings {
 
   public static boolean stageDebug;
 
-  public static int chunkRadius = 5; // ish max chunks when fully zoomed out
+  public static int viewDistance = 4; // ish max chunks when fully zoomed out
 
   private Settings() {}
 }

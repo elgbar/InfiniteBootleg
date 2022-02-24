@@ -80,7 +80,7 @@ public class ChunkRenderer implements Renderer, Disposable {
           return;
         } // nothing to render
         chunk = renderQueue.remove(0);
-      } while (chunk.isAllAir() || worldRender.isOutOfView(chunk) || !chunk.isLoaded());
+      } while (chunk.isAllAir() || !chunk.isLoaded() || worldRender.isOutOfView(chunk));
       curr = chunk;
     }
 

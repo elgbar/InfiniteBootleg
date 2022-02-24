@@ -686,7 +686,7 @@ public abstract class World implements Disposable, Resizable {
 
   /** @return All currently loaded chunks */
   public Array<Chunk> getLoadedChunks() {
-    var loadedChunks = new Array<Chunk>(chunks.size);
+    var loadedChunks = new Array<Chunk>(true, chunks.size, Chunk.class);
     for (Chunk chunk : chunks.values()) {
       if (chunk != null && chunk.isLoaded()) {
         loadedChunks.add(chunk);

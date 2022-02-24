@@ -9,7 +9,9 @@ import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -26,6 +28,7 @@ import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
+import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
@@ -496,13 +499,66 @@ public class Commands extends CommandExecutor {
   }
 
   @ConsoleDoc(description = "Some some debug info")
-  public void debug_info() {
-    Main.logger().log("Debug Info");
+  public void chunk_info() {
+    Main.logger().log("Debug chunk Info");
     var world = Main.inst().getWorld();
     Main.logger().log("Total chunks: " + world.getChunks().size);
     Main.logger().log("Loaded chunks: " + world.getLoadedChunks().size);
-    Main.logger().log("Entities: " + world.getEntities().size());
+    for (Player player : world.getPlayers()) {
+      var worldRenderer = world.getRender();
+      if (worldRenderer instanceof ClientWorldRender clientWr) {
+        var view = clientWr.getChunksInView();
+        Main.logger()
+            .log(
+                "Player "
+                    + player.getName()
+                    + " from "
+                    + view.getHorizontalStart()
+                    + ", "
+                    + view.getVerticalStart()
+                    + " to "
+                    + view.getHorizontalEnd()
+                    + ","
+                    + view.getVerticalEnd());
+      } else if (worldRenderer instanceof HeadlessWorldRenderer headlessWr) {
+        var view = headlessWr.getClient(player.getUuid());
+        if (view == null) {
+          Main.logger()
+              .error("HeadlessWorldRenderer", "No world renderer for player " + player.hudDebug());
+          continue;
+        }
+        Main.logger()
+            .log(
+                "Player "
+                    + player.getName()
+                    + " view center: ("
+                    + view.getCenterX()
+                    + ","
+                    + view.getCenterY()
+                    + ") from "
+                    + view.getHorizontalStart()
+                    + ", "
+                    + view.getVerticalStart()
+                    + " to "
+                    + view.getHorizontalEnd()
+                    + ","
+                    + view.getVerticalEnd());
+      }
+    }
+
     Main.logger()
-        .log("Players: " + world.getEntities().stream().filter(Player.class::isInstance).count());
+        .log(
+            "Chunk pos: \n"
+                + Arrays.stream(world.getLoadedChunks().items)
+                    .sorted()
+                    .map(
+                        c ->
+                            "("
+                                + c.getChunkX()
+                                + ", "
+                                + c.getChunkY()
+                                + ") in view? "
+                                + !world.getRender().isOutOfView(c))
+                    .collect(Collectors.joining("\n")));
   }
 }

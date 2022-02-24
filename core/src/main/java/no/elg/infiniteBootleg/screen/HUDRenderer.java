@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
-import no.elg.infiniteBootleg.world.render.ChunksInView;
+import no.elg.infiniteBootleg.world.render.ClientChunksInView;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.time.WorldTime;
@@ -146,7 +146,7 @@ public class HUDRenderer implements Renderer {
   }
 
   private String viewChunk(ClientWorld world, Entity player) {
-    ChunksInView viewingChunks = world.getRender().getChunksInView();
+    ClientChunksInView viewingChunks = world.getRender().getChunksInView();
 
     int chunksHor = viewingChunks.getHorizontalLength();
     int chunksVer = viewingChunks.getVerticalLength();

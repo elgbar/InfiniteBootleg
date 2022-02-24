@@ -31,10 +31,10 @@ public class DebugChunkRenderer implements Renderer {
   @Override
   public void render() {
 
-    ChunksInView chunksInView = worldRender.getChunksInView();
+    ClientChunksInView chunksInView = worldRender.getChunksInView();
 
-    int yEnd = chunksInView.verticalEnd;
-    int xEnd = chunksInView.horizontalEnd;
+    int yEnd = chunksInView.getVerticalEnd();
+    int xEnd = chunksInView.getHorizontalEnd();
 
     lr.begin(ShapeRenderer.ShapeType.Line);
 
@@ -44,12 +44,12 @@ public class DebugChunkRenderer implements Renderer {
     lr.setProjectionMatrix(camera.combined);
 
     int offset = Chunk.CHUNK_SIZE * Block.BLOCK_SIZE;
-    for (float y = chunksInView.verticalStart; y < yEnd; y++) {
-      for (float x = chunksInView.horizontalStart; x < xEnd; x++) {
+    for (float y = chunksInView.getVerticalStart(); y < yEnd; y++) {
+      for (float x = chunksInView.getHorizontalStart(); x < xEnd; x++) {
         Color c;
-        if (y == chunksInView.verticalEnd - 1
-            || x == chunksInView.horizontalStart
-            || x == chunksInView.horizontalEnd - 1) {
+        if (y == chunksInView.getVerticalEnd() - 1
+            || x == chunksInView.getHorizontalStart()
+            || x == chunksInView.getHorizontalEnd() - 1) {
           c = OUTSIDE_CAMERA_COLOR;
         } else {
           c = WITHIN_CAMERA_COLOR;

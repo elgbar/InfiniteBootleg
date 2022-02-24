@@ -141,8 +141,12 @@ private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
   }
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
-  val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-  world.setBlock(worldX, worldY, protoBlock, false)
+  if (world.isChunkLoaded(CoordUtil.worldXYtoChunkLoc(worldX, worldY))) {
+    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
+    world.setBlock(worldX, worldY, protoBlock, false)
+  } else {
+    Main.logger().warn("handleSpawnEntity", "Sever sent block update to unloaded client chunk")
+  }
 }
 
 private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
@@ -155,7 +159,7 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
   val chunk = world.getChunk(chunkPos)
   if (chunk == null) {
-    Main.logger().warn("handleSpawnEntity", "Chunk not loaded $chunkPos")
+    Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPos")
     return
   }
   val loaded = Entity.load(world, chunk, spawnEntity.entity)

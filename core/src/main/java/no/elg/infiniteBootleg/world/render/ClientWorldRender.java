@@ -35,7 +35,7 @@ public class ClientWorldRender implements WorldRender {
 
   @NotNull public final ClientWorld world;
   @NotNull private final Rectangle viewBound;
-  @NotNull private final ChunksInView chunksInView;
+  @NotNull private final ClientChunksInView chunksInView;
   @NotNull private final Matrix4 m4 = new Matrix4();
   @NotNull OrderedMap<Chunk, TextureRegion> draw;
   @NotNull private final PublicRayHandler rayHandler;
@@ -50,7 +50,7 @@ public class ClientWorldRender implements WorldRender {
 
   public ClientWorldRender(@NotNull ClientWorld world) {
     viewBound = new Rectangle();
-    chunksInView = new ChunksInView();
+    chunksInView = new ClientChunksInView();
     this.world = world;
     draw = new OrderedMap<>();
     draw.orderedKeys().ordered = false; // improve remove
@@ -122,8 +122,12 @@ public class ClientWorldRender implements WorldRender {
     final WorldBody worldBody = world.getWorldBody();
     float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
     float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
-    for (int y = chunksInView.verticalStart; y < chunksInView.verticalEnd; y++) {
-      for (int x = chunksInView.horizontalStart; x < chunksInView.horizontalEnd; x++) {
+    int verticalStart = chunksInView.getVerticalStart();
+    int verticalEnd = chunksInView.getVerticalEnd();
+    for (int y = verticalStart; y < verticalEnd; y++) {
+      int horizontalStart = chunksInView.getHorizontalStart();
+      int horizontalEnd = chunksInView.getHorizontalEnd();
+      for (int x = horizontalStart; x < horizontalEnd; x++) {
         Chunk chunk = world.getChunk(x, y);
         if (chunk == null) {
           continue;
@@ -131,10 +135,10 @@ public class ClientWorldRender implements WorldRender {
         chunk.view();
 
         // No need to update texture when out of view, but in loaded zone
-        if (y == chunksInView.verticalEnd - 1
-            || y == chunksInView.verticalStart
-            || x == chunksInView.horizontalStart
-            || x == chunksInView.horizontalEnd - 1) {
+        if (y == verticalEnd - 1
+            || y == verticalStart
+            || x == horizontalStart
+            || x == horizontalEnd - 1) {
           continue;
         }
 
@@ -186,7 +190,7 @@ public class ClientWorldRender implements WorldRender {
   }
 
   @NotNull
-  public ChunksInView getChunksInView() {
+  public ClientChunksInView getChunksInView() {
     return chunksInView;
   }
 
@@ -252,20 +256,21 @@ public class ClientWorldRender implements WorldRender {
           w,
           h);
 
-      chunksInView.horizontalStart = //
-          MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
-      chunksInView.horizontalEnd = //
+      chunksInView.setHorizontalStart(
+          MathUtils.floor(viewBound.x / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS);
+      chunksInView.setHorizontalEnd(
           MathUtils.floor((viewBound.x + viewBound.width + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE)
-              + CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS;
+              + CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS);
 
-      chunksInView.verticalStart =
-          MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_PADDING_RENDER;
-      chunksInView.verticalEnd = //
+      chunksInView.setVerticalStart(
+          MathUtils.floor(viewBound.y / CHUNK_TEXTURE_SIZE) - CHUNKS_IN_VIEW_PADDING_RENDER);
+      chunksInView.setVerticalEnd(
           MathUtils.floor(
                   (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE)
-              + CHUNKS_IN_VIEW_PADDING_RENDER;
+              + CHUNKS_IN_VIEW_PADDING_RENDER);
 
-      chunksInView.forEach(
+      ChunksInView.Companion.forEach(
+          chunksInView,
           world,
           chunk -> {
             if (!chunk.hasTextureRegion()) {

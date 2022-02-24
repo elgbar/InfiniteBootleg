@@ -162,8 +162,15 @@ private fun handleBlockUpdate(blockUpdate: UpdateBlock) {
 
 private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunkLoc = Location.fromVector2i(chunkRequest.chunkLocation)
-  val chunk = ServerMain.inst().serverWorld.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
-  ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
+  val serverWorld = ServerMain.inst().serverWorld
+  val uuid = ctx.getClientCredentials()?.entityUUID ?: return
+  val chunksInView = serverWorld.render.getClient(uuid) ?: return
+
+  // Only send chunks which the player is allowed to see
+  if (chunksInView.isInView(chunkLoc.x, chunkLoc.y)) {
+    val chunk = serverWorld.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
+    ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
+  }
 }
 
 private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
@@ -177,8 +184,8 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   // Send chunk packets to client
   val ix = CoordUtil.worldToChunk(player.blockX)
   val iy = CoordUtil.worldToChunk(player.blockY)
-  for (cx in -Settings.chunkRadius..Settings.chunkRadius) {
-    for (cy in -Settings.chunkRadius..Settings.chunkRadius) {
+  for (cx in -Settings.viewDistance..Settings.viewDistance) {
+    for (cy in -Settings.viewDistance..Settings.viewDistance) {
       val chunk = world.getChunk(ix + cx, iy + cy) ?: continue
       ctx.write(clientBoundUpdateChunkPacket(chunk))
     }
@@ -194,7 +201,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
   Main.logger().log("Player " + player.name + " joined")
-  broadcast(clientBoundSpawnEntity(player)) { c, _ -> c != ctx.channel() }
+  broadcastToInView(clientBoundSpawnEntity(player), player.blockX, player.blockY) { c, _ -> c != ctx.channel() }
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {

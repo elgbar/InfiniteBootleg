@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable {
+public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable, Comparable<Chunk> {
 
   int CHUNK_SIZE = 32;
   int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;

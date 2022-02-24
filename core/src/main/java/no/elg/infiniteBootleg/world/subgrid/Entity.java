@@ -286,11 +286,22 @@ public abstract class Entity
     velCache.x = velX;
     velCache.y = velY;
     if (Main.isServer() && sendMovePacket) {
-      Main.logger().debug("server", "Force updating player packet");
+      Main.logger()
+          .debug(
+              "server",
+              "Force updating entity "
+                  + hudDebug()
+                  + " to position ("
+                  + posCache.x
+                  + ", "
+                  + posCache.y
+                  + ")");
       Main.inst()
           .getScheduler()
           .executeAsync(
-              () -> PacketExtraKt.broadcast(PacketExtraKt.clientBoundMoveEntity(this), null));
+              () ->
+                  PacketExtraKt.broadcastToInView(
+                      PacketExtraKt.clientBoundMoveEntity(this), getBlockX(), getBlockY(), null));
     }
   }
 
@@ -597,12 +608,12 @@ public abstract class Entity
           .getScheduler()
           .executeSync(
               () ->
-                  PacketExtraKt.broadcast(
+                  PacketExtraKt.broadcastToInView(
                       PacketExtraKt.clientBoundMoveEntity(this),
-                      (channel, credentials) -> {
-                        // don't send packet to the owning player
-                        return credentials.getEntityUUID() != getUuid();
-                      }));
+                      getBlockX(),
+                      getBlockY(),
+                      // don't send packet to the owning player
+                      (channel, credentials) -> credentials.getEntityUUID() != getUuid()));
     }
   }
 
@@ -634,15 +645,15 @@ public abstract class Entity
                 if (isInvalid()) {
                   return;
                 }
-                if (Main.isAuthoritative()) {
-                  world.removeEntity(this);
-                } else if (Main.isServerClient()) {
+                if (Main.isServerClient()) {
                   // Ask the server about the entity
                   final ServerClient client = ClientMain.inst().getServerClient();
                   if (client != null) {
                     client.ctx.writeAndFlush(PacketExtraKt.serverBoundEntityRequest(client, uuid));
+                    return;
                   }
                 }
+                world.removeEntity(this);
               });
     }
   }
