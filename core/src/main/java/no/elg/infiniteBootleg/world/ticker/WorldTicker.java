@@ -84,7 +84,7 @@ public class WorldTicker extends Ticker {
         Chunk chunk = entry.value;
 
         // clean up dead chunks
-        if (!chunk.isLoaded()) {
+        if (chunk == null || !chunk.isLoaded()) {
           chunkIterator.remove();
           continue;
         }
