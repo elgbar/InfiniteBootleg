@@ -64,6 +64,15 @@ public class WorldTicker extends Ticker {
 
     private final Array<ForkJoinTask<?>> forks = new Array<>(false, 48);
 
+    private void chunkIterRemove() {
+      world.chunksWriteLock.lock();
+      try {
+        chunkIterator.remove();
+      } finally {
+        world.chunksWriteLock.unlock();
+      }
+    }
+
     @Override
     public synchronized void tick() {
 
@@ -79,13 +88,24 @@ public class WorldTicker extends Ticker {
       }
       ForkJoinPool pool = ForkJoinPool.commonPool();
 
-      while (chunkIterator.hasNext()) {
-        ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
-        Chunk chunk = entry.value;
+      while (true) {
+        Chunk chunk;
+        // An ugly (but more performant) way of locking the for chunk reading
+        world.chunksReadLock.lock();
+        try {
+          if (chunkIterator.hasNext()) {
+            ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
+            chunk = entry.value;
+          } else {
+            break;
+          }
+        } finally {
+          world.chunksReadLock.unlock();
+        }
 
         // clean up dead chunks
         if (chunk == null || !chunk.isLoaded()) {
-          chunkIterator.remove();
+          chunkIterRemove();
           continue;
         }
         if (chunk.isAllowingUnloading()
@@ -93,7 +113,7 @@ public class WorldTicker extends Ticker {
             && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
           world.unloadChunk(chunk);
-          chunkIterator.remove();
+          chunkIterRemove();
           continue;
         }
         ForkJoinTask<?> task = pool.submit(chunk::tick);

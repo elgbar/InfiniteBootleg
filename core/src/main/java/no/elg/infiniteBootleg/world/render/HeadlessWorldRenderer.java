@@ -8,6 +8,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
@@ -26,14 +27,35 @@ public class HeadlessWorldRenderer implements WorldRender {
   private final Lock readLock = lock.readLock();
   private final Lock writeLock = lock.writeLock();
 
+  OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
+
   public HeadlessWorldRenderer(@NotNull ServerWorld world) {
     this.world = world;
   }
 
   @Override
   public void render() {
-    for (Chunk chunk : world.getChunks().values()) {
-      if (chunk.isValid() && chunk.isDirty()) {
+    if (chunkIterator == null) {
+      chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
+    } else {
+      chunkIterator.reset();
+    }
+    while (true) {
+      Chunk chunk;
+      // An ugly (but more performant) way of locking the for chunk reading
+      world.chunksReadLock.lock();
+      try {
+        if (chunkIterator.hasNext()) {
+          ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
+          chunk = entry.value;
+        } else {
+          break;
+        }
+      } finally {
+        world.chunksReadLock.unlock();
+      }
+
+      if (chunk != null && chunk.isValid() && chunk.isDirty()) {
         chunk.getChunkBody().update(true);
       }
     }
@@ -47,7 +69,7 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public void update() {
-    // Main.logger().debug("Headless rendering", "Updating");
+    //    Main.logger().debug("Headless rendering", "Updating");
     readLock.lock();
     try {
       for (Player player : world.getPlayers()) {
