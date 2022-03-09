@@ -27,19 +27,16 @@ public class HeadlessWorldRenderer implements WorldRender {
   private final Lock readLock = lock.readLock();
   private final Lock writeLock = lock.writeLock();
 
-  OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
+  @NotNull private OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
 
   public HeadlessWorldRenderer(@NotNull ServerWorld world) {
     this.world = world;
+    chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
   }
 
   @Override
-  public void render() {
-    if (chunkIterator == null) {
-      chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
-    } else {
-      chunkIterator.reset();
-    }
+  public synchronized void render() {
+    chunkIterator.reset();
     while (true) {
       Chunk chunk;
       // An ugly (but more performant) way of locking the for chunk reading

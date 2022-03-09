@@ -55,11 +55,12 @@ public class WorldTicker extends Ticker {
 
   private static class WorldTickee implements Ticking {
 
-    OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
+    @NotNull private final OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
     @NotNull private final World world;
 
     private WorldTickee(@NotNull World world) {
       this.world = world;
+      chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
     }
 
     private final Array<ForkJoinTask<?>> forks = new Array<>(false, 48);
@@ -81,11 +82,7 @@ public class WorldTicker extends Ticker {
 
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
-      if (chunkIterator == null) {
-        chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
-      } else {
-        chunkIterator.reset();
-      }
+      chunkIterator.reset();
       ForkJoinPool pool = ForkJoinPool.commonPool();
 
       while (true) {
