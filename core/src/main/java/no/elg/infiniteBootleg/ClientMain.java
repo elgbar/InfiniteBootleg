@@ -217,16 +217,16 @@ public class ClientMain extends CommonMain {
 
   /**
    * @return Either the world we're connected to or the singleplayer world, whichever is more
-   *     correct.
+   *     correct. If the client is not in a world null will be returned
    * @throws IllegalStateException If there is a client, but no world attached.
    * @throws IllegalStateException If there is no client, and there is no singleplayer world
    */
-  @NotNull
+  @Nullable
   public ClientWorld getWorld() {
     final ServerClient client = ClientMain.inst().getServerClient();
     if (Main.isSingleplayer()) {
       return ClientMain.inst().getSingleplayerWorld();
-    } else {
+    } else if (Main.isServerClient()) {
       final ClientWorld world = client.getWorld();
       if (world == null) {
         PacketExtraKt.fatal(client.ctx, "Failed to get client world when executing command");
@@ -234,17 +234,15 @@ public class ClientMain extends CommonMain {
       }
       return world;
     }
+    return null;
   }
 
   /**
    * @return Only use when singleplayer is guaranteed
    * @see #getWorld()
    */
-  @NotNull
+  @Nullable
   public ClientWorld getSingleplayerWorld() {
-    if (singleplayerWorld == null) {
-      throw new IllegalStateException("There is no world when not in world screen");
-    }
     return singleplayerWorld;
   }
 

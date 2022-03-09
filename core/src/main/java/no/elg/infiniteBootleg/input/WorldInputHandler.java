@@ -51,6 +51,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
       return false;
     }
     ClientWorld world = ClientMain.inst().getWorld();
+    if (world == null) {
+      return false;
+    }
     switch (keycode) {
       case F3:
         Screen screen = ClientMain.inst().getScreen();

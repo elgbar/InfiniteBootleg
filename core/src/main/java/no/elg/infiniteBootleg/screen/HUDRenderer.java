@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
@@ -22,6 +23,7 @@ import no.elg.infiniteBootleg.world.render.ClientChunksInView;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.time.WorldTime;
+import org.jetbrains.annotations.Nullable;
 
 /** @author Elg */
 public class HUDRenderer implements Renderer {
@@ -95,10 +97,19 @@ public class HUDRenderer implements Renderer {
     return ents.toString().trim();
   }
 
-  private String fpsString(ClientWorld world) {
+  private String fpsString(@Nullable ClientWorld world) {
     int activeThreads = Main.inst().getScheduler().getActiveThreads();
-    long tpsDelta = TimeUtils.nanosToMillis(world.getWorldTicker().getTpsDelta());
-    long realTPS = world.getWorldTicker().getRealTPS();
+
+    long tpsDelta;
+    long realTPS;
+    if (world != null) {
+      Ticker worldTicker = world.getWorldTicker();
+      tpsDelta = TimeUtils.nanosToMillis(worldTicker.getTpsDelta());
+      realTPS = worldTicker.getRealTPS();
+    } else {
+      tpsDelta = -1;
+      realTPS = -1;
+    }
     float fpsDelta = Gdx.graphics.getDeltaTime();
     int tps = Gdx.graphics.getFramesPerSecond();
 
