@@ -248,6 +248,9 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
         player.giveControls()
         started = true
 
+        // Change the info text to something generic in case the server throws an error and no further information is received
+        ConnectingScreen.info = "Connection from server abruptly stopped, no further information received"
+
         val sharedInformation = sharedInformation!!
         sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //          Main.logger().log("Sending heartbeat to server")

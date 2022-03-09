@@ -22,7 +22,7 @@ object ConnectingScreen : StageScreen() {
   var info: String
     get() = ConnectingScreen.field.text.toString()
     set(value) {
-      Main.logger().log("ConnectingScreen", value)
+      Main.logger().debug("ConnectingScreen", value)
       ConnectingScreen.field.setText(value)
     }
 
