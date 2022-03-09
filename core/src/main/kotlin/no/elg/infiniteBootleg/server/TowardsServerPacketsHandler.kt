@@ -146,7 +146,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: Sec
       ctx.fatal("Wrong shared information returned by client")
       return
     }
-    val player = Main.inst().world.getPlayer(shared.entityUUID)
+    val player = Main.inst().world?.getPlayer(shared.entityUUID)
     if (player != null) {
       ctx.writeAndFlush(clientBoundStartGamePacket(player))
     } else {
@@ -208,10 +208,6 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
   for (entity in world.entities) {
-    if (entity.uuid == shared.entityUUID) {
-      // client already know of themselves
-      continue
-    }
     Main.logger().log("Sending entity ${entity.simpleName()} (${entity.uuid}) to client")
     ctx.write(clientBoundSpawnEntity(entity))
   }
@@ -219,7 +215,6 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
-  broadcastToInView(clientBoundSpawnEntity(player), player.blockX, player.blockY) { c, _ -> c != ctx.channel() }
 
   shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //    Main.logger().log("Sending heartbeat to client")
