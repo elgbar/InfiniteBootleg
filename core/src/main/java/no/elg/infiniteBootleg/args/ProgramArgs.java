@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 public class ProgramArgs implements ConsoleLogger, Disposable {
 
   private final CancellableThreadScheduler scheduler = new CancellableThreadScheduler(1);
-  private final ConsoleHandler logger = new ConsoleHandler(false);
 
   public ProgramArgs(String[] args) {
     Map<Pair<String, Boolean>, String> options = Util.interpreterArgs(args);
@@ -45,8 +43,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
           }
         }
         if (name == null) {
-          logger.logf(
-              LogLevel.ERROR, "Failed to find a valid argument with with the alt '%s'", altKey);
+          log("ProgramArgs", "Failed to find a valid argument with with the alt '" + altKey + "'");
           continue;
         }
       }
@@ -63,13 +60,12 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
   @Override
   public void log(@NotNull LogLevel level, @NotNull String msg) {
-    scheduler.scheduleAsync(2, () -> logger.log(level, msg));
+    System.out.println("[" + level + "] " + msg);
   }
 
   @Override
   public void dispose() {
     scheduler.shutdown();
-    logger.dispose();
   }
 
   /*

@@ -29,7 +29,6 @@ public abstract class CommonMain extends ApplicationAdapter implements Main {
     }
     this.test = test;
     scheduler = new CancellableThreadScheduler(Settings.schedulerThreads);
-    console = new ConsoleHandler(false);
   }
 
   @NotNull
@@ -44,8 +43,7 @@ public abstract class CommonMain extends ApplicationAdapter implements Main {
 
   @Override
   public void create() {
-    console.dispose();
-    console = new ConsoleHandler(Settings.client);
+    console = new ConsoleHandler();
     Gdx.app.setApplicationLogger(console);
     Gdx.app.setLogLevel(test || Settings.debug ? Application.LOG_DEBUG : Application.LOG_INFO);
 

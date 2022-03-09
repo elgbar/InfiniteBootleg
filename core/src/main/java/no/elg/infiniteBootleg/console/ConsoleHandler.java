@@ -29,6 +29,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
   private final boolean inGameConsole;
   private final Console console;
   private final CommandExecutor exec;
+  private final SystemConsoleReader consoleReader;
 
   public ConsoleHandler() {
     this(Settings.client);
@@ -40,9 +41,9 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
       console = new CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE);
       console.setLoggingToSystem(true);
     } else {
-      console = new StdConsole(this);
+      console = new StdConsole();
     }
-
+    consoleReader = new SystemConsoleReader(this);
     console.setConsoleStackTrace(true);
     exec = new Commands(this);
     console.setCommandExecutor(exec);
@@ -70,9 +71,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     if (console.isDisabled()) {
       return false;
     }
-
     log(LogLevel.COMMAND, command);
-
     String[] parts = command.split(" ");
     String methodName = parts[0];
     String[] sArgs = null;
@@ -206,6 +205,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
   @Override
   public void dispose() {
     console.dispose();
+    consoleReader.dispose();
   }
 
   @Override
