@@ -61,10 +61,16 @@ public final class HelpfulConsoleHelpUtil {
 
   public static void printCommands(Console console, CommandExecutor exec) {
     for (Method method : getRelevantMethods(console, exec, null)) {
-      StringBuilder sb = createCmdPrefix(method);
-      appendCmdSignature(sb, method);
-      Main.logger().log(sb.toString());
+      if (canExecute(method)) {
+        StringBuilder sb = createCmdPrefix(method);
+        appendCmdSignature(sb, method);
+        Main.logger().log(sb.toString());
+      }
     }
+  }
+
+  public static boolean canExecute(Method method) {
+    return !Main.isServer() || !method.isAnnotationPresent(ClientsideOnly.class);
   }
 
   public static void appendCmdSignature(StringBuilder sb, Method method) {

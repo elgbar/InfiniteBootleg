@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.console;
 
+import static no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil.canExecute;
+
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -84,7 +86,9 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
     Set<String> potentialMethods =
         Arrays.stream(methods)
-            .filter(m -> m.getName().toLowerCase().startsWith(methodName.toLowerCase()))
+            .filter(
+                m ->
+                    canExecute(m) && m.getName().toLowerCase().startsWith(methodName.toLowerCase()))
             .map(HelpfulConsoleHelpUtil::generateCommandSignature)
             .collect(Collectors.toSet());
 
