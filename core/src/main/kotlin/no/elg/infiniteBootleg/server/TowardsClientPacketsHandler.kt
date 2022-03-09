@@ -180,6 +180,7 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   }
   val sharedInformation = SharedInformation(uuid, secretExchange.secret)
   this.sharedInformation = sharedInformation
+  Main.logger().debug("LOGIN", "Secret received from sever sending response")
   ctx.writeAndFlush(serverBoundClientSecretResponse(sharedInformation))
 }
 
@@ -202,6 +203,7 @@ private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
 }
 
 private fun ServerClient.handleStartGame(startGame: StartGame) {
+  Main.logger().debug("LOGIN", "Initialization okay, loading world")
   val protoWorld = startGame.world
   this.world = ClientWorld(protoWorld).apply {
     serverLoad(protoWorld)
@@ -210,6 +212,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
     ctx.fatal("Can only control a player, got ${startGame.controlling.type}")
   } else {
     this.controllingEntity = startGame.controlling
+    Main.logger().debug("LOGIN", "World loaded, player loaded, waiting for chunks")
     ctx.writeAndFlush(serverBoundPacket(SB_CLIENT_WORLD_LOADED))
   }
 }
@@ -225,6 +228,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       return
     }
     ServerLoginStatus.ServerStatus.PROCEED_LOGIN -> {
+      Main.logger().debug("LOGIN", "User accepted by server, logging in...")
       ConnectingScreen.info = "Logging in..."
     }
     ServerLoginStatus.ServerStatus.LOGIN_SUCCESS -> {
@@ -252,6 +256,8 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
             ctx.fatal("Server stopped responding, heartbeats not received")
           }
         }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+
+        Main.logger().debug("LOGIN", "Logged into server success")
       }
     }
     ServerLoginStatus.ServerStatus.UNRECOGNIZED -> {

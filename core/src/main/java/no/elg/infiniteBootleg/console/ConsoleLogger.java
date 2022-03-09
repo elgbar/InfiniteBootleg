@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.console;
 
 import com.badlogic.gdx.ApplicationLogger;
 import com.strongjoshua.console.LogLevel;
+import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,6 +98,10 @@ public interface ConsoleLogger extends ApplicationLogger {
   @Override
   default void debug(@NotNull String tag, @NotNull String message) {
     log(LogLevel.DEFAULT, "DBG [" + tag + "] " + message);
+  }
+
+  default void debug(@NotNull String tag, @NotNull Function0<String> message) {
+    log(LogLevel.DEFAULT, "DBG [" + tag + "] " + message.invoke());
   }
 
   @Override

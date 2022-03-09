@@ -67,6 +67,7 @@ public class WorldLoader {
         var proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes());
         Player player = new Player(world, proto);
         if (!player.isInvalid()) {
+          Main.logger().debug("SERVER", "Loading persisted player profile for " + playerId);
           player.disableGravity();
           world.addEntity(player);
           return player;
@@ -79,6 +80,7 @@ public class WorldLoader {
         // fall through
       }
     }
+    Main.logger().debug("SERVER", "Creating fresh player profile for " + playerId);
     // Invalid/non-existing player data
     final Player player = world.createNewPlayer(playerId);
     saveServerPlayer(player);

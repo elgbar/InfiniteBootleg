@@ -134,29 +134,27 @@ private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntit
 }
 
 private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
-  val cc = ServerBoundHandler.clients[ctx.channel()]
-  if (cc == null) {
+  val shared = ctx.getSharedInformation()
+  if (shared == null) {
     ctx.fatal("No secret with this channel, send login request first")
     return
   }
 
   try {
     val uuid = UUID.fromString(secretExchange.entityUUID)
-    if (uuid != cc.entityUUID || secretExchange.secret != cc.secret) {
-      ctx.fatal("Wrong secret returned!")
+    if (uuid != shared.entityUUID || secretExchange.secret != shared.secret) {
+      ctx.fatal("Wrong shared information returned by client")
       return
     }
-    val world = ServerMain.inst().serverWorld
-    val player = world.getPlayer(uuid)
+    val player = Main.inst().world.getPlayer(shared.entityUUID)
     if (player != null) {
       ctx.writeAndFlush(clientBoundStartGamePacket(player))
     } else {
-      ctx.fatal("handleSecretExchange: Failed secret response")
+      ctx.fatal("handleSecretExchange: Failed to find entity with the given uuid")
     }
   } catch (e: Exception) {
     ctx.fatal("handleSecretExchange: Failed to parse entity")
     e.printStackTrace()
-    return
   }
 }
 
@@ -189,6 +187,8 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     return
   }
 
+  Main.logger().debug("LOGIN", "Client world ready, sending chunks to client ${player.name}")
+
   // Send chunk packets to client
   val ix = CoordUtil.worldToChunk(player.blockX)
   val iy = CoordUtil.worldToChunk(player.blockY)
@@ -198,17 +198,27 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
       ctx.write(clientBoundUpdateChunkPacket(chunk))
     }
     ctx.flush()
+    Main.logger().debug("LOGIN") {
+      val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
+      val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
+      "Sent $sent/$total chunks sent to player ${player.name}"
+    }
   }
   ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
+  Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
   for (entity in world.entities) {
-    Main.logger().log("Sending ${entity.simpleName()} ${entity.hudDebug()} to client")
+    if (entity.uuid == shared.entityUUID) {
+      // client already know of themselves
+      continue
+    }
+    Main.logger().log("Sending entity ${entity.simpleName()} (${entity.uuid}) to client")
     ctx.write(clientBoundSpawnEntity(entity))
   }
   ctx.flush()
+  Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
-  Main.logger().log("Player " + player.name + " joined")
   broadcastToInView(clientBoundSpawnEntity(player), player.blockX, player.blockY) { c, _ -> c != ctx.channel() }
 
   shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
@@ -219,6 +229,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
       ctx.close()
     }
   }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+  Main.logger().log("Player " + player.name + " joined")
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {
@@ -227,6 +238,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     ctx.fatal("Version mismatch! Client: '${login.version}' Server: '$version'")
     return
   }
+  Main.logger().debug("LOGIN", "Login request received by " + login.username + " uuid " + login.uuid)
 
   val world = ServerMain.inst().serverWorld
   val uuid = fromUUIDOrNull(login.uuid) ?: return
@@ -240,18 +252,22 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
   val player = WorldLoader.getServerPlayer(world, uuid)
   if (player.isInvalid) {
-    ctx.fatal("Failed to spawn player server side")
+    ctx.fatal("Failed to spawn player server side, player is invalid")
     return
   }
   require(player.uuid == uuid)
-  player.name = login.username
-  WorldLoader.saveServerPlayer(player)
+  // username might have changed
+  if (player.name != login.username) {
+    Main.logger().debug("LOGIN", "Player name has changed from '" + player.name + "' to '" + login.username + "'")
+    player.name = login.username
+    WorldLoader.saveServerPlayer(player)
+  }
 
   val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
-
   val sharedInformation = SharedInformation(player.uuid, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
+  Main.logger().debug("LOGIN", "Secret sent to player, waiting for confirmation")
   // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
   ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
 }

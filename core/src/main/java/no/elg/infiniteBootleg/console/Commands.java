@@ -502,7 +502,6 @@ public class Commands extends CommandExecutor {
   public void chunk_info() {
     Main.logger().log("Debug chunk Info");
     var world = Main.inst().getWorld();
-    Main.logger().log("Total chunks: " + world.getChunks().size);
     Main.logger().log("Loaded chunks: " + world.getLoadedChunks().size);
     for (Player player : world.getPlayers()) {
       var worldRenderer = world.getRender();
