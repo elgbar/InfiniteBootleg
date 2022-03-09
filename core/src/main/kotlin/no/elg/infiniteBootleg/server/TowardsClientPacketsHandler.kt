@@ -78,11 +78,6 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       }
     }
     CB_INITIAL_CHUNKS_SENT -> chunksLoaded = true
-    DX_HEARTBEAT -> {
-      if (packet.hasHeartbeat()) {
-        ctx.writeAndFlush(packet)
-      }
-    }
     DX_MOVE_ENTITY -> {
       if (packet.hasMoveEntity() && started) {
         handleMoveEntity(packet.moveEntity)
