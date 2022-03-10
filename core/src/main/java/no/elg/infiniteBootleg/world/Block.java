@@ -81,22 +81,30 @@ public class Block
     return chunk;
   }
 
-  /** @return World this block exists in */
+  /**
+   * @return World this block exists in
+   */
   public World getWorld() {
     return world;
   }
 
-  /** @return The offset/local position of this block within its chunk */
+  /**
+   * @return The offset/local position of this block within its chunk
+   */
   public int getLocalX() {
     return localX;
   }
 
-  /** @return The offset/local position of this block within its chunk */
+  /**
+   * @return The offset/local position of this block within its chunk
+   */
   public int getLocalY() {
     return localY;
   }
 
-  /** @return {@code new Location(getWorldX(), getLocalY())} */
+  /**
+   * @return {@code new Location(getWorldX(), getLocalY())}
+   */
   public Location getLocation() {
     return new Location(getWorldX(), getLocalY());
   }
@@ -117,12 +125,16 @@ public class Block
     return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
   }
 
-  /** @return World location of this block */
+  /**
+   * @return World location of this block
+   */
   public int getWorldX() {
     return chunk.getWorldX(localX);
   }
 
-  /** @return World location of this block */
+  /**
+   * @return World location of this block
+   */
   public int getWorldY() {
     return chunk.getWorldY(localY);
   }

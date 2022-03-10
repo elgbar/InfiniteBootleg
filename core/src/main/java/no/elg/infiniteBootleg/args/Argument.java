@@ -5,14 +5,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Argument {
 
-  /** @return Help string */
+  /**
+   * @return Help string
+   */
   String value();
 
-  /** @return Single char alias */
+  /**
+   * @return Single char alias
+   */
   char alt() default '\0';
 }

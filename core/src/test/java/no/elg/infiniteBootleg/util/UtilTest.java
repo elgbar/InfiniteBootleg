@@ -11,7 +11,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class UtilTest extends TestGraphic {
 
   @Test

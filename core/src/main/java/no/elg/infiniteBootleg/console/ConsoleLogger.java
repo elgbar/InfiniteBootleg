@@ -6,7 +6,9 @@ import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public interface ConsoleLogger extends ApplicationLogger {
 
   /**

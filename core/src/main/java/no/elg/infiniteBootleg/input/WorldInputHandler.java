@@ -30,7 +30,9 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
 
   public static final float SCROLL_SPEED = 0.25f;
@@ -113,7 +115,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     ClientMain.inst().getInputMultiplexer().removeProcessor(this);
   }
 
-  /** @return We are following a non-null, valid target, and is locked on */
+  /**
+   * @return We are following a non-null, valid target, and is locked on
+   */
   private boolean hasValidLockOn() {
     return following != null && !following.isInvalid() && lockedOn;
   }

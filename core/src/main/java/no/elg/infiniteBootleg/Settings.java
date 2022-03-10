@@ -4,7 +4,9 @@ import java.awt.GraphicsEnvironment;
 import no.elg.infiniteBootleg.util.Ticker;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class Settings {
 
   /** If worlds should be loaded from disk */

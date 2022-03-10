@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 import no.elg.infiniteBootleg.TestGraphic;
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class BlockTest extends TestGraphic {
 
   @Test

@@ -81,7 +81,9 @@ public final class PointLightPool extends Pool<PointLight> {
     }
   }
 
-  /** @deprecated Use {@link #obtain(float, float)} to correctly calculate any world offset */
+  /**
+   * @deprecated Use {@link #obtain(float, float)} to correctly calculate any world offset
+   */
   @Deprecated
   @Override
   public PointLight obtain() {

@@ -30,7 +30,9 @@ public class PerlinNoise {
 
   private final int[] p = new int[512];
 
-  /** @param seed The random seed used to swap elements around randomly */
+  /**
+   * @param seed The random seed used to swap elements around randomly
+   */
   public PerlinNoise(long seed) {
     Random random = new RandomXS128(seed);
     for (int i = 0; i < 256; i++) {

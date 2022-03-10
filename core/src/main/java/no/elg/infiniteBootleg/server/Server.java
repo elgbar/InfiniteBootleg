@@ -17,7 +17,9 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.Packets;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class Server {
 
   public void start() throws InterruptedException {

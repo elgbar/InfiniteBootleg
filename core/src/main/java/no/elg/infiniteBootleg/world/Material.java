@@ -21,7 +21,9 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Door;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public enum Material {
   AIR(null, ItemType.AIR, 0f, false, false, false),
   STONE(1.5f),

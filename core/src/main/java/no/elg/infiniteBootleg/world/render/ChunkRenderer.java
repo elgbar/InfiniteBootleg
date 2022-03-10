@@ -21,7 +21,9 @@ import no.elg.infiniteBootleg.world.Chunk;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ChunkRenderer implements Renderer, Disposable {
 
   private final SpriteBatch batch;

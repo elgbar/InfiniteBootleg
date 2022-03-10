@@ -142,7 +142,9 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable, C
 
   FrameBuffer getFbo();
 
-  /** @return The backing array of the chunk, might contain null elements */
+  /**
+   * @return The backing array of the chunk, might contain null elements
+   */
   @NotNull
   Block[][] getBlocks();
 
@@ -159,10 +161,14 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable, C
    */
   boolean isAllAir();
 
-  /** @return If this chunk has not been unloaded */
+  /**
+   * @return If this chunk has not been unloaded
+   */
   boolean isLoaded();
 
-  /** @return If this chunk has been fully loaded and has not been unloaded */
+  /**
+   * @return If this chunk has been fully loaded and has not been unloaded
+   */
   boolean isValid();
 
   /**
@@ -172,7 +178,9 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable, C
    */
   void setAllowUnload(boolean allowUnload);
 
-  /** @return {@code true} if all the {@link Direction#CARDINAL} neighbors are loaded */
+  /**
+   * @return {@code true} if all the {@link Direction#CARDINAL} neighbors are loaded
+   */
   boolean isNeighborsLoaded();
 
   /**
@@ -207,7 +215,9 @@ public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable, C
   @NotNull
   ChunkBody getChunkBody();
 
-  /** @return if this chunk is dirty */
+  /**
+   * @return if this chunk is dirty
+   */
   boolean isDirty();
 
   /** Mark chunk as dirty */

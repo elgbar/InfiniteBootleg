@@ -9,7 +9,9 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public interface WorldRender extends Updatable, Renderer, Disposable, Resizable {
 
   float MIN_ZOOM = 0.25f;

@@ -305,7 +305,9 @@ public abstract class Entity
     }
   }
 
-  /** @return An unordered collection of all the blocks this entity is currently touching */
+  /**
+   * @return An unordered collection of all the blocks this entity is currently touching
+   */
   @NotNull
   public ObjectSet<@NotNull Block> touchingBlocks() {
     return touchingBlocks(posCache.x, posCache.y);
@@ -330,7 +332,9 @@ public abstract class Entity
     return blocks;
   }
 
-  /** @return An unordered collection of all the locations this entity is currently touching */
+  /**
+   * @return An unordered collection of all the locations this entity is currently touching
+   */
   @NotNull
   public ObjectSet<@NotNull Location> touchingLocations() {
     return touchingLocations(posCache.x, posCache.y);
@@ -423,7 +427,9 @@ public abstract class Entity
     return true;
   }
 
-  /** @return A set of all other entities (excluding this) this entity is touching */
+  /**
+   * @return A set of all other entities (excluding this) this entity is touching
+   */
   @NotNull
   public ObjectSet<@NotNull Entity> touchingEntities() {
     return touchingEntities(posCache.x, posCache.y);
@@ -458,7 +464,9 @@ public abstract class Entity
     return entities;
   }
 
-  /** @return Current chunk this entity is in */
+  /**
+   * @return Current chunk this entity is in
+   */
   @Nullable
   public Chunk getChunk() {
     var chunkX = CoordUtil.worldToChunk(getBlockX());
@@ -658,28 +666,38 @@ public abstract class Entity
     }
   }
 
-  /** @return The texture of this entity */
+  /**
+   * @return The texture of this entity
+   */
   @Nullable
   public abstract TextureRegion getTextureRegion();
 
-  /** @return How to handle invalid spawn location */
+  /**
+   * @return How to handle invalid spawn location
+   */
   @Contract(pure = true)
   public InvalidSpawnAction invalidSpawnLocationAction() {
     return InvalidSpawnAction.DELETE;
   }
 
-  /** @return Velocity of this entity last tick, note that the same vector is returned each time */
+  /**
+   * @return Velocity of this entity last tick, note that the same vector is returned each time
+   */
   @NotNull
   public Vector2 getVelocity() {
     return velCache;
   }
 
-  /** @return Block x-coordinate of this entity */
+  /**
+   * @return Block x-coordinate of this entity
+   */
   public int getBlockX() {
     return MathUtils.floor(posCache.x);
   }
 
-  /** @return Block y-coordinate of this entity */
+  /**
+   * @return Block y-coordinate of this entity
+   */
   public int getBlockY() {
     return MathUtils.floor(posCache.y);
   }

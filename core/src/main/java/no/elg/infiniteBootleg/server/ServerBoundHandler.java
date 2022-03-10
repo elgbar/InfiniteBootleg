@@ -17,7 +17,9 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
   public static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);

@@ -2,7 +2,9 @@ package no.elg.infiniteBootleg;
 
 import no.elg.infiniteBootleg.util.Ticker;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public interface Ticking {
 
   /**

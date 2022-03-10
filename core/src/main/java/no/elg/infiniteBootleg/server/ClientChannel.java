@@ -19,7 +19,9 @@ import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ClientChannel {
 
   @Nullable private Channel channel;

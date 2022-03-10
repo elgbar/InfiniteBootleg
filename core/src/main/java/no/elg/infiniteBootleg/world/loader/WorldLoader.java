@@ -19,7 +19,9 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class WorldLoader {
 
   public static final String WORLD_INFO_PATH = "world.dat";

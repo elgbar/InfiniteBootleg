@@ -224,7 +224,9 @@ public class Util {
     return calcHash.equals(FALLBACK_VERSION) ? savedHash : calcHash;
   }
 
-  /** @return The latest commit ID in the current repo */
+  /**
+   * @return The latest commit ID in the current repo
+   */
   public static String getLastGitCommitID(final boolean full) {
     final String hashCommand = "git log --format=%H -n 1";
     try {
@@ -240,7 +242,9 @@ public class Util {
     }
   }
 
-  /** @return The number of commits in this repository */
+  /**
+   * @return The number of commits in this repository
+   */
   public static int commitCount() {
     final String countCommand = "git rev-list HEAD --count";
     try {

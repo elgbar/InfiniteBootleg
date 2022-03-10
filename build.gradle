@@ -69,7 +69,7 @@ subprojects {
     }
     java {
       removeUnusedImports()
-      googleJavaFormat("1.13.0")
+      googleJavaFormat("1.15.0")
     }
     kotlin {
       ktlint("0.44.0").userData([

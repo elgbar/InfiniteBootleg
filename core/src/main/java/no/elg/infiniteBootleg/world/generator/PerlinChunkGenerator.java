@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class PerlinChunkGenerator implements ChunkGenerator {
 
   private static final float CAVE_CREATION_THRESHOLD =

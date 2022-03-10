@@ -7,7 +7,9 @@ import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class FlatChunkGenerator implements ChunkGenerator {
 
   @Override

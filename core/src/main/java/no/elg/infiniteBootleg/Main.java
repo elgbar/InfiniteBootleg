@@ -9,7 +9,9 @@ import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public interface Main extends ApplicationListener {
 
   String EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar;
@@ -31,22 +33,30 @@ public interface Main extends ApplicationListener {
     return CommonMain.inst();
   }
 
-  /** @return If this is a client of a server */
+  /**
+   * @return If this is a client of a server
+   */
   static boolean isServerClient() {
     return Settings.client && ClientMain.inst().getServerClient() != null;
   }
 
-  /** @return If this is a server instance (i.e., is NOT rendering) */
+  /**
+   * @return If this is a server instance (i.e., is NOT rendering)
+   */
   static boolean isServer() {
     return !Settings.client;
   }
 
-  /** @return If this is a client instance (i.e., is rendering) */
+  /**
+   * @return If this is a client instance (i.e., is rendering)
+   */
   static boolean isClient() {
     return Settings.client;
   }
 
-  /** @return If this is a singleplayer instance */
+  /**
+   * @return If this is a singleplayer instance
+   */
   static boolean isSingleplayer() {
     if (Settings.client) {
       ClientMain clientMain = ClientMain.inst();
@@ -63,7 +73,9 @@ public interface Main extends ApplicationListener {
     return !Settings.client || ClientMain.inst().getServerClient() != null;
   }
 
-  /** @return If this instance is authoritative (i.e., have the final say) */
+  /**
+   * @return If this instance is authoritative (i.e., have the final say)
+   */
   static boolean isAuthoritative() {
     return isServer() || isSingleplayer();
   }

@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public enum Direction {
   NORTH(0, 1),
   NORTH_EAST(1, 1),

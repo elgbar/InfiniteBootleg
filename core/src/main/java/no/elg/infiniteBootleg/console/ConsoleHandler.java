@@ -188,7 +188,9 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     return false;
   }
 
-  /** @see com.strongjoshua.console.Console#log(String, LogLevel) */
+  /**
+   * @see com.strongjoshua.console.Console#log(String, LogLevel)
+   */
   @Override
   public void log(@NotNull LogLevel level, @NotNull String msg) {
     try {

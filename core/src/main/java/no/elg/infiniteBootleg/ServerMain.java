@@ -10,7 +10,9 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ServerMain extends CommonMain {
 
   private static ServerMain inst;

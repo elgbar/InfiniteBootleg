@@ -10,7 +10,9 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ClientBoundHandler extends SimpleChannelInboundHandler<Packet> {
 
   public static final String TAG = "CLIENT";

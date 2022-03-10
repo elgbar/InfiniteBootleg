@@ -280,7 +280,9 @@ public abstract class World implements Disposable, Resizable {
     return builder.build();
   }
 
-  /** @return The current folder of the world or {@code null} if no disk should be used */
+  /**
+   * @return The current folder of the world or {@code null} if no disk should be used
+   */
   @Nullable
   public FileHandle getWorldFolder() {
     if (Settings.loadWorldFromDisk) {
@@ -646,7 +648,9 @@ public abstract class World implements Disposable, Resizable {
     return chunk.getRawBlock(localX, localY);
   }
 
-  /** @return If the given chunk is loaded in memory */
+  /**
+   * @return If the given chunk is loaded in memory
+   */
   public boolean isChunkLoaded(int chunkX, int chunkY) {
     return isChunkLoaded(new Location(chunkX, chunkY));
   }
@@ -719,7 +723,9 @@ public abstract class World implements Disposable, Resizable {
     Main.logger().log("World", "World reloaded last save");
   }
 
-  /** @return All currently loaded chunks */
+  /**
+   * @return All currently loaded chunks
+   */
   public Array<Chunk> getLoadedChunks() {
     chunksReadLock.lock();
     try {
@@ -976,12 +982,16 @@ public abstract class World implements Disposable, Resizable {
     return chunks;
   }
 
-  /** @return The random seed of this world */
+  /**
+   * @return The random seed of this world
+   */
   public long getSeed() {
     return seed;
   }
 
-  /** @return The name of the world */
+  /**
+   * @return The name of the world
+   */
   public @NotNull String getName() {
     return name;
   }
@@ -990,12 +1000,16 @@ public abstract class World implements Disposable, Resizable {
     this.name = name;
   }
 
-  /** @return Unique identification of this world */
+  /**
+   * @return Unique identification of this world
+   */
   public @NotNull UUID getUuid() {
     return uuid;
   }
 
-  /** @return The current world tick */
+  /**
+   * @return The current world tick
+   */
   public long getTick() {
     return worldTicker.getTickId();
   }
@@ -1008,7 +1022,9 @@ public abstract class World implements Disposable, Resizable {
     return worldTicker;
   }
 
-  /** @return the current entities */
+  /**
+   * @return the current entities
+   */
   public @NotNull Collection<Entity> getEntities() {
     return entities.values();
   }

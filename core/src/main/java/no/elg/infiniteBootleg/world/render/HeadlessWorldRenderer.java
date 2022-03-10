@@ -14,7 +14,9 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class HeadlessWorldRenderer implements WorldRender {
 
   @NotNull

@@ -30,7 +30,9 @@ import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ClientWorldRender implements WorldRender {
 
   @NotNull public final ClientWorld world;
@@ -107,7 +109,9 @@ public class ClientWorldRender implements WorldRender {
     }
   }
 
-  /** @return How many blocks there currently are horizontally on screen */
+  /**
+   * @return How many blocks there currently are horizontally on screen
+   */
   public int blocksHorizontally() {
     return (int) Math.ceil(camera.viewportWidth * camera.zoom / BLOCK_SIZE) + 1;
   }

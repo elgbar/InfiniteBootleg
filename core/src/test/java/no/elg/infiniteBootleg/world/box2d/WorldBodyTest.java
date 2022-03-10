@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class WorldBodyTest {
 
   @Test

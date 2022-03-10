@@ -8,7 +8,9 @@ import static org.junit.Assert.assertTrue;
 import no.elg.infiniteBootleg.world.Location;
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class CoordUtilTest {
 
   @Test

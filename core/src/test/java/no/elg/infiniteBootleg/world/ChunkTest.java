@@ -14,7 +14,9 @@ import no.elg.infiniteBootleg.TestGraphic;
 import org.junit.Before;
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ChunkTest extends TestGraphic {
 
   private ChunkImpl chunk;

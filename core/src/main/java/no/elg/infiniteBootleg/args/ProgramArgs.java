@@ -17,7 +17,9 @@ import no.elg.infiniteBootleg.util.Util;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 @SuppressWarnings("unused")
 public class ProgramArgs implements ConsoleLogger, Disposable {
 

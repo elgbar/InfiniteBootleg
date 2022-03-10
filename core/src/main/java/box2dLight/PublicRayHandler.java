@@ -3,7 +3,9 @@ package box2dLight;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class PublicRayHandler extends RayHandler {
 
   public PublicRayHandler(World world) {

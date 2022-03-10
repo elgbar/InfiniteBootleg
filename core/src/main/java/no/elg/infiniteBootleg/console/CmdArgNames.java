@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CmdArgNames {
 
-  /** @return Names of arguments to the annotated command (in order) */
+  /**
+   * @return Names of arguments to the annotated command (in order)
+   */
   String[] value();
 }

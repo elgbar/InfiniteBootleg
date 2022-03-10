@@ -37,7 +37,9 @@ import no.elg.infiniteBootleg.world.time.WorldTime;
 import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 @SuppressWarnings("unused")
 public class Commands extends CommandExecutor {
 

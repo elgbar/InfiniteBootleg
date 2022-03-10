@@ -17,7 +17,9 @@ import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.junit.Before;
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class WorldTest extends TestGraphic {
 
   private Location loc;

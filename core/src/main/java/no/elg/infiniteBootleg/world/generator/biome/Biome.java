@@ -9,7 +9,9 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public enum Biome {
   PLAINS(0.1f, 0.9f, 64, 0.009f, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
   MOUNTAINS(

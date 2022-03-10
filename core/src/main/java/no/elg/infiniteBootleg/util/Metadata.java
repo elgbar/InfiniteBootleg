@@ -3,7 +3,9 @@ package no.elg.infiniteBootleg.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public interface Metadata {
 
   @Nullable

@@ -8,7 +8,9 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public abstract class AbstractEntityControls extends InputAdapter implements EntityControls {
 
   private final ClientWorldRender worldRender;

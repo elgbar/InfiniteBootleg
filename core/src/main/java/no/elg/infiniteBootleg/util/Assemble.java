@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.util;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public interface Assemble {
 
   /**

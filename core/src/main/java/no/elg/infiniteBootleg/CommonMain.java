@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public abstract class CommonMain extends ApplicationAdapter implements Main {
 
   private static Main inst;

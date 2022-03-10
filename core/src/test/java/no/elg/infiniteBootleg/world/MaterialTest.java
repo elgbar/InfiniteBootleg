@@ -3,7 +3,9 @@ package no.elg.infiniteBootleg.world;
 import no.elg.infiniteBootleg.TestGraphic;
 import org.junit.Test;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class MaterialTest extends TestGraphic {
 
   @Test

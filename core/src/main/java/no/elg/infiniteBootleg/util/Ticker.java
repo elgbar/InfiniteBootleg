@@ -190,7 +190,9 @@ public class Ticker implements Runnable {
     return nanoDelayBetweenTicks;
   }
 
-  /** @return How many ticks have passed since start */
+  /**
+   * @return How many ticks have passed since start
+   */
   public long getTickId() {
     return tickId;
   }
@@ -215,7 +217,9 @@ public class Ticker implements Runnable {
     return tickRareRate;
   }
 
-  /** @return Nanoseconds between each tick */
+  /**
+   * @return Nanoseconds between each tick
+   */
   public long getTpsDelta() {
     return tpsDelta;
   }

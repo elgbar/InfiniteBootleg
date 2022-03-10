@@ -6,7 +6,9 @@ import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class ClientWorld extends World {
 
   private final ClientWorldRender render;

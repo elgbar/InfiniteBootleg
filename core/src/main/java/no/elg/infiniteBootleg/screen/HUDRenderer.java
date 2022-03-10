@@ -25,7 +25,9 @@ import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.Nullable;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class HUDRenderer implements Renderer {
 
   private HUDModus modus;

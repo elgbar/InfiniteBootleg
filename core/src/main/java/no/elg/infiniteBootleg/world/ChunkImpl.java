@@ -432,7 +432,9 @@ public class ChunkImpl implements Chunk {
     return lastViewedTick;
   }
 
-  /** @return If the chunk has been modified since creation */
+  /**
+   * @return If the chunk has been modified since creation
+   */
   @Override
   public boolean shouldSave() {
     return modified || !getEntities().isEmpty();

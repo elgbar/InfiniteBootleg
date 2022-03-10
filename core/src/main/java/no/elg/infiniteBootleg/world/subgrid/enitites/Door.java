@@ -25,7 +25,9 @@ import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 
-/** @author Elg */
+/**
+ * @author Elg
+ */
 public class Door extends MaterialEntity {
 
   public static final String OPEN_DOOR_REGION_NAME = "door_open";

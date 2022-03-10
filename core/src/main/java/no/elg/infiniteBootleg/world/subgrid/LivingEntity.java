@@ -51,7 +51,9 @@ public abstract class LivingEntity extends Entity implements Updatable {
     return bodyDef;
   }
 
-  /** @return If this entity currently has controls */
+  /**
+   * @return If this entity currently has controls
+   */
   public abstract boolean hasControls();
 
   public int getHealth() {
@@ -78,7 +80,9 @@ public abstract class LivingEntity extends Entity implements Updatable {
     this.maxHealth = maxHealth;
   }
 
-  /** @return How this entity should be controlled (if at all) */
+  /**
+   * @return How this entity should be controlled (if at all)
+   */
   @Nullable
   public abstract EntityControls getControls();
 
