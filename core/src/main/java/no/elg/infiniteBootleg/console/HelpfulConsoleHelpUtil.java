@@ -44,7 +44,7 @@ public final class HelpfulConsoleHelpUtil {
           sb.append(params[i].getSimpleName());
           if (names != null && i < names.length) {
             sb.append(' ');
-            sb.append(names[i]);
+            sb.append(names[i].replace('_', '-').replace(' ', '-'));
           }
           sb.append("> ");
           if (i < doc.paramDescriptions().length) {
@@ -84,7 +84,7 @@ public final class HelpfulConsoleHelpUtil {
 
       if (names != null && i < names.length) {
         sb.append(' ');
-        sb.append(names[i]);
+        sb.append(names[i].replace('_', '-').replace(' ', '-'));
       }
       sb.append('>');
 
