@@ -29,7 +29,7 @@ public class HeadlessWorldRenderer implements WorldRender {
   private final Lock readLock = lock.readLock();
   private final Lock writeLock = lock.writeLock();
 
-  @NotNull private OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
+  @NotNull private final OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
 
   public HeadlessWorldRenderer(@NotNull ServerWorld world) {
     this.world = world;
@@ -39,24 +39,24 @@ public class HeadlessWorldRenderer implements WorldRender {
   @Override
   public synchronized void render() {
     chunkIterator.reset();
-    while (true) {
-      Chunk chunk;
-      // An ugly (but more performant) way of locking the for chunk reading
-      world.chunksReadLock.lock();
-      try {
+    // An ugly (but more performant) way of locking the for chunk reading
+    world.chunksReadLock.lock();
+    try {
+      while (true) {
+        Chunk chunk;
         if (chunkIterator.hasNext()) {
           ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
           chunk = entry.value;
         } else {
           break;
         }
-      } finally {
-        world.chunksReadLock.unlock();
-      }
 
-      if (chunk != null && chunk.isValid() && chunk.isDirty()) {
-        chunk.getChunkBody().update(true);
+        if (chunk != null && chunk.isValid() && chunk.isDirty()) {
+          chunk.getChunkBody().update(true);
+        }
       }
+    } finally {
+      world.chunksReadLock.unlock();
     }
   }
 

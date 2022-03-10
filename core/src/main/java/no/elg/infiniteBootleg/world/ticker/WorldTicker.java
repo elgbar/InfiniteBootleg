@@ -65,15 +65,6 @@ public class WorldTicker extends Ticker {
 
     private final Array<ForkJoinTask<?>> forks = new Array<>(false, 48);
 
-    private void chunkIterRemove() {
-      world.chunksWriteLock.lock();
-      try {
-        chunkIterator.remove();
-      } finally {
-        world.chunksWriteLock.unlock();
-      }
-    }
-
     @Override
     public synchronized void tick() {
 
@@ -85,37 +76,36 @@ public class WorldTicker extends Ticker {
       chunkIterator.reset();
       ForkJoinPool pool = ForkJoinPool.commonPool();
 
-      while (true) {
-        Chunk chunk;
-        // An ugly (but more performant) way of locking the for chunk reading
-        world.chunksReadLock.lock();
-        try {
+      world.chunksWriteLock.lock();
+      try {
+        while (true) {
+          Chunk chunk;
           if (chunkIterator.hasNext()) {
             ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
             chunk = entry.value;
           } else {
             break;
           }
-        } finally {
-          world.chunksReadLock.unlock();
-        }
 
-        // clean up dead chunks
-        if (chunk == null || !chunk.isLoaded()) {
-          chunkIterRemove();
-          continue;
-        }
-        if (chunk.isAllowingUnloading()
-            && wr.isOutOfView(chunk)
-            && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
+          // clean up dead chunks
+          if (chunk == null || !chunk.isLoaded()) {
+            chunkIterator.remove();
+            continue;
+          }
+          if (chunk.isAllowingUnloading()
+              && wr.isOutOfView(chunk)
+              && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
-          world.unloadChunk(chunk);
-          chunkIterRemove();
-          continue;
+            world.unloadChunk(chunk);
+            chunkIterator.remove();
+            continue;
+          }
+          ForkJoinTask<?> task = pool.submit(chunk::tick);
+          forks.add(task);
+          task.fork();
         }
-        ForkJoinTask<?> task = pool.submit(chunk::tick);
-        forks.add(task);
-        task.fork();
+      } finally {
+        world.chunksWriteLock.unlock();
       }
       for (Entity entity : world.getEntities()) {
         if (entity.isInvalid()) {
