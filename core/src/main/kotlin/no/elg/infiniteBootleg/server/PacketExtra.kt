@@ -278,6 +278,12 @@ fun clientBoundHeartbeat(): Packet {
 //   DUAL   //
 // ////////////
 
+/**
+ * Helper method to send either a server bound or client bound packet depending on which this instance currently is.
+ *
+ * @param ifIsServer The packet to send if we are the server
+ * @param ifIsClient The packet to send if we are a server client
+ */
 fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Packet) {
   if (Main.isServer()) {
     broadcast(ifIsServer())
