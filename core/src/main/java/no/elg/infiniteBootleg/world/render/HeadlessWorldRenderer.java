@@ -38,10 +38,10 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public synchronized void render() {
-    chunkIterator.reset();
     // An ugly (but more performant) way of locking the for chunk reading
     world.chunksReadLock.lock();
     try {
+      chunkIterator.reset();
       while (true) {
         Chunk chunk;
         if (chunkIterator.hasNext()) {

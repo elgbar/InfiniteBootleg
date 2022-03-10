@@ -73,11 +73,11 @@ public class WorldTicker extends Ticker {
 
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
-      chunkIterator.reset();
       ForkJoinPool pool = ForkJoinPool.commonPool();
 
       world.chunksWriteLock.lock();
       try {
+        chunkIterator.reset();
         while (true) {
           Chunk chunk;
           if (chunkIterator.hasNext()) {
