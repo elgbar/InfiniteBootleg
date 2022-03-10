@@ -72,10 +72,10 @@ subprojects {
       googleJavaFormat("1.13.0")
     }
     kotlin {
-      ktlint("0.43.2").userData([
-          "indent_size"             : "2",
-          "continuation_indent_size": "2",
-          "max_line_length"         : "180",
+      ktlint("0.44.0").userData([
+         "indent_size"             : "2",
+         "continuation_indent_size": "2",
+         "max_line_length"         : "180",
       ])
     }
   }
