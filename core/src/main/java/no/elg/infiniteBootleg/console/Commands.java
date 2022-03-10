@@ -373,7 +373,9 @@ public class Commands extends CommandExecutor {
   }
 
   @CmdArgNames({"time of day"})
-  @ConsoleDoc(description = "Set the current time", paramDescriptions = "Time of day")
+  @ConsoleDoc(
+      description = "Set the current time",
+      paramDescriptions = "Time of day such as day, noon, dusk, night")
   public void time(String timeOfDay) {
     float time;
     try {
@@ -382,9 +384,11 @@ public class Commands extends CommandExecutor {
     } catch (NumberFormatException ignored) {
 
       switch (timeOfDay.toLowerCase()) {
-        case "day", "dawn", "sunrise" -> time = WorldTime.SUNRISE_TIME;
+        case "dawn" -> time = WorldTime.DAWN_TIME;
+        case "day", "sunrise" -> time = WorldTime.SUNRISE_TIME;
         case "midday", "noon" -> time = WorldTime.MIDDAY_TIME;
-        case "dusk", "sunset" -> time = WorldTime.SUNSET_TIME;
+        case "sunset" -> time = WorldTime.SUNSET_TIME;
+        case "dusk" -> time = WorldTime.DUSK_TIME;
         case "midnight", "night" -> time = WorldTime.MIDNIGHT_TIME;
         case "end" -> time = Integer.MAX_VALUE;
         default -> {
@@ -399,7 +403,9 @@ public class Commands extends CommandExecutor {
   }
 
   @CmdArgNames({"time"})
-  @ConsoleDoc(description = "Set the current time", paramDescriptions = "The new time")
+  @ConsoleDoc(
+      description = "Set the current time",
+      paramDescriptions = "The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc")
   public void time(float time) {
     float old = Main.inst().getWorld().getWorldTime().getTime();
     Main.inst().getWorld().getWorldTime().setTime(time);

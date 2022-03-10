@@ -35,15 +35,13 @@ public class WorldLightTicker implements Ticking {
         if (skylight != null) {
           float currTime = time.getTime();
           skylight.setDirection(currTime);
-          if (time.normalizedTime() >= 180) {
-            float brightness = time.getSkyBrightness(currTime);
-            if (brightness > 0) {
-              Color newColor =
-                  tmpColor.set(time.getBaseColor()).mul(brightness, brightness, brightness, 1);
-              skylight.setColor(newColor);
-            } else if (!skylight.getColor().equals(Color.BLACK)) {
-              skylight.setColor(Color.BLACK);
-            }
+          float brightness = time.getSkyBrightness(currTime);
+          if (brightness > 0) {
+            Color newColor =
+                tmpColor.set(time.getBaseColor()).mul(brightness, brightness, brightness, 1);
+            skylight.setColor(newColor);
+          } else if (!skylight.getColor().equals(Color.BLACK)) {
+            skylight.setColor(Color.BLACK);
           }
         }
       }

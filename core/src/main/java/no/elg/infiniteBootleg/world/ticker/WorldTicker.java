@@ -163,7 +163,7 @@ public class WorldTicker extends Ticker {
       WorldTime time = world.getWorldTime();
       time.setTime(
           time.getTime()
-              - world.getWorldTicker().getSecondsDelayBetweenTicks() * time.getTimeScale());
+              + world.getWorldTicker().getSecondsDelayBetweenTicks() * time.getTimeScale());
     }
   }
 

@@ -11,15 +11,28 @@ public class WorldTime {
    * How many degrees the time light should have before triggering sunset/sunrise. This will happen
    * from {@code -TWILIGHT_DEGREES} to {@code +TWILIGHT_DEGREES}
    */
-  public static final float TWILIGHT_DEGREES = 20;
+  public static final float TWILIGHT_DEGREES = 18;
 
-  public static final float SUNSET_TIME = -180 + TWILIGHT_DEGREES;
-  public static final float SUNRISE_TIME = 0;
-  public static final float MIDDAY_TIME = -90;
-  public static final float MIDNIGHT_TIME = -270;
+  /** The moment the sun is parallel to the horizon and is rising */
+  public static final float SUNRISE_TIME = 180 + TWILIGHT_DEGREES;
+  /** When the world begins to lighten up */
+  public static final float DAWN_TIME = 180;
+
+  /** The moment the sun is parallel to the horizon and is sinking */
+  public static final float SUNSET_TIME = 0;
+  /** When there is no more ambient light from the sun */
+  public static final float DUSK_TIME = SUNSET_TIME + TWILIGHT_DEGREES;
+
+  /** Middle of the day */
+  public static final float MIDDAY_TIME = 270;
+
+  /** Middle of the night */
+  public static final float MIDNIGHT_TIME = 90;
+
   @NotNull private final World world;
   @NotNull private final Color baseColor = new Color(Color.WHITE);
-  private volatile float time = MIDDAY_TIME;
+
+  private volatile float time = SUNRISE_TIME;
   private volatile float timeScale = 1f;
 
   public WorldTime(World world) {
@@ -51,18 +64,17 @@ public class WorldTime {
    */
   public float getSkyBrightness(float time) {
     float dir = Util.normalizedDir(time);
-    float gray = 0;
 
-    if (dir <= 180) {
+    if (dir >= DAWN_TIME && dir <= SUNRISE_TIME) {
+      return (dir - DAWN_TIME) / TWILIGHT_DEGREES;
+    } else if (dir >= SUNSET_TIME && dir <= DUSK_TIME) {
+      return 1 - dir / TWILIGHT_DEGREES;
+    } else if (dir <= 180) {
       return 0;
-    } else if (dir > 360 - WorldTime.TWILIGHT_DEGREES && dir < 360) {
-      gray = (360 - dir) / (WorldTime.TWILIGHT_DEGREES);
-    } else if (dir >= 180 && dir <= 180 + WorldTime.TWILIGHT_DEGREES) {
-      gray = ((dir - 180) / (WorldTime.TWILIGHT_DEGREES));
     } else if (dir > 180) {
-      gray = 1; // white
+      return 1;
     }
-    return gray;
+    return 1;
   }
 
   public float normalizedTime() {
