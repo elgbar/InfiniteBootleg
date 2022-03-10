@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Server + 2 clients" type="CompoundRunConfigurationType">
+    <toRun name="A srv" type="Application" />
     <toRun name="B Run" type="Application" />
     <toRun name="C Run" type="Application" />
-    <toRun name="A srv" type="Application" />
     <method v="2" />
   </configuration>
 </component>
