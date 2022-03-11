@@ -60,6 +60,7 @@ public class ChunkImpl implements Chunk {
   private volatile boolean allowUnload;
   private volatile boolean initializing;
   private volatile boolean allAir;
+  private volatile boolean disposed;
   private volatile long lastViewedTick;
   private TextureRegion fboRegion;
   private FileHandle chunkFile;
@@ -529,7 +530,16 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
+  public synchronized boolean getDisposed() {
+    return disposed;
+  }
+
+  @Override
   public synchronized void dispose() {
+    if (disposed) {
+      return;
+    }
+
     loaded = false;
     allowUnload = false;
 

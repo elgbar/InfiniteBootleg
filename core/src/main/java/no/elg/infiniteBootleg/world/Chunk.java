@@ -5,8 +5,8 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import java.util.stream.Stream;
+import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -23,7 +23,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public interface Chunk extends Iterable<@Nullable Block>, Ticking, Disposable, Comparable<Chunk> {
+public interface Chunk
+    extends Iterable<@Nullable Block>, Ticking, CheckableDisposable, Comparable<Chunk> {
 
   int CHUNK_SIZE = 32;
   int CHUNK_TEXTURE_SIZE = CHUNK_SIZE * BLOCK_SIZE;
