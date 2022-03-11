@@ -172,6 +172,8 @@ public interface Chunk
    */
   boolean isValid();
 
+  boolean isInvalid();
+
   /**
    * If {@code isAllowingUnloading} is {@code false} this chunk cannot be unloaded
    *

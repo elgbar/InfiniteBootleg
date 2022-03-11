@@ -47,7 +47,7 @@ public class ChunkImpl implements Chunk {
   private final int chunkY;
 
   /**
-   * Must be accessed under a synchronized self block i.e {@code synchronized(tickingBlocks){...}}
+   * Must be accessed under a synchronized self block i.e, {@code synchronized(tickingBlocks){...}}
    */
   private final Array<TickingBlock> tickingBlocks;
 
@@ -56,9 +56,13 @@ public class ChunkImpl implements Chunk {
   private volatile boolean dirty; // if texture/allair needs to be updated
   private volatile boolean prioritize;
   private volatile boolean modified; // if the chunk has been modified since loaded
-  private volatile boolean loaded; // once unloaded it no longer is valid
   private volatile boolean allowUnload;
+  /**
+   * If the chunk is still being initialized, meaning not all blocks are in {@link #blocks} and
+   * {@link #tickingBlocks} does not contain all blocks it should
+   */
   private volatile boolean initializing;
+
   private volatile boolean allAir;
   private volatile boolean disposed;
   private volatile long lastViewedTick;
@@ -99,7 +103,7 @@ public class ChunkImpl implements Chunk {
     prioritize = false;
 
     allAir = false;
-    loaded = true;
+    disposed = false;
     allowUnload = true;
     modified = false;
     initializing = true;
@@ -146,7 +150,7 @@ public class ChunkImpl implements Chunk {
       boolean updateTexture,
       boolean prioritize,
       boolean sendUpdatePacket) {
-    Preconditions.checkState(loaded, "Chunk is not loaded");
+    Preconditions.checkState(!disposed, "Chunk is not loaded");
 
     if (block != null) {
       Preconditions.checkArgument(block.getLocalX() == localX);
@@ -261,7 +265,7 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public void updateTextureIfDirty() {
-    if (initializing) {
+    if (isInvalid()) {
       return;
     }
     synchronized (this) {
@@ -314,7 +318,9 @@ public class ChunkImpl implements Chunk {
   /** Update all updatable blocks in this chunk */
   @Override
   public void tick() {
-    Preconditions.checkState(loaded, "Chunk is not loaded");
+    if (isInvalid()) {
+      return;
+    }
     // OK to not synchronize over tickingBlocks as the iterator implementation should not result in
     // any errors
     for (TickingBlock block : tickingBlocks) {
@@ -324,7 +330,9 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public void tickRare() {
-    Preconditions.checkState(loaded, "Chunk is not loaded");
+    if (isInvalid()) {
+      return;
+    }
     // OK to not synchronize over tickingBlocks as the iterator implementation should not result in
     // any errors
     for (TickingBlock block : tickingBlocks) {
@@ -360,17 +368,22 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public boolean isLoaded() {
-    return loaded;
+    return !disposed;
   }
 
   @Override
   public boolean isValid() {
-    return loaded && !initializing;
+    return !disposed && !initializing;
+  }
+
+  @Override
+  public boolean isInvalid() {
+    return disposed || initializing;
   }
 
   @Override
   public void setAllowUnload(boolean allowUnload) {
-    if (!loaded) {
+    if (disposed) {
       return; // already unloaded
     }
     this.allowUnload = allowUnload;
@@ -483,7 +496,7 @@ public class ChunkImpl implements Chunk {
   @Override
   @NotNull
   public Block getBlock(int localX, int localY) {
-    Preconditions.checkState(loaded, "Chunk is not loaded");
+    Preconditions.checkState(isValid(), "Chunk is not loaded");
     Preconditions.checkArgument(
         CoordUtil.isInsideChunk(localX, localY),
         "Given arguments are not inside this chunk, localX=" + localX + " localY=" + localY);
@@ -541,7 +554,6 @@ public class ChunkImpl implements Chunk {
     }
     disposed = true;
 
-    loaded = false;
     allowUnload = false;
 
     if (fbo != null) {
@@ -639,7 +651,8 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public boolean load(ProtoWorld.Chunk protoChunk) {
-
+    Preconditions.checkState(
+        initializing, "Cannot load from proto chunk after chunk has been initialized");
     final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
     var posErrorMsg =
         "Invalid chunk coordinates given. Expected ("
@@ -715,8 +728,8 @@ public class ChunkImpl implements Chunk {
         + chunkX
         + ", chunkY="
         + chunkY
-        + ", loaded="
-        + loaded
+        + ", valid="
+        + isValid()
         + '}';
   }
 
