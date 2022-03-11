@@ -68,10 +68,10 @@ public class WorldLoader {
       try {
         var proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes());
         Player player = new Player(world, proto);
+        player.disableGravity();
+        world.addEntity(player);
         if (!player.isInvalid()) {
           Main.logger().debug("SERVER", "Loading persisted player profile for " + playerId);
-          player.disableGravity();
-          world.addEntity(player);
           return player;
         } else {
           Main.logger().error("SERVER", "Invalid player parsed");
