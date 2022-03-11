@@ -327,10 +327,15 @@ public abstract class World implements Disposable, Resizable {
   public void updateChunk(@NotNull Chunk chunk) {
     Preconditions.checkState(chunk.isValid());
     chunksWriteLock.lock();
+    Chunk old;
     try {
-      chunks.put(new Location(chunk.getChunkX(), chunk.getChunkY()), chunk);
+      old = chunks.put(new Location(chunk.getChunkX(), chunk.getChunkY()), chunk);
     } finally {
       chunksWriteLock.unlock();
+    }
+
+    if (old != null) {
+      old.dispose();
     }
   }
 
@@ -342,6 +347,7 @@ public abstract class World implements Disposable, Resizable {
     }
     // This is a long lock, it must appear to be an atomic operation though
     Chunk readChunk;
+    Chunk old = null;
     chunksReadLock.lock();
     try {
       readChunk = chunks.get(chunkLoc);
@@ -357,15 +363,18 @@ public abstract class World implements Disposable, Resizable {
         }
         Chunk loadedChunk = chunkLoader.load(chunkLoc);
         if (loadedChunk == null) {
-          chunks.remove(chunkLoc);
+          old = chunks.remove(chunkLoc);
           return null;
         } else {
           Preconditions.checkState(loadedChunk.isValid());
-          chunks.put(chunkLoc, loadedChunk);
+          old = chunks.put(chunkLoc, loadedChunk);
           return loadedChunk;
         }
       } finally {
         chunksWriteLock.unlock();
+        if (old != null) {
+          old.dispose();
+        }
       }
     }
     return readChunk;
@@ -759,6 +768,7 @@ public abstract class World implements Disposable, Resizable {
    */
   public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
     if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
+      Chunk old = null;
       chunksWriteLock.lock();
       try {
         if (save) {
@@ -768,9 +778,12 @@ public abstract class World implements Disposable, Resizable {
           removeEntity(entity, CHUNK_UNLOADED);
         }
         chunk.dispose();
-        chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
+        old = chunks.remove(new Location(chunk.getChunkX(), chunk.getChunkY()));
       } finally {
         chunksWriteLock.unlock();
+        if (old != null) {
+          old.dispose();
+        }
       }
     }
   }
