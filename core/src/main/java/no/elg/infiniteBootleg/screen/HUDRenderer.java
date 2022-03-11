@@ -153,9 +153,14 @@ public class HUDRenderer implements Renderer {
 
   private String time(ClientWorld world) {
     WorldTime worldTime = world.getWorldTime();
-    String format = "time: %.2f scale: %.2f sky brightness: %s";
+    String format = "time: %.2f (%.2f) scale: %.2f sky brightness: %.2f TOD: %s ";
     return String.format(
-        format, worldTime.getTime(), worldTime.getTimeScale(), worldTime.getSkyBrightness());
+        format,
+        worldTime.getTime(),
+        worldTime.normalizedTime(),
+        worldTime.getTimeScale(),
+        worldTime.getSkyBrightness(),
+        worldTime.timeOfDay(worldTime.getTime()));
   }
 
   private String viewChunk(ClientWorld world, Entity player) {
