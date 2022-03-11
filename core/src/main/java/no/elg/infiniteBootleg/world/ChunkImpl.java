@@ -162,7 +162,7 @@ public class ChunkImpl implements Chunk {
       if (isAirish(currBlock, block)) {
         // Ok to return here, only internal change
         if (currBlock != null) {
-          currBlock.dispose();
+          currBlock.tryDispose();
           blocks[localX][localY] = null;
           return null;
         }
@@ -170,7 +170,7 @@ public class ChunkImpl implements Chunk {
       }
 
       if (currBlock != null) {
-        currBlock.dispose();
+        currBlock.tryDispose();
 
         if (currBlock instanceof TickingBlock tickingBlock) {
           tickingBlocks.removeValue(tickingBlock, true);
@@ -543,7 +543,7 @@ public class ChunkImpl implements Chunk {
     for (Block[] blockArr : blocks) {
       for (Block block : blockArr) {
         if (block != null) {
-          block.dispose();
+          block.tryDispose();
         }
       }
     }

@@ -5,7 +5,6 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.CheckableDisposable;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
@@ -184,17 +183,6 @@ public class Block
 
   public void load(ProtoWorld.Block protoBlock) {
     Preconditions.checkArgument(protoBlock.getMaterialOrdinal() == material.ordinal());
-  }
-
-  public void tryDispose() {
-    if (disposed) {
-      return;
-    }
-    dispose();
-  }
-
-  public boolean isDisposed() {
-    return disposed;
   }
 
   @Override
