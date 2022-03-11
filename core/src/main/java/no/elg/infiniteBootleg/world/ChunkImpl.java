@@ -539,6 +539,7 @@ public class ChunkImpl implements Chunk {
     if (disposed) {
       return;
     }
+    disposed = true;
 
     loaded = false;
     allowUnload = false;
