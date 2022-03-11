@@ -38,25 +38,11 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public synchronized void render() {
-    // An ugly (but more performant) way of locking the for chunk reading
-    world.chunksReadLock.lock();
-    try {
-      chunkIterator.reset();
-      while (true) {
-        Chunk chunk;
-        if (chunkIterator.hasNext()) {
-          ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
-          chunk = entry.value;
-        } else {
-          break;
-        }
-
-        if (chunk != null && chunk.isValid() && chunk.isDirty()) {
-          chunk.getChunkBody().update(true);
-        }
+    // Note to self: do not call chunkBody#update while under the chunksReadLock or chunksWriteLock
+    for (Chunk chunk : world.getLoadedChunks()) {
+      if (chunk != null && chunk.isValid() && chunk.isDirty()) {
+        chunk.getChunkBody().update(true);
       }
-    } finally {
-      world.chunksReadLock.unlock();
     }
   }
 
