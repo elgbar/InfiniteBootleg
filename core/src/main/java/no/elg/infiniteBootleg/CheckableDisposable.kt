@@ -7,15 +7,5 @@ interface CheckableDisposable : Disposable {
   /**
    * If this has been disposed
    */
-  val disposed: Boolean
-
-  /**
-   * Call [dispose] if [disposed] is `false`
-   */
-  fun tryDispose() {
-    if (disposed) {
-      return
-    }
-    dispose()
-  }
+  fun isDisposed(): Boolean
 }

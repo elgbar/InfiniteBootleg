@@ -35,7 +35,7 @@ public class WorldTime {
   private volatile float time = SUNRISE_TIME;
   private volatile float timeScale = 1f;
 
-  public WorldTime(World world) {
+  public WorldTime(@NotNull World world) {
     this.world = world;
   }
 

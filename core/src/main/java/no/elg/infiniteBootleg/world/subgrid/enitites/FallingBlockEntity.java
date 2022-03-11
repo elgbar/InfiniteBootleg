@@ -177,7 +177,9 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   @Override
   public void dispose() {
     super.dispose();
-    block.tryDispose();
+    if (!block.isDisposed()) {
+      block.dispose();
+    }
   }
 
   @Nullable

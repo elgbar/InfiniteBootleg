@@ -32,7 +32,7 @@ abstract class LightBlock(
   }
 
   override fun dispose() {
-    if (disposed) return
+    if (isDisposed()) return
     super<TickingBlock>.dispose()
     super<LightTrait>.dispose()
   }

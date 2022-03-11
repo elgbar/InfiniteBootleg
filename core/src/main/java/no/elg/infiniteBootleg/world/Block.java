@@ -5,6 +5,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.CheckableDisposable;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
@@ -202,7 +203,7 @@ public class Block
   }
 
   @Override
-  public boolean getDisposed() {
+  public boolean isDisposed() {
     return disposed;
   }
 

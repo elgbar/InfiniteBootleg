@@ -35,7 +35,7 @@ interface LightTrait : BlockTrait, CheckableDisposable {
         return
       }
       synchronized(this) {
-        if (disposed || light != null) {
+        if (isDisposed() || light != null) {
           return
         }
         val world = block.world

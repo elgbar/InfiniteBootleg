@@ -768,7 +768,7 @@ public abstract class Entity
   }
 
   @Override
-  public synchronized boolean getDisposed() {
+  public synchronized boolean isDisposed() {
     return !valid;
   }
 
