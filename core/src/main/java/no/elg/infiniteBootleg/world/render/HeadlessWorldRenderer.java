@@ -41,7 +41,7 @@ public class HeadlessWorldRenderer implements WorldRender {
     // Note to self: do not call chunkBody#update while under the chunksReadLock or chunksWriteLock
     for (Chunk chunk : world.getLoadedChunks()) {
       if (chunk != null && chunk.isValid() && chunk.isDirty()) {
-        chunk.getChunkBody().update(true);
+        chunk.getChunkBody().update();
       }
     }
   }
@@ -54,7 +54,6 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public void update() {
-    //    Main.logger().debug("Headless rendering", "Updating");
     readLock.lock();
     try {
       for (Player player : world.getPlayers()) {

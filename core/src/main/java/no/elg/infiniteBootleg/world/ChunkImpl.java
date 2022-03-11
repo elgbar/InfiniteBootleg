@@ -284,7 +284,7 @@ public class ChunkImpl implements Chunk {
       }
     }
     if (Main.isServer()) {
-      Main.inst().getScheduler().executeSync(() -> this.getChunkBody().update(true));
+      Main.inst().getScheduler().executeSync(() -> this.getChunkBody().update());
     } else {
       final WorldRender render = world.getRender();
       if (render instanceof ClientWorldRender clientWorldRender) {

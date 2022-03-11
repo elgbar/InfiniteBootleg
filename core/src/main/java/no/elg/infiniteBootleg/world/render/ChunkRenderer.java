@@ -49,7 +49,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     synchronized (QUEUE_LOCK) {
       // do not queue the chunk we're currently rendering
       if (chunk != curr && !renderQueue.contains(chunk)) {
-        Main.inst().getScheduler().executeSync(() -> chunk.getChunkBody().update(true));
+        Main.inst().getScheduler().executeSync(() -> chunk.getChunkBody().update());
         if (prioritize) {
           renderQueue.add(0, chunk);
         } else {

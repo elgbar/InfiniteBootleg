@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
 import com.badlogic.gdx.physics.box2d.EdgeShape
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Updatable
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
@@ -14,7 +15,6 @@ import no.elg.infiniteBootleg.world.Direction.EAST
 import no.elg.infiniteBootleg.world.Direction.NORTH
 import no.elg.infiniteBootleg.world.Direction.SOUTH
 import no.elg.infiniteBootleg.world.Direction.WEST
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import java.util.concurrent.locks.ReentrantLock
@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock
 /**
  * @author Elg
  */
-class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
+class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   private val edgeShape = EdgeShape()
   private val lock = ReentrantLock()
@@ -56,10 +56,6 @@ class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
 
   override fun isDisposed(): Boolean = disposed
 
-  // make there is only one delayed check for this chunk
-  @field:Volatile
-  private var unsureFixture = false
-
   /**calculate the shape of the chunk (box2d)*/
   private val bodyDef = BodyDef().also {
     it.position[chunk.chunkX * CHUNK_SIZE.toFloat()] = chunk.chunkY * CHUNK_SIZE.toFloat()
@@ -73,7 +69,7 @@ class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
    * @param recalculateNeighbors
    * If the neighbors also should be updated
    */
-  fun update(recalculateNeighbors: Boolean) {
+  override fun update() {
     if (isDisposed()) {
       return
     }
@@ -119,6 +115,7 @@ class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
             dir == NORTH && localY == CHUNK_SIZE - 1 || // always render top of chunk
             dir == EAST && localX == CHUNK_SIZE - 1 || // and the east side
             dir == WEST && localX == 0 || // and the west side
+            dir == SOUTH && localY == 0 || // and the bottom
             (!rel.material.blocksLight() && block.material.blocksLight()) // prevent leaking of light
           ) {
 
@@ -154,46 +151,6 @@ class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
       chunk.world.updateLights()
       chunk.world.render.update()
     }
-    var potentiallyDirty = false
-
-    // TODO Try to optimize this (ie select what directions to recalculate)
-    for (direction in Direction.values()) {
-      val relChunk: Location = Location.relative(chunk.chunkX, chunk.chunkY, direction)
-      if (chunk.world.isChunkLoaded(relChunk)) {
-        if (recalculateNeighbors && !direction.isCardinal) {
-          Main.inst().scheduler.executeAsync {
-            chunk.world.getChunk(relChunk)?.chunkBody?.update(false)
-          }
-        }
-      } else {
-        potentiallyDirty = true
-      }
-    }
-    if (potentiallyDirty) {
-      scheduleFixtureReload(true)
-    }
-  }
-
-  @Synchronized
-  private fun scheduleFixtureReload(initial: Boolean) {
-    if (unsureFixture || disposed) {
-      return
-    }
-    unsureFixture = true
-    val delay = if (initial) INITIAL_UNSURE_FIXTURE_RELOAD_DELAY else UNSURE_FIXTURE_RELOAD_DELAY
-    Main.inst().scheduler.scheduleAsync(delay) {
-      if (disposed) {
-        return@scheduleAsync
-      }
-      synchronized(this@ChunkBody) {
-        unsureFixture = false
-        if (chunk.isNeighborsLoaded) {
-          update(recalculateNeighbors = false)
-        } else {
-          scheduleFixtureReload(false)
-        }
-      }
-    }
   }
 
   @Synchronized
@@ -206,8 +163,6 @@ class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
   fun hasBody(): Boolean = box2dBody != null
 
   companion object {
-    const val INITIAL_UNSURE_FIXTURE_RELOAD_DELAY = 10L
-    const val UNSURE_FIXTURE_RELOAD_DELAY = 100L
 
     /**
      * represent the direction to look and if no solid block there how to create a fixture at that location (ie
