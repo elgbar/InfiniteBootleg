@@ -286,16 +286,16 @@ public abstract class Entity
     velCache.x = velX;
     velCache.y = velY;
     if (Main.isServer() && sendMovePacket) {
-      Main.logger()
-          .debug(
-              "server",
-              "Force updating entity "
-                  + hudDebug()
-                  + " to position ("
-                  + posCache.x
-                  + ", "
-                  + posCache.y
-                  + ")");
+      //      Main.logger()
+      //          .debug(
+      //              "server",
+      //              "Force updating entity "
+      //                  + hudDebug()
+      //                  + " to position ("
+      //                  + posCache.x
+      //                  + ", "
+      //                  + posCache.y
+      //                  + ")");
       Main.inst()
           .getScheduler()
           .executeAsync(
