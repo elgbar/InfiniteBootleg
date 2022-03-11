@@ -101,20 +101,11 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
             continue
           }
 
-          val rel = if (CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy)) {
-            chunk.getRawBlock(localX + dir.dx, localY + dir.dy)
-          } else {
-            val relChunk = chunk.world.getChunkFromWorld(worldX + dir.dx, worldY + dir.dy) ?: continue
-            val relOffsetX = CoordUtil.chunkOffset(worldX + dir.dx)
-            val relOffsetY = CoordUtil.chunkOffset(worldY + dir.dy)
-            relChunk.blocks[relOffsetX][relOffsetY]
-          }
-
           edgeShape.set(
-            localX + edgeDelta[0].toFloat(),
-            localY + edgeDelta[1].toFloat(),
-            localX + edgeDelta[2].toFloat(),
-            localY + edgeDelta[3].toFloat()
+            localX + edgeDelta[0],
+            localY + edgeDelta[1],
+            localX + edgeDelta[2],
+            localY + edgeDelta[3]
           )
 
           val fix = synchronized(BOX2D_LOCK) {
@@ -172,11 +163,11 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
      * * `x`/`y` is if this is the `x` or `y` component of the coordinate
      * * `end`/`start` is if this is the start or end vector
      */
-    val EDGE_DEF: Array<Pair<Direction, ByteArray>> = arrayOf(
-      NORTH to byteArrayOf(0, 1, 1, 1),
-      EAST to byteArrayOf(1, 0, 1, 1),
-      SOUTH to byteArrayOf(0, 0, 1, 0),
-      WEST to byteArrayOf(0, 0, 0, 1)
+    private val EDGE_DEF: Array<Pair<Direction, FloatArray>> = arrayOf(
+      NORTH to floatArrayOf(0f, 1f, 1f, 1f),
+      EAST to floatArrayOf(1f, 0f, 1f, 1f),
+      SOUTH to floatArrayOf(0f, 0f, 1f, 0f),
+      WEST to floatArrayOf(0f, 0f, 0f, 1f)
     )
   }
 }
