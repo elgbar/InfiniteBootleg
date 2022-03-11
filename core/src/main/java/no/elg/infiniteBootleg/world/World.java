@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import no.elg.infiniteBootleg.ClientMain;
@@ -342,17 +343,27 @@ public abstract class World implements Disposable, Resizable {
   @Nullable
   public Chunk getChunk(@NotNull Location chunkLoc) {
     if (getWorldTicker().isPaused()) {
-      Main.logger().debug("TICKER", "Ticker paused will not return chunk");
+      Main.logger().debug("World", "Ticker paused will not return chunk");
       return null;
     }
     // This is a long lock, it must appear to be an atomic operation though
     Chunk readChunk;
     Chunk old = null;
-    chunksReadLock.lock();
+    boolean acquiredLock;
     try {
-      readChunk = chunks.get(chunkLoc);
-    } finally {
-      chunksReadLock.unlock();
+      acquiredLock = chunksReadLock.tryLock(100, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      acquiredLock = false;
+    }
+    if (acquiredLock) {
+      try {
+        readChunk = chunks.get(chunkLoc);
+      } finally {
+        chunksReadLock.unlock();
+      }
+    } else {
+      Main.logger().debug("World", "Failed to acquire chunks read lock in 100 ms");
+      return null;
     }
     if (readChunk == null || !readChunk.isLoaded()) {
       chunksWriteLock.lock();
@@ -360,6 +371,9 @@ public abstract class World implements Disposable, Resizable {
         // another thread might have loaded the chunk while we were waiting here
         if (readChunk != null && readChunk.isLoaded()) {
           return readChunk;
+        }
+        if (readChunk != null) {
+          readChunk.dispose();
         }
         Chunk loadedChunk = chunkLoader.load(chunkLoc);
         if (loadedChunk == null) {
