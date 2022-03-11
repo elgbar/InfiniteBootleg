@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
 import com.badlogic.gdx.physics.box2d.EdgeShape
-import com.badlogic.gdx.utils.Disposable
+import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Chunk
@@ -17,16 +17,44 @@ import no.elg.infiniteBootleg.world.Direction.WEST
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * @author Elg
  */
-class ChunkBody(private val chunk: Chunk) : Disposable {
+class ChunkBody(private val chunk: Chunk) : CheckableDisposable {
 
+  private val edgeShape = EdgeShape()
+  private val lock = ReentrantLock()
+
+  /**
+   * The actual box2d body of the chunk.
+   *
+   * The setter is locked under [lock], the old body will automatically be destroyed.
+   *
+   * The getter is **not** locked under [lock]
+   */
+  @field:Volatile
   private var box2dBody: Body? = null
+    set(value) {
+      val oldBody: Body?
+      lock.lock()
+      try {
+        oldBody = field
+        field = value
+      } finally {
+        lock.unlock()
+      }
+      if (oldBody != null) {
+        // We should now be fine to destroy the old body
+        chunk.world.worldBody.destroyBody(oldBody)
+      }
+    }
 
   @field:Volatile
   private var disposed = false
+
+  override fun isDisposed(): Boolean = disposed
 
   // make there is only one delayed check for this chunk
   @field:Volatile
@@ -44,21 +72,16 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
    *
    * @param recalculateNeighbors
    * If the neighbors also should be updated
-   * @param lightsOnly
    */
   fun update(recalculateNeighbors: Boolean) {
-    if (chunk.isAllAir) {
-      destroyCurrentBody()
+    if (isDisposed()) {
       return
     }
-
-    val tmpBody = synchronized(BOX2D_LOCK) {
-      if (disposed) {
-        return
-      }
-      chunk.world.worldBody.createBody(bodyDef)
+    if (chunk.isAllAir) {
+      box2dBody = null
+      return
     }
-    val edgeShape = EdgeShape()
+    val tmpBody = chunk.world.worldBody.createBody(bodyDef)
 
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
@@ -107,12 +130,9 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
             )
 
             val fix = synchronized(BOX2D_LOCK) {
-              if (!tmpBody.isActive) {
-                // tmp body was disposed somewhere else (probably in a reload)
-                return
-              }
               tmpBody.createFixture(edgeShape, 0f)
             }
+
             if (!block.material.blocksLight()) {
               fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER
             }
@@ -121,17 +141,15 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
       }
     }
 
-    edgeShape.dispose()
-    synchronized(BOX2D_LOCK) {
-      destroyCurrentBody()
+    // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
+    if (isDisposed()) {
+      box2dBody = null
+      chunk.world.worldBody.destroyBody(tmpBody)
+      return
+    } else {
       box2dBody = tmpBody
-
-      // we got disposed while creating the new chunk fixture, this is the easiest cleanup solution
-      if (disposed) {
-        destroyCurrentBody()
-        return
-      }
     }
+
     Main.inst().scheduler.executeAsync {
       chunk.world.updateLights()
       chunk.world.render.update()
@@ -158,12 +176,15 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
 
   @Synchronized
   private fun scheduleFixtureReload(initial: Boolean) {
-    if (unsureFixture) {
+    if (unsureFixture || disposed) {
       return
     }
     unsureFixture = true
     val delay = if (initial) INITIAL_UNSURE_FIXTURE_RELOAD_DELAY else UNSURE_FIXTURE_RELOAD_DELAY
     Main.inst().scheduler.scheduleAsync(delay) {
+      if (disposed) {
+        return@scheduleAsync
+      }
       synchronized(this@ChunkBody) {
         unsureFixture = false
         if (chunk.isNeighborsLoaded) {
@@ -175,20 +196,11 @@ class ChunkBody(private val chunk: Chunk) : Disposable {
     }
   }
 
-  private fun destroyCurrentBody() {
-    synchronized(BOX2D_LOCK) {
-      val currentBody = box2dBody ?: return
-      chunk.world.worldBody.destroyBody(currentBody)
-      box2dBody = null
-    }
-  }
-
+  @Synchronized
   override fun dispose() {
-    synchronized(BOX2D_LOCK) {
-      if (disposed) return
-      disposed = true
-      destroyCurrentBody()
-    }
+    if (isDisposed()) return
+    disposed = true
+    box2dBody = null
   }
 
   fun hasBody(): Boolean = box2dBody != null
