@@ -47,7 +47,8 @@ public class ClientWorldRender implements WorldRender {
   @NotNull private final ChunkRenderer chunkRenderer;
   @NotNull private final Box2DDebugRenderer box2DDebugRenderer;
   @NotNull private final DebugChunkRenderer chunkDebugRenderer;
-  @Nullable private DirectionalLight skylight;
+  @Nullable private DirectionalLight sun;
+  @Nullable private DirectionalLight ambientLight;
   private float lastZoom;
 
   public ClientWorldRender(@NotNull ClientWorld world) {
@@ -77,29 +78,34 @@ public class ClientWorldRender implements WorldRender {
     RayHandler.useDiffuseLight(true);
     rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld());
     rayHandler.setBlurNum(1);
-    rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 0f);
+    rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1f);
     rayHandler.setCulling(true);
     Main.inst().getScheduler().executeSync(this::resetSkylight);
+  }
+
+  private DirectionalLight createDirLight() {
+    var light =
+        new DirectionalLight(
+            rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.MIDDAY_TIME);
+    light.setStaticLight(true);
+    light.setContactFilter(World.LIGHT_FILTER);
+    light.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
+    return light;
   }
 
   private void resetSkylight() {
 
     synchronized (BOX2D_LOCK) {
       synchronized (LIGHT_LOCK) {
-        if (skylight != null) {
-          skylight.remove();
+        if (sun != null) {
+          sun.remove();
         }
-        skylight =
-            new DirectionalLight(
-                rayHandler,
-                blocksHorizontally() * RAYS_PER_BLOCK,
-                Color.WHITE,
-                WorldTime.SUNRISE_TIME);
-        skylight.setStaticLight(true);
-        skylight.setContactFilter(World.LIGHT_FILTER);
-        skylight.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
+        if (ambientLight != null) {
+          ambientLight.remove();
+        }
+        sun = createDirLight();
+        ambientLight = createDirLight();
 
-        rayHandler.setAmbientLight(0, 0, 0, 1);
         rayHandler.update();
 
         // Re-render at once otherwise a quick flickering might happen
@@ -214,8 +220,12 @@ public class ClientWorldRender implements WorldRender {
     return rayHandler;
   }
 
-  public @Nullable DirectionalLight getSkylight() {
-    return skylight;
+  public @Nullable DirectionalLight getSun() {
+    return sun;
+  }
+
+  public DirectionalLight getAmbientLight() {
+    return ambientLight;
   }
 
   @Override
@@ -300,7 +310,8 @@ public class ClientWorldRender implements WorldRender {
       synchronized (LIGHT_LOCK) {
         rayHandler.removeAll();
         PointLightPool.clearAllPools();
-        skylight = null; // do not dispose skylight, it has already been disposed here
+        sun = null; // do not dispose skylight, it has already been disposed here
+        ambientLight = null;
 
         final int active = rayHandler.getEnabledLights().size;
         if (active != 0) {
