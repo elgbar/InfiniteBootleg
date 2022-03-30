@@ -178,13 +178,17 @@ public class ChunkImpl implements Chunk {
         currBlock.dispose();
 
         if (currBlock instanceof TickingBlock tickingBlock) {
-          tickingBlocks.removeValue(tickingBlock, true);
+          synchronized (tickingBlocks) {
+            tickingBlocks.removeValue(tickingBlock, true);
+          }
         }
       }
 
       blocks[localX][localY] = block;
       if (block instanceof TickingBlock tickingBlock) {
-        tickingBlocks.add(tickingBlock);
+        synchronized (tickingBlocks) {
+          tickingBlocks.add(tickingBlock);
+        }
       }
 
       modified = true;
@@ -321,10 +325,10 @@ public class ChunkImpl implements Chunk {
     if (isInvalid()) {
       return;
     }
-    // OK to not synchronize over tickingBlocks as the iterator implementation should not result in
-    // any errors
-    for (TickingBlock block : tickingBlocks) {
-      block.tryTick(false);
+    synchronized (tickingBlocks) {
+      for (TickingBlock block : tickingBlocks) {
+        block.tryTick(false);
+      }
     }
   }
 
@@ -333,10 +337,10 @@ public class ChunkImpl implements Chunk {
     if (isInvalid()) {
       return;
     }
-    // OK to not synchronize over tickingBlocks as the iterator implementation should not result in
-    // any errors
-    for (TickingBlock block : tickingBlocks) {
-      block.tryTick(true);
+    synchronized (tickingBlocks) {
+      for (TickingBlock block : tickingBlocks) {
+        block.tryTick(true);
+      }
     }
   }
 
@@ -561,7 +565,9 @@ public class ChunkImpl implements Chunk {
     }
 
     chunkBody.dispose();
-    tickingBlocks.clear();
+    synchronized (tickingBlocks) {
+      tickingBlocks.clear();
+    }
 
     for (Block[] blockArr : blocks) {
       for (Block block : blockArr) {
@@ -606,13 +612,15 @@ public class ChunkImpl implements Chunk {
     }
     initializing = false;
 
-    tickingBlocks.clear();
-    tickingBlocks.ensureCapacity(CHUNK_SIZE);
-    for (int x = 0; x < CHUNK_SIZE; x++) {
-      for (int y = 0; y < CHUNK_SIZE; y++) {
-        Block block = blocks[x][y];
-        if (block instanceof TickingBlock tickingBlock) {
-          tickingBlocks.add(tickingBlock);
+    synchronized (tickingBlocks) {
+      tickingBlocks.clear();
+      tickingBlocks.ensureCapacity(CHUNK_SIZE);
+      for (int x = 0; x < CHUNK_SIZE; x++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+          Block block = blocks[x][y];
+          if (block instanceof TickingBlock tickingBlock) {
+            tickingBlocks.add(tickingBlock);
+          }
         }
       }
     }

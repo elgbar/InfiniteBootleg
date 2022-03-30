@@ -639,9 +639,13 @@ public abstract class World implements Disposable, Resizable {
         .executeSync(
             () -> {
               for (Chunk chunk : getLoadedChunks()) {
-                for (TickingBlock block : chunk.getTickingBlocks()) {
-                  if (block instanceof LightTrait lightTrait) {
-                    LightTrait.Companion.recreateLight(lightTrait);
+
+                Array<TickingBlock> tickingBlocks = chunk.getTickingBlocks();
+                synchronized (tickingBlocks) {
+                  for (TickingBlock block : tickingBlocks) {
+                    if (block instanceof LightTrait lightTrait) {
+                      LightTrait.Companion.recreateLight(lightTrait);
+                    }
                   }
                 }
               }
