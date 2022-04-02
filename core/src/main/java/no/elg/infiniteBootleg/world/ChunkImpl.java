@@ -420,6 +420,11 @@ public class ChunkImpl implements Chunk {
     return chunkY;
   }
 
+  @Override
+  public long getCompactLocation() {
+    return CoordUtil.compactLoc(chunkX, chunkY);
+  }
+
   /**
    * @return Location of this chunk in world coordinates
    * @see CoordUtil#chunkToWorld(Location)

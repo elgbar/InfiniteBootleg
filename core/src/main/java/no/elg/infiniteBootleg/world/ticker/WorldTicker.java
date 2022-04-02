@@ -1,8 +1,7 @@
 package no.elg.infiniteBootleg.world.ticker;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.LongMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import no.elg.infiniteBootleg.Main;
@@ -11,7 +10,6 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -55,19 +53,18 @@ public class WorldTicker extends Ticker {
 
   private static class WorldTickee implements Ticking {
 
-    @NotNull private final OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
+    @NotNull private final LongMap.Entries<@Nullable Chunk> chunkIterator;
     @NotNull private final World world;
 
     private WorldTickee(@NotNull World world) {
       this.world = world;
-      chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
+      chunkIterator = new LongMap.Entries<>(world.getChunks());
     }
 
     private final Array<ForkJoinTask<?>> forks = new Array<>(false, 48);
 
     @Override
     public synchronized void tick() {
-
       WorldRender wr = world.getRender();
       long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
 
@@ -78,26 +75,32 @@ public class WorldTicker extends Ticker {
       world.chunksWriteLock.lock();
       try {
         chunkIterator.reset();
-        while (true) {
-          Chunk chunk;
-          if (chunkIterator.hasNext()) {
-            ObjectMap.Entry<Location, Chunk> entry = chunkIterator.next();
-            chunk = entry.value;
-          } else {
-            break;
-          }
+        while (chunkIterator.hasNext()) {
+          Chunk chunk = chunkIterator.next().value;
 
           // clean up dead chunks
-          if (chunk == null || !chunk.isLoaded()) {
+          if (chunk == null) {
+            Main.logger().warn("Found null chunk when ticking world");
+            chunkIterator.remove();
+            continue;
+          } else if (!chunk.isLoaded()) {
+            Main.logger()
+                .warn(
+                    "Found unloaded chunk ("
+                        + chunk.getChunkX()
+                        + ","
+                        + chunk.getChunkY()
+                        + ") when ticking world");
             chunkIterator.remove();
             continue;
           }
+
           if (chunk.isAllowingUnloading()
               && wr.isOutOfView(chunk)
               && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
+            // not need to remove with iterator
             world.unloadChunk(chunk);
-            chunkIterator.remove();
             continue;
           }
           ForkJoinTask<?> task = pool.submit(chunk::tick);

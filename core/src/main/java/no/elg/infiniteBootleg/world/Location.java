@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,7 +37,7 @@ public class Location {
   }
 
   public static long distCubed(int x1, int y1, int x2, int y2) {
-    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    return (long) (x2 - x1) * (x2 - x1) + (long) (y2 - y1) * (y2 - y1);
   }
 
   public Vector2 toVector2() {
@@ -53,6 +54,14 @@ public class Location {
 
   public ProtoWorld.Vector2i toVector2i() {
     return ProtoWorld.Vector2i.newBuilder().setX(x).setY(y).build();
+  }
+
+  /**
+   * @return This location compacted into a single long
+   * @see CoordUtil#compactLoc(int, int)
+   */
+  public long toCompactLocation() {
+    return CoordUtil.compactLoc(x, y);
   }
 
   @Override

@@ -85,4 +85,16 @@ public class CoordUtilTest {
     assertFalse(CoordUtil.isInsideChunk(CHUNK_SIZE, 0));
     assertFalse(CoordUtil.isInsideChunk(0, CHUNK_SIZE));
   }
+
+  @Test
+  public void compactLocations() {
+    for (int x = -10; x <= 10; x++) {
+      for (int y = -10; y <= 10; y++) {
+        long compact = CoordUtil.compactLoc(x, y);
+        assertEquals(x, CoordUtil.decompactLocX(compact));
+        assertEquals(y, CoordUtil.decompactLocY(compact));
+        assertEquals(new Location(x, y), CoordUtil.decompactLoc(compact));
+      }
+    }
+  }
 }

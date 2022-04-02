@@ -166,14 +166,14 @@ private fun handleBlockUpdate(blockUpdate: UpdateBlock) {
 }
 
 private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
-  val chunkLoc = Location.fromVector2i(chunkRequest.chunkLocation)
+  val chunkLoc = chunkRequest.chunkLocation
   val serverWorld = ServerMain.inst().serverWorld
   val uuid = ctx.getSharedInformation()?.entityUUID ?: return
   val chunksInView = serverWorld.render.getClient(uuid) ?: return
 
   // Only send chunks which the player is allowed to see
   if (chunksInView.isInView(chunkLoc.x, chunkLoc.y)) {
-    val chunk = serverWorld.getChunk(chunkLoc) ?: return // if no chunk, don't send a chunk update
+    val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y) ?: return // if no chunk, don't send a chunk update
     ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
   }
 }

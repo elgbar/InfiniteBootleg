@@ -9,9 +9,9 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
@@ -53,16 +53,16 @@ public class ChunkLoader {
    * @return The loaded chunk
    */
   @Nullable
-  public Chunk load(@NotNull Location chunkLoc) {
+  public synchronized Chunk load(long chunkLoc) {
+    int chunkX = CoordUtil.decompactLocX(chunkLoc);
+    int chunkY = CoordUtil.decompactLocY(chunkLoc);
     if (Main.isServerClient()) {
       ServerClient serverClient = ClientMain.inst().getServerClient();
       assert serverClient != null;
       serverClient.ctx.writeAndFlush(
-          PacketExtraKt.serverBoundChunkRequestPacket(serverClient, chunkLoc));
+          PacketExtraKt.serverBoundChunkRequestPacket(serverClient, chunkX, chunkY));
       return null;
     }
-    int chunkX = chunkLoc.x;
-    int chunkY = chunkLoc.y;
 
     if (existsOnDisk(chunkX, chunkY)) {
       ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);

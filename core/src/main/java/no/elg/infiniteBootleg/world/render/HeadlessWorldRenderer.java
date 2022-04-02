@@ -8,7 +8,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
@@ -29,18 +28,15 @@ public class HeadlessWorldRenderer implements WorldRender {
   private final Lock readLock = lock.readLock();
   private final Lock writeLock = lock.writeLock();
 
-  @NotNull private final OrderedMap.OrderedMapEntries<Location, Chunk> chunkIterator;
-
   public HeadlessWorldRenderer(@NotNull ServerWorld world) {
     this.world = world;
-    chunkIterator = new OrderedMap.OrderedMapEntries<>(world.getChunks());
   }
 
   @Override
   public synchronized void render() {
     // Note to self: do not call chunkBody#update while under the chunksReadLock or chunksWriteLock
     for (Chunk chunk : world.getLoadedChunks()) {
-      if (chunk != null && chunk.isValid() && chunk.isDirty()) {
+      if (chunk.isValid() && chunk.isDirty()) {
         chunk.getChunkBody().update();
       }
     }

@@ -141,4 +141,44 @@ public class CoordUtil {
   public static @NotNull Location worldXYtoChunkLoc(int worldX, int worldY) {
     return new Location(worldToChunk(worldX), worldToChunk(worldY));
   }
+
+  /**
+   * Store two intergers inside a single long
+   *
+   * @param x The x coordinate of the location
+   * @param y The y coordinate of the location
+   * @return A long containing both the x and y int
+   */
+  public static long compactLoc(int x, int y) {
+    // as an int have 32 bits and long 64, we can store two ints inside a long
+    return (((long) x) << Integer.SIZE) | (y & 0xffffffffL);
+  }
+
+  /**
+   * @param compactLoc A long created by {@link #compactLoc(int, int)}
+   * @return The x coordinate of the compacted location
+   */
+  public static int decompactLocX(long compactLoc) {
+    return (int) (compactLoc >> Integer.SIZE);
+  }
+
+  /**
+   * @param compactLoc A long created by {@link #compactLoc(int, int)}
+   * @return The y coordinate of the compacted location
+   */
+  public static int decompactLocY(long compactLoc) {
+    return (int) compactLoc;
+  }
+
+  public static String stringifyCompactLoc(long compactLoc) {
+    return "(" + decompactLocX(compactLoc) + "," + decompactLocY(compactLoc) + ")";
+  }
+
+  /**
+   * @param compactLoc A long created by {@link #compactLoc(int, int)}
+   * @return The compacted location as a {@link Location}
+   */
+  public static Location decompactLoc(long compactLoc) {
+    return new Location(decompactLocX(compactLoc), decompactLocY(compactLoc));
+  }
 }

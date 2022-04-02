@@ -200,6 +200,8 @@ public interface Chunk
 
   int getChunkY();
 
+  long getCompactLocation();
+
   int getWorldX();
 
   int getWorldY();

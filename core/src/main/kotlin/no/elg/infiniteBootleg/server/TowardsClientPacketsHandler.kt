@@ -152,16 +152,17 @@ private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
 }
 
 private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
-
   val world = this.world
   if (world == null) {
     Main.logger().warn("handleSpawnEntity", "Failed to find world")
     return
   }
-  val chunkPos = CoordUtil.worldToChunk(spawnEntity.entity.position.toLocation())
-  val chunk = world.getChunk(chunkPos)
+  val position = spawnEntity.entity.position
+  val chunkPosX = CoordUtil.worldToChunk(position.x)
+  val chunkPosY = CoordUtil.worldToChunk(position.y)
+  val chunk = world.getChunk(chunkPosX, chunkPosY)
   if (chunk == null) {
-    Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPos")
+    Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return
   }
   val loaded = Entity.load(world, chunk, spawnEntity.entity)

@@ -151,6 +151,10 @@ fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInform
   ).build()
 }
 
+fun ServerClient.serverBoundChunkRequestPacket(x: Int, y: Int): Packet {
+  return serverBoundChunkRequestPacket(Vector2i.newBuilder().setX(x).setY(y).build())
+}
+
 fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Location): Packet {
   return serverBoundChunkRequestPacket(chunkLocation.toVector2i())
 }
