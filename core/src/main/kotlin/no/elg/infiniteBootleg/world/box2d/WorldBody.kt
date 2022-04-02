@@ -46,6 +46,8 @@ open class WorldBody(private val world: World) : Ticking {
   /**
    * Create a new body in this world, this method can be called from any thread
    *
+   * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
+   *
    * @param def
    * The definition of the body to create
    */
@@ -64,23 +66,32 @@ open class WorldBody(private val world: World) : Ticking {
    * The body to destroy
    */
   fun destroyBody(body: Body) {
-    synchronized(BOX2D_LOCK) {
-      require(!box2dWorld.isLocked) {
-        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
+    Main.inst().scheduler.executeAsync {
+      // Execute async to not be under any locks
+      synchronized(BOX2D_LOCK) {
+        require(!box2dWorld.isLocked) {
+          "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
+        }
+        if (!body.isActive) {
+          Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
+        }
+        box2dWorld.destroyBody(body)
       }
-      if (!body.isActive) {
-        Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
-      }
-      box2dWorld.destroyBody(body)
     }
   }
 
+  /**
+   * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
+   */
   override fun tick() {
     synchronized(BOX2D_LOCK) {
       box2dWorld.step(timeStep, 20, 10)
     }
   }
 
+  /**
+   * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
+   */
   override fun tickRare() {
     if (Main.isServer()) {
       // We only short because of the light, no point is shifting when there is no client
@@ -119,35 +130,37 @@ open class WorldBody(private val world: World) : Ticking {
    * Move world offset to make sure physics don't go haywire by floating point rounding error
    */
   fun shiftWorldOffset(deltaOffsetX: Float, deltaOffsetY: Float) {
-    synchronized(BOX2D_LOCK) {
-      worldOffsetX += deltaOffsetX
-      worldOffsetY += deltaOffsetY
-      bodies.clear()
-      bodies.ensureCapacity(world.entities.size)
-      box2dWorld.getBodies(bodies)
-      for (body in bodies) {
-        applyShift(body, deltaOffsetX, deltaOffsetY)
-      }
-      for (entity in world.entities) {
-        entity.updatePos()
-      }
-
-      val render = world.render
-      if (render is ClientWorldRender) {
-        val rayHandler = render.rayHandler
-        for (light in rayHandler.enabledLights) {
-          light.position = light.position.add(deltaOffsetX, deltaOffsetY)
+    Main.inst().scheduler.executeAsync {
+      synchronized(BOX2D_LOCK) {
+        worldOffsetX += deltaOffsetX
+        worldOffsetY += deltaOffsetY
+        bodies.clear()
+        bodies.ensureCapacity(world.entities.size)
+        box2dWorld.getBodies(bodies)
+        for (body in bodies) {
+          applyShift(body, deltaOffsetX, deltaOffsetY)
         }
-        // TODO enable if needed
+        for (entity in world.entities) {
+          entity.updatePos()
+        }
+
+        val render = world.render
+        if (render is ClientWorldRender) {
+          val rayHandler = render.rayHandler
+          for (light in rayHandler.enabledLights) {
+            light.position = light.position.add(deltaOffsetX, deltaOffsetY)
+          }
+          // TODO enable if needed
 //      for (light in rayHandler.disabledLights) {
 //        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
 //      }
-        rayHandler.update()
+          rayHandler.update()
 
-        // test logic only, move to world render when possible
-        render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
+          // test logic only, move to world render when possible
+          render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
+        }
+        render.update()
       }
-      render.update()
     }
   }
 
@@ -155,8 +168,11 @@ open class WorldBody(private val world: World) : Ticking {
    * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
    */
   fun queryAABB(worldX: Float, worldY: Float, worldWidth: Float, worldHeight: Float, callback: ((Fixture) -> Boolean)) {
-    synchronized(BOX2D_LOCK) {
-      box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
+
+    Main.inst().scheduler.executeAsync {
+      synchronized(BOX2D_LOCK) {
+        box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
+      }
     }
   }
 
