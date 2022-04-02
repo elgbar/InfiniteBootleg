@@ -133,6 +133,16 @@ public class CoordUtil {
   }
 
   /**
+   * @param localX The chunk local x coordinate
+   * @param localY The chunk local y coordinate
+   * @return If given x and y are on the edge of a chunk, while still inside the chunk
+   */
+  @Contract(pure = true)
+  public static boolean isInnerEdgeOfChunk(int localX, int localY) {
+    return localX == 0 || localX == CHUNK_SIZE - 1 || localY == 0 || localY == CHUNK_SIZE - 1;
+  }
+
+  /**
    * @param worldX The world x coordinate
    * @param worldY The world y coordinate
    * @return The chunk location for the given world coordinates

@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
 import com.badlogic.gdx.physics.box2d.EdgeShape
+import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Updatable
@@ -78,7 +79,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       return
     }
     val tmpBody = chunk.world.worldBody.createBody(bodyDef)
-
+    val edges = GdxLongArray(false, 1 + CHUNK_SIZE * CHUNK_SIZE)
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
 
@@ -92,21 +93,25 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
         for ((dir, edgeDelta) in EDGE_DEF) {
 
+          val edgeId = CoordUtil.compactLoc(localX, localY)
           // FIXME only check the chunk if the local coordinates are outside this chunk
-          if (!CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) && !chunk.world.isChunkLoaded(
-              CoordUtil.worldToChunk(worldX + dir.dx),
-              CoordUtil.worldToChunk(worldY + dir.dy)
-            )
+          if (edgeId in edges ||
+            CoordUtil.isInnerEdgeOfChunk(localX, localY) &&
+            !CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) &&
+            !chunk.world.isChunkLoaded(
+                CoordUtil.worldToChunk(worldX + dir.dx),
+                CoordUtil.worldToChunk(worldY + dir.dy)
+              )
           ) {
             continue
           }
-
           edgeShape.set(
             localX + edgeDelta[0],
             localY + edgeDelta[1],
             localX + edgeDelta[2],
             localY + edgeDelta[3]
           )
+          edges.add(edgeId)
 
           val fix = synchronized(BOX2D_LOCK) {
             tmpBody.createFixture(edgeShape, 0f)
