@@ -10,6 +10,7 @@ import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
@@ -337,10 +338,15 @@ public class Commands extends CommandExecutor {
       logger.error("CMD", "The main player does not have any controls");
       return;
     }
+    if (type == null) {
+      logger.error("CMD", "Valid brush types are 'break' and 'place'");
+      return;
+    }
+    type = type.toLowerCase(Locale.ROOT);
 
-    if ("break".equalsIgnoreCase(type)) {
+    if (type.startsWith("b")) {
       controls.setBreakBrushSize(size);
-    } else if ("place".equalsIgnoreCase(type)) {
+    } else if (type.startsWith("p")) {
       controls.setPlaceBrushSize(size);
     } else {
       logger.error("CMD", "Valid brush types are 'break' and 'place'");
