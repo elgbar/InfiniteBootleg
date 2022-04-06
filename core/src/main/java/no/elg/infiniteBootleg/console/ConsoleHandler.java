@@ -163,14 +163,26 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
           m.invoke(exec, args);
           return true;
         } catch (ReflectionException e) {
-          String msg = e.getMessage();
-          if (msg == null || msg.length() <= 0) {
-            msg = "Unknown Error";
-            e.printStackTrace();
-          }
-          log(LogLevel.ERROR, msg);
           StringWriter sw = new StringWriter();
-          e.printStackTrace(new PrintWriter(sw));
+          if (e.getCause() != null && e.getCause().getCause() != null) {
+            e.getCause().getCause().printStackTrace(new PrintWriter(sw));
+          } else {
+            e.printStackTrace(new PrintWriter(sw));
+          }
+          if (numArgs > 0) {
+            log(
+                LogLevel.ERROR,
+                "Failed to execute command "
+                    + m.getName()
+                    + "("
+                    + Arrays.stream(m.getParameterTypes())
+                        .map(Class::getSimpleName)
+                        .collect(Collectors.joining(", "))
+                    + ")' with args "
+                    + Arrays.toString(sArgs));
+          } else {
+            log(LogLevel.ERROR, "Failed to execute command: " + m.getName());
+          }
           log(LogLevel.ERROR, sw.toString());
           return false;
         }
