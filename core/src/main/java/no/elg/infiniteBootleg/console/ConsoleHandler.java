@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
 import no.elg.infiniteBootleg.console.consoles.StdConsole;
@@ -154,13 +153,13 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
             // to next function
             continue;
           }
-          if (isClientsideOnly(m) && Main.isServer()) {
+          if (canExecute(m)) {
+            m.setAccessible(true);
+            m.invoke(exec, args);
+          } else {
             log(LogLevel.ERROR, "This command can only be executed client side");
             return true;
           }
-
-          m.setAccessible(true);
-          m.invoke(exec, args);
           return true;
         } catch (ReflectionException e) {
           StringWriter sw = new StringWriter();

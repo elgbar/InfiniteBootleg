@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.Console;
 import com.strongjoshua.console.ConsoleUtils;
+import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +20,7 @@ public final class HelpfulConsoleHelpUtil {
 
     Set<Method> methods = getRelevantMethods(console, exec, command);
     if (methods.isEmpty()) {
-      Main.logger().log("Command does not exist.");
+      console.log("Command does not exist.");
       return;
     }
 
@@ -27,7 +28,6 @@ public final class HelpfulConsoleHelpUtil {
       StringBuilder sb = createCmdPrefix(m);
       Annotation annotation = m.getDeclaredAnnotation(ConsoleDoc.class);
       if (annotation != null) {
-
         ConsoleDoc doc = annotation.getAnnotation(ConsoleDoc.class);
         sb.append(doc.description());
 
@@ -36,17 +36,9 @@ public final class HelpfulConsoleHelpUtil {
 
         for (int i = 0; i < params.length; i++) {
           sb.append("\n");
-          for (int j = 0; j < m.getName().length() + 2; j++) {
-            // using spaces this way works with monotype fonts
-            sb.append(" ");
-          }
-          sb.append('<');
-          sb.append(params[i].getSimpleName());
-          if (names != null && i < names.length) {
-            sb.append(' ');
-            sb.append(names[i].replace('_', '-').replace(' ', '-'));
-          }
-          sb.append("> ");
+          // using spaces this way works with monotype fonts
+          sb.append(" ".repeat(Math.max(0, m.getName().length() + 2)));
+          cmdArgs(sb, params, names, i);
           if (i < doc.paramDescriptions().length) {
             sb.append(doc.paramDescriptions()[i]);
           }
@@ -64,7 +56,7 @@ public final class HelpfulConsoleHelpUtil {
       if (canExecute(method)) {
         StringBuilder sb = createCmdPrefix(method);
         appendCmdSignature(sb, method);
-        Main.logger().log(sb.toString());
+        console.log(sb.toString());
       }
     }
   }
@@ -78,20 +70,18 @@ public final class HelpfulConsoleHelpUtil {
     String[] names = getArgNames(method, params);
 
     for (int i = 0; i < params.length; i++) {
-
-      sb.append('<');
-      sb.append(params[i].getSimpleName());
-
-      if (names != null && i < names.length) {
-        sb.append(' ');
-        sb.append(names[i].replace('_', '-').replace(' ', '-'));
-      }
-      sb.append('>');
-
-      if (i < params.length - 1) {
-        sb.append(' ');
-      }
+      cmdArgs(sb, params, names, i);
     }
+  }
+
+  private static void cmdArgs(StringBuilder sb, Class<?>[] params, String[] names, int i) {
+    sb.append('<');
+    sb.append(params[i].getSimpleName());
+
+    if (names != null && i < names.length) {
+      sb.append(' ').append(names[i].replace('_', '-').replace(' ', '-'));
+    }
+    sb.append("> ");
   }
 
   public static String generateCommandSignature(Method method) {
