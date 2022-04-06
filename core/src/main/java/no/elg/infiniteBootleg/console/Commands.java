@@ -37,6 +37,7 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -50,32 +51,60 @@ public class Commands extends CommandExecutor {
     this.logger = logger;
   }
 
+  @Nullable
+  private World getWorld() {
+    var world = Main.inst().getWorld();
+    if (world == null) {
+      logger.error("CMD", "Failed to find the current world");
+    }
+    return world;
+  }
+
+  @Nullable
+  private ClientWorld getClientWorld() {
+    var world = ClientMain.inst().getWorld();
+    if (world == null) {
+      logger.error("CMD", "Failed to find world");
+    }
+    return world;
+  }
+
+  @Nullable
+  private Player getSPPlayer() {
+    Player player = ClientMain.inst().getPlayer();
+    if (player == null) {
+      logger.error("CMD", "Failed to find any players");
+    }
+    return player;
+  }
+
   @CmdArgNames({"red", "green", "blue", "alpha"})
   @ConsoleDoc(
       description = "Set the color of the sky. Params are expected to be between 0 and 1",
       paramDescriptions = {"red", "green", "blue", "alpha"})
   public void skyColor(float r, float g, float b, float a) {
-    Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
+    World world = getWorld();
+    if (world == null) return;
+    Color skylight = world.getWorldTime().getBaseColor();
     skylight.set(r, g, b, a);
     logger.success("Sky color changed to " + skylight);
   }
 
+  @ClientsideOnly
   @CmdArgNames("color")
   @ConsoleDoc(
       description = "Set the color of the sky",
       paramDescriptions = {"Name of color"})
   public void skyColor(String colorName) {
-    if (Settings.client) {
-      Color skylight = Main.inst().getWorld().getWorldTime().getBaseColor();
-      try {
-        Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
-        skylight.set(color);
-        logger.log("Sky color changed to " + colorName.toLowerCase() + " (" + color + ")");
-      } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
-        logger.logf(LogLevel.ERROR, "Unknown color '%s'", colorName);
-      }
-    } else {
-      logger.log(LogLevel.ERROR, "Cannot change the color of the sky as graphics are not enabled");
+    World world = getWorld();
+    if (world == null) return;
+    Color skylight = world.getWorldTime().getBaseColor();
+    try {
+      Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
+      skylight.set(color);
+      logger.log("Sky color changed to " + colorName.toLowerCase() + " (" + color + ")");
+    } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
+      logger.logf(LogLevel.ERROR, "Unknown color '%s'", colorName);
     }
   }
 
@@ -83,8 +112,11 @@ public class Commands extends CommandExecutor {
   @ConsoleDoc(description = "Toggle rendering of lights")
   public void lights() {
     Settings.renderLight = !Settings.renderLight;
+
     if (Settings.renderLight) {
-      Main.inst().getWorld().getRender().update();
+      World world = getWorld();
+      if (world == null) return;
+      world.getRender().update();
     }
     logger.log(
         LogLevel.SUCCESS, "Lighting is now " + (Settings.renderLight ? "enabled" : "disabled"));
@@ -102,16 +134,17 @@ public class Commands extends CommandExecutor {
       description = "Reload all loaded chunks",
       paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
   public void reload(boolean force) {
-    Main.inst().getWorld().reload(force);
+    World world = getWorld();
+    if (world == null) return;
+    world.reload(force);
     logger.log(LogLevel.SUCCESS, "All chunks have been reloaded");
   }
 
   @ClientsideOnly
   @ConsoleDoc(description = "Toggle flight for player")
   public void fly() {
-    Player player = ClientMain.inst().getPlayer();
+    Player player = getSPPlayer();
     if (player == null) {
-      logger.error("CMD", "Failed to find any players");
       return;
     }
     player.setFlying(!player.isFlying());
@@ -123,9 +156,11 @@ public class Commands extends CommandExecutor {
           "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
               + " entity updates and chunks update")
   public void pause() {
-    Ticker ticker = Main.inst().getWorld().getWorldTicker();
+    World world = getWorld();
+    if (world == null) return;
+    Ticker ticker = world.getWorldTicker();
     if (ticker.isPaused()) {
-      logger.log(LogLevel.ERROR, "World is already paused");
+      logger.error("World is already paused");
     } else {
       ticker.pause();
       logger.log(LogLevel.SUCCESS, "World is now paused");
@@ -137,14 +172,15 @@ public class Commands extends CommandExecutor {
           "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
               + " entity updates and chunks update")
   public void resume() {
-    World world = Main.inst().getWorld();
-    Ticker ticker = Main.inst().getWorld().getWorldTicker();
+    World world = getWorld();
+    if (world == null) return;
+    Ticker ticker = world.getWorldTicker();
     if (ticker.isPaused()) {
       world.getWorldTicker().resume();
       world.getRender().update();
       logger.log(LogLevel.SUCCESS, "World is now resumed");
     } else {
-      logger.log(LogLevel.ERROR, "World is not paused");
+      logger.error("World is not paused");
     }
   }
 
@@ -173,19 +209,19 @@ public class Commands extends CommandExecutor {
       description = "Teleport to given world coordinate",
       paramDescriptions = {"World x coordinate", "World y coordinate"})
   public void tp(float worldX, float worldY) {
-    if (Main.isServer()) {
+    var clientWorld = getClientWorld();
+    if (clientWorld == null) {
       return;
     }
-    ClientWorldRender render = ClientMain.inst().getWorld().getRender();
-    var worldBody = Main.inst().getWorld().getWorldBody();
+    ClientWorldRender render = clientWorld.getRender();
+    var worldBody = clientWorld.getWorldBody();
     render.getCamera().position.x = worldX * Block.BLOCK_SIZE + worldBody.getWorldOffsetX();
     render.getCamera().position.y = worldY * Block.BLOCK_SIZE + worldBody.getWorldOffsetY();
     render.update();
     logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY);
 
-    Player player = ClientMain.inst().getPlayer();
+    Player player = getSPPlayer();
     if (player == null) {
-      logger.error("CMD", "Failed to find any players");
       return;
     }
     player.teleport(worldX, worldY, false);
@@ -205,7 +241,11 @@ public class Commands extends CommandExecutor {
       logger.warn("Quality given is a negative number. It has been set to 0");
       quality = 0;
     }
-    ClientMain.inst().getWorld().getRender().getRayHandler().setBlurNum(quality);
+    var clientWorld = getClientWorld();
+    if (clientWorld == null) {
+      return;
+    }
+    clientWorld.getRender().getRayHandler().setBlurNum(quality);
     logger.success("Light quality is now " + quality);
   }
 
@@ -217,7 +257,7 @@ public class Commands extends CommandExecutor {
   public void hud(String modusName) {
     var screen = ClientMain.inst().getScreen();
     if (!(screen instanceof WorldScreen)) {
-      logger.log(LogLevel.ERROR, "Not currently in a world, cannot change hud");
+      logger.error("Not currently in a world, cannot change hud");
       return;
     }
 
@@ -225,7 +265,7 @@ public class Commands extends CommandExecutor {
       HUDRenderer.HUDModus modus = HUDRenderer.HUDModus.valueOf(modusName.toUpperCase());
       ((WorldScreen) screen).getHud().setModus(modus);
     } catch (IllegalArgumentException e) {
-      logger.log(LogLevel.ERROR, "Unknown HUD modus '" + modusName + "'");
+      logger.error("Unknown HUD modus '" + modusName + "'");
     }
   }
 
@@ -240,7 +280,11 @@ public class Commands extends CommandExecutor {
           "Given zoom level (%.3f) is less than the minimum % .3f", zoom, WorldRender.MIN_ZOOM);
       zoom = WorldRender.MIN_ZOOM;
     }
-    ClientWorldRender render = ClientMain.inst().getWorld().getRender();
+    var clientWorld = getClientWorld();
+    if (clientWorld == null) {
+      return;
+    }
+    ClientWorldRender render = clientWorld.getRender();
     render.getCamera().zoom = Math.max(zoom, WorldRender.MIN_ZOOM);
     render.update();
     logger.success("Zoom level is now " + zoom);
@@ -249,9 +293,8 @@ public class Commands extends CommandExecutor {
   @HiddenCommand
   @ClientsideOnly
   public void paint() {
-    Player player = ClientMain.inst().getPlayer();
+    Player player = getSPPlayer();
     if (player == null) {
-      logger.error("CMD", "Failed to find any players");
       return;
     }
     for (Block block : player.touchingBlocks()) {
@@ -265,7 +308,11 @@ public class Commands extends CommandExecutor {
           "Spawn a generic static entity at the given location with the given width and height",
       paramDescriptions = {"worldX", "worldY", "width", "height"})
   public void ent(float worldX, float worldY, int width, int height) {
-    final World world = Main.inst().getWorld();
+    World world = getWorld();
+    if (world == null) {
+      return;
+    }
+
     var entity = new GenericEntity(world, worldX, worldY, width, height);
     if (entity.isInvalid()) {
       logger.error(
@@ -285,7 +332,10 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(description = "Kill all non-player entities")
   public void killall() {
-    World world = Main.inst().getWorld();
+    World world = getWorld();
+    if (world == null) {
+      return;
+    }
     int entities = 0;
     synchronized (BOX2D_LOCK) {
       for (Entity entity : world.getEntities()) {
@@ -302,12 +352,11 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Get the brush sizes")
   public void brush() {
-    Player player = ClientMain.inst().getPlayer();
+    Player player = getSPPlayer();
     if (player == null) {
-      logger.error("CMD", "Failed to find any players");
       return;
     }
-    EntityControls controls = ClientMain.inst().getPlayer().getControls();
+    EntityControls controls = player.getControls();
     if (controls == null) {
       logger.error("CMD", "The main player does not have any controls");
     } else {
@@ -328,12 +377,11 @@ public class Commands extends CommandExecutor {
         "New brush size, positive integer"
       })
   public void brush(String type, float size) {
-    Player player = ClientMain.inst().getPlayer();
+    Player player = getSPPlayer();
     if (player == null) {
-      logger.error("CMD", "Failed to find any players");
       return;
     }
-    EntityControls controls = ClientMain.inst().getPlayer().getControls();
+    EntityControls controls = player.getControls();
     if (controls == null) {
       logger.error("CMD", "The main player does not have any controls");
       return;
@@ -358,8 +406,13 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"scale"})
   @ConsoleDoc(description = "How fast the time flows", paramDescriptions = "The new scale of time")
   public void timescale(float scale) {
-    float old = Main.inst().getWorld().getWorldTime().getTimeScale();
-    Main.inst().getWorld().getWorldTime().setTimeScale(scale);
+    var world = getWorld();
+    if (world == null) {
+      return;
+    }
+    WorldTime worldTime = world.getWorldTime();
+    float old = worldTime.getTimeScale();
+    worldTime.setTimeScale(scale);
     logger.success("Changed time scale from % .3f to % .3f", old, scale);
 
     PacketExtraKt.sendDuplexPacket(
@@ -415,8 +468,13 @@ public class Commands extends CommandExecutor {
       description = "Set the current time",
       paramDescriptions = "The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc")
   public void time(float time) {
-    float old = Main.inst().getWorld().getWorldTime().getTime();
-    Main.inst().getWorld().getWorldTime().setTime(time);
+    var world = getWorld();
+    if (world == null) {
+      return;
+    }
+    WorldTime worldTime = world.getWorldTime();
+    float old = worldTime.getTime();
+    worldTime.setTime(time);
 
     PacketExtraKt.sendDuplexPacket(
         () -> PacketExtraKt.clientBoundWorldSettings(null, time, null),
@@ -427,12 +485,14 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Reset camera and zoom")
   public void reset() {
-    Player player = ClientMain.inst().getPlayer();
+    Player player = getSPPlayer();
     if (player == null) {
-      logger.error("CMD", "Failed to find any players");
       return;
     }
-    ClientWorld world = ClientMain.inst().getWorld();
+    var world = getClientWorld();
+    if (world == null) {
+      return;
+    }
     ClientWorldRender render = world.getRender();
     render.getCamera().zoom = 1f;
     render.getCamera().position.x = player.getPosition().x * Block.BLOCK_SIZE;
@@ -446,14 +506,21 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"dx", "dy"})
   @ConsoleDoc(description = "Shift world offset")
   public void swo(float x, float y) {
-    Main.inst().getWorld().getWorldBody().shiftWorldOffset(x, y);
+    var world = getWorld();
+    if (world == null) {
+      return;
+    }
+    world.getWorldBody().shiftWorldOffset(x, y);
   }
 
   @HiddenCommand
   @ConsoleDoc(description = "check dangling entities")
   public void cde() {
     synchronized (BOX2D_LOCK) {
-      var world = Main.inst().getWorld();
+      var world = getWorld();
+      if (world == null) {
+        return;
+      }
       final com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
           world.getWorldBody().getBox2dWorld();
       var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
@@ -462,7 +529,7 @@ public class Commands extends CommandExecutor {
       int invalid = 0;
       for (Body body : bodies) {
         final Object userData = body.getUserData();
-        if (userData != null && userData instanceof Entity entity) {
+        if (userData instanceof Entity entity) {
           if (world.containsEntity(entity.getUuid())) {
             continue;
           }
@@ -484,12 +551,20 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
   public void spawnPlayer() {
-    Main.inst().getWorld().createNewPlayer(UUID.randomUUID());
+    var world = getWorld();
+    if (world == null) {
+      return;
+    }
+    world.createNewPlayer(UUID.randomUUID());
   }
 
   @ConsoleDoc(description = "Save the world server side")
   public void save() {
-    Main.inst().getWorld().save();
+    var world = getWorld();
+    if (world == null) {
+      return;
+    }
+    world.save();
   }
 
   @ClientsideOnly
@@ -513,9 +588,12 @@ public class Commands extends CommandExecutor {
   }
 
   @ConsoleDoc(description = "Some some debug info")
-  public void chunk_info() {
+  public void chunkInfo() {
     Main.logger().log("Debug chunk Info");
-    var world = Main.inst().getWorld();
+    var world = getWorld();
+    if (world == null) {
+      return;
+    }
     Main.logger().log("Loaded chunks: " + world.getLoadedChunks().size);
     for (Player player : world.getPlayers()) {
       var worldRenderer = world.getRender();
