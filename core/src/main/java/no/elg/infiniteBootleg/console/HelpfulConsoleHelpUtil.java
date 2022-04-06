@@ -46,8 +46,11 @@ public final class HelpfulConsoleHelpUtil {
       } else {
         appendCmdSignature(sb, m);
       }
-
-      Main.logger().log(sb.toString());
+      console.log(sb.toString());
+      if (!canExecute(m)) {
+        console.log(
+            "[WARN] Note that you cannot execute command '" + m.getName() + "'", LogLevel.ERROR);
+      }
     }
   }
 
