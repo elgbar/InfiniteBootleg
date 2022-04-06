@@ -196,6 +196,7 @@ public class ClientMain extends CommonMain {
     // clean up any mess the previous screen have made
     inputMultiplexer.clear();
     Gdx.input.setOnscreenKeyboardVisible(false);
+    ClientMain.inst().setServerClient(null);
 
     Gdx.app.debug("SCREEN", "Loading new screen " + screen.getClass().getSimpleName());
     this.screen = screen;

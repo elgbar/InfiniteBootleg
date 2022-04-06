@@ -66,7 +66,6 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
     }
     Main.inst().scheduler.scheduleSync(50L) {
       close()
-      ClientMain.inst().serverClient = null
     }
   } else {
     this.writeAndFlush(clientBoundDisconnectPlayerPacket(msg))
