@@ -33,7 +33,7 @@ public class Player extends LivingEntity {
 
   @Nullable private static final TextureRegion TEXTURE_REGION;
   @Nullable private EntityControls controls;
-  @Nullable private final Light torchLight;
+  @Nullable private Light torchLight;
 
   public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
