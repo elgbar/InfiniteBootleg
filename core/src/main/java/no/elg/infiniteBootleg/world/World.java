@@ -681,11 +681,11 @@ public abstract class World implements Disposable, Resizable {
   }
 
   /**
+   * Use {@link #isChunkLoaded(int, int)} or {@link #isChunkLoaded(long)} if possible
+   *
    * @param chunkLoc Chunk location in chunk coordinates
    * @return If the given chunk is loaded in memory
-   * @deprecated use {@link #isChunkLoaded(int, int)} or {@link #isChunkLoaded(long)}
    */
-  @Deprecated
   public boolean isChunkLoaded(@NotNull Location chunkLoc) {
     return isChunkLoaded(chunkLoc.toCompactLocation());
   }
