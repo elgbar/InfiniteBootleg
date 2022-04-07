@@ -289,8 +289,8 @@ private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: Entit
 }
 
 private fun handleHeartbeat(ctx: ChannelHandlerContext, heartbeat: Heartbeat) {
-//  Main.logger().debug("Heartbeat","Server got client (" + ctx.getCurrentPlayer()?.name + ") heartbeat: " + heartbeat.keepAliveId)
-  ctx.getSharedInformation()?.beat()
+//  Main.logger().debug("Heartbeat", "Server got client (" + ctx.getCurrentPlayer()?.name + ") heartbeat: " + heartbeat.keepAliveId)
+  ctx.getSharedInformation()?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
 }
 
 // ///////////

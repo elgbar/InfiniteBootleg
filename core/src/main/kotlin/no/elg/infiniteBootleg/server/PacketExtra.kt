@@ -192,7 +192,7 @@ fun ServerClient.serverBoundWorldSettings(spawn: Location?, time: Float?, timeSc
   return worldSettingsPacketBuilder(serverBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
 }
 
-fun ServerClient.clientBoundHeartbeat(): Packet {
+fun ServerClient.serverBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(serverBoundPacket(DX_HEARTBEAT))
 }
 

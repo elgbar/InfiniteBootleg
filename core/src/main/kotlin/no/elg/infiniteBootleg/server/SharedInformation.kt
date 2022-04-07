@@ -27,7 +27,7 @@ data class SharedInformation(val entityUUID: UUID, val secret: String) {
     val now = Instant.now()
     val latest = now.minusMillis(HEARTBEAT_PERIOD_MS * MISSED_HEARTBEAT_LOST_CONNECTION)
 //    Main.logger()
-//      .debug("Heartbeat","Time since last beat " + Duration.between(lastHeartbeat, now) + " seconds. Should disconnect? " + lastHeartbeat.isBefore(latest))
+//      .debug("Heartbeat", "Time since last beat " + Duration.between(lastHeartbeat, now) + " seconds. Should disconnect? " + lastHeartbeat.isBefore(latest))
     // Uh-oh we didn't receive a heartbeat in quite some time
     return lastHeartbeat.isBefore(latest)
   }

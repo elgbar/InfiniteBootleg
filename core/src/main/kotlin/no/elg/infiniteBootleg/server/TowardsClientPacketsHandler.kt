@@ -255,7 +255,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
         val sharedInformation = sharedInformation!!
         sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //          Main.logger().log("Sending heartbeat to server")
-          ctx.writeAndFlush(clientBoundHeartbeat())
+          ctx.writeAndFlush(serverBoundHeartbeat())
           if (sharedInformation.lostConnection()) {
             ctx.fatal("Server stopped responding, heartbeats not received")
           }
@@ -301,15 +301,23 @@ private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
 private fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
   val world = world
   if (world == null) {
-    Main.logger().warn("handleDespawnEntity", "Failed to find world")
+    Main.logger().error("handleDespawnEntity", "Failed to find world")
     return
   }
-  val uuid = fromUUIDOrNull(despawnEntity.uuid) ?: return
-  val entity = world.getEntity(uuid) ?: return
+  val uuid = fromUUIDOrNull(despawnEntity.uuid)
+  if (uuid == null) {
+    Main.logger().error("handleDespawnEntity", "Failed to parse UUID '${despawnEntity.uuid}'")
+    return
+  }
+  val entity = world.getEntity(uuid)
+  if (entity == null) {
+    Main.logger().error("handleDespawnEntity", "Failed to get entity with uuid '${despawnEntity.uuid}'")
+    return
+  }
   world.removeEntity(entity)
 }
 
-private fun handleHeartbeat(heartbeat: Packets.Heartbeat) {
-//  Main.logger().debug("Heartbeat","Client got server heartbeat: " + heartbeat.keepAliveId)
-  ClientMain.inst().serverClient?.sharedInformation?.beat()
+private fun ServerClient.handleHeartbeat(heartbeat: Packets.Heartbeat) {
+//  Main.logger().debug("Heartbeat", "Client got server heartbeat: " + heartbeat.keepAliveId)
+  sharedInformation?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
 }
