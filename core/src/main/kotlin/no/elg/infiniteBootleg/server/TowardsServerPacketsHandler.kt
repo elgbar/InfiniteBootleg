@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.loader.WorldLoader
+import no.elg.infiniteBootleg.world.render.ChunksInView
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import java.security.SecureRandom
 import java.util.UUID
@@ -74,7 +75,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
     }
     DX_BLOCK_UPDATE -> {
       if (packet.hasUpdateBlock()) {
-        handleBlockUpdate(packet.updateBlock)
+        handleBlockUpdate(ctx, packet.updateBlock)
       }
     }
     DX_DISCONNECT -> {
@@ -158,21 +159,21 @@ private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: Sec
   }
 }
 
-private fun handleBlockUpdate(blockUpdate: UpdateBlock) {
+private fun handleBlockUpdate(ctx: ChannelHandlerContext, blockUpdate: UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
-  val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-  ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
+  if (isLocInView(ctx, worldX, worldY)) {
+    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
+    ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
+  }
 }
 
 private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
   val chunkLoc = chunkRequest.chunkLocation
   val serverWorld = ServerMain.inst().serverWorld
-  val uuid = ctx.getSharedInformation()?.entityUUID ?: return
-  val chunksInView = serverWorld.render.getClient(uuid) ?: return
 
   // Only send chunks which the player is allowed to see
-  if (chunksInView.isInView(chunkLoc.x, chunkLoc.y)) {
+  if (isChunkInView(ctx, chunkLoc.x, chunkLoc.y)) {
     val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y) ?: return // if no chunk, don't send a chunk update
     ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
   }
@@ -236,7 +237,11 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   Main.logger().debug("LOGIN", "Login request received by " + login.username + " uuid " + login.uuid)
 
   val world = ServerMain.inst().serverWorld
-  val uuid = fromUUIDOrNull(login.uuid) ?: return
+  val uuid = fromUUIDOrNull(login.uuid)
+  if (uuid == null) {
+    Main.logger().error("handleLoginPacket", "Failed to parse UUID '${login.uuid}'")
+    return
+  }
 
   if (world.hasPlayer(uuid)) {
     ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
@@ -270,9 +275,13 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
 private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {
   val world = ServerMain.inst().serverWorld
 
-  val uuid = fromUUIDOrNull(entityRequest.uuid) ?: return
+  val uuid = fromUUIDOrNull(entityRequest.uuid)
+  if (uuid == null) {
+    Main.logger().error("handleEntityRequest", "Failed to parse UUID '${entityRequest.uuid}'")
+    return
+  }
   val entity = world.getEntity(uuid)
-  if (entity != null) {
+  if (entity != null && isLocInView(ctx, entity.position.x.toInt(), entity.position.y.toInt())) {
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))
   } else {
     ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
@@ -284,6 +293,10 @@ private fun handleHeartbeat(ctx: ChannelHandlerContext, heartbeat: Heartbeat) {
   ctx.getSharedInformation()?.beat()
 }
 
+// ///////////
+//  UTILS  //
+// ///////////
+
 private fun ChannelHandlerContext.getSharedInformation(): SharedInformation? {
   return ServerBoundHandler.clients[this.channel()]
 }
@@ -291,4 +304,30 @@ private fun ChannelHandlerContext.getSharedInformation(): SharedInformation? {
 private fun ChannelHandlerContext.getCurrentPlayer(): Player? {
   val uuid = getSharedInformation()?.entityUUID ?: return null
   return ServerMain.inst().serverWorld.getPlayer(uuid)
+}
+
+/**
+ * Use to check if something should be sent to a client
+ */
+private fun chunksInView(ctx: ChannelHandlerContext): ChunksInView? {
+  val serverWorld = ServerMain.inst().serverWorld
+  val uuid = ctx.getSharedInformation()?.entityUUID
+  if (uuid == null) {
+    Main.logger().error("handleChunkRequest", "Failed to get UUID of requesting entity")
+    return null
+  }
+  val chunksInView = serverWorld.render.getClient(uuid)
+  if (chunksInView == null) {
+    Main.logger().error("handleChunkRequest", "Failed to get chunks in view")
+    return null
+  }
+  return chunksInView
+}
+
+private fun isChunkInView(ctx: ChannelHandlerContext, chunkX: Int, chunkY: Int): Boolean {
+  return chunksInView(ctx)?.isInView(chunkX, chunkY) ?: false
+}
+
+private fun isLocInView(ctx: ChannelHandlerContext, worldX: Int, worldY: Int): Boolean {
+  return chunksInView(ctx)?.isInView(CoordUtil.worldToChunk(worldX), CoordUtil.worldToChunk(worldY)) ?: false
 }
