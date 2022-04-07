@@ -179,7 +179,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
         player.toggleTorch()
       }
-      if (player.torchLight.isActive) {
+      if (player.torchLight?.isActive == true) {
         updateTorchDirection(player)
       }
     }

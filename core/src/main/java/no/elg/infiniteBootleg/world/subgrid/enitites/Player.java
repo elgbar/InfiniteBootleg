@@ -80,25 +80,6 @@ public class Player extends LivingEntity {
     }
   }
 
-  {
-    if (isInvalid() || Main.isServer()) {
-      torchLight = null;
-    } else {
-      ClientWorld world = ClientMain.inst().getWorld();
-      if (world == null) {
-        torchLight = null;
-      } else {
-        synchronized (LIGHT_LOCK) {
-          torchLight =
-              new ConeLight(world.getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
-          torchLight.setStaticLight(true);
-          torchLight.setContactFilter(World.LIGHT_FILTER);
-          torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-        }
-      }
-    }
-  }
-
   public synchronized void giveControls() {
     if (Main.isServer()) {
       return;
@@ -205,8 +186,21 @@ public class Player extends LivingEntity {
     return PUSH_UP;
   }
 
-  public @NotNull Light getTorchLight() {
-    Preconditions.checkNotNull(torchLight);
+  public @Nullable Light getTorchLight() {
+    if (torchLight == null && !isInvalid() && !Main.isServer()) {
+      ClientWorld world = ClientMain.inst().getWorld();
+      if (world == null) {
+        Main.logger().warn("Failed to get client world!");
+        return null;
+      }
+      synchronized (LIGHT_LOCK) {
+        torchLight =
+            new ConeLight(world.getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
+        torchLight.setStaticLight(true);
+        torchLight.setContactFilter(World.LIGHT_FILTER);
+        torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+      }
+    }
     return torchLight;
   }
 
