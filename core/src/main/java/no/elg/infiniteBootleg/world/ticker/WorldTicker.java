@@ -99,7 +99,7 @@ public class WorldTicker extends Ticker {
               && wr.isOutOfView(chunk)
               && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
-            // not need to remove with iterator
+            chunkIterator.remove();
             world.unloadChunk(chunk);
             continue;
           }

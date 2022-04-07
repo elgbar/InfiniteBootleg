@@ -801,7 +801,11 @@ public abstract class World implements Disposable, Resizable {
    */
   public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
     if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
-      Chunk old;
+      if (chunk.getWorld() != this) {
+        Main.logger().warn("Tried to unload chunk from different world");
+        return;
+      }
+      Chunk removedChunk;
       chunksWriteLock.lock();
       try {
         if (save) {
@@ -811,7 +815,7 @@ public abstract class World implements Disposable, Resizable {
           removeEntity(entity, CHUNK_UNLOADED);
         }
         long compactLocation = chunk.getCompactLocation();
-        old = chunks.remove(compactLocation);
+        removedChunk = chunks.remove(compactLocation);
         //        Main.logger().warn("World", "removed chunk " +
         // CoordUtil.stringifyCompactLoc(compactLocation) + ": unload chunk. Chunk size is now " +
         // chunks.size);
@@ -820,8 +824,9 @@ public abstract class World implements Disposable, Resizable {
       }
 
       chunk.dispose();
-      if (old != null) {
-        old.dispose();
+      if (removedChunk != null && chunk != removedChunk) {
+        Main.logger().warn("Removed unloaded chunk was different from chunk in chunks");
+        removedChunk.dispose();
       }
     }
   }
