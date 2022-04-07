@@ -33,7 +33,7 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
-import no.elg.infiniteBootleg.world.ClientWorld
+import no.elg.infiniteBootleg.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.subgrid.Entity
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.util.UUID
@@ -206,8 +206,8 @@ private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   Main.logger().debug("LOGIN", "Initialization okay, loading world")
   val protoWorld = startGame.world
-  this.world = ClientWorld(protoWorld).apply {
-    serverLoad(protoWorld)
+  this.world = ServerClientWorld(protoWorld, this).apply {
+    protoLoad(protoWorld, false)
   }
   if (startGame.controlling.type != PLAYER) {
     ctx.fatal("Can only control a player, got ${startGame.controlling.type}")

@@ -58,19 +58,14 @@ public interface Main extends ApplicationListener {
    * @return If this is a singleplayer instance
    */
   static boolean isSingleplayer() {
-    if (Settings.client) {
-      ClientMain clientMain = ClientMain.inst();
-      return clientMain.getServerClient() == null && clientMain.getSingleplayerWorld() != null;
-    } else {
-      return false;
-    }
+    return Settings.client && ClientMain.inst().isSinglePlayer();
   }
 
   /**
    * @return If the current instance is multiplayer (either as the server or a client of a server)
    */
   static boolean isMultiplayer() {
-    return !Settings.client || ClientMain.inst().getServerClient() != null;
+    return !Settings.client || ClientMain.inst().isMultiplayer();
   }
 
   /**

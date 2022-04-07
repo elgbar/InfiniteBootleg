@@ -19,8 +19,9 @@ import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.ServerClientWorld;
+import no.elg.infiniteBootleg.world.SinglePlayerWorld;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
-import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,10 +44,10 @@ public class ClientMain extends CommonMain {
   private float mouseWorldY;
 
   @Nullable private Screen screen;
+  private boolean singleplayer;
+  private boolean multiplayer;
 
   @Nullable private volatile Player mainPlayer;
-  @Nullable private volatile ServerClient serverClient;
-  @Nullable protected ClientWorld singleplayerWorld;
 
   @NotNull
   public static ClientMain inst() {
@@ -114,7 +115,7 @@ public class ClientMain extends CommonMain {
               worldFolder.deleteDirectory();
             }
           } else if (Main.isClient()) {
-            var serverClient = this.serverClient;
+            var serverClient = this.getServerClient();
             if (serverClient != null && serverClient.ctx != null) {
               serverClient.ctx.writeAndFlush(
                   PacketExtraKt.serverBoundClientDisconnectPacket(serverClient, "Client shutdown"));
@@ -175,9 +176,7 @@ public class ClientMain extends CommonMain {
   public void dispose() {
     super.dispose();
     if (Settings.client) {
-      if (screenRenderer != null) {
-        screenRenderer.dispose();
-      }
+      screenRenderer.dispose();
       blockAtlas.dispose();
       entityAtlas.dispose();
       VisUI.dispose();
@@ -196,21 +195,30 @@ public class ClientMain extends CommonMain {
     // clean up any mess the previous screen have made
     inputMultiplexer.clear();
     Gdx.input.setOnscreenKeyboardVisible(false);
-    ClientMain.inst().setServerClient(null);
 
     Gdx.app.debug("SCREEN", "Loading new screen " + screen.getClass().getSimpleName());
     this.screen = screen;
+    if (this.screen instanceof WorldScreen worldScreen) {
+      updateStatus(worldScreen.getWorld());
+    } else {
+      updateStatus(null);
+    }
     screen.show();
     screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+  }
+
+  public void updateStatus(@Nullable ClientWorld world) {
+    singleplayer = world instanceof SinglePlayerWorld;
+    multiplayer = world instanceof ServerClientWorld;
   }
 
   @NotNull
   public Screen getScreen() {
     if (screen == null) {
       if (Settings.client) {
-        throw new IllegalStateException("Server does not have screens");
-      } else {
         throw new IllegalStateException("Client has no screen!");
+      } else {
+        throw new IllegalStateException("Server does not have screens");
       }
     }
     return screen;
@@ -219,66 +227,26 @@ public class ClientMain extends CommonMain {
   /**
    * @return Either the world we're connected to or the singleplayer world, whichever is more
    *     correct. If the client is not in a world null will be returned
-   * @throws IllegalStateException If there is a client, but no world attached.
-   * @throws IllegalStateException If there is no client, and there is no singleplayer world
    */
   @Nullable
   public ClientWorld getWorld() {
-    final ServerClient client = ClientMain.inst().getServerClient();
-    if (Main.isSingleplayer()) {
-      return ClientMain.inst().getSingleplayerWorld();
-    } else if (Main.isServerClient()) {
-      final ClientWorld world = client.getWorld();
-      if (world == null) {
-        PacketExtraKt.fatal(client.ctx, "Failed to get client world when executing command");
-        throw new IllegalStateException("Failed to get client world when executing command");
-      }
-      return world;
+    if (screen instanceof WorldScreen worldScreen) {
+      return worldScreen.getWorld();
     }
     return null;
   }
 
-  /**
-   * @return Only use when singleplayer is guaranteed
-   * @see #getWorld()
-   */
-  @Nullable
-  public ClientWorld getSingleplayerWorld() {
-    return singleplayerWorld;
-  }
-
-  public void setSingleplayerWorld(@Nullable ClientWorld singleplayerWorld) {
-    if (Main.isMultiplayer()) {
-      throw new IllegalStateException("Cannot set the singleplayer world when in multiplayer!");
-    }
-    synchronized (INST_LOCK) {
-      this.singleplayerWorld = singleplayerWorld;
-    }
-  }
-
   @Nullable
   public Player getPlayer() {
-    if (Main.isServerClient()) {
+    ServerClient serverClient = getServerClient();
+    if (serverClient != null) {
       return serverClient.getPlayer();
     }
-    if (singleplayerWorld == null) {
+    var world = getWorld();
+    if (world == null) {
       return null;
     }
-    synchronized (INST_LOCK) {
-      if (mainPlayer == null || mainPlayer.isInvalid()) {
-        for (LivingEntity entity : singleplayerWorld.getPlayers()) {
-          if (entity instanceof Player player
-              && !entity.isInvalid()
-              && player.getControls() != null) {
-            setPlayer(player);
-            return mainPlayer;
-          }
-        }
-        return null;
-      } else {
-        return mainPlayer;
-      }
-    }
+    return mainPlayer;
   }
 
   public void setPlayer(@Nullable Player player) {
@@ -290,33 +258,36 @@ public class ClientMain extends CommonMain {
       Main.logger().error("PLR", "Tried to set main player to an invalid entity");
       return;
     }
+    var world = getWorld();
+    if (world == null) {
+      Main.logger().error("PLR", "No world loaded");
+      return;
+    }
     synchronized (INST_LOCK) {
+      final WorldInputHandler worldInput = world.getInput();
       if (mainPlayer != player) {
         // if mainPlayer and player are the same, we would dispose the ''new'' mainPlayer
 
-        if (mainPlayer != null && mainPlayer.hasControls()) {
-          mainPlayer.removeControls();
+        Player oldPlayer = this.mainPlayer;
+        if (oldPlayer != null && oldPlayer.hasControls()) {
+          oldPlayer.removeControls();
         }
         if (player != null) {
-          if (!singleplayerWorld.containsEntity(player.getUuid())) {
+          if (!world.containsEntity(player.getUuid())) {
             console.error("PLR", "Tried to set main player to an entity that's not in the world!");
-            singleplayerWorld.addEntity(player);
+            world.addEntity(player);
           }
           if (!player.hasControls()) {
             player.giveControls();
           }
         }
-        mainPlayer = player;
+        this.mainPlayer = player;
         if (Settings.client) {
-          assert singleplayerWorld.getInput() != null;
-          singleplayerWorld.getInput().setFollowing(mainPlayer);
+          world.getInput().setFollowing(player);
         }
         console.debug("PLR", "Changing main player to " + player);
       }
-      final WorldInputHandler worldInput = singleplayerWorld.getInput();
-      if (worldInput != null) {
-        worldInput.setFollowing(player);
-      }
+      worldInput.setFollowing(player);
     }
   }
 
@@ -362,10 +333,24 @@ public class ClientMain extends CommonMain {
 
   @Nullable
   public ServerClient getServerClient() {
-    return serverClient;
+    if (screen instanceof WorldScreen worldScreen
+        && worldScreen.getWorld() instanceof ServerClientWorld serverClientWorld) {
+      return serverClientWorld.getServerClient();
+    }
+    return null;
   }
 
-  public void setServerClient(@Nullable ServerClient serverClient) {
-    this.serverClient = serverClient;
+  /**
+   * @return If the player is singleplayer
+   */
+  public boolean isSinglePlayer() {
+    return singleplayer;
+  }
+
+  /**
+   * @return If the client is connected to a server
+   */
+  public boolean isMultiplayer() {
+    return multiplayer;
   }
 }

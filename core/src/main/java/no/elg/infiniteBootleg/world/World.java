@@ -192,7 +192,7 @@ public abstract class World implements Disposable, Resizable {
       e.printStackTrace();
       return;
     }
-    serverLoad(protoWorld);
+    protoLoad(protoWorld, this instanceof SinglePlayerWorld);
 
     if (!worldTicker.isStarted()) {
       worldTicker.start();
@@ -207,7 +207,7 @@ public abstract class World implements Disposable, Resizable {
     return player;
   }
 
-  public void serverLoad(@NotNull ProtoWorld.World protoWorld) {
+  public void protoLoad(@NotNull ProtoWorld.World protoWorld, boolean singleplayer) {
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());

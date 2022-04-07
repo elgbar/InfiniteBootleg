@@ -60,7 +60,6 @@ object ServerScreen : StageScreen() {
             ConnectingScreen.startLivelinessTest()
 
             val serverClient = ServerClient(nameField.text)
-            ClientMain.inst().serverClient = serverClient
             val clientChannel = ClientChannel(serverClient)
             val runnable = Runnable {
               val channel = clientChannel.channel ?: error("Could not connect to server")

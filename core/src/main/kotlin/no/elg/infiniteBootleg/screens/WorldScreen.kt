@@ -4,7 +4,6 @@ import com.badlogic.gdx.ScreenAdapter
 import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.util.PointLightPool
 import no.elg.infiniteBootleg.world.ClientWorld
@@ -37,16 +36,12 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   }
 
   override fun show() {
-    if (Main.isSingleplayer()) {
-      ClientMain.inst().setSingleplayerWorld(world)
-    }
-
+    ClientMain.inst().updateStatus(world)
     if (load) {
       world.load()
     }
-    if (Settings.client) {
-      Main.inst().console.addToInputMultiplexer()
-    }
+    Main.inst().console.addToInputMultiplexer()
+
     world.input.also { ClientMain.inst().inputMultiplexer.addProcessor(it) }
   }
 
@@ -54,8 +49,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
     if (Main.isSingleplayer()) {
       world.save()
       world.dispose()
-      ClientMain.inst().setSingleplayerWorld(null)
     }
+    ClientMain.inst().updateStatus(null)
     PointLightPool.clearAllPools()
     dispose()
   }
