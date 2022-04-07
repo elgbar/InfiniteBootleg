@@ -93,15 +93,13 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
         for ((dir, edgeDelta) in EDGE_DEF) {
 
-          val edgeId = CoordUtil.compactLoc(localX, localY)
+          // Create a pretty unique id for each edge
+          val edgeId = CoordUtil.compactLoc(worldX + dir.dx, worldY + dir.dy) * (dir.ordinal + 1L)
           // FIXME only check the chunk if the local coordinates are outside this chunk
           if (edgeId in edges ||
             CoordUtil.isInnerEdgeOfChunk(localX, localY) &&
             !CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) &&
-            !chunk.world.isChunkLoaded(
-                CoordUtil.worldToChunk(worldX + dir.dx),
-                CoordUtil.worldToChunk(worldY + dir.dy)
-              )
+            !chunk.world.isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx), CoordUtil.worldToChunk(worldY + dir.dy))
           ) {
             continue
           }
