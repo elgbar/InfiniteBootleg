@@ -33,6 +33,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
 
   override fun resize(width: Int, height: Int) {
     world.resize(width, height)
+    hud.resize(width, height)
   }
 
   override fun show() {

@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screen.hud.DebugLine;
+import no.elg.infiniteBootleg.screen.hud.FpsGraph;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -74,7 +75,7 @@ public class HUDRenderer implements Renderer, Resizable {
       CurrentBlock.INSTANCE.render(sr, player);
     }
     if (hasMode(DISPLAY_GRAPH_FPS)) {
-      sr.drawBottom("Imagine a graph here", 1);
+      FpsGraph.INSTANCE.render(sr);
     }
     sr.end();
   }
