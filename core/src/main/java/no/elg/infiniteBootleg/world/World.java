@@ -345,10 +345,6 @@ public abstract class World implements Disposable, Resizable {
 
   @Nullable
   public Chunk getChunk(long chunkLoc) {
-    if (getWorldTicker().isPaused()) {
-      Main.logger().debug("World", "Ticker paused will not return chunk");
-      return null;
-    }
     // This is a long lock, it must appear to be an atomic operation though
     Chunk readChunk;
     Chunk old = null;
@@ -369,6 +365,10 @@ public abstract class World implements Disposable, Resizable {
       return null;
     }
     if (readChunk == null || !readChunk.isLoaded()) {
+      if (getWorldTicker().isPaused()) {
+        Main.logger().debug("World", "Ticker paused will not load chunk");
+        return null;
+      }
       chunksWriteLock.lock();
       try {
         // another thread might have loaded the chunk while we were waiting here
