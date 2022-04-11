@@ -249,23 +249,34 @@ public class Commands extends CommandExecutor {
     logger.success("Light quality is now " + quality);
   }
 
-  @CmdArgNames({"modus"})
+  @CmdArgNames({"mode"})
   @ClientsideOnly
   @ConsoleDoc(
-      description = "Set how much information to show",
-      paramDescriptions = "normal (default), debug or none")
+      description = "Toggle how much information to show",
+      paramDescriptions = "block, debug, graph, mindebug, or none")
   public void hud(String modusName) {
     var screen = ClientMain.inst().getScreen();
-    if (!(screen instanceof WorldScreen)) {
+    if (!(screen instanceof WorldScreen worldScreen)) {
       logger.error("Not currently in a world, cannot change hud");
       return;
     }
+    var hud = worldScreen.getHud();
 
-    try {
-      HUDRenderer.HUDModus modus = HUDRenderer.HUDModus.valueOf(modusName.toUpperCase());
-      ((WorldScreen) screen).getHud().setModus(modus);
-    } catch (IllegalArgumentException e) {
+    int mode =
+        switch (modusName) {
+          case "block" -> HUDRenderer.DISPLAY_CURRENT_BLOCK;
+          case "mindebug" -> HUDRenderer.DISPLAY_MINIMAL_DEBUG;
+          case "debug" -> HUDRenderer.DISPLAY_DEBUG;
+          case "graph" -> HUDRenderer.DISPLAY_GRAPH_FPS;
+          case "none" -> HUDRenderer.DISPLAY_NOTHING;
+          default -> -1;
+        };
+    if (mode < 0) {
       logger.error("Unknown HUD modus '" + modusName + "'");
+    } else if (mode == 0) {
+      hud.displayNothing();
+    } else {
+      hud.toggleMode(mode);
     }
   }
 

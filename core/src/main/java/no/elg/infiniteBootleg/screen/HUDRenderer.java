@@ -1,215 +1,115 @@
 package no.elg.infiniteBootleg.screen;
 
-import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
-
-import box2dLight.PublicRayHandler;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.input.EntityControls;
-import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.Ticker;
-import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
+import no.elg.infiniteBootleg.screen.hud.DebugLine;
+import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.Material;
-import no.elg.infiniteBootleg.world.generator.biome.Biome;
-import no.elg.infiniteBootleg.world.render.ClientChunksInView;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
-import no.elg.infiniteBootleg.world.time.WorldTime;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
  */
-public class HUDRenderer implements Renderer {
+public class HUDRenderer implements Renderer, Resizable {
 
-  private HUDModus modus;
+  public static final int DISPLAY_NOTHING = 0;
+  public static final int DISPLAY_CURRENT_BLOCK = 1;
+  public static final int DISPLAY_MINIMAL_DEBUG = 2;
+  public static final int DISPLAY_DEBUG = 4;
+  public static final int DISPLAY_GRAPH_FPS = 8;
+
+  private int modus = DISPLAY_CURRENT_BLOCK;
+
+  @NotNull private final StringBuilder builder = new StringBuilder();
 
   public HUDRenderer() {
-    modus = Settings.debug ? HUDModus.DEBUG : HUDModus.NORMAL;
+    modus |= Settings.debug ? DISPLAY_DEBUG : DISPLAY_CURRENT_BLOCK;
   }
 
   @Override
   public void render() {
-    if (modus == HUDModus.NONE || Main.isServer()) {
+    if (modus == DISPLAY_NOTHING || Main.isServer()) {
       return;
     }
     ClientMain main = ClientMain.inst();
-    ClientWorld world = main.getWorld();
-    int h = Gdx.graphics.getHeight();
+    @Nullable ClientWorld world = main.getWorld();
 
     LivingEntity player = ClientMain.inst().getPlayer();
     ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
-    if (modus == HUDModus.DEBUG) {
+
+    reset();
+    sr.begin();
+    if (hasMode(DISPLAY_MINIMAL_DEBUG) || hasMode(DISPLAY_DEBUG)) {
+      DebugLine.fpsString(builder, world);
+    }
+    if (hasMode(DISPLAY_DEBUG) && world != null) {
       int mouseBlockX = main.getMouseBlockX();
       int mouseBlockY = main.getMouseBlockY();
 
-      sr.begin();
-      sr.drawTop(fpsString(world), 1);
-      sr.drawTop(pointing(mouseBlockX, mouseBlockY, world), 3);
-      sr.drawTop(chunk(mouseBlockX, mouseBlockY, world), 5);
-      sr.drawTop(viewChunk(world, player), 7);
-      sr.drawTop(pos(player), 9);
-      sr.drawTop(time(world), 11);
-      sr.drawTop(lights(world), 13);
-      sr.drawTop(ents(world), 15);
-    } else {
-      sr.begin();
+      nl();
+      DebugLine.pointing(builder, world, mouseBlockX, mouseBlockY);
+      nl();
+      DebugLine.chunk(builder, world, mouseBlockX, mouseBlockY);
+      nl();
+      DebugLine.viewChunk(builder, world);
+      nl();
+      DebugLine.pos(builder, player);
+      nl();
+      DebugLine.time(builder, world);
+      nl();
+      DebugLine.lights(builder, world);
+      nl();
+      DebugLine.ents(builder, world);
     }
-    if (player != null) {
-      final EntityControls controls = player.getControls();
-      Material mat = controls != null ? controls.getSelected() : null;
-      if (mat != null && mat.getTextureRegion() != null) {
-        sr.getBatch()
-            .draw(
-                mat.getTextureRegion(),
-                Gdx.graphics.getWidth() - BLOCK_SIZE * 3f * ClientMain.SCALE,
-                h - BLOCK_SIZE * 3f * ClientMain.SCALE,
-                BLOCK_SIZE * 2f * ClientMain.SCALE,
-                BLOCK_SIZE * 2f * ClientMain.SCALE);
-      }
+    if (!builder.isEmpty()) {
+      sr.drawTop(builder.toString(), 1);
+    }
+
+    if (player != null && hasMode(DISPLAY_CURRENT_BLOCK)) {
+      CurrentBlock.INSTANCE.render(sr, player);
+    }
+    if (hasMode(DISPLAY_GRAPH_FPS)) {
+      sr.drawBottom("Imagine a graph here", 1);
     }
     sr.end();
   }
 
-  private String lights(ClientWorld world) {
-    final PublicRayHandler handler = world.getRender().getRayHandler();
-    return "Active Lights:" + handler.getEnabledLights().size;
+  private void reset() {
+    builder.setLength(0);
   }
 
-  private String ents(ClientWorld world) {
-    String nl = "\n    ";
-    StringBuilder ents = new StringBuilder("E = ");
-
-    for (Entity entity :
-        world.getEntities(ClientMain.inst().getMouseX(), ClientMain.inst().getMouseY())) {
-      ents.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl);
-    }
-    int index = ents.lastIndexOf(nl);
-    if (index != -1) {
-      ents.deleteCharAt(index);
-    }
-    return ents.toString().trim();
+  private void nl() {
+    builder.append('\n');
   }
 
-  private String fpsString(@Nullable ClientWorld world) {
-    int activeThreads = Main.inst().getScheduler().getActiveThreads();
-
-    long tpsDelta;
-    long realTPS;
-    if (world != null) {
-      Ticker worldTicker = world.getWorldTicker();
-      tpsDelta = TimeUtils.nanosToMillis(worldTicker.getTpsDelta());
-      realTPS = worldTicker.getRealTPS();
-    } else {
-      tpsDelta = -1;
-      realTPS = -1;
-    }
-    float fpsDelta = Gdx.graphics.getDeltaTime();
-    int tps = Gdx.graphics.getFramesPerSecond();
-
-    String format = "FPS: %4d delta: %.5f tps: %2d tps delta: %3d ms active threads %d";
-    return String.format(format, tps, fpsDelta, realTPS, tpsDelta, activeThreads);
+  public boolean hasMode(int mode) {
+    return (this.modus & mode) > 0;
   }
 
-  private String pointing(int mouseBlockX, int mouseBlockY, ClientWorld world) {
-
-    Block block = world.getBlock(mouseBlockX, mouseBlockY, true);
-    Material material = block != null ? block.getMaterial() : Material.AIR;
-    float rawX = ClientMain.inst().getMouseX();
-    float rawY = ClientMain.inst().getMouseY();
-    boolean exists = block != null;
-    final String blockDebug = block != null ? block.hudDebug() : "";
-
-    String format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b %s";
-    return String.format(
-        format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug);
+  public void displayNothing() {
+    this.modus = DISPLAY_NOTHING;
   }
 
-  private String chunk(int mouseBlockX, int mouseBlockY, ClientWorld world) {
-
-    Chunk pc = world.getChunkFromWorld(mouseBlockX, mouseBlockY);
-    int chunkY = CoordUtil.worldToChunk(mouseBlockY);
-    int chunkX = CoordUtil.worldToChunk(mouseBlockX);
-    if (pc == null) {
-      String format = "chunk (% 4d,% 4d) : not loaded";
-      return String.format(format, chunkX, chunkY);
-    } else {
-      Biome biome = world.getChunkLoader().getGenerator().getBiome(mouseBlockX);
-      boolean allAir = pc.isAllAir();
-      boolean allowUnloading = pc.isAllowingUnloading();
-
-      String format = "chunk (% 4d,% 4d) : type: %-9.9s just air? %-5b can unload? %-5b";
-      return String.format(format, chunkX, chunkY, biome, allAir, allowUnloading);
-    }
+  public void enableMode(int mode) {
+    this.modus |= mode;
   }
 
-  private String time(ClientWorld world) {
-    WorldTime worldTime = world.getWorldTime();
-    String format = "time: %.2f (%.2f) scale: %.2f sky brightness: %.2f TOD: %s ";
-    return String.format(
-        format,
-        worldTime.getTime(),
-        worldTime.normalizedTime(),
-        worldTime.getTimeScale(),
-        worldTime.getSkyBrightness(),
-        worldTime.timeOfDay(worldTime.getTime()));
+  public void disableMode(int mode) {
+    this.modus &= ~mode;
   }
 
-  private String viewChunk(ClientWorld world, Entity player) {
-    ClientChunksInView viewingChunks = world.getRender().getChunksInView();
-
-    int chunksHor = viewingChunks.getHorizontalLength();
-    int chunksVer = viewingChunks.getVerticalLength();
-
-    int chunksInView = chunksHor * chunksVer;
-    int blocks = chunksInView * CHUNK_SIZE * CHUNK_SIZE;
-    int blocksHor = chunksHor * CHUNK_SIZE;
-    int blocksVer = chunksVer * CHUNK_SIZE;
-    float zoom = world.getRender().getCamera().zoom;
-
-    String format = "Viewing %d chunks (total %d blocks, w %d b, h %d b) with zoom: %.3f";
-    return String.format(format, chunksInView, blocks, blocksHor, blocksVer, zoom);
+  public void toggleMode(int mode) {
+    this.modus ^= mode;
   }
 
-  private String pos(LivingEntity player) {
-    if (player == null) {
-      return "No player";
-    }
-
-    Vector2 velocity = player.getVelocity();
-    Vector2 position = player.getPosition();
-    Vector2 physicsPosition = player.getPhysicsPosition();
-
-    boolean onGround = player.isOnGround();
-    boolean flying = player.isFlying();
-
-    String format = "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b f? %-5b";
-    return String.format(
-        format,
-        position.x,
-        position.y,
-        velocity.x,
-        velocity.y,
-        physicsPosition.x,
-        physicsPosition.y,
-        onGround,
-        flying);
-  }
-
-  public HUDModus getModus() {
-    return modus;
-  }
-
-  public void setModus(HUDModus modus) {
-    this.modus = modus;
+  @Override
+  public void resize(int width, int height) {
+    FpsGraph.INSTANCE.resize(width, height);
   }
 
   /** How much information to show */

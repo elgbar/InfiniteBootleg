@@ -7,6 +7,7 @@ import static com.badlogic.gdx.Input.Keys.F5;
 import static com.badlogic.gdx.Input.Keys.F9;
 import static com.badlogic.gdx.Input.Keys.LEFT;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
+import static com.badlogic.gdx.Input.Keys.SHIFT_LEFT;
 import static com.badlogic.gdx.Input.Keys.UP;
 
 import com.badlogic.gdx.Gdx;
@@ -19,7 +20,6 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
-import no.elg.infiniteBootleg.screen.HUDRenderer.HUDModus;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
@@ -61,10 +61,9 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         Screen screen = ClientMain.inst().getScreen();
         if (screen instanceof WorldScreen worldScreen) {
           HUDRenderer hud = worldScreen.getHud();
-          if (hud.getModus() == HUDModus.DEBUG) {
-            hud.setModus(HUDModus.NORMAL);
-          } else {
-            hud.setModus(HUDModus.DEBUG);
+          hud.toggleMode(HUDRenderer.DISPLAY_DEBUG);
+          if (hud.hasMode(HUDRenderer.DISPLAY_DEBUG) && Gdx.input.isKeyPressed(SHIFT_LEFT)) {
+            hud.toggleMode(HUDRenderer.DISPLAY_GRAPH_FPS);
           }
         }
         break;
