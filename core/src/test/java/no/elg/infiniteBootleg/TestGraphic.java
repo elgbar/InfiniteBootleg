@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import de.tomgrill.gdxtesting.GdxTestRunner;
 import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.SinglePlayerWorld;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,7 @@ public class TestGraphic {
 
   @NotNull
   public ClientWorld createNewWorld() {
-    world = new ClientWorld(new EmptyChunkGenerator(), 0, "World");
-    ClientMain.inst().setSingleplayerWorld(world);
+    world = new SinglePlayerWorld(new EmptyChunkGenerator(), 0, "World");
     return world;
   }
 

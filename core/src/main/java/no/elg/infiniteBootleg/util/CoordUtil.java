@@ -180,6 +180,30 @@ public class CoordUtil {
     return (int) compactLoc;
   }
 
+  public static long compactShort(short a, short b, short c, short d) {
+    return compactLoc(compactShort(a, b), compactShort(c, d));
+  }
+
+  public static int compactShort(short a, short b) {
+    return (a << Short.SIZE) | (b & 0xffff);
+  }
+
+  /**
+   * @param compactLoc A long created by {@link #compactLoc(int, int)}
+   * @return The x coordinate of the compacted location
+   */
+  public static short decompactShortA(int compactLoc) {
+    return (short) (compactLoc >> Short.SIZE);
+  }
+
+  /**
+   * @param compactLoc A long created by {@link #compactLoc(int, int)}
+   * @return The y coordinate of the compacted location
+   */
+  public static short decompactShortB(int compactLoc) {
+    return (short) compactLoc;
+  }
+
   public static String stringifyCompactLoc(long compactLoc) {
     return "(" + decompactLocX(compactLoc) + "," + decompactLocY(compactLoc) + ")";
   }

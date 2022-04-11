@@ -97,4 +97,15 @@ public class CoordUtilTest {
       }
     }
   }
+
+  @Test
+  public void compactShort() {
+    for (short x = -10; x <= 10; x++) {
+      for (short y = -10; y <= 10; y++) {
+        int compact = CoordUtil.compactShort(x, y);
+        assertEquals(x, CoordUtil.decompactShortA(compact));
+        assertEquals(y, CoordUtil.decompactShortB(compact));
+      }
+    }
+  }
 }
