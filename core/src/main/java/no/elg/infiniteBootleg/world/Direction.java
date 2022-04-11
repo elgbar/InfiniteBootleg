@@ -24,9 +24,9 @@ public enum Direction {
   }
 
   public static Direction fromAngleCardinal(double angle) {
-    if (angle < 0 || angle >= 365) {
+    if (angle < 0 || angle >= 360) {
       throw new IllegalArgumentException(
-          "Angle must be between 0 and 2π (both inclusive), got " + angle);
+          "Angle must be between 0 and 360 (both inclusive), got " + angle);
     }
     if (angle > 315 || angle <= 45) {
       return EAST;
@@ -41,9 +41,9 @@ public enum Direction {
   }
 
   public static Direction fromAngle(double angle) {
-    if (angle < 0 || angle >= 365) {
+    if (angle < 0 || angle >= 360) {
       throw new IllegalArgumentException(
-          "Angle must be between 0 and 2π (both inclusive), got " + angle);
+          "Angle must be between 0 and 360 (both inclusive), got " + angle);
     }
     if (angle > 330 || angle <= 30) {
       return EAST;
@@ -59,7 +59,7 @@ public enum Direction {
       return SOUTH_WEST;
     } else if (angle > 240 && angle <= 300) {
       return SOUTH;
-    } else if (angle > 300 && angle <= 330) {
+    } else if (angle > 300 /* && angle <= 330*/) {
       return SOUTH_EAST;
     }
     throw new IllegalArgumentException("Cannot find angle of " + angle);
