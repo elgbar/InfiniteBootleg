@@ -43,18 +43,20 @@ public class WorldLightTicker implements Ticking {
 
   @Override
   public void tick() {
-    ClientWorldRender wr = world.getRender();
-
     if (Settings.renderLight) {
-      if (Settings.dayTicking) {
-        updateLight(wr.getAmbientLight(), WorldTime.MIDDAY_TIME, 0.25f);
-        updateLight(wr.getSun(), world.getWorldTime().getTime(), 1f);
-      }
+      ClientWorldRender wr = world.getRender();
       synchronized (WorldRender.BOX2D_LOCK) {
-        synchronized (WorldRender.LIGHT_LOCK) {
-          wr.getRayHandler().update();
-        }
+        wr.getRayHandler().update();
       }
+    }
+  }
+
+  @Override
+  public void tickRare() {
+    if (Settings.renderLight && Settings.dayTicking) {
+      ClientWorldRender wr = world.getRender();
+      updateLight(wr.getAmbientLight(), WorldTime.MIDDAY_TIME, 0.25f);
+      updateLight(wr.getSun(), world.getWorldTime().getTime(), 1f);
     }
   }
 
