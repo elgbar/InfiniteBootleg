@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.LinkedList;
 import java.util.List;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -32,7 +31,6 @@ public class ChunkRenderer implements Renderer, Disposable {
 
   // current rendering chunk
   private Chunk curr;
-
   private static final Object QUEUE_LOCK = new Object();
 
   public ChunkRenderer(@NotNull WorldRender worldRender) {
@@ -49,7 +47,6 @@ public class ChunkRenderer implements Renderer, Disposable {
     synchronized (QUEUE_LOCK) {
       // do not queue the chunk we're currently rendering
       if (chunk != curr && !renderQueue.contains(chunk)) {
-        Main.inst().getScheduler().executeSync(() -> chunk.getChunkBody().update());
         if (prioritize) {
           renderQueue.add(0, chunk);
         } else {
@@ -109,7 +106,6 @@ public class ChunkRenderer implements Renderer, Disposable {
 
     batch.end();
     fbo.end();
-    Main.inst().getScheduler().executeAsync(worldRender::update);
 
     synchronized (QUEUE_LOCK) {
       curr = null;

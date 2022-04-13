@@ -5,7 +5,6 @@ import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterator.SIZED;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -67,7 +66,6 @@ public class ChunkImpl implements Chunk {
   private volatile boolean disposed;
   private volatile long lastViewedTick;
   private TextureRegion fboRegion;
-  private FileHandle chunkFile;
   private FrameBuffer fbo;
 
   /**
@@ -272,10 +270,13 @@ public class ChunkImpl implements Chunk {
     if (isInvalid()) {
       return;
     }
+    boolean wasPrioritize;
     synchronized (this) {
       if (!dirty) {
         return;
       }
+      wasPrioritize = prioritize;
+      prioritize = false;
       dirty = false;
 
       // test if all the blocks in this chunk has the material air
@@ -291,14 +292,10 @@ public class ChunkImpl implements Chunk {
         }
       }
     }
-    if (Main.isServer()) {
-      Main.inst().getScheduler().executeSync(() -> this.getChunkBody().update());
-    } else {
-      final WorldRender render = world.getRender();
-      if (render instanceof ClientWorldRender clientWorldRender) {
-        clientWorldRender.getChunkRenderer().queueRendering(this, prioritize);
-      }
-      prioritize = false;
+    Main.inst().getScheduler().executeSync(chunkBody::update);
+    final WorldRender render = world.getRender();
+    if (render instanceof ClientWorldRender clientWorldRender) {
+      clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
     }
   }
 
