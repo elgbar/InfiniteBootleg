@@ -33,4 +33,8 @@ public class PublicRayHandler extends RayHandler {
   public Array<Light> getDisabledLights() {
     return disabledLights;
   }
+
+  public void renderLightMap() {
+    lightMap.render();
+  }
 }

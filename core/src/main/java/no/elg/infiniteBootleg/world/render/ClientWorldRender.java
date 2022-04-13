@@ -180,9 +180,10 @@ public class ClientWorldRender implements WorldRender {
     entityRenderer.render();
     batch.end();
     if (Settings.renderLight) {
+      rayHandler.prepareRender();
       synchronized (BOX2D_LOCK) {
         synchronized (LIGHT_LOCK) {
-          rayHandler.render();
+          rayHandler.renderLightMap();
         }
       }
     }
