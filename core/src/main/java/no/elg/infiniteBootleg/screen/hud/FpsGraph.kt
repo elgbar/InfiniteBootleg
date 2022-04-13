@@ -61,6 +61,12 @@ object FpsGraph : Resizable {
     FpsGraph.height = height / 3
     index = Int.MAX_VALUE
 
+    if (::pixmap.isInitialized) {
+      pixmap.dispose()
+    }
+    if (::texture.isInitialized) {
+      texture.dispose()
+    }
     pixmap = buffer()
     texture = Texture(pixmap)
 
