@@ -41,6 +41,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     renderQueue = SetUniqueList.setUniqueList(chunkList);
     batch.setProjectionMatrix(
         new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
+    batch.disableBlending();
   }
 
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
