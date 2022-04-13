@@ -308,13 +308,20 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  public synchronized FrameBuffer getFbo() {
-    if (fbo == null) {
-      fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
-      fbo.getColorBufferTexture()
-          .setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-      fboRegion = new TextureRegion(fbo.getColorBufferTexture());
-      fboRegion.flip(false, true);
+  public FrameBuffer getFbo() {
+    if (fbo != null) {
+      return fbo;
+    }
+    synchronized (this) {
+      // Some other thread might have created the fbo already, so we should check it
+      if (fbo == null) {
+        fbo =
+            new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
+        fbo.getColorBufferTexture()
+            .setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        fboRegion = new TextureRegion(fbo.getColorBufferTexture());
+        fboRegion.flip(false, true);
+      }
     }
     return fbo;
   }
