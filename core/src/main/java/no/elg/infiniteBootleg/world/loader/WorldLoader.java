@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import java.util.Random;
 import java.util.UUID;
-import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -92,7 +91,11 @@ public class WorldLoader {
   public static void saveServerPlayer(@NotNull Player player) {
     FileHandle fileHandle = getServerPlayerFile(player.getWorld(), player.getUuid());
     if (fileHandle != null) {
-      fileHandle.writeBytes(player.save().build().toByteArray(), false);
+      try {
+        fileHandle.writeBytes(player.save().build().toByteArray(), false);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -101,7 +104,7 @@ public class WorldLoader {
   }
 
   public static FileHandle getWorldFolder(@NotNull UUID uuid) {
-    return Gdx.files.external(ClientMain.WORLD_FOLDER + uuid);
+    return Gdx.files.external(Main.WORLD_FOLDER + uuid);
   }
 
   public static ChunkGenerator generatorFromProto(@NotNull ProtoWorld.World protoWorld) {

@@ -95,7 +95,6 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
           // Create a unique id for each edge
           val edgeId = CoordUtil.compactShort(localX.toShort(), dir.dx.toShort(), localY.toShort(), dir.dy.toShort())
-          // FIXME only check the chunk if the local coordinates are outside this chunk
           if (edgeId in edges ||
             CoordUtil.isInnerEdgeOfChunk(localX, localY) &&
             !CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) &&
