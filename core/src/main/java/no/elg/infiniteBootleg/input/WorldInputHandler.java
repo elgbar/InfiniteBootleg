@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.input;
 
-import static com.badlogic.gdx.Input.Keys.ALT_LEFT;
 import static com.badlogic.gdx.Input.Keys.DOWN;
 import static com.badlogic.gdx.Input.Keys.F12;
 import static com.badlogic.gdx.Input.Keys.F3;
@@ -63,10 +62,15 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
         if (screen instanceof WorldScreen worldScreen) {
           HUDRenderer hud = worldScreen.getHud();
 
-          if (Gdx.input.isKeyPressed(ALT_LEFT)) {
-            hud.toggleMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG);
+          if (!hud.hasMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG)
+              && !hud.hasMode(HUDRenderer.DISPLAY_DEBUG)) {
+            hud.enableMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG);
+          } else if (hud.hasMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG)) {
+            hud.enableMode(HUDRenderer.DISPLAY_DEBUG);
+            hud.disableMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG);
           } else {
-            hud.toggleMode(HUDRenderer.DISPLAY_DEBUG);
+            hud.disableMode(HUDRenderer.DISPLAY_DEBUG);
+            hud.disableMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG);
           }
 
           if (Gdx.input.isKeyPressed(SHIFT_LEFT)) {
