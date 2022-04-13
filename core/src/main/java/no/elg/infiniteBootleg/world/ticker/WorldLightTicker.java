@@ -18,11 +18,16 @@ public class WorldLightTicker implements Ticking {
   @NotNull private final ClientWorld world;
 
   private final Color tmpColor = new Color();
+  private static boolean updateDirectional;
 
   WorldLightTicker(@NotNull ClientWorld world, boolean tick) {
     this.world = world;
     ticker =
         new Ticker(this, "WorldLight-" + world.getName(), tick, Settings.tps / 3, Double.MAX_VALUE);
+  }
+
+  public static void updateLights() {
+    updateDirectional = true;
   }
 
   private void updateLight(@Nullable DirectionalLight light, float direction, float intensity) {
@@ -44,6 +49,9 @@ public class WorldLightTicker implements Ticking {
   @Override
   public void tick() {
     if (Settings.renderLight) {
+      if (updateDirectional) {
+        tickRare();
+      }
       ClientWorldRender wr = world.getRender();
       synchronized (WorldRender.BOX2D_LOCK) {
         wr.getRayHandler().update();
@@ -53,6 +61,7 @@ public class WorldLightTicker implements Ticking {
 
   @Override
   public void tickRare() {
+    updateDirectional = false;
     if (Settings.renderLight && Settings.dayTicking) {
       ClientWorldRender wr = world.getRender();
       updateLight(wr.getAmbientLight(), WorldTime.MIDDAY_TIME, 0.25f);

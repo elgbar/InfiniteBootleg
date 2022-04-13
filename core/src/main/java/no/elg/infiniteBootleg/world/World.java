@@ -55,6 +55,7 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
 import no.elg.infiniteBootleg.world.ticker.WorldTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
@@ -644,6 +645,7 @@ public abstract class World implements Disposable, Resizable {
         .getScheduler()
         .executeSync(
             () -> {
+              WorldLightTicker.updateLights();
               for (Chunk chunk : getLoadedChunks()) {
 
                 Array<TickingBlock> tickingBlocks = chunk.getTickingBlocks();
