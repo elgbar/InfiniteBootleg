@@ -152,7 +152,7 @@ public class Player extends LivingEntity {
   }
 
   @Override
-  public ProtoWorld.Entity.Builder save() {
+  public ProtoWorld.Entity.@NotNull Builder save() {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Player.Builder playerBuilder = ProtoWorld.Entity.Player.newBuilder();
 

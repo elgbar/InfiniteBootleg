@@ -163,7 +163,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   }
 
   @Override
-  public ProtoWorld.Entity.Builder save() {
+  public ProtoWorld.Entity.@NotNull Builder save() {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Material.Builder materialBuilder =
         ProtoWorld.Entity.Material.newBuilder();

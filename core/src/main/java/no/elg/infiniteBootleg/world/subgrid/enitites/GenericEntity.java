@@ -50,7 +50,7 @@ public class GenericEntity extends Entity implements Removable {
   }
 
   @Override
-  public ProtoWorld.Entity.Builder save() {
+  public ProtoWorld.Entity.@NotNull Builder save() {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Generic.Builder genericBuilder = ProtoWorld.Entity.Generic.newBuilder();
 

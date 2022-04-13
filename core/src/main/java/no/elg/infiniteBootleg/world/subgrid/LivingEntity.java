@@ -87,6 +87,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
   public abstract EntityControls getControls();
 
   @Override
+  @NotNull
   public ProtoWorld.Entity.Builder save() {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Living.Builder livingBuilder = ProtoWorld.Entity.Living.newBuilder();

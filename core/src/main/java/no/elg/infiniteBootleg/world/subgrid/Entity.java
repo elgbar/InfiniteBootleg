@@ -773,6 +773,7 @@ public abstract class Entity
   }
 
   @Override
+  @NotNull
   public ProtoWorld.Entity.Builder save() {
     final ProtoWorld.Entity.Builder builder = ProtoWorld.Entity.newBuilder();
 

@@ -49,7 +49,7 @@ public abstract class MaterialEntity extends Entity implements Removable {
   public abstract Material getMaterial();
 
   @Override
-  public ProtoWorld.Entity.Builder save() {
+  public ProtoWorld.Entity.@NotNull Builder save() {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Material.Builder materialBuilder =
         ProtoWorld.Entity.Material.newBuilder();
