@@ -34,6 +34,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
+import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
@@ -87,6 +88,7 @@ public class Commands extends CommandExecutor {
     if (world == null) return;
     Color skylight = world.getWorldTime().getBaseColor();
     skylight.set(r, g, b, a);
+    WorldLightTicker.updateDirectionalLights();
     logger.success("Sky color changed to " + skylight);
   }
 
@@ -102,6 +104,7 @@ public class Commands extends CommandExecutor {
     try {
       Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
       skylight.set(color);
+      WorldLightTicker.updateDirectionalLights();
       logger.log("Sky color changed to " + colorName.toLowerCase() + " (" + color + ")");
     } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
       logger.logf(LogLevel.ERROR, "Unknown color '%s'", colorName);
@@ -436,6 +439,7 @@ public class Commands extends CommandExecutor {
     Settings.dayTicking = !Settings.dayTicking;
 
     logger.success("Time is now " + (Settings.dayTicking ? "" : "not ") + "ticking");
+    WorldLightTicker.updateDirectionalLights();
 
     PacketExtraKt.sendDuplexPacket(
         () -> PacketExtraKt.clientBoundWorldSettings(null, null, Settings.dayTicking ? 1f : 0f),
@@ -486,6 +490,7 @@ public class Commands extends CommandExecutor {
     WorldTime worldTime = world.getWorldTime();
     float old = worldTime.getTime();
     worldTime.setTime(time);
+    WorldLightTicker.updateDirectionalLights();
 
     PacketExtraKt.sendDuplexPacket(
         () -> PacketExtraKt.clientBoundWorldSettings(null, time, null),
@@ -598,7 +603,7 @@ public class Commands extends CommandExecutor {
         .scheduleSync(50L, () -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE));
   }
 
-  @ConsoleDoc(description = "Some some debug info")
+  @ConsoleDoc(description = "Some debug info")
   public void chunkInfo() {
     Main.logger().log("Debug chunk Info");
     var world = getWorld();

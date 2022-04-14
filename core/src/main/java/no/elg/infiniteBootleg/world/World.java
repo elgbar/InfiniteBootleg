@@ -645,7 +645,7 @@ public abstract class World implements Disposable, Resizable {
         .getScheduler()
         .executeSync(
             () -> {
-              WorldLightTicker.updateLights();
+              WorldLightTicker.updateDirectionalLights();
               for (Chunk chunk : getLoadedChunks()) {
 
                 Array<TickingBlock> tickingBlocks = chunk.getTickingBlocks();
