@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.screen.hud
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.utils.TimeUtils
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fastIntFormat
@@ -18,13 +17,13 @@ object DebugLine {
   @JvmStatic
   inline fun fpsString(sb: StringBuilder, world: ClientWorld?) {
     val worldTicker = world?.worldTicker
-    val tpsDelta = if (worldTicker == null) -1 else TimeUtils.nanosToMillis(worldTicker.tpsDelta)
+    val tpsDelta = (worldTicker?.tpsDelta ?: 0) / 1_000_000.0
     val realTPS = worldTicker?.realTPS ?: -1
 
     sb.append("FPS: ").fastIntFormat(Gdx.graphics.framesPerSecond, 4)
-      .append(" delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble()))
-      .append(" tps: ").fastIntFormat(realTPS.toInt(), 2)
-      .append(" tps delta: ").fastIntFormat(tpsDelta.toInt(), 3)
+      .append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")
+      .append(" | tps: ").fastIntFormat(realTPS.toInt(), 2)
+      .append(" | tps delta: ").append(dotFourFormat.format(tpsDelta)).append(" ms")
 //      .append(" ms active threads ").append(Main.inst().scheduler.activeThreads)
   }
 
