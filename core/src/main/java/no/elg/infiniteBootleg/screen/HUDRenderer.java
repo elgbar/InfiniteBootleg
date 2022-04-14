@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screen.hud.DebugGraph;
-import no.elg.infiniteBootleg.screen.hud.DebugLine;
+import no.elg.infiniteBootleg.screen.hud.DebugText;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -46,26 +46,26 @@ public class HUDRenderer implements Renderer, Resizable {
     reset();
     sr.begin();
     if (hasMode(DISPLAY_MINIMAL_DEBUG) || hasMode(DISPLAY_DEBUG)) {
-      DebugLine.fpsString(builder, world);
+      DebugText.fpsString(builder, world);
     }
     if (hasMode(DISPLAY_DEBUG) && world != null) {
       int mouseBlockX = main.getMouseBlockX();
       int mouseBlockY = main.getMouseBlockY();
 
       nl();
-      DebugLine.pointing(builder, world, mouseBlockX, mouseBlockY);
+      DebugText.pointing(builder, world, mouseBlockX, mouseBlockY);
       nl();
-      DebugLine.chunk(builder, world, mouseBlockX, mouseBlockY);
+      DebugText.chunk(builder, world, mouseBlockX, mouseBlockY);
       nl();
-      DebugLine.viewChunk(builder, world);
+      DebugText.viewChunk(builder, world);
       nl();
-      DebugLine.pos(builder, player);
+      DebugText.pos(builder, player);
       nl();
-      DebugLine.time(builder, world);
+      DebugText.time(builder, world);
       nl();
-      DebugLine.lights(builder, world);
+      DebugText.lights(builder, world);
       nl();
-      DebugLine.ents(builder, world);
+      DebugText.ents(builder, world);
     }
     if (!builder.isEmpty()) {
       sr.drawTop(builder.toString(), 1);

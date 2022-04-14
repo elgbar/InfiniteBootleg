@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.text.DecimalFormat
 
-object DebugLine {
+object DebugText {
 
   val dotFourFormat = DecimalFormat("0.0000")
 
@@ -24,7 +24,7 @@ object DebugLine {
       .append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")
       .append(" | tps: ").fastIntFormat(realTPS.toInt(), 2)
       .append(" | tps delta: ").append(dotFourFormat.format(tpsDelta)).append(" ms")
-//      .append(" ms active threads ").append(Main.inst().scheduler.activeThreads)
+//      .append(" | active threads ").append(Main.inst().scheduler.activeThreads)
   }
 
   @JvmStatic
