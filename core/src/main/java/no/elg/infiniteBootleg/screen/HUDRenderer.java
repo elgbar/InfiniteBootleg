@@ -5,8 +5,8 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
+import no.elg.infiniteBootleg.screen.hud.DebugGraph;
 import no.elg.infiniteBootleg.screen.hud.DebugLine;
-import no.elg.infiniteBootleg.screen.hud.FpsGraph;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
@@ -75,7 +75,7 @@ public class HUDRenderer implements Renderer, Resizable {
       CurrentBlock.INSTANCE.render(sr, player);
     }
     if (hasMode(DISPLAY_GRAPH_FPS)) {
-      FpsGraph.INSTANCE.render(sr);
+      DebugGraph.INSTANCE.render(sr, world);
     }
     sr.end();
   }
@@ -110,7 +110,7 @@ public class HUDRenderer implements Renderer, Resizable {
 
   @Override
   public void resize(int width, int height) {
-    FpsGraph.INSTANCE.resize(width, height);
+    DebugGraph.INSTANCE.resize(width, height);
   }
 
   /** How much information to show */
