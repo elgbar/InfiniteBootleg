@@ -30,19 +30,26 @@ object FpsGraph : Resizable {
     }
   }
 
+  private var deltaAcc = 0f
+
   fun render(sr: ScreenRenderer) {
-    newFrame()
+
+    deltaAcc += Gdx.graphics.deltaTime
+    if (Gdx.graphics.frameId % COL_WIDTH == 0L) {
+      drawColumn()
+      deltaAcc = 0f
+    }
     sr.batch.draw(fbo.colorBufferTexture, 0f, 0f)
   }
 
-  private fun newFrame() {
+  private fun drawColumn() {
     if (index >= width) {
       index = 0
     } else {
       index += COL_WIDTH
     }
 
-    val delta = Gdx.graphics.deltaTime * 10_000
+    val delta = (deltaAcc / COL_WIDTH) * 10_000f
     val pillarHeight = (height - delta.toInt()).coerceAtLeast(0)
 
     val colorIndex = (delta / height * COLOR_SIZE.toFloat()).toInt()
