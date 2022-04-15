@@ -31,7 +31,7 @@ public class DesktopLauncher {
           config.height = 720;
         }
         config.vSyncEnabled = false;
-        config.foregroundFPS = 9999;
+        config.foregroundFPS = -1;
         config.backgroundFPS = 60;
         config.samples = 16;
         config.title = "Infinite Terraria";
