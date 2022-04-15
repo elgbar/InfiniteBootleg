@@ -97,7 +97,7 @@ public class ServerMain extends CommonMain {
     setServerWorld(
         new ServerWorld(
             new PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World"));
-    getServerWorld().load();
+    getServerWorld().initialize();
   }
 
   @Override

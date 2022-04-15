@@ -39,7 +39,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   override fun show() {
     ClientMain.inst().updateStatus(world)
     if (load) {
-      world.load()
+      world.initialize()
     }
     Main.inst().console.addToInputMultiplexer()
 

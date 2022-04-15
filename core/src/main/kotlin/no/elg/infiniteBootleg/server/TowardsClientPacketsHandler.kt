@@ -207,7 +207,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
   Main.logger().debug("LOGIN", "Initialization okay, loading world")
   val protoWorld = startGame.world
   this.world = ServerClientWorld(protoWorld, this).apply {
-    protoLoad(protoWorld, false)
+    loadFromProtoWorld(protoWorld)
   }
   if (startGame.controlling.type != PLAYER) {
     ctx.fatal("Can only control a player, got ${startGame.controlling.type}")

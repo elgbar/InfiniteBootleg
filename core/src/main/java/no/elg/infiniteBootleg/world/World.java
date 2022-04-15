@@ -168,33 +168,32 @@ public abstract class World implements Disposable, Resizable {
     spawn = new Location(0, 0);
   }
 
-  public void load() {
-    FileHandle worldFolder = getWorldFolder();
-    FileHandle worldZip = getWorldZip();
+  public void initialize() {
+    if (Settings.loadWorldFromDisk) {
+      FileHandle worldFolder = getWorldFolder();
+      FileHandle worldZip = getWorldZip();
+      if (worldFolder == null || worldZip == null || !worldZip.exists()) {
+        Main.logger().log("No world save found");
+      } else {
+        Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
 
-    if (!Settings.loadWorldFromDisk) {
-      return;
+        worldFolder.deleteDirectory();
+        ZipUtils.unzip(worldFolder, worldZip);
+
+        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
+
+        final ProtoWorld.World protoWorld;
+        try {
+          protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
+          loadFromProtoWorld(protoWorld);
+        } catch (InvalidProtocolBufferException e) {
+          e.printStackTrace();
+        }
+      }
     }
-    if (worldFolder == null || worldZip == null || !worldZip.exists()) {
-      Main.logger().log("No world save found");
-      return;
+    if (ClientMain.inst().isSinglePlayer() && ClientMain.inst().getPlayer() == null) {
+      ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
     }
-    Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
-
-    worldFolder.deleteDirectory();
-    ZipUtils.unzip(worldFolder, worldZip);
-
-    var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
-
-    final ProtoWorld.World protoWorld;
-    try {
-      protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
-    } catch (InvalidProtocolBufferException e) {
-      e.printStackTrace();
-      return;
-    }
-    protoLoad(protoWorld, this instanceof SinglePlayerWorld);
-
     if (!worldTicker.isStarted()) {
       worldTicker.start();
     }
@@ -208,22 +207,13 @@ public abstract class World implements Disposable, Resizable {
     return player;
   }
 
-  public void protoLoad(@NotNull ProtoWorld.World protoWorld, boolean singleplayer) {
+  public void loadFromProtoWorld(@NotNull ProtoWorld.World protoWorld) {
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
 
     if (Main.isSingleplayer()) {
-      final Player newPlayer;
-      if (protoWorld.hasPlayer()) {
-        newPlayer = new Player(this, protoWorld.getPlayer());
-      } else {
-        newPlayer = new Player(this, spawn.x, spawn.y);
-      }
-      if (!newPlayer.isInvalid()) {
-        addEntity(newPlayer, false);
-        ClientMain.inst().setPlayer(newPlayer);
-      }
+      ClientMain.inst().setPlayer(new Player(this, protoWorld.getPlayer()));
     }
   }
 
@@ -758,7 +748,7 @@ public abstract class World implements Disposable, Resizable {
       }
     }
 
-    load();
+    initialize();
 
     if (wasNotPaused) {
       worldTicker.resume();

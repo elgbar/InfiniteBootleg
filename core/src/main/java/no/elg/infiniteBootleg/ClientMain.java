@@ -274,7 +274,6 @@ public class ClientMain extends CommonMain {
         }
         if (player != null) {
           if (!world.containsEntity(player.getUuid())) {
-            console.error("PLR", "Tried to set main player to an entity that's not in the world!");
             world.addEntity(player);
           }
           if (!player.hasControls()) {
