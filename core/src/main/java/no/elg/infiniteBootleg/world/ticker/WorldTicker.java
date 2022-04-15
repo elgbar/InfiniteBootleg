@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.ticker;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.LongMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>Multiple tickers are needed due to some ticks will happen less frequently.
  */
-public class WorldTicker extends Ticker {
+public class WorldTicker extends Ticker implements Disposable {
 
   @Nullable private final WorldLightTicker lightTicker;
   @Nullable private final ServerRendererTicker serverRendererTicker;
@@ -219,5 +220,10 @@ public class WorldTicker extends Ticker {
       serverRendererTicker.getTicker().resume();
     }
     box2DTicker.getTicker().resume();
+  }
+
+  @Override
+  public void dispose() {
+    stop();
   }
 }

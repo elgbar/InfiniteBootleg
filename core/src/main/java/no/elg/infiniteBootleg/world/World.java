@@ -1139,6 +1139,21 @@ public abstract class World implements Disposable, Resizable {
 
   @Override
   public void dispose() {
-    getWorldTicker().stop();
+    worldTicker.dispose();
+    worldBody.dispose();
+    for (Entity entity : entities.values()) {
+      entity.dispose();
+    }
+    entities.clear();
+    players.clear();
+    chunksWriteLock.lock();
+    try {
+      for (Chunk chunk : chunks.values()) {
+        chunk.dispose();
+      }
+      chunks.clear();
+    } finally {
+      chunksWriteLock.unlock();
+    }
   }
 }

@@ -5,6 +5,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
@@ -13,7 +14,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.NotNull;
 
-public class DebugChunkRenderer implements Renderer {
+public class DebugChunkRenderer implements Renderer, Disposable {
 
   public static final Color WITHIN_CAMERA_COLOR = Color.TEAL;
   public static final Color OUTSIDE_CAMERA_COLOR = Color.FIREBRICK;
@@ -73,5 +74,10 @@ public class DebugChunkRenderer implements Renderer {
     sr.drawBottom("  Chunks outside camera boarders, only physics active", 1);
     sr.end();
     sr.resetFontColor();
+  }
+
+  @Override
+  public void dispose() {
+    lr.dispose();
   }
 }

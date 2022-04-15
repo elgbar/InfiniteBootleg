@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.Array
+import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Ticking
@@ -23,7 +24,7 @@ import com.badlogic.gdx.physics.box2d.World as Box2dWorld
  *
  * @author Elg
  */
-open class WorldBody(private val world: World) : Ticking {
+open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   /**
    * Use the returned object with care,
@@ -40,6 +41,9 @@ open class WorldBody(private val world: World) : Ticking {
     private set
   var worldOffsetY = 0f
     private set
+
+  @field:Volatile
+  private var disposed = false
 
   private val bodies = Array<Body>()
 
@@ -208,6 +212,15 @@ open class WorldBody(private val world: World) : Ticking {
         box2dWorld.setContactListener(ContactManager())
         timeStep = world.worldTicker.secondsDelayBetweenTicks
       }
+    }
+  }
+
+  override fun isDisposed(): Boolean = disposed
+
+  override fun dispose() {
+    disposed = true
+    synchronized(BOX2D_LOCK) {
+      box2dWorld.dispose()
     }
   }
 }

@@ -97,7 +97,6 @@ public class ClientWorldRender implements WorldRender {
   }
 
   private void resetSkylight() {
-
     synchronized (BOX2D_LOCK) {
       synchronized (LIGHT_LOCK) {
         if (sun != null) {
@@ -116,13 +115,6 @@ public class ClientWorldRender implements WorldRender {
         render();
       }
     }
-  }
-
-  /**
-   * @return How many blocks there currently are horizontally on screen
-   */
-  public int blocksHorizontally() {
-    return (int) Math.ceil(camera.viewportWidth * camera.zoom / BLOCK_SIZE) + 1;
   }
 
   @Override
@@ -199,55 +191,6 @@ public class ClientWorldRender implements WorldRender {
   }
 
   @Override
-  public boolean isOutOfView(@NotNull Chunk chunk) {
-    return getChunksInView().isOutOfView(chunk.getChunkX(), chunk.getChunkY());
-  }
-
-  @NotNull
-  public ClientChunksInView getChunksInView() {
-    return chunksInView;
-  }
-
-  public @NotNull OrthographicCamera getCamera() {
-    return camera;
-  }
-
-  public @NotNull ChunkRenderer getChunkRenderer() {
-    return chunkRenderer;
-  }
-
-  public @NotNull SpriteBatch getBatch() {
-    return batch;
-  }
-
-  public @NotNull PublicRayHandler getRayHandler() {
-    return rayHandler;
-  }
-
-  public @Nullable DirectionalLight getSun() {
-    return sun;
-  }
-
-  public DirectionalLight getAmbientLight() {
-    return ambientLight;
-  }
-
-  @Override
-  public void dispose() {
-    batch.dispose();
-    chunkRenderer.dispose();
-    rayHandler.dispose();
-  }
-
-  @Override
-  public void resize(int width, int height) {
-    Vector3 old = camera.position.cpy();
-    camera.setToOrtho(false, width, height);
-    camera.position.set(old);
-    update();
-  }
-
-  @Override
   public void update() {
     camera.update();
     Gdx.app.postRunnable(() -> batch.setProjectionMatrix(camera.combined));
@@ -304,11 +247,6 @@ public class ClientWorldRender implements WorldRender {
     }
   }
 
-  @Override
-  public @NotNull ClientWorld getWorld() {
-    return world;
-  }
-
   public void reload() {
     synchronized (BOX2D_LOCK) {
       synchronized (LIGHT_LOCK) {
@@ -331,5 +269,68 @@ public class ClientWorldRender implements WorldRender {
         rayHandler.update();
       }
     }
+  }
+
+  @Override
+  public void resize(int width, int height) {
+    Vector3 old = camera.position.cpy();
+    camera.setToOrtho(false, width, height);
+    camera.position.set(old);
+    update();
+  }
+
+  @Override
+  public void dispose() {
+    batch.dispose();
+    chunkRenderer.dispose();
+    rayHandler.dispose();
+    box2DDebugRenderer.dispose();
+    chunkDebugRenderer.dispose();
+  }
+
+  @Override
+  public @NotNull ClientWorld getWorld() {
+    return world;
+  }
+
+  /**
+   * @return How many blocks there currently are horizontally on screen
+   */
+  public int blocksHorizontally() {
+    return (int) Math.ceil(camera.viewportWidth * camera.zoom / BLOCK_SIZE) + 1;
+  }
+
+  @Override
+  public boolean isOutOfView(@NotNull Chunk chunk) {
+    return getChunksInView().isOutOfView(chunk.getChunkX(), chunk.getChunkY());
+  }
+
+  @NotNull
+  public ClientChunksInView getChunksInView() {
+    return chunksInView;
+  }
+
+  public @NotNull OrthographicCamera getCamera() {
+    return camera;
+  }
+
+  public @NotNull ChunkRenderer getChunkRenderer() {
+    return chunkRenderer;
+  }
+
+  public @NotNull SpriteBatch getBatch() {
+    return batch;
+  }
+
+  public @NotNull PublicRayHandler getRayHandler() {
+    return rayHandler;
+  }
+
+  public @Nullable DirectionalLight getSun() {
+    return sun;
+  }
+
+  public DirectionalLight getAmbientLight() {
+    return ambientLight;
   }
 }

@@ -2,6 +2,7 @@ package box2dLight;
 
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import no.elg.infiniteBootleg.util.PointLightPool;
 
 /**
  * @author Elg
@@ -36,5 +37,11 @@ public class PublicRayHandler extends RayHandler {
 
   public void renderLightMap() {
     lightMap.render();
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    PointLightPool.clearAllPools();
   }
 }

@@ -5,7 +5,6 @@ import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.screen.HUDRenderer
-import no.elg.infiniteBootleg.util.PointLightPool
 import no.elg.infiniteBootleg.world.ClientWorld
 
 /**
@@ -52,7 +51,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
       world.dispose()
     }
     ClientMain.inst().updateStatus(null)
-    PointLightPool.clearAllPools()
     dispose()
   }
 
