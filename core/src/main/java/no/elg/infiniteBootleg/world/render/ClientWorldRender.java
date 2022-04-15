@@ -51,6 +51,11 @@ public class ClientWorldRender implements WorldRender {
   @Nullable private DirectionalLight ambientLight;
   private float lastZoom;
 
+  static {
+    RayHandler.setGammaCorrection(true);
+    RayHandler.useDiffuseLight(true);
+  }
+
   public ClientWorldRender(@NotNull ClientWorld world) {
     viewBound = new Rectangle();
     chunksInView = new ClientChunksInView();
@@ -74,8 +79,6 @@ public class ClientWorldRender implements WorldRender {
     chunkDebugRenderer = new DebugChunkRenderer(this);
     box2DDebugRenderer = new Box2DDebugRenderer();
 
-    RayHandler.setGammaCorrection(true);
-    RayHandler.useDiffuseLight(true);
     rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld());
     rayHandler.setBlurNum(1);
     rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1f);
