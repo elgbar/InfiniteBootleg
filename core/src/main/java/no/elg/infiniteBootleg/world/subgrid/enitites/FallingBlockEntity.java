@@ -46,7 +46,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     final ProtoWorld.Entity.Material protoEntityMaterial = protoEntity.getMaterial();
 
     material = Material.fromOrdinal(protoEntityMaterial.getMaterialOrdinal());
-    region = Settings.client ? new TextureRegion(material.getTextureRegion()) : null;
+    region = Settings.client ? material.getTextureRegion() : null;
     final ProtoWorld.Vector2f position = protoEntity.getPosition();
     block = material.createBlock(world, chunk, (int) position.getX(), (int) position.getY());
   }
@@ -58,7 +58,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     }
     this.block = block;
     this.material = block.getMaterial();
-    region = Settings.client ? new TextureRegion(material.getTextureRegion()) : null;
+    region = Settings.client ? material.getTextureRegion() : null;
   }
 
   @Override
