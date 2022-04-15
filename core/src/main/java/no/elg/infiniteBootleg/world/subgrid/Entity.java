@@ -113,7 +113,7 @@ public abstract class Entity
     this(world, worldX, worldY, center, uuid, true);
   }
 
-  private Entity(
+  protected Entity(
       @NotNull World world,
       float worldX,
       float worldY,

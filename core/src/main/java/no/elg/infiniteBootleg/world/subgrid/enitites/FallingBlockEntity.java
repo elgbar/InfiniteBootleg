@@ -54,7 +54,8 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   }
 
   public FallingBlockEntity(@NotNull World world, @NotNull Block block) {
-    super(world, block.getWorldX() + 0.5f, block.getWorldY() - 0.5f, false, UUID.randomUUID());
+    super(
+        world, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f, false, UUID.randomUUID(), false);
     if (isInvalid()) {
       return;
     }
@@ -71,7 +72,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
   @Override
   protected void createFixture(@NotNull Body body) {
     PolygonShape box = new PolygonShape();
-    box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
+    box.setAsBox(getHalfBox2dWidth() - 0.1f, getHalfBox2dHeight() - 0.1f);
     Fixture fix = body.createFixture(box, 1.0f);
     fix.setFilterData(World.FALLING_BLOCK_ENTITY_FILTER);
     Main.inst()
@@ -83,6 +84,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
                 fix.setFilterData(World.FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER);
               }
             });
+    fix.setFriction(0f);
     box.dispose();
   }
 
