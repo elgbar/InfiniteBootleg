@@ -104,11 +104,11 @@ public abstract class Entity
     }
   }
 
-  public Entity(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
+  protected Entity(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
     this(world, worldX, worldY, true, uuid);
   }
 
-  public Entity(
+  protected Entity(
       @NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
     this(world, worldX, worldY, center, uuid, true);
   }

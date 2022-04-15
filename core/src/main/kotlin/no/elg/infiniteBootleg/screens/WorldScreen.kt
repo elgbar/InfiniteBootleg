@@ -48,7 +48,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   override fun hide() {
     if (Main.isSingleplayer()) {
       world.save()
-      world.dispose()
     }
     ClientMain.inst().updateStatus(null)
     dispose()

@@ -210,7 +210,6 @@ public class Block
   @Override
   public int hashCode() {
     int result = material.hashCode();
-    result = 31 * result + world.hashCode();
     result = 31 * result + chunk.hashCode();
     result = 31 * result + localX;
     result = 31 * result + localY;
@@ -235,9 +234,6 @@ public class Block
       return false;
     }
     if (material != block.material) {
-      return false;
-    }
-    if (!world.equals(block.world)) {
       return false;
     }
     return chunk.equals(block.chunk);
