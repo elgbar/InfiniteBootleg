@@ -5249,7 +5249,7 @@ public final class Packets {
    *
    *
    * <pre>
-   * Server send this every tick (??), client must respond with another heartbeat packet with the name keepAliveId
+   * Server send this every so often, client must respond with another heartbeat packet with the name keepAliveId
    * </pre>
    *
    * Protobuf type {@code packets.Heartbeat}
@@ -5537,7 +5537,7 @@ public final class Packets {
      *
      *
      * <pre>
-     * Server send this every tick (??), client must respond with another heartbeat packet with the name keepAliveId
+     * Server send this every so often, client must respond with another heartbeat packet with the name keepAliveId
      * </pre>
      *
      * Protobuf type {@code packets.Heartbeat}
@@ -13495,6 +13495,16 @@ public final class Packets {
        * <code>PLAYER_KICKED = 5;</code>
        */
       PLAYER_KICKED(5),
+      /**
+       *
+       *
+       * <pre>
+       * Something natural happened, i.e., a falling block hit ground
+       * </pre>
+       *
+       * <code>NATURAL = 6;</code>
+       */
+      NATURAL(6),
       UNRECOGNIZED(-1),
       ;
 
@@ -13541,6 +13551,16 @@ public final class Packets {
        * <code>PLAYER_KICKED = 5;</code>
        */
       public static final int PLAYER_KICKED_VALUE = 5;
+      /**
+       *
+       *
+       * <pre>
+       * Something natural happened, i.e., a falling block hit ground
+       * </pre>
+       *
+       * <code>NATURAL = 6;</code>
+       */
+      public static final int NATURAL_VALUE = 6;
 
       public final int getNumber() {
         if (this == UNRECOGNIZED) {
@@ -13578,6 +13598,8 @@ public final class Packets {
             return UNKNOWN_ENTITY;
           case 5:
             return PLAYER_KICKED;
+          case 6:
+            return NATURAL;
           default:
             return null;
         }
@@ -16540,17 +16562,17 @@ public final class Packets {
           + "\n\021ALREADY_LOGGED_IN\020\001\022\017\n\013FULL_SERVER\020\002\022\021"
           + "\n\rLOGIN_SUCCESS\020\003\"@\n\013SpawnEntity\022#\n\006enti"
           + "ty\030\001 \001(\0132\023.persistence.Entity\022\014\n\004uuid\030\002 "
-          + "\001(\t\"\327\001\n\rDespawnEntity\022\014\n\004uuid\030\001 \001(\t\022;\n\rd"
+          + "\001(\t\"\345\001\n\rDespawnEntity\022\014\n\004uuid\030\001 \001(\t\022;\n\rd"
           + "espawnReason\030\002 \001(\0162$.packets.DespawnEnti"
-          + "ty.DespawnReason\"{\n\rDespawnReason\022\022\n\016UNK"
-          + "NOWN_REASON\020\000\022\n\n\006KILLED\020\001\022\017\n\013PLAYER_QUIT"
-          + "\020\002\022\022\n\016CHUNK_UNLOADED\020\003\022\022\n\016UNKNOWN_ENTITY"
-          + "\020\004\022\021\n\rPLAYER_KICKED\020\005\"8\n\005Login\022\014\n\004uuid\030\001"
-          + " \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007version\030\003 \001(\t\""
-          + "<\n\014ChunkRequest\022,\n\rchunkLocation\030\001 \001(\0132\025"
-          + ".persistence.Vector2i\"\035\n\rEntityRequest\022\014"
-          + "\n\004uuid\030\001 \001(\tB,\n\037no.elg.infiniteBootleg.p"
-          + "rotobufB\007PacketsP\000b\006proto3"
+          + "ty.DespawnReason\"\210\001\n\rDespawnReason\022\022\n\016UN"
+          + "KNOWN_REASON\020\000\022\n\n\006KILLED\020\001\022\017\n\013PLAYER_QUI"
+          + "T\020\002\022\022\n\016CHUNK_UNLOADED\020\003\022\022\n\016UNKNOWN_ENTIT"
+          + "Y\020\004\022\021\n\rPLAYER_KICKED\020\005\022\013\n\007NATURAL\020\006\"8\n\005L"
+          + "ogin\022\014\n\004uuid\030\001 \001(\t\022\020\n\010username\030\002 \001(\t\022\017\n\007"
+          + "version\030\003 \001(\t\"<\n\014ChunkRequest\022,\n\rchunkLo"
+          + "cation\030\001 \001(\0132\025.persistence.Vector2i\"\035\n\rE"
+          + "ntityRequest\022\014\n\004uuid\030\001 \001(\tB,\n\037no.elg.inf"
+          + "initeBootleg.protobufB\007PacketsP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(

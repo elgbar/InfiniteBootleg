@@ -142,6 +142,7 @@ message DespawnEntity {
     CHUNK_UNLOADED = 3;
     UNKNOWN_ENTITY = 4; // Unknown entity by the server
     PLAYER_KICKED = 5; // players only
+    NATURAL = 6; //Something natural happened, i.e., a falling block hit ground
   }
   string uuid = 1;
   DespawnReason despawnReason = 2;

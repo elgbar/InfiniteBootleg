@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.PointLightPool;
@@ -97,7 +98,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
                   while (!world.isAirBlock(newX, newY + deltaY)) {
                     deltaY++;
                   }
-                  world.removeEntity(this);
+                  world.removeEntity(this, Packets.DespawnEntity.DespawnReason.NATURAL);
                   world.setBlock(newX, newY + deltaY, material, true);
                   //              //TODO drop as an item
                 });
