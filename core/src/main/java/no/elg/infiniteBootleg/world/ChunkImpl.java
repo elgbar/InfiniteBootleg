@@ -292,7 +292,7 @@ public class ChunkImpl implements Chunk {
         }
       }
     }
-    Main.inst().getScheduler().executeSync(chunkBody::update);
+    Main.inst().getScheduler().executeAsync(chunkBody::update);
     final WorldRender render = world.getRender();
     if (render instanceof ClientWorldRender clientWorldRender) {
       clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
