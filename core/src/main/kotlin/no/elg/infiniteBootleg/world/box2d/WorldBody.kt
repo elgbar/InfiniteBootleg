@@ -57,6 +57,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    */
   fun createBody(def: BodyDef): Body {
     synchronized(BOX2D_LOCK) {
+      if (disposed) {
+        throw IllegalStateException("Cannot create body when world is disposed")
+      }
       val body = box2dWorld.createBody(def)
       applyShift(body, worldOffsetX, worldOffsetY)
       return body
@@ -73,6 +76,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     Main.inst().scheduler.executeAsync {
       // Execute async to not be under any locks
       synchronized(BOX2D_LOCK) {
+        if (disposed) {
+          return@executeAsync
+        }
         require(!box2dWorld.isLocked) {
           "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
         }
@@ -89,6 +95,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    */
   override fun tick() {
     synchronized(BOX2D_LOCK) {
+      if (disposed) {
+        return@synchronized
+      }
       box2dWorld.step(timeStep, 20, 10)
     }
   }
@@ -105,6 +114,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     if (Main.isSingleplayer()) {
       // TODO move to WorldRender, makes more sense to do this there
       synchronized(BOX2D_LOCK) {
+        if (disposed) {
+          return@synchronized
+        }
         val player = ClientMain.inst().player ?: return
         if (player.isInvalid) {
           return
@@ -136,6 +148,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   fun shiftWorldOffset(deltaOffsetX: Float, deltaOffsetY: Float) {
     Main.inst().scheduler.executeAsync {
       synchronized(BOX2D_LOCK) {
+        if (disposed) {
+          return@synchronized
+        }
         worldOffsetX += deltaOffsetX
         worldOffsetY += deltaOffsetY
         bodies.clear()
@@ -175,6 +190,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
     Main.inst().scheduler.executeAsync {
       synchronized(BOX2D_LOCK) {
+        if (disposed) {
+          return@synchronized
+        }
         box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
       }
     }
