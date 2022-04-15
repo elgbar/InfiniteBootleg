@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
@@ -951,13 +952,18 @@ public abstract class World implements Disposable, Resizable {
     Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number");
     ObjectSet<Block> blocks = new ObjectSet<>();
     float radiusSquare = radius * radius;
-    for (Block block : getBlocksAABB(worldX, worldY, radius, radius, raw)) {
-      if (abs(Vector2.dst2(worldX, worldY, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f))
+    for (long compact : getLocationsAABB(worldX, worldY, radius, radius).items) {
+      int blockWorldX = CoordUtil.decompactLocX(compact);
+      int blockWorldY = CoordUtil.decompactLocY(compact);
+      if (abs(Vector2.dst2(worldX, worldY, blockWorldX + 0.5f, blockWorldY + 0.5f))
           <= radiusSquare) {
+        Block block = getBlock(blockWorldX, blockWorldY, raw);
+        if (block == null) {
+          continue;
+        }
         blocks.add(block);
       }
     }
-
     return blocks;
   }
 
@@ -976,6 +982,21 @@ public abstract class World implements Disposable, Resizable {
           continue;
         }
         blocks.add(b);
+      }
+    }
+    return blocks;
+  }
+
+  @NotNull
+  public LongArray getLocationsAABB(float worldX, float worldY, float offsetX, float offsetY) {
+    int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
+    LongArray blocks = new LongArray(true, capacity);
+    int x = MathUtils.floor(worldX - offsetX);
+    float maxX = worldX + offsetX;
+    float maxY = worldY + offsetY;
+    for (; x <= maxX; x++) {
+      for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
+        blocks.add(CoordUtil.compactLoc(x, y));
       }
     }
     return blocks;
