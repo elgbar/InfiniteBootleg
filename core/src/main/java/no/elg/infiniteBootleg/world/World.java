@@ -82,6 +82,7 @@ public abstract class World implements Disposable, Resizable {
   public static final short ENTITY_CATEGORY = 0b0000_0000_0000_0100;
 
   public static final Filter FALLING_BLOCK_ENTITY_FILTER;
+  public static final Filter FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER;
   public static final Filter TRANSPARENT_BLOCK_ENTITY_FILTER;
   public static final Filter ENTITY_FILTER;
   public static final Filter LIGHT_FILTER;
@@ -105,7 +106,12 @@ public abstract class World implements Disposable, Resizable {
     // for falling blocks
     FALLING_BLOCK_ENTITY_FILTER = new Filter();
     FALLING_BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-    FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
+    FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY;
+
+    // for falling blocks which blocks light
+    FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER = new Filter();
+    FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
+    FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
 
     // ie glass
     TRANSPARENT_BLOCK_ENTITY_FILTER = new Filter();

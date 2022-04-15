@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
+import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,6 +74,15 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
     Fixture fix = body.createFixture(box, 1.0f);
     fix.setFilterData(World.FALLING_BLOCK_ENTITY_FILTER);
+    Main.inst()
+        .getScheduler()
+        .scheduleAsync(
+            100L,
+            () -> {
+              if (material.blocksLight()) {
+                fix.setFilterData(World.FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER);
+              }
+            });
     box.dispose();
   }
 
@@ -88,7 +98,7 @@ public class FallingBlockEntity extends Entity implements LightTrait {
       if (Main.isAuthoritative()) {
         Main.inst()
             .getScheduler()
-            .executeSync(
+            .executeAsync(
                 () -> {
                   var world = getWorld();
                   int newX = getBlockX();
@@ -114,6 +124,9 @@ public class FallingBlockEntity extends Entity implements LightTrait {
     super.tick();
     if (block instanceof LightTrait) {
       LightTrait.Companion.createLight(this);
+    }
+    if (material.blocksLight()) {
+      WorldLightTicker.updateDirectionalLights();
     }
   }
 
