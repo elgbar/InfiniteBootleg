@@ -112,6 +112,8 @@ public interface Chunk
   /**
    * Force update of this chunk's texture and invariants
    *
+   * <p>Prioritization will not be removed if already prioritized.
+   *
    * @param prioritize If this chunk should be prioritized when rendering
    */
   void updateTexture(boolean prioritize);

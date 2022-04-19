@@ -53,7 +53,7 @@ public class ChunkImpl implements Chunk {
   private final ChunkBody chunkBody;
   // if this chunk should be prioritized to be updated
   private volatile boolean dirty; // if texture/allair needs to be updated
-  private volatile boolean prioritize;
+  private boolean prioritize;
   private volatile boolean modified; // if the chunk has been modified since loaded
   private volatile boolean allowUnload;
   /**
@@ -245,10 +245,10 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  public void updateTexture(boolean prioritize) {
+  public synchronized void updateTexture(boolean prioritize) {
     dirty = true;
     modified = true;
-    this.prioritize = prioritize;
+    this.prioritize |= prioritize;
   }
 
   @Override
