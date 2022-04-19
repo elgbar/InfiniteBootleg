@@ -220,8 +220,14 @@ public abstract class World implements Disposable, Resizable {
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
 
-    if (Main.isSingleplayer()) {
-      ClientMain.inst().setPlayer(new Player(this, protoWorld.getPlayer()));
+    if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
+      ProtoWorld.Entity protoWorldPlayer = protoWorld.getPlayer();
+      if (ExtraKt.fromUUIDOrNull(protoWorldPlayer.getUuid()) != null) {
+        ClientMain.inst().setPlayer(new Player(this, protoWorldPlayer));
+      } else {
+        Main.logger()
+            .error("World", "Failed to load player from world. The world might be corrupt.");
+      }
     }
   }
 
