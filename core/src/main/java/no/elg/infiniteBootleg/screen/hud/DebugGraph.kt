@@ -113,7 +113,7 @@ object DebugGraph : Resizable {
 
     // 0 is top, height is bottom, pillarHeight is how far up the pillar should go
     // Fill from the top to pillarHeight with transparent pixels
-    Gdx.gl.glScissor(index, 0, COL_WIDTH + 1, fboHeight)
+    Gdx.gl.glScissor(index, 0, COL_WIDTH * 2, fboHeight)
     Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
