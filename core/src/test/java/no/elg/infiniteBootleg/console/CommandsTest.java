@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.console;
 import static org.junit.Assert.assertTrue;
 
 import no.elg.infiniteBootleg.TestGraphic;
-import no.elg.infiniteBootleg.screen.HUDRenderer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,13 +74,6 @@ public class CommandsTest extends TestGraphic {
   @Test
   public void time() {
     assertTrue(cmds.execCommand("time 45"));
-  }
-
-  @Test
-  public void hud() {
-    for (HUDRenderer.HUDModus modus : HUDRenderer.HUDModus.values()) {
-      assertTrue(cmds.execCommand("hud " + modus.name()));
-    }
   }
 
   @Test

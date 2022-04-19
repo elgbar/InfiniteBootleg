@@ -112,11 +112,4 @@ public class HUDRenderer implements Renderer, Resizable {
   public void resize(int width, int height) {
     DebugGraph.INSTANCE.resize(width, height);
   }
-
-  /** How much information to show */
-  public enum HUDModus {
-    DEBUG,
-    NORMAL,
-    NONE
-  }
 }
