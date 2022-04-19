@@ -198,7 +198,7 @@ public abstract class World implements Disposable, Resizable {
         }
       }
     }
-    if (ClientMain.inst().isSinglePlayer() && ClientMain.inst().getPlayer() == null) {
+    if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {
       ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
     }
     getRender().update();
