@@ -10,7 +10,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.HUDDebuggable;
 import no.elg.infiniteBootleg.util.Savable;
-import no.elg.infiniteBootleg.world.blocks.traits.BlockTrait;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Elg
  */
 public class Block
-    implements BlockTrait, CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
+    implements CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.BlockOrBuilder> {
 
   public static final int BLOCK_SIZE = 16;
 
@@ -107,12 +106,6 @@ public class Block
    */
   public Location getLocation() {
     return new Location(getWorldX(), getLocalY());
-  }
-
-  @NotNull
-  @Override
-  public Block getBlock() {
-    return this;
   }
 
   /**

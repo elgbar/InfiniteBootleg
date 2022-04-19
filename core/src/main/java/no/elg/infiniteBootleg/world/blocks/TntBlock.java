@@ -22,7 +22,6 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Elg
  */
-public class TntBlock extends TickingBlock implements LightTrait {
+public class TntBlock extends LightBlock {
 
   /** Maximum explosion radius */
   public static final int EXPLOSION_STRENGTH = 40;
@@ -105,8 +104,8 @@ public class TntBlock extends TickingBlock implements LightTrait {
     if (exploded) {
       return;
     }
+    super.tick();
 
-    LightTrait.Companion.createLight(this);
     long ticked = getWorld().getTick() - startTick;
     if (ticked > fuseDurationTicks && (Main.isAuthoritative())) {
       exploded = true;
@@ -248,22 +247,5 @@ public class TntBlock extends TickingBlock implements LightTrait {
   @Override
   public void dispose() {
     super.dispose();
-    LightTrait.Companion.releaseLight(this);
-  }
-
-  @Nullable
-  @Override
-  public PointLight getLight() {
-    return light;
-  }
-
-  @Override
-  public void setLight(@Nullable PointLight light) {
-    if (this.light != null && light != null) throw new IllegalArgumentException();
-    this.light = light;
-  }
-
-  public boolean canCreateLight() {
-    return true;
   }
 }

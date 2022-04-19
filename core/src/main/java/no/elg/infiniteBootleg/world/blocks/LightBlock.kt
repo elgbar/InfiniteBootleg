@@ -1,11 +1,12 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import box2dLight.PointLight
+import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.blocks.traits.LightTrait
-import no.elg.infiniteBootleg.world.blocks.traits.LightTrait.Companion.createLight
+import no.elg.infiniteBootleg.world.blocks.traits.LightTraitHandler
 
 abstract class LightBlock(
   world: World,
@@ -15,25 +16,34 @@ abstract class LightBlock(
   material: Material
 ) : TickingBlock(world, chunk, localX, localY, material), LightTrait {
 
-  override var light: PointLight? = null
-    get() {
-      if (field == null) {
-        setShouldTick(true)
-      }
-      return field
-    }
-    set(value) {
-      if (field != null && value != null) error("Cannot set light before releasing old light")
-      field = value
-    }
+  private val lightTraitHandler = LightTraitHandler(
+    world,
+    CoordUtil.chunkToWorld(chunk.chunkX, localX),
+    CoordUtil.chunkToWorld(chunk.chunkY, localY),
+    this
+  )
+
+  override val light: PointLight? get() = lightTraitHandler.light
 
   override fun tick() {
-    this.createLight()
+    lightTraitHandler.createLight()
+  }
+
+  override fun createLight(customizer: (light: PointLight) -> Unit) {
+    lightTraitHandler.createLight(customizer)
+  }
+
+  override fun releaseLight() {
+    lightTraitHandler.releaseLight()
+  }
+
+  override fun recreateLight() {
+    lightTraitHandler.recreateLight()
   }
 
   override fun dispose() {
     if (isDisposed()) return
-    super<TickingBlock>.dispose()
-    super<LightTrait>.dispose()
+    super.dispose()
+    lightTraitHandler.dispose()
   }
 }
