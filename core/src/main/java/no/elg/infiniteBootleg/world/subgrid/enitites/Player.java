@@ -37,7 +37,7 @@ public class Player extends LivingEntity {
 
   public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
 
@@ -50,7 +50,7 @@ public class Player extends LivingEntity {
           .getScheduler()
           .executeSync(
               () -> {
-                if (!isInvalid()) {
+                if (!isDisposed()) {
                   ClientMain.inst().setPlayer(this);
                 }
               });
@@ -63,7 +63,7 @@ public class Player extends LivingEntity {
 
   public Player(@NotNull World world, float worldX, float worldY, @NotNull UUID uuid) {
     super(world, worldX, worldY, uuid);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     if (Settings.client) {
@@ -167,7 +167,7 @@ public class Player extends LivingEntity {
 
   @Override
   public void dispose() {
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     super.dispose();
@@ -187,7 +187,7 @@ public class Player extends LivingEntity {
   }
 
   public @Nullable Light getTorchLight() {
-    if (torchLight == null && !isInvalid() && !Main.isServer()) {
+    if (torchLight == null && !isDisposed() && !Main.isServer()) {
       ClientWorld world = ClientMain.inst().getWorld();
       if (world == null) {
         Main.logger().warn("Failed to get client world!");

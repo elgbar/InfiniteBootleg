@@ -129,7 +129,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
    * @return We are following a non-null, valid target, and is locked on
    */
   private boolean hasValidLockOn() {
-    return following != null && !following.isInvalid() && lockedOn;
+    return following != null && !following.isDisposed() && lockedOn;
   }
 
   private void cameraFollowUpdate() {
@@ -198,7 +198,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
    * @param following What to follow, null if none
    */
   public void setFollowing(@Nullable Entity following) {
-    if (following != null && following.isInvalid()) {
+    if (following != null && following.isDisposed()) {
       Main.logger().error("World Input", "Cannot pass a non-null invalid entity!");
       return;
     }

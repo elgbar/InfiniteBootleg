@@ -42,7 +42,7 @@ abstract class LightBlock(
   }
 
   override fun dispose() {
-    if (isDisposed()) return
+    if (isDisposed) return
     super.dispose()
     lightTraitHandler.dispose()
   }

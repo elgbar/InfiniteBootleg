@@ -69,7 +69,7 @@ public class WorldLoader {
         Player player = new Player(world, proto);
         player.disableGravity();
         world.addEntity(player);
-        if (!player.isInvalid()) {
+        if (!player.isDisposed()) {
           Main.logger().debug("SERVER", "Loading persisted player profile for " + playerId);
           return player;
         } else {

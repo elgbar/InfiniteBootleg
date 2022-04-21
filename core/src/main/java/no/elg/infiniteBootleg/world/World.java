@@ -210,7 +210,7 @@ public abstract class World implements Disposable, Resizable {
   @NotNull
   public Player createNewPlayer(@NotNull UUID playerId) {
     Player player = new Player(this, spawn.x, spawn.y, playerId);
-    Preconditions.checkState(!player.isInvalid());
+    Preconditions.checkState(!player.isDisposed());
     addEntity(player);
     return player;
   }
@@ -953,7 +953,7 @@ public abstract class World implements Disposable, Resizable {
       players.remove(entityUuid);
       saveServerPlayer(player);
     }
-    if (!entity.isInvalid()) {
+    if (!entity.isDisposed()) {
       // even if we do not know of this entity, dispose it
       entity.dispose();
     }

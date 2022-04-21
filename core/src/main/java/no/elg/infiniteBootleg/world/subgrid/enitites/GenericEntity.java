@@ -18,7 +18,7 @@ public class GenericEntity extends Entity implements Removable {
 
   public GenericEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
     super(world, protoEntity);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
 

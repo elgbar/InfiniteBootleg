@@ -21,7 +21,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
   public LivingEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
     super(world, protoEntity);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     Preconditions.checkArgument(
@@ -124,13 +124,13 @@ public abstract class LivingEntity extends Entity implements Updatable {
   }
 
   public void disableGravity() {
-    if (!isInvalid() && Main.isServerClient()) {
+    if (!isDisposed() && Main.isServerClient()) {
       getBody().setGravityScale(0.0f);
     }
   }
 
   public void enableGravity() {
-    if (!isInvalid() && Main.isServerClient()) {
+    if (!isDisposed() && Main.isServerClient()) {
       getBody().setGravityScale(DEFAULT_GRAVITY_SCALE);
     }
   }

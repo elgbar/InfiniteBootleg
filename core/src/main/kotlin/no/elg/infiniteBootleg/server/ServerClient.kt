@@ -30,10 +30,11 @@ class ServerClient(
   val uuid get() = sharedInformation!!.entityUUID // FIXME
   val player: Player?
     get() {
-      // FIXME
-      if (backingPlayer == null || backingPlayer!!.isInvalid) {
-        backingPlayer = world!!.getPlayer(uuid)
+      val bp = backingPlayer
+      val clientWorld = world
+      if (clientWorld != null && (bp == null || bp.isDisposed)) {
+        backingPlayer = clientWorld.getPlayer(uuid)
       }
-      return backingPlayer
+      return bp
     }
 }

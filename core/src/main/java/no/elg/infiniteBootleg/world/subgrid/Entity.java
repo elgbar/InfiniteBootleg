@@ -78,7 +78,7 @@ public abstract class Entity
   @NotNull private Filter filter = World.ENTITY_FILTER;
   private float lookDeg;
 
-  protected volatile boolean valid = true;
+  protected volatile boolean disposed;
 
   public Entity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     this(
@@ -88,7 +88,7 @@ public abstract class Entity
         false,
         UUID.fromString(protoEntity.getUuid()),
         false);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     Preconditions.checkArgument(protoEntity.getType() == getEntityType());
@@ -127,7 +127,7 @@ public abstract class Entity
 
     if (world.containsEntity(uuid)) {
       Main.logger().warn("World already contains entity with uuid " + uuid);
-      valid = false;
+      dispose();
       return;
     }
 
@@ -144,7 +144,7 @@ public abstract class Entity
                   String.format(
                       "Did not spawn %s at (%.2f,%.2f) as the spawn is invalid",
                       simpleName(), posCache.x, posCache.y));
-          valid = false;
+          dispose();
           return;
         }
         case PUSH_UP -> {
@@ -173,7 +173,7 @@ public abstract class Entity
         .scheduleSync(
             10L,
             () -> {
-              if (!isInvalid() && !world.containsEntity(uuid)) {
+              if (!isDisposed() && !world.containsEntity(uuid)) {
                 Main.logger()
                     .warn(
                         "Failed to find entity "
@@ -233,7 +233,7 @@ public abstract class Entity
 
   public void translate(
       float worldX, float worldY, float velX, float velY, float lookAngleDeg, boolean validate) {
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     if (validate) {
@@ -263,7 +263,7 @@ public abstract class Entity
     boolean sendMovePacket = false;
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
-        if (isInvalid() || body == null) {
+        if (isDisposed() || body == null) {
           return;
         }
         updatePos();
@@ -522,7 +522,7 @@ public abstract class Entity
    */
   @Override
   public void contact(@NotNull ContactType type, @NotNull Contact contact) {
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     if (contact.getFixtureA().getFilterData().categoryBits == World.GROUND_CATEGORY) {
@@ -563,25 +563,23 @@ public abstract class Entity
   public final void updatePos() {
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
-        if (isInvalid()) {
+        if (isDisposed() || body == null) {
           return;
         }
         final WorldBody worldBody = world.getWorldBody();
 
-        final Body body = this.body;
-        if (body != null) {
-          posCache
-              .set(body.getPosition())
-              .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
-          velCache.set(body.getLinearVelocity());
-        }
+        final Body body = getBody();
+        posCache
+            .set(body.getPosition())
+            .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
+        velCache.set(body.getLinearVelocity());
       }
     }
   }
 
   @Override
   public void tick() {
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     updatePos();
@@ -650,7 +648,7 @@ public abstract class Entity
           .scheduleSync(
               FREEZE_DESPAWN_TIMEOUT_MS,
               () -> {
-                if (isInvalid()) {
+                if (isDisposed()) {
                   return;
                 }
                 if (Main.isServerClient()) {
@@ -703,8 +701,8 @@ public abstract class Entity
   }
 
   @NotNull
-  public synchronized Body getBody() {
-    if (isInvalid()) {
+  public Body getBody() {
+    if (body == null) {
       throw new IllegalStateException("Cannot access the body of an invalid entity!");
     }
     return body;
@@ -750,26 +748,24 @@ public abstract class Entity
 
   /** Do not call directly. Use {@link World#removeEntity(Entity)} */
   @Override
-  public void dispose() {
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        if (isInvalid()) {
-          Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
-          return;
-        }
-        valid = false;
-        world.getWorldBody().destroyBody(body);
-        body = null;
-        if (this instanceof Removable removable) {
-          removable.onRemove();
-        }
-      }
+  public synchronized void dispose() {
+    if (isDisposed()) {
+      Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
+      return;
+    }
+    if (body != null) {
+      world.getWorldBody().destroyBody(body);
+    }
+    body = null;
+    disposed = false;
+    if (this instanceof Removable removable) {
+      removable.onRemove();
     }
   }
 
   @Override
-  public synchronized boolean isDisposed() {
-    return !valid;
+  public boolean isDisposed() {
+    return disposed;
   }
 
   @Override
@@ -830,7 +826,7 @@ public abstract class Entity
       }
     }
 
-    if (entity.isInvalid()) {
+    if (entity.isDisposed()) {
       return null;
     }
     world.addEntity(entity, false);
@@ -840,10 +836,6 @@ public abstract class Entity
 
   @NotNull
   protected abstract ProtoWorld.Entity.EntityType getEntityType();
-
-  public boolean isInvalid() {
-    return !valid || body == null;
-  }
 
   public float getLookDeg() {
     return lookDeg;

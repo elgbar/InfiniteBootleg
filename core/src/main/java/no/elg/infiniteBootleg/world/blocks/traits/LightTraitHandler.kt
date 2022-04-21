@@ -23,7 +23,7 @@ class LightTraitHandler(
       return
     }
     synchronized(this) {
-      if (isDisposed() || light != null) {
+      if (isDisposed || light != null) {
         return
       }
       if (world is ClientWorld && world.getChunkFromWorld(originWorldX, originWorldY)?.isValid != false && lightTrait.canCreateLight()) {
@@ -52,7 +52,8 @@ class LightTraitHandler(
     tryCreateLight(customizer)
   }
 
-  override fun isDisposed(): Boolean = disposed
+  override val isDisposed: Boolean
+    get() = disposed
 
   override fun dispose() {
     disposed = true

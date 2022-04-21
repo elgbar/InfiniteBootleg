@@ -205,7 +205,7 @@ public enum Material {
   @Nullable
   private MaterialEntity commonEntity(
       @NotNull World world, @NotNull MaterialEntity entity, @Nullable Chunk chunk) {
-    if (entity.isInvalid()) {
+    if (entity.isDisposed()) {
       return null;
     }
     world.addEntity(entity, false);

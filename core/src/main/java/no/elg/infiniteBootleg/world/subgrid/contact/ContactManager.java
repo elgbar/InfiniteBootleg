@@ -16,7 +16,7 @@ public class ContactManager implements ContactListener {
     synchronized (BOX2D_LOCK) {
       final Body body = contact.getFixtureB().getBody();
       final Object data = body.getUserData();
-      if (data instanceof Entity entity && !entity.isInvalid()) {
+      if (data instanceof Entity entity && !entity.isDisposed()) {
         entity.contact(type, contact);
       }
     }

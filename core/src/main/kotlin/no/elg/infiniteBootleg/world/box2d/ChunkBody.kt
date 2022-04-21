@@ -55,7 +55,8 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   @field:Volatile
   private var disposed = false
 
-  override fun isDisposed(): Boolean = disposed
+  override val isDisposed: Boolean
+    get() = disposed
 
   /**calculate the shape of the chunk (box2d)*/
   private val bodyDef = BodyDef().also {
@@ -71,7 +72,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
    * If the neighbors also should be updated
    */
   override fun update() {
-    if (isDisposed()) {
+    if (isDisposed) {
       return
     }
     if (chunk.isAllAir) {
@@ -122,7 +123,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     }
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
-    if (isDisposed()) {
+      if (isDisposed) {
       box2dBody = null
       chunk.world.worldBody.destroyBody(tmpBody)
       return
@@ -138,7 +139,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   @Synchronized
   override fun dispose() {
-    if (isDisposed()) return
+    if (isDisposed) return
     disposed = true
     box2dBody = null
   }

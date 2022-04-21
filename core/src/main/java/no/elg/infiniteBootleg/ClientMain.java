@@ -254,7 +254,7 @@ public class ClientMain extends CommonMain {
       // server does not have a main player
       return;
     }
-    if (player != null && player.isInvalid()) {
+    if (player != null && player.isDisposed()) {
       Main.logger().error("PLR", "Tried to set main player to an invalid entity");
       return;
     }

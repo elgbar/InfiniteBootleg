@@ -12,7 +12,7 @@ public abstract class MaterialEntity extends Entity implements Removable {
 
   public MaterialEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
     super(world, protoEntity);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     Preconditions.checkArgument(protoEntity.getType() == ProtoWorld.Entity.EntityType.BLOCK);

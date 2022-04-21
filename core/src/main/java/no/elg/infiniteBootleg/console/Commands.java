@@ -328,7 +328,7 @@ public class Commands extends CommandExecutor {
     }
 
     var entity = new GenericEntity(world, worldX, worldY, width, height);
-    if (entity.isInvalid()) {
+    if (entity.isDisposed()) {
       logger.error(
           "GEN ENT",
           "Failed to create an entity at (% 7.2f,% 7.2f) with width %d and height %d",

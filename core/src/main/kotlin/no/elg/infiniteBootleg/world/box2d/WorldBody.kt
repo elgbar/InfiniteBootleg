@@ -118,7 +118,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
           return@synchronized
         }
         val player = ClientMain.inst().player ?: return
-        if (player.isInvalid) {
+        if (player.isDisposed) {
           return
         }
 
@@ -233,11 +233,15 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     }
   }
 
-  override fun isDisposed(): Boolean = disposed
+  override val isDisposed: Boolean
+    get() = disposed
 
   override fun dispose() {
-    disposed = true
     synchronized(BOX2D_LOCK) {
+      if (disposed) {
+        return
+      }
+      disposed = true
       box2dWorld.dispose()
     }
   }

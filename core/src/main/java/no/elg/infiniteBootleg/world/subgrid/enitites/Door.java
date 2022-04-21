@@ -59,7 +59,7 @@ public class Door extends MaterialEntity {
   }
 
   {
-    if (!isInvalid()) {
+    if (!isDisposed()) {
       setFilter(BLOCK_ENTITY_FILTER);
 
       // Wake up all bodies to get an accurate contacts count

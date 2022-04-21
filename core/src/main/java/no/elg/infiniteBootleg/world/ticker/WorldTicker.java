@@ -112,7 +112,7 @@ public class WorldTicker extends Ticker implements Disposable {
         world.chunksWriteLock.unlock();
       }
       for (Entity entity : world.getEntities()) {
-        if (entity.isInvalid()) {
+        if (entity.isDisposed()) {
           String message =
               "Invalid entity in world entities ("
                   + entity.simpleName()
@@ -148,7 +148,7 @@ public class WorldTicker extends Ticker implements Disposable {
         chunk.tickRare();
       }
       for (Entity entity : world.getEntities()) {
-        if (entity.isInvalid()) {
+        if (entity.isDisposed()) {
           continue;
         }
         entity.tickRare();

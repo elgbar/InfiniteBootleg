@@ -251,7 +251,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   // Client is good to login
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
   val player = WorldLoader.getServerPlayer(world, uuid)
-  if (player.isInvalid) {
+  if (player.isDisposed) {
     ctx.fatal("Failed to spawn player server side, player is invalid")
     return
   }

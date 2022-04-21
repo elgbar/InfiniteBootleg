@@ -41,7 +41,7 @@ public class FallingBlockEntity extends Entity {
   public FallingBlockEntity(
       @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     Preconditions.checkArgument(protoEntity.hasMaterial());
@@ -60,7 +60,7 @@ public class FallingBlockEntity extends Entity {
   public FallingBlockEntity(@NotNull World world, @NotNull Block block) {
     super(
         world, block.getWorldX() + 0.5f, block.getWorldY() + 0.5f, false, UUID.randomUUID(), false);
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     if (block instanceof Trait blockTrait) {
@@ -81,7 +81,7 @@ public class FallingBlockEntity extends Entity {
         .scheduleAsync(
             100L,
             () -> {
-              if (material.blocksLight()) {
+              if (material != null && material.blocksLight()) {
                 fix.setFilterData(World.FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER);
               }
             });
@@ -91,7 +91,7 @@ public class FallingBlockEntity extends Entity {
 
   @Override
   public synchronized void contact(@NotNull ContactType type, @NotNull Contact contact) {
-    if (isInvalid()) {
+    if (isDisposed()) {
       return;
     }
     if (!crashed && type == ContactType.BEGIN_CONTACT) {
@@ -126,7 +126,7 @@ public class FallingBlockEntity extends Entity {
     }
     super.tick();
     if (trait instanceof LightTrait lightTrait) {
-      lightTrait.createLight(
+      lightTrait.tryCreateLight(
           light -> {
             light.setStaticLight(false);
             light.attachToBody(getBody());

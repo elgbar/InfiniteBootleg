@@ -241,7 +241,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       }
       ConnectingScreen.info = "Login success!"
       val player = world.getPlayer(UUID.fromString(entity.uuid))
-      if (player == null || player.isInvalid) {
+      if (player == null || player.isDisposed) {
         ctx.fatal("Invalid player client side reason: ${if (player == null) "Player is null" else "Player invalid"}")
       } else {
         world.worldTicker.start()
