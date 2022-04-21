@@ -537,6 +537,21 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
+  public void removeBlocks(ObjectSet<@NotNull Block> blocks, boolean prioritize) {
+    var blockChunks = new ObjectSet<Chunk>();
+    for (Block block : blocks) {
+      block.destroy(false);
+      blockChunks.add(block.getChunk());
+    }
+    for (Chunk chunk : blockChunks) {
+      chunk.updateTexture(prioritize);
+    }
+    // only update once all the correct blocks have been removed
+    for (Block block : blocks) {
+      updateBlocksAround(block.getWorldX(), block.getWorldY());
+    }
+  }
+
   public Array<Entity> getEntities(float worldX, float worldY) {
     Array<Entity> foundEntities = new Array<>(false, 4);
     for (Entity entity : entities.values()) {

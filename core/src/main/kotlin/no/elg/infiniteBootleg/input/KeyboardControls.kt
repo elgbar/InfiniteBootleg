@@ -39,13 +39,11 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     if (breakBrushSize <= 1) {
       world.remove(blockX, blockY, true)
     } else {
-      val blocksWithin = world.getBlocksWithin(rawX, rawY, breakBrushSize, true)
+      val blocksWithin = world.getBlocksWithin(rawX, rawY, breakBrushSize)
       if (blocksWithin.isEmpty) {
         world.remove(blockX, blockY, true)
       } else {
-        for (block in blocksWithin) {
-          world.remove(block.worldX, block.worldY, true)
-        }
+        world.removeBlocks(blocksWithin, true)
       }
     }
     lastEditTick = world.tick
