@@ -4,8 +4,8 @@ import static no.elg.infiniteBootleg.ClientMain.SCALE;
 
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.ServerMain;
@@ -22,21 +22,17 @@ public class DesktopLauncher {
       if (Settings.client) {
         Main main = new ClientMain(false);
 
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         if (SCALE > 1) {
-          config.width = 1920;
-          config.height = 1080;
+          config.setWindowedMode(1920, 1080);
         } else {
-          config.width = 1280;
-          config.height = 720;
+          config.setWindowedMode(1280, 720);
         }
-        config.vSyncEnabled = false;
-        config.foregroundFPS = -1;
-        config.backgroundFPS = 60;
-        config.samples = 16;
-        config.title = "Infinite Terraria";
-        config.useHDPI = true;
-        new LwjglApplication(main, config);
+        config.useVsync(false);
+        config.setTitle("Infinite Terraria");
+        config.useOpenGL3(false, 3, 2);
+        config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 8);
+        new Lwjgl3Application(main, config);
       } else {
         HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
         config.updatesPerSecond =
