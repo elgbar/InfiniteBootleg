@@ -9,13 +9,7 @@ import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
-public class EntityRenderer implements Renderer {
-
-  private final ClientWorldRender worldRender;
-
-  public EntityRenderer(@NotNull ClientWorldRender worldRender) {
-    this.worldRender = worldRender;
-  }
+public record EntityRenderer(@NotNull ClientWorldRender worldRender) implements Renderer {
 
   @Override
   public void render() {

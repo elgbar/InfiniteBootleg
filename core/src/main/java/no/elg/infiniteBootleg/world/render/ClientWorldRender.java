@@ -77,7 +77,7 @@ public class ClientWorldRender implements WorldRender {
     batch.setProjectionMatrix(camera.combined);
 
     chunkDebugRenderer = new DebugChunkRenderer(this);
-    box2DDebugRenderer = new Box2DDebugRenderer();
+    box2DDebugRenderer = new Box2DDebugRenderer(true, false, false, false, true, true);
 
     rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld());
     rayHandler.setBlurNum(1);
