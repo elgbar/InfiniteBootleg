@@ -647,9 +647,9 @@ public abstract class World implements Disposable, Resizable {
    */
   public void updateBlocksAround(int worldX, int worldY) {
     for (Direction dir : Direction.CARDINAL) {
-      Block rel = getBlock(worldX + dir.dx, worldY + dir.dy, true);
+      Block rel = getBlock(worldX + dir.dx, worldY + dir.dy);
       if (rel instanceof TickingBlock tickingBlock) {
-        tickingBlock.setShouldTick(true);
+        tickingBlock.enableTick();
       }
     }
   }
@@ -671,7 +671,7 @@ public abstract class World implements Disposable, Resizable {
                 synchronized (tickingBlocks) {
                   for (TickingBlock block : tickingBlocks) {
                     if (block instanceof LightTrait lightTrait) {
-                      lightTrait.recreateLight();
+                      lightTrait.recreateLight(it -> null);
                     }
                   }
                 }

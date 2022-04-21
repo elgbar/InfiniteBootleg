@@ -8,15 +8,24 @@ import no.elg.infiniteBootleg.Ticking
 interface TickingTrait : Trait, Ticking {
 
   /**
-   * Update if the update flag is set to true
+   * Call [tick] or [tickRare] if [shouldTick] is `true`
    *
    * @param rare If the rare update should be called instead of the normal update
    */
   fun tryTick(rare: Boolean)
 
+  /**
+   * If ticking should be done
+   */
   fun shouldTick(): Boolean
 
-  fun setShouldTick(boolean: Boolean)
+  /**
+   * Say we should tick
+   */
+  fun enableTick()
 
+  /**
+   * Enable ticking after [delayTicks] ticks
+   */
   fun delayedShouldTick(delayTicks: Long)
 }

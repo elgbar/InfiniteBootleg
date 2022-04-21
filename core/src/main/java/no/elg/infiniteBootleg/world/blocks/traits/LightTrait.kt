@@ -8,15 +8,34 @@ import no.elg.infiniteBootleg.CheckableDisposable
  */
 interface LightTrait : Trait, CheckableDisposable {
 
+  /**
+   * The current light
+   */
   val light: PointLight?
 
+  /**
+   * Default customization to do when creating the light
+   */
   fun customizeLight(light: PointLight) {
     // Default point light
   }
 
   fun canCreateLight(): Boolean = true
 
-  fun createLight(customizer: (light: PointLight) -> Unit = {})
+  /**
+   * Try to create light if it has not been created yet
+   *
+   * @param customizer Additional customization of the light
+   */
+  fun tryCreateLight(customizer: (light: PointLight) -> Unit = {})
+
+  /**
+   * Release the light back to the point light pool
+   */
   fun releaseLight()
-  fun recreateLight()
+
+  /**
+   * Release, then create the light again.
+   */
+  fun recreateLight(customizer: (light: PointLight) -> Unit = {})
 }

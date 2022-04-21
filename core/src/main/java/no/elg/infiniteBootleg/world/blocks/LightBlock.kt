@@ -26,19 +26,19 @@ abstract class LightBlock(
   override val light: PointLight? get() = lightTraitHandler.light
 
   override fun tick() {
-    lightTraitHandler.createLight()
+    lightTraitHandler.tryCreateLight()
   }
 
-  override fun createLight(customizer: (light: PointLight) -> Unit) {
-    lightTraitHandler.createLight(customizer)
+  override fun tryCreateLight(customizer: (light: PointLight) -> Unit) {
+    lightTraitHandler.tryCreateLight(customizer)
   }
 
   override fun releaseLight() {
     lightTraitHandler.releaseLight()
   }
 
-  override fun recreateLight() {
-    lightTraitHandler.recreateLight()
+  override fun recreateLight(customizer: (light: PointLight) -> Unit) {
+    lightTraitHandler.recreateLight(customizer)
   }
 
   override fun dispose() {

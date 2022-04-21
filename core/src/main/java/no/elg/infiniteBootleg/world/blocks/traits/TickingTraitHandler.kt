@@ -40,7 +40,7 @@ class TickingTraitHandler(private val tickingTrait: TickingTrait, private val wo
   fun tryTick(rare: Boolean) {
     synchronized(tickLock) {
       // should not tick right away to not spawn multiple entities when spawning e.g., sand
-      if (!shouldTick || minimumTick > worldTicker.tickId) {
+      if (!tickingTrait.shouldTick() || minimumTick > worldTicker.tickId) {
         return
       }
       shouldTick = false

@@ -16,9 +16,9 @@ class LightTraitHandler(
 ) : TraitHandler<LightTrait>, CheckableDisposable {
 
   var light: PointLight? = null
-  val disposed = false
+  var disposed = false
 
-  fun createLight(customizer: (light: PointLight) -> Unit = {}) {
+  fun tryCreateLight(customizer: (light: PointLight) -> Unit = {}) {
     if (!Settings.renderLight || Main.isServer()) {
       return
     }
@@ -47,14 +47,15 @@ class LightTraitHandler(
     }
   }
 
-  fun recreateLight() {
+  fun recreateLight(customizer: (light: PointLight) -> Unit) {
     releaseLight()
-    createLight()
+    tryCreateLight(customizer)
   }
 
   override fun isDisposed(): Boolean = disposed
 
   override fun dispose() {
+    disposed = true
     releaseLight()
   }
 }
