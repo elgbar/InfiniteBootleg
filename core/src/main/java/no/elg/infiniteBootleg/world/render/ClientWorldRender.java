@@ -6,7 +6,6 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import box2dLight.DirectionalLight;
 import box2dLight.PublicRayHandler;
 import box2dLight.RayHandler;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -193,7 +192,7 @@ public class ClientWorldRender implements WorldRender {
   @Override
   public void update() {
     camera.update();
-    Gdx.app.postRunnable(() -> batch.setProjectionMatrix(camera.combined));
+    batch.setProjectionMatrix(camera.combined);
     m4.set(camera.combined).scl(Block.BLOCK_SIZE);
 
     final float width = camera.viewportWidth * camera.zoom;

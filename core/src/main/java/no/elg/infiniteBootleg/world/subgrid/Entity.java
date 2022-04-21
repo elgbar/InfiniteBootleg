@@ -18,9 +18,11 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import kotlin.jvm.functions.Function1;
 import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
@@ -69,8 +71,9 @@ public abstract class Entity
   public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
   @NotNull private final World world;
   private final UUID uuid;
-
   @Nullable private Body body;
+
+  private final Array<Function1<@NotNull Body, @Nullable Void>> bodyCreations = new Array<>();
   private boolean flying; // ignore world gravity
   private final Vector2 posCache;
   private final Vector2 velCache;
@@ -96,11 +99,12 @@ public abstract class Entity
       setFlying(true);
     }
     final ProtoWorld.Vector2f velocity = protoEntity.getVelocity();
-    synchronized (BOX2D_LOCK) {
-      if (isInvalid()) {
-        return;
-      }
-      getBody().setLinearVelocity(velocity.getX(), velocity.getY());
+    if (velocity.getX() != 0f || velocity.getY() != 0f) {
+      postWorldBodyRunnable(
+          body -> {
+            body.setLinearVelocity(velocity.getX(), velocity.getY());
+            return null;
+          });
     }
   }
 
@@ -158,13 +162,29 @@ public abstract class Entity
     }
 
     if (Main.inst().isNotTest()) {
-      synchronized (BOX2D_LOCK) {
-        BodyDef def = createBodyDef(posCache.x, posCache.y);
-        body = world.getWorldBody().createBody(def);
-        createFixture(body);
-        body.setGravityScale(DEFAULT_GRAVITY_SCALE);
-        body.setUserData(this);
-      }
+      BodyDef def = createBodyDef(posCache.x, posCache.y);
+      world
+          .getWorldBody()
+          .createBody(
+              def,
+              it -> {
+                if (isDisposed()) {
+                  world.getWorldBody().destroyBody(it);
+                  return null;
+                }
+                synchronized (bodyCreations) {
+                  body = it;
+                  createFixture(body);
+                  body.setGravityScale(DEFAULT_GRAVITY_SCALE);
+                  body.setUserData(this);
+
+                  for (Function1<@NotNull Body, @Nullable Void> runnable : bodyCreations) {
+                    runnable.invoke(it);
+                  }
+                  bodyCreations.clear();
+                }
+                return null;
+              });
     }
 
     // Sanity check
@@ -189,7 +209,28 @@ public abstract class Entity
             });
   }
 
-  /** Always call while synchronized with {@link WorldRender#BOX2D_LOCK} */
+  private void postWorldBodyRunnable(Function1<@NotNull Body, @Nullable Void> runnable) {
+    boolean runNow;
+    Body body1 = body;
+    synchronized (bodyCreations) {
+      runNow = body1 != null;
+      if (!runNow) {
+        bodyCreations.add(runnable);
+      }
+    }
+    if (runNow) {
+      world
+          .getWorldBody()
+          .postBox2dRunnable(
+              () -> {
+                if (isDisposed()) {
+                  return;
+                }
+                runnable.invoke(body1);
+              });
+    }
+  }
+
   @NotNull
   protected BodyDef createBodyDef(float worldX, float worldY) {
     BodyDef bodyDef = new BodyDef();
@@ -501,17 +542,14 @@ public abstract class Entity
    * @param filter The type of filter to set
    */
   public void setFilter(@NotNull Filter filter) {
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        if (isInvalid()) {
-          return;
-        }
-        this.filter = filter;
-        for (Fixture fixture : body.getFixtureList()) {
-          fixture.setFilterData(filter);
-        }
-      }
-    }
+    this.filter = filter;
+    postWorldBodyRunnable(
+        body -> {
+          for (Fixture fixture : body.getFixtureList()) {
+            fixture.setFilterData(filter);
+          }
+          return null;
+        });
   }
 
   /**
@@ -561,6 +599,7 @@ public abstract class Entity
 
   /** Update the cached position and velocity */
   public final void updatePos() {
+    // must sync with box2d lock, as the side effect is what we desire
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
         if (isDisposed() || body == null) {
@@ -600,14 +639,12 @@ public abstract class Entity
     }
 
     if (tooFastX || tooFastY) {
-      synchronized (BOX2D_LOCK) {
-        synchronized (this) {
-          if (isInvalid()) {
-            return;
-          }
-          body.setLinearVelocity(nx, ny);
-        }
-      }
+
+      postWorldBodyRunnable(
+          body -> {
+            body.setLinearVelocity(nx, ny);
+            return null;
+          });
     }
     if (Main.isServer()) {
       Main.inst()
@@ -630,16 +667,14 @@ public abstract class Entity
    *     #FREEZE_DESPAWN_TIMEOUT_MS} time
    */
   public void freeze(boolean despawnAfterTimeout) {
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        if (isInvalid()) {
-          return;
-        }
-        setFilter(NON_INTERACTIVE_FILTER);
-        body.setLinearVelocity(0, 0);
-        body.setGravityScale(0f);
-      }
-    }
+    postWorldBodyRunnable(
+        body -> {
+          setFilter(NON_INTERACTIVE_FILTER);
+          body.setLinearVelocity(0, 0);
+          body.setGravityScale(0f);
+          return null;
+        });
+
     // Remove
     if (despawnAfterTimeout) {
 
@@ -713,21 +748,18 @@ public abstract class Entity
   }
 
   public void setFlying(boolean flying) {
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        if (isInvalid()) {
-          return;
-        }
-        this.flying = flying;
-        if (flying) {
-          body.setLinearVelocity(0, 0);
-          body.setGravityScale(0);
-        } else {
-          body.setGravityScale(DEFAULT_GRAVITY_SCALE);
-          body.setAwake(true);
-        }
-      }
-    }
+    this.flying = flying;
+    postWorldBodyRunnable(
+        body -> {
+          if (flying) {
+            body.setLinearVelocity(0, 0);
+            body.setGravityScale(0);
+          } else {
+            body.setGravityScale(DEFAULT_GRAVITY_SCALE);
+            body.setAwake(true);
+          }
+          return null;
+        });
   }
 
   public World getWorld() {

@@ -4,7 +4,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
-import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.OrderedSet
+import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
@@ -45,7 +46,31 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   @field:Volatile
   private var disposed = false
 
-  private val bodies = Array<Body>()
+  private val bodies = GdxArray<Body>()
+
+  private val chunksToUpdate = OrderedSet<ChunkBody>()
+  private val updatingChunks = OrderedSet<ChunkBody>()
+
+  private val runnables = GdxArray<Runnable>()
+  private val executedRunnables = GdxArray<Runnable>()
+
+  /**
+   * Posts a [Runnable] on the physics thread.
+   * The runnable will be executed under the synchronization of [BOX2D_LOCK].
+   *
+   * @see [com.badlogic.gdx.Application.postRunnable]
+   */
+  fun postBox2dRunnable(runnable: Runnable) {
+    synchronized(runnables) {
+      runnables.add(runnable)
+    }
+  }
+
+  internal fun updateChunk(chunkBody: ChunkBody) {
+    synchronized(chunksToUpdate) {
+      chunksToUpdate.add(chunkBody)
+    }
+  }
 
   /**
    * Create a new body in this world, this method can be called from any thread
@@ -55,15 +80,16 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * @param def
    * The definition of the body to create
    */
-  fun createBody(def: BodyDef): Body {
-    synchronized(BOX2D_LOCK) {
-      if (disposed) {
-        throw IllegalStateException("Cannot create body when world is disposed")
-      }
-      val body = box2dWorld.createBody(def)
-      applyShift(body, worldOffsetX, worldOffsetY)
-      return body
+  fun createBody(def: BodyDef, callback: (Body) -> Unit) {
+    postBox2dRunnable {
+      createBodyNow(def, callback)
     }
+  }
+
+  private fun createBodyNow(def: BodyDef, callback: (Body) -> Unit) {
+    val body = box2dWorld.createBody(def)
+    applyShift(body, worldOffsetX, worldOffsetY)
+    callback(body)
   }
 
   /**
@@ -73,20 +99,14 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * The body to destroy
    */
   fun destroyBody(body: Body) {
-    Main.inst().scheduler.executeAsync {
-      // Execute async to not be under any locks
-      synchronized(BOX2D_LOCK) {
-        if (disposed) {
-          return@executeAsync
-        }
-        require(!box2dWorld.isLocked) {
-          "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
-        }
-        if (!body.isActive) {
-          Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
-        }
-        box2dWorld.destroyBody(body)
+    postBox2dRunnable {
+      require(!box2dWorld.isLocked) {
+        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
       }
+      if (!body.isActive) {
+        Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
+      }
+      box2dWorld.destroyBody(body)
     }
   }
 
@@ -98,7 +118,28 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       if (disposed) {
         return@synchronized
       }
-      box2dWorld.step(timeStep, 20, 10)
+      synchronized(runnables) {
+        executedRunnables.clear()
+        executedRunnables.addAll(runnables)
+        runnables.clear()
+      }
+      for (runnable in executedRunnables) {
+        runnable.run()
+      }
+
+      synchronized(chunksToUpdate) {
+        updatingChunks.clear()
+        updatingChunks.addAll(chunksToUpdate)
+        chunksToUpdate.clear()
+      }
+
+      for (chunkBody in updatingChunks) {
+        if (chunkBody.shouldCreateBody()) {
+          createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
+        }
+      }
+
+      box2dWorld.step(timeStep, 8, 3)
     }
   }
 
@@ -146,40 +187,35 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * Move world offset to make sure physics don't go haywire by floating point rounding error
    */
   fun shiftWorldOffset(deltaOffsetX: Float, deltaOffsetY: Float) {
-    Main.inst().scheduler.executeAsync {
-      synchronized(BOX2D_LOCK) {
-        if (disposed) {
-          return@synchronized
-        }
-        worldOffsetX += deltaOffsetX
-        worldOffsetY += deltaOffsetY
-        bodies.clear()
-        bodies.ensureCapacity(world.entities.size)
-        box2dWorld.getBodies(bodies)
-        for (body in bodies) {
-          applyShift(body, deltaOffsetX, deltaOffsetY)
-        }
-        for (entity in world.entities) {
-          entity.updatePos()
-        }
+    postBox2dRunnable {
+      worldOffsetX += deltaOffsetX
+      worldOffsetY += deltaOffsetY
+      bodies.clear()
+      bodies.ensureCapacity(world.entities.size)
+      box2dWorld.getBodies(bodies)
+      for (body in bodies) {
+        applyShift(body, deltaOffsetX, deltaOffsetY)
+      }
+      for (entity in world.entities) {
+        entity.updatePos()
+      }
 
-        val render = world.render
-        if (render is ClientWorldRender) {
-          val rayHandler = render.rayHandler
-          for (light in rayHandler.enabledLights) {
-            light.position = light.position.add(deltaOffsetX, deltaOffsetY)
-          }
-          // TODO enable if needed
+      val render = world.render
+      if (render is ClientWorldRender) {
+        val rayHandler = render.rayHandler
+        for (light in rayHandler.enabledLights) {
+          light.position = light.position.add(deltaOffsetX, deltaOffsetY)
+        }
+        // TODO enable if needed
 //      for (light in rayHandler.disabledLights) {
 //        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
 //      }
-          rayHandler.update()
+        rayHandler.update()
 
-          // test logic only, move to world render when possible
-          render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
-        }
-        render.update()
+        // test logic only, move to world render when possible
+        render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
       }
+      render.update()
     }
   }
 
@@ -187,14 +223,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
    */
   fun queryAABB(worldX: Float, worldY: Float, worldWidth: Float, worldHeight: Float, callback: ((Fixture) -> Boolean)) {
-
-    Main.inst().scheduler.executeAsync {
-      synchronized(BOX2D_LOCK) {
-        if (disposed) {
-          return@synchronized
-        }
-        box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
-      }
+    postBox2dRunnable {
+      box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
     }
   }
 

@@ -59,7 +59,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     get() = disposed
 
   /**calculate the shape of the chunk (box2d)*/
-  private val bodyDef = BodyDef().also {
+  val bodyDef = BodyDef().also {
     it.position[chunk.chunkX * CHUNK_SIZE.toFloat()] = chunk.chunkY * CHUNK_SIZE.toFloat()
     it.fixedRotation = true
     it.type = StaticBody
@@ -72,14 +72,21 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
    * If the neighbors also should be updated
    */
   override fun update() {
+    chunk.world.worldBody.updateChunk(this)
+  }
+
+  fun shouldCreateBody(): Boolean {
     if (isDisposed) {
-      return
+      return false
     }
     if (chunk.isAllAir) {
       box2dBody = null
-      return
+      return false
     }
-    val tmpBody = chunk.world.worldBody.createBody(bodyDef)
+    return true
+  }
+
+  fun onBodyCreated(tmpBody: Body) {
     val edges = GdxLongArray(false, 1 + CHUNK_SIZE * CHUNK_SIZE)
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
@@ -123,17 +130,15 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     }
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
-      if (isDisposed) {
+    if (isDisposed) {
       box2dBody = null
       chunk.world.worldBody.destroyBody(tmpBody)
-      return
     } else {
       box2dBody = tmpBody
-    }
-
-    Main.inst().scheduler.executeAsync {
-      chunk.world.updateLights()
-      chunk.world.render.update()
+      Main.inst().scheduler.executeAsync {
+        chunk.world.updateLights()
+        chunk.world.render.update()
+      }
     }
   }
 
@@ -145,6 +150,17 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   }
 
   fun hasBody(): Boolean = box2dBody != null
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is ChunkBody) return false
+    if (chunk != other.chunk) return false
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return chunk.hashCode()
+  }
 
   companion object {
 
