@@ -324,7 +324,7 @@ public abstract class Entity
     var locations = touchingLocations(worldX, worldY);
     ObjectSet<Block> blocks = new ObjectSet<>();
     for (Location location : locations) {
-      Block block = world.getBlock(location.x, location.y, false);
+      Block block = world.getBlock(location.x, location.y);
       if (block != null) {
         blocks.add(block);
       }
@@ -415,7 +415,7 @@ public abstract class Entity
       int y = MathUtils.floor(worldY - getHalfBox2dHeight());
       float maxY = worldY + getHalfBox2dHeight();
       for (; y < maxY; y++) {
-        var block = world.getBlock(x, y, true);
+        var block = world.getBlock(x, y);
         if (block == null
             || block.getMaterial() == Material.AIR
             || (block instanceof EntityBlock entityBlock && entityBlock.getEntity() == this)) {

@@ -575,8 +575,8 @@ public abstract class World implements Disposable, Resizable {
   /**
    * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists)
    * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
-   * the {@link #getBlock(int, int, boolean)} method might createBlock and store a new air block at
-   * the given location
+   * the {@link #getBlock(int, int)} method might createBlock and store a new air block at the given
+   * location
    *
    * <p><b>note</b> this does not if there are entities at this location
    *
@@ -590,8 +590,8 @@ public abstract class World implements Disposable, Resizable {
   /**
    * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist)
    * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
-   * the {@link #getBlock(int, int, boolean)} method might create a Block and store a new air block
-   * at the given location.
+   * the {@link #getBlock(int, int)} method might create a Block and store a new air block at the
+   * given location.
    *
    * <p>If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent
    * teleportation and other actions that depend on an empty space.
@@ -683,11 +683,10 @@ public abstract class World implements Disposable, Resizable {
   /**
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
-   * @param raw
    * @return The block at the given x and y
    */
   @Nullable
-  public Block getBlock(int worldX, int worldY, boolean raw) {
+  public Block getBlock(int worldX, int worldY) {
     int chunkX = CoordUtil.worldToChunk(worldX);
     int chunkY = CoordUtil.worldToChunk(worldY);
 
@@ -972,11 +971,10 @@ public abstract class World implements Disposable, Resizable {
    * @param worldX X center (center of each block
    * @param worldY Y center
    * @param radius Radius to be equal or less from center
-   * @param raw If blocks should be generated, if false this will return no null blocks
    * @return Set of blocks within the given radius
    */
   @NotNull
-  public ObjectSet<Block> getBlocksWithin(float worldX, float worldY, float radius, boolean raw) {
+  public ObjectSet<@NotNull Block> getBlocksWithin(float worldX, float worldY, float radius) {
     Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number");
     ObjectSet<Block> blocks = new ObjectSet<>();
     float radiusSquare = radius * radius;
@@ -985,7 +983,7 @@ public abstract class World implements Disposable, Resizable {
       int blockWorldY = CoordUtil.decompactLocY(compact);
       if (abs(Vector2.dst2(worldX, worldY, blockWorldX + 0.5f, blockWorldY + 0.5f))
           <= radiusSquare) {
-        Block block = getBlock(blockWorldX, blockWorldY, raw);
+        Block block = getBlock(blockWorldX, blockWorldY);
         if (block == null) {
           continue;
         }
@@ -996,8 +994,8 @@ public abstract class World implements Disposable, Resizable {
   }
 
   @NotNull
-  public Array<Block> getBlocksAABB(
-      float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
+  public Array<@NotNull Block> getBlocksAABB(
+      float worldX, float worldY, float offsetX, float offsetY) {
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
     int x = MathUtils.floor(worldX - offsetX);
@@ -1005,7 +1003,7 @@ public abstract class World implements Disposable, Resizable {
     float maxY = worldY + offsetY;
     for (; x <= maxX; x++) {
       for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
-        Block b = getBlock(x, y, raw);
+        Block b = getBlock(x, y);
         if (b == null) {
           continue;
         }
@@ -1057,7 +1055,7 @@ public abstract class World implements Disposable, Resizable {
    */
   @NotNull
   public Material getMaterial(int worldX, int worldY) {
-    Block block = getBlock(worldX, worldY, true);
+    Block block = getBlock(worldX, worldY);
     if (block != null) {
       return block.getMaterial();
     }

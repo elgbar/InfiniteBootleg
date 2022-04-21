@@ -74,57 +74,56 @@ public class WorldTest extends TestGraphic {
   @Test
   public void getCorrectBlockFromOrigin() {
     world.getChunk(0, 0).setBlock(0, 0, Material.STONE);
-    assertEquals(Material.STONE, world.getBlock(0, 0, false).getMaterial());
+    assertEquals(Material.STONE, world.getBlock(0, 0).getMaterial());
   }
 
   @Test
   public void getCorrectBlockFromWorldCoords() {
     world.getChunk(-2, 5).setBlock(2, 11, Material.STONE);
     assertEquals(
-        Material.STONE,
-        world.getBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11, false).getMaterial());
+        Material.STONE, world.getBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11).getMaterial());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void BlockWithinNegativeRadiusFails() {
-    world.getBlocksWithin(0, 0, -1, false);
+    world.getBlocksWithin(0, 0, -1);
   }
 
   @Test
   public void BlockAtOriginWithZeroRadiusReturnsEmptySet() {
-    ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 0, false);
+    ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 0);
     assertTrue(blocks.isEmpty());
   }
 
   @Test
   public void BlockAtBlockOriginWithZeroRadiusReturnsOriginBlock() {
-    ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 0, false);
+    ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 0);
     ObjectSet<Block> expected = new ObjectSet<>();
-    expected.add(world.getBlock(0, 0, false));
+    expected.add(world.getBlock(0, 0));
     assertEquals(expected, blocks);
   }
 
   @Test
   public void BlockWithinOneReturnsGivenCoords() {
-    ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 1, false);
+    ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 1);
 
     ObjectSet<Block> expected = new ObjectSet<>();
-    expected.add(world.getBlock(0, 0, false));
-    expected.add(world.getBlock(-1, 0, false));
-    expected.add(world.getBlock(0, -1, false));
-    expected.add(world.getBlock(-1, -1, false));
+    expected.add(world.getBlock(0, 0));
+    expected.add(world.getBlock(-1, 0));
+    expected.add(world.getBlock(0, -1));
+    expected.add(world.getBlock(-1, -1));
 
     assertEquals(expected, blocks);
   }
 
   @Test
   public void BlockWithin1_5ReturnsGivenCoords() {
-    ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1.5f, false);
+    ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1.5f);
 
     ObjectSet<Block> expected = new ObjectSet<>();
-    expected.add(world.getBlock(0, 0, false));
+    expected.add(world.getBlock(0, 0));
     for (Direction dir : Direction.values()) {
-      expected.add(world.getBlock(dir.dx, dir.dy, false));
+      expected.add(world.getBlock(dir.dx, dir.dy));
     }
 
     assertEquals(expected, blocks);
@@ -132,7 +131,7 @@ public class WorldTest extends TestGraphic {
 
   @Test
   public void BlockWithinOneOffsetPoint5() {
-    ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1, false);
+    ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1);
     // convert set to the locations of the blocks
     Set<Location> bal =
         StreamSupport.stream(
@@ -143,9 +142,9 @@ public class WorldTest extends TestGraphic {
             .collect(Collectors.toSet());
 
     Set<Block> expected = new HashSet<>();
-    expected.add(world.getBlock(0, 0, false));
+    expected.add(world.getBlock(0, 0));
     for (Direction dir : Direction.CARDINAL) {
-      expected.add(world.getBlock(dir.dx, dir.dy, false));
+      expected.add(world.getBlock(dir.dx, dir.dy));
     }
     Set<Location> larr =
         expected.stream()

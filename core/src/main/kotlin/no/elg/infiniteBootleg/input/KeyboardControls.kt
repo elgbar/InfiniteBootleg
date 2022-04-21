@@ -66,7 +66,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       if (placeBrushSize <= 1) {
         update = selected.create(world, blockX, blockY, true)
       } else {
-        val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize, false)
+        val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize)
         if (blocksWithin.isEmpty) {
           update = update or selected.create(world, blockX, blockY, true)
         } else {

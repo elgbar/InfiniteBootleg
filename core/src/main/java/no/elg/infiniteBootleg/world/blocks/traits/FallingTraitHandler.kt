@@ -25,7 +25,7 @@ class FallingTraitHandler(
       falling = true
 
       Main.inst().scheduler.executeAsync {
-        val block = world.getBlock(originWorldX, originWorldY, true) ?: return@executeAsync
+        val block = world.getBlock(originWorldX, originWorldY) ?: return@executeAsync
         block.destroy(true)
         Main.inst().scheduler.executeAsync {
           if (!falling) {

@@ -111,11 +111,11 @@ public class Block
   /**
    * @param dir The relative direction
    * @return The relative block in the given location
-   * @see World#getBlock(int, int, boolean)
+   * @see #getBlock(int, int)
    */
   @Nullable
   public Block getRelative(@NotNull Direction dir) {
-    return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, false);
+    return world.getBlock(getWorldX() + dir.dx, getWorldY() + dir.dy);
   }
 
   /**
@@ -135,7 +135,7 @@ public class Block
   /**
    * @param dir The relative direction
    * @return The relative raw block in the given location
-   * @see World#getBlock(int, int, boolean)
+   * @see #getBlock(int, int)
    */
   @Nullable
   public Block getRawRelative(@NotNull Direction dir) {
@@ -146,7 +146,7 @@ public class Block
         CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
       return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
     }
-    return world.getBlock(newWorldX, newWorldY, true);
+    return world.getBlock(newWorldX, newWorldY);
   }
 
   public Block setBlock(@NotNull Material material) {
