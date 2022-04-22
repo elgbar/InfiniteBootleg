@@ -621,7 +621,6 @@ public abstract class Entity
     if (isDisposed()) {
       return;
     }
-    updatePos();
     float nx;
     boolean tooFastX = abs(velCache.x) > MAX_X_VEL;
     if (tooFastX) {

@@ -9,6 +9,7 @@ import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.Block.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
@@ -131,6 +132,10 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         updatingChunks.clear()
         updatingChunks.addAll(chunksToUpdate)
         chunksToUpdate.clear()
+      }
+
+      for (entity in world.entities) {
+        entity.updatePos()
       }
 
       for (chunkBody in updatingChunks) {
