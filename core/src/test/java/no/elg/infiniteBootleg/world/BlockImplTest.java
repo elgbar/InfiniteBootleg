@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * @author Elg
  */
-public class BlockTest extends TestGraphic {
+public class BlockImplTest extends TestGraphic {
 
   @Test
   public void correctBlockType() {

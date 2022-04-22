@@ -24,6 +24,10 @@ public class Location {
     return new Location(x + dir.dx, y + dir.dy);
   }
 
+  public static long relativeCompact(int x, int y, @NotNull Direction dir) {
+    return CoordUtil.compactLoc(x + dir.dx, y + dir.dy);
+  }
+
   public Location scl(int x, int y) {
     return new Location(this.x * x, this.y * y);
   }

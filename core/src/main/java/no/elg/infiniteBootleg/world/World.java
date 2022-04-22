@@ -537,7 +537,7 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
-  public void removeBlocks(ObjectSet<@NotNull Block> blocks, boolean prioritize) {
+  public void removeBlocks(ObjectSet<? extends @NotNull Block> blocks, boolean prioritize) {
     var blockChunks = new ObjectSet<Chunk>();
     for (Block block : blocks) {
       block.destroy(false);
@@ -585,6 +585,11 @@ public abstract class World implements Disposable, Resizable {
    */
   public boolean isAirBlock(@NotNull Location worldLoc) {
     return isAirBlock(worldLoc.x, worldLoc.y);
+  }
+
+  public boolean isAirBlock(long compactWorldLoc) {
+    return isAirBlock(
+        CoordUtil.decompactLocX(compactWorldLoc), CoordUtil.decompactLocY(compactWorldLoc));
   }
 
   /**
@@ -678,6 +683,16 @@ public abstract class World implements Disposable, Resizable {
               }
               willUpdateLights = false;
             });
+  }
+
+  /**
+   * @param compactWorldLoc The coordinates from world view in a compact form
+   * @return The block at the given x and y
+   */
+  @Nullable
+  public Block getBlock(long compactWorldLoc) {
+    return getBlock(
+        CoordUtil.decompactLocX(compactWorldLoc), CoordUtil.decompactLocY(compactWorldLoc));
   }
 
   /**

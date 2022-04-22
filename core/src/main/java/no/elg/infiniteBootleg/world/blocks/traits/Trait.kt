@@ -1,3 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks.traits
 
-interface Trait
+import no.elg.infiniteBootleg.world.Block
+
+interface Trait : Block

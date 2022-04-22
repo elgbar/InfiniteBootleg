@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.BlockImpl
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
@@ -27,7 +27,7 @@ abstract class TickingBlock protected constructor(
   localX: Int,
   localY: Int,
   material: Material
-) : Block(world, chunk!!, localX, localY, material), TickingTrait {
+) : BlockImpl(world, chunk!!, localX, localY, material), TickingTrait {
 
   private val tickingTrait: TickingTraitHandler
 

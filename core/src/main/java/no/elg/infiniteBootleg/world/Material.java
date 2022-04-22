@@ -74,8 +74,8 @@ public enum Material {
     if (impl != null) {
       if (itemType == ItemType.BLOCK) {
         Preconditions.checkArgument(
-            Util.hasSuperClass(impl, Block.class),
-            name() + " does not have " + Block.class.getSimpleName() + " as a super class");
+            Block.class.isAssignableFrom(impl),
+            name() + " does not have " + Block.class.getSimpleName() + " as a super type");
         try {
           constructor =
               impl.getDeclaredConstructor(
@@ -140,7 +140,7 @@ public enum Material {
   public Block createBlock(@NotNull World world, @NotNull Chunk chunk, int localX, int localY) {
     Preconditions.checkArgument(isBlock());
     if (constructor == null) {
-      return new Block(world, chunk, localX, localY, this);
+      return new BlockImpl(world, chunk, localX, localY, this);
     }
     try {
       return (Block) constructor.newInstance(world, chunk, localX, localY, this);
