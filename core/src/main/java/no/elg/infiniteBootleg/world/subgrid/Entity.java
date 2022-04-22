@@ -784,11 +784,11 @@ public abstract class Entity
       Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
       return;
     }
+    disposed = true;
     if (body != null) {
       world.getWorldBody().destroyBody(body);
     }
     body = null;
-    disposed = false;
     if (this instanceof Removable removable) {
       removable.onRemove();
     }
