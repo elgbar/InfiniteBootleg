@@ -30,4 +30,8 @@ class FallingBlock(
   override fun tryFall() {
     fallingTraitHandler.tryFall()
   }
+
+  override fun createEntityFromBlock() {
+    fallingTraitHandler.createEntityFromBlock(this)
+  }
 }

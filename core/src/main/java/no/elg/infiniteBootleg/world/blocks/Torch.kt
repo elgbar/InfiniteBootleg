@@ -29,6 +29,10 @@ class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Mate
     fallingTraitHandler.tryFall()
   }
 
+  override fun createEntityFromBlock() {
+    fallingTraitHandler.createEntityFromBlock(this)
+  }
+
   override fun tick() {
     super<LightBlock>.tick()
     super<FallingTrait>.tick()
