@@ -258,7 +258,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       synchronized(BOX2D_LOCK) {
         box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
         box2dWorld.setContactListener(ContactManager())
-        timeStep = world.worldTicker.secondsDelayBetweenTicks
+        timeStep = 1f / Settings.tps
       }
     }
   }

@@ -30,7 +30,7 @@ public class WorldTicker extends Ticker implements Disposable {
 
   @Nullable private final WorldLightTicker lightTicker;
   @Nullable private final ServerRendererTicker serverRendererTicker;
-  @NotNull private final WorldBox2DTicker box2DTicker;
+  @NotNull private final Ticker box2DTicker;
 
   public WorldTicker(@NotNull World world, boolean tick) {
     super(
@@ -49,7 +49,13 @@ public class WorldTicker extends Ticker implements Disposable {
       lightTicker = null;
       serverRendererTicker = null;
     }
-    box2DTicker = new WorldBox2DTicker(world, tick);
+    box2DTicker =
+        new Ticker(
+            world.getWorldBody(),
+            "Box2DWorld-" + world.getName(),
+            tick,
+            Settings.tps,
+            Double.MAX_VALUE);
   }
 
   private static class WorldTickee implements Ticking {
@@ -170,7 +176,7 @@ public class WorldTicker extends Ticker implements Disposable {
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().start();
     }
-    box2DTicker.getTicker().start();
+    box2DTicker.start();
   }
 
   /** Stop this ticker, the tickers thread will not be called anymore */
@@ -183,7 +189,7 @@ public class WorldTicker extends Ticker implements Disposable {
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().stop();
     }
-    box2DTicker.getTicker().stop();
+    box2DTicker.stop();
   }
 
   /**
@@ -201,7 +207,7 @@ public class WorldTicker extends Ticker implements Disposable {
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().pause();
     }
-    box2DTicker.getTicker().pause();
+    box2DTicker.pause();
   }
 
   /**
@@ -219,7 +225,7 @@ public class WorldTicker extends Ticker implements Disposable {
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().resume();
     }
-    box2DTicker.getTicker().resume();
+    box2DTicker.resume();
   }
 
   @Override
