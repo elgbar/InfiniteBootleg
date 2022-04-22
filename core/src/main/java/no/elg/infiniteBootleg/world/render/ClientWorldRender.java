@@ -192,7 +192,9 @@ public class ClientWorldRender implements WorldRender {
   @Override
   public void update() {
     camera.update();
-    batch.setProjectionMatrix(camera.combined);
+    // must be done on gl thread!
+    Main.inst().getScheduler().executeSync(() -> batch.setProjectionMatrix(camera.combined));
+
     m4.set(camera.combined).scl(Block.BLOCK_SIZE);
 
     final float width = camera.viewportWidth * camera.zoom;
