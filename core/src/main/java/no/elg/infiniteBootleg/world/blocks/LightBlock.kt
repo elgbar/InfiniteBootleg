@@ -17,6 +17,7 @@ abstract class LightBlock(
 ) : TickingBlock(world, chunk, localX, localY, material), LightTrait {
 
   private val lightTraitHandler = LightTraitHandler(
+    this,
     world,
     CoordUtil.chunkToWorld(chunk.chunkX, localX),
     CoordUtil.chunkToWorld(chunk.chunkY, localY),

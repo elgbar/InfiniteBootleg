@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.blocks.traits.TickingTrait
 import no.elg.infiniteBootleg.world.blocks.traits.TickingTraitHandler
+import no.elg.infiniteBootleg.world.blocks.traits.TraitHandlerCollection
 
 /**
  * Describes a block that implements the [Ticking] interface.
@@ -23,11 +24,13 @@ import no.elg.infiniteBootleg.world.blocks.traits.TickingTraitHandler
  */
 abstract class TickingBlock protected constructor(
   world: World,
-  chunk: Chunk?,
+  chunk: Chunk,
   localX: Int,
   localY: Int,
   material: Material
-) : BlockImpl(world, chunk!!, localX, localY, material), TickingTrait {
+) : BlockImpl(world, chunk, localX, localY, material), TickingTrait {
+
+  override val handlers = TraitHandlerCollection()
 
   private val tickingTrait: TickingTraitHandler
 

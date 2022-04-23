@@ -22,6 +22,7 @@ class FallingBlock(
     get() = fallingTraitHandler.falling
 
   private val fallingTraitHandler = FallingTraitHandler(
+    this,
     world,
     CoordUtil.chunkToWorld(chunk.chunkX, localX),
     CoordUtil.chunkToWorld(chunk.chunkY, localY)
@@ -29,9 +30,5 @@ class FallingBlock(
 
   override fun tryFall() {
     fallingTraitHandler.tryFall()
-  }
-
-  override fun createEntityFromBlock() {
-    fallingTraitHandler.createEntityFromBlock(this)
   }
 }

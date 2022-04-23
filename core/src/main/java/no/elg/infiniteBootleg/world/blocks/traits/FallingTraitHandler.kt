@@ -1,18 +1,22 @@
 package no.elg.infiniteBootleg.world.blocks.traits
 
-import ktx.collections.GdxSet
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlockEntity
 
 class FallingTraitHandler(
+  trait: FallingTrait,
   val world: World,
   private val originWorldX: Int,
   private val originWorldY: Int,
 ) : TraitHandler<FallingTrait> {
+
+  init {
+    trait.handlers.set<FallingTrait>(this)
+  }
 
   var falling: Boolean = false
     private set
@@ -21,41 +25,25 @@ class FallingTraitHandler(
     if (falling || Main.isServerClient()) {
       return
     }
-    Main.inst().scheduler.executeAsync {
-      val south = Location.relativeCompact(originWorldX, originWorldY, Direction.SOUTH)
-      if (world.isAirBlock(south)) {
-        falling = true
+    val blockBelow = Location.relativeCompact(originWorldX, originWorldY, Direction.SOUTH)
+    if (world.isAirBlock(blockBelow)) {
+      val block = world.getRawBlock(originWorldX, originWorldY) ?: return
+      falling = true
+      val blockAbove = world.getRawBlock(originWorldX, originWorldY + 1)
+      if (blockAbove is TickingTrait) {
+        blockAbove.delayedShouldTick(Settings.tps / 5)
+      }
 
-        var dy = 0
-        val blocks = GdxSet<FallingTrait>()
+      world.worldBody.postBox2dRunnable {
+        block.destroy(true)
+        val fallingBlockEntity = FallingBlockEntity(world, block)
+        if (fallingBlockEntity.isDisposed) {
+          // well fuck
 
-        while (true) {
-          val block = world.getBlock(originWorldX, originWorldY + dy) ?: break
-          dy++
-          if (block is FallingTrait) {
-            blocks.add(block)
-          } else {
-            break
-          }
+          return@postBox2dRunnable
         }
-
-        world.removeBlocks(blocks, true)
-
-        for (block in blocks) {
-          block.createEntityFromBlock()
-        }
+        world.addEntity(fallingBlockEntity)
       }
     }
-  }
-
-  fun createEntityFromBlock(block: Block): FallingBlockEntity? {
-    // Do not update world straight away as if there are sand blocks above this it will begin to fall on the same tick
-    val fallingBlockEntity = FallingBlockEntity(world, block)
-    if (fallingBlockEntity.isDisposed) {
-      falling = false // try again later
-      return null
-    }
-    world.addEntity(fallingBlockEntity)
-    return fallingBlockEntity
   }
 }

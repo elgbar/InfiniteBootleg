@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.World
 
 class LightTraitHandler(
+  trait: LightTrait,
   val world: World,
   private val originWorldX: Int,
   private val originWorldY: Int,
@@ -17,6 +18,10 @@ class LightTraitHandler(
 
   var light: PointLight? = null
   var disposed = false
+
+  init {
+    trait.handlers.set<LightTrait>(this)
+  }
 
   fun tryCreateLight(customizer: (light: PointLight) -> Unit = {}) {
     if (!Settings.renderLight || Main.isServer()) {

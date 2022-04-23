@@ -25,6 +25,7 @@ class TickingTraitHandler(private val tickingTrait: TickingTrait, private val wo
   private val tickLock = Any()
 
   init {
+    tickingTrait.handlers.set<TickingTrait>(this)
     synchronized(tickLock) {
       shouldTick = true
       // spread ticking over multiple ticks to ease strain on ticker

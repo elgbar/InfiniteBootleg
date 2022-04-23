@@ -9,8 +9,6 @@ interface FallingTrait : TickingTrait {
 
   fun tryFall()
 
-  fun createEntityFromBlock()
-
   override fun tick() {
     tryFall()
   }

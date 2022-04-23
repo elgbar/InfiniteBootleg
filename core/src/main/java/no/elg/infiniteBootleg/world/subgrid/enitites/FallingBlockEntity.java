@@ -21,7 +21,10 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
+import no.elg.infiniteBootleg.world.blocks.traits.LightTraitHandler;
 import no.elg.infiniteBootleg.world.blocks.traits.Trait;
+import no.elg.infiniteBootleg.world.blocks.traits.TraitHandler;
+import no.elg.infiniteBootleg.world.blocks.traits.TraitHandlerCollection;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
@@ -34,7 +37,7 @@ public class FallingBlockEntity extends Entity {
   private Material material;
   @Nullable private TextureRegion region;
 
-  @Nullable private Trait trait;
+  @Nullable private TraitHandlerCollection traitHandlers;
 
   private volatile boolean crashed;
 
@@ -53,8 +56,9 @@ public class FallingBlockEntity extends Entity {
     var block = material.createBlock(world, chunk, (int) position.getX(), (int) position.getY());
 
     if (block instanceof Trait blockTrait) {
-      this.trait = blockTrait;
+      traitHandlers = blockTrait.getHandlers();
     }
+    block.dispose();
   }
 
   public FallingBlockEntity(@NotNull World world, @NotNull Block block) {
@@ -64,7 +68,7 @@ public class FallingBlockEntity extends Entity {
       return;
     }
     if (block instanceof Trait blockTrait) {
-      this.trait = blockTrait;
+      traitHandlers = blockTrait.getHandlers();
     }
     this.material = block.getMaterial();
     region = Settings.client ? material.getTextureRegion() : null;
@@ -125,17 +129,30 @@ public class FallingBlockEntity extends Entity {
       return;
     }
     super.tick();
-    if (trait instanceof LightTrait lightTrait) {
-      lightTrait.tryCreateLight(
+    LightTraitHandler lightTraitHandler = getLightTraitHandler();
+    if (lightTraitHandler != null) {
+      lightTraitHandler.tryCreateLight(
           light -> {
             light.setStaticLight(false);
             light.attachToBody(getBody());
             return null;
           });
     }
+
     if (material.blocksLight()) {
       WorldLightTicker.updateDirectionalLights();
     }
+  }
+
+  @Nullable
+  private LightTraitHandler getLightTraitHandler() {
+    if (traitHandlers != null) {
+      TraitHandler<LightTrait> genericHandler = traitHandlers.get(LightTrait.class);
+      if (genericHandler instanceof LightTraitHandler lightTraitHandler) {
+        return lightTraitHandler;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -198,8 +215,10 @@ public class FallingBlockEntity extends Entity {
 
   @Nullable
   public PointLight getLight() {
-    if (trait instanceof LightTrait lightTrait) {
-      return lightTrait.getLight();
+
+    LightTraitHandler lightTraitHandler = getLightTraitHandler();
+    if (lightTraitHandler != null) {
+      return lightTraitHandler.getLight();
     }
     return null;
   }

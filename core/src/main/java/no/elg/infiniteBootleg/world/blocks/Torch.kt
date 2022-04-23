@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.world.blocks.traits.FallingTraitHandler
 class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material) : LightBlock(world, chunk, localX, localY, material), FallingTrait {
 
   private val fallingTraitHandler = FallingTraitHandler(
+    this,
     world,
     CoordUtil.chunkToWorld(chunk.chunkX, localX),
     CoordUtil.chunkToWorld(chunk.chunkY, localY)
@@ -27,10 +28,6 @@ class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Mate
 
   override fun tryFall() {
     fallingTraitHandler.tryFall()
-  }
-
-  override fun createEntityFromBlock() {
-    fallingTraitHandler.createEntityFromBlock(this)
   }
 
   override fun tick() {
