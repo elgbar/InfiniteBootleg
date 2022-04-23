@@ -23,7 +23,7 @@ public class WorldLightTicker implements Ticking {
   WorldLightTicker(@NotNull ClientWorld world, boolean tick) {
     this.world = world;
     ticker =
-        new Ticker(this, "WorldLight-" + world.getName(), tick, Settings.tps / 3, Double.MAX_VALUE);
+        new Ticker(this, "WorldLight-" + world.getName(), tick, Settings.tps / 4, Double.MAX_VALUE);
   }
 
   public static void updateDirectionalLights() {
