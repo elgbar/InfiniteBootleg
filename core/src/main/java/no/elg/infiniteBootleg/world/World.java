@@ -167,13 +167,12 @@ public abstract class World implements Disposable, Resizable {
 
     name = worldName;
 
-    worldBody = new WorldBody(this);
+    worldTicker = new WorldTicker(this, false);
+
     chunkLoader = new ChunkLoader(this, generator);
+    worldBody = new WorldBody(this);
     worldTime = new WorldTime(this);
     spawn = new Location(0, 0);
-
-    // create last
-    worldTicker = new WorldTicker(this, false);
   }
 
   public void initialize() {
