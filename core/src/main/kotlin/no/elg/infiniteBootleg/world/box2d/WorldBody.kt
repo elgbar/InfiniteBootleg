@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
+import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS_DIVIDER
 import kotlin.math.abs
 import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 
@@ -115,36 +116,41 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
    */
   override fun tick() {
-    synchronized(BOX2D_LOCK) {
-      if (disposed) {
-        return@synchronized
-      }
-      synchronized(runnables) {
-        executedRunnables.clear()
-        executedRunnables.addAll(runnables)
-        runnables.clear()
-      }
-      for (runnable in executedRunnables) {
+    if (disposed) {
+      return
+    }
+    synchronized(runnables) {
+      executedRunnables.clear()
+      executedRunnables.addAll(runnables)
+      runnables.clear()
+    }
+    for (runnable in executedRunnables) {
+      synchronized(BOX2D_LOCK) {
         runnable.run()
       }
+    }
+    synchronized(chunksToUpdate) {
+      updatingChunks.clear()
+      updatingChunks.addAll(chunksToUpdate)
+      chunksToUpdate.clear()
+    }
 
-      synchronized(chunksToUpdate) {
-        updatingChunks.clear()
-        updatingChunks.addAll(chunksToUpdate)
-        chunksToUpdate.clear()
-      }
-
-      for (entity in world.entities) {
-        entity.updatePos()
-      }
-
-      for (chunkBody in updatingChunks) {
-        if (chunkBody.shouldCreateBody()) {
+    for (chunkBody in updatingChunks) {
+      if (chunkBody.shouldCreateBody()) {
+        synchronized(BOX2D_LOCK) {
           createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
         }
       }
+    }
 
-      box2dWorld.step(timeStep, 8, 3)
+    synchronized(BOX2D_LOCK) {
+      box2dWorld.step(timeStep, 1, 1)
+    }
+
+    for (entity in world.entities) {
+      synchronized(BOX2D_LOCK) {
+        entity.updatePos()
+      }
     }
   }
 
@@ -263,7 +269,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       synchronized(BOX2D_LOCK) {
         box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
         box2dWorld.setContactListener(ContactManager())
-        timeStep = 1f / Settings.tps
+        timeStep = (1f / Settings.tps) * BOX2D_TPS_DIVIDER
       }
     }
   }
