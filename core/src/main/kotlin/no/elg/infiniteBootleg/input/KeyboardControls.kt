@@ -7,7 +7,6 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
@@ -57,22 +56,20 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     val rawY = ClientMain.inst().mouseY
 
     var update = false
-    synchronized(BOX2D_LOCK) {
-      if (!world.getEntities(rawX, rawY).isEmpty) {
-        // cannot place on an entity
-        return false
-      }
+    if (!world.getEntities(rawX, rawY).isEmpty) {
+      // cannot place on an entity
+      return false
+    }
 
-      if (placeBrushSize <= 1) {
+    if (placeBrushSize <= 1) {
+      update = selected.create(world, blockX, blockY, true)
+    } else {
+      val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize)
+      if (blocksWithin.isEmpty) {
         update = selected.create(world, blockX, blockY, true)
       } else {
-        val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize)
-        if (blocksWithin.isEmpty) {
-          update = update or selected.create(world, blockX, blockY, true)
-        } else {
-          for (block in blocksWithin) {
-            update = update or selected.create(world, block.worldX, block.worldY, true)
-          }
+        for (block in blocksWithin) {
+          update = update or selected.create(world, block.worldX, block.worldY, true)
         }
       }
     }
@@ -111,7 +108,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       if (!controlled.validLocation(controlled.position.x + GROUND_CHECK_OFFSET * dir, controlled.position.y)) {
         return
       }
-      synchronized(BOX2D_LOCK) {
+      world.worldBody.postBox2dRunnable {
 
         val body = controlled.body
 
@@ -188,7 +185,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
   }
 
   private fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-    synchronized(BOX2D_LOCK) {
+    world.worldBody.postBox2dRunnable {
       val body = controlled.body
       val vel = body.linearVelocity
       val (nx, ny) = modify(vel.x, vel.y)
