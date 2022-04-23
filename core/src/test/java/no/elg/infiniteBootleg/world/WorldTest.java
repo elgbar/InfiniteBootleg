@@ -74,14 +74,14 @@ public class WorldTest extends TestGraphic {
   @Test
   public void getCorrectBlockFromOrigin() {
     world.getChunk(0, 0).setBlock(0, 0, Material.STONE);
-    assertEquals(Material.STONE, world.getBlock(0, 0).getMaterial());
+    assertEquals(Material.STONE, world.getRawBlock(0, 0).getMaterial());
   }
 
   @Test
   public void getCorrectBlockFromWorldCoords() {
     world.getChunk(-2, 5).setBlock(2, 11, Material.STONE);
     assertEquals(
-        Material.STONE, world.getBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11).getMaterial());
+        Material.STONE, world.getRawBlock(-2 * CHUNK_SIZE + 2, 5 * CHUNK_SIZE + 11).getMaterial());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -99,7 +99,7 @@ public class WorldTest extends TestGraphic {
   public void BlockAtBlockOriginWithZeroRadiusReturnsOriginBlock() {
     ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 0);
     ObjectSet<Block> expected = new ObjectSet<>();
-    expected.add(world.getBlock(0, 0));
+    expected.add(world.getRawBlock(0, 0));
     assertEquals(expected, blocks);
   }
 
@@ -108,10 +108,10 @@ public class WorldTest extends TestGraphic {
     ObjectSet<Block> blocks = world.getBlocksWithin(0, 0, 1);
 
     ObjectSet<Block> expected = new ObjectSet<>();
-    expected.add(world.getBlock(0, 0));
-    expected.add(world.getBlock(-1, 0));
-    expected.add(world.getBlock(0, -1));
-    expected.add(world.getBlock(-1, -1));
+    expected.add(world.getRawBlock(0, 0));
+    expected.add(world.getRawBlock(-1, 0));
+    expected.add(world.getRawBlock(0, -1));
+    expected.add(world.getRawBlock(-1, -1));
 
     assertEquals(expected, blocks);
   }
@@ -121,9 +121,9 @@ public class WorldTest extends TestGraphic {
     ObjectSet<Block> blocks = world.getBlocksWithin(0.5f, 0.5f, 1.5f);
 
     ObjectSet<Block> expected = new ObjectSet<>();
-    expected.add(world.getBlock(0, 0));
+    expected.add(world.getRawBlock(0, 0));
     for (Direction dir : Direction.values()) {
-      expected.add(world.getBlock(dir.dx, dir.dy));
+      expected.add(world.getRawBlock(dir.dx, dir.dy));
     }
 
     assertEquals(expected, blocks);
@@ -142,9 +142,9 @@ public class WorldTest extends TestGraphic {
             .collect(Collectors.toSet());
 
     Set<Block> expected = new HashSet<>();
-    expected.add(world.getBlock(0, 0));
+    expected.add(world.getRawBlock(0, 0));
     for (Direction dir : Direction.CARDINAL) {
-      expected.add(world.getBlock(dir.dx, dir.dy));
+      expected.add(world.getRawBlock(dir.dx, dir.dy));
     }
     Set<Location> larr =
         expected.stream()

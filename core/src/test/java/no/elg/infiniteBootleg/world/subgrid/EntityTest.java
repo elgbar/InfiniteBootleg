@@ -15,10 +15,10 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, 0, 0, 1, 1);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(-1, -1), //
-        world.getBlock(-1, 0), //
-        world.getBlock(0, -1), //
-        world.getBlock(0, 0));
+        world.getRawBlock(-1, -1), //
+        world.getRawBlock(-1, 0), //
+        world.getRawBlock(0, -1), //
+        world.getRawBlock(0, 0));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -30,7 +30,7 @@ public class EntityTest extends TestGraphic {
 
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(0, 0));
+        world.getRawBlock(0, 0));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -40,10 +40,10 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, 0, 0, 1, 2);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(-1, -1), //
-        world.getBlock(-1, 0), //
-        world.getBlock(0, -1), //
-        world.getBlock(0, 0));
+        world.getRawBlock(-1, -1), //
+        world.getRawBlock(-1, 0), //
+        world.getRawBlock(0, -1), //
+        world.getRawBlock(0, 0));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -53,10 +53,10 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, 0, 0, 2, 1);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(-1, -1), //
-        world.getBlock(-1, 0), //
-        world.getBlock(0, -1), //
-        world.getBlock(0, 0));
+        world.getRawBlock(-1, -1), //
+        world.getRawBlock(-1, 0), //
+        world.getRawBlock(0, -1), //
+        world.getRawBlock(0, 0));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -66,10 +66,10 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, -5, -5, 2, 1);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(-6, -6), //
-        world.getBlock(-6, -5), //
-        world.getBlock(-5, -6), //
-        world.getBlock(-5, -5));
+        world.getRawBlock(-6, -6), //
+        world.getRawBlock(-6, -5), //
+        world.getRawBlock(-5, -6), //
+        world.getRawBlock(-5, -5));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -79,15 +79,15 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, -5.5f, -5.5f, 2, 2);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(-7, -7), //
-        world.getBlock(-7, -6), //
-        world.getBlock(-7, -5), //
-        world.getBlock(-6, -7), //
-        world.getBlock(-6, -6), //
-        world.getBlock(-6, -5), //
-        world.getBlock(-5, -7), //
-        world.getBlock(-5, -6), //
-        world.getBlock(-5, -5));
+        world.getRawBlock(-7, -7), //
+        world.getRawBlock(-7, -6), //
+        world.getRawBlock(-7, -5), //
+        world.getRawBlock(-6, -7), //
+        world.getRawBlock(-6, -6), //
+        world.getRawBlock(-6, -5), //
+        world.getRawBlock(-5, -7), //
+        world.getRawBlock(-5, -6), //
+        world.getRawBlock(-5, -5));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -97,14 +97,14 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, 2f, -100f, 3, 2);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(0, -101), //
-        world.getBlock(0, -100), //
-        world.getBlock(1, -101), //
-        world.getBlock(1, -100), //
-        world.getBlock(2, -101), //
-        world.getBlock(2, -100), //
-        world.getBlock(3, -101), //
-        world.getBlock(3, -100));
+        world.getRawBlock(0, -101), //
+        world.getRawBlock(0, -100), //
+        world.getRawBlock(1, -101), //
+        world.getRawBlock(1, -100), //
+        world.getRawBlock(2, -101), //
+        world.getRawBlock(2, -100), //
+        world.getRawBlock(3, -101), //
+        world.getRawBlock(3, -100));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }
@@ -114,18 +114,18 @@ public class EntityTest extends TestGraphic {
     Entity ent = new GenericEntity(world, 2f, -100.5f, 3, 2);
     ObjectSet<Block> expectedBlocks = new ObjectSet<>();
     expectedBlocks.addAll( //
-        world.getBlock(0, -102), //
-        world.getBlock(0, -101), //
-        world.getBlock(0, -100), //
-        world.getBlock(1, -102), //
-        world.getBlock(1, -101), //
-        world.getBlock(1, -100), //
-        world.getBlock(2, -102), //
-        world.getBlock(2, -101), //
-        world.getBlock(2, -100), //
-        world.getBlock(3, -102), //
-        world.getBlock(3, -101), //
-        world.getBlock(3, -100));
+        world.getRawBlock(0, -102), //
+        world.getRawBlock(0, -101), //
+        world.getRawBlock(0, -100), //
+        world.getRawBlock(1, -102), //
+        world.getRawBlock(1, -101), //
+        world.getRawBlock(1, -100), //
+        world.getRawBlock(2, -102), //
+        world.getRawBlock(2, -101), //
+        world.getRawBlock(2, -100), //
+        world.getRawBlock(3, -102), //
+        world.getRawBlock(3, -101), //
+        world.getRawBlock(3, -100));
     ObjectSet<Block> actualBlocks = ent.touchingBlocks();
     Assert.assertEquals(expectedBlocks, actualBlocks);
   }

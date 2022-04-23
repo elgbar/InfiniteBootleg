@@ -86,6 +86,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     return true
   }
 
+  /**
+   * Must be called under [BOX2D_LOCK]
+   */
   fun onBodyCreated(tmpBody: Body) {
     val edges = GdxLongArray(false, 1 + CHUNK_SIZE * CHUNK_SIZE)
     for (localX in 0 until CHUNK_SIZE) {
@@ -118,9 +121,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
           )
           edges.add(edgeId)
 
-          val fix = synchronized(BOX2D_LOCK) {
-            tmpBody.createFixture(edgeShape, 0f)
-          }
+          val fix = tmpBody.createFixture(edgeShape, 0f)
 
           if (!block.material.blocksLight()) {
             fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER

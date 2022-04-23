@@ -576,8 +576,8 @@ public abstract class World implements Disposable, Resizable {
   /**
    * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists)
    * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
-   * the {@link #getBlock(int, int)} method might createBlock and store a new air block at the given
-   * location
+   * the {@link #getRawBlock(int, int)} method might createBlock and store a new air block at the
+   * given location
    *
    * <p><b>note</b> this does not if there are entities at this location
    *
@@ -596,7 +596,7 @@ public abstract class World implements Disposable, Resizable {
   /**
    * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist)
    * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
-   * the {@link #getBlock(int, int)} method might create a Block and store a new air block at the
+   * the {@link #getRawBlock(int, int)} method might create a Block and store a new air block at the
    * given location.
    *
    * <p>If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent
@@ -653,7 +653,7 @@ public abstract class World implements Disposable, Resizable {
    */
   public void updateBlocksAround(int worldX, int worldY) {
     for (Direction dir : Direction.CARDINAL) {
-      Block rel = getBlock(worldX + dir.dx, worldY + dir.dy);
+      Block rel = getRawBlock(worldX + dir.dx, worldY + dir.dy);
       if (rel instanceof TickingBlock tickingBlock) {
         tickingBlock.enableTick();
       }
@@ -691,12 +691,35 @@ public abstract class World implements Disposable, Resizable {
    * @return The block at the given x and y
    */
   @Nullable
-  public Block getBlock(long compactWorldLoc) {
-    return getBlock(
+  public Block getRawBlock(long compactWorldLoc) {
+    return getRawBlock(
         CoordUtil.decompactLocX(compactWorldLoc), CoordUtil.decompactLocY(compactWorldLoc));
   }
 
   /**
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @return The block at the given x and y (or null if air block)
+   */
+  @Nullable
+  public Block getRawBlock(int worldX, int worldY) {
+    int chunkX = CoordUtil.worldToChunk(worldX);
+    int chunkY = CoordUtil.worldToChunk(worldY);
+
+    int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
+    int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
+
+    Chunk chunk = getChunk(chunkX, chunkY);
+    if (chunk == null) {
+      return null;
+    }
+    return chunk.getRawBlock(localX, localY);
+  }
+
+  /**
+   * Note an air block will be created if the chunk is loaded and there is no other block at the
+   * given location
+   *
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
    * @return The block at the given x and y
@@ -713,7 +736,7 @@ public abstract class World implements Disposable, Resizable {
     if (chunk == null) {
       return null;
     }
-    return chunk.getRawBlock(localX, localY);
+    return chunk.getBlock(localX, localY);
   }
 
   /**
@@ -1019,7 +1042,7 @@ public abstract class World implements Disposable, Resizable {
     float maxY = worldY + offsetY;
     for (; x <= maxX; x++) {
       for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
-        Block b = getBlock(x, y);
+        Block b = getRawBlock(x, y);
         if (b == null) {
           continue;
         }
@@ -1071,7 +1094,7 @@ public abstract class World implements Disposable, Resizable {
    */
   @NotNull
   public Material getMaterial(int worldX, int worldY) {
-    Block block = getBlock(worldX, worldY);
+    Block block = getRawBlock(worldX, worldY);
     if (block != null) {
       return block.getMaterial();
     }

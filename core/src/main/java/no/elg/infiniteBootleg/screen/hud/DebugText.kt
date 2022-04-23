@@ -41,7 +41,7 @@ object DebugText {
     mouseBlockX: Int,
     mouseBlockY: Int
   ) {
-    val block = world.getBlock(mouseBlockX, mouseBlockY)
+    val block = world.getRawBlock(mouseBlockX, mouseBlockY)
     val material = block?.material ?: Material.AIR
     val rawX = ClientMain.inst().mouseX
     val rawY = ClientMain.inst().mouseY
