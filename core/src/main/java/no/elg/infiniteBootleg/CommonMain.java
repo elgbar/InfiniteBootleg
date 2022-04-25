@@ -5,11 +5,13 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Collections;
 import com.strongjoshua.console.LogLevel;
+import no.elg.infiniteBootleg.args.ProgramArgs;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -22,7 +24,10 @@ public abstract class CommonMain extends ApplicationAdapter implements Main {
   @NotNull protected final CancellableThreadScheduler scheduler;
   @NotNull protected ConsoleHandler console;
 
-  protected CommonMain(boolean test) {
+  protected CommonMain(boolean test, @Nullable ProgramArgs progArgs) {
+    if (progArgs != null) {
+      progArgs.dispose();
+    }
     synchronized (INST_LOCK) {
       if (inst != null) {
         throw new IllegalStateException("A main instance have already be declared");

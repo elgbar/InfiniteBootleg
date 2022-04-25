@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import no.elg.infiniteBootleg.args.ProgramArgs;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.Server;
 import no.elg.infiniteBootleg.world.ServerWorld;
@@ -21,8 +22,8 @@ public class ServerMain extends CommonMain {
 
   @Nullable public Server server;
 
-  public ServerMain(boolean test) {
-    super(test);
+  public ServerMain(boolean test, @Nullable ProgramArgs progArgs) {
+    super(test, progArgs);
     synchronized (INST_LOCK) {
       if (inst != null) {
         throw new IllegalStateException("A main instance have already be declared");

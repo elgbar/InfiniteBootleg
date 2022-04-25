@@ -20,7 +20,7 @@ public class TestGraphic {
     Settings.client = false;
     Settings.loadWorldFromDisk = false;
     Settings.debug = true;
-    new ClientMain(true);
+    new ClientMain(true, null);
   }
 
   public ClientWorld world;

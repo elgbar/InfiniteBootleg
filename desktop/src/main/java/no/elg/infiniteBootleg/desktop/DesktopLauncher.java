@@ -16,11 +16,10 @@ import no.elg.infiniteBootleg.util.Ticker;
 public class DesktopLauncher {
 
   public static void main(String[] args) {
-
-    new ProgramArgs(args);
+    var progArgs = new ProgramArgs(args);
     try {
       if (Settings.client) {
-        Main main = new ClientMain(false);
+        Main main = new ClientMain(false, progArgs);
 
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         if (SCALE > 1) {
@@ -37,7 +36,7 @@ public class DesktopLauncher {
         HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
         config.updatesPerSecond =
             (int) (Settings.tps < 0 ? Ticker.DEFAULT_TICKS_PER_SECOND : Settings.tps);
-        Main main = new ServerMain(false);
+        Main main = new ServerMain(false, progArgs);
         new HeadlessApplication(main, config);
       }
     } catch (Throwable t) {

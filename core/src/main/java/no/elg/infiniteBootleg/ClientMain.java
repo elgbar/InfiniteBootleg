@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import java.awt.Toolkit;
+import no.elg.infiniteBootleg.args.ProgramArgs;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
@@ -57,8 +58,8 @@ public class ClientMain extends CommonMain {
     throw new IllegalStateException("Cannot get client main as a server");
   }
 
-  public ClientMain(boolean test) {
-    super(test);
+  public ClientMain(boolean test, @Nullable ProgramArgs progArgs) {
+    super(test, progArgs);
 
     if (Main.isServer()) {
       throw new IllegalStateException("Cannot create client main as a server!");

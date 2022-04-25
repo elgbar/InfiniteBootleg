@@ -57,7 +57,6 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         e.printStackTrace();
       }
     }
-    scheduler.scheduleSync(500, this::dispose);
   }
 
   @Override
