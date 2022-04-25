@@ -767,6 +767,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -5315,6 +5317,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -5387,7 +5391,7 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getKeepAliveIdBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(keepAliveId_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, keepAliveId_);
       }
       unknownFields.writeTo(output);
@@ -5399,7 +5403,7 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getKeepAliveIdBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(keepAliveId_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, keepAliveId_);
       }
       size += unknownFields.getSerializedSize();
@@ -5943,6 +5947,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -6860,6 +6866,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -7012,7 +7020,7 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
       if (velocity_ != null) {
@@ -7021,7 +7029,7 @@ public final class Packets {
       if (position_ != null) {
         output.writeMessage(3, getPosition());
       }
-      if (lookAngleDeg_ != 0F) {
+      if (java.lang.Float.floatToRawIntBits(lookAngleDeg_) != 0) {
         output.writeFloat(4, lookAngleDeg_);
       }
       unknownFields.writeTo(output);
@@ -7033,7 +7041,7 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
       if (velocity_ != null) {
@@ -7042,7 +7050,7 @@ public final class Packets {
       if (position_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(3, getPosition());
       }
-      if (lookAngleDeg_ != 0F) {
+      if (java.lang.Float.floatToRawIntBits(lookAngleDeg_) != 0) {
         size += com.google.protobuf.CodedOutputStream.computeFloatSize(4, lookAngleDeg_);
       }
       size += unknownFields.getSerializedSize();
@@ -7907,6 +7915,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -7979,7 +7989,7 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getReasonBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reason_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, reason_);
       }
       unknownFields.writeTo(output);
@@ -7991,7 +8001,7 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getReasonBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reason_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, reason_);
       }
       size += unknownFields.getSerializedSize();
@@ -8513,6 +8523,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -8627,10 +8639,10 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getEntityUUIDBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(entityUUID_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, entityUUID_);
       }
-      if (!getSecretBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(secret_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, secret_);
       }
       unknownFields.writeTo(output);
@@ -8642,10 +8654,10 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getEntityUUIDBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(entityUUID_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, entityUUID_);
       }
-      if (!getSecretBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(secret_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, secret_);
       }
       size += unknownFields.getSerializedSize();
@@ -9291,6 +9303,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -10213,6 +10227,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -11213,6 +11229,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -11857,6 +11875,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -12639,6 +12659,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -12742,7 +12764,7 @@ public final class Packets {
       if (entity_ != null) {
         output.writeMessage(1, getEntity());
       }
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, uuid_);
       }
       unknownFields.writeTo(output);
@@ -12757,7 +12779,7 @@ public final class Packets {
       if (entity_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, getEntity());
       }
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, uuid_);
       }
       size += unknownFields.getSerializedSize();
@@ -13425,6 +13447,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -13740,7 +13764,7 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
       if (despawnReason_
@@ -13757,7 +13781,7 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
       if (despawnReason_
@@ -14394,6 +14418,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -14552,13 +14578,13 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
-      if (!getUsernameBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, username_);
       }
-      if (!getVersionBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(version_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, version_);
       }
       unknownFields.writeTo(output);
@@ -14570,13 +14596,13 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
-      if (!getUsernameBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(username_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, username_);
       }
-      if (!getVersionBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(version_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, version_);
       }
       size += unknownFields.getSerializedSize();
@@ -15280,6 +15306,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -15923,6 +15951,8 @@ public final class Packets {
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
@@ -15999,7 +16029,7 @@ public final class Packets {
 
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
       unknownFields.writeTo(output);
@@ -16011,7 +16041,7 @@ public final class Packets {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUuidBytes().isEmpty()) {
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
       size += unknownFields.getSerializedSize();
