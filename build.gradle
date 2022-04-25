@@ -3,7 +3,7 @@ plugins {
   id "idea"
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.3.0"
+  id "com.diffplug.spotless" version "6.4.2"
 }
 
 tasks.named("wrapper") {
@@ -43,7 +43,7 @@ subprojects {
   apply plugin: "org.jetbrains.kotlin.jvm"
   apply plugin: "com.diffplug.spotless"
 
-  sourceCompatibility = 17
+  sourceCompatibility = 18
   targetCompatibility = sourceCompatibility
   [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = sourceCompatibility
 
@@ -71,7 +71,7 @@ subprojects {
       googleJavaFormat("1.15.0")
     }
     kotlin {
-      ktlint("0.44.0").userData([
+      ktlint("0.45.2").userData([
           "indent_size"             : "2",
           "continuation_indent_size": "2",
           "max_line_length"         : "180",
@@ -122,7 +122,7 @@ project(":core") {
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
     implementation "com.google.guava:guava:31.0.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.19.4"
+    implementation "com.google.protobuf:protobuf-java:3.20.1"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
@@ -134,14 +134,14 @@ project(":core") {
     implementation "io.github.libktx:ktx-style:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.75.Final"
+    implementation "io.netty:netty-all:4.1.76.Final"
     implementation "no.kh498.util:CommonUtil:1.0.4"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "org.jetbrains:annotations:23.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.12.2"
+    testImplementation "io.mockk:mockk:1.12.3"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
