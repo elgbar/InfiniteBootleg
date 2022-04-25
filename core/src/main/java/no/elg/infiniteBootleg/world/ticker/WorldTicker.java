@@ -28,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class WorldTicker extends Ticker implements Disposable {
 
-  @Nullable private final WorldLightTicker lightTicker;
-  @Nullable private final ServerRendererTicker serverRendererTicker;
-  @NotNull private final WorldBox2DTicker box2DTicker;
+  @Nullable public final WorldLightTicker lightTicker;
+  @Nullable public final ServerRendererTicker serverRendererTicker;
+  @NotNull public final WorldBox2DTicker box2DTicker;
 
   public WorldTicker(@NotNull World world, boolean tick) {
     super(

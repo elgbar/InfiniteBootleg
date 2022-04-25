@@ -69,6 +69,7 @@ public class WorldLightTicker implements Ticking {
     }
   }
 
+  @NotNull
   public Ticker getTicker() {
     return ticker;
   }

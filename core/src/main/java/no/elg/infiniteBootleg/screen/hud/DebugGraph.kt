@@ -6,21 +6,24 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.screen.ScreenRenderer
+import no.elg.infiniteBootleg.screen.hud.helper.TickerGraph
 import no.elg.infiniteBootleg.util.Resizable
 import no.elg.infiniteBootleg.world.ClientWorld
+import no.elg.infiniteBootleg.world.ticker.WorldTicker
 
 object DebugGraph : Resizable {
 
   private lateinit var fbo: FrameBuffer
 
-  private var fboWidth: Int = 0
-  private var fboHeight: Int = 0
+  var fboWidth: Int = 0
+    private set
+  var fboHeight: Int = 0
+    private set
 
-  private var fpsIndex: Int = 0
-  private var tpsIndex: Int = 0
+  private var fpsIndex: Int = 0 // frames per second
 
-  private const val COL_WIDTH = 2
-  private const val COLOR_SIZE = 6
+  const val COL_WIDTH = 2
+  const val COLOR_SIZE = 6
 
   private val colors = Array<Color>(COLOR_SIZE) {
     when (it) {
@@ -35,34 +38,45 @@ object DebugGraph : Resizable {
   }
 
   private var fpsDeltaAcc = 0f
-  private var tpsDeltaAcc = 0f
-  private var lastTickId = -1L
+
+  private var tps: TickerGraph? = null
+  private var lps: TickerGraph? = null
+  private var pps: TickerGraph? = null
 
   fun render(sr: ScreenRenderer, world: ClientWorld?) {
-    val worldTicker = world?.worldTicker
-
-    fpsDeltaAcc += Gdx.graphics.deltaTime
-    tpsDeltaAcc += (worldTicker?.tpsDelta?.toFloat() ?: 0f)
-    val updateFps = Gdx.graphics.frameId % COL_WIDTH == 0L
-    val currTick = (worldTicker?.tickId ?: lastTickId)
-    val updateTps = lastTickId < currTick
-
-    if (updateFps || updateTps) {
-      begin()
+    val worldTicker = world?.worldTicker as? WorldTicker?
+    if (worldTicker != null && worldTicker != tps?.ticker) {
+      tps = TickerGraph(worldTicker, { width -> (width * 0.76).toInt() }, { it })
+      val lightTicker = worldTicker.lightTicker?.ticker
+      if (lightTicker != null) {
+        lps = TickerGraph(lightTicker, { width -> (width * 0.51).toInt() }, { width -> (width * 0.75).toInt() })
+      }
+      pps = TickerGraph(worldTicker.box2DTicker.ticker, { width -> (width * 0.26).toInt() }, { width -> (width * 0.50).toInt() })
     }
 
+    fpsDeltaAcc += Gdx.graphics.deltaTime
+    val updateFps = Gdx.graphics.frameId % COL_WIDTH == 0L
+
+    val updateTps = tps?.update ?: false
+    val updateLps = lps?.update ?: false
+    val updatePps = pps?.update ?: false
+
+    val updateAny = updateFps || updateTps || updateLps || updatePps
+
+    if (updateAny) {
+      begin()
+    }
     if (updateFps) {
       drawFps()
     }
 
-    if (updateTps) {
-      drawTps(currTick)
-    }
+    tps?.draw()
+    lps?.draw()
+    pps?.draw()
 
-    if (updateFps || updateTps) {
+    if (updateAny) {
       end()
     }
-
     sr.batch.draw(fbo.colorBufferTexture, 0f, 0f)
   }
 
@@ -78,7 +92,7 @@ object DebugGraph : Resizable {
   }
 
   private inline fun drawFps() {
-    if (fpsIndex >= fboWidth / 3) {
+    if (fpsIndex >= fboWidth / 4) {
       fpsIndex = 0
     } else {
       fpsIndex += COL_WIDTH
@@ -90,21 +104,7 @@ object DebugGraph : Resizable {
     drawColumn(fpsDelta, fpsIndex)
   }
 
-  private inline fun drawTps(currTick: Long) {
-    if (tpsIndex >= fboWidth) {
-      tpsIndex = (fboWidth / 3) * 2
-    } else {
-      tpsIndex += COL_WIDTH
-    }
-
-    val ticks = currTick - lastTickId
-    lastTickId = currTick
-    val tpsDelta = (tpsDeltaAcc / ticks) / 1_000_000f
-    tpsDeltaAcc = 0f
-    drawColumn(tpsDelta, tpsIndex)
-  }
-
-  private inline fun drawColumn(height: Float, index: Int) {
+  fun drawColumn(height: Float, index: Int) {
     // inverse height
     val pillarHeight = (fboHeight - height.toInt()).coerceAtLeast(0)
 
@@ -127,7 +127,10 @@ object DebugGraph : Resizable {
     fboWidth = width
     fboHeight = height / 3
     fpsIndex = Int.MAX_VALUE
-    tpsIndex = Int.MAX_VALUE
+
+    tps?.resize(fboWidth, fboHeight)
+    lps?.resize(fboWidth, fboHeight)
+    pps?.resize(fboWidth, fboHeight)
 
     if (::fbo.isInitialized) {
       fbo.dispose()
