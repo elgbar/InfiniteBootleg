@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.google.common.base.Preconditions;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import no.elg.infiniteBootleg.Main;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,7 @@ public class CancellableThreadScheduler {
    */
   public CancellableThreadScheduler(int threads) {
     if (threads < 0) {
-      threads = Runtime.getRuntime().availableProcessors();
+      threads = 1;
     }
     executor =
         new ScheduledThreadPoolExecutor(threads, (runnable, e) -> Gdx.app.postRunnable(runnable));
