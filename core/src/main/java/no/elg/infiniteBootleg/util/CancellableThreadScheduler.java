@@ -28,7 +28,8 @@ public class CancellableThreadScheduler {
     if (threads < 0) {
       threads = Runtime.getRuntime().availableProcessors();
     }
-    executor = new ScheduledThreadPoolExecutor(threads, new ThreadPoolExecutor.DiscardPolicy());
+    executor =
+        new ScheduledThreadPoolExecutor(threads, (runnable, e) -> Gdx.app.postRunnable(runnable));
     this.threads = threads;
   }
 
