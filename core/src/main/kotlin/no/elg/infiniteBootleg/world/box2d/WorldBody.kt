@@ -144,7 +144,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     }
 
     synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 1, 1)
+      box2dWorld.step(timeStep, 4, 2)
     }
 
     for (entity in world.entities) {
