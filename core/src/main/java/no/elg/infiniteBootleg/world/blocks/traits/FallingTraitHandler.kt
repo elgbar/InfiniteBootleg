@@ -35,13 +35,12 @@ class FallingTraitHandler(
       }
 
       world.worldBody.postBox2dRunnable {
-        block.destroy(true)
         val fallingBlockEntity = FallingBlockEntity(world, block)
         if (fallingBlockEntity.isDisposed) {
-          // well fuck
-
+          Main.logger().error("Failed to create falling block entity at $originWorldX, $originWorldY")
           return@postBox2dRunnable
         }
+        block.destroy(true)
         world.addEntity(fallingBlockEntity)
       }
     }
