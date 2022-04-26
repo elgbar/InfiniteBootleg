@@ -4,6 +4,7 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.FastNoise;
+import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
 import no.elg.infiniteBootleg.world.World;
@@ -83,6 +84,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
       }
 
       // generate caves
+      Block[][] blocks = chunk.getBlocks();
       int worldChunkY = CoordUtil.chunkToWorld(chunkY);
       for (int localY = 0; localY < CHUNK_SIZE; localY++) {
         int worldY = worldChunkY + localY;
@@ -96,7 +98,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
           // null;
           //                        Block b = mat == null ? null : mat.createBlock(world, chunk,
           // localX, localY);
-          chunk.getBlocks()[localX][localY] = null;
+          blocks[localX][localY] = null;
         }
       }
     }

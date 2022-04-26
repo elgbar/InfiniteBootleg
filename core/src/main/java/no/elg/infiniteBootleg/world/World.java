@@ -659,7 +659,7 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
-  private volatile boolean willUpdateLights = false;
+  private boolean willUpdateLights;
 
   /** Update all light sources currently loaded */
   public void updateLights() {
