@@ -71,7 +71,9 @@ public abstract class Entity
   public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
   @NotNull private final World world;
   private final UUID uuid;
-  @Nullable private Body body;
+
+  // Note: must only be accessed with getters
+  @Nullable private volatile Body body;
 
   private final Array<Function1<@NotNull Body, @Nullable Void>> bodyCreations = new Array<>();
   private boolean flying; // ignore world gravity
@@ -167,19 +169,15 @@ public abstract class Entity
           .getWorldBody()
           .createBody(
               def,
-              it -> {
-                if (isDisposed()) {
-                  world.getWorldBody().destroyBody(it);
-                  return null;
-                }
+              newBody -> {
                 synchronized (bodyCreations) {
-                  body = it;
-                  createFixture(body);
-                  body.setGravityScale(DEFAULT_GRAVITY_SCALE);
-                  body.setUserData(this);
+                  setBody(newBody);
+                  createFixture(newBody);
+                  newBody.setGravityScale(DEFAULT_GRAVITY_SCALE);
+                  newBody.setUserData(this);
 
                   for (Function1<@NotNull Body, @Nullable Void> runnable : bodyCreations) {
-                    runnable.invoke(it);
+                    runnable.invoke(newBody);
                   }
                   bodyCreations.clear();
                 }
@@ -209,11 +207,11 @@ public abstract class Entity
             });
   }
 
-  private void postWorldBodyRunnable(Function1<@NotNull Body, @Nullable Void> runnable) {
+  protected void postWorldBodyRunnable(Function1<@NotNull Body, @Nullable Void> runnable) {
     boolean runNow;
-    Body body1 = body;
+    Body currentBody = getUnsafeBody();
     synchronized (bodyCreations) {
-      runNow = body1 != null;
+      runNow = currentBody != null;
       if (!runNow) {
         bodyCreations.add(runnable);
       }
@@ -226,7 +224,7 @@ public abstract class Entity
                 if (isDisposed()) {
                   return;
                 }
-                runnable.invoke(body1);
+                runnable.invoke(currentBody);
               });
     }
   }
@@ -304,23 +302,23 @@ public abstract class Entity
     boolean sendMovePacket = false;
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
-        if (isDisposed() || body == null) {
+        var currentBody = getUnsafeBody();
+        if (isDisposed() || currentBody == null) {
           return;
         }
         updatePos();
         // If we're too far away teleport the entity to its correct location
         // and add a bit to the y coordinate, so we don't fall through the floor
-        //noinspection ConstantConditions
         if ((Main.isServerClient() && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
             || Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
             || Math.abs(physicsWorldY - posCache.y) > TELEPORT_DIFFERENCE_THRESHOLD) {
           posCache.x = worldX;
           posCache.y = worldY;
-          body.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
+          currentBody.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
           sendMovePacket = true;
         }
-        body.setLinearVelocity(velX, velY);
-        body.setAwake(true);
+        currentBody.setLinearVelocity(velX, velY);
+        currentBody.setAwake(true);
       }
     }
     setLookDeg(lookAngleDeg);
@@ -602,16 +600,16 @@ public abstract class Entity
     // must sync with box2d lock, as the side effect is what we desire
     synchronized (BOX2D_LOCK) {
       synchronized (this) {
-        if (isDisposed() || body == null) {
+        final Body currentBody = getUnsafeBody();
+        if (isDisposed() || currentBody == null) {
           return;
         }
         final WorldBody worldBody = world.getWorldBody();
 
-        final Body body = getBody();
         posCache
-            .set(body.getPosition())
+            .set(currentBody.getPosition())
             .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
-        velCache.set(body.getLinearVelocity());
+        velCache.set(currentBody.getLinearVelocity());
       }
     }
   }
@@ -736,10 +734,33 @@ public abstract class Entity
 
   @NotNull
   public Body getBody() {
-    if (body == null) {
+    var currentBody = getUnsafeBody();
+    if (currentBody == null) {
       throw new IllegalStateException("Cannot access the body of an invalid entity!");
     }
-    return body;
+    return currentBody;
+  }
+
+  @Nullable
+  protected Body getUnsafeBody() {
+    synchronized (bodyCreations) {
+      return body;
+    }
+  }
+
+  private synchronized void setBody(@Nullable Body newBody) {
+    if (isDisposed() && newBody != null) {
+      world.getWorldBody().destroyBody(newBody);
+    } else {
+      Body oldBody;
+      synchronized (bodyCreations) {
+        oldBody = getUnsafeBody();
+        this.body = newBody;
+      }
+      if (oldBody != null) {
+        world.getWorldBody().destroyBody(oldBody);
+      }
+    }
   }
 
   public boolean isFlying() {
@@ -784,11 +805,8 @@ public abstract class Entity
       Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
       return;
     }
+    setBody(null); // must be called before disposed is true
     disposed = true;
-    if (body != null) {
-      world.getWorldBody().destroyBody(body);
-    }
-    body = null;
     if (this instanceof Removable removable) {
       removable.onRemove();
     }
