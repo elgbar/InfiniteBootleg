@@ -60,22 +60,27 @@ public class Door extends MaterialEntity {
 
   {
     if (!isDisposed()) {
-      setFilter(BLOCK_ENTITY_FILTER);
 
-      // Wake up all bodies to get an accurate contacts count
-      final Vector2 position = getBody().getPosition();
-      final WorldBody worldBody = getWorld().getWorldBody();
-      worldBody.queryAABB(
-          position.x,
-          position.y,
-          position.x + getHalfBox2dWidth() * 2,
-          position.y + getHalfBox2dHeight() * 2,
-          fixture -> {
-            final Body body = fixture.getBody();
-            if (body != null && body.getUserData() != this) {
-              body.setAwake(true);
-            }
-            return true;
+      postWorldBodyRunnable(
+          body -> {
+            setFilter(BLOCK_ENTITY_FILTER);
+
+            // Wake up all bodies to get an accurate contacts count
+            final Vector2 position = body.getPosition();
+            final WorldBody worldBody = getWorld().getWorldBody();
+            worldBody.queryAABB(
+                position.x,
+                position.y,
+                position.x + getHalfBox2dWidth() * 2,
+                position.y + getHalfBox2dHeight() * 2,
+                fixture -> {
+                  final Body fixtBody = fixture.getBody();
+                  if (fixtBody != null && fixtBody.getUserData() != this) {
+                    fixtBody.setAwake(true);
+                  }
+                  return true;
+                });
+            return null;
           });
       // Make sure to get the correct lights
       Main.inst().getScheduler().executeAsync(() -> getWorld().updateLights());
