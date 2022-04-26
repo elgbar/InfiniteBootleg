@@ -6,6 +6,7 @@ import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
 
 import box2dLight.ConeLight;
 import box2dLight.Light;
+import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -34,6 +35,7 @@ public class Player extends LivingEntity {
   @Nullable private static final TextureRegion TEXTURE_REGION;
   @Nullable private EntityControls controls;
   @Nullable private Light torchLight;
+  @Nullable private Light haloLight;
 
   public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
@@ -136,9 +138,10 @@ public class Player extends LivingEntity {
   }
 
   public void toggleTorch() {
-    if (torchLight != null) {
+    Light torch = getTorchLight();
+    if (torch != null) {
       synchronized (LIGHT_LOCK) {
-        torchLight.setActive(!torchLight.isActive());
+        torch.setActive(!torch.isActive());
       }
     }
   }
@@ -146,8 +149,9 @@ public class Player extends LivingEntity {
   @Override
   public void setLookDeg(float lookDeg) {
     super.setLookDeg(lookDeg);
-    if (torchLight != null) {
-      torchLight.setDirection(lookDeg);
+    Light torch = getTorchLight();
+    if (torch != null) {
+      torch.setDirection(lookDeg);
     }
   }
 
@@ -156,8 +160,9 @@ public class Player extends LivingEntity {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Player.Builder playerBuilder = ProtoWorld.Entity.Player.newBuilder();
 
-    if (torchLight != null) {
-      playerBuilder.setTorchAngleDeg(torchLight.getDirection());
+    Light torch = getTorchLight();
+    if (torch != null) {
+      playerBuilder.setTorchAngleDeg(torch.getDirection());
     }
     playerBuilder.setControlled(!Main.isMultiplayer() && hasControls());
 
@@ -174,9 +179,10 @@ public class Player extends LivingEntity {
     if (hasControls()) {
       removeControls();
     }
-    if (torchLight != null) {
+    Light torch = torchLight;
+    if (torch != null) {
       synchronized (LIGHT_LOCK) {
-        torchLight.remove();
+        torch.remove();
       }
     }
   }
@@ -186,31 +192,94 @@ public class Player extends LivingEntity {
     return PUSH_UP;
   }
 
-  public @Nullable Light getTorchLight() {
-    if (torchLight == null && !isDisposed() && !Main.isServer()) {
-      ClientWorld world = ClientMain.inst().getWorld();
-      if (world == null) {
-        Main.logger().warn("Failed to get client world!");
-        return null;
-      }
-      synchronized (LIGHT_LOCK) {
-        torchLight =
-            new ConeLight(world.getRender().getRayHandler(), 64, Color.TAN, 48, 5, 5, 0, 30);
-        torchLight.setStaticLight(true);
-        torchLight.setContactFilter(World.LIGHT_FILTER);
-        torchLight.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-      }
+  private void setupLights() {
+    if (isDisposed() || Main.isServer()) {
+      return;
     }
-    return torchLight;
+    ClientWorld world = ClientMain.inst().getWorld();
+    if (world == null) {
+      Main.logger().warn("Failed to get client world!");
+      return;
+    }
+    if (torchLight == null) {
+      ConeLight torch;
+      synchronized (LIGHT_LOCK) {
+        torch =
+            new ConeLight(
+                world.getRender().getRayHandler(),
+                64,
+                Color.TAN,
+                48,
+                Integer.MAX_VALUE,
+                Integer.MAX_VALUE,
+                0,
+                30);
+        this.torchLight = torch;
+      }
+      torch.setStaticLight(true);
+      torch.setContactFilter(World.LIGHT_FILTER);
+      torch.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+    }
+    if (haloLight == null) {
+      PointLight halo;
+      synchronized (LIGHT_LOCK) {
+        halo =
+            new PointLight(
+                world.getRender().getRayHandler(),
+                12,
+                Color.GRAY,
+                8f,
+                Float.MAX_VALUE,
+                Float.MAX_VALUE);
+        this.haloLight = halo;
+      }
+      halo.setStaticLight(true);
+    }
+  }
+
+  @Nullable
+  public Light getTorchLight() {
+    Light currentTorch = torchLight;
+    if (currentTorch == null) {
+      setupLights();
+      return torchLight;
+    }
+    return currentTorch;
+  }
+
+  @Nullable
+  public Light getHaloLight() {
+    Light currentHalo = haloLight;
+    if (currentHalo == null) {
+      setupLights();
+      return haloLight;
+    }
+    return currentHalo;
+  }
+
+  private void updateLights() {
+    @Nullable Vector2 pos = null;
+    var halo = getHaloLight();
+    if (halo != null) {
+      pos = getPhysicsPosition();
+      halo.setPosition(pos);
+    }
+
+    // Note torch must be after halo because torch modifies pos
+    var torch = getTorchLight();
+    if (torch != null) {
+      if (pos == null) {
+        pos = getPhysicsPosition();
+      }
+      torch.setPosition(pos.add(0f, getHalfBox2dHeight() / 2f));
+    }
   }
 
   @Override
   public void tick() {
     super.tick();
-    Vector2 pos = getPhysicsPosition();
-    if (torchLight != null) {
-      torchLight.setPosition(pos);
-    }
+    updateLights();
+
     if (Main.isServerClient() && hasControls()) {
       final ServerClient client = ClientMain.inst().getServerClient();
       if (client != null) {
