@@ -27,7 +27,7 @@ class TickingTraitHandler(private val tickingTrait: TickingTrait, private val wo
   init {
     tickingTrait.handlers.set<TickingTrait>(this)
     synchronized(tickLock) {
-      shouldTick = true
+      shouldTick = false
       // spread ticking over multiple ticks to ease strain on ticker
       minimumTick = (worldTicker.tickId + ThreadLocalRandom.current().nextInt(worldTicker.tps.toInt() / 3))
     }
