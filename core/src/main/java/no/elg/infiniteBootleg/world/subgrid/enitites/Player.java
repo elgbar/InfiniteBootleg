@@ -228,7 +228,7 @@ public class Player extends LivingEntity {
                 world.getRender().getRayHandler(),
                 12,
                 Color.GRAY,
-                8f,
+                6f,
                 Float.MAX_VALUE,
                 Float.MAX_VALUE);
         this.haloLight = halo;
