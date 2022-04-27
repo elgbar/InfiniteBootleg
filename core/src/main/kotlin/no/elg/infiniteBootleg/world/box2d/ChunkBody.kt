@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.world.Direction.SOUTH
 import no.elg.infiniteBootleg.world.Direction.WEST
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
-import java.util.concurrent.locks.ReentrantLock
 
 /**
  * @author Elg
@@ -26,25 +25,23 @@ import java.util.concurrent.locks.ReentrantLock
 class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   private val edgeShape = EdgeShape()
-  private val lock = ReentrantLock()
 
   /**
    * The actual box2d body of the chunk.
    *
-   * The setter is locked under [lock], the old body will automatically be destroyed.
+   * The setter is locked under [bodyLock], the old body will automatically be destroyed.
    *
-   * The getter is **not** locked under [lock]
+   * The getter is **not** locked under [bodyLock]
    */
   @field:Volatile
   private var box2dBody: Body? = null
     set(value) {
       val oldBody: Body?
-      lock.lock()
-      try {
+      // Use edgeShape as a lock.
+      // We could create a new object as a semaphore, but why bother when we already have one.
+      synchronized(edgeShape) {
         oldBody = field
         field = value
-      } finally {
-        lock.unlock()
       }
       if (oldBody != null) {
         // We should now be fine to destroy the old body
@@ -60,7 +57,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   /**calculate the shape of the chunk (box2d)*/
   val bodyDef = BodyDef().also {
-    it.position[chunk.chunkX * CHUNK_SIZE.toFloat()] = chunk.chunkY * CHUNK_SIZE.toFloat()
+    it.position.set(chunk.chunkX * CHUNK_SIZE.toFloat(), chunk.chunkY * CHUNK_SIZE.toFloat())
     it.fixedRotation = true
     it.type = StaticBody
   }
@@ -75,6 +72,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     chunk.world.worldBody.updateChunk(this)
   }
 
+  @Synchronized
   fun shouldCreateBody(): Boolean {
     if (isDisposed) {
       return false
@@ -131,14 +129,16 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     }
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
-    if (isDisposed) {
-      box2dBody = null
-      chunk.world.worldBody.destroyBody(tmpBody)
-    } else {
-      box2dBody = tmpBody
-      Main.inst().scheduler.executeAsync {
-        chunk.world.updateLights()
-        chunk.world.render.update()
+    synchronized(this) {
+      if (isDisposed) {
+        box2dBody = null
+        chunk.world.worldBody.destroyBody(tmpBody)
+      } else {
+        box2dBody = tmpBody
+        Main.inst().scheduler.executeAsync {
+          chunk.world.updateLights()
+          chunk.world.render.update()
+        }
       }
     }
   }
