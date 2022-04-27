@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
+import com.badlogic.gdx.utils.Array.ArrayIterator
 import com.badlogic.gdx.utils.OrderedSet
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.CheckableDisposable
@@ -55,6 +56,10 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   private val runnables = GdxArray<Runnable>()
   private val executedRunnables = GdxArray<Runnable>()
+
+  private val updatingChunksIterator = OrderedSet.OrderedSetIterator(updatingChunks)
+  private val executedRunnablesIterator = ArrayIterator(executedRunnables)
+  private val bodiesIterator = ArrayIterator(bodies)
 
   /**
    * Posts a [Runnable] on the physics thread.
@@ -124,7 +129,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       executedRunnables.addAll(runnables)
       runnables.clear()
     }
-    for (runnable in executedRunnables) {
+    executedRunnablesIterator.reset()
+    for (runnable in executedRunnablesIterator) {
       synchronized(BOX2D_LOCK) {
         runnable.run()
       }
@@ -134,8 +140,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       updatingChunks.addAll(chunksToUpdate)
       chunksToUpdate.clear()
     }
-
-    for (chunkBody in updatingChunks) {
+    updatingChunksIterator.reset()
+    for (chunkBody in updatingChunksIterator) {
       if (chunkBody.shouldCreateBody()) {
         synchronized(BOX2D_LOCK) {
           createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
@@ -164,7 +170,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     }
 
     if (Main.isSingleplayer()) {
-      // TODO move to WorldRender, makes more sense to do this there
       synchronized(BOX2D_LOCK) {
         if (disposed) {
           return@synchronized
@@ -204,7 +209,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       bodies.clear()
       bodies.ensureCapacity(world.entities.size)
       box2dWorld.getBodies(bodies)
-      for (body in bodies) {
+      bodiesIterator.reset()
+      for (body in bodiesIterator) {
         applyShift(body, deltaOffsetX, deltaOffsetY)
       }
       for (entity in world.entities) {
