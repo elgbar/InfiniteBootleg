@@ -124,10 +124,21 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     if (disposed) {
       return
     }
+
     synchronized(runnables) {
       executedRunnables.clear()
       executedRunnables.addAll(runnables)
       runnables.clear()
+    }
+
+    synchronized(BOX2D_LOCK) {
+      box2dWorld.step(timeStep, 4, 2)
+    }
+
+    for (entity in world.entities) {
+      synchronized(BOX2D_LOCK) {
+        entity.updatePos()
+      }
     }
     executedRunnablesIterator.reset()
     for (runnable in executedRunnablesIterator) {
@@ -146,16 +157,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         synchronized(BOX2D_LOCK) {
           createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
         }
-      }
-    }
-
-    synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 4, 2)
-    }
-
-    for (entity in world.entities) {
-      synchronized(BOX2D_LOCK) {
-        entity.updatePos()
       }
     }
   }
