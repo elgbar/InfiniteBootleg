@@ -925,7 +925,7 @@ public abstract class World implements Disposable, Resizable {
    * @param loadChunk
    */
   public void addEntity(@NotNull Entity entity, boolean loadChunk) {
-    if (entities.values().stream().anyMatch(it -> it == entity)) {
+    if (entities.containsValue(entity)) {
       Main.logger()
           .error(
               "World",
