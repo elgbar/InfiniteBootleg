@@ -51,8 +51,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   private val bodies = GdxArray<Body>()
 
-  private val chunksToUpdate = OrderedSet<ChunkBody>()
-  private val updatingChunks = OrderedSet<ChunkBody>()
+  private val chunksToUpdate = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
+  private val updatingChunks = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
 
   private val runnables = GdxArray<Runnable>()
   private val executedRunnables = GdxArray<Runnable>()
