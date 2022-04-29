@@ -103,9 +103,9 @@ public class FallingBlockEntity extends Entity {
 
       freeze(true);
       if (Main.isAuthoritative()) {
-        Main.inst()
-            .getScheduler()
-            .executeAsync(
+        getWorld()
+            .getWorldBody()
+            .postBox2dRunnable(
                 () -> {
                   var world = getWorld();
                   int newX = getBlockX();
