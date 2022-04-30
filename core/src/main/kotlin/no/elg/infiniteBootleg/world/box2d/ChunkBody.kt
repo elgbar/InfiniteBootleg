@@ -4,10 +4,12 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
 import com.badlogic.gdx.physics.box2d.ChainShape
-import com.badlogic.gdx.physics.box2d.EdgeShape
+import com.badlogic.gdx.physics.box2d.Fixture
+import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Updatable
+import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
@@ -24,7 +26,9 @@ import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
  */
 class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
-  private val edgeShape = EdgeShape()
+  private val fixtureMap = LongMap<Fixture>()
+
+  private val BODY_LOCK = Any()
 
   /**
    * The actual box2d body of the chunk.
@@ -37,11 +41,10 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   private var box2dBody: Body? = null
     set(value) {
       val oldBody: Body?
-      // Use edgeShape as a lock.
-      // We could create a new object as a semaphore, but why bother when we already have one.
-      synchronized(edgeShape) {
+      synchronized(BODY_LOCK) {
         oldBody = field
         field = value
+        fixtureMap.clear()
       }
       if (oldBody != null) {
         // We should now be fine to destroy the old body
@@ -116,15 +119,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   }
 
   fun removeBlock(block: Block) {
-    val worldBody = chunk.world.worldBody
-    worldBody.postBox2dRunnable {
-      val body = box2dBody
-      if (body == null) {
-        worldBody.updateChunk(this@ChunkBody)
-        return@postBox2dRunnable
-      }
-      val fix = body.fixtureList?.find { it.userData === block } ?: return@postBox2dRunnable
-      body.destroyFixture(fix)
+    chunk.world.worldBody.postBox2dRunnable {
+      val fixture: Fixture? = fixtureMap.get(CoordUtil.compactLoc(block.localX, block.localY))
+      fixture?.filterData = World.NON_INTERACTIVE_GROUND_FILTER
     }
   }
 
@@ -139,28 +136,37 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       val localX = block.localX
       val localY = block.localY
 
-      val chainShape = ChainShape()
-      chainShape.createLoop(
-        floatArrayOf(
-          localX + 0f,
-          localY + 0f,
+      val compactLoc = CoordUtil.compactLoc(localX, localY)
+      val cacheFix: Fixture? = fixtureMap.get(compactLoc)
+      val fix: Fixture = if (cacheFix != null) {
+        cacheFix
+      } else {
+        val chainShape = ChainShape()
+        chainShape.createLoop(
+          floatArrayOf(
+            localX + 0f,
+            localY + 0f,
 
-          localX + 0f,
-          localY + 1f,
+            localX + 0f,
+            localY + 1f,
 
-          localX + 1f,
-          localY + 1f,
+            localX + 1f,
+            localY + 1f,
 
-          localX + 1f,
-          localY + 0f,
+            localX + 1f,
+            localY + 0f,
+          )
         )
-      )
+        val newFix = body.createFixture(chainShape, 0f)
+        fixtureMap.put(compactLoc, newFix)
 
-      val fix = body.createFixture(chainShape, 0f)
-      chainShape.dispose()
-      fix.userData = block
+        chainShape.dispose()
+        newFix
+      }
 
-      if (!block.material.blocksLight()) {
+      if (block.material.blocksLight()) {
+        fix.filterData = World.BLOCK_ENTITY_FILTER
+      } else {
         fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER
       }
     }
