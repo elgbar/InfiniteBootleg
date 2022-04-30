@@ -125,9 +125,7 @@ class TntBlock(
     }
 
   override fun getTexture(): TextureRegion? {
-    return if (glowing) {
-      whiteTexture
-    } else super.getTexture()
+    return if (glowing) whiteTexture else super.getTexture()
   }
 
   override fun save(): ProtoWorld.Block.Builder {
@@ -191,7 +189,9 @@ class TntBlock(
       val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
       pixmap.setColor(Color.WHITE)
       pixmap.fill()
-      TextureRegion(Texture(pixmap))
+      val texture = Texture(pixmap)
+      pixmap.dispose()
+      TextureRegion(texture)
     } else {
       null
     }
