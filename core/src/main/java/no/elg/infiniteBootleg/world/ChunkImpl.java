@@ -156,7 +156,7 @@ public class ChunkImpl implements Chunk {
       Preconditions.checkArgument(block.getChunk() == this);
     }
     synchronized (this) {
-      Block currBlock = blocks[localX][localY];
+      @Nullable Block currBlock = blocks[localX][localY];
 
       if (currBlock == block) {
         return currBlock;
@@ -193,6 +193,12 @@ public class ChunkImpl implements Chunk {
       if (updateTexture) {
         dirty = true;
         this.prioritize |= prioritize; // do not remove prioritization if it already is
+      }
+      if (currBlock != null) {
+        chunkBody.removeBlock(currBlock);
+      }
+      if (block != null) {
+        chunkBody.addBlock(block, null);
       }
     }
     if (sendUpdatePacket && isValid()) {
@@ -292,7 +298,6 @@ public class ChunkImpl implements Chunk {
         }
       }
     }
-    chunkBody.update();
     final WorldRender render = world.getRender();
     if (render instanceof ClientWorldRender clientWorldRender) {
       clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
@@ -633,6 +638,7 @@ public class ChunkImpl implements Chunk {
         }
       }
     }
+    chunkBody.update();
   }
 
   @NotNull

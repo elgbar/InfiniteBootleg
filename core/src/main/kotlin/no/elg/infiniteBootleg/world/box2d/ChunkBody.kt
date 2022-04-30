@@ -3,12 +3,12 @@ package no.elg.infiniteBootleg.world.box2d
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
+import com.badlogic.gdx.physics.box2d.ChainShape
 import com.badlogic.gdx.physics.box2d.EdgeShape
-import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Updatable
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.Direction
@@ -88,7 +88,6 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
    * Must be called under [BOX2D_LOCK]
    */
   fun onBodyCreated(tmpBody: Body) {
-    val edges = GdxLongArray(false, 1 + CHUNK_SIZE * CHUNK_SIZE)
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
 
@@ -97,34 +96,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
           continue
         }
 
-        val worldX = CoordUtil.chunkToWorld(chunk.chunkX, localX)
-        val worldY = CoordUtil.chunkToWorld(chunk.chunkY, localY)
-
-        for ((dir, edgeDelta) in EDGE_DEF) {
-
-          // Create a unique id for each edge
-          val edgeId = CoordUtil.compactShort(localX.toShort(), dir.dx.toShort(), localY.toShort(), dir.dy.toShort())
-          if (edgeId in edges ||
-            CoordUtil.isInnerEdgeOfChunk(localX, localY) &&
-            !CoordUtil.isInsideChunk(localX + dir.dx, localY + dir.dy) &&
-            !chunk.world.isChunkLoaded(CoordUtil.worldToChunk(worldX + dir.dx), CoordUtil.worldToChunk(worldY + dir.dy))
-          ) {
-            continue
-          }
-          edgeShape.set(
-            localX + edgeDelta[0],
-            localY + edgeDelta[1],
-            localX + edgeDelta[2],
-            localY + edgeDelta[3]
-          )
-          edges.add(edgeId)
-
-          val fix = tmpBody.createFixture(edgeShape, 0f)
-
-          if (!block.material.blocksLight()) {
-            fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER
-          }
-        }
+        addBlock(block)
       }
     }
 
@@ -139,6 +111,57 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
           chunk.world.updateLights()
           chunk.world.render.update()
         }
+      }
+    }
+  }
+
+  fun removeBlock(block: Block) {
+    val worldBody = chunk.world.worldBody
+    worldBody.postBox2dRunnable {
+      val body = box2dBody
+      if (body == null) {
+        worldBody.updateChunk(this@ChunkBody)
+        return@postBox2dRunnable
+      }
+      val fix = body.fixtureList?.find { it.userData === block } ?: return@postBox2dRunnable
+      body.destroyFixture(fix)
+    }
+  }
+
+  fun addBlock(block: Block, box2dBody: Body? = null) {
+    val worldBody = chunk.world.worldBody
+    chunk.world.worldBody.postBox2dRunnable {
+      val body = box2dBody ?: this.box2dBody
+      if (body == null) {
+        worldBody.updateChunk(this@ChunkBody)
+        return@postBox2dRunnable
+      }
+      val localX = block.localX
+      val localY = block.localY
+
+      val chainShape = ChainShape()
+      chainShape.createLoop(
+        floatArrayOf(
+          localX + 0f,
+          localY + 0f,
+
+          localX + 0f,
+          localY + 1f,
+
+          localX + 1f,
+          localY + 1f,
+
+          localX + 1f,
+          localY + 0f,
+        )
+      )
+
+      val fix = body.createFixture(chainShape, 0f)
+      chainShape.dispose()
+      fix.userData = block
+
+      if (!block.material.blocksLight()) {
+        fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER
       }
     }
   }
