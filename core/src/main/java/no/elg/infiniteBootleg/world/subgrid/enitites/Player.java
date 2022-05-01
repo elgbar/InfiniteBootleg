@@ -228,9 +228,12 @@ public class Player extends LivingEntity {
                 world.getRender().getRayHandler(),
                 12,
                 Color.GRAY,
-                6f,
+                4f,
                 Float.MAX_VALUE,
                 Float.MAX_VALUE);
+        halo.setStaticLight(true);
+        halo.setContactFilter(World.LIGHT_FILTER);
+        halo.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH / 2);
         this.haloLight = halo;
       }
       halo.setStaticLight(true);
