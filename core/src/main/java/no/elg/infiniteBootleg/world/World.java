@@ -162,6 +162,8 @@ public abstract class World implements Disposable, Resizable {
   public final Lock chunksReadLock = chunkLock.readLock();
   public final Lock chunksWriteLock = chunkLock.writeLock();
 
+  private volatile boolean willUpdateLights;
+
   public World(@NotNull ProtoWorld.World protoWorld) {
     this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
   }
@@ -665,12 +667,12 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
-  private boolean willUpdateLights;
-
   /** Update all light sources currently loaded */
   public void updateLights() {
-    if (willUpdateLights) return;
-    willUpdateLights = true;
+    synchronized (this) {
+      if (willUpdateLights) return;
+      willUpdateLights = true;
+    }
     Main.inst()
         .getScheduler()
         .executeSync(

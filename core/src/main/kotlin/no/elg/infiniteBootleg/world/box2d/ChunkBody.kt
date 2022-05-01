@@ -7,7 +7,6 @@ import com.badlogic.gdx.physics.box2d.ChainShape
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.CheckableDisposable
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Updatable
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Block
@@ -110,10 +109,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
         chunk.world.worldBody.destroyBody(tmpBody)
       } else {
         box2dBody = tmpBody
-        Main.inst().scheduler.executeAsync {
-          chunk.world.updateLights()
-          chunk.world.render.update()
-        }
+        chunk.world.updateLights()
       }
     }
   }

@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
+import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,6 +109,7 @@ public class ClientWorldRender implements WorldRender {
         ambientLight = createDirLight();
 
         rayHandler.update();
+        WorldLightTicker.updateDirectionalLights();
 
         // Re-render at once otherwise a quick flickering might happen
         update();
