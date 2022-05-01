@@ -154,8 +154,8 @@ public abstract class World implements Disposable, Resizable {
   @NotNull protected final LongMap<Chunk> chunks = new LongMap<>();
 
   @Nullable private volatile FileHandle worldFile;
-  // only exists when graphics exits
-  @NotNull private String name;
+
+  @NotNull private final String name;
 
   private Location spawn;
   private final ReentrantReadWriteLock chunkLock = new ReentrantReadWriteLock();
@@ -1135,10 +1135,6 @@ public abstract class World implements Disposable, Resizable {
    */
   public @NotNull String getName() {
     return name;
-  }
-
-  public void setName(@NotNull String name) {
-    this.name = name;
   }
 
   /**
