@@ -17,7 +17,7 @@ public interface WorldRender extends Updatable, Renderer, Disposable, Resizable 
   float MIN_ZOOM = 0.25f;
   float MAX_ZOOM = 1.75f;
   float AMBIENT_LIGHT = 0.026f;
-  int RAYS_PER_BLOCK = 50;
+  int RAYS_PER_BLOCK = 25;
   /**
    * How many chunks around extra should be included.
    *
