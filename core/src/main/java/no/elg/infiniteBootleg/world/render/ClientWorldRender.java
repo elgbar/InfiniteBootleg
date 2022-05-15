@@ -329,10 +329,12 @@ public class ClientWorldRender implements WorldRender {
     return rayHandler;
   }
 
-  public @Nullable DirectionalLight getSun() {
+  @Nullable
+  public DirectionalLight getSun() {
     return sun;
   }
 
+  @Nullable
   public DirectionalLight getAmbientLight() {
     return ambientLight;
   }
