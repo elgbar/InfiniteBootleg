@@ -141,7 +141,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 4, 2)
+      box2dWorld.step(timeStep, 1, 1)
 
       for (entity in world.entities) {
         entity.updatePos()
