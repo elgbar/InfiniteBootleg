@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.EntityBlock;
 import no.elg.infiniteBootleg.world.blocks.FallingBlock;
+import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import no.elg.infiniteBootleg.world.blocks.Torch;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -160,7 +161,11 @@ public enum Material {
   public boolean create(@NotNull World world, int worldX, int worldY, boolean prioritize) {
     if (world.getMaterial(worldX, worldY) == AIR) {
       if (isBlock()) {
-        return world.setBlock(worldX, worldY, this, prioritize) != null;
+        Block block = world.setBlock(worldX, worldY, this, true, true);
+        if (block instanceof TickingBlock tickingBlock) {
+          tickingBlock.delayedShouldTick(1L);
+        }
+        return block != null;
       } else if (isEntity()) {
         return createEntity(world, worldX, worldY) != null;
       }
