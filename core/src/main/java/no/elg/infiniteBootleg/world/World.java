@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1179,11 +1180,11 @@ public abstract class World implements Disposable, Resizable {
    * @return the current entities
    */
   public @NotNull Collection<Entity> getEntities() {
-    return entities.values();
+    return new HashSet<>(entities.values());
   }
 
   public @NotNull Collection<Player> getPlayers() {
-    return players.values();
+    return new HashSet<>(players.values());
   }
 
   public boolean hasPlayer(@NotNull UUID uuid) {

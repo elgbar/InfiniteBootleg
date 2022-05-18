@@ -13,11 +13,6 @@ import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
-import no.elg.infiniteBootleg.world.Direction
-import no.elg.infiniteBootleg.world.Direction.EAST
-import no.elg.infiniteBootleg.world.Direction.NORTH
-import no.elg.infiniteBootleg.world.Direction.SOUTH
-import no.elg.infiniteBootleg.world.Direction.WEST
 import no.elg.infiniteBootleg.world.World
 
 /**
@@ -189,33 +184,5 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   override fun hashCode(): Int {
     return chunk.hashCode()
-  }
-
-  companion object {
-
-    /**
-     * represent the direction to look and if no solid block there how to create a fixture at that location (ie
-     * two relative vectors)
-     * the value of the pair is as follows `dxStart`, `dyStart`, `dxEnd`, `dyEnd`
-     * this can be visually represented with a cube:
-     *
-     * ```
-     * (0,1)---(1,1)
-     *  |         |
-     *  |         |
-     *  |         |
-     * (0,0)---(1,0)
-     * ```
-     *
-     * * Where `d` stands for delta
-     * * `x`/`y` is if this is the `x` or `y` component of the coordinate
-     * * `end`/`start` is if this is the start or end vector
-     */
-    private val EDGE_DEF: Array<Pair<Direction, FloatArray>> = arrayOf(
-      NORTH to floatArrayOf(0f, 1f, 1f, 1f),
-      EAST to floatArrayOf(1f, 0f, 1f, 1f),
-      SOUTH to floatArrayOf(0f, 0f, 1f, 0f),
-      WEST to floatArrayOf(0f, 0f, 0f, 1f)
-    )
   }
 }
