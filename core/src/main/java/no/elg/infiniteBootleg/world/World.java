@@ -1114,6 +1114,11 @@ public abstract class World implements Disposable, Resizable {
     return Material.AIR;
   }
 
+  /** Alias to {@code WorldBody#postBox2dRunnable} */
+  public void postBox2dRunnable(Runnable runnable) {
+    worldBody.postBox2dRunnable(runnable);
+  }
+
   /**
    * Must be accessed under {@link #chunksReadLock} or {@link #chunksWriteLock}
    *

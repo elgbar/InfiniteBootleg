@@ -15,7 +15,7 @@ class FallingTraitHandler(
 ) : TraitHandler<FallingTrait> {
 
   init {
-    trait.handlers.set<FallingTrait>(this)
+    trait.handlers.set(this)
   }
 
   var falling: Boolean = false
@@ -31,10 +31,10 @@ class FallingTraitHandler(
       falling = true
       val blockAbove = world.getRawBlock(originWorldX, originWorldY + 1)
       if (blockAbove is TickingTrait) {
-        blockAbove.delayedShouldTick(Settings.tps / 5)
+        blockAbove.delayedShouldTick(Settings.tps / 10)
       }
 
-      world.worldBody.postBox2dRunnable {
+      world.postBox2dRunnable {
         val fallingBlockEntity = FallingBlockEntity(world, block)
         if (fallingBlockEntity.isDisposed) {
           Main.logger().error("Failed to create falling block entity at $originWorldX, $originWorldY")

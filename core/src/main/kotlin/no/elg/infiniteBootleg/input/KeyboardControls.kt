@@ -108,7 +108,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       if (!controlled.validLocation(controlled.position.x + GROUND_CHECK_OFFSET * dir, controlled.position.y)) {
         return
       }
-      world.worldBody.postBox2dRunnable {
+      world.postBox2dRunnable {
 
         val body = controlled.body
 
@@ -185,7 +185,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
   }
 
   private fun setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-    world.worldBody.postBox2dRunnable {
+    world.postBox2dRunnable {
       val body = controlled.body
       val vel = body.linearVelocity
       val (nx, ny) = modify(vel.x, vel.y)
