@@ -16,15 +16,15 @@ object DebugText {
 
   @JvmStatic
   inline fun fpsString(sb: StringBuilder, world: ClientWorld?) {
-    val worldTicker = world?.worldTicker
-    val tpsDelta = (worldTicker?.tpsDelta ?: 0) / 1_000_000.0
-    val realTPS = worldTicker?.realTPS ?: -1
+    val worldTps = world?.worldTicker?.realTPS ?: -1
+    val physicsTps = world?.box2DTicker?.realTPS ?: -1
+    val lightTps = world?.lightTicker?.realTPS ?: -1
 
     sb.append("FPS: ").fastIntFormat(Gdx.graphics.framesPerSecond, 4)
       .append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")
-      .append(" | tps: ").fastIntFormat(realTPS.toInt(), 2)
-      .append(" | tps delta: ").append(dotFourFormat.format(tpsDelta)).append(" ms")
-//      .append(" | active threads ").append(Main.inst().scheduler.activeThreads)
+      .append(" | wtps: ").fastIntFormat(worldTps.toInt(), 2)
+      .append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
+      .append(" | ltps: ").fastIntFormat(lightTps.toInt(), 2)
   }
 
   @JvmStatic

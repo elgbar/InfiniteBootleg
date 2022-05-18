@@ -1164,6 +1164,17 @@ public abstract class World implements Disposable, Resizable {
     return worldTicker;
   }
 
+  @NotNull
+  public Ticker getBox2DTicker() {
+    return worldTicker.box2DTicker.getTicker();
+  }
+
+  @Nullable
+  public Ticker getLightTicker() {
+    WorldLightTicker lightTicker = worldTicker.lightTicker;
+    return lightTicker != null ? lightTicker.getTicker() : null;
+  }
+
   /**
    * @return the current entities
    */
