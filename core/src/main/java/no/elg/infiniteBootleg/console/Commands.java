@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg.console;
 
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
@@ -351,14 +349,12 @@ public class Commands extends CommandExecutor {
       return;
     }
     int entities = 0;
-    synchronized (BOX2D_LOCK) {
-      for (Entity entity : world.getEntities()) {
-        if (entity instanceof Player) {
-          continue;
-        }
-        entities++;
-        world.removeEntity(entity);
+    for (Entity entity : world.getEntities()) {
+      if (entity instanceof Player) {
+        continue;
       }
+      entities++;
+      world.removeEntity(entity);
     }
     logger.log(LogLevel.SUCCESS, "Killed " + entities + " entities");
   }
@@ -532,36 +528,37 @@ public class Commands extends CommandExecutor {
   @HiddenCommand
   @ConsoleDoc(description = "check dangling entities")
   public void cde() {
-    synchronized (BOX2D_LOCK) {
-      var world = getWorld();
-      if (world == null) {
-        return;
-      }
-      final com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
-          world.getWorldBody().getBox2dWorld();
-      var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
-      worldBox2dWorld.getBodies(bodies);
-
-      int invalid = 0;
-      for (Body body : bodies) {
-        final Object userData = body.getUserData();
-        if (userData instanceof Entity entity) {
-          if (world.containsEntity(entity.getUuid())) {
-            continue;
-          }
-          invalid++;
-          logger.error(
-              "Entity",
-              "Found entity not added to the world! "
-                  + entity.simpleName()
-                  + " "
-                  + entity.hudDebug());
-        }
-      }
-      if (invalid == 0) {
-        logger.success("No invalid bodies found!");
-      }
+    var world = getWorld();
+    if (world == null) {
+      return;
     }
+    world.postBox2dRunnable(
+        () -> {
+          final com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
+              world.getWorldBody().getBox2dWorld();
+          var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
+          worldBox2dWorld.getBodies(bodies);
+
+          int invalid = 0;
+          for (Body body : bodies) {
+            final Object userData = body.getUserData();
+            if (userData instanceof Entity entity) {
+              if (world.containsEntity(entity.getUuid())) {
+                continue;
+              }
+              invalid++;
+              logger.error(
+                  "Entity",
+                  "Found entity not added to the world! "
+                      + entity.simpleName()
+                      + " "
+                      + entity.hudDebug());
+            }
+          }
+          if (invalid == 0) {
+            logger.success("No invalid bodies found!");
+          }
+        });
   }
 
   @ClientsideOnly

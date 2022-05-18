@@ -83,7 +83,7 @@ public class ClientWorldRender implements WorldRender {
     rayHandler.setBlurNum(1);
     rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1f);
     rayHandler.setCulling(true);
-    Main.inst().getScheduler().executeSync(this::resetSkylight);
+    resetSkylight();
   }
 
   private DirectionalLight createDirLight() {
@@ -97,25 +97,25 @@ public class ClientWorldRender implements WorldRender {
   }
 
   private void resetSkylight() {
-    synchronized (BOX2D_LOCK) {
-      synchronized (LIGHT_LOCK) {
-        if (sun != null) {
-          sun.remove();
-        }
-        if (ambientLight != null) {
-          ambientLight.remove();
-        }
-        sun = createDirLight();
-        ambientLight = createDirLight();
+    world.postBox2dRunnable(
+        () -> {
+          synchronized (LIGHT_LOCK) {
+            if (sun != null) {
+              sun.remove();
+            }
+            if (ambientLight != null) {
+              ambientLight.remove();
+            }
+            sun = createDirLight();
+            ambientLight = createDirLight();
 
-        rayHandler.update();
-        WorldLightTicker.updateDirectionalLights();
+            rayHandler.update();
+            WorldLightTicker.updateDirectionalLights();
 
-        // Re-render at once otherwise a quick flickering might happen
-        update();
-        render();
-      }
-    }
+            // Re-render at once otherwise a quick flickering might happen
+            update();
+          }
+        });
   }
 
   @Override
@@ -175,18 +175,19 @@ public class ClientWorldRender implements WorldRender {
     }
     entityRenderer.render();
     batch.end();
+    var debug = Settings.renderBox2dDebug && Settings.debug;
     if (Settings.renderLight) {
       rayHandler.prepareRender();
       synchronized (BOX2D_LOCK) {
         synchronized (LIGHT_LOCK) {
           rayHandler.renderLightMap();
         }
+        if (debug) {
+          box2DDebugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
+        }
       }
     }
-    if (Settings.renderBox2dDebug && Settings.debug) {
-      synchronized (BOX2D_LOCK) {
-        box2DDebugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
-      }
+    if (debug) {
       chunkDebugRenderer.render();
     }
   }
@@ -251,27 +252,29 @@ public class ClientWorldRender implements WorldRender {
   }
 
   public void reload() {
-    synchronized (BOX2D_LOCK) {
-      synchronized (LIGHT_LOCK) {
-        rayHandler.removeAll();
-        PointLightPool.clearAllPools();
-        sun = null; // do not dispose skylight, it has already been disposed here
-        ambientLight = null;
+    world.postBox2dRunnable(
+        () -> {
+          synchronized (LIGHT_LOCK) {
+            rayHandler.removeAll();
+            PointLightPool.clearAllPools();
+            sun = null; // do not dispose skylight, it has already been disposed here
+            ambientLight = null;
 
-        final int active = rayHandler.getEnabledLights().size;
-        if (active != 0) {
-          Main.logger().error("LIGHT", "There are " + active + " active lights after reload");
-        }
-        final int disabled = rayHandler.getDisabledLights().size;
-        if (disabled != 0) {
-          Main.logger().error("LIGHT", "There are " + disabled + " disabled lights after reload");
-        }
+            final int active = rayHandler.getEnabledLights().size;
+            if (active != 0) {
+              Main.logger().error("LIGHT", "There are " + active + " active lights after reload");
+            }
+            final int disabled = rayHandler.getDisabledLights().size;
+            if (disabled != 0) {
+              Main.logger()
+                  .error("LIGHT", "There are " + disabled + " disabled lights after reload");
+            }
 
-        resetSkylight();
+            resetSkylight();
 
-        rayHandler.update();
-      }
-    }
+            rayHandler.update();
+          }
+        });
   }
 
   @Override

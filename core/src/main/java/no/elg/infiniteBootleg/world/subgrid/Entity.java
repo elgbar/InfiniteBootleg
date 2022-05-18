@@ -295,53 +295,62 @@ public abstract class Entity
         return;
       }
     }
+    float newWorldY = worldY;
 
     final WorldBody worldBody = world.getWorldBody();
     float physicsWorldX = worldX + worldBody.getWorldOffsetX();
     float physicsWorldY = worldY + worldBody.getWorldOffsetY();
-    boolean sendMovePacket = false;
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        var currentBody = getUnsafeBody();
-        if (isDisposed() || currentBody == null) {
-          return;
-        }
-        updatePos();
-        // If we're too far away teleport the entity to its correct location
-        // and add a bit to the y coordinate, so we don't fall through the floor
-        if ((Main.isServerClient() && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
-            || Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
-            || Math.abs(physicsWorldY - posCache.y) > TELEPORT_DIFFERENCE_THRESHOLD) {
-          posCache.x = worldX;
-          posCache.y = worldY;
-          currentBody.setTransform(physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
-          sendMovePacket = true;
-        }
-        currentBody.setLinearVelocity(velX, velY);
-        currentBody.setAwake(true);
-      }
-    }
     setLookDeg(lookAngleDeg);
-    velCache.x = velX;
-    velCache.y = velY;
-    if (Main.isServer() && sendMovePacket) {
-      //      Main.logger()
-      //          .debug(
-      //              "server",
-      //              "Force updating entity "
-      //                  + hudDebug()
-      //                  + " to position ("
-      //                  + posCache.x
-      //                  + ", "
-      //                  + posCache.y
-      //                  + ")");
-      Main.inst()
-          .getScheduler()
-          .executeAsync(
-              () ->
-                  PacketExtraKt.broadcastToInView(
-                      PacketExtraKt.clientBoundMoveEntity(this), getBlockX(), getBlockY(), null));
-    }
+
+    world.postBox2dRunnable(
+        () -> {
+          boolean sendMovePacket = false;
+          synchronized (this) {
+            var currentBody = getUnsafeBody();
+            if (isDisposed() || currentBody == null) {
+              return;
+            }
+            updatePos();
+            // If we're too far away teleport the entity to its correct location
+            // and add a bit to the y coordinate, so we don't fall through the floor
+            if ((Main.isServerClient()
+                    && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
+                || Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
+                || Math.abs(physicsWorldY - posCache.y) > TELEPORT_DIFFERENCE_THRESHOLD) {
+              posCache.x = worldX;
+              posCache.y = newWorldY;
+              currentBody.setTransform(
+                  physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
+              sendMovePacket = true;
+            }
+            currentBody.setLinearVelocity(velX, velY);
+            velCache.x = velX;
+            velCache.y = velY;
+
+            currentBody.setAwake(true);
+          }
+          if (Main.isServer() && sendMovePacket) {
+            //      Main.logger()
+            //          .debug(
+            //              "server",
+            //              "Force updating entity "
+            //                  + hudDebug()
+            //                  + " to position ("
+            //                  + posCache.x
+            //                  + ", "
+            //                  + posCache.y
+            //                  + ")");
+            Main.inst()
+                .getScheduler()
+                .executeAsync(
+                    () ->
+                        PacketExtraKt.broadcastToInView(
+                            PacketExtraKt.clientBoundMoveEntity(this),
+                            getBlockX(),
+                            getBlockY(),
+                            null));
+          }
+        });
   }
 
   /**

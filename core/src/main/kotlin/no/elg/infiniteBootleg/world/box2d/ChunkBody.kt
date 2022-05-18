@@ -27,7 +27,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   private val fixtureMap = LongMap<Fixture>()
 
-  private val BODY_LOCK = Any()
+  private val chunkBodyLock = Any()
 
   /**
    * The actual box2d body of the chunk.
@@ -40,7 +40,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   private var box2dBody: Body? = null
     set(value) {
       val oldBody: Body?
-      synchronized(BODY_LOCK) {
+      synchronized(chunkBodyLock) {
         oldBody = field
         field = value
         fixtureMap.clear()
@@ -88,6 +88,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   /**
    * Must be called under [BOX2D_LOCK]
+   *
+   * @see World.postBox2dRunnable
+   * @see WorldBody.postBox2dRunnable
    */
   fun onBodyCreated(tmpBody: Body) {
     for (localX in 0 until CHUNK_SIZE) {
