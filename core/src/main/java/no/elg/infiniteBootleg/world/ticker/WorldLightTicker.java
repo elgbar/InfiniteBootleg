@@ -7,7 +7,6 @@ import no.elg.infiniteBootleg.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,9 +52,7 @@ public class WorldLightTicker implements Ticking {
         tickRare();
       }
       ClientWorldRender wr = world.getRender();
-      synchronized (WorldRender.BOX2D_LOCK) {
-        wr.getRayHandler().update();
-      }
+      world.postBox2dRunnable(() -> wr.getRayHandler().update());
     }
   }
 

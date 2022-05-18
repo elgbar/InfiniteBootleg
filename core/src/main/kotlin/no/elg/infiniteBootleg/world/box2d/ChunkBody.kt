@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Updatable
 import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
@@ -18,7 +19,6 @@ import no.elg.infiniteBootleg.world.Direction.NORTH
 import no.elg.infiniteBootleg.world.Direction.SOUTH
 import no.elg.infiniteBootleg.world.Direction.WEST
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 
 /**
  * @author Elg

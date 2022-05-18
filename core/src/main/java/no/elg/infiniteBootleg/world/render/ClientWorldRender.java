@@ -2,6 +2,8 @@ package no.elg.infiniteBootleg.world.render;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.LIGHT_LOCK;
 
 import box2dLight.DirectionalLight;
 import box2dLight.PublicRayHandler;

@@ -7,8 +7,8 @@ import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
 import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOGNIZED;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.loader.WorldLoader.saveServerPlayer;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;

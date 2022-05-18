@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.subgrid.contact;
 
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;

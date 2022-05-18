@@ -12,12 +12,11 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Ticking
+import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.world.render.WorldRender
-import no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS_DIVIDER
 import kotlin.math.abs
@@ -34,7 +33,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * Use the returned object with care,
    *
    *
-   * Synchronized over [WorldRender.BOX2D_LOCK] when it must be used
+   * Synchronized over [BOX2D_LOCK] when it must be used
    *
    * @return The underlying box2d world
    */

@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.util;
 
-import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.LIGHT_LOCK;
 
 import box2dLight.PointLight;
 import box2dLight.RayHandler;

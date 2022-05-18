@@ -14,10 +14,10 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.LIGHT_LOCK
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.render.WorldRender
 import kotlin.math.abs
 
 /**
@@ -99,7 +99,7 @@ class TntBlock(
       glowing = !glowing
     }
     if (old != glowing && Settings.client) {
-      synchronized(WorldRender.LIGHT_LOCK) {
+      synchronized(LIGHT_LOCK) {
         val currentLight = this.light
         if (currentLight != null) {
           currentLight.distance = if (glowing) ON_DISTANCE else OFF_DISTANCE

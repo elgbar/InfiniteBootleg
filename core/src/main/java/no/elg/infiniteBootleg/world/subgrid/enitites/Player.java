@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.render.WorldRender.LIGHT_LOCK;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.LIGHT_LOCK;
 import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
 
 import box2dLight.ConeLight;

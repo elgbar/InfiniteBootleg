@@ -4,8 +4,8 @@ import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.World.NON_INTERACTIVE_FILTER;
-import static no.elg.infiniteBootleg.world.render.WorldRender.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -560,7 +560,7 @@ public abstract class Entity
   }
 
   /**
-   * Must be called while synchronized under WorldRender.BOX2D_LOCK
+   * Must be called while synchronized under BOX2D_LOCK
    *
    * @param type The type of contact
    * @param contact Contact made
