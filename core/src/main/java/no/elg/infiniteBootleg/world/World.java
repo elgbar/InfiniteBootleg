@@ -420,7 +420,7 @@ public abstract class World implements Disposable, Resizable {
    * @param material The new material to at given location
    * @see Chunk#setBlock(int, int, Material, boolean)
    */
-  public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material) {
+  public Block setBlock(@NotNull Location worldLoc, @Nullable Material material) {
     return setBlock(worldLoc, material, true);
   }
 
@@ -432,7 +432,7 @@ public abstract class World implements Disposable, Resizable {
    * @param update If the texture of the corresponding chunk should be updated
    * @see Chunk#setBlock(int, int, Material, boolean)
    */
-  public Chunk setBlock(@NotNull Location worldLoc, @Nullable Material material, boolean update) {
+  public Block setBlock(@NotNull Location worldLoc, @Nullable Material material, boolean update) {
     return setBlock(worldLoc.x, worldLoc.y, material, update);
   }
 
@@ -446,12 +446,12 @@ public abstract class World implements Disposable, Resizable {
    * @see Chunk#setBlock(int, int, Material, boolean)
    */
   @Nullable
-  public Chunk setBlock(
+  public Block setBlock(
       int worldX, int worldY, @Nullable Material material, boolean updateTexture) {
     return setBlock(worldX, worldY, material, updateTexture, false);
   }
 
-  public Chunk setBlock(
+  public Block setBlock(
       int worldX,
       int worldY,
       @Nullable Material material,
@@ -465,9 +465,9 @@ public abstract class World implements Disposable, Resizable {
 
     Chunk chunk = getChunk(chunkX, chunkY);
     if (chunk != null) {
-      chunk.setBlock(localX, localY, material, updateTexture, prioritize);
+      return chunk.setBlock(localX, localY, material, updateTexture, prioritize);
     }
-    return chunk;
+    return null;
   }
 
   /**
@@ -478,7 +478,7 @@ public abstract class World implements Disposable, Resizable {
    * @param material The new material to at given location
    * @see Chunk#setBlock(int, int, Material, boolean)
    */
-  public Chunk setBlock(int worldX, int worldY, @Nullable Material material) {
+  public Block setBlock(int worldX, int worldY, @Nullable Material material) {
     return setBlock(worldX, worldY, material, true);
   }
 
