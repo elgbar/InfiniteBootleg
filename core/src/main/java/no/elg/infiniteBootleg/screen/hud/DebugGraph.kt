@@ -71,8 +71,8 @@ object DebugGraph : Resizable {
     }
 
     tps?.draw()
-    lps?.draw()
     pps?.draw()
+    lps?.draw()
 
     if (updateAny) {
       end()
