@@ -4,7 +4,7 @@ import box2dLight.PointLight
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.util.PointLightPool
+import no.elg.infiniteBootleg.light.PointLightPool
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.World
 
