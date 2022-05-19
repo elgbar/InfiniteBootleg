@@ -98,7 +98,7 @@ object DebugGraph : Resizable {
       fpsIndex += COL_WIDTH
     }
 
-    val fpsDelta = (fpsDeltaAcc / COL_WIDTH) * 10_000f
+    val fpsDelta = (fpsDeltaAcc / COL_WIDTH) * 5_000f
     fpsDeltaAcc = 0f
 
     drawColumn(fpsDelta, fpsIndex)
