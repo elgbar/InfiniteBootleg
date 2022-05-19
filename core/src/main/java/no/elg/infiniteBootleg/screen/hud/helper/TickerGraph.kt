@@ -35,7 +35,7 @@ class TickerGraph(val ticker: Ticker, val startIndex: (width: Int) -> Int, val e
 
       val ticks = currTick - lastTickId
       lastTickId = currTick
-      val tpsDelta = (this.acc / ticks) / 1_000_000f
+      val tpsDelta = ((this.acc / ticks) / 1_000_000f) + 1
       this.acc = 0f
       DebugGraph.drawColumn(tpsDelta, index)
     }
