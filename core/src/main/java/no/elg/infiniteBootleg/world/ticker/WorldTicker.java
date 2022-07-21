@@ -164,13 +164,28 @@ public class WorldTicker extends Ticker implements Disposable {
   @Override
   public void start() {
     super.start();
-    if (lightTicker != null) {
-      lightTicker.getTicker().start();
+    box2DTicker.getTicker().start();
+
+    while (getTickId() <= 0) {
+      Thread.onSpinWait();
     }
+    while (box2DTicker.getTicker().getTickId() <= 0) {
+      Thread.onSpinWait();
+    }
+
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().start();
+      while (serverRendererTicker.getTicker().getTickId() <= 0) {
+        Thread.onSpinWait();
+      }
     }
-    box2DTicker.getTicker().start();
+
+    if (lightTicker != null) {
+      lightTicker.getTicker().start();
+      while (lightTicker.getTicker().getTickId() <= 0) {
+        Thread.onSpinWait();
+      }
+    }
   }
 
   /** Stop this ticker, the tickers thread will not be called anymore */
