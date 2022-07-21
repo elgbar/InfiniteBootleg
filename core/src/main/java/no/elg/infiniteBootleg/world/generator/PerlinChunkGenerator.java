@@ -17,12 +17,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PerlinChunkGenerator implements ChunkGenerator {
 
-  private static final float CAVE_CREATION_THRESHOLD =
-      0.92f; // noise values above this value will be cave (ie air)
-  private static final float WORM_SIZE_AMPLITUDE =
-      0.15f; // how much the size of the caves(worms) changes
-  private static final float WORM_SIZE_FREQUENCY =
-      0.1f; // how fast the size of the caves(worms) changes
+  /** Noise values above this value will be cave (i.e., air). */
+  private static final float CAVE_CREATION_THRESHOLD = 0.92f;
+  /** How much the size of the caves (worms) changes */
+  private static final float WORM_SIZE_AMPLITUDE = 0.15f;
+  /** How fast the size of the caves (worms) changes */
+  private static final float WORM_SIZE_FREQUENCY = 0.1f;
+
+  /** How many blocks of the surface should not be caved in */
+  private static final float CAVELESS_DEPTH = 16f;
   private final PerlinNoise noise;
   private final FastNoise noise2;
 
@@ -83,22 +86,24 @@ public class PerlinChunkGenerator implements ChunkGenerator {
         biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, genHeight);
       }
 
-      // generate caves
-      Block[][] blocks = chunk.getBlocks();
-      int worldChunkY = CoordUtil.chunkToWorld(chunkY);
-      for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-        int worldY = worldChunkY + localY;
+      // generate caves (where there is something to generate them in
+      if (chunkY <= genChunkY) {
+        Block[][] blocks = chunk.getBlocks();
+        int worldChunkY = CoordUtil.chunkToWorld(chunkY);
+        for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+          int worldY = worldChunkY + localY;
 
-        // calculate the size of the worm
-        float wormSize =
-            1 + Math.abs(noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
-        float x = noise2.GetNoise(worldX, worldY) / wormSize;
-        if (x > CAVE_CREATION_THRESHOLD) {
-          //                        Material mat = x > 0.99 && chunkY < genChunkY ? Material.TORCH :
-          // null;
-          //                        Block b = mat == null ? null : mat.createBlock(world, chunk,
-          // localX, localY);
-          blocks[localX][localY] = null;
+          // calculate the size of the worm
+          float wormSize =
+              1
+                  + Math.abs(
+                      noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
+          float caveNoise = noise2.GetNoise(worldX, worldY) / wormSize;
+          float diffToSurface = genHeight - worldY;
+          float depthModifier = Math.min(1f, diffToSurface / CAVELESS_DEPTH);
+          if (caveNoise > CAVE_CREATION_THRESHOLD / depthModifier) {
+            blocks[localX][localY] = null;
+          }
         }
       }
     }
