@@ -193,7 +193,7 @@ public class Player extends LivingEntity {
   }
 
   private void setupLights() {
-    if (isDisposed() || Main.isServer()) {
+    if (isDisposed() || Main.isServer() || !Settings.renderLight) {
       return;
     }
     ClientWorld world = ClientMain.inst().getWorld();
