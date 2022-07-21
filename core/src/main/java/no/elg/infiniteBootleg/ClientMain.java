@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
 import java.awt.Toolkit;
 import no.elg.infiniteBootleg.args.ProgramArgs;
+import no.elg.infiniteBootleg.input.GlobalInputListener;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.screen.ScreenRenderer;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
@@ -203,6 +204,7 @@ public class ClientMain extends CommonMain {
 
     // clean up any mess the previous screen have made
     inputMultiplexer.clear();
+    inputMultiplexer.addProcessor(GlobalInputListener.INSTANCE);
     Gdx.input.setOnscreenKeyboardVisible(false);
 
     Gdx.app.debug("SCREEN", "Loading new screen " + screen.getClass().getSimpleName());
