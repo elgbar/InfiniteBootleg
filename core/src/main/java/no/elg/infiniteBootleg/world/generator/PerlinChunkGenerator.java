@@ -26,6 +26,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
 
   /** How many blocks of the surface should not be caved in */
   private static final float CAVELESS_DEPTH = 16f;
+
   private final PerlinNoise noise;
   private final FastNoise noise2;
 
@@ -47,15 +48,19 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     return noise;
   }
 
+  public float getBiomeHeight(int worldX) {
+    float a = 1.25f;
+    return (noise.noise(worldX, 0.5f, 0.5f, a, 0.001f) + a) / (a * 2);
+  }
+
   @Override
   public @NotNull Biome getBiome(int worldX) {
-
-    float a = 1.25f;
-    float height = (noise.noise(worldX, 0.5f, 0.5f, a, 0.001f) + a) / (a * 2);
-
-    if (height > 0.7) {
+    float height = getBiomeHeight(worldX);
+    if (height > 0.65) {
       return Biome.MOUNTAINS;
-    } else if (height > 0.5) {
+    } else if (height > 0.45) {
+      return Biome.PLAINS;
+    } else if (height > 0.15) {
       return Biome.DESERT;
     } else {
       return Biome.PLAINS;
