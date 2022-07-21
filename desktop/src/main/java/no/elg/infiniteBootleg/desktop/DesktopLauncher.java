@@ -30,7 +30,7 @@ public class DesktopLauncher {
         }
         config.useVsync(false);
         config.setTitle("Infinite Terraria");
-        config.setOpenGLEmulation(GLEmulation.GL20, 4, 2);
+        config.setOpenGLEmulation(GLEmulation.GL20, 4, 6);
         config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 8);
         config.setForegroundFPS(361); // Max hz reasonably to expect
         new Lwjgl3Application(main, config);
