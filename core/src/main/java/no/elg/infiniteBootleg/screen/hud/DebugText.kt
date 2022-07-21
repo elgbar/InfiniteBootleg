@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.util.fastIntFormat
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.text.DecimalFormat
 
@@ -43,8 +44,8 @@ object DebugText {
   ) {
     val block = world.getRawBlock(mouseBlockX, mouseBlockY)
     val material = block?.material ?: Material.AIR
-    val rawX = ClientMain.inst().mouseX
-    val rawY = ClientMain.inst().mouseY
+    val rawX = ClientMain.inst().mouseWorldX
+    val rawY = ClientMain.inst().mouseWorldY
     val exists = block != null
     val blockDebug = block?.hudDebug() ?: ""
     val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b %s"
@@ -65,11 +66,13 @@ object DebugText {
       val format = "chunk (% 4d,% 4d) : not loaded"
       sb.append(String.format(format, chunkX, chunkY))
     } else {
-      val biome = world.chunkLoader.generator.getBiome(mouseBlockX)
+      val generator = world.chunkLoader.generator
+      val biome = generator.getBiome(mouseBlockX)
+      val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0f
       val allAir = pc.isAllAir
       val allowUnloading = pc.isAllowingUnloading
-      val format = "chunk (% 4d,% 4d) : type: %-9.9s just air? %-5b can unload? %-5b"
-      sb.append(String.format(format, chunkX, chunkY, biome, allAir, allowUnloading))
+      val format = "chunk (% 4d,% 4d) : type: %-9.9s (noise % .2f) just air? %-5b can unload? %-5b"
+      sb.append(String.format(format, chunkX, chunkY, biome, biomeHeight, allAir, allowUnloading))
     }
   }
 
@@ -134,7 +137,7 @@ object DebugText {
   fun ents(sb: StringBuilder, world: ClientWorld) {
     val nl = "\n    "
     sb.append("E = ")
-    for (entity in world.getEntities(ClientMain.inst().mouseX, ClientMain.inst().mouseY)) {
+    for (entity in world.getEntities(ClientMain.inst().mouseWorldX, ClientMain.inst().mouseWorldY)) {
       sb.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl)
     }
   }
