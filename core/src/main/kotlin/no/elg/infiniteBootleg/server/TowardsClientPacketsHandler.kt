@@ -40,10 +40,11 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**
+ * Handle packets sent FROM the server THIS client, will quietly drop any packets that are malformed
+ *
  * @author Elg
  */
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
-
   when (packet.type) {
     DX_HEARTBEAT -> {
       if (packet.hasHeartbeat()) {
@@ -135,7 +136,6 @@ private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
 }
 
 private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
-
   val world = this.world
   if (world == null) {
     Main.logger().warn("handleBlockUpdate", "Failed to find world")

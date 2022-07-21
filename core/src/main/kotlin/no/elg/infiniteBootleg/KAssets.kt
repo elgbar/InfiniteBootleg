@@ -37,7 +37,6 @@ object KAssets {
   }
 
   fun load() {
-
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font
       val boldNotFlippedFont = font

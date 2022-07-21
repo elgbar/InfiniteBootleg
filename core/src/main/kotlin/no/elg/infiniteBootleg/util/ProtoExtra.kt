@@ -10,7 +10,8 @@ fun Vector2.toVector2f(): Vector2f = Vector2f.newBuilder().setX(x).setY(y).build
 fun Vector2f.toVector2(): Vector2 = Vector2(x, y)
 
 fun Vector2f.toLocation(): Location = Location(
-  x.toInt(), y.toInt()
+  x.toInt(),
+  y.toInt()
 )
 
 fun Vector2i.toLocation(): Location = Location(x, y)

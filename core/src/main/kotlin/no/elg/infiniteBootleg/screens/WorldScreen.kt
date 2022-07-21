@@ -16,7 +16,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
     private set
 
   override fun render(delta: Float) {
-
     //noinspection ConstantConditions
     world.input.update()
     if (!world.worldTicker.isPaused) {

@@ -90,7 +90,6 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   fun onBodyCreated(tmpBody: Body) {
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
-
         val block = chunk.getRawBlock(localX, localY)
         if (block == null || !block.material.isSolid) {
           continue
@@ -148,7 +147,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
             localY + 1f,
 
             localX + 1f,
-            localY + 0f,
+            localY + 0f
           )
         )
         val newFix = body.createFixture(chainShape, 0f)

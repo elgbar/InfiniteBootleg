@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.Main;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Util {
 
@@ -150,16 +151,22 @@ public class Util {
   }
 
   /**
-   * The key in the map is a pair of the character given before a equal sign (=) or end of string
-   * and a boolean that is {@code true } if the key started with two dash (-) as prefix. The value
-   * of is a String containing the substring from after (not including the first) equal sign to the
-   * end of the string.
+   * The key in the map is a pair of the character given before an equal sign (=) or end of string
+   * and a boolean that is {@code true} if the key started with two dash (-) as prefix. Values in
+   * the map are {@code String}s containing the substring from after (not including the first) equal
+   * sign to the end of the string.
+   *
+   * <h2>Example</h2>
+   *
+   * <p>Given {@code new String{"--key=value" "--toggle"}} will return {@code mapOf(new
+   * Pair("key",true) to "value", new Pair("toggle", true), null)}
    *
    * @param args The system args to interpret
    * @return A Map of the interpreted args
    */
   @NotNull
-  public static Map<Pair<String, Boolean>, String> interpreterArgs(final String[] args) {
+  public static Map<@NotNull Pair<@NotNull String, @NotNull Boolean>, @Nullable String>
+      interpreterArgs(final String[] args) {
     final HashMap<Pair<String, Boolean>, String> argsMap = new HashMap<>();
 
     for (final String arg : args) {
