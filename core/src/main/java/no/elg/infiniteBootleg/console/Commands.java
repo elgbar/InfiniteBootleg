@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.console;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
@@ -578,6 +579,14 @@ public class Commands extends CommandExecutor {
       return;
     }
     world.save();
+  }
+
+  @ClientsideOnly
+  @ConsoleDoc(description = "Toggle vsync")
+  @CmdArgNames({"enable"})
+  public void vsync(boolean enable) {
+    Gdx.graphics.setVSync(enable);
+    logger.success("VSync is now " + (enable ? "enabled" : "disabled"));
   }
 
   @ClientsideOnly
