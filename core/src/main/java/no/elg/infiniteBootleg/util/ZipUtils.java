@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -28,20 +29,21 @@ public final class ZipUtils {
       zipFile.parent().mkdirs();
     }
 
-    try (ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(zipFile.file()))) {
-      while (!queue.isEmpty()) {
-        directory = queue.pop();
-        for (FileHandle kid : directory.list()) {
-          String name = base.relativize(kid.file().toURI()).getPath();
-          if (kid.isDirectory()) {
-            queue.push(kid);
-            name = name.endsWith("/") ? name : name + "/";
-            zip.putNextEntry(new ZipEntry(name));
-          } else {
-            zip.putNextEntry(new ZipEntry(name));
-            //noinspection UnstableApiUsage
-            Files.copy(kid.file(), zip);
-            zip.closeEntry();
+    try (FileOutputStream out = new FileOutputStream(zipFile.file())) {
+      try (ZipOutputStream zip = new ZipOutputStream(out)) {
+        while (!queue.isEmpty()) {
+          directory = queue.pop();
+          for (FileHandle kid : directory.list()) {
+            String name = base.relativize(kid.file().toURI()).getPath();
+            if (kid.isDirectory()) {
+              queue.push(kid);
+              name = name.endsWith("/") ? name : name + "/";
+              zip.putNextEntry(new ZipEntry(name));
+            } else {
+              zip.putNextEntry(new ZipEntry(name));
+              Files.copy(kid.file(), zip);
+              zip.closeEntry();
+            }
           }
         }
       }
@@ -51,20 +53,24 @@ public final class ZipUtils {
   }
 
   public static void unzip(@NotNull FileHandle directory, @NotNull FileHandle zipFile) {
-    try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile.file()))) {
-      ZipEntry entry = zipInputStream.getNextEntry();
-      if (entry == null) {
-        return;
-      }
-      do {
-        if (!entry.isDirectory()) {
-          FileHandle newFile = directory.child(entry.getName());
-          newFile.parent().mkdirs();
-          StreamUtils.copyStream(zipInputStream, newFile.write(false));
-        }
-        entry = zipInputStream.getNextEntry();
-      } while (entry != null);
 
+    try (FileInputStream in = new FileInputStream(zipFile.file())) {
+      try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
+        ZipEntry entry = zipInputStream.getNextEntry();
+        if (entry == null) {
+          return;
+        }
+        do {
+          if (!entry.isDirectory()) {
+            FileHandle newFile = directory.child(entry.getName());
+            newFile.parent().mkdirs();
+            try (OutputStream outputFileStream = newFile.write(false)) {
+              StreamUtils.copyStream(zipInputStream, outputFileStream);
+            }
+          }
+          entry = zipInputStream.getNextEntry();
+        } while (entry != null);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
