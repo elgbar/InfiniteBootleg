@@ -215,15 +215,13 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
       val render = world.render
       if (render is ClientWorldRender) {
-        val rayHandler = render.rayHandler
-        for (light in rayHandler.enabledLights) {
-          light.position = light.position.add(deltaOffsetX, deltaOffsetY)
+        if (Settings.renderLight) {
+          val rayHandler = render.rayHandler
+          for (light in rayHandler.enabledLights) {
+            light.position = light.position.add(deltaOffsetX, deltaOffsetY)
+          }
+          rayHandler.update()
         }
-        // TODO enable if needed
-//      for (light in rayHandler.disabledLights) {
-//        light.position = light.position.add(deltaOffsetX, deltaOffsetY)
-//      }
-        rayHandler.update()
 
         // test logic only, move to world render when possible
         render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
