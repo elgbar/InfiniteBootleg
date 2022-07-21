@@ -233,7 +233,7 @@ public class Ticker implements Runnable {
       throw new IllegalStateException("Ticker thread has already been started");
     }
     started = true;
-    Main.inst().getScheduler().executeSync(tickerThread::start);
+    Main.inst().getScheduler().executeAsync(tickerThread::start);
   }
 
   /** Stop this ticker, the tickers thread will not be called anymore */
