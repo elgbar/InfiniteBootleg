@@ -36,12 +36,7 @@ object DebugText {
   }
 
   @JvmStatic
-  fun pointing(
-    sb: StringBuilder,
-    world: ClientWorld,
-    mouseBlockX: Int,
-    mouseBlockY: Int
-  ) {
+  fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val block = world.getRawBlock(mouseBlockX, mouseBlockY)
     val material = block?.material ?: Material.AIR
     val rawX = ClientMain.inst().mouseWorldX
@@ -53,12 +48,7 @@ object DebugText {
   }
 
   @JvmStatic
-  fun chunk(
-    sb: StringBuilder,
-    world: ClientWorld,
-    mouseBlockX: Int,
-    mouseBlockY: Int
-  ) {
+  fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val pc = world.getChunkFromWorld(mouseBlockX, mouseBlockY)
     val chunkY = CoordUtil.worldToChunk(mouseBlockY)
     val chunkX = CoordUtil.worldToChunk(mouseBlockX)

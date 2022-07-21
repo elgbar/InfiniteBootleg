@@ -236,7 +236,6 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
 
     var update = false
     if (distance in 0.0..maxDistance) {
-
       val iterations = ceil(distance).toInt()
 
       val logging = Settings.debug && Gdx.graphics.frameId % 100 == 0L && distance > 1

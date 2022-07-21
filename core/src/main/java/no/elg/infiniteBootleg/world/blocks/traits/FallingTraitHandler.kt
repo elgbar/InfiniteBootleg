@@ -11,7 +11,7 @@ class FallingTraitHandler(
   trait: FallingTrait,
   val world: World,
   private val originWorldX: Int,
-  private val originWorldY: Int,
+  private val originWorldY: Int
 ) : TraitHandler<FallingTrait> {
 
   init {

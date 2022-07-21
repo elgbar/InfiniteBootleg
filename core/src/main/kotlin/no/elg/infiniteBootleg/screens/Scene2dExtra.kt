@@ -25,12 +25,7 @@ fun PopupMenu.separator() {
 }
 
 @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
-fun Button.onInteract(
-  stage: Stage,
-  vararg keyShortcut: Int,
-  catchEvent: Boolean = false,
-  interaction: Button.() -> Unit
-) {
+fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, catchEvent: Boolean = false, interaction: Button.() -> Unit) {
   this.onInteract(
     stage = stage,
     keyShortcuts = arrayOf(keyShortcut),
@@ -43,12 +38,7 @@ fun Button.onInteract(
  * Call [interaction] when either the user clicks on the menu item or when pressing all the given
  * keys.
  */
-fun Button.onInteract(
-  stage: Stage,
-  vararg keyShortcuts: IntArray,
-  catchEvent: Boolean = false,
-  interaction: Button.() -> Unit
-) {
+fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, catchEvent: Boolean = false, interaction: Button.() -> Unit) {
   onChange(interaction)
 
   if (keyShortcuts.isNotEmpty()) {
@@ -100,25 +90,16 @@ operator fun Stage.plusAssign(eventListener: EventListener) {
 }
 
 /** Call listener if a key down event where the keycode is the given key is fired */
-inline fun <T : Actor> T.onKeyDown(
-  keycode: Int,
-  catchEvent: Boolean = false,
-  onlyWhenShown: Boolean = false,
-  crossinline listener: T.() -> Unit
-) =
-  onKeyDown(catchEvent) { eventKey ->
+inline fun <T : Actor> T.onKeyDown(keycode: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
+  return onKeyDown(catchEvent) { eventKey ->
     if (eventKey == keycode && (!onlyWhenShown || isShown())) {
       listener()
     }
   }
+}
 
 /** Call listener when all of the given keys are pressed and one of them are in the fired onKeyDown event */
-inline fun <T : Actor> T.onAllKeysDownEvent(
-  vararg keycodes: Int,
-  catchEvent: Boolean = false,
-  onlyWhenShown: Boolean = false,
-  crossinline listener: T.() -> Unit
-): EventListener {
+inline fun <T : Actor> T.onAllKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
     if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all { it == eventKey || Gdx.input.isKeyPressed(it) }) {
@@ -128,12 +109,7 @@ inline fun <T : Actor> T.onAllKeysDownEvent(
 }
 
 /** Call listener when any of the given keys are pressed */
-inline fun <T : Actor> T.onAnyKeysDownEvent(
-  vararg keycodes: Int,
-  catchEvent: Boolean = false,
-  onlyWhenShown: Boolean = false,
-  crossinline listener: T.() -> Unit
-): EventListener {
+inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
     if ((!onlyWhenShown || isShown()) && eventKey in keycodes) {
