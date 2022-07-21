@@ -72,12 +72,12 @@ subprojects {
     }
     kotlin {
       ktlint()
-          .setUseExperimental(true)
-          .editorConfigOverride([
-              "indent_size"             : "2",
-              "continuation_indent_size": "2",
-              "max_line_length"         : "180",
-          ])
+        .setUseExperimental(true)
+        .editorConfigOverride([
+          "indent_size"             : "2",
+          "continuation_indent_size": "2",
+          "max_line_length"         : "180",
+        ])
     }
   }
 
@@ -123,8 +123,8 @@ project(":core") {
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
-    implementation "com.google.guava:guava:31.0.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.20.1"
+    implementation "com.google.guava:guava:31.1-jre"
+    implementation "com.google.protobuf:protobuf-java:3.21.3"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
@@ -136,14 +136,14 @@ project(":core") {
     implementation "io.github.libktx:ktx-style:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.76.Final"
+    implementation "io.netty:netty-all:4.1.79.Final"
     implementation "no.kh498.util:CommonUtil:1.0.4"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "org.jetbrains:annotations:23.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.12.3"
+    testImplementation "io.mockk:mockk:1.12.4"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
