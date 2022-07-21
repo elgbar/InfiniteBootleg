@@ -46,7 +46,8 @@ public class Settings {
 
   public static boolean enableCameraFollowLerp = true;
 
-  public static int port = -1;
+  public static final int DEFAULT_PORT = 8558;
+  public static int port = DEFAULT_PORT;
 
   @NotNull public static String host = "";
 
