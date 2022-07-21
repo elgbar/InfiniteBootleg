@@ -23,6 +23,8 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -93,6 +95,8 @@ public abstract class World implements Disposable, Resizable {
 
   public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
   public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
+
+  public static final String LOCK_FILE_NAME = ".locked";
 
   static {
     // base filter for entities
@@ -165,6 +169,8 @@ public abstract class World implements Disposable, Resizable {
 
   private volatile boolean willUpdateLights;
 
+  private boolean volatileWorld = !Settings.loadWorldFromDisk;
+
   public World(@NotNull ProtoWorld.World protoWorld) {
     this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
   }
@@ -187,13 +193,23 @@ public abstract class World implements Disposable, Resizable {
   public void initialize() {
     if (Settings.loadWorldFromDisk) {
       FileHandle worldFolder = getWorldFolder();
+      if (worldFolder != null
+          && worldFolder.exists()
+          && worldFolder.child(LOCK_FILE_NAME).exists()) {
+        volatileWorld = true;
+        Main.logger()
+            .warn("World", "World found is already in use. Initializing this as a volatile world.");
+      }
+
       FileHandle worldZip = getWorldZip();
-      if (worldFolder == null || worldZip == null || !worldZip.exists()) {
+      if (volatileWorld || worldFolder == null || worldZip == null || !worldZip.exists()) {
         Main.logger().log("No world save found");
       } else {
         Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
 
         worldFolder.deleteDirectory();
+        var lockFile = worldFolder.child(LOCK_FILE_NAME);
+        lockFile.writeString(ProcessHandle.current().pid() + "\n", true);
         ZipUtils.unzip(worldFolder, worldZip);
 
         var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
@@ -241,7 +257,7 @@ public abstract class World implements Disposable, Resizable {
   }
 
   public void save() {
-    if (!Settings.loadWorldFromDisk) {
+    if (volatileWorld) {
       return;
     }
     FileHandle worldFolder = getWorldFolder();
@@ -298,14 +314,13 @@ public abstract class World implements Disposable, Resizable {
    */
   @Nullable
   public FileHandle getWorldFolder() {
-    if (Settings.loadWorldFromDisk) {
-      if (worldFile == null) {
-        worldFile = WorldLoader.getWorldFolder(uuid);
-      }
-      return worldFile;
-    } else {
+    if (volatileWorld) {
       return null;
     }
+    if (worldFile == null) {
+      worldFile = WorldLoader.getWorldFolder(uuid);
+    }
+    return worldFile;
   }
 
   protected FileHandle getWorldZip() {
@@ -1260,6 +1275,29 @@ public abstract class World implements Disposable, Resizable {
       chunks.clear();
     } finally {
       chunksWriteLock.unlock();
+    }
+
+    if (!volatileWorld) {
+      FileHandle worldFolder = getWorldFolder();
+      if (worldFolder != null) {
+        if (!worldFolder.deleteDirectory()) {
+          Main.logger()
+              .warn(
+                  "World",
+                  "Failed to delete world directory, trying to explicitly delete lock file");
+          FileHandle child = worldFolder.child(LOCK_FILE_NAME);
+          Path path = child.file().toPath();
+          try {
+            Files.delete(path);
+            Main.logger()
+                .log("World", "Deleted world lock file after failing to delete world folder");
+          } catch (IOException e) {
+            Main.logger().warn("World", "Failed to delete lock file: " + e.getMessage());
+          }
+        } else {
+          Main.logger().log("World", "Deleted world directory");
+        }
+      }
     }
   }
 }

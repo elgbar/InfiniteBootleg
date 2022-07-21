@@ -5,7 +5,6 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -117,10 +116,7 @@ public class ClientMain extends CommonMain {
           if (Main.isSingleplayer() && screen instanceof WorldScreen worldScreen) {
             var clientWorld = worldScreen.getWorld();
             clientWorld.save();
-            final FileHandle worldFolder = clientWorld.getWorldFolder();
-            if (worldFolder != null) {
-              worldFolder.deleteDirectory();
-            }
+            clientWorld.dispose();
           } else if (Main.isClient()) {
             var serverClient = this.getServerClient();
             if (serverClient != null && serverClient.ctx != null) {

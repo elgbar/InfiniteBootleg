@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world;
 
+import com.badlogic.gdx.Gdx;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -53,7 +54,8 @@ public abstract class ClientWorld extends World {
   @Override
   public void dispose() {
     super.dispose();
-    render.dispose();
     input.dispose();
+    // Must be done on GL thread
+    Gdx.app.postRunnable(render::dispose);
   }
 }

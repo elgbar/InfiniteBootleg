@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import no.elg.infiniteBootleg.args.ProgramArgs;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.Server;
@@ -39,11 +38,9 @@ public class ServerMain extends CommonMain {
           }
           if (serverWorld != null) {
             serverWorld.save();
-            final FileHandle worldFolder = serverWorld.getWorldFolder();
-            if (worldFolder != null) {
-              worldFolder.deleteDirectory();
-            }
+            serverWorld.dispose();
           }
+          dispose();
           scheduler.shutdown(); // make sure scheduler threads are dead
         };
     Runtime.getRuntime().addShutdownHook(new Thread(onShutdown));

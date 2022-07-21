@@ -99,7 +99,7 @@ public class WorldLoader {
     }
   }
 
-  public static FileHandle getWorldZip(FileHandle folder) {
+  public static FileHandle getWorldZip(@Nullable FileHandle folder) {
     return folder != null ? folder.parent().child(folder.name() + ".zip") : null;
   }
 
