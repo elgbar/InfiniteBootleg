@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -32,7 +33,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
       Pair<String, Boolean> key = entry.getKey();
 
       String name = null;
-      if (Boolean.TRUE.equals(key.getValue())) {
+      if (key.getValue()) {
         name = key.getKey().toLowerCase().replace('-', '_');
       } else {
         char altKey = key.getKey().charAt(0);
@@ -54,7 +55,9 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         Method method = ProgramArgs.class.getDeclaredMethod(name, String.class);
         method.invoke(this, entry.getValue());
       } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-        e.printStackTrace();
+        error(
+            "ProgramArgs", "Unknown argument '" + name + "' with value '" + entry.getValue() + "'");
+        System.exit(2);
       }
     }
   }
@@ -96,14 +99,14 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
   /** Do not render the graphics */
   @Argument(value = "Disable rendering of graphics", alt = 'h')
-  private void headless(String val) {
+  private void headless(@Nullable String val) {
     Settings.client = false;
     log("Graphics is disabled");
   }
 
   /** Do not load the worlds from disk */
   @Argument(value = "Do not save nor load the world to and from disk", alt = 'l')
-  private void no_load(String val) {
+  private void no_load(@Nullable String val) {
     Settings.loadWorldFromDisk = false;
     log("Worlds will not be loaded/saved from/to disk");
   }
@@ -114,7 +117,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
    * @param val The world seed
    */
   @Argument(value = "Set the default world seed. Example: --world_seed=test", alt = 's')
-  private void world_seed(String val) {
+  private void world_seed(@Nullable String val) {
     if (val == null) {
       log(
           LogLevel.ERROR,
@@ -128,14 +131,14 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
   /** Disable Box2DLights */
   @Argument(value = "Disable rendering of lights", alt = 'L')
-  private void no_lights(String val) {
+  private void no_lights(@Nullable String val) {
     log("Lights are disabled. To dynamically enable this use command 'lights'");
     Settings.renderLight = false;
   }
 
   /** Enable debug rendering (ie box2d) */
   @Argument(value = "Enable debugging, including debug rendering for box2d", alt = 'd')
-  private void debug(String val) {
+  private void debug(@Nullable String val) {
     log("Debug view is enabled. To disable this at runtime use command 'debug'");
     Settings.renderBox2dDebug = true;
     Settings.debug = true;
@@ -144,7 +147,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   @Argument(
       value = "The number of secondary threads. Must be an non-negative integer (>= 0)",
       alt = 't')
-  public boolean threads(String val) {
+  public boolean threads(@Nullable String val) {
     if (val == null) {
       log(
           LogLevel.ERROR,
@@ -168,7 +171,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   @Argument(
       value = "Specify physics updates per seconds. Must be a positive integer (> 0)",
       alt = 'T')
-  public boolean tps(String val) {
+  public boolean tps(@Nullable String val) {
     if (val == null) {
       log(
           LogLevel.ERROR,
@@ -190,7 +193,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   }
 
   @Argument(value = "Print out available arguments and exit", alt = '?')
-  public void help(String val) {
+  public void help(@Nullable String val) {
     System.out.println("List of program arguments:");
 
     // find the maximum length of the argument methods
