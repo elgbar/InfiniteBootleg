@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server + 1 client no light" type="CompoundRunConfigurationType">
+    <toRun name="A srv" type="Application" />
+    <toRun name="D Run no-light" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>
