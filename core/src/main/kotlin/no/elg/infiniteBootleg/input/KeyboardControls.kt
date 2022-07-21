@@ -1,18 +1,23 @@
 package no.elg.infiniteBootleg.input
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
+import com.badlogic.gdx.Input.Buttons
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.sign
+import kotlin.math.sqrt
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -22,41 +27,29 @@ import kotlin.math.sign
 class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : AbstractEntityControls(worldRender, entity) {
   private var selected: Material = Material.STONE
 
-  // if objects can be placed on non-air blocks
-  var replacePlacement = false
   private var breakBrushSize = 2f
   private var placeBrushSize = 1f
-  private var lastEditTick: Long = 0
+
   private val tmpVec = Vector2()
+  private val tmpVec2 = Vector2()
 
-  private fun breakBlocks(): Boolean {
-    val blockX = ClientMain.inst().mouseBlockX
-    val blockY = ClientMain.inst().mouseBlockY
-    val rawX = ClientMain.inst().mouseX
-    val rawY = ClientMain.inst().mouseY
-
+  private fun breakBlocks(blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
     if (breakBrushSize <= 1) {
       world.remove(blockX, blockY, true)
     } else {
-      val blocksWithin = world.getBlocksWithin(rawX, rawY, breakBrushSize)
+      val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
       if (blocksWithin.isEmpty) {
         world.remove(blockX, blockY, true)
       } else {
         world.removeBlocks(blocksWithin, true)
       }
     }
-    lastEditTick = world.tick
     return true
   }
 
-  private fun placeBlocks(): Boolean {
-    val blockX = ClientMain.inst().mouseBlockX
-    val blockY = ClientMain.inst().mouseBlockY
-    val rawX = ClientMain.inst().mouseX
-    val rawY = ClientMain.inst().mouseY
-
+  private fun placeBlocks(blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
     var update = false
-    if (!world.getEntities(rawX, rawY).isEmpty) {
+    if (!world.getEntities(worldX, worldY).isEmpty) {
       // cannot place on an entity
       return false
     }
@@ -64,7 +57,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     if (placeBrushSize <= 1) {
       update = selected.create(world, blockX, blockY, true)
     } else {
-      val blocksWithin = world.getBlocksWithin(rawX, rawY, placeBrushSize)
+      val blocksWithin = world.getBlocksWithin(worldX, worldY, placeBrushSize)
       if (blocksWithin.isEmpty) {
         update = selected.create(world, blockX, blockY, true)
       } else {
@@ -73,43 +66,35 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
         }
       }
     }
-    if (update) {
-      lastEditTick = world.tick
-    }
+
     return update
   }
 
   private fun teleport() {
     // teleport the player to the (last) location of the mouse
-    controlled.teleport(ClientMain.inst().mouseX, ClientMain.inst().mouseY, true)
-    val input = world.input
-    if (input != null) {
-      input.following = controlled
-    }
+    controlled.teleport(ClientMain.inst().mouseWorldX, ClientMain.inst().mouseWorldY, true)
+    world.input.following = controlled
   }
 
   private fun fly() {
-
     fun fly(dx: Float = 0f, dy: Float = 0f) {
       setVel { oldX, oldY -> oldX + dx to oldY + dy }
     }
 
     when {
-      Gdx.input.isKeyPressed(Input.Keys.W) -> fly(dy = FLY_VEL)
-      Gdx.input.isKeyPressed(Input.Keys.S) -> fly(dy = -FLY_VEL)
-      Gdx.input.isKeyPressed(Input.Keys.A) -> fly(dx = -FLY_VEL)
-      Gdx.input.isKeyPressed(Input.Keys.D) -> fly(dx = FLY_VEL)
+      Gdx.input.isKeyPressed(Keys.W) -> fly(dy = FLY_VEL)
+      Gdx.input.isKeyPressed(Keys.S) -> fly(dy = -FLY_VEL)
+      Gdx.input.isKeyPressed(Keys.A) -> fly(dx = -FLY_VEL)
+      Gdx.input.isKeyPressed(Keys.D) -> fly(dx = FLY_VEL)
     }
   }
 
   private fun walk() {
-
     fun moveHorz(dir: Float) {
       if (!controlled.validLocation(controlled.position.x + GROUND_CHECK_OFFSET * dir, controlled.position.y)) {
         return
       }
       world.postBox2dRunnable {
-
         val body = controlled.body
 
         val currSpeed = body.linearVelocity.x
@@ -126,16 +111,16 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       }
     }
 
-    if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+    if (Gdx.input.isKeyPressed(Keys.A)) {
       moveHorz(-1f)
     }
-    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+    if (Gdx.input.isKeyPressed(Keys.D)) {
       moveHorz(1f)
     }
   }
 
   private fun jump() {
-    if (controlled.isOnGround && Gdx.input.isKeyPressed(Input.Keys.W)) {
+    if (controlled.isOnGround && Gdx.input.isKeyPressed(Keys.W)) {
       setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
     }
   }
@@ -151,13 +136,13 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     }
     val update =
       when {
-        Gdx.input.isButtonPressed(Input.Buttons.LEFT) -> breakBlocks()
-        Gdx.input.isButtonPressed(Input.Buttons.RIGHT) -> placeBlocks()
-        Gdx.input.isKeyJustPressed(Input.Keys.Q) -> placeBlocks()
+        Gdx.input.isButtonPressed(Buttons.LEFT) -> interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::breakBlocks)
+        Gdx.input.isButtonPressed(Buttons.RIGHT) -> interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::placeBlocks)
+        Gdx.input.isKeyJustPressed(Keys.Q) -> interpolate(true, this::placeBlocks)
         else -> false
       }
 
-    if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+    if (Gdx.input.isKeyJustPressed(Keys.T)) {
       teleport()
     } else {
       if (controlled.isFlying) {
@@ -171,7 +156,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     if (controlled is Player) {
       val player = controlled as Player
 
-      if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+      if (Gdx.input.isKeyJustPressed(Keys.P)) {
         player.toggleTorch()
       }
       if (player.torchLight?.isActive == true) {
@@ -200,19 +185,102 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       return false
     }
     selected = when (keycode) {
-      Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> Material.values()[0]
-      Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> Material.values()[1]
-      Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> Material.values()[2]
-      Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> Material.values()[3]
-      Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> Material.values()[4]
-      Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> Material.values()[5]
-      Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> Material.values()[6]
-      Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> Material.values()[7]
-      Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> Material.values()[8]
-      Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> Material.values()[9]
+      Keys.NUM_0, Keys.NUMPAD_0 -> Material.values()[0]
+      Keys.NUM_1, Keys.NUMPAD_1 -> Material.values()[1]
+      Keys.NUM_2, Keys.NUMPAD_2 -> Material.values()[2]
+      Keys.NUM_3, Keys.NUMPAD_3 -> Material.values()[3]
+      Keys.NUM_4, Keys.NUMPAD_4 -> Material.values()[4]
+      Keys.NUM_5, Keys.NUMPAD_5 -> Material.values()[5]
+      Keys.NUM_6, Keys.NUMPAD_6 -> Material.values()[6]
+      Keys.NUM_7, Keys.NUMPAD_7 -> Material.values()[7]
+      Keys.NUM_8, Keys.NUMPAD_8 -> Material.values()[8]
+      Keys.NUM_9, Keys.NUMPAD_9 -> Material.values()[9]
       else -> return false
     }
     return true
+  }
+
+  /**
+   * @param justPressed Whether to interpolate between placements
+   */
+  private fun interpolate(justPressed: Boolean, action: (blockX: Int, blockY: Int, worldX: Float, worldY: Float) -> Boolean): Boolean {
+    val main = ClientMain.inst()
+    val blockX = main.mouseBlockX
+    val blockY = main.mouseBlockY
+    val worldX = main.mouseWorldX
+    val worldY = main.mouseWorldY
+
+    val inSameBlock = main.previousMouseBlockX == blockX && main.previousMouseBlockY == blockY
+    if (justPressed || inSameBlock) {
+      return action(blockX, blockY, worldX, worldY)
+    }
+
+    val currPos = tmpVec
+    val prevPos = tmpVec2
+
+    currPos.x = worldX
+    currPos.y = worldY
+
+    prevPos.x = main.previousMouseWorldX
+    prevPos.y = main.previousMouseWorldY
+
+    fun Vector2.dstd(v: Vector2): Double {
+      val dx: Float = v.x - x
+      val dy: Float = v.y - y
+      return sqrt((dx * dx + dy * dy).toDouble())
+    }
+
+    val distance = currPos.dstd(prevPos)
+    // Limit max distance to draw
+    val maxDistance = 20.0
+
+    var update = false
+    if (distance in 0.0..maxDistance) {
+
+      val iterations = ceil(distance).toInt()
+
+      val logging = Settings.debug && Gdx.graphics.frameId % 100 == 0L && distance > 1
+      if (logging) {
+        Main.logger().log("---START SMOOTH PLACEMENT---")
+        Main.logger().log("(pos) prev: $prevPos, curr $currPos")
+        Main.logger().log("(distance) $distance")
+        Main.logger().log("Doing $iterations iterations of interpolation")
+      }
+      for (i in 1 until iterations + 1) {
+        val multiplierX = (distance - i) / distance
+
+        // When drawing from (lower right to upper left) and (upper right to lower right) the Y multiplication must be the inverse
+        //
+        val multiplierY = when {
+          prevPos.x < currPos.x && prevPos.y > currPos.y -> 1 - multiplierX
+          prevPos.x > currPos.x && prevPos.y < currPos.y -> 1 - multiplierX
+          else -> multiplierX
+        }
+
+        if (multiplierX.isInfinite() || multiplierX !in 0.0..1.0) {
+          // If the multiplier is weird, don't place a block
+          continue
+        }
+
+        fun halfpoint(i1: Float, i2: Float, multiplier: Double): Float = (min(i1, i2) + abs(i1 - i2) * multiplier).toFloat()
+
+        val pWx = halfpoint(worldX, main.previousMouseWorldX, multiplierX)
+        val pWy = halfpoint(worldY, main.previousMouseWorldY, multiplierY)
+        val pBx = CoordUtil.worldToBlock(pWx)
+        val pBy = CoordUtil.worldToBlock(pWy)
+
+        if (logging) {
+          Main.logger().log("--inter $i mltX: $multiplierX | mltY: $multiplierY, pBx:$pBx | pBy:$pBy | pWx:$pWx | pWy:$pWy")
+        }
+        update = update or action(pBx, pBy, pWx, pWy)
+      }
+
+      if (logging) {
+        Main.logger().log("---END SMOOTH PLACEMENT (update? $update)---")
+      }
+    }
+
+    return update or action(blockX, blockY, worldX, worldY)
   }
 
   override fun getSelected(): Material {

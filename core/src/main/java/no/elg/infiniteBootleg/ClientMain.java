@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.ServerClientWorld;
 import no.elg.infiniteBootleg.world.SinglePlayerWorld;
@@ -43,6 +44,11 @@ public class ClientMain extends CommonMain {
   private int mouseBlockY;
   private float mouseWorldX;
   private float mouseWorldY;
+
+  private int previousMouseBlockX;
+  private int previousMouseBlockY;
+  private float previousMouseWorldX;
+  private float previousMouseWorldY;
 
   @Nullable private Screen screen;
   private boolean singleplayer;
@@ -152,13 +158,19 @@ public class ClientMain extends CommonMain {
       // Whenever z is not zero unproject returns a very low number
       // I don't know why this is the case, but checking for z to be zero seems to fix the bug
       if (screenInputVec.z == 0f) {
+
+        previousMouseWorldX = mouseWorldX;
+        previousMouseWorldY = mouseWorldY;
+        previousMouseBlockX = mouseBlockX;
+        previousMouseBlockY = mouseBlockY;
+
         final WorldBody worldBody = world.getWorldBody();
         mouseWorldX = screenInputVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
         mouseWorldY = screenInputVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
         mouseWorldInput.set(mouseWorldX, mouseWorldY);
 
-        mouseBlockX = (int) Math.floor(mouseWorldX);
-        mouseBlockY = (int) Math.floor(mouseWorldY);
+        mouseBlockX = CoordUtil.worldToBlock(mouseWorldX);
+        mouseBlockY = CoordUtil.worldToBlock(mouseWorldY);
       }
     }
 
@@ -313,12 +325,28 @@ public class ClientMain extends CommonMain {
     return mouseBlockY;
   }
 
-  public float getMouseX() {
+  public float getMouseWorldX() {
     return mouseWorldX;
   }
 
-  public float getMouseY() {
+  public float getMouseWorldY() {
     return mouseWorldY;
+  }
+
+  public int getPreviousMouseBlockX() {
+    return previousMouseBlockX;
+  }
+
+  public int getPreviousMouseBlockY() {
+    return previousMouseBlockY;
+  }
+
+  public float getPreviousMouseWorldX() {
+    return previousMouseWorldX;
+  }
+
+  public float getPreviousMouseWorldY() {
+    return previousMouseWorldY;
   }
 
   @NotNull

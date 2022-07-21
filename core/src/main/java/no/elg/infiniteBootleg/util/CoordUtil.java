@@ -215,4 +215,12 @@ public class CoordUtil {
   public static Location decompactLoc(long compactLoc) {
     return new Location(decompactLocX(compactLoc), decompactLocY(compactLoc));
   }
+
+  /**
+   * @param worldCoord A part of a coordinate in the world
+   * @return Which coordinate a block at the given world coordinate will have
+   */
+  public static int worldToBlock(float worldCoord) {
+    return (int) Math.floor(worldCoord);
+  }
 }
