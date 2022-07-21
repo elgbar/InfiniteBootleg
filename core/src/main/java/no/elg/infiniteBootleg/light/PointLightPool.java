@@ -29,7 +29,8 @@ public final class PointLightPool extends Pool<PointLight> implements Disposable
   private final RayHandler rayHandler;
   private final WorldBody worldBody;
 
-  private static final ConcurrentMap<ClientWorld, PointLightPool> poolMap = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<ClientWorld, PointLightPool> poolMap =
+      new ConcurrentHashMap<>();
 
   private PointLightPool(@NotNull ClientWorld world) {
     rayHandler = world.getRender().getRayHandler();
@@ -59,7 +60,8 @@ public final class PointLightPool extends Pool<PointLight> implements Disposable
   }
 
   /**
-   * Must be called within {@link WorldBody#postBox2dRunnable(Runnable)} or {@link  World#postBox2dRunnable(Runnable)}
+   * Must be called within {@link WorldBody#postBox2dRunnable(Runnable)} or {@link
+   * World#postBox2dRunnable(Runnable)}
    */
   @Override
   protected PointLight newObject() {
@@ -79,7 +81,8 @@ public final class PointLightPool extends Pool<PointLight> implements Disposable
   }
 
   /**
-   * Must be called within {@link WorldBody#postBox2dRunnable(Runnable)} or {@link  World#postBox2dRunnable(Runnable)}
+   * Must be called within {@link WorldBody#postBox2dRunnable(Runnable)} or {@link
+   * World#postBox2dRunnable(Runnable)}
    */
   @NotNull
   public PointLight obtain(float worldX, float worldY) {
@@ -91,7 +94,8 @@ public final class PointLightPool extends Pool<PointLight> implements Disposable
   }
 
   /**
-   * Must be called within {@link WorldBody#postBox2dRunnable(Runnable)} or {@link  World#postBox2dRunnable(Runnable)}
+   * Must be called within {@link WorldBody#postBox2dRunnable(Runnable)} or {@link
+   * World#postBox2dRunnable(Runnable)}
    *
    * @deprecated Use {@link #obtain(float, float)} to correctly calculate any world offset
    */
@@ -105,24 +109,24 @@ public final class PointLightPool extends Pool<PointLight> implements Disposable
       } while (light == null);
       light.setActive(true);
       return light;
-
     }
   }
 
   @Override
   public void free(@NotNull PointLight light) {
-    worldBody.postBox2dRunnable(() -> {
-      if (!light.isActive()) {
-        if (Settings.debug) {
-          throw new IllegalStateException("Double light release!");
-        } else {
-          Main.logger().error("PLP", "Tried to free inactive light");
-          return;
-        }
-      }
-      light.setActive(false);
-      super.free(light);
-    });
+    worldBody.postBox2dRunnable(
+        () -> {
+          if (!light.isActive()) {
+            if (Settings.debug) {
+              throw new IllegalStateException("Double light release!");
+            } else {
+              Main.logger().error("PLP", "Tried to free inactive light");
+              return;
+            }
+          }
+          light.setActive(false);
+          super.free(light);
+        });
   }
 
   @Override
@@ -132,16 +136,17 @@ public final class PointLightPool extends Pool<PointLight> implements Disposable
 
   @Override
   protected void reset(@NotNull PointLight light) {
-    worldBody.postBox2dRunnable(() -> {
-      light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
-      light.setStaticLight(true);
-      light.setXray(false);
-      light.setSoft(true);
-      light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-      light.setDistance(POINT_LIGHT_DISTANCE);
-      light.setColor(Color.WHITE);
-      light.setContactFilter(World.LIGHT_FILTER);
-    });
+    worldBody.postBox2dRunnable(
+        () -> {
+          light.setPosition(Float.MAX_VALUE, Float.MAX_VALUE);
+          light.setStaticLight(true);
+          light.setXray(false);
+          light.setSoft(true);
+          light.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
+          light.setDistance(POINT_LIGHT_DISTANCE);
+          light.setColor(Color.WHITE);
+          light.setContactFilter(World.LIGHT_FILTER);
+        });
   }
 
   @Override

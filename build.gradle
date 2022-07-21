@@ -3,7 +3,7 @@ plugins {
   id "idea"
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.5.0"
+  id "com.diffplug.spotless" version "6.7.2"
 }
 
 tasks.named("wrapper") {
@@ -68,13 +68,13 @@ subprojects {
     }
     java {
       removeUnusedImports()
-      googleJavaFormat("1.15.0")
+      googleJavaFormat()
     }
     kotlin {
       ktlint("0.44.0").userData([
-          "indent_size"             : "2",
-          "continuation_indent_size": "2",
-          "max_line_length"         : "180",
+        "indent_size"             : "2",
+        "continuation_indent_size": "2",
+        "max_line_length"         : "180",
       ])
     }
   }
