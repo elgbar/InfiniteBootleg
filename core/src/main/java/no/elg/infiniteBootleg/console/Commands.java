@@ -590,6 +590,14 @@ public class Commands extends CommandExecutor {
   }
 
   @ClientsideOnly
+  @ConsoleDoc(description = "Set max FPS, if < 0 there is no limit. ")
+  @CmdArgNames({"fps"})
+  public void maxFPS(int fps) {
+    Gdx.graphics.setForegroundFPS(fps);
+    logger.success("Max foreground fps is now " + fps);
+  }
+
+  @ClientsideOnly
   @ConsoleDoc(description = "Disconnect from the server")
   public void quit() {
     disconnect();
