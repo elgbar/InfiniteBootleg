@@ -25,7 +25,7 @@ import kotlin.math.sqrt
  * @author Elg
  */
 class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : AbstractEntityControls(worldRender, entity) {
-  private var selected: Material = Material.STONE
+  private var selected: Material = Material.BRICK
 
   private var breakBrushSize = 2f
   private var placeBrushSize = 1f
