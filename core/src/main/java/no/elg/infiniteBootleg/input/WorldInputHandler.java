@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.WorldScreen;
@@ -134,18 +135,31 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
   private void cameraFollowUpdate() {
     OrthographicCamera camera = worldRender.getCamera();
+
     if (hasValidLockOn()) {
       assert following != null;
       final Vector2 position = following.getPhysicsPosition();
       float x = position.x * Block.BLOCK_SIZE;
       float y = position.y * Block.BLOCK_SIZE;
 
-      float dx = (x - camera.position.x) * CAMERA_LERP;
-      float dy = (y - camera.position.y) * CAMERA_LERP;
+      var diffX = (x - camera.position.x);
+      var diffY = (y - camera.position.y);
 
-      if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
-        camera.position.x += dx * Gdx.graphics.getDeltaTime();
-        camera.position.y += dy * Gdx.graphics.getDeltaTime();
+      var teleportCam =
+          !Settings.enableCameraFollowLerp
+              || Math.abs(diffX) > Gdx.graphics.getWidth()
+              || Math.abs(diffY) > Gdx.graphics.getHeight();
+      if (teleportCam) {
+        camera.position.x = x;
+        camera.position.y = y;
+      } else {
+        float dx = diffX * CAMERA_LERP;
+        float dy = diffY * CAMERA_LERP;
+
+        if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
+          camera.position.x += dx * Gdx.graphics.getDeltaTime();
+          camera.position.y += dy * Gdx.graphics.getDeltaTime();
+        }
       }
       worldRender.update();
     }
