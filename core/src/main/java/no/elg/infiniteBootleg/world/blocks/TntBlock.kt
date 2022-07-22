@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import box2dLight.PointLight
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -14,7 +13,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.LIGHT_LOCK
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
@@ -31,7 +29,7 @@ class TntBlock(
   localX: Int,
   localY: Int,
   material: Material
-) : LightBlock(world, chunk, localX, localY, material) {
+) : TickingBlock(world, chunk, localX, localY, material) {
 
   /** How long, in ticks, the fuse time should be  */
   val fuseDurationTicks: Int = (getWorld().worldTicker.tps * FUSE_DURATION_SECONDS).toInt()
@@ -50,19 +48,10 @@ class TntBlock(
     return !exploded
   }
 
-  override fun customizeLight(light: PointLight) {
-    light.color = Color.RED
-    light.isXray = false
-    light.isSoft = false
-    light.isStaticLight = true
-    light.distance = ON_DISTANCE
-  }
-
   override fun tick() {
     if (exploded) {
       return
     }
-    super.tick()
     val ticked = world.tick - startTick
     if (ticked > fuseDurationTicks && Main.isAuthoritative()) {
       exploded = true
@@ -90,23 +79,6 @@ class TntBlock(
         }
         world.removeBlocks(destroyed, false)
       }
-    }
-    val r = world.worldTicker.tps / 5
-    val old = glowing
-    if (ticked >= fuseDurationTicks - world.worldTicker.tps) {
-      glowing = true
-    } else if (ticked % r == 0L) {
-      glowing = !glowing
-    }
-    if (old != glowing && Settings.client) {
-      synchronized(LIGHT_LOCK) {
-        val currentLight = this.light
-        if (currentLight != null) {
-          currentLight.distance = if (glowing) ON_DISTANCE else OFF_DISTANCE
-          currentLight.update()
-        }
-      }
-      chunk.updateTexture(true)
     }
   }
 
@@ -182,8 +154,6 @@ class TntBlock(
      */
     const val RESISTANCE = 8
     const val FUSE_DURATION_SECONDS = 3f
-    const val ON_DISTANCE = 16f
-    const val OFF_DISTANCE = 0.1f
 
     private val whiteTexture: TextureRegion? = if (Settings.client) {
       val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)

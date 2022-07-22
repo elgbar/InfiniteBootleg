@@ -47,10 +47,6 @@ object DebugGraph : Resizable {
     val worldTicker = world?.worldTicker as? WorldTicker?
     if (worldTicker != null && worldTicker != tps?.ticker) {
       tps = TickerGraph(worldTicker, { width -> (width * 0.76).toInt() }, { it })
-      val lightTicker = worldTicker.lightTicker?.ticker
-      if (lightTicker != null) {
-        lps = TickerGraph(lightTicker, { width -> (width * 0.51).toInt() }, { width -> (width * 0.75).toInt() })
-      }
       pps = TickerGraph(worldTicker.box2DTicker.ticker, { width -> (width * 0.26).toInt() }, { width -> (width * 0.50).toInt() })
     }
 

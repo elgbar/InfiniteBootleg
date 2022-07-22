@@ -41,12 +41,6 @@ public abstract class ClientWorld extends World {
   }
 
   @Override
-  public void reload(boolean force) {
-    super.reload(force);
-    render.reload();
-  }
-
-  @Override
   public void resize(int width, int height) {
     render.resize(width, height);
   }

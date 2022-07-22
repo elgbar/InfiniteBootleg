@@ -1,15 +1,9 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.GlobalLockKt.LIGHT_LOCK;
 import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
 
-import box2dLight.ConeLight;
-import box2dLight.Light;
-import box2dLight.PointLight;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.ClientMain;
@@ -34,8 +28,6 @@ public class Player extends LivingEntity {
 
   @Nullable private static final TextureRegion TEXTURE_REGION;
   @Nullable private EntityControls controls;
-  @Nullable private Light torchLight;
-  @Nullable private Light haloLight;
 
   public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
     super(world, protoEntity);
@@ -138,21 +130,7 @@ public class Player extends LivingEntity {
   }
 
   public void toggleTorch() {
-    Light torch = getTorchLight();
-    if (torch != null) {
-      synchronized (LIGHT_LOCK) {
-        torch.setActive(!torch.isActive());
-      }
-    }
-  }
-
-  @Override
-  public void setLookDeg(float lookDeg) {
-    super.setLookDeg(lookDeg);
-    Light torch = getTorchLight();
-    if (torch != null) {
-      torch.setDirection(lookDeg);
-    }
+    // TODO
   }
 
   @Override
@@ -160,10 +138,6 @@ public class Player extends LivingEntity {
     final ProtoWorld.Entity.Builder builder = super.save();
     final ProtoWorld.Entity.Player.Builder playerBuilder = ProtoWorld.Entity.Player.newBuilder();
 
-    Light torch = getTorchLight();
-    if (torch != null) {
-      playerBuilder.setTorchAngleDeg(torch.getDirection());
-    }
     playerBuilder.setControlled(!Main.isMultiplayer() && hasControls());
 
     builder.setPlayer(playerBuilder.build());
@@ -179,12 +153,6 @@ public class Player extends LivingEntity {
     if (hasControls()) {
       removeControls();
     }
-    Light torch = torchLight;
-    if (torch != null) {
-      synchronized (LIGHT_LOCK) {
-        torch.remove();
-      }
-    }
   }
 
   @Override
@@ -192,96 +160,9 @@ public class Player extends LivingEntity {
     return PUSH_UP;
   }
 
-  private void setupLights() {
-    if (isDisposed() || Main.isServer() || !Settings.renderLight) {
-      return;
-    }
-    ClientWorld world = ClientMain.inst().getWorld();
-    if (world == null) {
-      Main.logger().warn("Failed to get client world!");
-      return;
-    }
-    if (torchLight == null) {
-      ConeLight torch;
-      synchronized (LIGHT_LOCK) {
-        torch =
-            new ConeLight(
-                world.getRender().getRayHandler(),
-                64,
-                Color.TAN,
-                48,
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE,
-                0,
-                30);
-        this.torchLight = torch;
-      }
-      torch.setStaticLight(true);
-      torch.setContactFilter(World.LIGHT_FILTER);
-      torch.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH);
-    }
-    if (haloLight == null) {
-      PointLight halo;
-      synchronized (LIGHT_LOCK) {
-        halo =
-            new PointLight(
-                world.getRender().getRayHandler(),
-                12,
-                Color.GRAY,
-                4f,
-                Float.MAX_VALUE,
-                Float.MAX_VALUE);
-        halo.setStaticLight(true);
-        halo.setContactFilter(World.LIGHT_FILTER);
-        halo.setSoftnessLength(World.POINT_LIGHT_SOFTNESS_LENGTH / 2);
-        this.haloLight = halo;
-      }
-      halo.setStaticLight(true);
-    }
-  }
-
-  @Nullable
-  public Light getTorchLight() {
-    Light currentTorch = torchLight;
-    if (currentTorch == null) {
-      setupLights();
-      return torchLight;
-    }
-    return currentTorch;
-  }
-
-  @Nullable
-  public Light getHaloLight() {
-    Light currentHalo = haloLight;
-    if (currentHalo == null) {
-      setupLights();
-      return haloLight;
-    }
-    return currentHalo;
-  }
-
-  private void updateLights() {
-    @Nullable Vector2 pos = null;
-    var halo = getHaloLight();
-    if (halo != null) {
-      pos = getPhysicsPosition();
-      halo.setPosition(pos);
-    }
-
-    // Note torch must be after halo because torch modifies pos
-    var torch = getTorchLight();
-    if (torch != null) {
-      if (pos == null) {
-        pos = getPhysicsPosition();
-      }
-      torch.setPosition(pos.add(0f, getHalfBox2dHeight() / 2f));
-    }
-  }
-
   @Override
   public void tick() {
     super.tick();
-    updateLights();
 
     if (Main.isServerClient() && hasControls()) {
       final ServerClient client = ClientMain.inst().getServerClient();

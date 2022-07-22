@@ -19,20 +19,17 @@ object DebugText {
   inline fun fpsString(sb: StringBuilder, world: ClientWorld?) {
     val worldTps = world?.worldTicker?.realTPS ?: -1
     val physicsTps = world?.box2DTicker?.realTPS ?: -1
-    val lightTps = world?.lightTicker?.realTPS ?: -1
 
     sb.append("FPS: ").fastIntFormat(Gdx.graphics.framesPerSecond, 4)
       .append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")
       .append(" | wtps: ").fastIntFormat(worldTps.toInt(), 2)
       .append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
-      .append(" | ltps: ").fastIntFormat(lightTps.toInt(), 2)
   }
 
   @JvmStatic
   fun lights(sb: StringBuilder, world: ClientWorld) {
     sb.append("Active Lights: ")
-    val handler = world.render.rayHandler
-    sb.append(handler.enabledLights.size)
+    sb.append(-1)
   }
 
   @JvmStatic

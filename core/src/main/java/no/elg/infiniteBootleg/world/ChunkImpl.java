@@ -200,8 +200,6 @@ public class ChunkImpl implements Chunk {
       if (block != null) {
         chunkBody.addBlock(block, null);
       }
-
-      world.updateLights();
     }
     if (sendUpdatePacket && isValid()) {
       if (Main.isServer()) {

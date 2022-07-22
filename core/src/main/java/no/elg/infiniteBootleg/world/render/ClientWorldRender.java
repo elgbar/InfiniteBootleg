@@ -2,13 +2,7 @@ package no.elg.infiniteBootleg.world.render;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
-import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
-import static no.elg.infiniteBootleg.world.GlobalLockKt.LIGHT_LOCK;
 
-import box2dLight.DirectionalLight;
-import box2dLight.PublicRayHandler;
-import box2dLight.RayHandler;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,18 +13,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.light.PointLightPool;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
-import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
-import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -42,21 +30,13 @@ public class ClientWorldRender implements WorldRender {
   @NotNull private final ClientChunksInView chunksInView;
   @NotNull private final Matrix4 m4 = new Matrix4();
   @NotNull OrderedMap<Chunk, TextureRegion> draw;
-  @NotNull private final PublicRayHandler rayHandler;
   @NotNull private final EntityRenderer entityRenderer;
   @NotNull private final SpriteBatch batch;
   @NotNull private final OrthographicCamera camera;
   @NotNull private final ChunkRenderer chunkRenderer;
   @NotNull private final Box2DDebugRenderer box2DDebugRenderer;
   @NotNull private final DebugChunkRenderer chunkDebugRenderer;
-  @Nullable private DirectionalLight sun;
-  @Nullable private DirectionalLight ambientLight;
   private float lastZoom;
-
-  static {
-    RayHandler.setGammaCorrection(true);
-    RayHandler.useDiffuseLight(true);
-  }
 
   public ClientWorldRender(@NotNull ClientWorld world) {
     viewBound = new Rectangle();
@@ -80,44 +60,6 @@ public class ClientWorldRender implements WorldRender {
 
     chunkDebugRenderer = new DebugChunkRenderer(this);
     box2DDebugRenderer = new Box2DDebugRenderer(true, false, false, false, true, true);
-
-    rayHandler = new PublicRayHandler(world.getWorldBody().getBox2dWorld());
-    rayHandler.setBlurNum(1);
-    rayHandler.setAmbientLight(AMBIENT_LIGHT, AMBIENT_LIGHT, AMBIENT_LIGHT, 1f);
-    rayHandler.setCulling(true);
-    resetSkylight();
-  }
-
-  private DirectionalLight createDirLight() {
-    var light =
-        new DirectionalLight(
-            rayHandler, blocksHorizontally() * RAYS_PER_BLOCK, Color.WHITE, WorldTime.MIDDAY_TIME);
-    light.setStaticLight(true);
-    light.setContactFilter(World.LIGHT_FILTER);
-    light.setSoftnessLength(World.SKYLIGHT_SOFTNESS_LENGTH);
-    return light;
-  }
-
-  private void resetSkylight() {
-    world.postBox2dRunnable(
-        () -> {
-          synchronized (LIGHT_LOCK) {
-            if (sun != null) {
-              sun.remove();
-            }
-            if (ambientLight != null) {
-              ambientLight.remove();
-            }
-            sun = createDirLight();
-            ambientLight = createDirLight();
-
-            rayHandler.update();
-            WorldLightTicker.updateDirectionalLights();
-
-            // Re-render at once otherwise a quick flickering might happen
-            update();
-          }
-        });
   }
 
   @Override
@@ -179,17 +121,6 @@ public class ClientWorldRender implements WorldRender {
     entityRenderer.render();
     batch.end();
     var debug = Settings.renderBox2dDebug && Settings.debug;
-    if (Settings.renderLight) {
-      rayHandler.prepareRender();
-      synchronized (BOX2D_LOCK) {
-        synchronized (LIGHT_LOCK) {
-          rayHandler.renderLightMap();
-        }
-        if (debug) {
-          box2DDebugRenderer.render(world.getWorldBody().getBox2dWorld(), m4);
-        }
-      }
-    }
     if (debug) {
       chunkDebugRenderer.render();
     }
@@ -202,10 +133,6 @@ public class ClientWorldRender implements WorldRender {
 
     final float width = camera.viewportWidth * camera.zoom;
     final float height = camera.viewportHeight * camera.zoom;
-
-    if (Settings.renderLight) {
-      rayHandler.setCombinedMatrix(m4, 0, 0, width, height);
-    }
 
     if (!getWorld().getWorldTicker().isPaused()) {
 
@@ -246,35 +173,8 @@ public class ClientWorldRender implements WorldRender {
 
       if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
         lastZoom = camera.zoom;
-        resetSkylight();
       }
     }
-  }
-
-  public void reload() {
-    world.postBox2dRunnable(
-        () -> {
-          synchronized (LIGHT_LOCK) {
-            rayHandler.removeAll();
-            PointLightPool.clearAllPools();
-            sun = null; // do not dispose skylight, it has already been disposed here
-            ambientLight = null;
-
-            final int active = rayHandler.getEnabledLights().size;
-            if (active != 0) {
-              Main.logger().error("LIGHT", "There are " + active + " active lights after reload");
-            }
-            final int disabled = rayHandler.getDisabledLights().size;
-            if (disabled != 0) {
-              Main.logger()
-                  .error("LIGHT", "There are " + disabled + " disabled lights after reload");
-            }
-
-            resetSkylight();
-
-            rayHandler.update();
-          }
-        });
   }
 
   @Override
@@ -289,7 +189,6 @@ public class ClientWorldRender implements WorldRender {
   public void dispose() {
     batch.dispose();
     chunkRenderer.dispose();
-    rayHandler.dispose();
     box2DDebugRenderer.dispose();
     chunkDebugRenderer.dispose();
   }
@@ -326,19 +225,5 @@ public class ClientWorldRender implements WorldRender {
 
   public @NotNull SpriteBatch getBatch() {
     return batch;
-  }
-
-  public @NotNull PublicRayHandler getRayHandler() {
-    return rayHandler;
-  }
-
-  @Nullable
-  public DirectionalLight getSun() {
-    return sun;
-  }
-
-  @Nullable
-  public DirectionalLight getAmbientLight() {
-    return ambientLight;
   }
 }

@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world.subgrid.enitites;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction.PUSH_UP;
 
-import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -20,15 +19,11 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
-import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
-import no.elg.infiniteBootleg.world.blocks.traits.LightTraitHandler;
 import no.elg.infiniteBootleg.world.blocks.traits.Trait;
-import no.elg.infiniteBootleg.world.blocks.traits.TraitHandler;
 import no.elg.infiniteBootleg.world.blocks.traits.TraitHandlerCollection;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
-import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,30 +124,6 @@ public class FallingBlockEntity extends Entity {
       return;
     }
     super.tick();
-    LightTraitHandler lightTraitHandler = getLightTraitHandler();
-    if (lightTraitHandler != null) {
-      lightTraitHandler.tryCreateLight(
-          light -> {
-            light.setStaticLight(false);
-            light.attachToBody(getBody());
-            return null;
-          });
-    }
-
-    if (material.blocksLight()) {
-      WorldLightTicker.updateDirectionalLights();
-    }
-  }
-
-  @Nullable
-  private LightTraitHandler getLightTraitHandler() {
-    if (traitHandlers != null) {
-      TraitHandler<LightTrait> genericHandler = traitHandlers.get(LightTrait.class);
-      if (genericHandler instanceof LightTraitHandler lightTraitHandler) {
-        return lightTraitHandler;
-      }
-    }
-    return null;
   }
 
   @Override
@@ -211,15 +182,5 @@ public class FallingBlockEntity extends Entity {
 
     builder.setMaterial(materialBuilder.build());
     return builder;
-  }
-
-  @Nullable
-  public PointLight getLight() {
-
-    LightTraitHandler lightTraitHandler = getLightTraitHandler();
-    if (lightTraitHandler != null) {
-      return lightTraitHandler.getLight();
-    }
-    return null;
   }
 }

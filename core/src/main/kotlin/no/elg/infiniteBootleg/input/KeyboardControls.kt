@@ -125,7 +125,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     }
   }
 
-  private fun updateTorchDirection(player: Player) {
+  private fun updateLookDirection(player: Player) {
     val angle: Float = tmpVec.set(ClientMain.inst().mouse).sub(player.position).angleDeg()
     player.lookDeg = angle
   }
@@ -159,9 +159,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       if (Gdx.input.isKeyJustPressed(Keys.P)) {
         player.toggleTorch()
       }
-      if (player.torchLight?.isActive == true) {
-        updateTorchDirection(player)
-      }
+      updateLookDirection(player)
     }
 
     if (update) {

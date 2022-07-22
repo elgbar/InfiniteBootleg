@@ -106,7 +106,6 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
         chunk.world.worldBody.destroyBody(tmpBody)
       } else {
         box2dBody = tmpBody
-        chunk.world.updateLights()
       }
     }
   }

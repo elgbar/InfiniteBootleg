@@ -46,7 +46,6 @@ import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
-import no.elg.infiniteBootleg.world.blocks.traits.LightTrait;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
@@ -59,7 +58,6 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
-import no.elg.infiniteBootleg.world.ticker.WorldLightTicker;
 import no.elg.infiniteBootleg.world.ticker.WorldTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
@@ -683,32 +681,6 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
-  /** Update all light sources currently loaded */
-  public void updateLights() {
-    synchronized (this) {
-      if (willUpdateLights) return;
-      willUpdateLights = true;
-    }
-    Main.inst()
-        .getScheduler()
-        .executeSync(
-            () -> {
-              WorldLightTicker.updateDirectionalLights();
-              for (Chunk chunk : getLoadedChunks()) {
-
-                Array<TickingBlock> tickingBlocks = chunk.getTickingBlocks();
-                synchronized (tickingBlocks) {
-                  for (TickingBlock block : tickingBlocks) {
-                    if (block instanceof LightTrait lightTrait) {
-                      lightTrait.recreateLight(it -> null);
-                    }
-                  }
-                }
-              }
-              willUpdateLights = false;
-            });
-  }
-
   /**
    * @param compactWorldLoc The coordinates from world view in a compact form
    * @return The block at the given x and y
@@ -1183,12 +1155,6 @@ public abstract class World implements Disposable, Resizable {
   @NotNull
   public Ticker getBox2DTicker() {
     return worldTicker.box2DTicker.getTicker();
-  }
-
-  @Nullable
-  public Ticker getLightTicker() {
-    WorldLightTicker lightTicker = worldTicker.lightTicker;
-    return lightTicker != null ? lightTicker.getTicker() : null;
   }
 
   /**

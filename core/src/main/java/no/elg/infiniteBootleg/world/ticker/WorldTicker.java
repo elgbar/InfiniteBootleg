@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class WorldTicker extends Ticker implements Disposable {
 
-  @Nullable public final WorldLightTicker lightTicker;
   @Nullable public final ServerRendererTicker serverRendererTicker;
   @NotNull public final WorldBox2DTicker box2DTicker;
 
@@ -40,13 +39,10 @@ public class WorldTicker extends Ticker implements Disposable {
         Settings.tps,
         Ticker.DEFAULT_NAG_DELAY);
     if (world instanceof ClientWorld clientWorld) {
-      lightTicker = new WorldLightTicker(clientWorld, tick);
       serverRendererTicker = null;
     } else if (world instanceof ServerWorld serverWorld) {
-      lightTicker = null;
       serverRendererTicker = new ServerRendererTicker(serverWorld, tick);
     } else {
-      lightTicker = null;
       serverRendererTicker = null;
     }
     box2DTicker = new WorldBox2DTicker(world, tick);
@@ -179,22 +175,12 @@ public class WorldTicker extends Ticker implements Disposable {
         Thread.onSpinWait();
       }
     }
-
-    if (lightTicker != null) {
-      lightTicker.getTicker().start();
-      while (lightTicker.getTicker().getTickId() <= 0) {
-        Thread.onSpinWait();
-      }
-    }
   }
 
   /** Stop this ticker, the tickers thread will not be called anymore */
   @Override
   public void stop() {
     super.stop();
-    if (lightTicker != null) {
-      lightTicker.getTicker().stop();
-    }
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().stop();
     }
@@ -210,9 +196,6 @@ public class WorldTicker extends Ticker implements Disposable {
   @Override
   public void pause() {
     super.pause();
-    if (lightTicker != null) {
-      lightTicker.getTicker().pause();
-    }
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().pause();
     }
@@ -228,9 +211,6 @@ public class WorldTicker extends Ticker implements Disposable {
   @Override
   public void resume() {
     super.resume();
-    if (lightTicker != null) {
-      lightTicker.getTicker().resume();
-    }
     if (serverRendererTicker != null) {
       serverRendererTicker.getTicker().resume();
     }

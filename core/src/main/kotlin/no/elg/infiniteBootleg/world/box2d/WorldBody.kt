@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS_DIVIDER
 import kotlin.math.abs
@@ -212,17 +211,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         entity.updatePos()
       }
 
-      val render = world.render
-      if (render is ClientWorldRender) {
-        if (Settings.renderLight) {
-          val rayHandler = render.rayHandler
-          for (light in rayHandler.enabledLights) {
-            light.position = light.position.add(deltaOffsetX, deltaOffsetY)
-          }
-          rayHandler.update()
-        }
-      }
-      render.update()
+      world.render.update()
     }
   }
 
