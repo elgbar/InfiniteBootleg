@@ -236,7 +236,7 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
     if (distance in 0.0..maxDistance) {
       val iterations = ceil(distance).toInt()
 
-      val logging = Settings.debug && Gdx.graphics.frameId % 100 == 0L && distance > 1
+      val logging = Settings.debug && Gdx.graphics.frameId % 100 == 0L && distance > Int.MAX_VALUE
       if (logging) {
         Main.logger().log("---START SMOOTH PLACEMENT---")
         Main.logger().log("(pos) prev: $prevPos, curr $currPos")

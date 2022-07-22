@@ -59,7 +59,7 @@ public class ClientWorldRender implements WorldRender {
     batch.setProjectionMatrix(camera.combined);
 
     chunkDebugRenderer = new DebugChunkRenderer(this);
-    box2DDebugRenderer = new Box2DDebugRenderer(true, false, false, false, true, true);
+    box2DDebugRenderer = new Box2DDebugRenderer(false, false, true, true, true, true);
   }
 
   @Override

@@ -84,9 +84,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     val oldTop: Int
 
     // sanity check
-    require(getWorldBlock(localX, worldY).isNotAir()) {
-      "New top block is air!"
-    }
+    require(getWorldBlock(localX, worldY).isNotAir()) { "New top block is air!" }
 
     synchronized(syncLocks[localX]) {
       oldTop = topBlockHeight(localX)
