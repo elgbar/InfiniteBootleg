@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Ticking
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
-import no.elg.infiniteBootleg.world.Block.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -240,7 +239,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     const val X_WORLD_GRAVITY = 0f
     const val Y_WORLD_GRAVITY = -20f
 
-    const val WORLD_MOVE_OFFSET_THRESHOLD = CHUNK_SIZE * 8f
+    const val WORLD_MOVE_OFFSET_THRESHOLD: Float = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE.toFloat()
 
     /**
      * Given the distance from the current physics origin, calculate how much the physics world offset should be shifted.
