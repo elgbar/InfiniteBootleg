@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.util
 
 import com.fasterxml.uuid.Generators
+import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Material
 import java.util.UUID
 
 fun fromUUIDOrNull(string: String?): UUID? {
@@ -55,3 +57,6 @@ fun Int.stringSize(): Int {
   }
   return 10 + d
 }
+
+fun Block?.isAir(): Boolean = this == null || this.material == Material.AIR
+fun Block?.isNotAir(): Boolean = this != null && this.material != Material.AIR

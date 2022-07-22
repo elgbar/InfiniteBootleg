@@ -201,14 +201,15 @@ public class ChunkImpl implements Chunk {
         chunkBody.addBlock(block, null);
       }
     }
+    int worldX = getWorldX(localX);
+    int worldY = getWorldY(localY);
+
     if (sendUpdatePacket && isValid()) {
       if (Main.isServer()) {
         Main.inst()
             .getScheduler()
             .executeAsync(
                 () -> {
-                  final int worldX = getWorldX(localX);
-                  final int worldY = getWorldY(localY);
                   var packet = PacketExtraKt.clientBoundBlockUpdate(worldX, worldY, block);
                   PacketExtraKt.broadcastToInView(packet, worldX, worldY, null);
                 });
@@ -220,17 +221,16 @@ public class ChunkImpl implements Chunk {
                   var client = ClientMain.inst().getServerClient();
                   if (client != null) {
                     var packet =
-                        PacketExtraKt.serverBoundBlockUpdate(
-                            client, getWorldX(localX), getWorldY(localY), block);
+                        PacketExtraKt.serverBoundBlockUpdate(client, worldX, worldY, block);
                     client.ctx.writeAndFlush(packet);
                   }
                 });
       }
     }
     if (updateTexture) {
-      // TODO maybe this can be done async? (it was before)
-      world.updateBlocksAround(getWorldX(localX), getWorldY(localY));
+      world.updateBlocksAround(worldX, worldY);
     }
+    world.getChunkColumn(chunkX).updateTopBlock(localX, worldY);
     return block;
   }
 

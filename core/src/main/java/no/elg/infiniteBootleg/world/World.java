@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.LongArray;
 import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -155,6 +156,8 @@ public abstract class World implements Disposable, Resizable {
 
   /** must be accessed under {@link #chunkLock} */
   @NotNull protected final LongMap<Chunk> chunks = new LongMap<>();
+
+  @NotNull protected final IntMap<ChunkColumn> chunkColumns = new IntMap<>();
 
   @Nullable private volatile FileHandle worldFile;
 
@@ -335,6 +338,17 @@ public abstract class World implements Disposable, Resizable {
     } else {
       return UNRECOGNIZED;
     }
+  }
+
+  @NotNull
+  public ChunkColumn getChunkColumn(int chunkX) {
+    var column = chunkColumns.get(chunkX);
+    if (column == null) {
+      ChunkColumn newCol = new ChunkColumnImpl(this, chunkX, null);
+      chunkColumns.put(chunkX, newCol);
+      return newCol;
+    }
+    return column;
   }
 
   @Nullable

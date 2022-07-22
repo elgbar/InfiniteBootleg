@@ -46,20 +46,21 @@ object DebugText {
 
   @JvmStatic
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
-    val pc = world.getChunkFromWorld(mouseBlockX, mouseBlockY)
-    val chunkY = CoordUtil.worldToChunk(mouseBlockY)
     val chunkX = CoordUtil.worldToChunk(mouseBlockX)
+    val chunkY = CoordUtil.worldToChunk(mouseBlockY)
+    val pc = world.getChunk(chunkX, chunkY)
+    val topblock = world.getChunkColumn(chunkX).topBlockHeight(CoordUtil.chunkOffset(mouseBlockX))
     if (pc == null) {
-      val format = "chunk (% 4d,% 4d) : not loaded"
-      sb.append(String.format(format, chunkX, chunkY))
+      val format = "chunk (% 4d,% 4d) [top block %2d]: <not loaded>"
+      sb.append(String.format(format, chunkX, chunkY, topblock))
     } else {
       val generator = world.chunkLoader.generator
       val biome = generator.getBiome(mouseBlockX)
       val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0f
       val allAir = pc.isAllAir
       val allowUnloading = pc.isAllowingUnloading
-      val format = "chunk (% 4d,% 4d) : type: %-9.9s (noise % .2f) just air? %-5b can unload? %-5b"
-      sb.append(String.format(format, chunkX, chunkY, biome, biomeHeight, allAir, allowUnloading))
+      val format = "chunk (% 4d,% 4d) [top block %2d]: type: %-9.9s (noise % .2f) just air? %-5b can unload? %-5b"
+      sb.append(String.format(format, chunkX, chunkY, topblock, biome, biomeHeight, allAir, allowUnloading))
     }
   }
 
