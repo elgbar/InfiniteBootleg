@@ -64,12 +64,12 @@ public enum Biome {
         Biome biome = pcg.getBiome(worldX + dx);
         // NOTE it is not a bug that the worldX does not have dx added to it
         // well it was, but it looks better (ie more random) when the dx is not here
-        y += biome.rawHeightAt(pcg.getNoise(), worldX);
+        y += biome.rawHeightAt(pcg.getNoise(), worldX + dx);
       } else {
         y += rawHeightAt(pcg.getNoise(), worldX);
       }
     }
-    return Math.abs(y / (INTERPOLATION_RADIUS * 2 + 1));
+    return y / (INTERPOLATION_RADIUS * 2 + 1);
   }
 
   public double rawHeightAt(@NotNull PerlinNoise noise, int worldX) {
