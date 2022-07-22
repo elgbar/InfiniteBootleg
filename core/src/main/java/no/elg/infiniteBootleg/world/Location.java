@@ -44,6 +44,10 @@ public class Location {
     return (long) (x2 - x1) * (x2 - x1) + (long) (y2 - y1) * (y2 - y1);
   }
 
+  public static double distCubed(double x1, double y1, double x2, double y2) {
+    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+  }
+
   public Vector2 toVector2() {
     return new Vector2(x, y);
   }

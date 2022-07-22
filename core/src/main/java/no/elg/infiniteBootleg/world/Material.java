@@ -26,16 +26,16 @@ import org.jetbrains.annotations.Nullable;
  * @author Elg
  */
 public enum Material {
-  AIR(null, ItemType.AIR, 0f, false, false, false),
+  AIR(null, ItemType.AIR, 0f, false, false, false, false),
   STONE(1.5f),
   BRICK(2f),
   DIRT(1f),
   GRASS(0.8f),
-  TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true),
+  TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true, true),
   SAND(FallingBlock.class, 1f),
-  TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true),
-  GLASS(null, ItemType.BLOCK, 0.1f, true, false, true),
-  DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true),
+  TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true, true),
+  GLASS(null, ItemType.BLOCK, 0.1f, true, false, true, false),
+  DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true, false),
   ;
   @Nullable private final Constructor<?> constructor;
   @Nullable private final Constructor<?> constructorProtoBuf;
@@ -45,6 +45,7 @@ public enum Material {
   private final float hardness;
   @Nullable private final TextureRegion texture;
   @NotNull private final ItemType itemType;
+  private final boolean luminescent;
 
   private static final Material[] VALUES = values();
 
@@ -53,7 +54,7 @@ public enum Material {
   }
 
   Material(@Nullable Class<?> impl, float hardness) {
-    this(impl, ItemType.BLOCK, hardness, true, true, true);
+    this(impl, ItemType.BLOCK, hardness, true, true, true, false);
   }
 
   /**
@@ -70,8 +71,10 @@ public enum Material {
       float hardness,
       boolean solid,
       boolean blocksLight,
-      boolean placable) {
+      boolean placable,
+      boolean luminescent) {
     this.itemType = itemType;
+    this.luminescent = luminescent;
     if (impl != null) {
       if (itemType == ItemType.BLOCK) {
         Preconditions.checkArgument(
@@ -256,6 +259,13 @@ public enum Material {
 
   public float getHardness() {
     return hardness;
+  }
+
+  /**
+   * @return If this material emits light
+   */
+  public boolean isLuminescent() {
+    return luminescent;
   }
 
   public boolean isSuperclassOf(Class<?> interfaze) {

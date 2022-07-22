@@ -1042,7 +1042,7 @@ public abstract class World implements Disposable, Resizable {
 
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
-      float worldX, float worldY, float offsetX, float offsetY) {
+      float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
     int x = MathUtils.floor(worldX - offsetX);
@@ -1050,7 +1050,7 @@ public abstract class World implements Disposable, Resizable {
     float maxY = worldY + offsetY;
     for (; x <= maxX; x++) {
       for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
-        Block b = getRawBlock(x, y);
+        Block b = raw ? getRawBlock(x, y) : getBlock(x, y);
         if (b == null) {
           continue;
         }

@@ -7,18 +7,22 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_RENDER_THRESHOLD;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.LongMap;
 import java.util.LinkedList;
 import java.util.List;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +39,9 @@ public class ChunkRenderer implements Renderer, Disposable {
   // current rendering chunk
   private Chunk curr;
   private static final Object QUEUE_LOCK = new Object();
+
+  public static final int LIGHT_PER_BLOCK = 2;
+  public static final double LIGHT_SOURCE_LOOK_BLOCKS = 4.0;
 
   public ChunkRenderer(@NotNull WorldRender worldRender) {
     this.worldRender = worldRender;
@@ -103,13 +110,14 @@ public class ChunkRenderer implements Renderer, Disposable {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
+      int topBlockHeight = chunkColumn.topBlockHeight(x);
       for (int y = 0; y < CHUNK_SIZE; y++) {
         Block block = blocks[x][y];
 
         if (block != null && block.getMaterial().isEntity()) {
           continue;
         } else if ((block == null || block.getMaterial() == AIR)) {
-          if (chunkColumn.topBlockHeight(x) > CoordUtil.chunkToWorld(chunk.getChunkY(), y)) {
+          if (topBlockHeight > CoordUtil.chunkToWorld(chunk.getChunkY(), y)) {
             block = chunk.setBlock(x, y, AIR, false);
           } else {
             continue;
@@ -127,26 +135,105 @@ public class ChunkRenderer implements Renderer, Disposable {
         int dx = block.getLocalX() * BLOCK_SIZE;
         int dy = block.getLocalY() * BLOCK_SIZE;
 
-        assert texture != null;
-        int splits = 4;
-        int tileWidth = texture.getRegionWidth() / splits;
-        int tileHeight = texture.getRegionHeight() / splits;
+        // find light sources around this block
 
-        TextureRegion[][] split = texture.split(tileWidth, tileHeight);
-        for (int rx = 0, splitLength = split.length; rx < splitLength; rx++) {
+        //        //Distance to neasest light source
+        //        int above = 0, below = 0, left = 0, right = 0;
 
-          TextureRegion[] regions = split[rx];
-          for (int ry = 0, regionsLength = regions.length; ry < regionsLength; ry++) {
-            TextureRegion region = regions[ry];
-            float color = ((rx / (float) splits) + (ry / (float) splits)) / 2f;
-            batch.setColor(color, color, color, a);
-            batch.draw(
-                region,
-                dx + rx * tileWidth,
-                dy + ry * tileHeight,
-                BLOCK_SIZE / (float) splits,
-                BLOCK_SIZE / (float) splits);
+        // outermap: compact loc to sub light cell
+        // inner array: distance to all sources in blocks^2
+        LongMap<Double> lightMap = new LongMap<>(LIGHT_PER_BLOCK * LIGHT_PER_BLOCK);
+        int lightSources = 0;
+
+        // skylight
+        int worldX = block.getWorldX();
+        int worldY = block.getWorldY();
+
+        Array<@NotNull Block> blocksAABB =
+            chunk
+                .getWorld()
+                .getBlocksAABB(
+                    worldX + 0.5f,
+                    worldY + 0.5f,
+                    (float) LIGHT_SOURCE_LOOK_BLOCKS,
+                    (float) LIGHT_SOURCE_LOOK_BLOCKS,
+                    false);
+        for (Block neighbor : blocksAABB) {
+          //          if (neighbor.getMaterial() == AIR || ) {
+          //            System.out.println("test " + (neighbor.getWorldY() > topBlockHeight &&
+          // neighbor.getMaterial() == AIR) + " first " + (neighbor.getWorldY() > topBlockHeight));
+          //          }
+          if (neighbor.getMaterial().isLuminescent()
+              || (neighbor.getWorldY() >= topBlockHeight && neighbor.getMaterial() == AIR)) {
+            lightSources++;
+            for (int lx = 0; lx < LIGHT_PER_BLOCK; lx++) {
+              for (int ly = 0; ly < LIGHT_PER_BLOCK; ly++) {
+                // Calculate distance for each light cell
+                var dist =
+                    (Location.distCubed(
+                            worldX + ((float) lx / LIGHT_PER_BLOCK),
+                            worldY + ((float) ly / LIGHT_PER_BLOCK),
+                            neighbor.getWorldX() + 0.5,
+                            neighbor.getWorldY() + 0.5))
+                        / (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS);
+                //                System.out.println("dist " + dist);
+                long key = CoordUtil.compactLoc(lx, ly);
+                var old = lightMap.get(key, Double.MAX_VALUE);
+                if (old > dist) {
+                  lightMap.put(key, dist);
+                }
+              }
+            }
           }
+        }
+
+        assert texture != null;
+
+        if (lightSources > 0) {
+
+          int tileWidth = texture.getRegionWidth() / LIGHT_PER_BLOCK;
+          int tileHeight = texture.getRegionHeight() / LIGHT_PER_BLOCK;
+          TextureRegion[][] split = texture.split(tileWidth, tileHeight);
+
+          for (int ry = 0, splitLength = split.length; ry < splitLength; ry++) {
+            TextureRegion[] regions = split[LIGHT_PER_BLOCK - ry - 1];
+            for (int rx = 0, regionsLength = regions.length; rx < regionsLength; rx++) {
+              TextureRegion region = regions[rx];
+
+              double rawIntensity = lightMap.get(CoordUtil.compactLoc(rx, ry), 0.0);
+              float normalizedIntensity;
+              if (rawIntensity == 0.0) {
+                normalizedIntensity = 0f;
+              } else if (rawIntensity > 0) {
+                normalizedIntensity = 1 - (float) (rawIntensity);
+              } else {
+                normalizedIntensity = 1 + (float) (rawIntensity);
+              }
+
+              if (rawIntensity != 0.0 && lightSources > 1)
+                System.out.println(
+                    "rawIntensity "
+                        + rawIntensity
+                        + ", normalizedIntensity "
+                        + normalizedIntensity
+                        + " lightSources "
+                        + lightSources);
+
+              //            float color = ((ry / (float) LIGHT_PER_BLOCK) + (rx / (float)
+              // LIGHT_PER_BLOCK) + 0.25f) / 2.25f;
+
+              batch.setColor(normalizedIntensity, normalizedIntensity, normalizedIntensity, 1);
+              batch.draw(
+                  region,
+                  dx + rx * tileWidth,
+                  dy + ry * tileHeight,
+                  BLOCK_SIZE / (float) LIGHT_PER_BLOCK,
+                  BLOCK_SIZE / (float) LIGHT_PER_BLOCK);
+            }
+          }
+        } else {
+          batch.setColor(Color.BLACK);
+          batch.draw(texture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
         }
       }
     }
