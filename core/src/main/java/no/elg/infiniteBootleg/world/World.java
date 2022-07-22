@@ -165,9 +165,7 @@ public abstract class World implements Disposable, Resizable {
   public final Lock chunksReadLock = chunkLock.readLock();
   public final Lock chunksWriteLock = chunkLock.writeLock();
 
-  private volatile boolean willUpdateLights;
-
-  private boolean volatileWorld = !Settings.loadWorldFromDisk;
+  private boolean transientWorld = !Settings.loadWorldFromDisk;
 
   public World(@NotNull ProtoWorld.World protoWorld) {
     this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
@@ -194,13 +192,14 @@ public abstract class World implements Disposable, Resizable {
       if (worldFolder != null
           && worldFolder.exists()
           && worldFolder.child(LOCK_FILE_NAME).exists()) {
-        volatileWorld = true;
+        transientWorld = true;
         Main.logger()
-            .warn("World", "World found is already in use. Initializing this as a volatile world.");
+            .warn(
+                "World", "World found is already in use. Initializing this as a transient world.");
       }
 
       FileHandle worldZip = getWorldZip();
-      if (volatileWorld || worldFolder == null || worldZip == null || !worldZip.exists()) {
+      if (transientWorld || worldFolder == null || worldZip == null || !worldZip.exists()) {
         Main.logger().log("No world save found");
       } else {
         Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
@@ -255,7 +254,7 @@ public abstract class World implements Disposable, Resizable {
   }
 
   public void save() {
-    if (volatileWorld) {
+    if (transientWorld) {
       return;
     }
     FileHandle worldFolder = getWorldFolder();
@@ -312,7 +311,7 @@ public abstract class World implements Disposable, Resizable {
    */
   @Nullable
   public FileHandle getWorldFolder() {
-    if (volatileWorld) {
+    if (transientWorld) {
       return null;
     }
     if (worldFile == null) {
@@ -1243,7 +1242,7 @@ public abstract class World implements Disposable, Resizable {
       chunksWriteLock.unlock();
     }
 
-    if (!volatileWorld) {
+    if (!transientWorld) {
       FileHandle worldFolder = getWorldFolder();
       if (worldFolder != null) {
         if (!worldFolder.deleteDirectory()) {
