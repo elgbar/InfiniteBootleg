@@ -222,9 +222,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
           }
           rayHandler.update()
         }
-
-        // test logic only, move to world render when possible
-        render.camera.translate(deltaOffsetX * BLOCK_SIZE, deltaOffsetY * BLOCK_SIZE, 0f)
       }
       render.update()
     }
