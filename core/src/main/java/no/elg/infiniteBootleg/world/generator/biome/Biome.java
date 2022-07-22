@@ -98,7 +98,7 @@ public enum Biome {
   }
 
   public Material materialAt(@NotNull PerlinNoise noise, int height, int worldX, int worldY) {
-    int delta = height - worldY - 1;
+    int delta = height - worldY;
     if (delta == 0) {
       return topmostBlock;
     }

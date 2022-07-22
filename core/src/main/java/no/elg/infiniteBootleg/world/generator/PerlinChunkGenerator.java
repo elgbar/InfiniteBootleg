@@ -86,7 +86,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
       int genChunkY = CoordUtil.worldToChunk(genHeight);
 
       if (chunkY == genChunkY) {
-        biome.fillUpTo(noise, chunk, localX, genHeight - genChunkY * CHUNK_SIZE, genHeight);
+        biome.fillUpTo(noise, chunk, localX, CoordUtil.chunkOffset(genHeight) + 1, genHeight);
       } else if (chunkY < genChunkY) {
         biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, genHeight);
       }
