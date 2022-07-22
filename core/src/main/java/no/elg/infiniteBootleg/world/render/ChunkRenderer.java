@@ -1,5 +1,9 @@
 package no.elg.infiniteBootleg.world.render;
 
+import static no.elg.infiniteBootleg.ClientMain.CLEAR_COLOR_A;
+import static no.elg.infiniteBootleg.ClientMain.CLEAR_COLOR_B;
+import static no.elg.infiniteBootleg.ClientMain.CLEAR_COLOR_G;
+import static no.elg.infiniteBootleg.ClientMain.CLEAR_COLOR_R;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
@@ -9,6 +13,8 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_REN
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -23,7 +29,6 @@ import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
-import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +47,23 @@ public class ChunkRenderer implements Renderer, Disposable {
 
   public static final int LIGHT_PER_BLOCK = 2;
   public static final double LIGHT_SOURCE_LOOK_BLOCKS = 4.0;
+
+  private static final TextureRegion CAVE_TEXTURE;
+  private static final TextureRegion SKY_TEXTURE;
+
+  static {
+    var pixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
+    Color base = Color.BROWN;
+    float modifier = 0.75f;
+    pixmap.setColor(base.r * modifier, base.g * modifier, base.b * modifier, 1);
+    pixmap.fill();
+    CAVE_TEXTURE = new TextureRegion(new Texture(pixmap));
+
+    SKY_TEXTURE = new TextureRegion(new Texture(pixmap));
+    pixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
+    pixmap.fill();
+    pixmap.dispose();
+  }
 
   public ChunkRenderer(@NotNull WorldRender worldRender) {
     this.worldRender = worldRender;
@@ -114,34 +136,27 @@ public class ChunkRenderer implements Renderer, Disposable {
       for (int y = 0; y < CHUNK_SIZE; y++) {
         Block block = blocks[x][y];
 
+        boolean aboveTop = topBlockHeight > CoordUtil.chunkToWorld(chunk.getChunkY(), y);
         if (block != null && block.getMaterial().isEntity()) {
           continue;
         } else if ((block == null || block.getMaterial() == AIR)) {
-          if (topBlockHeight > CoordUtil.chunkToWorld(chunk.getChunkY(), y)) {
+          if (aboveTop) {
             block = chunk.setBlock(x, y, AIR, false);
           } else {
             continue;
           }
         }
         TextureRegion texture;
-        float a;
         if (block.getMaterial() == AIR) {
-          texture = TntBlock.Companion.getWhiteTexture();
-          a = 0.5f;
+          texture = aboveTop ? SKY_TEXTURE : CAVE_TEXTURE;
         } else {
           texture = block.getTexture();
-          a = 1f;
         }
         int dx = block.getLocalX() * BLOCK_SIZE;
         int dy = block.getLocalY() * BLOCK_SIZE;
 
         // find light sources around this block
 
-        //        //Distance to neasest light source
-        //        int above = 0, below = 0, left = 0, right = 0;
-
-        // outermap: compact loc to sub light cell
-        // inner array: distance to all sources in blocks^2
         LongMap<Double> lightMap = new LongMap<>(LIGHT_PER_BLOCK * LIGHT_PER_BLOCK);
         int lightSources = 0;
 
@@ -159,10 +174,6 @@ public class ChunkRenderer implements Renderer, Disposable {
                     (float) LIGHT_SOURCE_LOOK_BLOCKS,
                     false);
         for (Block neighbor : blocksAABB) {
-          //          if (neighbor.getMaterial() == AIR || ) {
-          //            System.out.println("test " + (neighbor.getWorldY() > topBlockHeight &&
-          // neighbor.getMaterial() == AIR) + " first " + (neighbor.getWorldY() > topBlockHeight));
-          //          }
           if (neighbor.getMaterial().isLuminescent()
               || (neighbor.getWorldY() >= topBlockHeight && neighbor.getMaterial() == AIR)) {
             lightSources++;
@@ -176,7 +187,6 @@ public class ChunkRenderer implements Renderer, Disposable {
                             neighbor.getWorldX() + 0.5,
                             neighbor.getWorldY() + 0.5))
                         / (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS);
-                //                System.out.println("dist " + dist);
                 long key = CoordUtil.compactLoc(lx, ly);
                 var old = lightMap.get(key, Double.MAX_VALUE);
                 if (old > dist) {
@@ -209,18 +219,6 @@ public class ChunkRenderer implements Renderer, Disposable {
               } else {
                 normalizedIntensity = 1 + (float) (rawIntensity);
               }
-
-              if (rawIntensity != 0.0 && lightSources > 1)
-                System.out.println(
-                    "rawIntensity "
-                        + rawIntensity
-                        + ", normalizedIntensity "
-                        + normalizedIntensity
-                        + " lightSources "
-                        + lightSources);
-
-              //            float color = ((ry / (float) LIGHT_PER_BLOCK) + (rx / (float)
-              // LIGHT_PER_BLOCK) + 0.25f) / 2.25f;
 
               batch.setColor(normalizedIntensity, normalizedIntensity, normalizedIntensity, 1);
               batch.draw(

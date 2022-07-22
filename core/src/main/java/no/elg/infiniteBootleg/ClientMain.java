@@ -33,6 +33,11 @@ public class ClientMain extends CommonMain {
   /** Only use this when a server is present */
   public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
 
+  public static final float CLEAR_COLOR_R = 0.2f;
+  public static final float CLEAR_COLOR_G = 0.3f;
+  public static final float CLEAR_COLOR_B = 1f;
+  public static final float CLEAR_COLOR_A = 1f;
+
   private static ClientMain inst;
   @NotNull private final InputMultiplexer inputMultiplexer;
   private final Vector2 mouseWorldInput = new Vector2();
@@ -144,7 +149,7 @@ public class ClientMain extends CommonMain {
     if (Main.isServer()) {
       return;
     }
-    Gdx.gl.glClearColor(0.2f, 0.3f, 1, 1);
+    Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
     if (screen instanceof WorldScreen worldScreen) {
