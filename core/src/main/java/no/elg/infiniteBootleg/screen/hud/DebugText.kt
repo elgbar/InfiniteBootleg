@@ -49,18 +49,20 @@ object DebugText {
     val chunkX = CoordUtil.worldToChunk(mouseBlockX)
     val chunkY = CoordUtil.worldToChunk(mouseBlockY)
     val pc = world.getChunk(chunkX, chunkY)
-    val topblock = world.getChunkColumn(chunkX).topBlockHeight(CoordUtil.chunkOffset(mouseBlockX))
+    val cc = world.getChunkColumn(chunkX)
+    val topBlock = cc.topBlockHeight(CoordUtil.chunkOffset(mouseBlockX))
     if (pc == null) {
       val format = "chunk (% 4d,% 4d) [top block %2d]: <not loaded>"
-      sb.append(String.format(format, chunkX, chunkY, topblock))
+      sb.append(String.format(format, chunkX, chunkY, topBlock))
     } else {
       val generator = world.chunkLoader.generator
       val biome = generator.getBiome(mouseBlockX)
       val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0f
       val allAir = pc.isAllAir
       val allowUnloading = pc.isAllowingUnloading
-      val format = "chunk (% 4d,% 4d) [top block %2d]: type: %-9.9s (noise % .2f) just air? %-5b can unload? %-5b"
-      sb.append(String.format(format, chunkX, chunkY, topblock, biome, biomeHeight, allAir, allowUnloading))
+      val isBelowTopChunk = cc.isChunkBelowTopBlock(chunkY)
+      val format = "chunk (% 4d,% 4d) [top block %2d]: type: %-9.9s (noise % .2f) just air? %-5b can unload? %-5b below top chunk? %-5b"
+      sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, isBelowTopChunk))
     }
   }
 

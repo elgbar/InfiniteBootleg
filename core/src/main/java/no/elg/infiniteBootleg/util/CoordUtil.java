@@ -102,7 +102,8 @@ public class CoordUtil {
    * Convert a chunk coordinate to world coordinate with an offset within the chunk
    *
    * @param chunkCoord The chunk coordinate to convert
-   * @param offset The offset within the chunk (no bounds checking)
+   * @param offset The offset within the chunk (no bounds checking), but it should be in the range
+   *     {@code 0 <= offset < }{@link Chunk#CHUNK_SIZE}
    * @return The chunk coordinate in world view plus the offset
    */
   @Contract(pure = true)

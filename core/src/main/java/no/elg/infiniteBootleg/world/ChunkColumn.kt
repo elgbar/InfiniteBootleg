@@ -16,4 +16,5 @@ interface ChunkColumn {
   fun topBlockHeight(localX: Int): Int
   fun topBlock(localX: Int): Block?
   fun updateTopBlock(localX: Int, worldYHint: Int)
+  fun isChunkBelowTopBlock(chunkY: Int): Boolean
 }

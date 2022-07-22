@@ -4,6 +4,8 @@ import com.fasterxml.uuid.Generators
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import java.util.UUID
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 fun fromUUIDOrNull(string: String?): UUID? {
   return try {
@@ -59,4 +61,9 @@ fun Int.stringSize(): Int {
 }
 
 fun Block?.isAir(): Boolean = this == null || this.material == Material.AIR
-fun Block?.isNotAir(): Boolean = this != null && this.material != Material.AIR
+
+@ExperimentalContracts
+fun Block?.isNotAir(): Boolean {
+  contract { returns(true) implies (this@isNotAir != null) }
+  return this != null && this.material != Material.AIR
+}

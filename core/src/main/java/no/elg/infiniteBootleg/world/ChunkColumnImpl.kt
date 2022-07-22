@@ -4,7 +4,11 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
+import kotlin.contracts.ExperimentalContracts
+import kotlin.math.max
+import kotlin.math.min
 
+@ExperimentalContracts
 class ChunkColumnImpl(override val world: World, override val chunkX: Int, initialTop: IntArray? = null) : ChunkColumn {
 
   private val top = IntArray(CHUNK_SIZE)
@@ -37,6 +41,20 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     return getWorldBlock(localX, topBlockHeight(localX))
   }
 
+  /**
+   * @return Whether the chunk found at chunkY is STRICTLY below any of the chunks the topmost block are located in
+   */
+  override fun isChunkBelowTopBlock(chunkY: Int): Boolean {
+    val maxWorldY = CoordUtil.chunkToWorld(chunkY, CHUNK_SIZE - 1)
+    for (localX in 0 until CHUNK_SIZE) {
+      val topY = topBlockHeight(localX)
+      if (topY > maxWorldY) {
+        return true
+      }
+    }
+    return false
+  }
+
   private fun getWorldX(localX: Int): Int {
     return CoordUtil.chunkToWorld(chunkX, localX)
   }
@@ -58,20 +76,33 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   }
 
   private fun getChunk(worldY: Int): Chunk? {
-    val chunkX = CoordUtil.worldToChunk(chunkX)
     val chunkY = CoordUtil.worldToChunk(worldY)
     return world.getChunk(chunkX, chunkY)
   }
 
   private fun setTopBlock(localX: Int, worldY: Int) {
+    val oldTop: Int
+
+    // sanity check
+    require(getWorldBlock(localX, worldY).isNotAir()) {
+      "New top block is air!"
+    }
+
     synchronized(syncLocks[localX]) {
+      oldTop = topBlockHeight(localX)
       top[localX] = worldY
+    }
+
+    val min = min(oldTop, worldY)
+    val max = max(oldTop, worldY)
+    val fromClosedRange = IntProgression.fromClosedRange(min, max, CHUNK_SIZE)
+    for (ycoord in fromClosedRange) {
+      getLoadedChunk(ycoord)?.updateTexture(false)
     }
   }
 
   override fun updateTopBlock(localX: Int, worldYHint: Int) {
     synchronized(syncLocks[localX]) {
-//      Main.logger().log("Updating localX $localX (chunk x $chunkX) with hint $worldYHint")
       val currTopBlock = topBlock(localX)
       if (currTopBlock == null) {
         // failed to get the current block
@@ -103,12 +134,13 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
         return
       }
 
+      @ExperimentalContracts
       fun testChunk(nextChunk: Chunk?): Boolean {
         if (nextChunk != null && nextChunk.isValid && !nextChunk.isAllAir) {
           for (nextLocalY in CHUNK_SIZE - 1 downTo 0) {
             val nextBlock = nextChunk.getRawBlock(localX, nextLocalY)
             if (nextBlock.isNotAir()) {
-              setTopBlock(localX, CoordUtil.chunkToWorld(nextChunk.chunkY, nextLocalY))
+              setTopBlock(localX, nextBlock.worldY)
               return true
             }
           }
@@ -120,7 +152,9 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
       for (nextChunkY in MAX_CHUNKS_TO_LOOK_UPWARDS downTo 0) {
         val nextChunk = getLoadedChunk(nextChunkY + currentTopChunkY)
-        testChunk(nextChunk)
+        if (testChunk(nextChunk)) {
+          return
+        }
       }
 
       var nextChunkY = 0

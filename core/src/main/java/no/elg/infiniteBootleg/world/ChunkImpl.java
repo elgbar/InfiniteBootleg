@@ -200,6 +200,7 @@ public class ChunkImpl implements Chunk {
       if (block != null) {
         chunkBody.addBlock(block, null);
       }
+      world.getChunkColumn(chunkX).updateTopBlock(localX, getWorldY(localY));
     }
     int worldX = getWorldX(localX);
     int worldY = getWorldY(localY);
@@ -230,7 +231,6 @@ public class ChunkImpl implements Chunk {
     if (updateTexture) {
       world.updateBlocksAround(worldX, worldY);
     }
-    world.getChunkColumn(chunkX).updateTopBlock(localX, worldY);
     return block;
   }
 

@@ -155,7 +155,7 @@ class TntBlock(
     const val RESISTANCE = 8
     const val FUSE_DURATION_SECONDS = 3f
 
-    private val whiteTexture: TextureRegion? = if (Settings.client) {
+    val whiteTexture: TextureRegion? = if (Settings.client) {
       val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
       pixmap.setColor(Color.WHITE)
       pixmap.fill()

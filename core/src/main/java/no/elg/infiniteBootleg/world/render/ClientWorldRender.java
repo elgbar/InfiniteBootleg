@@ -99,7 +99,8 @@ public class ClientWorldRender implements WorldRender {
         }
 
         //noinspection LibGDXFlushInsideLoop
-        if (chunk.isAllAir()) {
+        if (chunk.isAllAir()
+            && !world.getChunkColumn(chunk.getChunkX()).isChunkBelowTopBlock(chunk.getChunkY())) {
           continue;
         }
 

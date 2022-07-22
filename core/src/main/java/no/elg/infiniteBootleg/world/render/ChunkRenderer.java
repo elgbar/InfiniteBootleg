@@ -9,14 +9,17 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_REN
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.LinkedList;
 import java.util.List;
 import no.elg.infiniteBootleg.Renderer;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 
@@ -80,11 +83,18 @@ public class ChunkRenderer implements Renderer, Disposable {
           return;
         } // nothing to render
         chunk = renderQueue.remove(0);
-      } while (chunk.isAllAir() || !chunk.isLoaded() || worldRender.isOutOfView(chunk));
+      } while ((chunk.isAllAir()
+              && !chunk
+                  .getWorld()
+                  .getChunkColumn(chunk.getChunkX())
+                  .isChunkBelowTopBlock(chunk.getChunkY()))
+          || !chunk.isLoaded()
+          || worldRender.isOutOfView(chunk));
       curr = chunk;
     }
 
     FrameBuffer fbo = chunk.getFbo();
+    var chunkColumn = chunk.getWorld().getChunkColumn(chunk.getChunkX());
 
     // this is the main render function
     Block[][] blocks = chunk.getBlocks();
@@ -95,13 +105,49 @@ public class ChunkRenderer implements Renderer, Disposable {
     for (int x = 0; x < CHUNK_SIZE; x++) {
       for (int y = 0; y < CHUNK_SIZE; y++) {
         Block block = blocks[x][y];
-        if (block == null || block.getMaterial() == AIR || block.getMaterial().isEntity()) {
+
+        if (block != null && block.getMaterial().isEntity()) {
           continue;
+        } else if ((block == null || block.getMaterial() == AIR)) {
+          if (chunkColumn.topBlockHeight(x) > CoordUtil.chunkToWorld(chunk.getChunkY(), y)) {
+            block = chunk.setBlock(x, y, AIR, false);
+          } else {
+            continue;
+          }
+        }
+        TextureRegion texture;
+        float a;
+        if (block.getMaterial() == AIR) {
+          texture = TntBlock.Companion.getWhiteTexture();
+          a = 0.5f;
+        } else {
+          texture = block.getTexture();
+          a = 1f;
         }
         int dx = block.getLocalX() * BLOCK_SIZE;
         int dy = block.getLocalY() * BLOCK_SIZE;
 
-        batch.draw(block.getTexture(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+        assert texture != null;
+        int splits = 4;
+        int tileWidth = texture.getRegionWidth() / splits;
+        int tileHeight = texture.getRegionHeight() / splits;
+
+        TextureRegion[][] split = texture.split(tileWidth, tileHeight);
+        for (int rx = 0, splitLength = split.length; rx < splitLength; rx++) {
+
+          TextureRegion[] regions = split[rx];
+          for (int ry = 0, regionsLength = regions.length; ry < regionsLength; ry++) {
+            TextureRegion region = regions[ry];
+            float color = ((rx / (float) splits) + (ry / (float) splits)) / 2f;
+            batch.setColor(color, color, color, a);
+            batch.draw(
+                region,
+                dx + rx * tileWidth,
+                dy + ry * tileHeight,
+                BLOCK_SIZE / (float) splits,
+                BLOCK_SIZE / (float) splits);
+          }
+        }
       }
     }
 
