@@ -53,15 +53,17 @@ public class ChunkRenderer implements Renderer, Disposable {
 
   static {
     var pixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
+
+    SKY_TEXTURE = new TextureRegion(new Texture(pixmap));
+    pixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
+    pixmap.fill();
+
     Color base = Color.BROWN;
     float modifier = 0.75f;
     pixmap.setColor(base.r * modifier, base.g * modifier, base.b * modifier, 1);
     pixmap.fill();
     CAVE_TEXTURE = new TextureRegion(new Texture(pixmap));
 
-    SKY_TEXTURE = new TextureRegion(new Texture(pixmap));
-    pixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
-    pixmap.fill();
     pixmap.dispose();
   }
 
@@ -136,19 +138,14 @@ public class ChunkRenderer implements Renderer, Disposable {
       for (int y = 0; y < CHUNK_SIZE; y++) {
         Block block = blocks[x][y];
 
-        boolean aboveTop = topBlockHeight > CoordUtil.chunkToWorld(chunk.getChunkY(), y);
         if (block != null && block.getMaterial().isEntity()) {
           continue;
-        } else if ((block == null || block.getMaterial() == AIR)) {
-          if (aboveTop) {
-            block = chunk.setBlock(x, y, AIR, false);
-          } else {
-            continue;
-          }
+        } else if (block == null) {
+          block = chunk.setBlock(x, y, AIR, false);
         }
         TextureRegion texture;
         if (block.getMaterial() == AIR) {
-          texture = aboveTop ? SKY_TEXTURE : CAVE_TEXTURE;
+          texture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
         } else {
           texture = block.getTexture();
         }
@@ -174,8 +171,15 @@ public class ChunkRenderer implements Renderer, Disposable {
                     (float) LIGHT_SOURCE_LOOK_BLOCKS,
                     false);
         for (Block neighbor : blocksAABB) {
+
+          var nCC =
+              (neighbor.getChunk() == block.getChunk())
+                  ? chunkColumn
+                  : chunk.getWorld().getChunkColumn(neighbor.getChunk().getChunkX());
           if (neighbor.getMaterial().isLuminescent()
-              || (neighbor.getWorldY() >= topBlockHeight && neighbor.getMaterial() == AIR)) {
+              || (neighbor.getWorldY() >= nCC.topBlockHeight(neighbor.getLocalX())
+                  && neighbor.getMaterial() == AIR)) {
+
             lightSources++;
             for (int lx = 0; lx < LIGHT_PER_BLOCK; lx++) {
               for (int ly = 0; ly < LIGHT_PER_BLOCK; ly++) {
