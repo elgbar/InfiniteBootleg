@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fastIntFormat
 import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
@@ -27,8 +28,8 @@ object DebugText {
   }
 
   @JvmStatic
-  fun lights(sb: StringBuilder, world: ClientWorld) {
-    sb.append("Active Lights: ")
+  fun lights(sb: StringBuilder) {
+    sb.append("Active lights threads: ")
     sb.append(-1)
   }
 
@@ -40,8 +41,10 @@ object DebugText {
     val rawY = ClientMain.inst().mouseWorldY
     val exists = block != null
     val blockDebug = block?.hudDebug() ?: ""
-    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5b %s"
-    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug))
+    val isLit = block?.isLit ?: "maybe"
+    val skylight = block?.isSkylight ?: "maybe"
+    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5s lit? %-5s sky? %-5s %s"
+    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, isLit, skylight, blockDebug))
   }
 
   @JvmStatic
@@ -60,9 +63,10 @@ object DebugText {
       val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0f
       val allAir = pc.isAllAir
       val allowUnloading = pc.isAllowingUnloading
-      val isBelowTopChunk = cc.isChunkBelowTopBlock(chunkY)
-      val format = "chunk (% 4d,% 4d) [top block %2d]: type: %-9.9s (noise % .2f) just air? %-5b can unload? %-5b below top chunk? %-5b"
-      sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, isBelowTopChunk))
+      val skychunk = cc.isChunkAboveTopBlock(chunkY)
+      val upId = if (pc is ChunkImpl) pc.lightUpdaters.get() else -1
+      val format = "chunk (% 4d,% 4d) [top %2d]: type: %-9.9s (noise % .2f) all air? %-5b can unload? %-5b sky? %-5b light id % 3d"
+      sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, skychunk, upId))
     }
   }
 

@@ -119,7 +119,7 @@ public interface Chunk
   void updateTexture(boolean prioritize);
 
   /**
-   * Might cause a call to {@link #updateTextureIfDirty()} if the chunk is marked as dirty
+   * Might cause a call to {@link #updateIfDirty()} if the chunk is marked as dirty
    *
    * @return The texture of this chunk
    */
@@ -127,7 +127,7 @@ public interface Chunk
   TextureRegion getTextureRegion();
 
   /**
-   * Will not call {@link #updateTextureIfDirty()}
+   * Will not call {@link #updateIfDirty()}
    *
    * @return If this chunk has a texture generated
    */
@@ -138,7 +138,7 @@ public interface Chunk
    * dirty flag of the chunk is set and either {@link #isAllAir()} or {@link #getTextureRegion()}
    * called.
    */
-  void updateTextureIfDirty();
+  void updateIfDirty();
 
   /** Mark this chunk as viewed during the current tick */
   void view();
@@ -158,7 +158,7 @@ public interface Chunk
   Array<TickingBlock> getTickingBlocks();
 
   /**
-   * Might cause a call to {@link #updateTextureIfDirty()} if the chunk is marked as dirty
+   * Might cause a call to {@link #updateIfDirty()} if the chunk is marked as dirty
    *
    * @return If all blocks in this chunk is air
    */
@@ -197,6 +197,9 @@ public interface Chunk
 
   @NotNull
   World getWorld();
+
+  @NotNull
+  ChunkColumn getChunkColumn();
 
   int getChunkX();
 

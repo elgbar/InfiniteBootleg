@@ -93,14 +93,8 @@ public class ClientWorldRender implements WorldRender {
           continue;
         }
 
-        if (chunk.isDirty()) {
-          //noinspection LibGDXFlushInsideLoop
-          chunk.updateTextureIfDirty();
-        }
-
         //noinspection LibGDXFlushInsideLoop
-        if (chunk.isAllAir()
-            && !world.getChunkColumn(chunk.getChunkX()).isChunkBelowTopBlock(chunk.getChunkY())) {
+        if (chunk.isAllAir() && chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY())) {
           continue;
         }
 
@@ -161,16 +155,6 @@ public class ClientWorldRender implements WorldRender {
           MathUtils.floor(
                   (viewBound.y + viewBound.height + CHUNK_TEXTURE_SIZE) / CHUNK_TEXTURE_SIZE)
               + CHUNKS_IN_VIEW_PADDING_RENDER);
-
-      ChunksInView.Companion.forEach(
-          chunksInView,
-          world,
-          chunk -> {
-            if (!chunk.hasTextureRegion()) {
-              chunk.dirty();
-            }
-            return null;
-          });
 
       if (Math.abs(lastZoom - camera.zoom) > SKYLIGHT_ZOOM_THRESHOLD) {
         lastZoom = camera.zoom;

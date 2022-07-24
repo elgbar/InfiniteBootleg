@@ -14,6 +14,8 @@ public interface Block
     extends CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.Builder> {
 
   int BLOCK_SIZE = 16;
+  int LIGHT_RESOLUTION = 2;
+  double LIGHT_SOURCE_LOOK_BLOCKS = 3.5;
 
   @Nullable
   static Block fromProto(
@@ -70,7 +72,7 @@ public interface Block
   /**
    * @param dir The relative direction
    * @return The relative block in the given location
-   * @see #getBlock(int, int)
+   * @see World#getBlock(int, int)
    */
   @Nullable
   Block getRelative(@NotNull Direction dir);
@@ -88,7 +90,7 @@ public interface Block
   /**
    * @param dir The relative direction
    * @return The relative raw block in the given location
-   * @see #getBlock(int, int)
+   * @see World#getBlock(int, int)
    */
   @Nullable
   Block getRawRelative(@NotNull Direction dir);
@@ -96,6 +98,20 @@ public interface Block
   Block setBlock(@NotNull Material material);
 
   Block setBlock(@NotNull Material material, boolean update);
+
+  void recalculateLighting();
+
+  /**
+   * @return Map of light values
+   */
+  float[][] getLights();
+
+  /**
+   * @return Whether this block has any light shining onto it
+   */
+  boolean isLit();
+
+  boolean isSkylight();
 
   /**
    * Remove this block from the world

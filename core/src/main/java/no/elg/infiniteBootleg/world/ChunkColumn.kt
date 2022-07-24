@@ -14,7 +14,17 @@ interface ChunkColumn {
    * @return the world y coordinate of the topmost block
    */
   fun topBlockHeight(localX: Int): Int
+
+  /**
+   * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
+   */
   fun topBlock(localX: Int): Block?
+
   fun updateTopBlock(localX: Int, worldYHint: Int)
-  fun isChunkBelowTopBlock(chunkY: Int): Boolean
+
+  /**
+   * @return Whether the chunk found at chunkY is STRICTLY above any of the chunks the topmost block are located in
+   */
+  fun isChunkAboveTopBlock(chunkY: Int): Boolean
+  fun isBlockSkylight(localX: Int, worldY: Int): Boolean
 }

@@ -11,11 +11,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import no.elg.infiniteBootleg.ClientMain;
@@ -39,6 +45,8 @@ public class ChunkImpl implements Chunk {
 
   private static final ProtoWorld.Block.Builder AIR_BLOCK_BUILDER = Block.save(AIR);
 
+  public final AtomicInteger lightUpdaters = new AtomicInteger();
+
   @NotNull private final World world;
   @Nullable private final Block[][] blocks;
 
@@ -51,8 +59,13 @@ public class ChunkImpl implements Chunk {
   private final Array<TickingBlock> tickingBlocks;
 
   private final ChunkBody chunkBody;
+  private volatile ScheduledFuture<?> lightUpdater;
+  private final ObjectSet<ForkJoinTask<?>> tasks = new ObjectSet<>(CHUNK_SIZE * CHUNK_SIZE, 0.99f);
+
   // if this chunk should be prioritized to be updated
+  /** Use {@link #dirty()} to mark chunk as dirty */
   private volatile boolean dirty; // if texture/allair needs to be updated
+
   private boolean prioritize;
   private volatile boolean modified; // if the chunk has been modified since loaded
   private volatile boolean allowUnload;
@@ -97,7 +110,7 @@ public class ChunkImpl implements Chunk {
     tickingBlocks = new Array<>(false, CHUNK_SIZE);
     chunkBody = new ChunkBody(this);
 
-    dirty = true;
+    dirty();
     prioritize = false;
 
     allAir = false;
@@ -148,13 +161,17 @@ public class ChunkImpl implements Chunk {
       boolean updateTexture,
       boolean prioritize,
       boolean sendUpdatePacket) {
-    Preconditions.checkState(!disposed, "Chunk is not loaded");
+    if (isInvalid()) {
+      return null;
+    }
+    //    Preconditions.checkState(isValid(), "Chunk is invalid");
 
     if (block != null) {
       Preconditions.checkArgument(block.getLocalX() == localX);
       Preconditions.checkArgument(block.getLocalY() == localY);
       Preconditions.checkArgument(block.getChunk() == this);
     }
+    boolean bothAirish;
     synchronized (this) {
       @Nullable Block currBlock = blocks[localX][localY];
 
@@ -162,14 +179,15 @@ public class ChunkImpl implements Chunk {
         return currBlock;
       }
       // accounts for both being null also ofc
-      if (isAirish(currBlock, block)) {
+      bothAirish = areBothAirish(currBlock, block);
+      if (bothAirish) {
         // Ok to return here, only internal change
         if (currBlock != null) {
           currBlock.dispose();
           blocks[localX][localY] = null;
           return null;
         }
-        return block;
+        //        return block;
       }
 
       if (currBlock != null) {
@@ -191,21 +209,23 @@ public class ChunkImpl implements Chunk {
 
       modified = true;
       if (updateTexture) {
-        dirty = true;
+        dirty();
         this.prioritize |= prioritize; // do not remove prioritization if it already is
       }
-      if (currBlock != null) {
-        chunkBody.removeBlock(currBlock);
+      if (!bothAirish) {
+        if (currBlock != null) {
+          chunkBody.removeBlock(currBlock);
+        }
+        if (block != null) {
+          chunkBody.addBlock(block, null);
+        }
+        getChunkColumn().updateTopBlock(localX, getWorldY(localY));
       }
-      if (block != null) {
-        chunkBody.addBlock(block, null);
-      }
-      world.getChunkColumn(chunkX).updateTopBlock(localX, getWorldY(localY));
     }
     int worldX = getWorldX(localX);
     int worldY = getWorldY(localY);
 
-    if (sendUpdatePacket && isValid()) {
+    if (sendUpdatePacket && isValid() && !bothAirish) {
       if (Main.isServer()) {
         Main.inst()
             .getScheduler()
@@ -229,12 +249,17 @@ public class ChunkImpl implements Chunk {
       }
     }
     if (updateTexture) {
-      world.updateBlocksAround(worldX, worldY);
+      Main.inst()
+          .getScheduler()
+          .executeAsync(
+              () -> {
+                world.updateBlocksAround(worldX, worldY);
+              });
     }
     return block;
   }
 
-  private static boolean isAirish(@Nullable Block blockA, @Nullable Block blockB) {
+  private static boolean areBothAirish(@Nullable Block blockA, @Nullable Block blockB) {
     return (blockA == null && blockB == null) //
         || (blockA == null && blockB.getMaterial() == AIR) //
         || (blockB == null && blockA.getMaterial() == AIR);
@@ -252,7 +277,7 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public synchronized void updateTexture(boolean prioritize) {
-    dirty = true;
+    dirty();
     modified = true;
     this.prioritize |= prioritize;
   }
@@ -261,7 +286,7 @@ public class ChunkImpl implements Chunk {
   @Nullable
   public TextureRegion getTextureRegion() {
     if (dirty) {
-      updateTextureIfDirty();
+      updateIfDirty();
     }
     return fboRegion;
   }
@@ -272,13 +297,14 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  public void updateTextureIfDirty() {
+  public void updateIfDirty() {
     if (isInvalid()) {
       return;
     }
     boolean wasPrioritize;
+
     synchronized (this) {
-      if (!dirty) {
+      if (!dirty || initializing) {
         return;
       }
       wasPrioritize = prioritize;
@@ -291,17 +317,75 @@ public class ChunkImpl implements Chunk {
       for (int localX = 0; localX < CHUNK_SIZE; localX++) {
         for (int localY = 0; localY < CHUNK_SIZE; localY++) {
           Block b = blocks[localX][localY];
-          if (b != null && b.getMaterial() != AIR) {
-            allAir = false;
-            break outer;
+          if (b != null) {
+            if (b.getMaterial() != AIR) {
+              allAir = false;
+              break outer;
+            }
           }
         }
       }
+
+      // If we reached this point before the light is done recalculating then we must start again
+      if (lightUpdater != null) {
+        lightUpdater.cancel(true);
+      }
     }
+
+    // Render the world with the changes (but potentially without the light changes)
     final WorldRender render = world.getRender();
     if (render instanceof ClientWorldRender clientWorldRender) {
       clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
     }
+
+    final int updateId = lightUpdaters.incrementAndGet();
+    lightUpdater =
+        Main.inst()
+            .getScheduler()
+            .executeAsync(
+                () -> {
+                  var pool = ForkJoinPool.commonPool();
+                  synchronized (tasks) {
+                    outer:
+                    for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+                      for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+                        synchronized (tasks) {
+                          if (updateId != lightUpdaters.get()) {
+                            break outer;
+                          }
+                          Block b = blocks[localX][localY];
+                          if (b != null) {
+                            ForkJoinTask<?> task = pool.submit(b::recalculateLighting);
+                            task.fork();
+                            tasks.add(task);
+                          }
+                        }
+                      }
+                    }
+
+                    for (ForkJoinTask<?> task : tasks) {
+                      if (updateId == lightUpdaters.get()) {
+                        try {
+                          task.join();
+                        } catch (CancellationException ignore) {
+                        } catch (Exception e) {
+                          e.printStackTrace();
+                        }
+                      } else {
+                        task.cancel(true);
+                      }
+                    }
+                    tasks.clear();
+                  }
+                  if (updateId == lightUpdaters.get()) {
+                    // Re-render the chunk with the new lighting
+                    if (render instanceof ClientWorldRender clientWorldRender) {
+                      clientWorldRender
+                          .getChunkRenderer()
+                          .queueRendering(this, wasPrioritize, true);
+                    }
+                  }
+                });
   }
 
   @Override
@@ -317,8 +401,7 @@ public class ChunkImpl implements Chunk {
     synchronized (this) {
       // Some other thread might have created the fbo already, so we should check it
       if (fbo == null) {
-        fbo =
-            new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, false);
+        fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, true);
         fbo.getColorBufferTexture()
             .setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         fboRegion = new TextureRegion(fbo.getColorBufferTexture());
@@ -374,7 +457,7 @@ public class ChunkImpl implements Chunk {
   @Override
   public boolean isAllAir() {
     if (dirty) {
-      updateTextureIfDirty();
+      updateIfDirty();
     }
     return allAir;
   }
@@ -417,6 +500,11 @@ public class ChunkImpl implements Chunk {
   @NotNull
   public World getWorld() {
     return world;
+  }
+
+  @Override
+  public @NotNull ChunkColumn getChunkColumn() {
+    return world.getChunkColumn(chunkX);
   }
 
   @Override
@@ -625,6 +713,7 @@ public class ChunkImpl implements Chunk {
       return;
     }
     initializing = false;
+    dirty();
 
     synchronized (tickingBlocks) {
       tickingBlocks.clear();

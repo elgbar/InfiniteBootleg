@@ -12,25 +12,23 @@ import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_REN
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.LongMap;
 import java.util.LinkedList;
 import java.util.List;
 import no.elg.infiniteBootleg.Renderer;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.Location;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -45,26 +43,25 @@ public class ChunkRenderer implements Renderer, Disposable {
   private Chunk curr;
   private static final Object QUEUE_LOCK = new Object();
 
-  public static final int LIGHT_PER_BLOCK = 2;
-  public static final double LIGHT_SOURCE_LOOK_BLOCKS = 4.0;
-
   private static final TextureRegion CAVE_TEXTURE;
   private static final TextureRegion SKY_TEXTURE;
 
+  public static final float CAVE_CLEAR_COLOR_R = 0.408824f;
+  public static final float CAVE_CLEAR_COLOR_G = 0.202941f;
+  public static final float CAVE_CLEAR_COLOR_B = 0.055882f;
+
   static {
-    var pixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
+    var skyPixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
+    skyPixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
+    skyPixmap.fill();
+    SKY_TEXTURE = new TextureRegion(new Texture(skyPixmap));
+    skyPixmap.dispose();
 
-    SKY_TEXTURE = new TextureRegion(new Texture(pixmap));
-    pixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
-    pixmap.fill();
-
-    Color base = Color.BROWN;
-    float modifier = 0.75f;
-    pixmap.setColor(base.r * modifier, base.g * modifier, base.b * modifier, 1);
-    pixmap.fill();
-    CAVE_TEXTURE = new TextureRegion(new Texture(pixmap));
-
-    pixmap.dispose();
+    var cavePixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
+    cavePixmap.setColor(CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A);
+    cavePixmap.fill();
+    CAVE_TEXTURE = new TextureRegion(new Texture(cavePixmap));
+    cavePixmap.dispose();
   }
 
   public ChunkRenderer(@NotNull WorldRender worldRender) {
@@ -75,13 +72,16 @@ public class ChunkRenderer implements Renderer, Disposable {
     renderQueue = SetUniqueList.setUniqueList(chunkList);
     batch.setProjectionMatrix(
         new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
-    batch.disableBlending();
   }
 
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
+    queueRendering(chunk, prioritize, false);
+  }
+
+  public void queueRendering(@NotNull Chunk chunk, boolean prioritize, boolean forceAdd) {
     synchronized (QUEUE_LOCK) {
       // do not queue the chunk we're currently rendering
-      if (chunk != curr && !renderQueue.contains(chunk)) {
+      if ((forceAdd || chunk != curr) && !renderQueue.contains(chunk)) {
         if (prioritize) {
           renderQueue.add(0, chunk);
         } else {
@@ -108,30 +108,35 @@ public class ChunkRenderer implements Renderer, Disposable {
   public void render() {
     // get the first valid chunk to render
     Chunk chunk;
+    boolean aboveGround;
     synchronized (QUEUE_LOCK) {
       do {
         if (renderQueue.isEmpty()) {
           return;
         } // nothing to render
         chunk = renderQueue.remove(0);
-      } while ((chunk.isAllAir()
-              && !chunk
-                  .getWorld()
-                  .getChunkColumn(chunk.getChunkX())
-                  .isChunkBelowTopBlock(chunk.getChunkY()))
+        aboveGround = chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY());
+      } while ((chunk.isAllAir() && aboveGround)
           || !chunk.isLoaded()
           || worldRender.isOutOfView(chunk));
       curr = chunk;
     }
 
     FrameBuffer fbo = chunk.getFbo();
-    var chunkColumn = chunk.getWorld().getChunkColumn(chunk.getChunkX());
+    var chunkColumn = chunk.getChunkColumn();
 
     // this is the main render function
     Block[][] blocks = chunk.getBlocks();
     fbo.begin();
     batch.begin();
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+
+    if (aboveGround) {
+      Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
+    } else {
+      Gdx.gl.glClearColor(
+          CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A);
+    }
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
       int topBlockHeight = chunkColumn.topBlockHeight(x);
@@ -142,99 +147,43 @@ public class ChunkRenderer implements Renderer, Disposable {
           continue;
         } else if (block == null) {
           block = chunk.setBlock(x, y, AIR, false);
+          block.recalculateLighting();
         }
-        TextureRegion texture;
+        @Nullable TextureRegion texture;
+        TextureRegion secondaryTexture;
         if (block.getMaterial() == AIR) {
           texture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
+          secondaryTexture = null;
         } else {
           texture = block.getTexture();
+          if (block.getMaterial().isTransparent()) {
+            secondaryTexture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
+          } else {
+            secondaryTexture = null;
+          }
         }
         int dx = block.getLocalX() * BLOCK_SIZE;
         int dy = block.getLocalY() * BLOCK_SIZE;
 
-        // find light sources around this block
-
-        LongMap<Double> lightMap = new LongMap<>(LIGHT_PER_BLOCK * LIGHT_PER_BLOCK);
-        int lightSources = 0;
-
-        // skylight
-        int worldX = block.getWorldX();
-        int worldY = block.getWorldY();
-
-        Array<@NotNull Block> blocksAABB =
-            chunk
-                .getWorld()
-                .getBlocksAABB(
-                    worldX + 0.5f,
-                    worldY + 0.5f,
-                    (float) LIGHT_SOURCE_LOOK_BLOCKS,
-                    (float) LIGHT_SOURCE_LOOK_BLOCKS,
-                    false);
-        for (Block neighbor : blocksAABB) {
-
-          var nCC =
-              (neighbor.getChunk() == block.getChunk())
-                  ? chunkColumn
-                  : chunk.getWorld().getChunkColumn(neighbor.getChunk().getChunkX());
-          if (neighbor.getMaterial().isLuminescent()
-              || (neighbor.getWorldY() >= nCC.topBlockHeight(neighbor.getLocalX())
-                  && neighbor.getMaterial() == AIR)) {
-
-            lightSources++;
-            for (int lx = 0; lx < LIGHT_PER_BLOCK; lx++) {
-              for (int ly = 0; ly < LIGHT_PER_BLOCK; ly++) {
-                // Calculate distance for each light cell
-                var dist =
-                    (Location.distCubed(
-                            worldX + ((float) lx / LIGHT_PER_BLOCK),
-                            worldY + ((float) ly / LIGHT_PER_BLOCK),
-                            neighbor.getWorldX() + 0.5,
-                            neighbor.getWorldY() + 0.5))
-                        / (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS);
-                long key = CoordUtil.compactLoc(lx, ly);
-                var old = lightMap.get(key, Double.MAX_VALUE);
-                if (old > dist) {
-                  lightMap.put(key, dist);
-                }
-              }
-            }
-          }
-        }
-
         assert texture != null;
+        var lights = block.getLights();
 
-        if (lightSources > 0) {
+        batch.setColor(Color.WHITE);
 
-          int tileWidth = texture.getRegionWidth() / LIGHT_PER_BLOCK;
-          int tileHeight = texture.getRegionHeight() / LIGHT_PER_BLOCK;
-          TextureRegion[][] split = texture.split(tileWidth, tileHeight);
-
-          for (int ry = 0, splitLength = split.length; ry < splitLength; ry++) {
-            TextureRegion[] regions = split[LIGHT_PER_BLOCK - ry - 1];
-            for (int rx = 0, regionsLength = regions.length; rx < regionsLength; rx++) {
-              TextureRegion region = regions[rx];
-
-              double rawIntensity = lightMap.get(CoordUtil.compactLoc(rx, ry), 0.0);
-              float normalizedIntensity;
-              if (rawIntensity == 0.0) {
-                normalizedIntensity = 0f;
-              } else if (rawIntensity > 0) {
-                normalizedIntensity = 1 - (float) (rawIntensity);
-              } else {
-                normalizedIntensity = 1 + (float) (rawIntensity);
-              }
-
-              batch.setColor(normalizedIntensity, normalizedIntensity, normalizedIntensity, 1);
-              batch.draw(
-                  region,
-                  dx + rx * tileWidth,
-                  dy + ry * tileHeight,
-                  BLOCK_SIZE / (float) LIGHT_PER_BLOCK,
-                  BLOCK_SIZE / (float) LIGHT_PER_BLOCK);
-            }
+        if (Settings.renderLight && block.isLit() && !block.isSkylight()) {
+          if (secondaryTexture != null) {
+            batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+            //            drawShadedBlock(secondaryTexture, lights, dx, dy);
           }
+          drawShadedBlock(texture, lights, dx, dy);
+
         } else {
-          batch.setColor(Color.BLACK);
+          if (Settings.renderLight && !block.isSkylight()) {
+            batch.setColor(Color.BLACK);
+          }
+          if (secondaryTexture != null) {
+            batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+          }
           batch.draw(texture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
         }
       }
@@ -245,6 +194,29 @@ public class ChunkRenderer implements Renderer, Disposable {
 
     synchronized (QUEUE_LOCK) {
       curr = null;
+    }
+  }
+
+  private void drawShadedBlock(TextureRegion texture, float[][] lights, float dx, float dy) {
+
+    int tileWidth = texture.getRegionWidth() / Block.LIGHT_RESOLUTION;
+    int tileHeight = texture.getRegionHeight() / Block.LIGHT_RESOLUTION;
+    TextureRegion[][] split = texture.split(tileWidth, tileHeight);
+
+    for (int ry = 0, splitLength = split.length; ry < splitLength; ry++) {
+      TextureRegion[] regions = split[Block.LIGHT_RESOLUTION - ry - 1];
+      for (int rx = 0, regionsLength = regions.length; rx < regionsLength; rx++) {
+        TextureRegion region = regions[rx];
+
+        var lightIntensity = lights[rx][ry];
+        batch.setColor(lightIntensity, lightIntensity, lightIntensity, 1f);
+        batch.draw(
+            region,
+            dx + rx * tileWidth,
+            dy + ry * tileHeight,
+            BLOCK_SIZE / (float) Block.LIGHT_RESOLUTION,
+            BLOCK_SIZE / (float) Block.LIGHT_RESOLUTION);
+      }
     }
   }
 

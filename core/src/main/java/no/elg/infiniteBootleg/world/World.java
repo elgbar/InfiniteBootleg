@@ -375,16 +375,21 @@ public abstract class World implements Disposable, Resizable {
 
   @Nullable
   public Chunk getChunk(@NotNull Location chunkLoc) {
-    return getChunk(chunkLoc.toCompactLocation());
+    return getChunk(chunkLoc.toCompactLocation(), true);
   }
 
   @Nullable
   public Chunk getChunk(int chunkX, int chunkY) {
-    return getChunk(CoordUtil.compactLoc(chunkX, chunkY));
+    return getChunk(CoordUtil.compactLoc(chunkX, chunkY), true);
   }
 
   @Nullable
   public Chunk getChunk(long chunkLoc) {
+    return getChunk(chunkLoc, true);
+  }
+
+  @Nullable
+  public Chunk getChunk(long chunkLoc, boolean load) {
     // This is a long lock, it must appear to be an atomic operation though
     Chunk readChunk;
     Chunk old = null;
@@ -404,7 +409,10 @@ public abstract class World implements Disposable, Resizable {
       Main.logger().warn("World", "Failed to acquire chunks read lock in 100 ms");
       return null;
     }
-    if (readChunk == null || !readChunk.isLoaded()) {
+    if (readChunk == null || readChunk.isInvalid()) {
+      if (!load) {
+        return null;
+      }
       if (getWorldTicker().isPaused()) {
         Main.logger().debug("World", "Ticker paused will not load chunk");
         return null;
@@ -1042,7 +1050,7 @@ public abstract class World implements Disposable, Resizable {
 
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
-      float worldX, float worldY, float offsetX, float offsetY, boolean raw) {
+      float worldX, float worldY, float offsetX, float offsetY, boolean raw, boolean loadChunk) {
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
     int x = MathUtils.floor(worldX - offsetX);
@@ -1055,7 +1063,7 @@ public abstract class World implements Disposable, Resizable {
         var chunkPos = CoordUtil.compactLoc(CoordUtil.worldToChunk(x), CoordUtil.worldToChunk(y));
         var chunk = chunks.get(chunkPos);
         if (chunk == null || chunk.isInvalid()) {
-          chunk = getChunk(chunkPos);
+          chunk = getChunk(chunkPos, loadChunk);
           if (chunk == null) {
             continue;
           }

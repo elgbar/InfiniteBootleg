@@ -33,26 +33,22 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     }
   }
 
-  /**
-   *
-   * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
-   */
   override fun topBlock(localX: Int): Block? {
     return getWorldBlock(localX, topBlockHeight(localX))
   }
 
-  /**
-   * @return Whether the chunk found at chunkY is STRICTLY below any of the chunks the topmost block are located in
-   */
-  override fun isChunkBelowTopBlock(chunkY: Int): Boolean {
+  override fun isChunkAboveTopBlock(chunkY: Int): Boolean {
     val maxWorldY = CoordUtil.chunkToWorld(chunkY, CHUNK_SIZE - 1)
     for (localX in 0 until CHUNK_SIZE) {
-      val topY = topBlockHeight(localX)
-      if (topY > maxWorldY) {
+      if (isBlockSkylight(localX, maxWorldY)) {
         return true
       }
     }
     return false
+  }
+
+  override fun isBlockSkylight(localX: Int, worldY: Int): Boolean {
+    return topBlockHeight(localX) < worldY
   }
 
   private fun getWorldX(localX: Int): Int {

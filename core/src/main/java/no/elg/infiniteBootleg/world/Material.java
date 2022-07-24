@@ -26,16 +26,16 @@ import org.jetbrains.annotations.Nullable;
  * @author Elg
  */
 public enum Material {
-  AIR(null, ItemType.AIR, 0f, false, false, false, false),
+  AIR(null, ItemType.AIR, 0f, false, false, false, false, true),
   STONE(1.5f),
   BRICK(2f),
   DIRT(1f),
   GRASS(0.8f),
-  TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true, true),
+  TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true, true, false),
   SAND(FallingBlock.class, 1f),
-  TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true, true),
-  GLASS(null, ItemType.BLOCK, 0.1f, true, false, true, false),
-  DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true, false),
+  TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true, true, true),
+  GLASS(null, ItemType.BLOCK, 0.1f, true, false, true, false, true),
+  DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true, false, true),
   ;
   @Nullable private final Constructor<?> constructor;
   @Nullable private final Constructor<?> constructorProtoBuf;
@@ -46,6 +46,7 @@ public enum Material {
   @Nullable private final TextureRegion texture;
   @NotNull private final ItemType itemType;
   private final boolean luminescent;
+  private final boolean transparent;
 
   private static final Material[] VALUES = values();
 
@@ -54,7 +55,7 @@ public enum Material {
   }
 
   Material(@Nullable Class<?> impl, float hardness) {
-    this(impl, ItemType.BLOCK, hardness, true, true, true, false);
+    this(impl, ItemType.BLOCK, hardness, true, true, true, false, false);
   }
 
   /**
@@ -64,6 +65,7 @@ public enum Material {
    * @param solid If objects can pass through this material
    * @param blocksLight If this material will block light
    * @param placable If a block of this material can be placed by a player
+   * @param transparent
    */
   Material(
       @Nullable Class<?> impl,
@@ -72,9 +74,11 @@ public enum Material {
       boolean solid,
       boolean blocksLight,
       boolean placable,
-      boolean luminescent) {
+      boolean luminescent,
+      boolean transparent) {
     this.itemType = itemType;
     this.luminescent = luminescent;
+    this.transparent = transparent;
     if (impl != null) {
       if (itemType == ItemType.BLOCK) {
         Preconditions.checkArgument(
@@ -256,6 +260,13 @@ public enum Material {
 
   public boolean isPlacable() {
     return placable;
+  }
+
+  /**
+   * @return If the texture of the material has any transparency
+   */
+  public boolean isTransparent() {
+    return transparent;
   }
 
   public float getHardness() {

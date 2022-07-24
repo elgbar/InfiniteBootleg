@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import no.elg.infiniteBootleg.Main;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Run (cancellable) tasks on other threads
@@ -51,12 +52,13 @@ public class CancellableThreadScheduler {
    *
    * @param runnable What to do
    */
-  public void executeAsync(@NotNull Runnable runnable) {
+  @Nullable
+  public ScheduledFuture<?> executeAsync(@NotNull Runnable runnable) {
     if (isAlwaysSync()) {
       executeSync(runnable);
-      return;
+      return null;
     }
-    executor.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS);
+    return executor.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS);
   }
 
   /**
