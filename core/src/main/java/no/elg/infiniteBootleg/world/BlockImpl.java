@@ -33,6 +33,7 @@ public class BlockImpl implements Block {
   private boolean isSkylight;
   private final float[][] lightMap = new float[Block.LIGHT_RESOLUTION][Block.LIGHT_RESOLUTION];
   private final float[][] tmpLightMap = new float[Block.LIGHT_RESOLUTION][Block.LIGHT_RESOLUTION];
+  private float averageBrightness;
 
   public BlockImpl(
       @NotNull World world,
@@ -137,6 +138,11 @@ public class BlockImpl implements Block {
     }
   }
 
+  @Override
+  public float averageBrightness() {
+    return averageBrightness;
+  }
+
   private void fillArray(float[][] mat, float newValue) {
     for (float[] arr : mat) {
       Arrays.fill(arr, newValue);
@@ -155,11 +161,13 @@ public class BlockImpl implements Block {
       // This block is a skylight, its always lit fully
       isLit = true;
       isSkylight = true;
+      averageBrightness = 1f;
       synchronized (lightMap) {
         fillArray(lightMap, 1f);
       }
       return;
     }
+    averageBrightness = 0f;
     isLit = false;
     isSkylight = false;
     fillArray(tmpLightMap, 0f);
@@ -222,6 +230,14 @@ public class BlockImpl implements Block {
         System.arraycopy(tmpLightMap[i], 0, lightMap[i], 0, Block.LIGHT_RESOLUTION);
       }
     }
+
+    double total = 0;
+    for (int x = 0; x < LIGHT_RESOLUTION; x++) {
+      for (int y = 0; y < LIGHT_RESOLUTION; y++) {
+        total += lightMap[x][y];
+      }
+    }
+    averageBrightness = (float) (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION));
   }
 
   @Override

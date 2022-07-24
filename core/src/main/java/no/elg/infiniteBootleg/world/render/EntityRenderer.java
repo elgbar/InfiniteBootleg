@@ -2,9 +2,11 @@ package no.elg.infiniteBootleg.world.render;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.Renderer;
+import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -22,9 +24,26 @@ public record EntityRenderer(@NotNull ClientWorldRender worldRender) implements 
       if (textureRegion == null) {
         continue;
       }
-      float x = (entity.getPosition().x - entity.getHalfBox2dWidth()) * BLOCK_SIZE + worldOffsetX;
-      float y = (entity.getPosition().y - entity.getHalfBox2dHeight()) * BLOCK_SIZE + worldOffsetY;
+      float worldX = (entity.getPosition().x - entity.getHalfBox2dWidth());
+      float worldY = (entity.getPosition().y - entity.getHalfBox2dHeight());
+      float x = worldX * BLOCK_SIZE + worldOffsetX;
+      float y = worldY * BLOCK_SIZE + worldOffsetY;
+      if (Settings.renderLight) {
+        var currentBlock =
+            worldRender.getWorld().getRawBlock((int) Math.floor(worldX), (int) Math.floor(worldY));
+        if (currentBlock != null) {
+          if (currentBlock.isSkylight()) {
+            batch.setColor(Color.WHITE);
+          } else if (currentBlock.isLit()) {
+            float v = currentBlock.averageBrightness();
+            batch.setColor(v, v, v, 1);
+          } else {
+            batch.setColor(Color.BLACK);
+          }
+        }
+      }
       batch.draw(textureRegion, x, y, entity.getWidth(), entity.getHeight());
     }
+    batch.setColor(Color.WHITE);
   }
 }

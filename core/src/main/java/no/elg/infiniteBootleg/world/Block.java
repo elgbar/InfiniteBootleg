@@ -106,6 +106,8 @@ public interface Block
    */
   float[][] getLights();
 
+  float averageBrightness();
+
   /**
    * @return Whether this block has any light shining onto it
    */
