@@ -38,7 +38,11 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
       world.remove(blockX, blockY, true)
     } else {
       val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
+      blocksWithin.removeAll { it.material == Material.AIR }
       if (blocksWithin.isEmpty) {
+        if (world.isAirBlock(blockX, blockY)) {
+          return true
+        }
         world.remove(blockX, blockY, true)
       } else {
         world.removeBlocks(blocksWithin, true)
