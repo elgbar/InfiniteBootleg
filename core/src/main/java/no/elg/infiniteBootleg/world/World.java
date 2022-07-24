@@ -1048,9 +1048,23 @@ public abstract class World implements Disposable, Resizable {
     int x = MathUtils.floor(worldX - offsetX);
     float maxX = worldX + offsetX;
     float maxY = worldY + offsetY;
+    LongMap<Chunk> chunks = new LongMap<>();
     for (; x <= maxX; x++) {
       for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
-        Block b = raw ? getRawBlock(x, y) : getBlock(x, y);
+
+        var chunkPos = CoordUtil.compactLoc(CoordUtil.worldToChunk(x), CoordUtil.worldToChunk(y));
+        var chunk = chunks.get(chunkPos);
+        if (chunk == null || chunk.isInvalid()) {
+          chunk = getChunk(chunkPos);
+          if (chunk == null) {
+            continue;
+          }
+          chunks.put(chunkPos, chunk);
+        }
+
+        int localX = CoordUtil.chunkOffset(x);
+        int localY = CoordUtil.chunkOffset(y);
+        Block b = raw ? chunk.getRawBlock(localX, localY) : chunk.getBlock(localX, localY);
         if (b == null) {
           continue;
         }
