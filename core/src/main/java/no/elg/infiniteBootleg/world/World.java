@@ -694,11 +694,25 @@ public abstract class World implements Disposable, Resizable {
    * @param worldY The y coordinate from world view
    */
   public void updateBlocksAround(int worldX, int worldY) {
-    for (Direction dir : Direction.CARDINAL) {
-      Block rel = getRawBlock(worldX + dir.dx, worldY + dir.dy);
-      if (rel instanceof TickingBlock tickingBlock) {
+
+    Array<@NotNull Block> blocksAABB =
+        getBlocksAABB(
+            worldX + 0.5f,
+            worldY + 0.5f,
+            (float) Block.LIGHT_SOURCE_LOOK_BLOCKS,
+            (float) Block.LIGHT_SOURCE_LOOK_BLOCKS,
+            false,
+            false);
+
+    LongMap<Chunk> chunks = new LongMap<>();
+    for (Block block : blocksAABB) {
+      chunks.put(block.getChunk().getCompactLocation(), block.getChunk());
+      if (block instanceof TickingBlock tickingBlock) {
         tickingBlock.enableTick();
       }
+    }
+    for (Chunk chunk : chunks.values()) {
+      chunk.dirty();
     }
   }
 

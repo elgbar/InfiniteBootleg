@@ -249,12 +249,7 @@ public class ChunkImpl implements Chunk {
       }
     }
     if (updateTexture) {
-      Main.inst()
-          .getScheduler()
-          .executeAsync(
-              () -> {
-                world.updateBlocksAround(worldX, worldY);
-              });
+      Main.inst().getScheduler().executeAsync(() -> world.updateBlocksAround(worldX, worldY));
     }
     return block;
   }
