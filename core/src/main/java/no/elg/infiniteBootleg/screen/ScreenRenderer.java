@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.util.Resizable;
+import org.jetbrains.annotations.NotNull;
 
 public class ScreenRenderer implements Disposable, Resizable {
 
@@ -38,11 +39,14 @@ public class ScreenRenderer implements Disposable, Resizable {
         new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
   }
 
-  public void drawTop(String text, float line) {
-    font.draw(batch, text, spacing, Gdx.graphics.getHeight() - spacing * line);
+  public void drawTop(@NotNull String text, float line) {
+    try {
+      font.draw(batch, text, spacing, Gdx.graphics.getHeight() - spacing * line);
+    } catch (NullPointerException ignore) {
+    }
   }
 
-  public void drawBottom(String text, float line) {
+  public void drawBottom(@NotNull String text, float line) {
     font.draw(batch, text, spacing, spacing * (line + 1f));
   }
 
@@ -54,10 +58,12 @@ public class ScreenRenderer implements Disposable, Resizable {
     batch.end();
   }
 
+  @NotNull
   public SpriteBatch getBatch() {
     return batch;
   }
 
+  @NotNull
   public BitmapFont getFont() {
     return font;
   }
