@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.LinkedList;
 import java.util.List;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
@@ -77,16 +78,21 @@ public class ChunkRenderer implements Renderer, Disposable {
   }
 
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize, boolean forceAdd) {
-    synchronized (QUEUE_LOCK) {
-      // do not queue the chunk we're currently rendering
-      if ((forceAdd || chunk != curr) && !renderQueue.contains(chunk)) {
-        if (prioritize) {
-          renderQueue.add(0, chunk);
-        } else {
-          renderQueue.add(chunk);
-        }
-      }
-    }
+    Main.inst()
+        .getScheduler()
+        .executeAsync(
+            () -> {
+              synchronized (QUEUE_LOCK) {
+                // do not queue the chunk we're currently rendering
+                if ((forceAdd || chunk != curr) && !renderQueue.contains(chunk)) {
+                  if (prioritize) {
+                    renderQueue.add(0, chunk);
+                  } else {
+                    renderQueue.add(chunk);
+                  }
+                }
+              }
+            });
   }
 
   public void render(int times) {

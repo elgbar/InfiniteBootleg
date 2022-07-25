@@ -87,24 +87,26 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
       top[localX] = worldY
     }
 
-    val oldChunk = CoordUtil.worldToChunk(oldTop)
-    val newChunk = CoordUtil.worldToChunk(worldY)
-    val min = min(oldChunk, newChunk) - 1
-    val max = max(oldChunk, newChunk)
-    val worldX = CoordUtil.chunkToWorld(chunkX, localX)
-    for (chunkY in min..max) {
-      val newWorldY = CoordUtil.chunkToWorld(chunkY)
-      getLoadedChunk(newWorldY)?.dirty()
+    Main.inst().scheduler.executeAsync {
+      val oldChunk = CoordUtil.worldToChunk(oldTop)
+      val newChunk = CoordUtil.worldToChunk(worldY)
+      val min = min(oldChunk, newChunk) - 1
+      val max = max(oldChunk, newChunk)
+      val worldX = CoordUtil.chunkToWorld(chunkX, localX)
+      for (chunkY in min..max) {
+        val newWorldY = CoordUtil.chunkToWorld(chunkY)
+        getLoadedChunk(newWorldY)?.dirty()
 
-      // Update chunks to the sides, if the light reaches that far
-      val leftChunkX = CoordUtil.worldToChunk((worldX - Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
-      if (leftChunkX != chunkX) {
-        getLoadedChunk(newWorldY, leftChunkX)?.dirty()
-      }
+        // Update chunks to the sides, if the light reaches that far
+        val leftChunkX = CoordUtil.worldToChunk((worldX - Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+        if (leftChunkX != chunkX) {
+          getLoadedChunk(newWorldY, leftChunkX)?.dirty()
+        }
 
-      val rightChunkX = CoordUtil.worldToChunk((worldX + Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
-      if (rightChunkX != chunkX) {
-        getLoadedChunk(newWorldY, rightChunkX)?.dirty()
+        val rightChunkX = CoordUtil.worldToChunk((worldX + Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+        if (rightChunkX != chunkX) {
+          getLoadedChunk(newWorldY, rightChunkX)?.dirty()
+        }
       }
     }
   }
@@ -165,13 +167,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
         }
       }
 
-      var nextChunkY = 0
-      while (true) {
+      for (nextChunkY in 0..Int.MAX_VALUE) {
         val nextChunk = getChunk(currentTopChunkY - nextChunkY)
         if (testChunk(nextChunk)) {
           return
         }
-        nextChunkY++
       }
     }
   }

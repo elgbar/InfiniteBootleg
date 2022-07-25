@@ -66,7 +66,7 @@ object DebugText {
       val allAir = pc.isAllAir
       val allowUnloading = pc.isAllowingUnloading
       val skychunk = cc.isChunkAboveTopBlock(chunkY)
-      val upId = if (pc is ChunkImpl) pc.lightUpdaters.get() else -1
+      val upId = if (pc is ChunkImpl) pc.currentUpdateId.get() else -1
       val format = "chunk (% 4d,% 4d) [top %2d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|light id% 3d"
       sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, skychunk, upId))
     }

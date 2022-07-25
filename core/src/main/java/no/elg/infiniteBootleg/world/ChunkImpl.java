@@ -45,7 +45,7 @@ public class ChunkImpl implements Chunk {
 
   private static final ProtoWorld.Block.Builder AIR_BLOCK_BUILDER = Block.save(AIR);
 
-  public final AtomicInteger lightUpdaters = new AtomicInteger();
+  public final AtomicInteger currentUpdateId = new AtomicInteger();
 
   @NotNull private final World world;
   @Nullable private final Block[][] blocks;
@@ -56,10 +56,12 @@ public class ChunkImpl implements Chunk {
   /**
    * Must be accessed under a synchronized self block i.e, {@code synchronized(tickingBlocks){...}}
    */
-  private final Array<TickingBlock> tickingBlocks;
+  @NotNull private final Array<@NotNull TickingBlock> tickingBlocks;
 
-  private final ChunkBody chunkBody;
-  private volatile ScheduledFuture<?> lightUpdater;
+  @NotNull private final ChunkBody chunkBody;
+  @Nullable private volatile ScheduledFuture<?> lightUpdater;
+
+  @NotNull
   private final ObjectSet<ForkJoinTask<?>> tasks = new ObjectSet<>(CHUNK_SIZE * CHUNK_SIZE, 0.99f);
 
   // if this chunk should be prioritized to be updated
@@ -187,7 +189,6 @@ public class ChunkImpl implements Chunk {
           blocks[localX][localY] = null;
           return null;
         }
-        //        return block;
       }
 
       if (currBlock != null) {
@@ -300,7 +301,7 @@ public class ChunkImpl implements Chunk {
       return;
     }
     boolean wasPrioritize;
-
+    ScheduledFuture<?> currLU;
     synchronized (this) {
       if (!dirty || initializing) {
         return;
@@ -325,17 +326,22 @@ public class ChunkImpl implements Chunk {
       }
 
       // If we reached this point before the light is done recalculating then we must start again
-      if (lightUpdater != null) {
-        lightUpdater.cancel(false);
+      currLU = lightUpdater;
+      if (currLU != null) {
+        // Note that the previous thread will dispose itself, to cancel tasks in the async thread we
+        // must
+        currLU.cancel(false);
       }
     }
+
     // Render the world with the changes (but potentially without the light changes)
     final WorldRender render = world.getRender();
-    if (render instanceof ClientWorldRender clientWorldRender) {
+    if ((currLU == null || currLU.isDone())
+        && render instanceof ClientWorldRender clientWorldRender) {
       clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
     }
 
-    final int updateId = lightUpdaters.incrementAndGet();
+    final int updateId = currentUpdateId.incrementAndGet();
     lightUpdater =
         Main.inst()
             .getScheduler()
@@ -347,7 +353,7 @@ public class ChunkImpl implements Chunk {
                     for (int localX = 0; localX < CHUNK_SIZE; localX++) {
                       for (int localY = 0; localY < CHUNK_SIZE; localY++) {
                         synchronized (tasks) {
-                          if (updateId != lightUpdaters.get()) {
+                          if (updateId != currentUpdateId.get()) {
                             break outer;
                           }
                           Block b = blocks[localX][localY];
@@ -362,7 +368,7 @@ public class ChunkImpl implements Chunk {
                     }
 
                     for (ForkJoinTask<?> task : tasks) {
-                      if (updateId == lightUpdaters.get()) {
+                      if (updateId == currentUpdateId.get()) {
                         try {
                           task.join();
                         } catch (CancellationException ignore) {
@@ -375,7 +381,7 @@ public class ChunkImpl implements Chunk {
                     }
                     tasks.clear();
                   }
-                  if (updateId == lightUpdaters.get()) {
+                  if (updateId == currentUpdateId.get()) {
                     // Re-render the chunk with the new lighting
                     if (render instanceof ClientWorldRender clientWorldRender) {
                       clientWorldRender
