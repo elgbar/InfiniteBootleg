@@ -40,11 +40,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   override fun isChunkAboveTopBlock(chunkY: Int): Boolean {
     val maxWorldY = CoordUtil.chunkToWorld(chunkY, CHUNK_SIZE - 1)
     for (localX in 0 until CHUNK_SIZE) {
-      if (isBlockSkylight(localX, maxWorldY)) {
-        return true
+      if (!isBlockSkylight(localX, maxWorldY)) {
+        return false
       }
     }
-    return false
+    return true
   }
 
   override fun isBlockSkylight(localX: Int, worldY: Int): Boolean {
