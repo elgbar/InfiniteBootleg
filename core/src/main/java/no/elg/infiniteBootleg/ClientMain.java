@@ -34,7 +34,7 @@ public class ClientMain extends CommonMain {
   public static final int SCALE = Toolkit.getDefaultToolkit().getScreenSize().width > 2560 ? 2 : 1;
 
   public static final float CLEAR_COLOR_R = 0.2f;
-  public static final float CLEAR_COLOR_G = 0.3f;
+  public static final float CLEAR_COLOR_G = (float) (68.0 / 255.0);
   public static final float CLEAR_COLOR_B = 1f;
   public static final float CLEAR_COLOR_A = 1f;
 
