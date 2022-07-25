@@ -687,8 +687,7 @@ public abstract class World implements Disposable, Resizable {
   }
 
   /**
-   * Set all blocks in all cardinal directions around a given block to be updated. Given location
-   * not included
+   * Update blocks around the given location
    *
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view

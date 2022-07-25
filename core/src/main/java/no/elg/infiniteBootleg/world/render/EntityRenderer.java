@@ -32,10 +32,11 @@ public record EntityRenderer(@NotNull ClientWorldRender worldRender) implements 
         var currentBlock =
             worldRender.getWorld().getRawBlock((int) Math.floor(worldX), (int) Math.floor(worldY));
         if (currentBlock != null) {
-          if (currentBlock.isSkylight()) {
+          var blockLight = currentBlock.getBlockLight();
+          if (blockLight.isSkylight()) {
             batch.setColor(Color.WHITE);
-          } else if (currentBlock.isLit()) {
-            float v = currentBlock.averageBrightness();
+          } else if (blockLight.isLit()) {
+            float v = blockLight.getAverageBrightness();
             batch.setColor(v, v, v, 1);
           } else {
             batch.setColor(Color.BLACK);

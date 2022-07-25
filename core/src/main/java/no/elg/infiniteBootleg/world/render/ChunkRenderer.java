@@ -28,7 +28,6 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -42,9 +41,8 @@ public class ChunkRenderer implements Renderer, Disposable {
   // current rendering chunk
   private Chunk curr;
   private static final Object QUEUE_LOCK = new Object();
-
-  private static final TextureRegion CAVE_TEXTURE;
-  private static final TextureRegion SKY_TEXTURE;
+  @NotNull private static final TextureRegion CAVE_TEXTURE;
+  @NotNull private static final TextureRegion SKY_TEXTURE;
 
   public static final float CAVE_CLEAR_COLOR_R = 0.408824f;
   public static final float CAVE_CLEAR_COLOR_G = 0.202941f;
@@ -147,15 +145,18 @@ public class ChunkRenderer implements Renderer, Disposable {
           continue;
         } else if (block == null) {
           block = chunk.setBlock(x, y, AIR, false);
-          block.recalculateLighting();
+          block.getBlockLight().recalculateLighting();
         }
-        @Nullable TextureRegion texture;
+        var blockLight = block.getBlockLight();
+        TextureRegion texture;
         TextureRegion secondaryTexture;
         if (block.getMaterial() == AIR) {
           texture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
           secondaryTexture = null;
         } else {
           texture = block.getTexture();
+          assert texture != null;
+
           if (block.getMaterial().isTransparent()) {
             secondaryTexture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
           } else {
@@ -165,20 +166,17 @@ public class ChunkRenderer implements Renderer, Disposable {
         int dx = block.getLocalX() * BLOCK_SIZE;
         int dy = block.getLocalY() * BLOCK_SIZE;
 
-        assert texture != null;
-        var lights = block.getLights();
-
         batch.setColor(Color.WHITE);
 
-        if (Settings.renderLight && block.isLit() && !block.isSkylight()) {
+        if (Settings.renderLight && blockLight.isLit() && !blockLight.isSkylight()) {
           if (secondaryTexture != null) {
             batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
-            //            drawShadedBlock(secondaryTexture, lights, dx, dy);
+            // drawShadedBlock(secondaryTexture, lights, dx, dy);
           }
-          drawShadedBlock(texture, lights, dx, dy);
+          drawShadedBlock(texture, blockLight.getLightMap(), dx, dy);
 
         } else {
-          if (Settings.renderLight && !block.isSkylight()) {
+          if (Settings.renderLight && !blockLight.isSkylight()) {
             batch.setColor(Color.BLACK);
           }
           if (secondaryTexture != null) {

@@ -99,21 +99,8 @@ public interface Block
 
   Block setBlock(@NotNull Material material, boolean update);
 
-  void recalculateLighting();
-
-  /**
-   * @return Map of light values
-   */
-  float[][] getLights();
-
-  float averageBrightness();
-
-  /**
-   * @return Whether this block has any light shining onto it
-   */
-  boolean isLit();
-
-  boolean isSkylight();
+  @NotNull
+  BlockLight getBlockLight();
 
   /**
    * Remove this block from the world

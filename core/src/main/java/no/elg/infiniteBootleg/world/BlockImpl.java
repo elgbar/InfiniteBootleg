@@ -1,13 +1,8 @@
 package no.elg.infiniteBootleg.world;
 
-import static no.elg.infiniteBootleg.world.Material.AIR;
-
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
 import com.google.common.base.Preconditions;
-import java.util.Arrays;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import org.jetbrains.annotations.NotNull;
@@ -27,13 +22,8 @@ public class BlockImpl implements Block {
 
   private final int localX;
   private final int localY;
+  private BlockLight blockLight;
   private boolean disposed;
-
-  private boolean isLit;
-  private boolean isSkylight;
-  private final float[][] lightMap = new float[Block.LIGHT_RESOLUTION][Block.LIGHT_RESOLUTION];
-  private final float[][] tmpLightMap = new float[Block.LIGHT_RESOLUTION][Block.LIGHT_RESOLUTION];
-  private float averageBrightness;
 
   public BlockImpl(
       @NotNull World world,
@@ -47,6 +37,22 @@ public class BlockImpl implements Block {
     this.material = material;
     this.world = world;
     this.chunk = chunk;
+  }
+
+  public void setupBlockLight(@Nullable BlockLight blockLight) {
+    synchronized (this) {
+      if (this.blockLight != null) {
+        return;
+      }
+      if (blockLight != null) {
+        Preconditions.checkArgument(localX == blockLight.getLocalX());
+        Preconditions.checkArgument(localY == blockLight.getLocalY());
+        Preconditions.checkArgument(chunk == blockLight.getChunk());
+        this.blockLight = blockLight;
+      } else {
+        this.blockLight = new BlockLight(chunk, localX, localY);
+      }
+    }
   }
 
   @Override
@@ -126,128 +132,15 @@ public class BlockImpl implements Block {
     return chunk.setBlock(localX, localY, material, update);
   }
 
+  @NotNull
+  public BlockLight getBlockLight() {
+    setupBlockLight(null);
+    return blockLight;
+  }
+
   @Override
   public void destroy(boolean updateTexture) {
     chunk.setBlock(localX, localY, (Block) null, updateTexture);
-  }
-
-  @Override
-  public float[][] getLights() {
-    synchronized (lightMap) {
-      return lightMap;
-    }
-  }
-
-  @Override
-  public float averageBrightness() {
-    return averageBrightness;
-  }
-
-  private void fillArray(float[][] mat, float newValue) {
-    for (float[] arr : mat) {
-      Arrays.fill(arr, newValue);
-    }
-  }
-
-  @Override
-  public void recalculateLighting() {
-    //    System.out.println("Recalculating light for " + getMaterial() + " block " + getWorldX() +
-    // "," + getWorldY());
-    if (!Settings.renderLight) {
-      return;
-    }
-    var chunkColumn = chunk.getChunkColumn();
-    if (getMaterial() == AIR && chunkColumn.isBlockSkylight(localX, getWorldY())) {
-      // This block is a skylight, its always lit fully
-      isLit = true;
-      isSkylight = true;
-      averageBrightness = 1f;
-      synchronized (lightMap) {
-        fillArray(lightMap, 1f);
-      }
-      return;
-    }
-    averageBrightness = 0f;
-    isLit = false;
-    isSkylight = false;
-    fillArray(tmpLightMap, 0f);
-
-    // find light sources around this block
-
-    int worldX = getWorldX();
-    int worldY = getWorldY();
-
-    Array<@NotNull Block> blocksAABB =
-        chunk
-            .getWorld()
-            .getBlocksAABB(
-                worldX + 0.5f,
-                worldY + 0.5f,
-                (float) Block.LIGHT_SOURCE_LOOK_BLOCKS,
-                (float) Block.LIGHT_SOURCE_LOOK_BLOCKS,
-                false,
-                false);
-
-    for (Block neighbor : blocksAABB) {
-
-      var neighChunkCol = neighbor.getChunk().getChunkColumn();
-      if (neighbor.getMaterial().isLuminescent()
-          || (neighChunkCol.isBlockSkylight(neighbor.getLocalX(), neighbor.getWorldY())
-              && neighbor.getMaterial() == AIR)) {
-
-        isLit = true;
-        for (int dx = 0; dx < Block.LIGHT_RESOLUTION; dx++) {
-          for (int dy = 0; dy < Block.LIGHT_RESOLUTION; dy++) {
-            // Calculate distance for each light cell
-            var dist =
-                (Location.distCubed(
-                        worldX + ((float) dx / Block.LIGHT_RESOLUTION),
-                        worldY + ((float) dy / Block.LIGHT_RESOLUTION),
-                        neighbor.getWorldX() + 0.5,
-                        neighbor.getWorldY() + 0.5))
-                    / (Block.LIGHT_SOURCE_LOOK_BLOCKS * Block.LIGHT_SOURCE_LOOK_BLOCKS);
-            var old = tmpLightMap[dx][dy];
-
-            float normalizedIntensity;
-            if (dist == 0.0) {
-              normalizedIntensity = 0f;
-            } else if (dist > 0) {
-              normalizedIntensity = 1 - (float) (dist);
-            } else {
-              normalizedIntensity = 1 + (float) (dist);
-            }
-
-            if (old < normalizedIntensity) {
-              tmpLightMap[dx][dy] = normalizedIntensity;
-            }
-          }
-        }
-      }
-    }
-
-    synchronized (lightMap) {
-      for (int i = 0; i < Block.LIGHT_RESOLUTION; i++) {
-        System.arraycopy(tmpLightMap[i], 0, lightMap[i], 0, Block.LIGHT_RESOLUTION);
-      }
-    }
-
-    double total = 0;
-    for (int x = 0; x < LIGHT_RESOLUTION; x++) {
-      for (int y = 0; y < LIGHT_RESOLUTION; y++) {
-        total += lightMap[x][y];
-      }
-    }
-    averageBrightness = (float) (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION));
-  }
-
-  @Override
-  public boolean isLit() {
-    return isLit;
-  }
-
-  @Override
-  public boolean isSkylight() {
-    return isSkylight;
   }
 
   @Override

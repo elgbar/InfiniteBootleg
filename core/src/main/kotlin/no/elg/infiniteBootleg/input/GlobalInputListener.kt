@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 
 object GlobalInputListener : InputAdapter() {
 
@@ -15,7 +14,6 @@ object GlobalInputListener : InputAdapter() {
     when (keycode) {
       Input.Keys.ENTER -> {
         if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
-          Main.logger().log("Toggeling fullsjing")
           val mode = Gdx.graphics.displayMode
           if (Gdx.graphics.isFullscreen) {
             if (ClientMain.SCALE > 1) {

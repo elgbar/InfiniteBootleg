@@ -192,6 +192,9 @@ public class ChunkImpl implements Chunk {
 
       if (currBlock != null) {
         currBlock.dispose();
+        if (block instanceof BlockImpl bb) {
+          bb.setupBlockLight(currBlock.getBlockLight());
+        }
 
         if (currBlock instanceof TickingBlock tickingBlock) {
           synchronized (tickingBlocks) {
@@ -323,10 +326,9 @@ public class ChunkImpl implements Chunk {
 
       // If we reached this point before the light is done recalculating then we must start again
       if (lightUpdater != null) {
-        lightUpdater.cancel(true);
+        lightUpdater.cancel(false);
       }
     }
-
     // Render the world with the changes (but potentially without the light changes)
     final WorldRender render = world.getRender();
     if (render instanceof ClientWorldRender clientWorldRender) {
@@ -350,7 +352,8 @@ public class ChunkImpl implements Chunk {
                           }
                           Block b = blocks[localX][localY];
                           if (b != null) {
-                            ForkJoinTask<?> task = pool.submit(b::recalculateLighting);
+                            var bl = b.getBlockLight();
+                            ForkJoinTask<?> task = pool.submit(bl::recalculateLighting);
                             task.fork();
                             tasks.add(task);
                           }

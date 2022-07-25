@@ -63,7 +63,7 @@ public class HUDRenderer implements Renderer, Resizable {
       nl();
       DebugText.time(builder, world);
       nl();
-      DebugText.lights(builder, world);
+      DebugText.lights(builder);
       nl();
       DebugText.ents(builder, world);
     }

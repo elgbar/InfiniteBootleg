@@ -41,8 +41,10 @@ object DebugText {
     val rawY = ClientMain.inst().mouseWorldY
     val exists = block != null
     val blockDebug = block?.hudDebug() ?: ""
-    val isLit = block?.isLit ?: "maybe"
-    val skylight = block?.isSkylight ?: "maybe"
+    val blockLight = block?.blockLight
+
+    val isLit = blockLight?.isLit ?: "maybe"
+    val skylight = blockLight?.isSkylight ?: "maybe"
     val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5s lit? %-5s sky? %-5s %s"
     sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, isLit, skylight, blockDebug))
   }
@@ -65,7 +67,7 @@ object DebugText {
       val allowUnloading = pc.isAllowingUnloading
       val skychunk = cc.isChunkAboveTopBlock(chunkY)
       val upId = if (pc is ChunkImpl) pc.lightUpdaters.get() else -1
-      val format = "chunk (% 4d,% 4d) [top %2d]: type: %-9.9s (noise % .2f) all air? %-5b can unload? %-5b sky? %-5b light id % 3d"
+      val format = "chunk (% 4d,% 4d) [top %2d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|light id% 3d"
       sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, skychunk, upId))
     }
   }
