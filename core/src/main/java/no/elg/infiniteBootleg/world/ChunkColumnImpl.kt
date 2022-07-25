@@ -59,7 +59,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     return world.getBlock(getWorldX(localX), worldY)
   }
 
-  private fun getLoadedChunk(worldY: Int): Chunk? {
+  private fun getLoadedChunk(worldY: Int, chunkX: Int = this.chunkX): Chunk? {
     val chunkY = CoordUtil.worldToChunk(worldY)
     val compactLoc = CoordUtil.compactLoc(chunkX, chunkY)
 
@@ -87,11 +87,25 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
       top[localX] = worldY
     }
 
-    val min = min(oldTop, worldY)
-    val max = max(oldTop, worldY)
-    val fromClosedRange = IntProgression.fromClosedRange(min, max, CHUNK_SIZE)
-    for (ycoord in fromClosedRange) {
-      getLoadedChunk(ycoord)?.updateTexture(false)
+    val oldChunk = CoordUtil.worldToChunk(oldTop)
+    val newChunk = CoordUtil.worldToChunk(worldY)
+    val min = min(oldChunk, newChunk) - 1
+    val max = max(oldChunk, newChunk)
+    val worldX = CoordUtil.chunkToWorld(chunkX, localX)
+    for (chunkY in min..max) {
+      val newWorldY = CoordUtil.chunkToWorld(chunkY)
+      getLoadedChunk(newWorldY)?.dirty()
+
+      // Update chunks to the sides, if the light reaches that far
+      val leftChunkX = CoordUtil.worldToChunk((worldX - Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+      if (leftChunkX != chunkX) {
+        getLoadedChunk(newWorldY, leftChunkX)?.dirty()
+      }
+
+      val rightChunkX = CoordUtil.worldToChunk((worldX + Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+      if (rightChunkX != chunkX) {
+        getLoadedChunk(newWorldY, rightChunkX)?.dirty()
+      }
     }
   }
 
