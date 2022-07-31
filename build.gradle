@@ -3,7 +3,7 @@ plugins {
   id "idea"
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.8.0"
+  id "com.diffplug.spotless" version "6.9.0"
 }
 
 tasks.named("wrapper") {
@@ -101,21 +101,7 @@ subprojects {
                "--add-opens", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
     ]
   }
-}
 
-project(":desktop") {
-
-  dependencies {
-    implementation project(":core")
-    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-  }
-}
-
-project(":core") {
 
   dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -123,7 +109,7 @@ project(":core") {
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
     implementation "com.google.guava:guava:31.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.21.3"
+    implementation "com.google.protobuf:protobuf-java:3.21.4"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
@@ -142,10 +128,24 @@ project(":core") {
     implementation "org.jetbrains:annotations:23.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.12.4"
+    testImplementation "io.mockk:mockk:1.12.5"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
     testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 }
+
+project(":desktop") {
+
+  dependencies {
+    implementation project(":core")
+    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  }
+}
+
+project(":core") {}
