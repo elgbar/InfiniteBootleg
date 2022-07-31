@@ -15,7 +15,7 @@ public interface Block
 
   int BLOCK_SIZE = 16;
   int LIGHT_RESOLUTION = 2;
-  double LIGHT_SOURCE_LOOK_BLOCKS = 3.5;
+  double LIGHT_SOURCE_LOOK_BLOCKS = 7.5;
 
   @Nullable
   static Block fromProto(
