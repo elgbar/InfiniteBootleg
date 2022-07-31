@@ -46,9 +46,11 @@ class BlockLight(
     if (!Settings.renderLight) {
       return
     }
-    val block = chunk.getRawBlock(localX, localY) ?: return
     val chunkColumn = chunk.chunkColumn
-    if (block.getMaterial() == Material.AIR && chunkColumn.isBlockSkylight(localX, block.getWorldY())) {
+    val worldX: Int = CoordUtil.chunkToWorld(chunk.chunkX, localX)
+    val worldY: Int = CoordUtil.chunkToWorld(chunk.chunkY, localY)
+
+    if (chunkColumn.isBlockSkylight(localX, worldY)) {
       // This block is a skylight, its always lit fully
       isLit = true
       isSkylight = true
@@ -56,12 +58,11 @@ class BlockLight(
       synchronized(lightMap) { fillArray(lightMap, 1f) }
       return
     }
+
     var isLitNext = false
     fillArray(tmpLightMap, 0f)
 
     // find light sources around this block
-    val worldX: Int = block.getWorldX()
-    val worldY: Int = block.getWorldY()
     val blocksAABB = chunk
       .world
       .getBlocksAABB(
