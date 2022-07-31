@@ -182,13 +182,12 @@ public class ChunkImpl implements Chunk {
       }
       // accounts for both being null also ofc
       bothAirish = areBothAirish(currBlock, block);
-      if (bothAirish) {
-        // Ok to return here, only internal change
-        if (currBlock != null) {
-          currBlock.dispose();
-          blocks[localX][localY] = null;
-          return null;
+      if (bothAirish && currBlock != null) {
+        // Ok to return here, an air block exists here and the new block is also air (or null)
+        if (block != null) {
+          block.dispose();
         }
+        return currBlock;
       }
 
       if (currBlock != null) {
@@ -261,7 +260,11 @@ public class ChunkImpl implements Chunk {
   private static boolean areBothAirish(@Nullable Block blockA, @Nullable Block blockB) {
     return (blockA == null && blockB == null) //
         || (blockA == null && blockB.getMaterial() == AIR) //
-        || (blockB == null && blockA.getMaterial() == AIR);
+        || (blockB == null && blockA.getMaterial() == AIR)
+        || (blockA != null
+            && blockB != null
+            && blockA.getMaterial() == AIR
+            && blockB.getMaterial() == AIR);
   }
 
   @Override
