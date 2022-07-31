@@ -10,15 +10,29 @@ class BlockLight(
   val localY: Int
 ) {
 
+  /**
+   * Whether this block is above the top-most block of the given world y-coordinate
+   *
+   * It denotes that this is a fully lit block, and thus light can be skipped rendered on it.
+   */
   var isSkylight: Boolean
     private set
 
+  /**
+   * If this block have any light shining onto it. If not then it should be rendered as a black square
+   */
   var isLit: Boolean
     private set
 
+  /**
+   * The average brightness of the block
+   */
   var averageBrightness: Float
     private set
 
+  /**
+   * Brightness, in the range `0..1`, of each sub-cells.
+   */
   val lightMap: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
     get() {
       synchronized(field) {
@@ -114,19 +128,25 @@ class BlockLight(
         }
       }
     }
+
     synchronized(lightMap) {
-      isLit = isLitNext
-      isSkylight = false
       for (i in 0 until Block.LIGHT_RESOLUTION) {
         System.arraycopy(tmpLightMap[i], 0, lightMap[i], 0, Block.LIGHT_RESOLUTION)
       }
     }
-    var total = 0.0
-    for (x in 0 until Block.LIGHT_RESOLUTION) {
-      for (y in 0 until Block.LIGHT_RESOLUTION) {
-        total += lightMap[x][y].toDouble()
+    isLit = isLitNext
+    isSkylight = false
+
+    if (isLitNext) {
+      var total = 0.0
+      for (x in 0 until Block.LIGHT_RESOLUTION) {
+        for (y in 0 until Block.LIGHT_RESOLUTION) {
+          total += lightMap[x][y].toDouble()
+        }
       }
+      averageBrightness = (total / (Block.LIGHT_RESOLUTION * Block.LIGHT_RESOLUTION)).toFloat()
+    } else {
+      averageBrightness = 0f
     }
-    averageBrightness = (total / (Block.LIGHT_RESOLUTION * Block.LIGHT_RESOLUTION)).toFloat()
   }
 }
