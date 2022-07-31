@@ -115,9 +115,11 @@ public class ClientWorldRender implements WorldRender {
     }
     entityRenderer.render();
     batch.end();
-    var debug = Settings.renderBox2dDebug && Settings.debug;
-    if (debug) {
+    if (Settings.renderChunkBounds && Settings.debug) {
       chunkDebugRenderer.render();
+    }
+    if (Settings.renderBox2dDebug && Settings.debug) {
+      box2DDebugRenderer.render(worldBody.box2dWorld, m4);
     }
   }
 

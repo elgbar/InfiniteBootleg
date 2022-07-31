@@ -141,6 +141,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   private void debug(@Nullable String val) {
     log("Debug view is enabled. To disable this at runtime use command 'debug'");
     Settings.renderBox2dDebug = true;
+    Settings.renderChunkBounds = true;
     Settings.debug = true;
   }
 

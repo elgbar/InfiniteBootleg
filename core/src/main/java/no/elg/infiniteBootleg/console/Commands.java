@@ -185,12 +185,22 @@ public class Commands extends CommandExecutor {
 
   @ClientsideOnly
   @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
-  public void debug() {
+  public void debBox() {
     Settings.renderBox2dDebug = !Settings.renderBox2dDebug;
     Settings.debug = true;
     logger.log(
         LogLevel.SUCCESS,
         "Debug rendering for Box2D is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
+  }
+
+  @ClientsideOnly
+  @ConsoleDoc(description = "Toggles debug rendering of chunk bounds")
+  public void debChu() {
+    Settings.renderChunkBounds = !Settings.renderChunkBounds;
+    Settings.debug = true;
+    logger.log(
+        LogLevel.SUCCESS,
+        "Debug rendering of chunks is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
   }
 
   @ClientsideOnly
