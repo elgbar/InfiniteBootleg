@@ -49,6 +49,8 @@ public class ChunkRenderer implements Renderer, Disposable {
   public static final float CAVE_CLEAR_COLOR_G = 0.202941f;
   public static final float CAVE_CLEAR_COLOR_B = 0.055882f;
 
+  private static final int CHUNK_NOT_IN_QUEUE_INDEX = -1;
+
   static {
     var skyPixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
     skyPixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
@@ -77,14 +79,32 @@ public class ChunkRenderer implements Renderer, Disposable {
     queueRendering(chunk, prioritize, false);
   }
 
+  /**
+   * Queue rendering of a chunk. If the chunk is already in the queue to be rendered and {@code
+   * prioritize} is {@code true} then the chunk will be moved to the front of the queue
+   *
+   * @param chunk The chunk to render
+   * @param prioritize If the chunk should be placed at the front of the queue
+   * @param forceAdd If the chunk should be rendered even if it is already in queue or is currently
+   *     being rendered
+   */
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize, boolean forceAdd) {
     Main.inst()
         .getScheduler()
         .executeAsync(
             () -> {
               synchronized (QUEUE_LOCK) {
+                var chunkIndex = renderQueue.indexOf(chunk);
+
+                // Place the chunk at the front of the queue
+                if (prioritize && chunkIndex != CHUNK_NOT_IN_QUEUE_INDEX) {
+                  renderQueue.remove(chunkIndex);
+                  renderQueue.add(0, chunk);
+                  return;
+                }
+
                 // do not queue the chunk we're currently rendering
-                if ((forceAdd || chunk != curr) && !renderQueue.contains(chunk)) {
+                if ((forceAdd || chunk != curr) && chunkIndex == CHUNK_NOT_IN_QUEUE_INDEX) {
                   if (prioritize) {
                     renderQueue.add(0, chunk);
                   } else {
