@@ -387,9 +387,7 @@ public class ChunkImpl implements Chunk {
                   if (updateId == currentUpdateId.get()) {
                     // Re-render the chunk with the new lighting
                     if (render instanceof ClientWorldRender clientWorldRender) {
-                      clientWorldRender
-                          .getChunkRenderer()
-                          .queueRendering(this, wasPrioritize, true);
+                      clientWorldRender.getChunkRenderer().queueRendering(this, true, true);
                     }
                   }
                 });
