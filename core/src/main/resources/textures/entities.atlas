@@ -1,10 +1,10 @@
 entities.png
-size:177,338
+size:58,34
 format:RGBA4444
 repeat:xy
 door_closed
-bounds:160,271,16,32
+bounds:41,1,16,32
 door_open
-bounds:160,305,16,32
+bounds:23,1,16,32
 player
-bounds:1,1,157,336
+bounds:1,3,20,30
