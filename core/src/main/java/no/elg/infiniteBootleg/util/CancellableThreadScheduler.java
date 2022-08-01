@@ -119,7 +119,9 @@ public class CancellableThreadScheduler {
   public void shutdown() {
     executor.shutdown();
     try {
-      executor.awaitTermination(10L, TimeUnit.SECONDS);
+      if (!executor.awaitTermination(1L, TimeUnit.SECONDS)) {
+        executor.shutdownNow();
+      }
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

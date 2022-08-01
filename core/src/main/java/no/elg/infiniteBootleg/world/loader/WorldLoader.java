@@ -37,9 +37,9 @@ public class WorldLoader {
   private static World loadWorld(long seed) {
     var uuid = getUUIDFromSeed(seed);
     var worldFolder = getWorldFolder(uuid);
-    FileHandle worldZip = getWorldZip(worldFolder);
+    var worldZip = getWorldZip(worldFolder);
 
-    if (!Settings.loadWorldFromDisk || worldFolder == null) {
+    if (!Settings.loadWorldFromDisk) {
       return null;
     }
     if (worldZip == null || !worldZip.exists()) {
@@ -99,14 +99,17 @@ public class WorldLoader {
     }
   }
 
+  @Nullable
   public static FileHandle getWorldZip(@Nullable FileHandle folder) {
     return folder != null ? folder.parent().child(folder.name() + ".zip") : null;
   }
 
+  @NotNull
   public static FileHandle getWorldFolder(@NotNull UUID uuid) {
     return Gdx.files.external(Main.WORLD_FOLDER + uuid);
   }
 
+  @NotNull
   public static ChunkGenerator generatorFromProto(@NotNull ProtoWorld.World protoWorld) {
     return switch (protoWorld.getGenerator()) {
       case PERLIN, UNRECOGNIZED -> new PerlinChunkGenerator(protoWorld.getSeed());

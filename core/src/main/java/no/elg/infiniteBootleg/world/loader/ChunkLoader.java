@@ -78,6 +78,8 @@ public class ChunkLoader {
           e.printStackTrace();
         }
       }
+      Main.logger()
+          .warn("Failed to load chunk " + chunkX + "," + chunkY + " from existing file chunk file");
       // Failed to assemble, generate new chunk
     }
     return generator.generate(world, chunkX, chunkY);

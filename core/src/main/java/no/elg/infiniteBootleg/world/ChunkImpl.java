@@ -222,7 +222,12 @@ public class ChunkImpl implements Chunk {
         if (block != null) {
           chunkBody.addBlock(block, null);
         }
-        getChunkColumn().updateTopBlock(localX, getWorldY(localY));
+        Main.inst()
+            .getScheduler()
+            .executeAsync(
+                () -> {
+                  getChunkColumn().updateTopBlock(localX, getWorldY(localY));
+                });
       }
     }
     int worldX = getWorldX(localX);
@@ -523,6 +528,7 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
+  @Contract(pure = true)
   public long getCompactLocation() {
     return CoordUtil.compactLoc(chunkX, chunkY);
   }
