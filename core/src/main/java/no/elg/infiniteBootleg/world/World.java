@@ -22,9 +22,6 @@ import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,7 +41,6 @@ import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
-import no.elg.infiniteBootleg.util.ZipUtils;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -133,9 +129,7 @@ public abstract class World implements Disposable, Resizable {
   public void initialize() {
     if (Settings.loadWorldFromDisk) {
       FileHandle worldFolder = getWorldFolder();
-      if (worldFolder != null
-          && worldFolder.exists()
-          && worldFolder.child(LOCK_FILE_NAME).exists()) {
+      if (worldFolder != null && worldFolder.isDirectory() && !WorldLoader.canWriteToWorld(uuid)) {
         if (!Settings.ignoreWorldLock) {
           transientWorld = true;
           Main.logger()
@@ -148,25 +142,26 @@ public abstract class World implements Disposable, Resizable {
         }
       }
 
-      FileHandle worldZip = getWorldZip();
-      if (transientWorld || worldFolder == null || worldZip == null || !worldZip.exists()) {
+      if (transientWorld || worldFolder == null) {
         Main.logger().log("No world save found");
       } else {
-        Main.logger().log("Loading world from '" + worldZip.file().getAbsolutePath() + '\'');
+        Main.logger().log("Loading world from '" + worldFolder.file().getAbsolutePath() + '\'');
 
-        worldFolder.deleteDirectory();
-        var lockFile = worldFolder.child(LOCK_FILE_NAME);
-        lockFile.writeString(ProcessHandle.current().pid() + "\n", true);
-        ZipUtils.unzip(worldFolder, worldZip);
-
-        var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
-
-        final ProtoWorld.World protoWorld;
-        try {
-          protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
-          loadFromProtoWorld(protoWorld);
-        } catch (InvalidProtocolBufferException e) {
-          e.printStackTrace();
+        if (WorldLoader.writeLockFile(uuid)) {
+          var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
+          if (worldInfoFile.exists() && !worldInfoFile.isDirectory()) {
+            try {
+              final ProtoWorld.World protoWorld =
+                  ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
+              loadFromProtoWorld(protoWorld);
+            } catch (InvalidProtocolBufferException e) {
+              e.printStackTrace();
+            }
+          }
+        } else {
+          Main.logger()
+              .error("Failed to write world lock file! Setting world to transient to be safe");
+          transientWorld = true;
         }
       }
     }
@@ -231,15 +226,6 @@ public abstract class World implements Disposable, Resizable {
       worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
     }
     worldInfoFile.writeBytes(builder.toByteArray(), false);
-
-    FileHandle worldZip = worldFolder.parent().child(uuid + ".zip");
-    try {
-      ZipUtils.zip(worldFolder, worldZip);
-      Main.logger().log("World", "World saved!");
-    } catch (IOException e) {
-      Main.logger()
-          .error("World", "Failed to save world due to a " + e.getClass().getSimpleName(), e);
-    }
   }
 
   @NotNull
@@ -277,10 +263,6 @@ public abstract class World implements Disposable, Resizable {
       worldFile = WorldLoader.getWorldFolder(uuid);
     }
     return worldFile;
-  }
-
-  protected FileHandle getWorldZip() {
-    return WorldLoader.getWorldZip(getWorldFolder());
   }
 
   private ProtoWorld.World.Generator getGeneratorType() {
@@ -1249,23 +1231,9 @@ public abstract class World implements Disposable, Resizable {
 
     if (!transientWorld) {
       FileHandle worldFolder = getWorldFolder();
-      if (worldFolder != null) {
-        if (!worldFolder.deleteDirectory()) {
-          Main.logger()
-              .warn(
-                  "World",
-                  "Failed to delete world directory, trying to explicitly delete lock file");
-          FileHandle child = worldFolder.child(LOCK_FILE_NAME);
-          Path path = child.file().toPath();
-          try {
-            Files.delete(path);
-            Main.logger()
-                .log("World", "Deleted world lock file after failing to delete world folder");
-          } catch (IOException e) {
-            Main.logger().warn("World", "Failed to delete lock file: " + e.getMessage());
-          }
-        } else {
-          Main.logger().log("World", "Deleted world directory");
+      if (worldFolder != null && worldFolder.isDirectory()) {
+        if (!WorldLoader.deleteLockFile(uuid)) {
+          Main.logger().error("Failed to delete world lock file!");
         }
       }
     }
