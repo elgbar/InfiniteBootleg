@@ -122,7 +122,6 @@ subprojects {
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
     implementation "io.netty:netty-all:4.1.79.Final"
-    implementation "no.kh498.util:CommonUtil:1.0.4"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "org.jetbrains:annotations:23.0.0"

@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
+import no.elg.infiniteBootleg.util.ReflectionUtil;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.ClientWorld;
@@ -34,7 +35,6 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.elg.infiniteBootleg.world.time.WorldTime;
-import no.kh498.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,7 +99,7 @@ public class Commands extends CommandExecutor {
     if (world == null) return;
     Color skylight = world.getWorldTime().getBaseColor();
     try {
-      Color color = (Color) Reflection.getStaticField(Color.class, colorName.toUpperCase());
+      Color color = (Color) ReflectionUtil.getStaticField(Color.class, colorName.toUpperCase());
       skylight.set(color);
       logger.log("Sky color changed to " + colorName.toLowerCase() + " (" + color + ")");
     } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
