@@ -31,6 +31,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
   private final Console console;
   private final CommandExecutor exec;
   private final SystemConsoleReader consoleReader;
+  private boolean disposed;
 
   public ConsoleHandler() {
     this(Settings.client);
@@ -203,11 +204,13 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
    * @see com.strongjoshua.console.Console#log(String, LogLevel)
    */
   @Override
-  public void log(@NotNull LogLevel level, @NotNull String msg) {
+  public synchronized void log(@NotNull LogLevel level, @NotNull String msg) {
+    if (disposed) {
+      System.out.println("[POST DISPOSED LOGGING] <" + level.name() + "> " + msg);
+      return;
+    }
     try {
-      synchronized (this) {
-        console.log(msg, level);
-      }
+      console.log(msg, level);
     } catch (Exception ex) {
       System.err.printf(
           "Failed to log the message '%s' with level %s due to the exception %s: %s%n",
@@ -220,7 +223,11 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
   }
 
   @Override
-  public void dispose() {
+  public synchronized void dispose() {
+    if (disposed) {
+      return;
+    }
+    disposed = true;
     console.dispose();
     consoleReader.dispose();
   }
