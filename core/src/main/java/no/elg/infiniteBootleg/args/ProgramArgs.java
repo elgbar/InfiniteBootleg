@@ -240,6 +240,9 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     System.exit(0);
   }
 
+  @Argument(
+      value = "Start instance as server, implies --headless, argument is port to start on",
+      alt = 'S')
   public boolean server(@Nullable String val) {
     Settings.client = false;
     if (val != null) {
