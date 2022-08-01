@@ -5,6 +5,7 @@ import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
@@ -24,13 +25,16 @@ public record EntityRenderer(@NotNull ClientWorldRender worldRender) implements 
       if (textureRegion == null) {
         continue;
       }
-      float worldX = (entity.getPosition().x - entity.getHalfBox2dWidth());
-      float worldY = (entity.getPosition().y - entity.getHalfBox2dHeight());
+      Vector2 centerPos = entity.getPosition();
+      float worldX = (centerPos.x - entity.getHalfBox2dWidth());
+      float worldY = (centerPos.y - entity.getHalfBox2dHeight());
       float x = worldX * BLOCK_SIZE + worldOffsetX;
       float y = worldY * BLOCK_SIZE + worldOffsetY;
       if (Settings.renderLight) {
         var currentBlock =
-            worldRender.getWorld().getRawBlock((int) Math.floor(worldX), (int) Math.floor(worldY));
+            worldRender
+                .getWorld()
+                .getRawBlock((int) Math.floor(centerPos.x), (int) Math.floor(centerPos.y));
         if (currentBlock != null) {
           var blockLight = currentBlock.getBlockLight();
           if (blockLight.isSkylight()) {
