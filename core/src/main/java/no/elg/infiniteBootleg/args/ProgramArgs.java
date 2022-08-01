@@ -108,7 +108,22 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   @Argument(value = "Do not save nor load the world to and from disk", alt = 'l')
   private void no_load(@Nullable String val) {
     Settings.loadWorldFromDisk = false;
+    if (Settings.ignoreWorldLock) {
+      warn(
+          "The world lock have no effect when not loading worlds. The --force-load argument is useless in with the --no-load argument");
+    }
     log("Worlds will not be loaded/saved from/to disk");
+  }
+
+  /** Do not load the worlds from disk */
+  @Argument(value = "Force load world from disk, even if it is already in use", alt = 'f')
+  private void force_load(@Nullable String val) {
+    Settings.ignoreWorldLock = true;
+    if (!Settings.loadWorldFromDisk) {
+      warn(
+          "The world lock have no effect when not loading worlds. The --force-load argument is useless in with the --no-load argument");
+    }
+    log("World will be loaded, even if it is already in use");
   }
 
   /**

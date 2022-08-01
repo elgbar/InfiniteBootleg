@@ -11,6 +11,8 @@ public class Settings {
 
   /** If worlds should be loaded from disk */
   public static boolean loadWorldFromDisk = true;
+  /** Ignore the world lock */
+  public static boolean ignoreWorldLock;
 
   /**
    * If graphics should be rendered, false implies this should be a server

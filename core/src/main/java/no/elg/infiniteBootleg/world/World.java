@@ -136,10 +136,16 @@ public abstract class World implements Disposable, Resizable {
       if (worldFolder != null
           && worldFolder.exists()
           && worldFolder.child(LOCK_FILE_NAME).exists()) {
-        transientWorld = true;
-        Main.logger()
-            .warn(
-                "World", "World found is already in use. Initializing this as a transient world.");
+        if (!Settings.ignoreWorldLock) {
+          transientWorld = true;
+          Main.logger()
+              .warn("World", "World found is already in use. Initializing world as a transient.");
+        } else {
+          Main.logger()
+              .warn(
+                  "World",
+                  "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!");
+        }
       }
 
       FileHandle worldZip = getWorldZip();
