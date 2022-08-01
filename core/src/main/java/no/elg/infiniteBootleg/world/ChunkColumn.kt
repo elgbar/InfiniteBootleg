@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world
 
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
+
 /**
  * A column representing all chunks with a given chunk x coordinate.
  */
@@ -27,4 +29,5 @@ interface ChunkColumn {
    */
   fun isChunkAboveTopBlock(chunkY: Int): Boolean
   fun isBlockSkylight(localX: Int, worldY: Int): Boolean
+  fun toProtobuf(): ProtoWorld.ChunkColumn
 }

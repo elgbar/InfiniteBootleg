@@ -22,6 +22,7 @@ message World {
   float time = 3;
   Vector2i spawn = 4;
   float timeScale = 5;
+  repeated ChunkColumn chunkColumns = 6;
 
   Generator generator = 16;
   optional Entity player = 17;
@@ -47,6 +48,11 @@ message Chunk {
   Vector2i position = 1;
   repeated Block blocks = 2;
   repeated Entity entities = 3;
+}
+
+message ChunkColumn {
+  int32 chunkX = 1;
+  repeated int32 top_blocks = 2;
 }
 
 message Entity {

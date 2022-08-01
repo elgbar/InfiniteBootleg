@@ -1244,6 +1244,19 @@ public final class ProtoWorld {
      */
     float getTimeScale();
 
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn> getChunkColumnsList();
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn getChunkColumns(int index);
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    int getChunkColumnsCount();
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    java.util.List<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder>
+        getChunkColumnsOrBuilderList();
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder getChunkColumnsOrBuilder(
+        int index);
+
     /**
      * <code>.persistence.World.Generator generator = 16;</code>
      *
@@ -1285,6 +1298,7 @@ public final class ProtoWorld {
 
     private World() {
       name_ = "";
+      chunkColumns_ = java.util.Collections.emptyList();
       generator_ = 0;
     }
 
@@ -1357,6 +1371,20 @@ public final class ProtoWorld {
                 timeScale_ = input.readFloat();
                 break;
               }
+            case 50:
+              {
+                if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                  chunkColumns_ =
+                      new java.util.ArrayList<
+                          no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn>();
+                  mutable_bitField0_ |= 0x00000001;
+                }
+                chunkColumns_.add(
+                    input.readMessage(
+                        no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.parser(),
+                        extensionRegistry));
+                break;
+              }
             case 128:
               {
                 int rawValue = input.readEnum();
@@ -1397,6 +1425,9 @@ public final class ProtoWorld {
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          chunkColumns_ = java.util.Collections.unmodifiableList(chunkColumns_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -1629,6 +1660,37 @@ public final class ProtoWorld {
       return timeScale_;
     }
 
+    public static final int CHUNKCOLUMNS_FIELD_NUMBER = 6;
+    private java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn> chunkColumns_;
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    @java.lang.Override
+    public java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn>
+        getChunkColumnsList() {
+      return chunkColumns_;
+    }
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    @java.lang.Override
+    public java.util.List<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder>
+        getChunkColumnsOrBuilderList() {
+      return chunkColumns_;
+    }
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    @java.lang.Override
+    public int getChunkColumnsCount() {
+      return chunkColumns_.size();
+    }
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn getChunkColumns(int index) {
+      return chunkColumns_.get(index);
+    }
+    /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder getChunkColumnsOrBuilder(
+        int index) {
+      return chunkColumns_.get(index);
+    }
+
     public static final int GENERATOR_FIELD_NUMBER = 16;
     private int generator_;
     /**
@@ -1714,6 +1776,9 @@ public final class ProtoWorld {
       if (java.lang.Float.floatToRawIntBits(timeScale_) != 0) {
         output.writeFloat(5, timeScale_);
       }
+      for (int i = 0; i < chunkColumns_.size(); i++) {
+        output.writeMessage(6, chunkColumns_.get(i));
+      }
       if (generator_
           != no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN.getNumber()) {
         output.writeEnum(16, generator_);
@@ -1744,6 +1809,9 @@ public final class ProtoWorld {
       }
       if (java.lang.Float.floatToRawIntBits(timeScale_) != 0) {
         size += com.google.protobuf.CodedOutputStream.computeFloatSize(5, timeScale_);
+      }
+      for (int i = 0; i < chunkColumns_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(6, chunkColumns_.get(i));
       }
       if (generator_
           != no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN.getNumber()) {
@@ -1778,6 +1846,7 @@ public final class ProtoWorld {
       }
       if (java.lang.Float.floatToIntBits(getTimeScale())
           != java.lang.Float.floatToIntBits(other.getTimeScale())) return false;
+      if (!getChunkColumnsList().equals(other.getChunkColumnsList())) return false;
       if (generator_ != other.generator_) return false;
       if (hasPlayer() != other.hasPlayer()) return false;
       if (hasPlayer()) {
@@ -1806,6 +1875,10 @@ public final class ProtoWorld {
       }
       hash = (37 * hash) + TIMESCALE_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(getTimeScale());
+      if (getChunkColumnsCount() > 0) {
+        hash = (37 * hash) + CHUNKCOLUMNS_FIELD_NUMBER;
+        hash = (53 * hash) + getChunkColumnsList().hashCode();
+      }
       hash = (37 * hash) + GENERATOR_FIELD_NUMBER;
       hash = (53 * hash) + generator_;
       if (hasPlayer()) {
@@ -1948,6 +2021,7 @@ public final class ProtoWorld {
 
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {
+          getChunkColumnsFieldBuilder();
           getPlayerFieldBuilder();
         }
       }
@@ -1969,6 +2043,12 @@ public final class ProtoWorld {
         }
         timeScale_ = 0F;
 
+        if (chunkColumnsBuilder_ == null) {
+          chunkColumns_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          chunkColumnsBuilder_.clear();
+        }
         generator_ = 0;
 
         if (playerBuilder_ == null) {
@@ -1976,7 +2056,7 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
 
@@ -2018,8 +2098,17 @@ public final class ProtoWorld {
           result.spawn_ = spawnBuilder_.build();
         }
         result.timeScale_ = timeScale_;
+        if (chunkColumnsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            chunkColumns_ = java.util.Collections.unmodifiableList(chunkColumns_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.chunkColumns_ = chunkColumns_;
+        } else {
+          result.chunkColumns_ = chunkColumnsBuilder_.build();
+        }
         result.generator_ = generator_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
+        if (((from_bitField0_ & 0x00000002) != 0)) {
           if (playerBuilder_ == null) {
             result.player_ = player_;
           } else {
@@ -2095,6 +2184,33 @@ public final class ProtoWorld {
         }
         if (other.getTimeScale() != 0F) {
           setTimeScale(other.getTimeScale());
+        }
+        if (chunkColumnsBuilder_ == null) {
+          if (!other.chunkColumns_.isEmpty()) {
+            if (chunkColumns_.isEmpty()) {
+              chunkColumns_ = other.chunkColumns_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureChunkColumnsIsMutable();
+              chunkColumns_.addAll(other.chunkColumns_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.chunkColumns_.isEmpty()) {
+            if (chunkColumnsBuilder_.isEmpty()) {
+              chunkColumnsBuilder_.dispose();
+              chunkColumnsBuilder_ = null;
+              chunkColumns_ = other.chunkColumns_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              chunkColumnsBuilder_ =
+                  com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders
+                      ? getChunkColumnsFieldBuilder()
+                      : null;
+            } else {
+              chunkColumnsBuilder_.addAllMessages(other.chunkColumns_);
+            }
+          }
         }
         if (other.generator_ != 0) {
           setGeneratorValue(other.getGeneratorValue());
@@ -2435,6 +2551,230 @@ public final class ProtoWorld {
         return this;
       }
 
+      private java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn> chunkColumns_ =
+          java.util.Collections.emptyList();
+
+      private void ensureChunkColumnsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          chunkColumns_ =
+              new java.util.ArrayList<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn>(
+                  chunkColumns_);
+          bitField0_ |= 0x00000001;
+        }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn,
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder,
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder>
+          chunkColumnsBuilder_;
+
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn>
+          getChunkColumnsList() {
+        if (chunkColumnsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(chunkColumns_);
+        } else {
+          return chunkColumnsBuilder_.getMessageList();
+        }
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public int getChunkColumnsCount() {
+        if (chunkColumnsBuilder_ == null) {
+          return chunkColumns_.size();
+        } else {
+          return chunkColumnsBuilder_.getCount();
+        }
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn getChunkColumns(int index) {
+        if (chunkColumnsBuilder_ == null) {
+          return chunkColumns_.get(index);
+        } else {
+          return chunkColumnsBuilder_.getMessage(index);
+        }
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder setChunkColumns(
+          int index, no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn value) {
+        if (chunkColumnsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.set(index, value);
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder setChunkColumns(
+          int index,
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder builderForValue) {
+        if (chunkColumnsBuilder_ == null) {
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder addChunkColumns(no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn value) {
+        if (chunkColumnsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.add(value);
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder addChunkColumns(
+          int index, no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn value) {
+        if (chunkColumnsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.add(index, value);
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder addChunkColumns(
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder builderForValue) {
+        if (chunkColumnsBuilder_ == null) {
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.add(builderForValue.build());
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder addChunkColumns(
+          int index,
+          no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder builderForValue) {
+        if (chunkColumnsBuilder_ == null) {
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder addAllChunkColumns(
+          java.lang.Iterable<? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn>
+              values) {
+        if (chunkColumnsBuilder_ == null) {
+          ensureChunkColumnsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(values, chunkColumns_);
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder clearChunkColumns() {
+        if (chunkColumnsBuilder_ == null) {
+          chunkColumns_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.clear();
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public Builder removeChunkColumns(int index) {
+        if (chunkColumnsBuilder_ == null) {
+          ensureChunkColumnsIsMutable();
+          chunkColumns_.remove(index);
+          onChanged();
+        } else {
+          chunkColumnsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder getChunkColumnsBuilder(
+          int index) {
+        return getChunkColumnsFieldBuilder().getBuilder(index);
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder
+          getChunkColumnsOrBuilder(int index) {
+        if (chunkColumnsBuilder_ == null) {
+          return chunkColumns_.get(index);
+        } else {
+          return chunkColumnsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public java.util.List<
+              ? extends no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder>
+          getChunkColumnsOrBuilderList() {
+        if (chunkColumnsBuilder_ != null) {
+          return chunkColumnsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(chunkColumns_);
+        }
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder
+          addChunkColumnsBuilder() {
+        return getChunkColumnsFieldBuilder()
+            .addBuilder(
+                no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.getDefaultInstance());
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder addChunkColumnsBuilder(
+          int index) {
+        return getChunkColumnsFieldBuilder()
+            .addBuilder(
+                index, no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.getDefaultInstance());
+      }
+      /** <code>repeated .persistence.ChunkColumn chunkColumns = 6;</code> */
+      public java.util.List<no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder>
+          getChunkColumnsBuilderList() {
+        return getChunkColumnsFieldBuilder().getBuilderList();
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn,
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder,
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder>
+          getChunkColumnsFieldBuilder() {
+        if (chunkColumnsBuilder_ == null) {
+          chunkColumnsBuilder_ =
+              new com.google.protobuf.RepeatedFieldBuilderV3<
+                  no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn,
+                  no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder,
+                  no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder>(
+                  chunkColumns_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          chunkColumns_ = null;
+        }
+        return chunkColumnsBuilder_;
+      }
+
       private int generator_ = 0;
       /**
        * <code>.persistence.World.Generator generator = 16;</code>
@@ -2511,7 +2851,7 @@ public final class ProtoWorld {
        * @return Whether the player field is set.
        */
       public boolean hasPlayer() {
-        return ((bitField0_ & 0x00000001) != 0);
+        return ((bitField0_ & 0x00000002) != 0);
       }
       /**
        * <code>optional .persistence.Entity player = 17;</code>
@@ -2538,7 +2878,7 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         return this;
       }
       /** <code>optional .persistence.Entity player = 17;</code> */
@@ -2550,13 +2890,13 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         return this;
       }
       /** <code>optional .persistence.Entity player = 17;</code> */
       public Builder mergePlayer(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (playerBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) != 0)
+          if (((bitField0_ & 0x00000002) != 0)
               && player_ != null
               && player_
                   != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()) {
@@ -2576,7 +2916,7 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         return this;
       }
       /** <code>optional .persistence.Entity player = 17;</code> */
@@ -2587,12 +2927,12 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
       /** <code>optional .persistence.Entity player = 17;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder getPlayerBuilder() {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         onChanged();
         return getPlayerFieldBuilder().getBuilder();
       }
@@ -5372,6 +5712,732 @@ public final class ProtoWorld {
 
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+  }
+
+  public interface ChunkColumnOrBuilder
+      extends
+      // @@protoc_insertion_point(interface_extends:persistence.ChunkColumn)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 chunkX = 1;</code>
+     *
+     * @return The chunkX.
+     */
+    int getChunkX();
+
+    /**
+     * <code>repeated int32 top_blocks = 2;</code>
+     *
+     * @return A list containing the topBlocks.
+     */
+    java.util.List<java.lang.Integer> getTopBlocksList();
+    /**
+     * <code>repeated int32 top_blocks = 2;</code>
+     *
+     * @return The count of topBlocks.
+     */
+    int getTopBlocksCount();
+    /**
+     * <code>repeated int32 top_blocks = 2;</code>
+     *
+     * @param index The index of the element to return.
+     * @return The topBlocks at the given index.
+     */
+    int getTopBlocks(int index);
+  }
+  /** Protobuf type {@code persistence.ChunkColumn} */
+  public static final class ChunkColumn extends com.google.protobuf.GeneratedMessageV3
+      implements
+      // @@protoc_insertion_point(message_implements:persistence.ChunkColumn)
+      ChunkColumnOrBuilder {
+    private static final long serialVersionUID = 0L;
+    // Use ChunkColumn.newBuilder() to construct.
+    private ChunkColumn(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+
+    private ChunkColumn() {
+      topBlocks_ = emptyIntList();
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
+      return new ChunkColumn();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
+      return this.unknownFields;
+    }
+
+    private ChunkColumn(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8:
+              {
+                chunkX_ = input.readInt32();
+                break;
+              }
+            case 16:
+              {
+                if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                  topBlocks_ = newIntList();
+                  mutable_bitField0_ |= 0x00000001;
+                }
+                topBlocks_.addInt(input.readInt32());
+                break;
+              }
+            case 18:
+              {
+                int length = input.readRawVarint32();
+                int limit = input.pushLimit(length);
+                if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
+                  topBlocks_ = newIntList();
+                  mutable_bitField0_ |= 0x00000001;
+                }
+                while (input.getBytesUntilLimit() > 0) {
+                  topBlocks_.addInt(input.readInt32());
+                }
+                input.popLimit(limit);
+                break;
+              }
+            default:
+              {
+                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (com.google.protobuf.UninitializedMessageException e) {
+        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          topBlocks_.makeImmutable(); // C
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+      return no.elg
+          .infiniteBootleg
+          .protobuf
+          .ProtoWorld
+          .internal_static_persistence_ChunkColumn_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return no.elg.infiniteBootleg.protobuf.ProtoWorld
+          .internal_static_persistence_ChunkColumn_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.class,
+              no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder.class);
+    }
+
+    public static final int CHUNKX_FIELD_NUMBER = 1;
+    private int chunkX_;
+    /**
+     * <code>int32 chunkX = 1;</code>
+     *
+     * @return The chunkX.
+     */
+    @java.lang.Override
+    public int getChunkX() {
+      return chunkX_;
+    }
+
+    public static final int TOP_BLOCKS_FIELD_NUMBER = 2;
+    private com.google.protobuf.Internal.IntList topBlocks_;
+    /**
+     * <code>repeated int32 top_blocks = 2;</code>
+     *
+     * @return A list containing the topBlocks.
+     */
+    @java.lang.Override
+    public java.util.List<java.lang.Integer> getTopBlocksList() {
+      return topBlocks_;
+    }
+    /**
+     * <code>repeated int32 top_blocks = 2;</code>
+     *
+     * @return The count of topBlocks.
+     */
+    public int getTopBlocksCount() {
+      return topBlocks_.size();
+    }
+    /**
+     * <code>repeated int32 top_blocks = 2;</code>
+     *
+     * @param index The index of the element to return.
+     * @return The topBlocks at the given index.
+     */
+    public int getTopBlocks(int index) {
+      return topBlocks_.getInt(index);
+    }
+
+    private int topBlocksMemoizedSerializedSize = -1;
+
+    private byte memoizedIsInitialized = -1;
+
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
+      getSerializedSize();
+      if (chunkX_ != 0) {
+        output.writeInt32(1, chunkX_);
+      }
+      if (getTopBlocksList().size() > 0) {
+        output.writeUInt32NoTag(18);
+        output.writeUInt32NoTag(topBlocksMemoizedSerializedSize);
+      }
+      for (int i = 0; i < topBlocks_.size(); i++) {
+        output.writeInt32NoTag(topBlocks_.getInt(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (chunkX_ != 0) {
+        size += com.google.protobuf.CodedOutputStream.computeInt32Size(1, chunkX_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < topBlocks_.size(); i++) {
+          dataSize +=
+              com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(topBlocks_.getInt(i));
+        }
+        size += dataSize;
+        if (!getTopBlocksList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
+        }
+        topBlocksMemoizedSerializedSize = dataSize;
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+        return true;
+      }
+      if (!(obj instanceof no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn)) {
+        return super.equals(obj);
+      }
+      no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn other =
+          (no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn) obj;
+
+      if (getChunkX() != other.getChunkX()) return false;
+      if (!getTopBlocksList().equals(other.getTopBlocksList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CHUNKX_FIELD_NUMBER;
+      hash = (53 * hash) + getChunkX();
+      if (getTopBlocksCount() > 0) {
+        hash = (37 * hash) + TOP_BLOCKS_FIELD_NUMBER;
+        hash = (53 * hash) + getTopBlocksList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        java.nio.ByteBuffer data) throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        java.nio.ByteBuffer data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        byte[] data, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        java.io.InputStream input) throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(PARSER, input);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(
+          PARSER, input, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseDelimitedFrom(
+        java.io.InputStream input) throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseDelimitedFrom(
+        java.io.InputStream input, com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseDelimitedWithIOException(
+          PARSER, input, extensionRegistry);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        com.google.protobuf.CodedInputStream input) throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(PARSER, input);
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3.parseWithIOException(
+          PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+
+    public static Builder newBuilder(
+        no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /** Protobuf type {@code persistence.ChunkColumn} */
+    public static final class Builder
+        extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
+        implements
+        // @@protoc_insertion_point(builder_implements:persistence.ChunkColumn)
+        no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumnOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+        return no.elg
+            .infiniteBootleg
+            .protobuf
+            .ProtoWorld
+            .internal_static_persistence_ChunkColumn_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return no.elg.infiniteBootleg.protobuf.ProtoWorld
+            .internal_static_persistence_ChunkColumn_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.class,
+                no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.Builder.class);
+      }
+
+      // Construct using no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
+      }
+
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        chunkX_ = 0;
+
+        topBlocks_ = emptyIntList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+        return no.elg
+            .infiniteBootleg
+            .protobuf
+            .ProtoWorld
+            .internal_static_persistence_ChunkColumn_descriptor;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn getDefaultInstanceForType() {
+        return no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn build() {
+        no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn buildPartial() {
+        no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn result =
+            new no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn(this);
+        int from_bitField0_ = bitField0_;
+        result.chunkX_ = chunkX_;
+        if (((bitField0_ & 0x00000001) != 0)) {
+          topBlocks_.makeImmutable();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.topBlocks_ = topBlocks_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
+        return super.setField(field, value);
+      }
+
+      @java.lang.Override
+      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+
+      @java.lang.Override
+      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index,
+          java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn) {
+          return mergeFrom((no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn) other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn other) {
+        if (other == no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.getDefaultInstance())
+          return this;
+        if (other.getChunkX() != 0) {
+          setChunkX(other.getChunkX());
+        }
+        if (!other.topBlocks_.isEmpty()) {
+          if (topBlocks_.isEmpty()) {
+            topBlocks_ = other.topBlocks_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureTopBlocksIsMutable();
+            topBlocks_.addAll(other.topBlocks_);
+          }
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage =
+              (no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int bitField0_;
+
+      private int chunkX_;
+      /**
+       * <code>int32 chunkX = 1;</code>
+       *
+       * @return The chunkX.
+       */
+      @java.lang.Override
+      public int getChunkX() {
+        return chunkX_;
+      }
+      /**
+       * <code>int32 chunkX = 1;</code>
+       *
+       * @param value The chunkX to set.
+       * @return This builder for chaining.
+       */
+      public Builder setChunkX(int value) {
+
+        chunkX_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 chunkX = 1;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearChunkX() {
+
+        chunkX_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Internal.IntList topBlocks_ = emptyIntList();
+
+      private void ensureTopBlocksIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          topBlocks_ = mutableCopy(topBlocks_);
+          bitField0_ |= 0x00000001;
+        }
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @return A list containing the topBlocks.
+       */
+      public java.util.List<java.lang.Integer> getTopBlocksList() {
+        return ((bitField0_ & 0x00000001) != 0)
+            ? java.util.Collections.unmodifiableList(topBlocks_)
+            : topBlocks_;
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @return The count of topBlocks.
+       */
+      public int getTopBlocksCount() {
+        return topBlocks_.size();
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @param index The index of the element to return.
+       * @return The topBlocks at the given index.
+       */
+      public int getTopBlocks(int index) {
+        return topBlocks_.getInt(index);
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @param index The index to set the value at.
+       * @param value The topBlocks to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTopBlocks(int index, int value) {
+        ensureTopBlocksIsMutable();
+        topBlocks_.setInt(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @param value The topBlocks to add.
+       * @return This builder for chaining.
+       */
+      public Builder addTopBlocks(int value) {
+        ensureTopBlocksIsMutable();
+        topBlocks_.addInt(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @param values The topBlocks to add.
+       * @return This builder for chaining.
+       */
+      public Builder addAllTopBlocks(java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureTopBlocksIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(values, topBlocks_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 top_blocks = 2;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearTopBlocks() {
+        topBlocks_ = emptyIntList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+      // @@protoc_insertion_point(builder_scope:persistence.ChunkColumn)
+    }
+
+    // @@protoc_insertion_point(class_scope:persistence.ChunkColumn)
+    private static final no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn DEFAULT_INSTANCE;
+
+    static {
+      DEFAULT_INSTANCE = new no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn();
+    }
+
+    public static no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ChunkColumn> PARSER =
+        new com.google.protobuf.AbstractParser<ChunkColumn>() {
+          @java.lang.Override
+          public ChunkColumn parsePartialFrom(
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws com.google.protobuf.InvalidProtocolBufferException {
+            return new ChunkColumn(input, extensionRegistry);
+          }
+        };
+
+    public static com.google.protobuf.Parser<ChunkColumn> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ChunkColumn> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
   }
@@ -10305,6 +11371,10 @@ public final class ProtoWorld {
   private static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_persistence_Chunk_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+      internal_static_persistence_ChunkColumn_descriptor;
+  private static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_persistence_ChunkColumn_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
       internal_static_persistence_Entity_descriptor;
   private static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_persistence_Entity_fieldAccessorTable;
@@ -10335,38 +11405,41 @@ public final class ProtoWorld {
     java.lang.String[] descriptorData = {
       "\n\037serialization/persistence.proto\022\013persi"
           + "stence\" \n\010Vector2f\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002 \001(\002"
-          + "\" \n\010Vector2i\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 \001(\021\"\376\001\n\005W"
+          + "\" \n\010Vector2i\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 \001(\021\"\256\002\n\005W"
           + "orld\022\014\n\004seed\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\022\014\n\004time"
           + "\030\003 \001(\002\022$\n\005spawn\030\004 \001(\0132\025.persistence.Vect"
-          + "or2i\022\021\n\ttimeScale\030\005 \001(\002\022/\n\tgenerator\030\020 \001"
-          + "(\0162\034.persistence.World.Generator\022(\n\006play"
-          + "er\030\021 \001(\0132\023.persistence.EntityH\000\210\001\001\",\n\tGe"
-          + "nerator\022\n\n\006PERLIN\020\000\022\010\n\004FLAT\020\001\022\t\n\005EMPTY\020\002"
-          + "B\t\n\007_player\"n\n\005Block\022\030\n\020material_ordinal"
-          + "\030\001 \001(\005\022(\n\003tnt\030\020 \001(\0132\026.persistence.Block."
-          + "TNTH\000\210\001\001\032\031\n\003TNT\022\022\n\nticks_left\030\001 \001(\003B\006\n\004_"
-          + "tnt\"{\n\005Chunk\022\'\n\010position\030\001 \001(\0132\025.persist"
-          + "ence.Vector2i\022\"\n\006blocks\030\002 \003(\0132\022.persiste"
-          + "nce.Block\022%\n\010entities\030\003 \003(\0132\023.persistenc"
-          + "e.Entity\"\264\005\n\006Entity\022,\n\004type\030\001 \001(\0162\036.pers"
-          + "istence.Entity.EntityType\022\'\n\010position\030\002 "
-          + "\001(\0132\025.persistence.Vector2f\022\'\n\010velocity\030\003"
-          + " \001(\0132\025.persistence.Vector2f\022\014\n\004uuid\030\004 \001("
-          + "\t\022\016\n\006flying\030\005 \001(\010\022/\n\006living\030\020 \001(\0132\032.pers"
-          + "istence.Entity.LivingH\000\210\001\001\0223\n\010material\030\021"
-          + " \001(\0132\034.persistence.Entity.MaterialH\001\210\001\001\022"
-          + "/\n\006player\030\022 \001(\0132\032.persistence.Entity.Pla"
-          + "yerH\002\210\001\001\0221\n\007generic\030\023 \001(\0132\033.persistence."
-          + "Entity.GenericH\003\210\001\001\032:\n\006Living\022\014\n\004name\030\001 "
-          + "\001(\t\022\016\n\006health\030\002 \001(\005\022\022\n\nmax_health\030\003 \001(\005\032"
-          + "$\n\010Material\022\030\n\020material_ordinal\030\001 \001(\005\0325\n"
-          + "\006Player\022\027\n\017torch_angle_deg\030\001 \001(\002\022\022\n\ncont"
-          + "rolled\030\002 \001(\010\032.\n\007Generic\022#\n\004size\030\001 \001(\0132\025."
-          + "persistence.Vector2i\"J\n\nEntityType\022\022\n\016GE"
-          + "NERIC_ENTITY\020\000\022\021\n\rFALLING_BLOCK\020\001\022\t\n\005BLO"
-          + "CK\020\002\022\n\n\006PLAYER\020\003B\t\n\007_livingB\013\n\t_material"
-          + "B\t\n\007_playerB\n\n\010_genericB/\n\037no.elg.infini"
-          + "teBootleg.protobufB\nProtoWorldP\000b\006proto3"
+          + "or2i\022\021\n\ttimeScale\030\005 \001(\002\022.\n\014chunkColumns\030"
+          + "\006 \003(\0132\030.persistence.ChunkColumn\022/\n\tgener"
+          + "ator\030\020 \001(\0162\034.persistence.World.Generator"
+          + "\022(\n\006player\030\021 \001(\0132\023.persistence.EntityH\000\210"
+          + "\001\001\",\n\tGenerator\022\n\n\006PERLIN\020\000\022\010\n\004FLAT\020\001\022\t\n"
+          + "\005EMPTY\020\002B\t\n\007_player\"n\n\005Block\022\030\n\020material"
+          + "_ordinal\030\001 \001(\005\022(\n\003tnt\030\020 \001(\0132\026.persistenc"
+          + "e.Block.TNTH\000\210\001\001\032\031\n\003TNT\022\022\n\nticks_left\030\001 "
+          + "\001(\003B\006\n\004_tnt\"{\n\005Chunk\022\'\n\010position\030\001 \001(\0132\025"
+          + ".persistence.Vector2i\022\"\n\006blocks\030\002 \003(\0132\022."
+          + "persistence.Block\022%\n\010entities\030\003 \003(\0132\023.pe"
+          + "rsistence.Entity\"1\n\013ChunkColumn\022\016\n\006chunk"
+          + "X\030\001 \001(\005\022\022\n\ntop_blocks\030\002 \003(\005\"\264\005\n\006Entity\022,"
+          + "\n\004type\030\001 \001(\0162\036.persistence.Entity.Entity"
+          + "Type\022\'\n\010position\030\002 \001(\0132\025.persistence.Vec"
+          + "tor2f\022\'\n\010velocity\030\003 \001(\0132\025.persistence.Ve"
+          + "ctor2f\022\014\n\004uuid\030\004 \001(\t\022\016\n\006flying\030\005 \001(\010\022/\n\006"
+          + "living\030\020 \001(\0132\032.persistence.Entity.Living"
+          + "H\000\210\001\001\0223\n\010material\030\021 \001(\0132\034.persistence.En"
+          + "tity.MaterialH\001\210\001\001\022/\n\006player\030\022 \001(\0132\032.per"
+          + "sistence.Entity.PlayerH\002\210\001\001\0221\n\007generic\030\023"
+          + " \001(\0132\033.persistence.Entity.GenericH\003\210\001\001\032:"
+          + "\n\006Living\022\014\n\004name\030\001 \001(\t\022\016\n\006health\030\002 \001(\005\022\022"
+          + "\n\nmax_health\030\003 \001(\005\032$\n\010Material\022\030\n\020materi"
+          + "al_ordinal\030\001 \001(\005\0325\n\006Player\022\027\n\017torch_angl"
+          + "e_deg\030\001 \001(\002\022\022\n\ncontrolled\030\002 \001(\010\032.\n\007Gener"
+          + "ic\022#\n\004size\030\001 \001(\0132\025.persistence.Vector2i\""
+          + "J\n\nEntityType\022\022\n\016GENERIC_ENTITY\020\000\022\021\n\rFAL"
+          + "LING_BLOCK\020\001\022\t\n\005BLOCK\020\002\022\n\n\006PLAYER\020\003B\t\n\007_"
+          + "livingB\013\n\t_materialB\t\n\007_playerB\n\n\010_gener"
+          + "icB/\n\037no.elg.infiniteBootleg.protobufB\nP"
+          + "rotoWorldP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
@@ -10390,7 +11463,15 @@ public final class ProtoWorld {
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_persistence_World_descriptor,
             new java.lang.String[] {
-              "Seed", "Name", "Time", "Spawn", "TimeScale", "Generator", "Player", "Player",
+              "Seed",
+              "Name",
+              "Time",
+              "Spawn",
+              "TimeScale",
+              "ChunkColumns",
+              "Generator",
+              "Player",
+              "Player",
             });
     internal_static_persistence_Block_descriptor = getDescriptor().getMessageTypes().get(3);
     internal_static_persistence_Block_fieldAccessorTable =
@@ -10414,7 +11495,14 @@ public final class ProtoWorld {
             new java.lang.String[] {
               "Position", "Blocks", "Entities",
             });
-    internal_static_persistence_Entity_descriptor = getDescriptor().getMessageTypes().get(5);
+    internal_static_persistence_ChunkColumn_descriptor = getDescriptor().getMessageTypes().get(5);
+    internal_static_persistence_ChunkColumn_fieldAccessorTable =
+        new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+            internal_static_persistence_ChunkColumn_descriptor,
+            new java.lang.String[] {
+              "ChunkX", "TopBlocks",
+            });
+    internal_static_persistence_Entity_descriptor = getDescriptor().getMessageTypes().get(6);
     internal_static_persistence_Entity_fieldAccessorTable =
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_persistence_Entity_descriptor,

@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world
 
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
@@ -176,7 +177,17 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     }
   }
 
+  override fun toProtobuf(): ProtoWorld.ChunkColumn {
+    val builder = ProtoWorld.ChunkColumn.newBuilder()
+    builder.chunkX = chunkX
+    builder.addAllTopBlocks(top.toList())
+    return builder.build()
+  }
+
   companion object {
     const val MAX_CHUNKS_TO_LOOK_UPWARDS = CHUNK_SIZE
+    fun fromProtobuf(world: World, protoCC: ProtoWorld.ChunkColumn): ChunkColumn {
+      return ChunkColumnImpl(world, protoCC.chunkX, protoCC.topBlocksList.toIntArray())
+    }
   }
 }

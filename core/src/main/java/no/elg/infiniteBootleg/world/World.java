@@ -191,6 +191,10 @@ public abstract class World implements Disposable, Resizable {
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
+    for (ProtoWorld.ChunkColumn protoCC : protoWorld.getChunkColumnsList()) {
+      ChunkColumn chunkColumn = ChunkColumnImpl.Companion.fromProtobuf(this, protoCC);
+      chunkColumns.put(protoCC.getChunkX(), chunkColumn);
+    }
 
     if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
       ProtoWorld.Entity protoWorldPlayer = protoWorld.getPlayer();
@@ -247,6 +251,11 @@ public abstract class World implements Disposable, Resizable {
     builder.setTimeScale(worldTime.getTimeScale());
     builder.setSpawn(spawn.toVector2i());
     builder.setGenerator(getGeneratorType());
+
+    for (ChunkColumn chunkColumn : chunkColumns.values()) {
+      builder.addChunkColumns(chunkColumn.toProtobuf());
+    }
+
     if (Main.isSingleplayer()) {
       final Player player = ClientMain.inst().getPlayer();
       if (player != null) {
