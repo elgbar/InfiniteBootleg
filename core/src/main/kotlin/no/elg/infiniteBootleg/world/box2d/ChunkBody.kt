@@ -113,7 +113,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   fun removeBlock(block: Block) {
     chunk.world.postBox2dRunnable {
       val fixture: Fixture? = fixtureMap.get(CoordUtil.compactLoc(block.localX, block.localY))
-      fixture?.filterData = World.NON_INTERACTIVE_GROUND_FILTER
+      fixture?.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
     }
   }
 
@@ -157,9 +157,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       }
 
       if (block.material.blocksLight()) {
-        fix.filterData = World.BLOCK_ENTITY_FILTER
+        fix.filterData = Filters.EN_GR_LI__GROUND_FILTER
       } else {
-        fix.filterData = World.TRANSPARENT_BLOCK_ENTITY_FILTER
+        fix.filterData = Filters.EN_GR__GROUND_FILTER
       }
     }
   }

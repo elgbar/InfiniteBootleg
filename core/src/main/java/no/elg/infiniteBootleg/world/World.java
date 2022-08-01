@@ -14,7 +14,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.IntMap;
@@ -79,65 +78,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class World implements Disposable, Resizable {
 
-  public static final short GROUND_CATEGORY = 0b0000_0000_0000_0001;
-  public static final short LIGHTS_CATEGORY = 0b0000_0000_0000_0010;
-  public static final short ENTITY_CATEGORY = 0b0000_0000_0000_0100;
-
-  public static final Filter FALLING_BLOCK_ENTITY_FILTER;
-  public static final Filter FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER;
-  public static final Filter TRANSPARENT_BLOCK_ENTITY_FILTER;
-  public static final Filter ENTITY_FILTER;
-  public static final Filter LIGHT_FILTER;
-  public static final Filter BLOCK_ENTITY_FILTER;
-  public static final Filter NON_INTERACTIVE_FILTER;
-  public static final Filter NON_INTERACTIVE_GROUND_FILTER;
-
-  public static final float SKYLIGHT_SOFTNESS_LENGTH = 3f;
-  public static final float POINT_LIGHT_SOFTNESS_LENGTH = SKYLIGHT_SOFTNESS_LENGTH * 2f;
-
   public static final String LOCK_FILE_NAME = ".locked";
-
-  static {
-    // base filter for entities
-    ENTITY_FILTER = new Filter();
-    ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-    ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
-
-    // How light should collide
-    LIGHT_FILTER = new Filter();
-    LIGHT_FILTER.categoryBits = LIGHTS_CATEGORY;
-    LIGHT_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
-
-    // for falling blocks
-    FALLING_BLOCK_ENTITY_FILTER = new Filter();
-    FALLING_BLOCK_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-    FALLING_BLOCK_ENTITY_FILTER.maskBits = GROUND_CATEGORY;
-
-    // for falling blocks which blocks light
-    FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER = new Filter();
-    FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER.categoryBits = ENTITY_CATEGORY;
-    FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER.maskBits = GROUND_CATEGORY | LIGHTS_CATEGORY;
-
-    // ie glass
-    TRANSPARENT_BLOCK_ENTITY_FILTER = new Filter();
-    TRANSPARENT_BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
-    TRANSPARENT_BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
-
-    // closed door
-    BLOCK_ENTITY_FILTER = new Filter();
-    BLOCK_ENTITY_FILTER.categoryBits = GROUND_CATEGORY;
-    BLOCK_ENTITY_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;
-
-    // Frozen body, should not interact with anything
-    NON_INTERACTIVE_FILTER = new Filter();
-    NON_INTERACTIVE_FILTER.categoryBits = 0;
-    NON_INTERACTIVE_FILTER.maskBits = 0;
-
-    // Frozen body, should not interact with anything
-    NON_INTERACTIVE_GROUND_FILTER = new Filter();
-    NON_INTERACTIVE_GROUND_FILTER.categoryBits = GROUND_CATEGORY;
-    NON_INTERACTIVE_GROUND_FILTER.maskBits = 0;
-  }
 
   @NotNull private final UUID uuid;
   private final long seed;

@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.blocks.traits.Trait;
 import no.elg.infiniteBootleg.world.blocks.traits.TraitHandlerCollection;
+import no.elg.infiniteBootleg.world.box2d.Filters;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
@@ -74,14 +75,14 @@ public class FallingBlockEntity extends Entity {
     PolygonShape box = new PolygonShape();
     box.setAsBox(getHalfBox2dWidth() - 0.1f, getHalfBox2dHeight() - 0.1f);
     Fixture fix = body.createFixture(box, 1.0f);
-    fix.setFilterData(World.FALLING_BLOCK_ENTITY_FILTER);
+    fix.setFilterData(Filters.GR__ENTITY_FILTER);
     Main.inst()
         .getScheduler()
         .scheduleAsync(
             100L,
             () -> {
               if (material != null && material.blocksLight()) {
-                fix.setFilterData(World.FALLING_BLOCK_BLOCKS_LIGHT_ENTITY_FILTER);
+                fix.setFilterData(Filters.GR_LI__ENTITY_FILTER);
               }
             });
     fix.setFriction(0f);

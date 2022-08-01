@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.subgrid.enitites;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
-import static no.elg.infiniteBootleg.world.World.BLOCK_ENTITY_FILTER;
-import static no.elg.infiniteBootleg.world.World.TRANSPARENT_BLOCK_ENTITY_FILTER;
+import static no.elg.infiniteBootleg.world.box2d.Filters.EN_GR_LI__GROUND_FILTER;
+import static no.elg.infiniteBootleg.world.box2d.Filters.EN_GR__GROUND_FILTER;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -63,7 +63,7 @@ public class Door extends MaterialEntity {
 
       postWorldBodyRunnable(
           body -> {
-            setFilter(BLOCK_ENTITY_FILTER);
+            setFilter(EN_GR_LI__GROUND_FILTER);
 
             // Wake up all bodies to get an accurate contacts count
             final Vector2 position = body.getPosition();
@@ -104,7 +104,7 @@ public class Door extends MaterialEntity {
     PolygonShape box = new PolygonShape();
     box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());
     Fixture fix = body.createFixture(box, 0.0f);
-    fix.setFilterData(BLOCK_ENTITY_FILTER);
+    fix.setFilterData(EN_GR_LI__GROUND_FILTER);
     fix.setSensor(true);
     box.dispose();
   }
@@ -114,12 +114,12 @@ public class Door extends MaterialEntity {
     if (type == ContactType.BEGIN_CONTACT) {
       int oldContacts = contacts.getAndIncrement();
       if (oldContacts == 0) {
-        setFilter(TRANSPARENT_BLOCK_ENTITY_FILTER);
+        setFilter(EN_GR__GROUND_FILTER);
       }
     } else if (type == ContactType.END_CONTACT) {
       int newContacts = contacts.decrementAndGet();
       if (newContacts <= 0) {
-        setFilter(BLOCK_ENTITY_FILTER);
+        setFilter(EN_GR_LI__GROUND_FILTER);
       }
     }
     final int cont = contacts.get();

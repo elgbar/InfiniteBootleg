@@ -5,7 +5,7 @@ import static java.lang.Math.signum;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
 import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
 import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
-import static no.elg.infiniteBootleg.world.World.NON_INTERACTIVE_FILTER;
+import static no.elg.infiniteBootleg.world.box2d.Filters.NON_INTERACTIVE_FILTER;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -40,6 +40,7 @@ import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.blocks.EntityBlock;
+import no.elg.infiniteBootleg.world.box2d.Filters;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
@@ -80,7 +81,7 @@ public abstract class Entity
   private final Vector2 posCache;
   private final Vector2 velCache;
   private int groundContacts;
-  @NotNull private Filter filter = World.ENTITY_FILTER;
+  @NotNull private Filter filter = Filters.EN_GR__ENTITY_FILTER;
   private float lookDeg;
 
   protected volatile boolean disposed;
@@ -252,7 +253,7 @@ public abstract class Entity
     def.restitution = 0.025f; // a bit bouncy!
 
     Fixture fix = body.createFixture(def);
-    fix.setFilterData(World.ENTITY_FILTER);
+    fix.setFilterData(Filters.EN_GR__ENTITY_FILTER);
 
     shape.dispose();
   }
@@ -570,7 +571,7 @@ public abstract class Entity
     if (isDisposed()) {
       return;
     }
-    if (contact.getFixtureA().getFilterData().categoryBits == World.GROUND_CATEGORY) {
+    if (contact.getFixtureA().getFilterData().categoryBits == Filters.GROUND_CATEGORY) {
       if (type == ContactType.BEGIN_CONTACT) {
         // newest pos is needed to accurately check if this is on ground
         updatePos();
