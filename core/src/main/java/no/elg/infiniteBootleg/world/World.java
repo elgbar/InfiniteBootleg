@@ -107,7 +107,7 @@ public abstract class World implements Disposable, Resizable {
   public final Lock chunksReadLock = chunkLock.readLock();
   public final Lock chunksWriteLock = chunkLock.writeLock();
 
-  private boolean transientWorld = !Settings.loadWorldFromDisk;
+  private boolean transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient();
 
   public World(@NotNull ProtoWorld.World protoWorld) {
     this(WorldLoader.generatorFromProto(protoWorld), protoWorld.getSeed(), protoWorld.getName());
@@ -131,7 +131,10 @@ public abstract class World implements Disposable, Resizable {
   public void initialize() {
     if (Settings.loadWorldFromDisk) {
       FileHandle worldFolder = getWorldFolder();
-      if (worldFolder != null && worldFolder.isDirectory() && !WorldLoader.canWriteToWorld(uuid)) {
+      if (!transientWorld
+          && worldFolder != null
+          && worldFolder.isDirectory()
+          && !WorldLoader.canWriteToWorld(uuid)) {
         if (!Settings.ignoreWorldLock) {
           transientWorld = true;
           Main.logger()
