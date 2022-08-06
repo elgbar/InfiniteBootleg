@@ -95,6 +95,7 @@ public abstract class World implements Disposable, Resizable {
   /** must be accessed under {@link #chunkLock} */
   @NotNull protected final LongMap<Chunk> chunks = new LongMap<>();
 
+  /** Must be accessed under {@code synchronized(chunkColumns)} */
   @NotNull protected final IntMap<ChunkColumn> chunkColumns = new IntMap<>();
 
   @Nullable private volatile FileHandle worldFile;
@@ -187,9 +188,12 @@ public abstract class World implements Disposable, Resizable {
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
-    for (ProtoWorld.ChunkColumn protoCC : protoWorld.getChunkColumnsList()) {
-      ChunkColumn chunkColumn = ChunkColumnImpl.Companion.fromProtobuf(this, protoCC);
-      chunkColumns.put(protoCC.getChunkX(), chunkColumn);
+    synchronized (chunkColumns) {
+      for (ProtoWorld.ChunkColumn protoCC : protoWorld.getChunkColumnsList()) {
+        ChunkColumn chunkColumn = ChunkColumnImpl.Companion.fromProtobuf(this, protoCC);
+        int chunkX = protoCC.getChunkX();
+        chunkColumns.put(chunkX, chunkColumn);
+      }
     }
 
     if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
@@ -238,9 +242,10 @@ public abstract class World implements Disposable, Resizable {
     builder.setTimeScale(worldTime.getTimeScale());
     builder.setSpawn(spawn.toVector2i());
     builder.setGenerator(getGeneratorType());
-
-    for (ChunkColumn chunkColumn : chunkColumns.values()) {
-      builder.addChunkColumns(chunkColumn.toProtobuf());
+    synchronized (chunkColumns) {
+      for (ChunkColumn chunkColumn : chunkColumns.values()) {
+        builder.addChunkColumns(chunkColumn.toProtobuf());
+      }
     }
 
     if (Main.isSingleplayer()) {
@@ -281,13 +286,15 @@ public abstract class World implements Disposable, Resizable {
 
   @NotNull
   public ChunkColumn getChunkColumn(int chunkX) {
-    var column = chunkColumns.get(chunkX);
-    if (column == null) {
-      ChunkColumn newCol = new ChunkColumnImpl(this, chunkX, null);
-      chunkColumns.put(chunkX, newCol);
-      return newCol;
+    synchronized (chunkColumns) {
+      var column = chunkColumns.get(chunkX);
+      if (column == null) {
+        ChunkColumn newCol = new ChunkColumnImpl(this, chunkX, null);
+        chunkColumns.put(chunkX, newCol);
+        return newCol;
+      }
+      return column;
     }
-    return column;
   }
 
   @Nullable
