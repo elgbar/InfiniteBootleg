@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import kotlin.jvm.functions.Function0;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -1002,6 +1003,17 @@ public abstract class World implements Disposable, Resizable {
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
       float worldX, float worldY, float offsetX, float offsetY, boolean raw, boolean loadChunk) {
+    return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, null);
+  }
+
+  public Array<@NotNull Block> getBlocksAABB(
+      float worldX,
+      float worldY,
+      float offsetX,
+      float offsetY,
+      boolean raw,
+      boolean loadChunk,
+      @Nullable Function0<Boolean> cancel) {
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
     int x = MathUtils.floor(worldX - offsetX);
@@ -1010,7 +1022,9 @@ public abstract class World implements Disposable, Resizable {
     LongMap<Chunk> chunks = new LongMap<>();
     for (; x <= maxX; x++) {
       for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
-
+        if (cancel != null && cancel.invoke()) {
+          return blocks;
+        }
         var chunkPos = CoordUtil.compactLoc(CoordUtil.worldToChunk(x), CoordUtil.worldToChunk(y));
         var chunk = chunks.get(chunkPos);
         if (chunk == null || chunk.isInvalid()) {

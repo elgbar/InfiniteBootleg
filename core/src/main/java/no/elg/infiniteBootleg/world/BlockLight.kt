@@ -33,14 +33,19 @@ class BlockLight(
   /**
    * Brightness, in the range `0..1`, of each sub-cells.
    */
-  val lightMap: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
+  var lightMap: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
     get() {
-      synchronized(field) {
+      synchronized(this) {
         return field
       }
     }
+    private set(value) {
+      synchronized(this) {
+        field = value
+      }
+    }
 
-  private val tmpLightMap = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
+  private val chunkImpl = chunk as ChunkImpl
 
   init {
     isSkylight = chunk.chunkColumn.isBlockSkylight(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY))
@@ -55,11 +60,20 @@ class BlockLight(
   }
 
   fun recalculateLighting() {
+    recalculateLighting(NEVER_CANCEL_UPDATE_ID)
+  }
+
+  fun recalculateLighting(updateId: Int) {
     //    System.out.println("Recalculating light for " + getMaterial() + " block " + getWorldX() +
     // "," + getWorldY());
     if (!Settings.renderLight) {
       return
     }
+
+    fun isCancelled(): Boolean {
+      return updateId != NEVER_CANCEL_UPDATE_ID && updateId != chunkImpl.currentUpdateId.get()
+    }
+
     val chunkColumn = chunk.chunkColumn
     val worldX: Int = CoordUtil.chunkToWorld(chunk.chunkX, localX)
     val worldY: Int = CoordUtil.chunkToWorld(chunk.chunkY, localY)
@@ -69,13 +83,18 @@ class BlockLight(
       isLit = true
       isSkylight = true
       averageBrightness = 1f
-      synchronized(lightMap) { fillArray(lightMap, 1f) }
+      synchronized(this) {
+        fillArray(lightMap, 1f)
+      }
       return
     }
 
     var isLitNext = false
-    fillArray(tmpLightMap, 0f)
+    val tmpLightMap = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
 
+    if (isCancelled()) {
+      return
+    }
     // find light sources around this block
     val blocksAABB = chunk
       .world
@@ -85,7 +104,8 @@ class BlockLight(
         Block.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
         Block.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
         false,
-        false
+        false,
+        ::isCancelled
       )
     for (neighbor in blocksAABB) {
       val neighChunkCol = neighbor.chunk.chunkColumn
@@ -95,6 +115,9 @@ class BlockLight(
             neighbor.material == Material.AIR
           )
       ) {
+        if (isCancelled()) {
+          return
+        }
         isLitNext = true
         for (dx in 0 until Block.LIGHT_RESOLUTION) {
           for (dy in 0 until Block.LIGHT_RESOLUTION) {
@@ -129,11 +152,11 @@ class BlockLight(
       }
     }
 
-    synchronized(lightMap) {
-      for (i in 0 until Block.LIGHT_RESOLUTION) {
-        System.arraycopy(tmpLightMap[i], 0, lightMap[i], 0, Block.LIGHT_RESOLUTION)
-      }
+    if (isCancelled()) {
+      return
     }
+
+    lightMap = tmpLightMap
     isLit = isLitNext
     isSkylight = false
 
@@ -148,5 +171,9 @@ class BlockLight(
     } else {
       averageBrightness = 0f
     }
+  }
+
+  companion object {
+    const val NEVER_CANCEL_UPDATE_ID = -1
   }
 }

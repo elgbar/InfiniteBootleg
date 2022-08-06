@@ -34,7 +34,6 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
@@ -224,10 +223,7 @@ public class ChunkImpl implements Chunk {
         }
         Main.inst()
             .getScheduler()
-            .executeAsync(
-                () -> {
-                  getChunkColumn().updateTopBlock(localX, getWorldY(localY));
-                });
+            .executeAsync(() -> getChunkColumn().updateTopBlock(localX, getWorldY(localY)));
       }
     }
     int worldX = getWorldX(localX);
@@ -343,59 +339,63 @@ public class ChunkImpl implements Chunk {
     }
 
     // Render the world with the changes (but potentially without the light changes)
-    final WorldRender render = world.getRender();
     if ((currLU == null || currLU.isDone())
-        && render instanceof ClientWorldRender clientWorldRender) {
+        && world.getRender() instanceof ClientWorldRender clientWorldRender) {
       clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
     }
 
-    final int updateId = currentUpdateId.incrementAndGet();
-    lightUpdater =
-        Main.inst()
-            .getScheduler()
-            .executeAsync(
-                () -> {
-                  var pool = ForkJoinPool.commonPool();
-                  synchronized (tasks) {
-                    outer:
-                    for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-                      for (int localY = 0; localY < CHUNK_SIZE; localY++) {
-                        synchronized (tasks) {
-                          if (updateId != currentUpdateId.get()) {
-                            break outer;
-                          }
-                          Block b = blocks[localX][localY];
-                          if (b != null) {
-                            var bl = b.getBlockLight();
-                            ForkJoinTask<?> task = pool.submit(bl::recalculateLighting);
-                            task.fork();
-                            tasks.add(task);
-                          }
-                        }
-                      }
-                    }
+    updateBlockLights();
+  }
 
-                    for (ForkJoinTask<?> task : tasks) {
-                      if (updateId == currentUpdateId.get()) {
-                        try {
-                          task.join();
-                        } catch (CancellationException ignore) {
-                        } catch (Exception e) {
-                          e.printStackTrace();
-                        }
-                      } else {
-                        task.cancel(true);
-                      }
-                    }
-                    tasks.clear();
-                  }
-                  if (updateId == currentUpdateId.get()) {
-                    // Re-render the chunk with the new lighting
-                    if (render instanceof ClientWorldRender clientWorldRender) {
-                      clientWorldRender.getChunkRenderer().queueRendering(this, true, true);
-                    }
-                  }
-                });
+  private void updateBlockLights() {
+    if (Settings.renderLight) {
+      final int updateId = currentUpdateId.incrementAndGet();
+      lightUpdater = Main.inst().getScheduler().executeAsync(() -> updateBlockLights(updateId));
+    }
+  }
+
+  /** Should only be used by {@link #updateBlockLights()} */
+  private void updateBlockLights(int updateId) {
+    var pool = ForkJoinPool.commonPool();
+    synchronized (tasks) {
+      outer:
+      for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+        for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+          synchronized (tasks) {
+            if (updateId != currentUpdateId.get()) {
+              break outer;
+            }
+            Block b = blocks[localX][localY];
+            if (b != null) {
+              var bl = b.getBlockLight();
+              ForkJoinTask<?> task = pool.submit(() -> bl.recalculateLighting(updateId));
+              task.fork();
+              tasks.add(task);
+            }
+          }
+        }
+      }
+
+      for (ForkJoinTask<?> task : tasks) {
+        if (updateId == currentUpdateId.get()) {
+          try {
+            task.join();
+          } catch (CancellationException ignore) {
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        } else {
+          task.cancel(true);
+        }
+      }
+      tasks.clear();
+    }
+    if (updateId == currentUpdateId.get()) {
+      // Re-render the chunk with the new lighting
+      if (world.getRender() instanceof ClientWorldRender clientWorldRender) {
+        clientWorldRender.getChunkRenderer().queueRendering(this, true, true);
+      }
+    }
   }
 
   @Override
