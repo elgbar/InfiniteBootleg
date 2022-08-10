@@ -5251,7 +5251,7 @@ public final class Packets {
    *
    *
    * <pre>
-   * Server send this every so often, client must respond with another heartbeat packet with the name keepAliveId
+   * Server send this every so often, client must respond with another heartbeat packet with the same keepAliveId
    * </pre>
    *
    * Protobuf type {@code packets.Heartbeat}
@@ -5541,7 +5541,7 @@ public final class Packets {
      *
      *
      * <pre>
-     * Server send this every so often, client must respond with another heartbeat packet with the name keepAliveId
+     * Server send this every so often, client must respond with another heartbeat packet with the same keepAliveId
      * </pre>
      *
      * Protobuf type {@code packets.Heartbeat}
