@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fastIntFormat
+import no.elg.infiniteBootleg.world.Block.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.world.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
+import no.elg.infiniteBootleg.world.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.ClientWorld
@@ -28,25 +31,45 @@ object DebugText {
   }
 
   @JvmStatic
-  fun lights(sb: StringBuilder) {
-    sb.append("Active lights threads: ")
-    sb.append(-1)
+  fun lights(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
+    val localX = CoordUtil.chunkOffset(mouseBlockX)
+    val localY = CoordUtil.chunkOffset(mouseBlockY)
+
+    fun calcSubCell(coord: Float): Int {
+      val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
+      return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
+    }
+
+    val rawX = calcSubCell(ClientMain.inst().mouseWorldX)
+    val rawY = calcSubCell(ClientMain.inst().mouseWorldY)
+
+    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)))
+    val blockLight = chunk?.getBlockLight(localX, localY)
+
+    val isLit = blockLight?.isLit ?: "maybe"
+    val skylight = blockLight?.isSkylight ?: "maybe"
+    val usingSkyArr = blockLight?.lightMap === SKYLIGHT_LIGHT_MAP
+    val usingNoLigArr = blockLight?.lightMap === NO_LIGHTS_LIGHT_MAP
+    val avg = blockLight?.averageBrightness ?: 0.0f
+    val sub = blockLight?.lightMap?.getOrNull(rawX)?.getOrNull(rawY) ?: 0.0
+    val format = " lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] %1.3f"
+    sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, sub))
   }
 
   @JvmStatic
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
-    val block = world.getRawBlock(mouseBlockX, mouseBlockY)
+    val localX = CoordUtil.chunkOffset(mouseBlockX)
+    val localY = CoordUtil.chunkOffset(mouseBlockY)
+    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)))
+    val block = chunk?.getBlock(localX, localY)
     val material = block?.material ?: Material.AIR
     val rawX = ClientMain.inst().mouseWorldX
     val rawY = ClientMain.inst().mouseWorldY
     val exists = block != null
     val blockDebug = block?.hudDebug() ?: ""
-    val blockLight = block?.blockLight
 
-    val isLit = blockLight?.isLit ?: "maybe"
-    val skylight = blockLight?.isSkylight ?: "maybe"
-    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5s lit? %-5s sky? %-5s %s"
-    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, isLit, skylight, blockDebug))
+    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5s %s"
+    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug))
   }
 
   @JvmStatic
