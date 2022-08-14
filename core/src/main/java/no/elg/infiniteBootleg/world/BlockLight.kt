@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world
 
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
-import java.util.Arrays
+import no.elg.infiniteBootleg.world.Material.AIR
 
 class BlockLight(
   val chunk: Chunk,
@@ -32,8 +32,10 @@ class BlockLight(
 
   /**
    * Brightness, in the range `0..1`, of each sub-cells.
+   *
+   * Do not modify
    */
-  var lightMap: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
+  var lightMap: Array<FloatArray> = NO_LIGHTS_LIGHT_MAP
     get() {
       synchronized(this) {
         return field
@@ -50,12 +52,16 @@ class BlockLight(
   init {
     isSkylight = chunk.chunkColumn.isBlockSkylight(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY))
     isLit = isSkylight
-    averageBrightness = if (isSkylight) 1f else 0f
-  }
+    averageBrightness = if (isSkylight) {
+      1f
+    } else {
+      0f
+    }
 
-  private fun fillArray(mat: Array<FloatArray>, newValue: Float) {
-    for (arr in mat) {
-      Arrays.fill(arr, newValue)
+    lightMap = if (isSkylight) {
+      SKYLIGHT_LIGHT_MAP
+    } else {
+      Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
     }
   }
 
@@ -83,9 +89,7 @@ class BlockLight(
       isLit = true
       isSkylight = true
       averageBrightness = 1f
-      synchronized(this) {
-        fillArray(lightMap, 1f)
-      }
+      lightMap = SKYLIGHT_LIGHT_MAP
       return
     }
 
@@ -107,13 +111,14 @@ class BlockLight(
         false,
         ::isCancelled
       )
+    if (isCancelled()) {
+      return
+    }
     for (neighbor in blocksAABB) {
       val neighChunkCol = neighbor.chunk.chunkColumn
-      if (neighbor.material.isLuminescent ||
-        (
-          neighChunkCol.isBlockSkylight(neighbor.localX, neighbor.worldY) &&
-            neighbor.material == Material.AIR
-          )
+      val neiMat = neighbor.material
+      if (neiMat.isLuminescent ||
+        (neiMat == AIR && neighChunkCol.isBlockSkylight(neighbor.localX, neighbor.worldY))
       ) {
         if (isCancelled()) {
           return
@@ -156,11 +161,10 @@ class BlockLight(
       return
     }
 
-    lightMap = tmpLightMap
-    isLit = isLitNext
     isSkylight = false
-
+    isLit = isLitNext
     if (isLitNext) {
+      lightMap = tmpLightMap
       var total = 0.0
       for (x in 0 until Block.LIGHT_RESOLUTION) {
         for (y in 0 until Block.LIGHT_RESOLUTION) {
@@ -169,11 +173,14 @@ class BlockLight(
       }
       averageBrightness = (total / (Block.LIGHT_RESOLUTION * Block.LIGHT_RESOLUTION)).toFloat()
     } else {
+      lightMap = NO_LIGHTS_LIGHT_MAP
       averageBrightness = 0f
     }
   }
 
   companion object {
     const val NEVER_CANCEL_UPDATE_ID = -1
+    val SKYLIGHT_LIGHT_MAP: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) { 1f } }
+    val NO_LIGHTS_LIGHT_MAP: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) { 0f } }
   }
 }
