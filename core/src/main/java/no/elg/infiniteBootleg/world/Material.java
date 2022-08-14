@@ -31,11 +31,11 @@ public enum Material {
   BRICK(2f),
   DIRT(1f),
   GRASS(0.8f),
-  TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, false, true, true, false),
+  TNT(TntBlock.class, ItemType.BLOCK, 0.5f, true, true, true, true, false),
   SAND(FallingBlock.class, 1f),
   TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true, true, true),
   GLASS(null, ItemType.BLOCK, 0.1f, true, false, true, false, true),
-  DOOR(Door.class, ItemType.ENTITY, 1f, false, false, true, false, true),
+  DOOR(Door.class, ItemType.ENTITY, 1f, false, true, true, false, true),
   ;
   @Nullable private final Constructor<?> constructor;
   @Nullable private final Constructor<?> constructorProtoBuf;
