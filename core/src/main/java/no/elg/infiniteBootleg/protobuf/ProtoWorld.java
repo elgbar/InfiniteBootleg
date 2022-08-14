@@ -5729,24 +5729,44 @@ public final class ProtoWorld {
     int getChunkX();
 
     /**
-     * <code>repeated int32 top_blocks = 2;</code>
+     * <code>repeated int32 top_solid_blocks = 2;</code>
      *
-     * @return A list containing the topBlocks.
+     * @return A list containing the topSolidBlocks.
      */
-    java.util.List<java.lang.Integer> getTopBlocksList();
+    java.util.List<java.lang.Integer> getTopSolidBlocksList();
     /**
-     * <code>repeated int32 top_blocks = 2;</code>
+     * <code>repeated int32 top_solid_blocks = 2;</code>
      *
-     * @return The count of topBlocks.
+     * @return The count of topSolidBlocks.
      */
-    int getTopBlocksCount();
+    int getTopSolidBlocksCount();
     /**
-     * <code>repeated int32 top_blocks = 2;</code>
+     * <code>repeated int32 top_solid_blocks = 2;</code>
      *
      * @param index The index of the element to return.
-     * @return The topBlocks at the given index.
+     * @return The topSolidBlocks at the given index.
      */
-    int getTopBlocks(int index);
+    int getTopSolidBlocks(int index);
+
+    /**
+     * <code>repeated int32 top_transparent_blocks = 3;</code>
+     *
+     * @return A list containing the topTransparentBlocks.
+     */
+    java.util.List<java.lang.Integer> getTopTransparentBlocksList();
+    /**
+     * <code>repeated int32 top_transparent_blocks = 3;</code>
+     *
+     * @return The count of topTransparentBlocks.
+     */
+    int getTopTransparentBlocksCount();
+    /**
+     * <code>repeated int32 top_transparent_blocks = 3;</code>
+     *
+     * @param index The index of the element to return.
+     * @return The topTransparentBlocks at the given index.
+     */
+    int getTopTransparentBlocks(int index);
   }
   /** Protobuf type {@code persistence.ChunkColumn} */
   public static final class ChunkColumn extends com.google.protobuf.GeneratedMessageV3
@@ -5760,7 +5780,8 @@ public final class ProtoWorld {
     }
 
     private ChunkColumn() {
-      topBlocks_ = emptyIntList();
+      topSolidBlocks_ = emptyIntList();
+      topTransparentBlocks_ = emptyIntList();
     }
 
     @java.lang.Override
@@ -5801,10 +5822,10 @@ public final class ProtoWorld {
             case 16:
               {
                 if (!((mutable_bitField0_ & 0x00000001) != 0)) {
-                  topBlocks_ = newIntList();
+                  topSolidBlocks_ = newIntList();
                   mutable_bitField0_ |= 0x00000001;
                 }
-                topBlocks_.addInt(input.readInt32());
+                topSolidBlocks_.addInt(input.readInt32());
                 break;
               }
             case 18:
@@ -5812,11 +5833,34 @@ public final class ProtoWorld {
                 int length = input.readRawVarint32();
                 int limit = input.pushLimit(length);
                 if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
-                  topBlocks_ = newIntList();
+                  topSolidBlocks_ = newIntList();
                   mutable_bitField0_ |= 0x00000001;
                 }
                 while (input.getBytesUntilLimit() > 0) {
-                  topBlocks_.addInt(input.readInt32());
+                  topSolidBlocks_.addInt(input.readInt32());
+                }
+                input.popLimit(limit);
+                break;
+              }
+            case 24:
+              {
+                if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                  topTransparentBlocks_ = newIntList();
+                  mutable_bitField0_ |= 0x00000002;
+                }
+                topTransparentBlocks_.addInt(input.readInt32());
+                break;
+              }
+            case 26:
+              {
+                int length = input.readRawVarint32();
+                int limit = input.pushLimit(length);
+                if (!((mutable_bitField0_ & 0x00000002) != 0) && input.getBytesUntilLimit() > 0) {
+                  topTransparentBlocks_ = newIntList();
+                  mutable_bitField0_ |= 0x00000002;
+                }
+                while (input.getBytesUntilLimit() > 0) {
+                  topTransparentBlocks_.addInt(input.readInt32());
                 }
                 input.popLimit(limit);
                 break;
@@ -5838,7 +5882,10 @@ public final class ProtoWorld {
         throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) != 0)) {
-          topBlocks_.makeImmutable(); // C
+          topSolidBlocks_.makeImmutable(); // C
+        }
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
+          topTransparentBlocks_.makeImmutable(); // C
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5875,36 +5922,67 @@ public final class ProtoWorld {
       return chunkX_;
     }
 
-    public static final int TOP_BLOCKS_FIELD_NUMBER = 2;
-    private com.google.protobuf.Internal.IntList topBlocks_;
+    public static final int TOP_SOLID_BLOCKS_FIELD_NUMBER = 2;
+    private com.google.protobuf.Internal.IntList topSolidBlocks_;
     /**
-     * <code>repeated int32 top_blocks = 2;</code>
+     * <code>repeated int32 top_solid_blocks = 2;</code>
      *
-     * @return A list containing the topBlocks.
+     * @return A list containing the topSolidBlocks.
      */
     @java.lang.Override
-    public java.util.List<java.lang.Integer> getTopBlocksList() {
-      return topBlocks_;
+    public java.util.List<java.lang.Integer> getTopSolidBlocksList() {
+      return topSolidBlocks_;
     }
     /**
-     * <code>repeated int32 top_blocks = 2;</code>
+     * <code>repeated int32 top_solid_blocks = 2;</code>
      *
-     * @return The count of topBlocks.
+     * @return The count of topSolidBlocks.
      */
-    public int getTopBlocksCount() {
-      return topBlocks_.size();
+    public int getTopSolidBlocksCount() {
+      return topSolidBlocks_.size();
     }
     /**
-     * <code>repeated int32 top_blocks = 2;</code>
+     * <code>repeated int32 top_solid_blocks = 2;</code>
      *
      * @param index The index of the element to return.
-     * @return The topBlocks at the given index.
+     * @return The topSolidBlocks at the given index.
      */
-    public int getTopBlocks(int index) {
-      return topBlocks_.getInt(index);
+    public int getTopSolidBlocks(int index) {
+      return topSolidBlocks_.getInt(index);
     }
 
-    private int topBlocksMemoizedSerializedSize = -1;
+    private int topSolidBlocksMemoizedSerializedSize = -1;
+
+    public static final int TOP_TRANSPARENT_BLOCKS_FIELD_NUMBER = 3;
+    private com.google.protobuf.Internal.IntList topTransparentBlocks_;
+    /**
+     * <code>repeated int32 top_transparent_blocks = 3;</code>
+     *
+     * @return A list containing the topTransparentBlocks.
+     */
+    @java.lang.Override
+    public java.util.List<java.lang.Integer> getTopTransparentBlocksList() {
+      return topTransparentBlocks_;
+    }
+    /**
+     * <code>repeated int32 top_transparent_blocks = 3;</code>
+     *
+     * @return The count of topTransparentBlocks.
+     */
+    public int getTopTransparentBlocksCount() {
+      return topTransparentBlocks_.size();
+    }
+    /**
+     * <code>repeated int32 top_transparent_blocks = 3;</code>
+     *
+     * @param index The index of the element to return.
+     * @return The topTransparentBlocks at the given index.
+     */
+    public int getTopTransparentBlocks(int index) {
+      return topTransparentBlocks_.getInt(index);
+    }
+
+    private int topTransparentBlocksMemoizedSerializedSize = -1;
 
     private byte memoizedIsInitialized = -1;
 
@@ -5924,12 +6002,19 @@ public final class ProtoWorld {
       if (chunkX_ != 0) {
         output.writeInt32(1, chunkX_);
       }
-      if (getTopBlocksList().size() > 0) {
+      if (getTopSolidBlocksList().size() > 0) {
         output.writeUInt32NoTag(18);
-        output.writeUInt32NoTag(topBlocksMemoizedSerializedSize);
+        output.writeUInt32NoTag(topSolidBlocksMemoizedSerializedSize);
       }
-      for (int i = 0; i < topBlocks_.size(); i++) {
-        output.writeInt32NoTag(topBlocks_.getInt(i));
+      for (int i = 0; i < topSolidBlocks_.size(); i++) {
+        output.writeInt32NoTag(topSolidBlocks_.getInt(i));
+      }
+      if (getTopTransparentBlocksList().size() > 0) {
+        output.writeUInt32NoTag(26);
+        output.writeUInt32NoTag(topTransparentBlocksMemoizedSerializedSize);
+      }
+      for (int i = 0; i < topTransparentBlocks_.size(); i++) {
+        output.writeInt32NoTag(topTransparentBlocks_.getInt(i));
       }
       unknownFields.writeTo(output);
     }
@@ -5945,16 +6030,31 @@ public final class ProtoWorld {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < topBlocks_.size(); i++) {
+        for (int i = 0; i < topSolidBlocks_.size(); i++) {
           dataSize +=
-              com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(topBlocks_.getInt(i));
+              com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(
+                  topSolidBlocks_.getInt(i));
         }
         size += dataSize;
-        if (!getTopBlocksList().isEmpty()) {
+        if (!getTopSolidBlocksList().isEmpty()) {
           size += 1;
           size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
         }
-        topBlocksMemoizedSerializedSize = dataSize;
+        topSolidBlocksMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < topTransparentBlocks_.size(); i++) {
+          dataSize +=
+              com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(
+                  topTransparentBlocks_.getInt(i));
+        }
+        size += dataSize;
+        if (!getTopTransparentBlocksList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
+        }
+        topTransparentBlocksMemoizedSerializedSize = dataSize;
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5973,7 +6073,8 @@ public final class ProtoWorld {
           (no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn) obj;
 
       if (getChunkX() != other.getChunkX()) return false;
-      if (!getTopBlocksList().equals(other.getTopBlocksList())) return false;
+      if (!getTopSolidBlocksList().equals(other.getTopSolidBlocksList())) return false;
+      if (!getTopTransparentBlocksList().equals(other.getTopTransparentBlocksList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5987,9 +6088,13 @@ public final class ProtoWorld {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CHUNKX_FIELD_NUMBER;
       hash = (53 * hash) + getChunkX();
-      if (getTopBlocksCount() > 0) {
-        hash = (37 * hash) + TOP_BLOCKS_FIELD_NUMBER;
-        hash = (53 * hash) + getTopBlocksList().hashCode();
+      if (getTopSolidBlocksCount() > 0) {
+        hash = (37 * hash) + TOP_SOLID_BLOCKS_FIELD_NUMBER;
+        hash = (53 * hash) + getTopSolidBlocksList().hashCode();
+      }
+      if (getTopTransparentBlocksCount() > 0) {
+        hash = (37 * hash) + TOP_TRANSPARENT_BLOCKS_FIELD_NUMBER;
+        hash = (53 * hash) + getTopTransparentBlocksList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -6136,8 +6241,10 @@ public final class ProtoWorld {
         super.clear();
         chunkX_ = 0;
 
-        topBlocks_ = emptyIntList();
+        topSolidBlocks_ = emptyIntList();
         bitField0_ = (bitField0_ & ~0x00000001);
+        topTransparentBlocks_ = emptyIntList();
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
 
@@ -6171,10 +6278,15 @@ public final class ProtoWorld {
         int from_bitField0_ = bitField0_;
         result.chunkX_ = chunkX_;
         if (((bitField0_ & 0x00000001) != 0)) {
-          topBlocks_.makeImmutable();
+          topSolidBlocks_.makeImmutable();
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.topBlocks_ = topBlocks_;
+        result.topSolidBlocks_ = topSolidBlocks_;
+        if (((bitField0_ & 0x00000002) != 0)) {
+          topTransparentBlocks_.makeImmutable();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.topTransparentBlocks_ = topTransparentBlocks_;
         onBuilt();
         return result;
       }
@@ -6230,13 +6342,23 @@ public final class ProtoWorld {
         if (other.getChunkX() != 0) {
           setChunkX(other.getChunkX());
         }
-        if (!other.topBlocks_.isEmpty()) {
-          if (topBlocks_.isEmpty()) {
-            topBlocks_ = other.topBlocks_;
+        if (!other.topSolidBlocks_.isEmpty()) {
+          if (topSolidBlocks_.isEmpty()) {
+            topSolidBlocks_ = other.topSolidBlocks_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensureTopBlocksIsMutable();
-            topBlocks_.addAll(other.topBlocks_);
+            ensureTopSolidBlocksIsMutable();
+            topSolidBlocks_.addAll(other.topSolidBlocks_);
+          }
+          onChanged();
+        }
+        if (!other.topTransparentBlocks_.isEmpty()) {
+          if (topTransparentBlocks_.isEmpty()) {
+            topTransparentBlocks_ = other.topTransparentBlocks_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureTopTransparentBlocksIsMutable();
+            topTransparentBlocks_.addAll(other.topTransparentBlocks_);
           }
           onChanged();
         }
@@ -6306,86 +6428,171 @@ public final class ProtoWorld {
         return this;
       }
 
-      private com.google.protobuf.Internal.IntList topBlocks_ = emptyIntList();
+      private com.google.protobuf.Internal.IntList topSolidBlocks_ = emptyIntList();
 
-      private void ensureTopBlocksIsMutable() {
+      private void ensureTopSolidBlocksIsMutable() {
         if (!((bitField0_ & 0x00000001) != 0)) {
-          topBlocks_ = mutableCopy(topBlocks_);
+          topSolidBlocks_ = mutableCopy(topSolidBlocks_);
           bitField0_ |= 0x00000001;
         }
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
-       * @return A list containing the topBlocks.
+       * @return A list containing the topSolidBlocks.
        */
-      public java.util.List<java.lang.Integer> getTopBlocksList() {
+      public java.util.List<java.lang.Integer> getTopSolidBlocksList() {
         return ((bitField0_ & 0x00000001) != 0)
-            ? java.util.Collections.unmodifiableList(topBlocks_)
-            : topBlocks_;
+            ? java.util.Collections.unmodifiableList(topSolidBlocks_)
+            : topSolidBlocks_;
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
-       * @return The count of topBlocks.
+       * @return The count of topSolidBlocks.
        */
-      public int getTopBlocksCount() {
-        return topBlocks_.size();
+      public int getTopSolidBlocksCount() {
+        return topSolidBlocks_.size();
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
        * @param index The index of the element to return.
-       * @return The topBlocks at the given index.
+       * @return The topSolidBlocks at the given index.
        */
-      public int getTopBlocks(int index) {
-        return topBlocks_.getInt(index);
+      public int getTopSolidBlocks(int index) {
+        return topSolidBlocks_.getInt(index);
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
        * @param index The index to set the value at.
-       * @param value The topBlocks to set.
+       * @param value The topSolidBlocks to set.
        * @return This builder for chaining.
        */
-      public Builder setTopBlocks(int index, int value) {
-        ensureTopBlocksIsMutable();
-        topBlocks_.setInt(index, value);
+      public Builder setTopSolidBlocks(int index, int value) {
+        ensureTopSolidBlocksIsMutable();
+        topSolidBlocks_.setInt(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
-       * @param value The topBlocks to add.
+       * @param value The topSolidBlocks to add.
        * @return This builder for chaining.
        */
-      public Builder addTopBlocks(int value) {
-        ensureTopBlocksIsMutable();
-        topBlocks_.addInt(value);
+      public Builder addTopSolidBlocks(int value) {
+        ensureTopSolidBlocksIsMutable();
+        topSolidBlocks_.addInt(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
-       * @param values The topBlocks to add.
+       * @param values The topSolidBlocks to add.
        * @return This builder for chaining.
        */
-      public Builder addAllTopBlocks(java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureTopBlocksIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(values, topBlocks_);
+      public Builder addAllTopSolidBlocks(java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureTopSolidBlocksIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(values, topSolidBlocks_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 top_blocks = 2;</code>
+       * <code>repeated int32 top_solid_blocks = 2;</code>
        *
        * @return This builder for chaining.
        */
-      public Builder clearTopBlocks() {
-        topBlocks_ = emptyIntList();
+      public Builder clearTopSolidBlocks() {
+        topSolidBlocks_ = emptyIntList();
         bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Internal.IntList topTransparentBlocks_ = emptyIntList();
+
+      private void ensureTopTransparentBlocksIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          topTransparentBlocks_ = mutableCopy(topTransparentBlocks_);
+          bitField0_ |= 0x00000002;
+        }
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @return A list containing the topTransparentBlocks.
+       */
+      public java.util.List<java.lang.Integer> getTopTransparentBlocksList() {
+        return ((bitField0_ & 0x00000002) != 0)
+            ? java.util.Collections.unmodifiableList(topTransparentBlocks_)
+            : topTransparentBlocks_;
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @return The count of topTransparentBlocks.
+       */
+      public int getTopTransparentBlocksCount() {
+        return topTransparentBlocks_.size();
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @param index The index of the element to return.
+       * @return The topTransparentBlocks at the given index.
+       */
+      public int getTopTransparentBlocks(int index) {
+        return topTransparentBlocks_.getInt(index);
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @param index The index to set the value at.
+       * @param value The topTransparentBlocks to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTopTransparentBlocks(int index, int value) {
+        ensureTopTransparentBlocksIsMutable();
+        topTransparentBlocks_.setInt(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @param value The topTransparentBlocks to add.
+       * @return This builder for chaining.
+       */
+      public Builder addTopTransparentBlocks(int value) {
+        ensureTopTransparentBlocksIsMutable();
+        topTransparentBlocks_.addInt(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @param values The topTransparentBlocks to add.
+       * @return This builder for chaining.
+       */
+      public Builder addAllTopTransparentBlocks(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureTopTransparentBlocksIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(values, topTransparentBlocks_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int32 top_transparent_blocks = 3;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearTopTransparentBlocks() {
+        topTransparentBlocks_ = emptyIntList();
+        bitField0_ = (bitField0_ & ~0x00000002);
         onChanged();
         return this;
       }
@@ -11419,27 +11626,28 @@ public final class ProtoWorld {
           + "\001(\003B\006\n\004_tnt\"{\n\005Chunk\022\'\n\010position\030\001 \001(\0132\025"
           + ".persistence.Vector2i\022\"\n\006blocks\030\002 \003(\0132\022."
           + "persistence.Block\022%\n\010entities\030\003 \003(\0132\023.pe"
-          + "rsistence.Entity\"1\n\013ChunkColumn\022\016\n\006chunk"
-          + "X\030\001 \001(\005\022\022\n\ntop_blocks\030\002 \003(\005\"\264\005\n\006Entity\022,"
-          + "\n\004type\030\001 \001(\0162\036.persistence.Entity.Entity"
-          + "Type\022\'\n\010position\030\002 \001(\0132\025.persistence.Vec"
-          + "tor2f\022\'\n\010velocity\030\003 \001(\0132\025.persistence.Ve"
-          + "ctor2f\022\014\n\004uuid\030\004 \001(\t\022\016\n\006flying\030\005 \001(\010\022/\n\006"
-          + "living\030\020 \001(\0132\032.persistence.Entity.Living"
-          + "H\000\210\001\001\0223\n\010material\030\021 \001(\0132\034.persistence.En"
-          + "tity.MaterialH\001\210\001\001\022/\n\006player\030\022 \001(\0132\032.per"
-          + "sistence.Entity.PlayerH\002\210\001\001\0221\n\007generic\030\023"
-          + " \001(\0132\033.persistence.Entity.GenericH\003\210\001\001\032:"
-          + "\n\006Living\022\014\n\004name\030\001 \001(\t\022\016\n\006health\030\002 \001(\005\022\022"
-          + "\n\nmax_health\030\003 \001(\005\032$\n\010Material\022\030\n\020materi"
-          + "al_ordinal\030\001 \001(\005\0325\n\006Player\022\027\n\017torch_angl"
-          + "e_deg\030\001 \001(\002\022\022\n\ncontrolled\030\002 \001(\010\032.\n\007Gener"
-          + "ic\022#\n\004size\030\001 \001(\0132\025.persistence.Vector2i\""
-          + "J\n\nEntityType\022\022\n\016GENERIC_ENTITY\020\000\022\021\n\rFAL"
-          + "LING_BLOCK\020\001\022\t\n\005BLOCK\020\002\022\n\n\006PLAYER\020\003B\t\n\007_"
-          + "livingB\013\n\t_materialB\t\n\007_playerB\n\n\010_gener"
-          + "icB/\n\037no.elg.infiniteBootleg.protobufB\nP"
-          + "rotoWorldP\000b\006proto3"
+          + "rsistence.Entity\"W\n\013ChunkColumn\022\016\n\006chunk"
+          + "X\030\001 \001(\005\022\030\n\020top_solid_blocks\030\002 \003(\005\022\036\n\026top"
+          + "_transparent_blocks\030\003 \003(\005\"\264\005\n\006Entity\022,\n\004"
+          + "type\030\001 \001(\0162\036.persistence.Entity.EntityTy"
+          + "pe\022\'\n\010position\030\002 \001(\0132\025.persistence.Vecto"
+          + "r2f\022\'\n\010velocity\030\003 \001(\0132\025.persistence.Vect"
+          + "or2f\022\014\n\004uuid\030\004 \001(\t\022\016\n\006flying\030\005 \001(\010\022/\n\006li"
+          + "ving\030\020 \001(\0132\032.persistence.Entity.LivingH\000"
+          + "\210\001\001\0223\n\010material\030\021 \001(\0132\034.persistence.Enti"
+          + "ty.MaterialH\001\210\001\001\022/\n\006player\030\022 \001(\0132\032.persi"
+          + "stence.Entity.PlayerH\002\210\001\001\0221\n\007generic\030\023 \001"
+          + "(\0132\033.persistence.Entity.GenericH\003\210\001\001\032:\n\006"
+          + "Living\022\014\n\004name\030\001 \001(\t\022\016\n\006health\030\002 \001(\005\022\022\n\n"
+          + "max_health\030\003 \001(\005\032$\n\010Material\022\030\n\020material"
+          + "_ordinal\030\001 \001(\005\0325\n\006Player\022\027\n\017torch_angle_"
+          + "deg\030\001 \001(\002\022\022\n\ncontrolled\030\002 \001(\010\032.\n\007Generic"
+          + "\022#\n\004size\030\001 \001(\0132\025.persistence.Vector2i\"J\n"
+          + "\nEntityType\022\022\n\016GENERIC_ENTITY\020\000\022\021\n\rFALLI"
+          + "NG_BLOCK\020\001\022\t\n\005BLOCK\020\002\022\n\n\006PLAYER\020\003B\t\n\007_li"
+          + "vingB\013\n\t_materialB\t\n\007_playerB\n\n\010_generic"
+          + "B/\n\037no.elg.infiniteBootleg.protobufB\nPro"
+          + "toWorldP\000b\006proto3"
     };
     descriptor =
         com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
@@ -11500,7 +11708,7 @@ public final class ProtoWorld {
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_persistence_ChunkColumn_descriptor,
             new java.lang.String[] {
-              "ChunkX", "TopBlocks",
+              "ChunkX", "TopSolidBlocks", "TopTransparentBlocks",
             });
     internal_static_persistence_Entity_descriptor = getDescriptor().getMessageTypes().get(6);
     internal_static_persistence_Entity_fieldAccessorTable =

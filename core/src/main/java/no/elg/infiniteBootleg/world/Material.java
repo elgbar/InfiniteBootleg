@@ -254,7 +254,7 @@ public enum Material {
     return solid;
   }
 
-  public boolean blocksLight() {
+  public boolean isBlocksLight() {
     return blocksLight;
   }
 

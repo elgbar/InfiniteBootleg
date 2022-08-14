@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.ChunkColumn;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.NotNull;
@@ -94,7 +95,10 @@ public class ClientWorldRender implements WorldRender {
         }
 
         //noinspection LibGDXFlushInsideLoop
-        if (chunk.isAllAir() && chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY())) {
+        if (chunk.isAllAir()
+            && chunk
+                .getChunkColumn()
+                .isChunkAboveTopBlock(chunk.getChunkY(), ChunkColumn.TOP_MOST_FLAG)) {
           continue;
         }
 

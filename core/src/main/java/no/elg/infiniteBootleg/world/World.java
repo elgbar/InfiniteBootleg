@@ -292,7 +292,7 @@ public abstract class World implements Disposable, Resizable {
     synchronized (chunkColumns) {
       var column = chunkColumns.get(chunkX);
       if (column == null) {
-        ChunkColumn newCol = new ChunkColumnImpl(this, chunkX, null);
+        ChunkColumn newCol = new ChunkColumnImpl(this, chunkX, null, null);
         chunkColumns.put(chunkX, newCol);
         return newCol;
       }

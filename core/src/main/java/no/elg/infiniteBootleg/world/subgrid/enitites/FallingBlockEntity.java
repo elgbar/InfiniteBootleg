@@ -81,7 +81,7 @@ public class FallingBlockEntity extends Entity {
         .scheduleAsync(
             100L,
             () -> {
-              if (material != null && material.blocksLight()) {
+              if (material != null && material.isBlocksLight()) {
                 fix.setFilterData(Filters.GR_LI__ENTITY_FILTER);
               }
             });

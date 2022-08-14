@@ -50,7 +50,7 @@ class BlockLight(
   private val chunkImpl = chunk as ChunkImpl
 
   init {
-    isSkylight = chunk.chunkColumn.isBlockSkylight(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY))
+    isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY), ChunkColumn.BLOCKS_LIGHT_FLAG)
     isLit = isSkylight
     averageBrightness = if (isSkylight) {
       1f
@@ -84,7 +84,7 @@ class BlockLight(
     val worldX: Int = CoordUtil.chunkToWorld(chunk.chunkX, localX)
     val worldY: Int = CoordUtil.chunkToWorld(chunk.chunkY, localY)
 
-    if (chunkColumn.isBlockSkylight(localX, worldY)) {
+    if (chunkColumn.isBlockAboveTopBlock(localX, worldY, ChunkColumn.BLOCKS_LIGHT_FLAG)) {
       // This block is a skylight, its always lit fully
       isLit = true
       isSkylight = true
@@ -118,7 +118,7 @@ class BlockLight(
       val neighChunkCol = neighbor.chunk.chunkColumn
       val neiMat = neighbor.material
       if (neiMat.isLuminescent ||
-        (neiMat == AIR && neighChunkCol.isBlockSkylight(neighbor.localX, neighbor.worldY))
+        (neiMat == AIR && neighChunkCol.isBlockAboveTopBlock(neighbor.localX, neighbor.worldY, ChunkColumn.BLOCKS_LIGHT_FLAG))
       ) {
         if (isCancelled()) {
           return

@@ -156,7 +156,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
         newFix
       }
 
-      if (block.material.blocksLight()) {
+      if (block.material.isBlocksLight()) {
         fix.filterData = Filters.EN_GR_LI__GROUND_FILTER
       } else {
         fix.filterData = Filters.EN_GR__GROUND_FILTER
