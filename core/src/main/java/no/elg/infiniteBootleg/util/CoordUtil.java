@@ -205,8 +205,18 @@ public class CoordUtil {
     return (short) compactLoc;
   }
 
+  @NotNull
   public static String stringifyCompactLoc(long compactLoc) {
     return "(" + decompactLocX(compactLoc) + "," + decompactLocY(compactLoc) + ")";
+  }
+
+  @NotNull
+  public static String stringifyChunkToWorld(@NotNull Chunk chunk, int localX, int localY) {
+    return "("
+        + CoordUtil.chunkToWorld(chunk.getChunkX(), localX)
+        + ","
+        + CoordUtil.chunkToWorld(chunk.getChunkY(), localY)
+        + ")";
   }
 
   /**

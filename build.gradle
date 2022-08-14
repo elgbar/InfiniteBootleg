@@ -102,7 +102,6 @@ subprojects {
     ]
   }
 
-
   dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"

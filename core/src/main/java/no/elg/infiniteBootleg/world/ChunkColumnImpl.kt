@@ -139,7 +139,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
           }
         }
         // The hint was wrong!
-        Main.logger().warn("ChunkCol", "WRONG gr top block hint! chunkx: $chunkX, localx: $localX, hint: $worldYHint valid chunk? ${hintChunk?.isValid ?: false}")
+//        Main.logger().warn("ChunkCol", "WRONG gr top block hint! chunkx: $chunkX, localx: $localX, hint: $worldYHint valid chunk? ${hintChunk?.isValid ?: false}")
       }
       if (worldYHint < currTopHeight && currTopBlock.isNotAir()) {
         // Top block did not change

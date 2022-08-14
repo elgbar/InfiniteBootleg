@@ -27,7 +27,7 @@ fun StringBuilder.fastIntFormat(int: Int, d: Byte): StringBuilder {
   this.ensureCapacity(d.toInt())
   if (len < d) {
     for (i in 1..(d - len)) {
-      this.append(" ")
+      this.append(' ')
     }
   }
   append(int)

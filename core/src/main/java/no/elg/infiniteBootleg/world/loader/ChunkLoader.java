@@ -93,7 +93,7 @@ public class ChunkLoader {
   }
 
   @Nullable
-  public Chunk load(@NotNull ChunkImpl chunk, @NotNull ProtoWorld.Chunk protoChunk) {
+  private Chunk load(@NotNull ChunkImpl chunk, @NotNull ProtoWorld.Chunk protoChunk) {
     if (chunk.load(protoChunk)) {
       chunk.finishLoading();
       return chunk;
