@@ -140,6 +140,8 @@ public interface Chunk
    */
   void updateIfDirty();
 
+  void updateBlockLights();
+
   /** Mark this chunk as viewed during the current tick */
   void view();
 
@@ -150,6 +152,9 @@ public interface Chunk
    */
   @NotNull
   Block[][] getBlocks();
+
+  @NotNull
+  BlockLight getBlockLight(int localX, int localY);
 
   @Nullable
   Block getRawBlock(int localX, int localY);

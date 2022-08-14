@@ -22,6 +22,7 @@ interface ChunkColumn {
    */
   fun topBlock(localX: Int): Block?
 
+  fun updateTopBlock(localX: Int)
   fun updateTopBlock(localX: Int, worldYHint: Int)
 
   /**

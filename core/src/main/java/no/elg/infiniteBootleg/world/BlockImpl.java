@@ -22,7 +22,6 @@ public class BlockImpl implements Block {
 
   private final int localX;
   private final int localY;
-  private BlockLight blockLight;
   private boolean disposed;
 
   public BlockImpl(
@@ -37,22 +36,6 @@ public class BlockImpl implements Block {
     this.material = material;
     this.world = world;
     this.chunk = chunk;
-  }
-
-  public void setupBlockLight(@Nullable BlockLight blockLight) {
-    synchronized (this) {
-      if (this.blockLight != null) {
-        return;
-      }
-      if (blockLight != null) {
-        Preconditions.checkArgument(localX == blockLight.getLocalX());
-        Preconditions.checkArgument(localY == blockLight.getLocalY());
-        Preconditions.checkArgument(chunk == blockLight.getChunk());
-        this.blockLight = blockLight;
-      } else {
-        this.blockLight = new BlockLight(chunk, localX, localY);
-      }
-    }
   }
 
   @Override
@@ -134,8 +117,7 @@ public class BlockImpl implements Block {
 
   @NotNull
   public BlockLight getBlockLight() {
-    setupBlockLight(null);
-    return blockLight;
+    return chunk.getBlockLight(localX, localY);
   }
 
   @Override

@@ -25,10 +25,13 @@ import java.util.List;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Material;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
@@ -162,42 +165,40 @@ public class ChunkRenderer implements Renderer, Disposable {
           CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A);
     }
 
-    for (int x = 0; x < CHUNK_SIZE; x++) {
-      int topBlockHeight = chunkColumn.topBlockHeight(x);
-      for (int y = 0; y < CHUNK_SIZE; y++) {
-        Block block = blocks[x][y];
+    for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+      int topBlockHeight = chunkColumn.topBlockHeight(localX);
+      for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+        @Nullable Block block = blocks[localX][localY];
+        Material material = block != null ? block.getMaterial() : AIR;
 
-        if (block != null && block.getMaterial().isEntity()) {
+        if (material.isEntity()) {
           continue;
-        } else if (block == null) {
-          block = chunk.setBlock(x, y, AIR, false);
-          block.getBlockLight().recalculateLighting();
         }
-        var blockLight = block.getBlockLight();
+        var blockLight = chunk.getBlockLight(localX, localY);
         TextureRegion texture;
         TextureRegion secondaryTexture;
-        if (block.getMaterial() == AIR) {
-          texture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
+        int worldY = CoordUtil.chunkToWorld(chunk.getChunkY(), localY);
+        if (material == AIR) {
+          texture = (topBlockHeight > worldY) ? CAVE_TEXTURE : SKY_TEXTURE;
           secondaryTexture = null;
         } else {
           texture = block.getTexture();
           assert texture != null;
 
-          if (block.getMaterial().isTransparent()) {
-            secondaryTexture = (topBlockHeight > block.getWorldY()) ? CAVE_TEXTURE : SKY_TEXTURE;
+          if (material.isTransparent()) {
+            secondaryTexture = (topBlockHeight > worldY) ? CAVE_TEXTURE : SKY_TEXTURE;
           } else {
             secondaryTexture = null;
           }
         }
-        int dx = block.getLocalX() * BLOCK_SIZE;
-        int dy = block.getLocalY() * BLOCK_SIZE;
+        int dx = localX * BLOCK_SIZE;
+        int dy = localY * BLOCK_SIZE;
 
         batch.setColor(Color.WHITE);
 
         if (Settings.renderLight && blockLight.isLit() && !blockLight.isSkylight()) {
           if (secondaryTexture != null) {
             batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
-            // drawShadedBlock(secondaryTexture, lights, dx, dy);
           }
           drawShadedBlock(texture, blockLight.getLightMap(), dx, dy);
 

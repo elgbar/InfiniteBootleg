@@ -47,7 +47,11 @@ public class ChunkImpl implements Chunk {
   public final AtomicInteger currentUpdateId = new AtomicInteger();
 
   @NotNull private final World world;
-  @Nullable private final Block[][] blocks;
+  @Nullable private final Block @NotNull [] @NotNull [] blocks;
+
+  @NotNull
+  private final BlockLight @NotNull [] @NotNull [] blockLights =
+      new BlockLight[CHUNK_SIZE][CHUNK_SIZE];
 
   private final int chunkX;
   private final int chunkY;
@@ -63,10 +67,11 @@ public class ChunkImpl implements Chunk {
   @NotNull
   private final ObjectSet<ForkJoinTask<?>> tasks = new ObjectSet<>(CHUNK_SIZE * CHUNK_SIZE, 0.99f);
 
-  // if this chunk should be prioritized to be updated
+  // if texture/allair needs to be updated
   /** Use {@link #dirty()} to mark chunk as dirty */
-  private volatile boolean dirty; // if texture/allair needs to be updated
+  private volatile boolean dirty;
 
+  // if this chunk should be prioritized to be updated
   private boolean prioritize;
   private volatile boolean modified; // if the chunk has been modified since loaded
   private volatile boolean allowUnload;
@@ -100,7 +105,8 @@ public class ChunkImpl implements Chunk {
    * @param blocks The initial blocks of this chunk (note: must be {@link #CHUNK_SIZE}x{@link
    *     #CHUNK_SIZE})
    */
-  public ChunkImpl(@NotNull World world, int chunkX, int chunkY, @NotNull Block[][] blocks) {
+  public ChunkImpl(
+      @NotNull World world, int chunkX, int chunkY, @NotNull Block @NotNull [] @NotNull [] blocks) {
     Preconditions.checkArgument(blocks.length == CHUNK_SIZE);
     Preconditions.checkArgument(blocks[0].length == CHUNK_SIZE);
     this.world = world;
@@ -119,6 +125,12 @@ public class ChunkImpl implements Chunk {
     allowUnload = true;
     modified = false;
     initializing = true;
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+      for (int y = 0; y < CHUNK_SIZE; y++) {
+        blockLights[x][y] = new BlockLight(this, x, y);
+      }
+    }
   }
 
   @Override
@@ -191,9 +203,6 @@ public class ChunkImpl implements Chunk {
 
       if (currBlock != null) {
         currBlock.dispose();
-        if (block instanceof BlockImpl bb) {
-          bb.setupBlockLight(currBlock.getBlockLight());
-        }
 
         if (currBlock instanceof TickingBlock tickingBlock) {
           synchronized (tickingBlocks) {
@@ -207,6 +216,10 @@ public class ChunkImpl implements Chunk {
         synchronized (tickingBlocks) {
           tickingBlocks.add(tickingBlock);
         }
+      }
+      if ((block != null && block.getMaterial().isLuminescent())
+          || (currBlock != null && currBlock.getMaterial().isLuminescent())) {
+        updateBlockLights();
       }
 
       modified = true;
@@ -305,7 +318,6 @@ public class ChunkImpl implements Chunk {
       return;
     }
     boolean wasPrioritize;
-    ScheduledFuture<?> currLU;
     synchronized (this) {
       if (!dirty || initializing) {
         return;
@@ -320,35 +332,35 @@ public class ChunkImpl implements Chunk {
       for (int localX = 0; localX < CHUNK_SIZE; localX++) {
         for (int localY = 0; localY < CHUNK_SIZE; localY++) {
           Block b = blocks[localX][localY];
-          if (b != null) {
-            if (b.getMaterial() != AIR) {
-              allAir = false;
-              break outer;
-            }
+          if (b != null && b.getMaterial() != AIR) {
+            allAir = false;
+            break outer;
           }
         }
-      }
-
-      // If we reached this point before the light is done recalculating then we must start again
-      currLU = lightUpdater;
-      if (currLU != null) {
-        // Note that the previous thread will dispose itself, to cancel tasks in the async thread we
-        // must
-        currLU.cancel(false);
       }
     }
 
     // Render the world with the changes (but potentially without the light changes)
-    if ((currLU == null || currLU.isDone())
-        && world.getRender() instanceof ClientWorldRender clientWorldRender) {
+    if (world.getRender() instanceof ClientWorldRender clientWorldRender) {
       clientWorldRender.getChunkRenderer().queueRendering(this, wasPrioritize);
     }
-
-    updateBlockLights();
   }
 
-  private void updateBlockLights() {
+  private synchronized void cancelCurrentBlockLightUpdate() {
+    // If we reached this point before the light is done recalculating then we must start again
+    var currLU = lightUpdater;
+    if (currLU != null) {
+      // Note that the previous thread will dispose itself, to cancel tasks in the async thread we
+      // must
+      currLU.cancel(false);
+      lightUpdater = null;
+    }
+  }
+
+  public synchronized void updateBlockLights() {
     if (Settings.renderLight) {
+      // If we reached this point before the light is done recalculating then we must start again
+      cancelCurrentBlockLightUpdate();
       final int updateId = currentUpdateId.incrementAndGet();
       lightUpdater = Main.inst().getScheduler().executeAsync(() -> updateBlockLights(updateId));
     }
@@ -360,18 +372,15 @@ public class ChunkImpl implements Chunk {
     synchronized (tasks) {
       outer:
       for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-        for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+        for (int localY = CHUNK_SIZE - 1; localY >= 0; localY--) {
           synchronized (tasks) {
             if (updateId != currentUpdateId.get()) {
               break outer;
             }
-            Block b = blocks[localX][localY];
-            if (b != null) {
-              var bl = b.getBlockLight();
-              ForkJoinTask<?> task = pool.submit(() -> bl.recalculateLighting(updateId));
-              task.fork();
-              tasks.add(task);
-            }
+            BlockLight bl = blockLights[localX][localY];
+            ForkJoinTask<?> task = pool.submit(() -> bl.recalculateLighting(updateId));
+            task.fork();
+            tasks.add(task);
           }
         }
       }
@@ -391,6 +400,8 @@ public class ChunkImpl implements Chunk {
       tasks.clear();
     }
     if (updateId == currentUpdateId.get()) {
+      // TODO only re-render if any lights changed
+
       // Re-render the chunk with the new lighting
       if (world.getRender() instanceof ClientWorldRender clientWorldRender) {
         clientWorldRender.getChunkRenderer().queueRendering(this, true, true);
@@ -450,6 +461,11 @@ public class ChunkImpl implements Chunk {
   @Override
   public Block[][] getBlocks() {
     return blocks;
+  }
+
+  @Override
+  public @NotNull BlockLight getBlockLight(int localX, int localY) {
+    return blockLights[localX][localY];
   }
 
   @NotNull
@@ -739,6 +755,7 @@ public class ChunkImpl implements Chunk {
       }
     }
     chunkBody.update();
+    updateBlockLights();
   }
 
   @NotNull
@@ -774,6 +791,7 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public boolean load(ProtoWorld.Chunk protoChunk) {
+
     Preconditions.checkState(
         initializing, "Cannot load from proto chunk after chunk has been initialized");
     final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
@@ -798,14 +816,13 @@ public class ChunkImpl implements Chunk {
     int index = 0;
     var protoBlocks = protoChunk.getBlocksList();
     synchronized (this) {
-      for (int y = 0; y < CHUNK_SIZE; y++) {
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-          if (blocks[x][y] != null) {
+      for (int localY = 0; localY < CHUNK_SIZE; localY++) {
+        for (int localX = 0; localX < CHUNK_SIZE; localX++) {
+          if (blocks[localX][localY] != null) {
             throw new IllegalStateException("Double assemble");
           }
           var protoBlock = protoBlocks.get(index++);
-
-          blocks[x][y] = Block.fromProto(world, this, x, y, protoBlock);
+          blocks[localX][localY] = Block.fromProto(world, this, localX, localY, protoBlock);
         }
       }
     }

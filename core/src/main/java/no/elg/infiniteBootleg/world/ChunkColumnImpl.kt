@@ -81,35 +81,37 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     val oldTop: Int
 
     // sanity check
-    require(getWorldBlock(localX, worldY).isNotAir()) { "New top block is air!" }
 
     synchronized(syncLocks[localX]) {
+      require(getWorldBlock(localX, worldY).isNotAir()) { "New top block is air!" }
       oldTop = topBlockHeight(localX)
       top[localX] = worldY
     }
 
-    Main.inst().scheduler.executeAsync {
-      val oldChunk = CoordUtil.worldToChunk(oldTop)
-      val newChunk = CoordUtil.worldToChunk(worldY)
-      val min = min(oldChunk, newChunk) - 1
-      val max = max(oldChunk, newChunk)
-      val worldX = CoordUtil.chunkToWorld(chunkX, localX)
-      for (chunkY in min..max) {
-        val newWorldY = CoordUtil.chunkToWorld(chunkY)
-        getLoadedChunk(newWorldY)?.dirty()
+    val oldChunk = CoordUtil.worldToChunk(oldTop)
+    val newChunk = CoordUtil.worldToChunk(worldY)
+    val min = min(oldChunk, newChunk) - 1
+    val max = max(oldChunk, newChunk)
+    val worldX = CoordUtil.chunkToWorld(chunkX, localX)
+    for (chunkY in min..max) {
+      val newWorldY = CoordUtil.chunkToWorld(chunkY)
+      getLoadedChunk(newWorldY)?.updateBlockLights()
 
-        // Update chunks to the sides, if the light reaches that far
-        val leftChunkX = CoordUtil.worldToChunk((worldX - Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
-        if (leftChunkX != chunkX) {
-          getLoadedChunk(newWorldY, leftChunkX)?.dirty()
-        }
+      // Update chunks to the sides, if the light reaches that far
+      val leftChunkX = CoordUtil.worldToChunk((worldX - Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+      if (leftChunkX != chunkX) {
+        getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights()
+      }
 
-        val rightChunkX = CoordUtil.worldToChunk((worldX + Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
-        if (rightChunkX != chunkX) {
-          getLoadedChunk(newWorldY, rightChunkX)?.dirty()
-        }
+      val rightChunkX = CoordUtil.worldToChunk((worldX + Block.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+      if (rightChunkX != chunkX) {
+        getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights()
       }
     }
+  }
+
+  override fun updateTopBlock(localX: Int) {
+    updateTopBlock(localX, topBlockHeight(localX))
   }
 
   override fun updateTopBlock(localX: Int, worldYHint: Int) {
