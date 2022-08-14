@@ -5,11 +5,10 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
-import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min
 
-@ExperimentalContracts
 class ChunkColumnImpl(override val world: World, override val chunkX: Int, initialTop: IntArray? = null) : ChunkColumn {
 
   private val top = IntArray(CHUNK_SIZE)
@@ -140,7 +139,6 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
         return
       }
 
-      @ExperimentalContracts
       fun testChunk(nextChunk: Chunk?): Boolean {
         if (nextChunk != null && nextChunk.isValid && !nextChunk.isAllAir) {
           for (nextLocalY in CHUNK_SIZE - 1 downTo 0) {
