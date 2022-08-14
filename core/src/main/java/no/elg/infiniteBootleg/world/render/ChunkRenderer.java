@@ -198,7 +198,12 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         if (Settings.renderLight && blockLight.isLit() && !blockLight.isSkylight()) {
           if (secondaryTexture != null) {
-            batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+            // If the block is emitting light there is no point in drawing it shaded
+            if (material.isLuminescent()) {
+              batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+            } else {
+              drawShadedBlock(secondaryTexture, blockLight.getLightMap(), dx, dy);
+            }
           }
           drawShadedBlock(texture, blockLight.getLightMap(), dx, dy);
 
