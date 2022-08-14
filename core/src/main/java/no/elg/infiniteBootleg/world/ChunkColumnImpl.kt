@@ -61,15 +61,8 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   }
 
   private fun getLoadedChunk(worldY: Int, chunkX: Int = this.chunkX): Chunk? {
-    val chunkY = CoordUtil.worldToChunk(worldY)
-    val compactLoc = CoordUtil.compactLoc(chunkX, chunkY)
-
-    world.chunksReadLock.lock()
-    try {
-      return world.getChunks()[compactLoc]
-    } finally {
-      world.chunksReadLock.unlock()
-    }
+    val compactLoc = CoordUtil.compactLoc(chunkX, CoordUtil.worldToChunk(worldY))
+    return world.getLoadedChunk(compactLoc)
   }
 
   private fun getChunk(worldY: Int): Chunk? {
@@ -83,8 +76,8 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     // sanity check
 
     synchronized(syncLocks[localX]) {
-      require(getWorldBlock(localX, worldY).isNotAir()) { "New top block is air!" }
       oldTop = topBlockHeight(localX)
+      require(getWorldBlock(localX, worldY).isNotAir()) { "New top block is air! World X ${getWorldX(localX)}, illegal world y $worldY, old top $oldTop" }
       top[localX] = worldY
     }
 

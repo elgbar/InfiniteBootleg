@@ -820,6 +820,15 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
+  public @Nullable Chunk getLoadedChunk(long compactChunkLoc) {
+    chunksReadLock.lock();
+    try {
+      return chunks.get(compactChunkLoc);
+    } finally {
+      chunksReadLock.unlock();
+    }
+  }
+
   /**
    * Unload the given chunks and save it to disk
    *
