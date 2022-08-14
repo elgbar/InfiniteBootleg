@@ -108,7 +108,7 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
     implementation "com.google.guava:guava:31.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.21.4"
+    implementation "com.google.protobuf:protobuf-java:3.21.5"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
