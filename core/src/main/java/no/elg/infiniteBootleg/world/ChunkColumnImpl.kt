@@ -38,8 +38,9 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     synchronized(syncLocks[localX]) {
       val solid = if (features and SOLID_FLAG != 0) topSolid[localX] else Int.MIN_VALUE
       val light = if (features and BLOCKS_LIGHT_FLAG != 0) topLight[localX] else Int.MIN_VALUE
-
-      return max(light, solid)
+      val max = max(light, solid)
+      require(max != Int.MIN_VALUE) { "Failed to find to block at local x $localX, with the given features $features in the chunk $chunkX column" }
+      return max
     }
   }
 
@@ -139,7 +140,8 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
   private fun updateTopBlock(top: IntArray, localX: Int, worldYHint: Int, rule: (block: Block) -> Boolean) {
     synchronized(syncLocks[localX]) {
-      val currTopBlock = topBlock(localX)
+      val currTopHeight = top[localX]
+      val currTopBlock = getWorldBlock(localX, top[localX])
       if (currTopBlock == null) {
         // failed to get the current block
         Main.inst().scheduler.scheduleAsync(100) {
@@ -149,7 +151,6 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
       }
 
       val localY = CoordUtil.chunkOffset(worldYHint)
-      val currTopHeight = topBlockHeight(localX)
 
       if (worldYHint > currTopHeight) {
         val hintChunk = getLoadedChunk(worldYHint)
