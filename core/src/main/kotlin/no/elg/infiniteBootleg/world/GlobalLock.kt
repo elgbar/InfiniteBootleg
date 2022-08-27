@@ -1,8 +1,5 @@
 package no.elg.infiniteBootleg.world
 
-@JvmField
-val LIGHT_LOCK = Any()
-
 /**
  * Lock to interact with physics
  *
