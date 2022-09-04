@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,12 +36,12 @@ public class Util {
    * Converts the given hex color in 0xAARRGGBB format to a {@link Color} that can be used in a
    * LibGdx application
    */
-  public static Color convert(final String str) {
-    final long hex = Long.decode(str);
-    final float a = (hex & 0xFF000000L) >> 24;
-    final float r = (hex & 0x00FF0000L) >> 16;
-    final float g = (hex & 0x0000FF00L) >> 8;
-    final float b = (hex & 0x000000FFL);
+  public static Color convert(String str) {
+    long hex = Long.decode(str);
+    float a = (hex & 0xFF000000L) >> 24;
+    float r = (hex & 0x00FF0000L) >> 16;
+    float g = (hex & 0x0000FF00L) >> 8;
+    float b = (hex & 0x000000FFL);
     return new Color(r / 255F, g / 255F, b / 255F, a / 255F);
   }
 
@@ -50,7 +52,7 @@ public class Util {
    * @return {@code val} if between {@code min} and {@code max}, if not return {@code min} or {@code
    *     max} respectively
    */
-  public static <T extends Comparable<T>> T clamp(final T min, final T val, final T max) {
+  public static <T extends Comparable<T>> T clamp(T min, T val, T max) {
     Preconditions.checkArgument(
         min != null && val != null && max != null, "None of the parameters can be null");
     Preconditions.checkArgument(
@@ -70,7 +72,7 @@ public class Util {
    * @param max The maximum value to check (exclusive)
    * @return if {@code val} is between {@code min} (inclusive) and {@code max} (exclusive)
    */
-  public static <T extends Comparable<T>> boolean isBetween(final T min, final T val, final T max) {
+  public static <T extends Comparable<T>> boolean isBetween(T min, T val, T max) {
     Preconditions.checkArgument(
         min != null && val != null && max != null, "None of the parameters can be null");
     Preconditions.checkArgument(
@@ -104,17 +106,17 @@ public class Util {
    *
    * @return The powerset of a set
    */
-  public static <T> Set<Set<T>> powerSet(final Set<T> originalSet) {
-    final Set<Set<T>> sets = new HashSet<>();
+  public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
+    Set<Set<T>> sets = new HashSet<>();
     if (originalSet.isEmpty()) {
       sets.add(new HashSet<>());
       return sets;
     }
-    final List<T> list = new ArrayList<>(originalSet);
-    final T head = list.get(0);
-    final Set<T> rest = new HashSet<>(list.subList(1, list.size()));
-    for (final Set<T> set : powerSet(rest)) {
-      final Set<T> newSet = new HashSet<>();
+    List<T> list = new ArrayList<>(originalSet);
+    T head = list.get(0);
+    Set<T> rest = new HashSet<>(list.subList(1, list.size()));
+    for (Set<T> set : powerSet(rest)) {
+      Set<T> newSet = new HashSet<>();
       newSet.add(head);
       newSet.addAll(set);
       sets.add(newSet);
@@ -127,7 +129,7 @@ public class Util {
    * @param string The string to convert to title case
    * @return The title case version of the given string
    */
-  public static String toTitleCase(final String string) {
+  public static String toTitleCase(String string) {
     return toTitleCase(true, string);
   }
 
@@ -135,8 +137,8 @@ public class Util {
    * @param string The string to convert to title case
    * @return The title case version of the given string
    */
-  public static String toTitleCase(boolean capFirst, final String string) {
-    final StringBuilder sb = new StringBuilder();
+  public static String toTitleCase(boolean capFirst, String string) {
+    StringBuilder sb = new StringBuilder();
 
     final String ACTIONABLE_DELIMITERS = " '-/";
     boolean capNext = capFirst;
@@ -166,15 +168,15 @@ public class Util {
    */
   @NotNull
   public static Map<@NotNull Pair<@NotNull String, @NotNull Boolean>, @Nullable String>
-      interpreterArgs(final String[] args) {
-    final HashMap<Pair<String, Boolean>, String> argsMap = new HashMap<>();
+      interpreterArgs(String[] args) {
+    HashMap<Pair<String, Boolean>, String> argsMap = new HashMap<>();
 
-    for (final String arg : args) {
+    for (String arg : args) {
       if (!arg.startsWith("-")) {
         Main.logger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
       } else {
         // we only care about the first equals sign, the rest is a part of the value
-        final int equal = arg.indexOf('=');
+        int equal = arg.indexOf('=');
 
         boolean doubleDash = arg.startsWith("--");
         int cutoff = doubleDash ? 2 : 1;
@@ -213,7 +215,7 @@ public class Util {
     String savedHash;
     try {
       savedHash = Gdx.files.internal(ClientMain.VERSION_FILE).readString();
-    } catch (final Exception e) {
+    } catch (Exception e) {
       savedHash = FALLBACK_VERSION;
     }
     if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
@@ -234,18 +236,16 @@ public class Util {
   /**
    * @return The latest commit ID in the current repo
    */
-  public static String getLastGitCommitID(final boolean full) {
-    final String hashCommand = "git log --format=%H -n 1";
-    try {
-      final Process p = Runtime.getRuntime().exec(hashCommand);
-      p.waitFor();
-      String hash = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-      if (!full) {
-        hash = hash.substring(0, 6);
-      }
-      return hash.toUpperCase();
-    } catch (final Exception e) {
+  public static String getLastGitCommitID(boolean full) {
+    String result = executeCommand("git", "log", "--format=%H", "-n", "1");
+    if (result == null) {
       return DEFAULT_HASH;
+    }
+    var hash = result.toUpperCase();
+    if (full) {
+      return hash;
+    } else {
+      return hash.substring(0, 6);
     }
   }
 
@@ -253,14 +253,33 @@ public class Util {
    * @return The number of commits in this repository
    */
   public static int commitCount() {
-    final String countCommand = "git rev-list HEAD --count";
-    try {
-      final Process p = Runtime.getRuntime().exec(countCommand);
-      p.waitFor();
-      String countStr = new BufferedReader(new InputStreamReader(p.getInputStream())).readLine();
-      return Integer.parseInt(countStr);
-    } catch (Exception e) {
+    String result = executeCommand("git", "rev-list", "HEAD", "--count");
+    if (result == null) {
       return DEFAULT_COMMIT_COUNT;
+    }
+    try {
+      return Integer.parseInt(result);
+    } catch (NumberFormatException e) {
+      return DEFAULT_COMMIT_COUNT;
+    }
+  }
+
+  @Nullable
+  private static <T> String executeCommand(String... command) {
+    try {
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      processBuilder.command(command);
+      Process p = processBuilder.start();
+      p.waitFor();
+
+      InputStream inputStream = p.getInputStream();
+      try (InputStreamReader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+        try (BufferedReader bufferedReader = new BufferedReader(in)) {
+          return bufferedReader.readLine();
+        }
+      }
+    } catch (Exception e) {
+      return "";
     }
   }
 
