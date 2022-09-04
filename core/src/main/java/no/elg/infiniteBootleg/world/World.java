@@ -80,6 +80,8 @@ public abstract class World implements Disposable, Resizable {
   public static final float BLOCK_SIZE = 1f;
   public static final double LIGHT_SOURCE_LOOK_BLOCKS = 7.5;
 
+  public static final int TRY_LOCK_CHUNKS_DURATION_MS = 100;
+
   @NotNull private final UUID uuid;
   private final long seed;
   @NotNull private final WorldTicker worldTicker;
@@ -346,8 +348,10 @@ public abstract class World implements Disposable, Resizable {
     @Nullable Chunk old = null;
     boolean acquiredLock = false;
     try {
-      acquiredLock = chunksLock.readLock().tryLock(100, TimeUnit.MILLISECONDS);
+      acquiredLock =
+          chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS, TimeUnit.MILLISECONDS);
       if (acquiredLock) {
+        //noinspection FieldAccessNotGuarded We do guard it!
         readChunk = chunks.get(chunkLoc);
       }
     } catch (InterruptedException ignore) {
@@ -358,7 +362,10 @@ public abstract class World implements Disposable, Resizable {
     }
 
     if (!acquiredLock) {
-      Main.logger().warn("World", "Failed to acquire chunks read lock in 100 ms");
+      Main.logger()
+          .warn(
+              "World",
+              "Failed to acquire chunks read lock in " + TRY_LOCK_CHUNKS_DURATION_MS + " ms");
       return null;
     }
 
