@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.LongMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.Ticking;
@@ -50,7 +51,10 @@ public class WorldTicker extends Ticker implements Disposable {
 
   private static class WorldTickee implements Ticking {
 
-    @NotNull private final LongMap.Entries<@Nullable Chunk> chunkIterator;
+    @GuardedBy("world.chunksLock")
+    @NotNull
+    private final LongMap.Entries<@Nullable Chunk> chunkIterator;
+
     @NotNull private final World world;
 
     private WorldTickee(@NotNull World world) {
@@ -69,7 +73,7 @@ public class WorldTicker extends Ticker implements Disposable {
       long tick = world.getWorldTicker().getTickId();
       ForkJoinPool pool = ForkJoinPool.commonPool();
 
-      world.chunksWriteLock.lock();
+      world.chunksLock.writeLock().lock();
       try {
         chunkIterator.reset();
         while (chunkIterator.hasNext()) {
@@ -105,7 +109,7 @@ public class WorldTicker extends Ticker implements Disposable {
           task.fork();
         }
       } finally {
-        world.chunksWriteLock.unlock();
+        world.chunksLock.writeLock().unlock();
       }
       for (Entity entity : world.getEntities()) {
         if (entity.isDisposed()) {

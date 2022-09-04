@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import javax.annotation.concurrent.GuardedBy;
 import kotlin.jvm.functions.Function1;
 import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
@@ -42,7 +43,6 @@ import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.blocks.EntityBlock;
 import no.elg.infiniteBootleg.world.box2d.Filters;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
-import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactHandler;
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlockEntity;
@@ -70,13 +70,24 @@ public abstract class Entity
   public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
   public static final float DEFAULT_GRAVITY_SCALE = 2f;
   public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
+  public static final float MIN_CHECK_STEP = 0.1f;
+  public static final long DISPOSED_SANITY_CHECK_DELAY = 10L;
+  public static final float DEFAULT_FIXTURE_DENSITY = 1000f;
+  public static final float DEFAULT_FIXTURE_FRICTION = 10f;
+  public static final float DEFAULT_FIXTURE_RESTITUTION = 0.025f;
   @NotNull private final World world;
   private final UUID uuid;
 
   // Note: must only be accessed with getters
-  @Nullable private volatile Body body;
+  @GuardedBy("entityLock")
+  @Nullable
+  private volatile Body body;
 
+  @GuardedBy("entityLock")
   private final Array<Function1<@NotNull Body, @Nullable Void>> bodyCreations = new Array<>();
+
+  protected final Object entityLock = new Object();
+
   private boolean flying; // ignore world gravity
   private final Vector2 posCache;
   private final Vector2 velCache;
@@ -84,9 +95,10 @@ public abstract class Entity
   @NotNull private Filter filter = Filters.EN_GR__ENTITY_FILTER;
   private float lookDeg;
 
-  protected volatile boolean disposed;
+  @GuardedBy("entityLock")
+  private volatile boolean disposed;
 
-  public Entity(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
+  public Entity(@NotNull World world, @NotNull ProtoWorld.EntityOrBuilder protoEntity) {
     this(
         world,
         protoEntity.getPosition().getX(),
@@ -101,7 +113,7 @@ public abstract class Entity
     if (protoEntity.getFlying()) {
       setFlying(true);
     }
-    final ProtoWorld.Vector2f velocity = protoEntity.getVelocity();
+    ProtoWorld.Vector2f velocity = protoEntity.getVelocity();
     if (velocity.getX() != 0f || velocity.getY() != 0f) {
       postWorldBodyRunnable(
           body -> {
@@ -156,7 +168,7 @@ public abstract class Entity
         }
         case PUSH_UP -> {
           // make sure we're not stuck in an infinite loop if the given height is zero
-          float checkStep = Math.min(getHalfBox2dHeight(), 0.1f);
+          float checkStep = Math.min(getHalfBox2dHeight(), MIN_CHECK_STEP);
           while (isInvalidLocation(posCache.x, posCache.y)) {
             posCache.y += checkStep;
           }
@@ -171,7 +183,7 @@ public abstract class Entity
           .createBody(
               def,
               newBody -> {
-                synchronized (bodyCreations) {
+                synchronized (entityLock) {
                   setBody(newBody);
                   createFixture(newBody);
                   newBody.setGravityScale(DEFAULT_GRAVITY_SCALE);
@@ -190,7 +202,7 @@ public abstract class Entity
     Main.inst()
         .getScheduler()
         .scheduleSync(
-            10L,
+            DISPOSED_SANITY_CHECK_DELAY,
             () -> {
               if (!isDisposed() && !world.containsEntity(uuid)) {
                 Main.logger()
@@ -208,25 +220,36 @@ public abstract class Entity
             });
   }
 
-  protected void postWorldBodyRunnable(Function1<@NotNull Body, @Nullable Void> runnable) {
-    boolean runNow;
-    Body currentBody = getUnsafeBody();
-    synchronized (bodyCreations) {
-      runNow = currentBody != null;
-      if (!runNow) {
-        bodyCreations.add(runnable);
+  /**
+   * Non-nullability of {@link #getBody()} is NOT guaranteed when the given runnable runs. This
+   * method guarantees that the runnable runs when the physics world and the entity is locked.
+   */
+  protected void synchronizeBox2dAndEntity(@NotNull Runnable runnable) {
+    synchronized (BOX2D_LOCK) {
+      synchronized (entityLock) {
+        runnable.run();
       }
     }
-    if (runNow) {
-      world
-          .getWorldBody()
-          .postBox2dRunnable(
-              () -> {
-                if (isDisposed()) {
-                  return;
-                }
-                runnable.invoke(currentBody);
-              });
+  }
+
+  protected void postWorldBodyRunnable(Function1<@NotNull Body, @Nullable Void> runnable) {
+    synchronized (entityLock) {
+      Body currentBody = getUnsafeBody();
+      if (currentBody != null) {
+        world
+            .getWorldBody()
+            .postBox2dRunnable(
+                () -> {
+                  synchronized (entityLock) {
+                    if (isDisposed()) {
+                      return;
+                    }
+                    runnable.invoke(currentBody);
+                  }
+                });
+      } else {
+        bodyCreations.add(runnable);
+      }
     }
   }
 
@@ -240,7 +263,11 @@ public abstract class Entity
     return bodyDef;
   }
 
-  /** Always call while synchronized with {@link WorldRender#BOX2D_LOCK} */
+  /**
+   * Always call while synchronized with {@link
+   * no.elg.infiniteBootleg.world.GlobalLockKt#BOX2D_LOCK}
+   */
+  @GuardedBy("BOX2D_LOCK")
   protected void createFixture(@NotNull Body body) {
     PolygonShape shape = new PolygonShape();
 
@@ -248,9 +275,9 @@ public abstract class Entity
 
     FixtureDef def = new FixtureDef();
     def.shape = shape;
-    def.density = 1000f;
-    def.friction = 10f;
-    def.restitution = 0.025f; // a bit bouncy!
+    def.density = DEFAULT_FIXTURE_DENSITY;
+    def.friction = DEFAULT_FIXTURE_FRICTION;
+    def.restitution = DEFAULT_FIXTURE_RESTITUTION; // a bit bouncy!
 
     Fixture fix = body.createFixture(def);
     fix.setFilterData(Filters.EN_GR__ENTITY_FILTER);
@@ -298,7 +325,7 @@ public abstract class Entity
     }
     float newWorldY = worldY;
 
-    final WorldBody worldBody = world.getWorldBody();
+    WorldBody worldBody = world.getWorldBody();
     float physicsWorldX = worldX + worldBody.getWorldOffsetX();
     float physicsWorldY = worldY + worldBody.getWorldOffsetY();
     setLookDeg(lookAngleDeg);
@@ -306,7 +333,7 @@ public abstract class Entity
     world.postBox2dRunnable(
         () -> {
           boolean sendMovePacket = false;
-          synchronized (this) {
+          synchronized (entityLock) {
             var currentBody = getUnsafeBody();
             if (isDisposed() || currentBody == null) {
               return;
@@ -524,7 +551,7 @@ public abstract class Entity
   }
 
   @NotNull
-  public synchronized Filter getFilter() {
+  public Filter getFilter() {
     return filter;
   }
 
@@ -608,20 +635,19 @@ public abstract class Entity
   /** Update the cached position and velocity */
   public final void updatePos() {
     // must sync with box2d lock, as the side effect is what we desire
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        final Body currentBody = getUnsafeBody();
-        if (isDisposed() || currentBody == null) {
-          return;
-        }
-        final WorldBody worldBody = world.getWorldBody();
+    synchronizeBox2dAndEntity(
+        () -> {
+          Body currentBody = getUnsafeBody();
+          if (isDisposed() || currentBody == null) {
+            return;
+          }
+          WorldBody worldBody = world.getWorldBody();
 
-        posCache
-            .set(currentBody.getPosition())
-            .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
-        velCache.set(currentBody.getLinearVelocity());
-      }
-    }
+          posCache
+              .set(currentBody.getPosition())
+              .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
+          velCache.set(currentBody.getLinearVelocity());
+        });
   }
 
   @Override
@@ -695,7 +721,7 @@ public abstract class Entity
                 }
                 if (Main.isServerClient()) {
                   // Ask the server about the entity
-                  final ServerClient client = ClientMain.inst().getServerClient();
+                  ServerClient client = ClientMain.inst().getServerClient();
                   if (client != null) {
                     client.ctx.writeAndFlush(PacketExtraKt.serverBoundEntityRequest(client, uuid));
                     return;
@@ -751,21 +777,28 @@ public abstract class Entity
     return currentBody;
   }
 
+  /**
+   * Prefer to use {@link #postWorldBodyRunnable(Function1)} to execute tasks correctly where
+   * possible.
+   *
+   * @return The current {@link #body}, which might be null
+   * @implNote synchronized with {@link #entityLock}
+   */
   @Nullable
-  protected Body getUnsafeBody() {
-    synchronized (bodyCreations) {
+  protected final Body getUnsafeBody() {
+    synchronized (entityLock) {
       return body;
     }
   }
 
-  private synchronized void setBody(@Nullable Body newBody) {
+  private void setBody(@Nullable Body newBody) {
     if (isDisposed() && newBody != null) {
       world.getWorldBody().destroyBody(newBody);
     } else {
       Body oldBody;
-      synchronized (bodyCreations) {
+      synchronized (entityLock) {
         oldBody = getUnsafeBody();
-        this.body = newBody;
+        body = newBody;
       }
       if (oldBody != null) {
         world.getWorldBody().destroyBody(oldBody);
@@ -810,35 +843,38 @@ public abstract class Entity
 
   /** Do not call directly. Use {@link World#removeEntity(Entity)} */
   @Override
-  public synchronized void dispose() {
-    if (isDisposed()) {
-      Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
-      return;
-    }
-    setBody(null); // must be called before disposed is true
-    disposed = true;
-    if (this instanceof Removable removable) {
-      removable.onRemove();
+  public void dispose() {
+    synchronized (entityLock) {
+      if (isDisposed()) {
+        Main.logger().error("Entity", "Tried to dispose an already disposed entity " + this);
+        return;
+      }
+      setBody(null); // must be called before disposed is true
+      disposed = true;
+      if (this instanceof Removable removable) {
+        removable.onRemove();
+      }
     }
   }
 
   @Override
   public boolean isDisposed() {
-    return disposed;
+    synchronized (entityLock) {
+      return disposed;
+    }
   }
 
   @Override
   @NotNull
   public ProtoWorld.Entity.Builder save() {
-    final ProtoWorld.Entity.Builder builder = ProtoWorld.Entity.newBuilder();
+    ProtoWorld.Entity.Builder builder = ProtoWorld.Entity.newBuilder();
 
-    synchronized (BOX2D_LOCK) {
-      synchronized (this) {
-        updatePos();
-        builder.setPosition(ProtoWorld.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
-        builder.setVelocity(ProtoWorld.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
-      }
-    }
+    synchronizeBox2dAndEntity(
+        () -> {
+          updatePos();
+          builder.setPosition(ProtoWorld.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
+          builder.setVelocity(ProtoWorld.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
+        });
     builder.setUuid(uuid.toString());
     builder.setType(getEntityType());
     builder.setFlying(flying);
@@ -857,19 +893,23 @@ public abstract class Entity
       Main.logger().warn("World already contains entity with uuid " + uuid);
       return null;
     }
-    Entity entity;
+    @Nullable Entity entity;
     switch (protoEntity.getType()) {
       case GENERIC_ENTITY -> entity = new GenericEntity(world, protoEntity);
       case FALLING_BLOCK -> entity = new FallingBlockEntity(world, chunk, protoEntity);
       case PLAYER -> {
         var player = new Player(world, protoEntity);
-        player.disableGravity();
-        entity = player;
+        if (!player.isDisposed()) {
+          player.disableGravity();
+          entity = player;
+        } else {
+          entity = null;
+        }
       }
       case BLOCK -> {
         Preconditions.checkArgument(protoEntity.hasMaterial());
-        final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
-        final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
+        ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
+        Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
         return material.createEntity(world, chunk, protoEntity);
       }
 
@@ -885,7 +925,8 @@ public abstract class Entity
       }
     }
 
-    if (entity.isDisposed()) {
+    if (entity == null || entity.isDisposed()) {
+      Main.logger().error("LOAD", "Loaded entity is already disposed!");
       return null;
     }
     world.addEntity(entity, false);
@@ -914,10 +955,9 @@ public abstract class Entity
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Entity)) {
+    if (!(o instanceof Entity entity)) {
       return false;
     }
-    Entity entity = (Entity) o;
     return uuid.equals(entity.uuid);
   }
 

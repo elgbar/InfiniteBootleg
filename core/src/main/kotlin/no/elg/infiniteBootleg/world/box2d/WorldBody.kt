@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS_DIVIDER
+import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs
 import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 
@@ -35,6 +36,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    *
    * @return The underlying box2d world
    */
+  @GuardedBy("BOX2D_LOCK")
   lateinit var box2dWorld: Box2dWorld
 
   private var timeStep = 0f

@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -100,6 +101,7 @@ public class Door extends MaterialEntity {
   }
 
   @Override
+  @GuardedBy("no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK")
   protected void createFixture(@NotNull Body body) {
     PolygonShape box = new PolygonShape();
     box.setAsBox(getHalfBox2dWidth(), getHalfBox2dHeight());

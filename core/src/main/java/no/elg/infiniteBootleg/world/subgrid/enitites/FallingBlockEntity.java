@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
+import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.Packets;
@@ -71,6 +72,7 @@ public class FallingBlockEntity extends Entity {
   }
 
   @Override
+  @GuardedBy("no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK")
   protected void createFixture(@NotNull Body body) {
     PolygonShape box = new PolygonShape();
     box.setAsBox(getHalfBox2dWidth() - 0.1f, getHalfBox2dHeight() - 0.1f);

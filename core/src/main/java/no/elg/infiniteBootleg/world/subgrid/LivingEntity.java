@@ -19,14 +19,14 @@ public abstract class LivingEntity extends Entity implements Updatable {
   private int maxHealth = DEFAULT_MAX_HEALTH;
   private String name = DEFAULT_NAME;
 
-  public LivingEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {
+  public LivingEntity(@NotNull World world, @NotNull ProtoWorld.EntityOrBuilder protoEntity) {
     super(world, protoEntity);
     if (isDisposed()) {
       return;
     }
     Preconditions.checkArgument(
         protoEntity.hasLiving(), "Living entity does not contain living data");
-    final ProtoWorld.Entity.Living protoLiving = protoEntity.getLiving();
+    ProtoWorld.Entity.Living protoLiving = protoEntity.getLiving();
     name = protoLiving.getName();
     health = protoLiving.getHealth();
     maxHealth = protoLiving.getMaxHealth();
@@ -38,7 +38,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
 
   @Override
   public void update() {
-    final EntityControls controls = getControls();
+    EntityControls controls = getControls();
     if (controls != null) {
       controls.update();
     }
@@ -89,8 +89,8 @@ public abstract class LivingEntity extends Entity implements Updatable {
   @Override
   @NotNull
   public ProtoWorld.Entity.Builder save() {
-    final ProtoWorld.Entity.Builder builder = super.save();
-    final ProtoWorld.Entity.Living.Builder livingBuilder = ProtoWorld.Entity.Living.newBuilder();
+    ProtoWorld.Entity.Builder builder = super.save();
+    ProtoWorld.Entity.Living.Builder livingBuilder = ProtoWorld.Entity.Living.newBuilder();
 
     livingBuilder.setHealth(health);
     livingBuilder.setMaxHealth(maxHealth);

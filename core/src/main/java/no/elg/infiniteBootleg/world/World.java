@@ -28,8 +28,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.annotation.concurrent.GuardedBy;
 import kotlin.jvm.functions.Function0;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
@@ -75,7 +76,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class World implements Disposable, Resizable {
 
-  public static final String LOCK_FILE_NAME = ".locked";
+  public static final float HALF_BLOCK_SIZE = 0.5f;
+  public static final float BLOCK_SIZE = 1f;
+  public static final double LIGHT_SOURCE_LOOK_BLOCKS = 7.5;
 
   @NotNull private final UUID uuid;
   private final long seed;
@@ -92,8 +95,10 @@ public abstract class World implements Disposable, Resizable {
   private final Map<@NotNull UUID, @NotNull Player> players =
       new ConcurrentHashMap<>(); // all player in this world
 
-  /** must be accessed under {@link #chunkLock} */
-  @NotNull protected final LongMap<Chunk> chunks = new LongMap<>();
+  /** must be accessed under {@link #chunksLock} */
+  @GuardedBy("chunksLock")
+  @NotNull
+  protected final LongMap<Chunk> chunks = new LongMap<>();
 
   /** Must be accessed under {@code synchronized(chunkColumns)} */
   @NotNull protected final IntMap<ChunkColumn> chunkColumns = new IntMap<>();
@@ -103,9 +108,7 @@ public abstract class World implements Disposable, Resizable {
   @NotNull private final String name;
 
   private Location spawn;
-  private final ReentrantReadWriteLock chunkLock = new ReentrantReadWriteLock();
-  public final Lock chunksReadLock = chunkLock.readLock();
-  public final Lock chunksWriteLock = chunkLock.writeLock();
+  public final ReadWriteLock chunksLock = new ReentrantReadWriteLock();
 
   private boolean transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient();
 
@@ -156,8 +159,7 @@ public abstract class World implements Disposable, Resizable {
           var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
           if (worldInfoFile.exists() && !worldInfoFile.isDirectory()) {
             try {
-              final ProtoWorld.World protoWorld =
-                  ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
+              ProtoWorld.World protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes());
               loadFromProtoWorld(protoWorld);
             } catch (InvalidProtocolBufferException e) {
               e.printStackTrace();
@@ -187,7 +189,7 @@ public abstract class World implements Disposable, Resizable {
     return player;
   }
 
-  public void loadFromProtoWorld(@NotNull ProtoWorld.World protoWorld) {
+  public void loadFromProtoWorld(@NotNull ProtoWorld.WorldOrBuilder protoWorld) {
     spawn = Location.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
@@ -252,7 +254,7 @@ public abstract class World implements Disposable, Resizable {
     }
 
     if (Main.isSingleplayer()) {
-      final Player player = ClientMain.inst().getPlayer();
+      Player player = ClientMain.inst().getPlayer();
       if (player != null) {
         builder.setPlayer(player.save());
       }
@@ -275,7 +277,7 @@ public abstract class World implements Disposable, Resizable {
   }
 
   private ProtoWorld.World.Generator getGeneratorType() {
-    final ChunkGenerator generator = chunkLoader.getGenerator();
+    ChunkGenerator generator = chunkLoader.getGenerator();
     if (generator instanceof PerlinChunkGenerator) {
       return PERLIN;
     } else if (generator instanceof FlatChunkGenerator) {
@@ -309,13 +311,13 @@ public abstract class World implements Disposable, Resizable {
 
   public void updateChunk(@NotNull Chunk chunk) {
     Preconditions.checkState(chunk.isValid());
-    chunksWriteLock.lock();
+    chunksLock.writeLock().lock();
 
-    Chunk old;
+    @Nullable Chunk old;
     try {
       old = chunks.put(chunk.getCompactLocation(), chunk);
     } finally {
-      chunksWriteLock.unlock();
+      chunksLock.writeLock().unlock();
     }
     if (old != null) {
       old.dispose();
@@ -340,24 +342,26 @@ public abstract class World implements Disposable, Resizable {
   @Nullable
   public Chunk getChunk(long chunkLoc, boolean load) {
     // This is a long lock, it must appear to be an atomic operation though
-    Chunk readChunk;
-    Chunk old = null;
-    boolean acquiredLock;
+    @Nullable Chunk readChunk = null;
+    @Nullable Chunk old = null;
+    boolean acquiredLock = false;
     try {
-      acquiredLock = chunksReadLock.tryLock(100, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      acquiredLock = false;
-    }
-    if (acquiredLock) {
-      try {
+      acquiredLock = chunksLock.readLock().tryLock(100, TimeUnit.MILLISECONDS);
+      if (acquiredLock) {
         readChunk = chunks.get(chunkLoc);
-      } finally {
-        chunksReadLock.unlock();
       }
-    } else {
+    } catch (InterruptedException ignore) {
+    } finally {
+      if (acquiredLock) {
+        chunksLock.readLock().unlock();
+      }
+    }
+
+    if (!acquiredLock) {
       Main.logger().warn("World", "Failed to acquire chunks read lock in 100 ms");
       return null;
     }
+
     if (readChunk == null || readChunk.isInvalid()) {
       if (!load) {
         return null;
@@ -366,7 +370,7 @@ public abstract class World implements Disposable, Resizable {
         Main.logger().debug("World", "Ticker paused will not load chunk");
         return null;
       }
-      chunksWriteLock.lock();
+      chunksLock.writeLock().lock();
       try {
         // another thread might have loaded the chunk while we were waiting here
         if (readChunk != null && readChunk.isLoaded()) {
@@ -388,7 +392,7 @@ public abstract class World implements Disposable, Resizable {
           return loadedChunk;
         }
       } finally {
-        chunksWriteLock.unlock();
+        chunksLock.writeLock().unlock();
         if (old != null) {
           old.dispose();
         }
@@ -529,7 +533,7 @@ public abstract class World implements Disposable, Resizable {
     }
   }
 
-  public void removeBlocks(ObjectSet<? extends @NotNull Block> blocks, boolean prioritize) {
+  public void removeBlocks(Iterable<? extends @NotNull Block> blocks, boolean prioritize) {
     var blockChunks = new ObjectSet<Chunk>();
     for (Block block : blocks) {
       block.destroy(false);
@@ -645,10 +649,10 @@ public abstract class World implements Disposable, Resizable {
 
     Array<@NotNull Block> blocksAABB =
         getBlocksAABB(
-            worldX + 0.5f,
-            worldY + 0.5f,
-            (float) Block.LIGHT_SOURCE_LOOK_BLOCKS,
-            (float) Block.LIGHT_SOURCE_LOOK_BLOCKS,
+            worldX + HALF_BLOCK_SIZE,
+            worldY + HALF_BLOCK_SIZE,
+            (float) LIGHT_SOURCE_LOOK_BLOCKS,
+            (float) LIGHT_SOURCE_LOOK_BLOCKS,
             false,
             false);
 
@@ -736,11 +740,11 @@ public abstract class World implements Disposable, Resizable {
 
   public boolean isChunkLoaded(long compactedChunkLoc) {
     Chunk chunk;
-    chunksReadLock.lock();
+    chunksLock.readLock().lock();
     try {
       chunk = chunks.get(compactedChunkLoc);
     } finally {
-      chunksReadLock.unlock();
+      chunksLock.readLock().unlock();
     }
     return chunk != null && chunk.isLoaded();
   }
@@ -753,52 +757,67 @@ public abstract class World implements Disposable, Resizable {
    * @param force If the chunks will be forced to unload
    */
   public void reload(boolean force) {
-    if (true) {
-      return;
-    }
-    var wasNotPaused = !worldTicker.isPaused();
-    if (wasNotPaused) {
-      worldTicker.pause();
-    }
-    Main.inst().getScheduler().waitForTasks();
+    Main.inst()
+        .getScheduler()
+        .executeSync(
+            () -> {
+              // Reload on render thread to make sure it does not try to load chunks while we're
+              // waiting
+              var wasNotPaused = !worldTicker.isPaused();
+              if (wasNotPaused) {
+                worldTicker.pause();
+              }
+              Main.inst().getScheduler().waitForTasks();
 
-    // remove all entities to speed up unloading
-    for (Entity entity : getEntities()) {
-      removeEntity(entity);
-    }
-    if (!entities.isEmpty() || !players.isEmpty()) {
-      throw new IllegalStateException("Failed to clear entities during reload");
-    }
-    // ok to include unloaded chunks as they will not cause an error when unloading again
-    chunksWriteLock.lock();
-    try {
-      for (Chunk chunk : chunks.values()) {
-        unloadChunk(chunk, force, false);
-      }
+              // remove all entities to speed up unloading
+              for (Entity entity : getEntities()) {
+                removeEntity(entity);
+              }
+              if (!entities.isEmpty() || !players.isEmpty()) {
+                throw new IllegalStateException("Failed to clear entities during reload");
+              }
+              // ok to include unloaded chunks as they will not cause an error when unloading again
+              chunksLock.writeLock().lock();
+              try {
+                for (@Nullable Chunk chunk : chunks.values()) {
+                  if (chunk != null && !unloadChunk(chunk, true, false)) {
+                    Main.logger()
+                        .warn(
+                            "Failed to unload chunk "
+                                + CoordUtil.stringifyCompactLoc(chunk.getCompactLocation()));
+                  }
+                }
 
-      if (!chunks.isEmpty()) {
-        throw new IllegalStateException("Failed to clear chunks during reload");
-      }
-    } finally {
-      chunksWriteLock.unlock();
-    }
-    synchronized (BOX2D_LOCK) {
-      var bodies = new Array<@NotNull Body>(false, worldBody.getBox2dWorld().getBodyCount());
-      worldBody.getBox2dWorld().getBodies(bodies);
-      if (!bodies.isEmpty()) {
-        Main.logger().error("BOX2D", "There existed dangling bodies after reload!");
-      }
-      for (Body body : bodies) {
-        worldBody.destroyBody(body);
-      }
-    }
+                var loadedChunks = chunks.size;
+                if (loadedChunks != 0) {
+                  Main.logger()
+                      .warn(
+                          "Failed to clear chunks during reload, there are "
+                              + loadedChunks
+                              + " loaded chunks.");
+                }
+              } finally {
+                chunksLock.writeLock().unlock();
+              }
+              synchronized (BOX2D_LOCK) {
+                var bodies =
+                    new Array<@NotNull Body>(false, worldBody.getBox2dWorld().getBodyCount());
+                worldBody.getBox2dWorld().getBodies(bodies);
+                if (!bodies.isEmpty()) {
+                  Main.logger().error("BOX2D", "There existed dangling bodies after reload!");
+                }
+                for (Body body : bodies) {
+                  worldBody.destroyBody(body);
+                }
+              }
 
-    initialize();
+              initialize();
 
-    if (wasNotPaused) {
-      worldTicker.resume();
-    }
-    Main.logger().log("World", "World reloaded last save");
+              if (wasNotPaused) {
+                worldTicker.resume();
+              }
+              Main.logger().log("World", "World reloaded last save");
+            });
   }
 
   /**
@@ -806,7 +825,7 @@ public abstract class World implements Disposable, Resizable {
    */
   @NotNull
   public Array<@NotNull Chunk> getLoadedChunks() {
-    chunksReadLock.lock();
+    chunksLock.readLock().lock();
     try {
       var loadedChunks = new Array<@NotNull Chunk>(true, chunks.size, Chunk.class);
       for (Chunk chunk : chunks.values()) {
@@ -816,16 +835,16 @@ public abstract class World implements Disposable, Resizable {
       }
       return loadedChunks;
     } finally {
-      chunksReadLock.unlock();
+      chunksLock.readLock().unlock();
     }
   }
 
   public @Nullable Chunk getLoadedChunk(long compactChunkLoc) {
-    chunksReadLock.lock();
+    chunksLock.readLock().lock();
     try {
       return chunks.get(compactChunkLoc);
     } finally {
-      chunksReadLock.unlock();
+      chunksLock.readLock().unlock();
     }
   }
 
@@ -844,15 +863,16 @@ public abstract class World implements Disposable, Resizable {
    * @param chunk The chunk to unload
    * @param force If the chunk will be forced to unload
    * @param save If the chunk will be saved
+   * @return If the unload was a success
    */
-  public void unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
+  public boolean unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
     if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
       if (chunk.getWorld() != this) {
         Main.logger().warn("Tried to unload chunk from different world");
-        return;
+        return false;
       }
       Chunk removedChunk;
-      chunksWriteLock.lock();
+      chunksLock.writeLock().lock();
       try {
         if (save) {
           chunkLoader.save(chunk);
@@ -866,7 +886,7 @@ public abstract class World implements Disposable, Resizable {
         // CoordUtil.stringifyCompactLoc(compactLocation) + ": unload chunk. Chunk size is now " +
         // chunks.size);
       } finally {
-        chunksWriteLock.unlock();
+        chunksLock.writeLock().unlock();
       }
 
       chunk.dispose();
@@ -874,7 +894,9 @@ public abstract class World implements Disposable, Resizable {
         Main.logger().warn("Removed unloaded chunk was different from chunk in chunks");
         removedChunk.dispose();
       }
+      return true;
     }
+    return false;
   }
 
   /**
@@ -973,7 +995,7 @@ public abstract class World implements Disposable, Resizable {
 
   public void removeEntity(
       @NotNull Entity entity, @NotNull Packets.DespawnEntity.DespawnReason reason) {
-    final UUID entityUuid = entity.getUuid();
+    UUID entityUuid = entity.getUuid();
     entities.remove(entityUuid);
     if (entity instanceof Player player) {
       players.remove(entityUuid);
@@ -1007,7 +1029,9 @@ public abstract class World implements Disposable, Resizable {
     for (long compact : getLocationsAABB(worldX, worldY, radius, radius).items) {
       int blockWorldX = CoordUtil.decompactLocX(compact);
       int blockWorldY = CoordUtil.decompactLocY(compact);
-      if (abs(Vector2.dst2(worldX, worldY, blockWorldX + 0.5f, blockWorldY + 0.5f))
+      if (abs(
+              Vector2.dst2(
+                  worldX, worldY, blockWorldX + HALF_BLOCK_SIZE, blockWorldY + HALF_BLOCK_SIZE))
           <= radiusSquare) {
         Block block = getBlock(blockWorldX, blockWorldY);
         if (block == null) {
@@ -1067,7 +1091,8 @@ public abstract class World implements Disposable, Resizable {
   }
 
   @NotNull
-  public LongArray getLocationsAABB(float worldX, float worldY, float offsetX, float offsetY) {
+  public static LongArray getLocationsAABB(
+      float worldX, float worldY, float offsetX, float offsetY) {
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     LongArray blocks = new LongArray(true, capacity);
     int x = MathUtils.floor(worldX - offsetX);
@@ -1127,10 +1152,11 @@ public abstract class World implements Disposable, Resizable {
   }
 
   /**
-   * Must be accessed under {@link #chunksReadLock} or {@link #chunksWriteLock}
+   * Must be accessed under {@link #chunksLock}
    *
    * @return Backing map of chunks
    */
+  @GuardedBy("chunksLock")
   public @NotNull LongMap<@Nullable Chunk> getChunks() {
     return chunks;
   }
@@ -1246,20 +1272,22 @@ public abstract class World implements Disposable, Resizable {
   @Override
   public void dispose() {
     worldTicker.dispose();
-    worldBody.dispose();
+    synchronized (BOX2D_LOCK) {
+      worldBody.dispose();
+    }
     for (Entity entity : entities.values()) {
       entity.dispose();
     }
     entities.clear();
     players.clear();
-    chunksWriteLock.lock();
+    chunksLock.writeLock().lock();
     try {
       for (Chunk chunk : chunks.values()) {
         chunk.dispose();
       }
       chunks.clear();
     } finally {
-      chunksWriteLock.unlock();
+      chunksLock.writeLock().unlock();
     }
 
     if (!transientWorld) {
