@@ -34,7 +34,8 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public synchronized void render() {
-    // Note to self: do not call chunkBody#update while under the chunksReadLock or chunksWriteLock
+    // Note to self: do not call chunkBody#update while under the chunksLock.readLock() or
+    // chunksLock.writeLock()
     for (Chunk chunk : world.getLoadedChunks()) {
       if (chunk.isValid() && chunk.isDirty()) {
         chunk.getChunkBody().update();
@@ -53,11 +54,12 @@ public class HeadlessWorldRenderer implements WorldRender {
     readLock.lock();
     try {
       for (Player player : world.getPlayers()) {
-        var chunksInView = viewingChunks.get(player.getUuid());
-
-        Vector2 position = player.getPosition();
-        chunksInView.setCenter(
-            CoordUtil.worldToChunk(position.x), CoordUtil.worldToChunk(position.y));
+        @Nullable var chunksInView = viewingChunks.get(player.getUuid());
+        if (chunksInView != null) {
+          Vector2 position = player.getPosition();
+          chunksInView.setCenter(
+              CoordUtil.worldToChunk(position.x), CoordUtil.worldToChunk(position.y));
+        }
       }
     } finally {
       readLock.unlock();

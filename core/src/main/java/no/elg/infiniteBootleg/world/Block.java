@@ -14,8 +14,6 @@ public interface Block
     extends CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.Builder> {
 
   int BLOCK_SIZE = 16;
-  int LIGHT_RESOLUTION = 2;
-  double LIGHT_SOURCE_LOOK_BLOCKS = 7.5;
 
   @Nullable
   static Block fromProto(

@@ -51,22 +51,26 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
         handleHeartbeat(packet.heartbeat)
       }
     }
+
     CB_LOGIN_STATUS -> {
       if (packet.hasServerLoginStatus()) {
         val loginStatus = packet.serverLoginStatus.status
         handleLoginStatus(loginStatus)
       }
     }
+
     CB_START_GAME -> {
       if (packet.hasStartGame()) {
         handleStartGame(packet.startGame)
       }
     }
+
     CB_UPDATE_CHUNK -> {
       if (packet.hasUpdateChunk()) {
         handleUpdateChunk(packet.updateChunk)
       }
     }
+
     CB_DESPAWN_ENTITY -> {
       if (packet.hasDespawnEntity()) {
         handleDespawnEntity(packet.despawnEntity)
@@ -74,26 +78,39 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     }
 
     CB_SPAWN_ENTITY -> {
-      if (packet.hasSpawnEntity() && chunksLoaded) {
-        handleSpawnEntity(packet.spawnEntity)
+      if (packet.hasSpawnEntity()) {
+        if (chunksLoaded) {
+          handleSpawnEntity(packet.spawnEntity)
+          Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet.\n${packet.spawnEntity.entity}")
+        } else {
+          Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet before chunks loaded packet, ignoring it.\n${packet.spawnEntity.entity}")
+        }
       }
     }
-    CB_INITIAL_CHUNKS_SENT -> chunksLoaded = true
+
+    CB_INITIAL_CHUNKS_SENT -> {
+      Main.logger().debug("CB_INITIAL_CHUNKS_SENT", "Setting chunks as loaded")
+      chunksLoaded = true
+    }
+
     DX_MOVE_ENTITY -> {
       if (packet.hasMoveEntity() && started) {
         handleMoveEntity(packet.moveEntity)
       }
     }
+
     DX_BLOCK_UPDATE -> {
       if (packet.hasUpdateBlock() && chunksLoaded) {
         handleBlockUpdate(packet.updateBlock)
       }
     }
+
     DX_SECRET_EXCHANGE -> {
       if (packet.hasSecretExchange()) {
         handleSecretExchange(packet.secretExchange)
       }
     }
+
     DX_DISCONNECT -> {
       if (packet.hasDisconnect()) {
         ConnectingScreen.info = "Disconnected: ${packet.disconnect.reason}"
@@ -102,6 +119,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       }
       ctx.close()
     }
+
     DX_WORLD_SETTINGS -> {
       if (packet.hasWorldSettings()) {
         handleWorldSettings(packet.worldSettings)
@@ -111,6 +129,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     UNRECOGNIZED -> {
       ctx.fatal("Unknown packet type received")
     }
+
     else -> {
       ctx.fatal("Cannot handle packet of type " + packet.type)
     }
@@ -224,14 +243,17 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       ctx.fatal("You are already logged in!")
       return
     }
+
     ServerLoginStatus.ServerStatus.FULL_SERVER -> {
       ctx.fatal("Server is full")
       return
     }
+
     ServerLoginStatus.ServerStatus.PROCEED_LOGIN -> {
       Main.logger().debug("LOGIN", "User accepted by server, logging in...")
       ConnectingScreen.info = "Logging in..."
     }
+
     ServerLoginStatus.ServerStatus.LOGIN_SUCCESS -> {
       val world = world
       val entity = controllingEntity
@@ -264,6 +286,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
         Main.logger().debug("LOGIN", "Logged into server success")
       }
     }
+
     ServerLoginStatus.ServerStatus.UNRECOGNIZED -> {
       ctx.fatal("Unrecognized server status")
       return

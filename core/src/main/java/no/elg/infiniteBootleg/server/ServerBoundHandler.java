@@ -55,7 +55,7 @@ public class ServerBoundHandler extends SimpleChannelInboundHandler<Packet> {
   }
 
   @Override
-  public void channelActive(@NotNull final ChannelHandlerContext ctx) {
+  public void channelActive(@NotNull ChannelHandlerContext ctx) {
     channels.add(ctx.channel());
   }
 

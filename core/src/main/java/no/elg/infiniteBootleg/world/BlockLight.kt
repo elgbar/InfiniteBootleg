@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Material.AIR
+import no.elg.infiniteBootleg.world.render.ChunkRenderer
 
 class BlockLight(
   val chunk: Chunk,
@@ -61,7 +62,7 @@ class BlockLight(
     lightMap = if (isSkylight) {
       SKYLIGHT_LIGHT_MAP
     } else {
-      Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
+      Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) }
     }
   }
 
@@ -94,7 +95,7 @@ class BlockLight(
     }
 
     var isLitNext = false
-    val tmpLightMap = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) }
+    val tmpLightMap = Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) }
 
     if (isCancelled()) {
       return
@@ -105,9 +106,9 @@ class BlockLight(
       .getBlocksAABB(
         worldX + 0.5f,
         worldY + 0.5f,
-        Block.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
-        Block.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
-        false,
+        World.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
+        World.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
+        true,
         false,
         ::isCancelled
       )
@@ -124,21 +125,21 @@ class BlockLight(
           return
         }
         isLitNext = true
-        for (dx in 0 until Block.LIGHT_RESOLUTION) {
-          for (dy in 0 until Block.LIGHT_RESOLUTION) {
+        for (dx in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
+          for (dy in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
             // Calculate distance for each light cell
             val dist = (
               Location.distCubed(
                 (
-                  worldX + dx.toFloat() / Block.LIGHT_RESOLUTION
+                  worldX + dx.toFloat() / ChunkRenderer.LIGHT_RESOLUTION
                   ).toDouble(),
                 (
-                  worldY + dy.toFloat() / Block.LIGHT_RESOLUTION
+                  worldY + dy.toFloat() / ChunkRenderer.LIGHT_RESOLUTION
                   ).toDouble(),
                 neighbor.worldX + 0.5,
                 neighbor.worldY + 0.5
               ) /
-                (Block.LIGHT_SOURCE_LOOK_BLOCKS * Block.LIGHT_SOURCE_LOOK_BLOCKS)
+                (World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS)
               )
             val old: Float = tmpLightMap[dx][dy]
             val normalizedIntensity = if (dist == 0.0) {
@@ -166,12 +167,12 @@ class BlockLight(
     if (isLitNext) {
       lightMap = tmpLightMap
       var total = 0.0
-      for (x in 0 until Block.LIGHT_RESOLUTION) {
-        for (y in 0 until Block.LIGHT_RESOLUTION) {
+      for (x in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
+        for (y in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
           total += lightMap[x][y].toDouble()
         }
       }
-      averageBrightness = (total / (Block.LIGHT_RESOLUTION * Block.LIGHT_RESOLUTION)).toFloat()
+      averageBrightness = (total / (ChunkRenderer.LIGHT_RESOLUTION * ChunkRenderer.LIGHT_RESOLUTION)).toFloat()
     } else {
       lightMap = NO_LIGHTS_LIGHT_MAP
       averageBrightness = 0f
@@ -180,7 +181,7 @@ class BlockLight(
 
   companion object {
     const val NEVER_CANCEL_UPDATE_ID = -1
-    val SKYLIGHT_LIGHT_MAP: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) { 1f } }
-    val NO_LIGHTS_LIGHT_MAP: Array<FloatArray> = Array(Block.LIGHT_RESOLUTION) { FloatArray(Block.LIGHT_RESOLUTION) { 0f } }
+    val SKYLIGHT_LIGHT_MAP: Array<FloatArray> = Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) { 1f } }
+    val NO_LIGHTS_LIGHT_MAP: Array<FloatArray> = Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) { 0f } }
   }
 }

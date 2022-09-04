@@ -39,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ChunkRenderer implements Renderer, Disposable {
 
+  public static final int LIGHT_RESOLUTION = 2;
   private final SpriteBatch batch;
   private final SetUniqueList<Chunk> renderQueue;
   private final WorldRender worldRender;
@@ -233,12 +234,12 @@ public class ChunkRenderer implements Renderer, Disposable {
 
   private void drawShadedBlock(TextureRegion texture, float[][] lights, float dx, float dy) {
 
-    int tileWidth = texture.getRegionWidth() / Block.LIGHT_RESOLUTION;
-    int tileHeight = texture.getRegionHeight() / Block.LIGHT_RESOLUTION;
+    int tileWidth = texture.getRegionWidth() / LIGHT_RESOLUTION;
+    int tileHeight = texture.getRegionHeight() / LIGHT_RESOLUTION;
     TextureRegion[][] split = texture.split(tileWidth, tileHeight);
 
     for (int ry = 0, splitLength = split.length; ry < splitLength; ry++) {
-      TextureRegion[] regions = split[Block.LIGHT_RESOLUTION - ry - 1];
+      TextureRegion[] regions = split[LIGHT_RESOLUTION - ry - 1];
       for (int rx = 0, regionsLength = regions.length; rx < regionsLength; rx++) {
         TextureRegion region = regions[rx];
 
@@ -248,8 +249,8 @@ public class ChunkRenderer implements Renderer, Disposable {
             region,
             dx + rx * tileWidth,
             dy + ry * tileHeight,
-            BLOCK_SIZE / (float) Block.LIGHT_RESOLUTION,
-            BLOCK_SIZE / (float) Block.LIGHT_RESOLUTION);
+            BLOCK_SIZE / (float) LIGHT_RESOLUTION,
+            BLOCK_SIZE / (float) LIGHT_RESOLUTION);
       }
     }
   }

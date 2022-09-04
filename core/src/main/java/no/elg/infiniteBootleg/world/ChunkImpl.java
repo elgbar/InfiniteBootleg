@@ -175,9 +175,14 @@ public class ChunkImpl implements Chunk {
       boolean prioritize,
       boolean sendUpdatePacket) {
     if (isInvalid()) {
+      Main.logger()
+          .warn(
+              "Changed block in invalid chunk "
+                  + CoordUtil.stringifyChunkToWorld(this, localX, localY)
+                  + ", block: "
+                  + block);
       return null;
     }
-    //    Preconditions.checkState(isValid(), "Chunk is invalid");
 
     if (block != null) {
       Preconditions.checkArgument(block.getLocalX() == localX);
@@ -373,15 +378,15 @@ public class ChunkImpl implements Chunk {
       outer:
       for (int localX = 0; localX < CHUNK_SIZE; localX++) {
         for (int localY = CHUNK_SIZE - 1; localY >= 0; localY--) {
-          synchronized (tasks) {
-            if (updateId != currentUpdateId.get()) {
-              break outer;
-            }
-            BlockLight bl = blockLights[localX][localY];
-            ForkJoinTask<?> task = pool.submit(() -> bl.recalculateLighting(updateId));
-            task.fork();
-            tasks.add(task);
+          //          synchronized (tasks) {
+          if (updateId != currentUpdateId.get()) {
+            break outer;
           }
+          BlockLight bl = blockLights[localX][localY];
+          ForkJoinTask<?> task = pool.submit(() -> bl.recalculateLighting(updateId));
+          task.fork();
+          tasks.add(task);
+          //          }
         }
       }
 
@@ -629,7 +634,12 @@ public class ChunkImpl implements Chunk {
   @Override
   @NotNull
   public Block getBlock(int localX, int localY) {
-    Preconditions.checkState(isValid(), "Chunk is not loaded");
+    if (!isValid()) {
+      Main.logger()
+          .warn(
+              "Fetched block from invalid chunk "
+                  + CoordUtil.stringifyChunkToWorld(this, localX, localY));
+    }
     Preconditions.checkArgument(
         CoordUtil.isInsideChunk(localX, localY),
         "Given arguments are not inside this chunk, localX=" + localX + " localY=" + localY);

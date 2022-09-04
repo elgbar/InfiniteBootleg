@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.server
 
 import io.netty.channel.ChannelHandlerContext
-import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 class ServerClient(
   val name: String,
   var world: ClientWorld? = null,
-  var controllingEntity: Entity? = null
+  var controllingEntity: ProtoWorld.Entity? = null
 ) {
 
   lateinit var ctx: ChannelHandlerContext

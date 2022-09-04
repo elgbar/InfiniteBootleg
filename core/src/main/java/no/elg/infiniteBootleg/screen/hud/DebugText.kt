@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.fastIntFormat
-import no.elg.infiniteBootleg.world.Block.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
 import no.elg.infiniteBootleg.world.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.world.Chunk
@@ -12,6 +11,7 @@ import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
+import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.text.DecimalFormat
 

@@ -1,7 +1,5 @@
 package no.elg.infiniteBootleg.world.loader;
 
-import static no.elg.infiniteBootleg.world.World.LOCK_FILE_NAME;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import java.util.Random;
@@ -24,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class WorldLoader {
 
+  public static final String LOCK_FILE_NAME = ".locked";
   private static final Object WORLD_LOCK_LOCK = new Object();
 
   private WorldLoader() {}
@@ -48,7 +47,7 @@ public final class WorldLoader {
   }
 
   @NotNull
-  public static Player getServerPlayer(@NotNull ServerWorld world, @NotNull UUID playerId) {
+  public static Player spawnServerPlayer(@NotNull ServerWorld world, @NotNull UUID playerId) {
     FileHandle fileHandle = getServerPlayerFile(world, playerId);
     if (fileHandle != null && fileHandle.exists()) {
       try {
@@ -70,7 +69,7 @@ public final class WorldLoader {
     }
     Main.logger().debug("SERVER", "Creating fresh player profile for " + playerId);
     // Invalid/non-existing player data
-    final Player player = world.createNewPlayer(playerId);
+    Player player = world.createNewPlayer(playerId);
     saveServerPlayer(player);
     return player;
   }

@@ -57,41 +57,49 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
         handleLoginPacket(ctx, packet.login)
       }
     }
+
     SB_CLIENT_WORLD_LOADED -> handleClientsWorldLoaded(ctx)
     SB_CHUNK_REQUEST -> {
       if (packet.hasChunkRequest()) {
         handleChunkRequest(ctx, packet.chunkRequest)
       }
     }
+
     DX_SECRET_EXCHANGE -> {
       if (packet.hasSecretExchange()) {
         handleSecretExchange(ctx, packet.secretExchange)
       }
     }
+
     DX_HEARTBEAT -> {
       if (packet.hasHeartbeat()) {
         handleHeartbeat(ctx, packet.heartbeat)
       }
     }
+
     DX_MOVE_ENTITY -> {
       if (packet.hasMoveEntity()) {
         handlePlayerUpdate(ctx, packet.moveEntity)
       }
     }
+
     DX_BLOCK_UPDATE -> {
       if (packet.hasUpdateBlock()) {
         handleBlockUpdate(ctx, packet.updateBlock)
       }
     }
+
     DX_DISCONNECT -> {
       Main.logger().log("Client sent disconnect packet. Reason: " + if (packet.hasDisconnect()) packet.disconnect?.reason else "No reason given")
       ctx.close()
     }
+
     SB_ENTITY_REQUEST -> {
       if (packet.hasEntityRequest()) {
         handleEntityRequest(ctx, packet.entityRequest)
       }
     }
+
     DX_WORLD_SETTINGS -> {
       if (packet.hasWorldSettings()) {
         handleWorldSettings(ctx, packet.worldSettings)
@@ -217,6 +225,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     Main.logger().log("Sending entity ${entity.simpleName()} (${entity.uuid}) to client")
     ctx.write(clientBoundSpawnEntity(entity))
   }
+
   ctx.flush()
   Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
 
@@ -253,13 +262,13 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     ctx.close()
     return
   }
-  // Client is good to login
-  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
-  val player = WorldLoader.getServerPlayer(world, uuid)
+  val player = WorldLoader.spawnServerPlayer(world, uuid)
   if (player.isDisposed) {
     ctx.fatal("Failed to spawn player server side, player is invalid")
     return
   }
+  // Client is good to login
+  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
   require(player.uuid == uuid)
   // username might have changed
   if (player.name != login.username) {
