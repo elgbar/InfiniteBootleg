@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.render;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
+import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -71,7 +72,7 @@ public class ClientWorldRender implements WorldRender {
     draw.clear();
     draw.ensureCapacity(chunksInView.getChunksInView());
 
-    final WorldBody worldBody = world.getWorldBody();
+    WorldBody worldBody = world.getWorldBody();
     float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
     float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
     int verticalStart = chunksInView.getVerticalStart();
@@ -123,7 +124,9 @@ public class ClientWorldRender implements WorldRender {
       chunkDebugRenderer.render();
     }
     if (Settings.renderBox2dDebug && Settings.debug) {
-      box2DDebugRenderer.render(worldBody.box2dWorld, m4);
+      synchronized (BOX2D_LOCK) {
+        box2DDebugRenderer.render(worldBody.box2dWorld, m4);
+      }
     }
   }
 
@@ -132,12 +135,12 @@ public class ClientWorldRender implements WorldRender {
     camera.update();
     m4.set(camera.combined).scl(Block.BLOCK_SIZE);
 
-    final float width = camera.viewportWidth * camera.zoom;
-    final float height = camera.viewportHeight * camera.zoom;
+    float width = camera.viewportWidth * camera.zoom;
+    float height = camera.viewportHeight * camera.zoom;
 
     if (!getWorld().getWorldTicker().isPaused()) {
 
-      final WorldBody worldBody = world.getWorldBody();
+      WorldBody worldBody = world.getWorldBody();
       float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
       float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
 
