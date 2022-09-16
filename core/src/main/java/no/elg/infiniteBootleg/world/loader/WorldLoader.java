@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.loader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import java.util.Random;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -29,13 +28,6 @@ public final class WorldLoader {
 
   public static final String WORLD_INFO_PATH = "world.dat";
   public static final String PLAYERS_PATH = "players";
-
-  public static UUID getUUIDFromSeed(long seed) {
-    byte[] uuidSeed = new byte[128];
-    var random = new Random(seed);
-    random.nextBytes(uuidSeed);
-    return UUID.nameUUIDFromBytes(uuidSeed);
-  }
 
   @Nullable
   public static FileHandle getServerPlayerFile(@NotNull World world, @NotNull UUID playerId) {
