@@ -78,7 +78,7 @@ public abstract class World implements Disposable, Resizable {
 
   public static final float HALF_BLOCK_SIZE = 0.5f;
   public static final float BLOCK_SIZE = 1f;
-  public static final double LIGHT_SOURCE_LOOK_BLOCKS = 7.5;
+  public static final float LIGHT_SOURCE_LOOK_BLOCKS = 7.5f;
 
   public static final int TRY_LOCK_CHUNKS_DURATION_MS = 100;
 
@@ -302,6 +302,28 @@ public abstract class World implements Disposable, Resizable {
       }
       return column;
     }
+  }
+
+  /**
+   * @param features What kind of top block to return
+   * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
+   * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
+   */
+  @Nullable
+  public Block getTopBlock(int worldX, int features) {
+    return getChunkColumn(CoordUtil.worldToChunk(worldX))
+        .topBlock(CoordUtil.chunkOffset(worldX), features);
+  }
+
+  /**
+   * @param worldX The block column to query for the worldX for
+   * @param features What kind of top block to return
+   * @return The worldY coordinate of the top block of the given worldX
+   * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
+   */
+  public int getTopBlockWorldY(int worldX, int features) {
+    return getChunkColumn(CoordUtil.worldToChunk(worldX))
+        .topBlockHeight(CoordUtil.chunkOffset(worldX), features);
   }
 
   @Nullable
@@ -658,8 +680,8 @@ public abstract class World implements Disposable, Resizable {
         getBlocksAABB(
             worldX + HALF_BLOCK_SIZE,
             worldY + HALF_BLOCK_SIZE,
-            (float) LIGHT_SOURCE_LOOK_BLOCKS,
-            (float) LIGHT_SOURCE_LOOK_BLOCKS,
+            LIGHT_SOURCE_LOOK_BLOCKS,
+            LIGHT_SOURCE_LOOK_BLOCKS,
             false,
             false);
 
