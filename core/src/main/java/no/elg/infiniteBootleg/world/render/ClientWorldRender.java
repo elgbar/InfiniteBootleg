@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.render;
 
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
+import static no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG;
 import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,7 +18,6 @@ import com.badlogic.gdx.utils.OrderedMap;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.ChunkColumn;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.NotNull;
@@ -97,9 +97,7 @@ public class ClientWorldRender implements WorldRender {
 
         //noinspection LibGDXFlushInsideLoop
         if (chunk.isAllAir()
-            && chunk
-                .getChunkColumn()
-                .isChunkAboveTopBlock(chunk.getChunkY(), ChunkColumn.TOP_MOST_FLAG)) {
+            && chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY(), TOP_MOST_FLAG)) {
           continue;
         }
 

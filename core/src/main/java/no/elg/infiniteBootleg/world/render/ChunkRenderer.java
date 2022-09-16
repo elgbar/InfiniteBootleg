@@ -7,6 +7,8 @@ import static no.elg.infiniteBootleg.ClientMain.CLEAR_COLOR_R;
 import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
+import static no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG;
+import static no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG;
 import static no.elg.infiniteBootleg.world.Material.AIR;
 import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_RENDER_THRESHOLD;
 
@@ -28,7 +30,6 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.ChunkColumn;
 import no.elg.infiniteBootleg.world.Material;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
@@ -144,10 +145,7 @@ public class ChunkRenderer implements Renderer, Disposable {
           return;
         } // nothing to render
         chunk = renderQueue.remove(0);
-        aboveGround =
-            chunk
-                .getChunkColumn()
-                .isChunkAboveTopBlock(chunk.getChunkY(), ChunkColumn.TOP_MOST_FLAG);
+        aboveGround = chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY(), TOP_MOST_FLAG);
       } while ((chunk.isAllAir() && aboveGround)
           || !chunk.isLoaded()
           || worldRender.isOutOfView(chunk));
@@ -174,7 +172,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     }
 
     for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-      int topBlockHeight = chunkColumn.topBlockHeight(localX, ChunkColumn.BLOCKS_LIGHT_FLAG);
+      int topBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG);
       for (int localY = 0; localY < CHUNK_SIZE; localY++) {
         @Nullable Block block = blocks[localX][localY];
         Material material = block != null ? block.getMaterial() : AIR;

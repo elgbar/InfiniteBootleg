@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 
 /**
  * A column representing all chunks with the given [chunkX] coordinate.
@@ -20,12 +21,18 @@ interface ChunkColumn {
 
   /**
    * @param localX offset into the chunk, must be in `0..`[CHUNK_SIZE]
-   * @return the world y coordinate of the topmost block. Might return [Int.MIN_VALUE] if invalid flag
+   * @param features What kind of top block to return
+   * @return the world y coordinate of the topmost block. Might return [FeatureFlag.FAILED_TO_FIND_TOP_BLOCK] if invalid flag
+   *
+   * @see FeatureFlag
    */
   fun topBlockHeight(localX: Int, features: Int = TOP_MOST_FLAG): Int
 
   /**
+   * @param features What kind of top block to return
    * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
+   *
+   * @see FeatureFlag
    */
   fun topBlock(localX: Int, features: Int = TOP_MOST_FLAG): Block?
 
@@ -43,12 +50,18 @@ interface ChunkColumn {
   fun updateTopBlock(localX: Int, worldYHint: Int)
 
   /**
+   * @param features What kind of top block to return
    * @return Whether the chunk found at chunkY is STRICTLY above any of the chunks the topmost block are located in
+   *
+   * @see FeatureFlag
    */
   fun isChunkAboveTopBlock(chunkY: Int, features: Int = TOP_MOST_FLAG): Boolean
 
   /**
+   * @param features What kind of top block to return
    * @return If the block at the given position is above the top-most block
+   *
+   * @see FeatureFlag
    */
   fun isBlockAboveTopBlock(localX: Int, worldY: Int, features: Int = TOP_MOST_FLAG): Boolean
 
@@ -58,16 +71,22 @@ interface ChunkColumn {
   fun toProtobuf(): ProtoWorld.ChunkColumn
 
   companion object {
-    /**
-     * Indicate that the returned top block must block light
-     */
-    const val BLOCKS_LIGHT_FLAG = 1 shl 0
 
-    /**
-     * Indicate that the returned top block must be solid
-     */
-    const val SOLID_FLAG = 1 shl 2
+    object FeatureFlag {
+      /**
+       * Indicate that the returned top block must block light
+       */
+      const val BLOCKS_LIGHT_FLAG: Int = 1 shl 0
 
-    const val TOP_MOST_FLAG = BLOCKS_LIGHT_FLAG or SOLID_FLAG
+      /**
+       * Indicate that the returned top block must be solid
+       */
+      const val SOLID_FLAG: Int = 1 shl 1
+
+      /**
+       * The absolute top-most block, contains all flags
+       */
+      const val TOP_MOST_FLAG: Int = BLOCKS_LIGHT_FLAG or SOLID_FLAG
+    }
   }
 }
