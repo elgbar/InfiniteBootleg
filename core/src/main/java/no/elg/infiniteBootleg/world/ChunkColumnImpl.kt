@@ -83,7 +83,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
   private fun getChunk(worldY: Int): Chunk? {
     val chunkY = CoordUtil.worldToChunk(worldY)
-    return world.getChunk(chunkX, chunkY)
+    return world.getChunk(chunkX, chunkY, true)
   }
 
   private fun setTopBlock(top: IntArray, localX: Int, worldY: Int) {

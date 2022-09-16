@@ -3,8 +3,10 @@ package no.elg.infiniteBootleg.world
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
-import no.elg.infiniteBootleg.world.Material.AIR
+import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class BlockLight(
   val chunk: Chunk,
@@ -54,7 +56,7 @@ class BlockLight(
   private val chunkImpl = chunk as ChunkImpl
 
   init {
-    isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY), ChunkColumn.BLOCKS_LIGHT_FLAG)
+    isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY), BLOCKS_LIGHT_FLAG)
     isLit = isSkylight
     averageBrightness = if (isSkylight) {
       1f
@@ -82,18 +84,15 @@ class BlockLight(
     }
 
     fun isCancelled(): Boolean {
-      val b = updateId != NEVER_CANCEL_UPDATE_ID && updateId != chunkImpl.currentUpdateId.get()
-      if (b) {
-        Main.logger().debug("BL $strPos") { "Calculation cancelled" }
-      }
-      return b
+      val diff = updateId != chunkImpl.currentUpdateId.get()
+      return updateId != NEVER_CANCEL_UPDATE_ID && diff
     }
 
     val chunkColumn = chunk.chunkColumn
     val worldX: Int = CoordUtil.chunkToWorld(chunk.chunkX, localX)
     val worldY: Int = CoordUtil.chunkToWorld(chunk.chunkY, localY)
 
-    if (chunkColumn.isBlockAboveTopBlock(localX, worldY, ChunkColumn.BLOCKS_LIGHT_FLAG)) {
+    if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
       // This block is a skylight, its always lit fully
       isLit = true
       isSkylight = true
@@ -116,21 +115,34 @@ class BlockLight(
       .getBlocksAABB(
         worldX + 0.5f,
         worldY + 0.5f,
-        World.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
-        World.LIGHT_SOURCE_LOOK_BLOCKS.toFloat(),
+        World.LIGHT_SOURCE_LOOK_BLOCKS,
+        World.LIGHT_SOURCE_LOOK_BLOCKS,
         true,
+        false,
         false,
         ::isCancelled
       )
     if (isCancelled()) {
       return
     }
+    // Since we're not creating air blocks above, we will instead just load
+    for (offsetWorldX in -floor(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
+      val topWorldX = worldX + offsetWorldX
+      // add one to get the air block above the top-block
+      val topWorldY = 1 + chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
+      val topBlock = chunk.world.getBlock(topWorldX, topWorldY, false)
+      if (topBlock != null) {
+//        Main.logger().debug("BL $strPos") { "topBlock found! (mat: ${topBlock.material}" }
+        blocksAABB.add(topBlock)
+      }
+      if (isCancelled()) {
+        return
+      }
+    }
     for (neighbor in blocksAABB) {
-      val neighChunkCol = neighbor.chunk.chunkColumn
       val neiMat = neighbor.material
-      if (neiMat.isLuminescent ||
-        (neiMat == AIR && neighChunkCol.isBlockAboveTopBlock(neighbor.localX, neighbor.worldY, ChunkColumn.BLOCKS_LIGHT_FLAG))
-      ) {
+      // We assume that if the neighbor is air, it is a topblock
+      if (neiMat.isLuminescent || (neiMat.isTransparent && neighbor.chunk.chunkColumn.isBlockAboveTopBlock(neighbor.localX, neighbor.worldY, BLOCKS_LIGHT_FLAG))) {
         if (isCancelled()) {
           return
         }
