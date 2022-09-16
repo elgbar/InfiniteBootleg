@@ -179,7 +179,7 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   val position = spawnEntity.entity.position
   val chunkPosX = CoordUtil.worldToChunk(position.x)
   val chunkPosY = CoordUtil.worldToChunk(position.y)
-  val chunk = world.getChunk(chunkPosX, chunkPosY)
+  val chunk = world.getChunk(chunkPosX, chunkPosY, true)
   if (chunk == null) {
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return

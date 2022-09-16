@@ -36,7 +36,7 @@ interface ChunksInView {
     inline fun ChunksInView.forEach(world: World, crossinline apply: (chunk: Chunk) -> Unit) {
       for (y in verticalStart until verticalEnd) {
         for (x in horizontalStart until horizontalEnd) {
-          val chunk = world.getChunk(x, y) ?: continue
+          val chunk = world.getChunk(x, y, true) ?: continue
           apply(chunk)
         }
       }

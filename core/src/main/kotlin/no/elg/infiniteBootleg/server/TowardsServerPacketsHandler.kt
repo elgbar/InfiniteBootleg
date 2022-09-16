@@ -187,7 +187,7 @@ private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRe
 
   // Only send chunks which the player is allowed to see
   if (isChunkInView(ctx, chunkLoc.x, chunkLoc.y)) {
-    val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y) ?: return // if no chunk, don't send a chunk update
+    val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y, true) ?: return // if no chunk, don't send a chunk update
     ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
   }
 }
@@ -208,7 +208,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   val iy = CoordUtil.worldToChunk(player.blockY)
   for (cx in -Settings.viewDistance..Settings.viewDistance) {
     for (cy in -Settings.viewDistance..Settings.viewDistance) {
-      val chunk = world.getChunk(ix + cx, iy + cy) ?: continue
+      val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
       ctx.write(clientBoundUpdateChunkPacket(chunk))
     }
     ctx.flush()

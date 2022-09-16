@@ -76,7 +76,7 @@ object DebugText {
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val chunkX = CoordUtil.worldToChunk(mouseBlockX)
     val chunkY = CoordUtil.worldToChunk(mouseBlockY)
-    val pc = world.getChunk(chunkX, chunkY)
+    val pc = world.getChunk(chunkX, chunkY, false)
     val cc = world.getChunkColumn(chunkX)
     val topBlock = cc.topBlockHeight(CoordUtil.chunkOffset(mouseBlockX))
     if (pc == null) {

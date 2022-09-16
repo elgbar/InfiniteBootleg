@@ -81,7 +81,7 @@ public class ClientWorldRender implements WorldRender {
       int horizontalStart = chunksInView.getHorizontalStart();
       int horizontalEnd = chunksInView.getHorizontalEnd();
       for (int x = horizontalStart; x < horizontalEnd; x++) {
-        Chunk chunk = world.getChunk(x, y);
+        Chunk chunk = world.getChunk(x, y, true);
         if (chunk == null) {
           continue;
         }

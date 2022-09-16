@@ -547,7 +547,7 @@ public abstract class Entity
   public Chunk getChunk() {
     var chunkX = CoordUtil.worldToChunk(getBlockX());
     var chunkY = CoordUtil.worldToChunk(getBlockY());
-    return world.getChunk(chunkX, chunkY);
+    return world.getChunk(chunkX, chunkY, true);
   }
 
   @NotNull

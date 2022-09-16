@@ -308,7 +308,7 @@ public abstract class World implements Disposable, Resizable {
   public Chunk getChunkFromWorld(int worldX, int worldY) {
     int chunkX = CoordUtil.worldToChunk(worldX);
     int chunkY = CoordUtil.worldToChunk(worldY);
-    return getChunk(chunkX, chunkY);
+    return getChunk(chunkX, chunkY, true);
   }
 
   public void updateChunk(@NotNull Chunk chunk) {
@@ -332,8 +332,8 @@ public abstract class World implements Disposable, Resizable {
   }
 
   @Nullable
-  public Chunk getChunk(int chunkX, int chunkY) {
-    return getChunk(CoordUtil.compactLoc(chunkX, chunkY), true);
+  public Chunk getChunk(int chunkX, int chunkY, boolean load) {
+    return getChunk(CoordUtil.compactLoc(chunkX, chunkY), load);
   }
 
   @Nullable
@@ -458,7 +458,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk != null) {
       return chunk.setBlock(localX, localY, material, updateTexture, prioritize);
     }
@@ -493,7 +493,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = CoordUtil.chunkOffset(worldX);
     int localY = CoordUtil.chunkOffset(worldY);
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk != null) {
       chunk.setBlock(localX, localY, block, update);
     }
@@ -507,7 +507,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = CoordUtil.chunkOffset(worldX);
     int localY = CoordUtil.chunkOffset(worldY);
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk != null) {
       var block = Block.fromProto(this, chunk, localX, localY, protoBlock);
       chunk.setBlock(localX, localY, block, true, false, sendUpdatePacket);
@@ -534,7 +534,7 @@ public abstract class World implements Disposable, Resizable {
       }
     }
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk != null) {
       chunk.setBlock(localX, localY, (Block) null, update);
     }
@@ -617,7 +617,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk == null) {
       // What should we return here? we don't really know as it does not exist.
       // Return false to prevent teleportation and other actions that depend on an empty space.
@@ -635,7 +635,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk == null) {
       // What should we return here? we don't really know as it does not exist.
       // Return false to prevent teleportation and other actions that depend on an empty space.
@@ -698,7 +698,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk == null) {
       return null;
     }
@@ -715,13 +715,27 @@ public abstract class World implements Disposable, Resizable {
    */
   @Nullable
   public Block getBlock(int worldX, int worldY) {
+    return getBlock(worldX, worldY, true);
+  }
+
+  /**
+   * Note an air block will be created if the chunk is loaded and there is no other block at the
+   * given location
+   *
+   * @param worldX The x coordinate from world view
+   * @param worldY The y coordinate from world view
+   * @param loadChunk
+   * @return The block at the given x and y
+   */
+  @Nullable
+  public Block getBlock(int worldX, int worldY, boolean loadChunk) {
     int chunkX = CoordUtil.worldToChunk(worldX);
     int chunkY = CoordUtil.worldToChunk(worldY);
 
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY);
+    Chunk chunk = getChunk(chunkX, chunkY, loadChunk);
     if (chunk == null) {
       return null;
     }
@@ -969,7 +983,8 @@ public abstract class World implements Disposable, Resizable {
       var chunk =
           getChunk(
               CoordUtil.worldToChunk(entity.getBlockX()),
-              CoordUtil.worldToChunk(entity.getBlockY()));
+              CoordUtil.worldToChunk(entity.getBlockY()),
+              true);
       if (chunk == null) {
         // Failed to load chunk, remove entity
         Main.logger()
