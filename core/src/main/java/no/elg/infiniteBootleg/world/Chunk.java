@@ -145,6 +145,11 @@ public interface Chunk
   /** Mark this chunk as viewed during the current tick */
   void view();
 
+  /**
+   * @return The backing {@link FrameBuffer} which holds the texture of this chunk. Will be null if
+   *     the chunk is disposed, never null otherwise.
+   */
+  @Nullable
   FrameBuffer getFbo();
 
   /**

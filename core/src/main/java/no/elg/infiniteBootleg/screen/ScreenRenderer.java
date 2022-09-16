@@ -42,7 +42,7 @@ public class ScreenRenderer implements Disposable, Resizable {
   public void drawTop(@NotNull String text, float line) {
     try {
       font.draw(batch, text, spacing, Gdx.graphics.getHeight() - spacing * line);
-    } catch (NullPointerException ignore) {
+    } catch (ArrayIndexOutOfBoundsException | NullPointerException ignore) {
     }
   }
 

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world
 
+import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Material.AIR
@@ -48,6 +49,8 @@ class BlockLight(
       }
     }
 
+  private val strPos by lazy { CoordUtil.stringifyChunkToWorld(chunk, localX, localY) }
+
   private val chunkImpl = chunk as ChunkImpl
 
   init {
@@ -74,11 +77,16 @@ class BlockLight(
     //    System.out.println("Recalculating light for " + getMaterial() + " block " + getWorldX() +
     // "," + getWorldY());
     if (!Settings.renderLight) {
+      Main.logger().debug("BL $strPos") { "Not rendering light" }
       return
     }
 
     fun isCancelled(): Boolean {
-      return updateId != NEVER_CANCEL_UPDATE_ID && updateId != chunkImpl.currentUpdateId.get()
+      val b = updateId != NEVER_CANCEL_UPDATE_ID && updateId != chunkImpl.currentUpdateId.get()
+      if (b) {
+        Main.logger().debug("BL $strPos") { "Calculation cancelled" }
+      }
+      return b
     }
 
     val chunkColumn = chunk.chunkColumn
@@ -91,6 +99,8 @@ class BlockLight(
       isSkylight = true
       averageBrightness = 1f
       lightMap = SKYLIGHT_LIGHT_MAP
+
+//      Main.logger().trace("BL $strPos") { "Above top-block, setting as skylight" }
       return
     }
 
@@ -173,10 +183,30 @@ class BlockLight(
         }
       }
       averageBrightness = (total / (ChunkRenderer.LIGHT_RESOLUTION * ChunkRenderer.LIGHT_RESOLUTION)).toFloat()
+//      Main.logger().debug("BL $strPos") { "Recalculation finished normally - is lit" }
     } else {
       lightMap = NO_LIGHTS_LIGHT_MAP
       averageBrightness = 0f
+//      Main.logger().debug("BL $strPos") { "Recalculation finished normally - is not lit" }
     }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is BlockLight) return false
+
+    if (chunk != other.chunk) return false
+    if (localX != other.localX) return false
+    if (localY != other.localY) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = chunk.hashCode()
+    result = 31 * result + localX
+    result = 31 * result + localY
+    return result
   }
 
   companion object {

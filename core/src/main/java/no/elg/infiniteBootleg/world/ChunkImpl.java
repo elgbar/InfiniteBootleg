@@ -24,6 +24,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -84,8 +85,16 @@ public class ChunkImpl implements Chunk {
   private volatile boolean allAir;
   private volatile boolean disposed;
   private volatile long lastViewedTick;
+
+  @GuardedBy("fboLock")
+  @Nullable
   private TextureRegion fboRegion;
+
+  @GuardedBy("fboLock")
+  @Nullable
   private FrameBuffer fbo;
+
+  private final Object fboLock = new Object();
 
   /**
    * Create a new empty chunk
@@ -306,15 +315,19 @@ public class ChunkImpl implements Chunk {
   @Override
   @Nullable
   public TextureRegion getTextureRegion() {
-    if (dirty) {
-      updateIfDirty();
+    synchronized (fboLock) {
+      if (dirty) {
+        updateIfDirty();
+      }
+      return fboRegion;
     }
-    return fboRegion;
   }
 
   @Override
   public boolean hasTextureRegion() {
-    return fboRegion != null;
+    synchronized (fboLock) {
+      return fboRegion != null;
+    }
   }
 
   @Override
@@ -351,23 +364,29 @@ public class ChunkImpl implements Chunk {
     }
   }
 
-  private synchronized void cancelCurrentBlockLightUpdate() {
-    // If we reached this point before the light is done recalculating then we must start again
-    var currLU = lightUpdater;
-    if (currLU != null) {
-      // Note that the previous thread will dispose itself, to cancel tasks in the async thread we
-      // must
-      currLU.cancel(false);
-      lightUpdater = null;
+  private void cancelCurrentBlockLightUpdate() {
+    if (Settings.renderLight) {
+      synchronized (blockLights) {
+        // If we reached this point before the light is done recalculating then we must start again
+        var currLU = lightUpdater;
+        if (currLU != null) {
+          // Note that the previous thread will dispose itself (therefor it should not be
+          // interrupted)
+          currLU.cancel(false);
+          lightUpdater = null;
+        }
+      }
     }
   }
 
-  public synchronized void updateBlockLights() {
+  public void updateBlockLights() {
     if (Settings.renderLight) {
-      // If we reached this point before the light is done recalculating then we must start again
-      cancelCurrentBlockLightUpdate();
-      final int updateId = currentUpdateId.incrementAndGet();
-      lightUpdater = Main.inst().getScheduler().executeAsync(() -> updateBlockLights(updateId));
+      synchronized (blockLights) {
+        // If we reached this point before the light is done recalculating then we must start again
+        cancelCurrentBlockLightUpdate();
+        int updateId = currentUpdateId.incrementAndGet();
+        lightUpdater = Main.inst().getScheduler().executeAsync(() -> updateBlockLights(updateId));
+      }
     }
   }
 
@@ -420,21 +439,23 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
+  @Nullable
   public FrameBuffer getFbo() {
-    if (fbo != null) {
+    if (isDisposed()) {
+      return null;
+    }
+    synchronized (fboLock) {
+      if (fbo != null) {
+        return fbo;
+      }
+      fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, true);
+      fbo.getColorBufferTexture()
+          .setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+      fboRegion = new TextureRegion(fbo.getColorBufferTexture());
+      fboRegion.flip(false, true);
+
       return fbo;
     }
-    synchronized (this) {
-      // Some other thread might have created the fbo already, so we should check it
-      if (fbo == null) {
-        fbo = new FrameBuffer(Pixmap.Format.RGBA4444, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE, true);
-        fbo.getColorBufferTexture()
-            .setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        fboRegion = new TextureRegion(fbo.getColorBufferTexture());
-        fboRegion.flip(false, true);
-      }
-    }
-    return fbo;
   }
 
   /** Update all updatable blocks in this chunk */
@@ -520,7 +541,7 @@ public class ChunkImpl implements Chunk {
   public boolean isAllowingUnloading() {
     if (Settings.client) {
       var player = ClientMain.inst().getPlayer();
-      if (player != null && this.equals(player.getChunk())) {
+      if (player != null && equals(player.getChunk())) {
         return false;
       }
     }
@@ -699,8 +720,12 @@ public class ChunkImpl implements Chunk {
 
     allowUnload = false;
 
-    if (fbo != null) {
-      Main.inst().getScheduler().executeSync(fbo::dispose);
+    synchronized (fboLock) {
+      if (fbo != null) {
+        Main.inst().getScheduler().executeSync(fbo::dispose);
+        fbo = null;
+      }
+      fboRegion = null;
     }
 
     chunkBody.dispose();
@@ -782,7 +807,7 @@ public class ChunkImpl implements Chunk {
 
   @NotNull
   private ProtoWorld.Chunk save(boolean includeEntities) {
-    final ProtoWorld.Chunk.Builder builder = ProtoWorld.Chunk.newBuilder();
+    ProtoWorld.Chunk.Builder builder = ProtoWorld.Chunk.newBuilder();
     builder.setPosition(ProtoWorld.Vector2i.newBuilder().setX(chunkX).setY(chunkY).build());
 
     for (Block block : this) {
@@ -804,7 +829,7 @@ public class ChunkImpl implements Chunk {
 
     Preconditions.checkState(
         initializing, "Cannot load from proto chunk after chunk has been initialized");
-    final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
+    ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
     var posErrorMsg =
         "Invalid chunk coordinates given. Expected ("
             + chunkX
