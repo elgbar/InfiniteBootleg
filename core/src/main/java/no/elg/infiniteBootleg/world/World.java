@@ -1068,9 +1068,10 @@ public abstract class World implements Disposable, Resizable {
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
       float worldX, float worldY, float offsetX, float offsetY, boolean raw, boolean loadChunk) {
-    return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, null);
+    return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, true, null);
   }
 
+  @NotNull
   public Array<@NotNull Block> getBlocksAABB(
       float worldX,
       float worldY,
@@ -1078,6 +1079,7 @@ public abstract class World implements Disposable, Resizable {
       float offsetY,
       boolean raw,
       boolean loadChunk,
+      boolean includeAir,
       @Nullable Function0<Boolean> cancel) {
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
@@ -1103,7 +1105,7 @@ public abstract class World implements Disposable, Resizable {
         int localX = CoordUtil.chunkOffset(x);
         int localY = CoordUtil.chunkOffset(y);
         Block b = raw ? chunk.getRawBlock(localX, localY) : chunk.getBlock(localX, localY);
-        if (b == null) {
+        if (ExtraKt.isAir(b)) {
           continue;
         }
         blocks.add(b);
