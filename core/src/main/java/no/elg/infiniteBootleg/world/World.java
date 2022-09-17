@@ -1087,12 +1087,34 @@ public abstract class World implements Disposable, Resizable {
     return blocks;
   }
 
+  /**
+   * @param worldX Lower world X coordinate
+   * @param worldY Lower world Y coordinate
+   * @param offsetX Higher world X coordinate
+   * @param offsetY Higher world Y coordinate
+   * @param raw If non-existing blocks (i.e., air) should be created to be included
+   * @param loadChunk Whether to load the chunks the blocks exist in. If false no blocks from
+   *     unloaded chunks will be included
+   * @return An Axis-Aligned Bounding Box of blocks
+   */
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
       float worldX, float worldY, float offsetX, float offsetY, boolean raw, boolean loadChunk) {
     return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, true, null);
   }
 
+  /**
+   * @param worldX Lower world X coordinate
+   * @param worldY Lower world Y coordinate
+   * @param offsetX Offset from the world X coordinate
+   * @param offsetY Offset from the world Y coordinate
+   * @param raw If non-existing blocks (i.e., air) should be created to be included
+   * @param loadChunk Whether to load the chunks the blocks exist in. If false no blocks from
+   *     unloaded chunks will be included
+   * @param includeAir Whether air should be included
+   * @param cancel Allows for early termination of this method
+   * @return An Axis-Aligned Bounding Box of blocks
+   */
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
       float worldX,
@@ -1103,6 +1125,17 @@ public abstract class World implements Disposable, Resizable {
       boolean loadChunk,
       boolean includeAir,
       @Nullable Function0<Boolean> cancel) {
+    boolean effectiveRaw;
+    if (!raw && !includeAir) {
+      Main.logger()
+          .warn(
+              "getBlocksAABB",
+              "Will not include air AND air blocks will be created! (raw: false, includeAir: false)");
+      effectiveRaw = true;
+    } else {
+      effectiveRaw = raw;
+    }
+
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
     int x = MathUtils.floor(worldX - offsetX);
@@ -1126,8 +1159,9 @@ public abstract class World implements Disposable, Resizable {
 
         int localX = CoordUtil.chunkOffset(x);
         int localY = CoordUtil.chunkOffset(y);
-        Block b = raw ? chunk.getRawBlock(localX, localY) : chunk.getBlock(localX, localY);
-        if (ExtraKt.isAir(b)) {
+        Block b = effectiveRaw ? chunk.getRawBlock(localX, localY) : chunk.getBlock(localX, localY);
+        if (b == null) continue;
+        if (!includeAir && ExtraKt.isAir(b)) {
           continue;
         }
         blocks.add(b);
