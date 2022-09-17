@@ -59,9 +59,17 @@ fun Int.stringSize(): Int {
   return 10 + d
 }
 
+fun Block.isAir(): Boolean = this.material == Material.AIR
+
+@JvmName("isAirOrNull")
 fun Block?.isAir(): Boolean = this == null || this.material == Material.AIR
 
+@JvmName("isNotAirOrNull")
 fun Block?.isNotAir(): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
   return this != null && this.material != Material.AIR
+}
+
+fun Block.isNotAir(): Boolean {
+  return this.material != Material.AIR
 }
