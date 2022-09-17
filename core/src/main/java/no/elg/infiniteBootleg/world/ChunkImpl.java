@@ -4,6 +4,7 @@ import static java.util.Spliterator.DISTINCT;
 import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterator.SIZED;
 import static no.elg.infiniteBootleg.world.Material.AIR;
+import static no.elg.infiniteBootleg.world.World.LIGHT_SOURCE_LOOK_BLOCKS;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -233,7 +234,7 @@ public class ChunkImpl implements Chunk {
       }
       if ((block != null && block.getMaterial().isLuminescent())
           || (currBlock != null && currBlock.getMaterial().isLuminescent())) {
-        updateBlockLights();
+        updateBlockLights(localX, localY);
       }
 
       modified = true;
@@ -379,6 +380,34 @@ public class ChunkImpl implements Chunk {
     }
   }
 
+  public void updateBlockLights(int localX, int localY) {
+    updateBlockLights();
+    if (localX - LIGHT_SOURCE_LOOK_BLOCKS < 0) {
+      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX - 1, chunkY));
+      if (chunk != null) {
+        chunk.updateBlockLights();
+      }
+    }
+    if (localX + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE) {
+      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX + 1, chunkY));
+      if (chunk != null) {
+        chunk.updateBlockLights();
+      }
+    }
+    if (localY - LIGHT_SOURCE_LOOK_BLOCKS < 0) {
+      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX, chunkY - 1));
+      if (chunk != null) {
+        chunk.updateBlockLights();
+      }
+    }
+    if (localY + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE) {
+      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX, chunkY + 1));
+      if (chunk != null) {
+        chunk.updateBlockLights();
+      }
+    }
+  }
+
   public void updateBlockLights() {
     if (Settings.renderLight) {
       synchronized (blockLights) {
@@ -397,7 +426,6 @@ public class ChunkImpl implements Chunk {
       outer:
       for (int localX = 0; localX < CHUNK_SIZE; localX++) {
         for (int localY = CHUNK_SIZE - 1; localY >= 0; localY--) {
-          //          synchronized (tasks) {
           if (updateId != currentUpdateId.get()) {
             break outer;
           }
@@ -405,7 +433,6 @@ public class ChunkImpl implements Chunk {
           ForkJoinTask<?> task = pool.submit(() -> bl.recalculateLighting(updateId));
           task.fork();
           tasks.add(task);
-          //          }
         }
       }
 

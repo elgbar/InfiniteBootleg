@@ -140,6 +140,17 @@ public interface Chunk
    */
   void updateIfDirty();
 
+  /**
+   * Update the light of this chunk and potentially neighboring chunks. A neighboring chunk will be
+   * updated if the given local chunk point is within the {@link World#LIGHT_SOURCE_LOOK_BLOCKS}
+   * radius
+   *
+   * @param localX The local x coordinate a light originated from
+   * @param localY The local y coordinate a light originated from
+   */
+  void updateBlockLights(int localX, int localY);
+
+  /** Update the light of the chunk */
   void updateBlockLights();
 
   /** Mark this chunk as viewed during the current tick */
