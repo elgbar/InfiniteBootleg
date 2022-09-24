@@ -382,28 +382,20 @@ public class ChunkImpl implements Chunk {
 
   public void updateBlockLights(int localX, int localY) {
     updateBlockLights();
-    if (localX - LIGHT_SOURCE_LOOK_BLOCKS < 0) {
-      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX - 1, chunkY));
-      if (chunk != null) {
-        chunk.updateBlockLights();
-      }
-    }
-    if (localX + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE) {
-      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX + 1, chunkY));
-      if (chunk != null) {
-        chunk.updateBlockLights();
-      }
-    }
-    if (localY - LIGHT_SOURCE_LOOK_BLOCKS < 0) {
-      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX, chunkY - 1));
-      if (chunk != null) {
-        chunk.updateBlockLights();
-      }
-    }
-    if (localY + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE) {
-      var chunk = getWorld().getLoadedChunk(CoordUtil.compactLoc(chunkX, chunkY + 1));
-      if (chunk != null) {
-        chunk.updateBlockLights();
+    // Update all neighboring chunks if any light from the local point given would hit the chunk
+    for (int deltaChunkX = -1; deltaChunkX <= 1; deltaChunkX++) {
+      for (int deltaChunkY = -1; deltaChunkY <= 1; deltaChunkY++) {
+        if (localX - LIGHT_SOURCE_LOOK_BLOCKS < 0
+            || localX + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE
+            || localY - LIGHT_SOURCE_LOOK_BLOCKS < 0
+            || localY + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE) {
+          var chunk =
+              getWorld()
+                  .getLoadedChunk(CoordUtil.compactLoc(chunkX + deltaChunkX, chunkY + deltaChunkY));
+          if (chunk != null) {
+            chunk.updateBlockLights();
+          }
+        }
       }
     }
   }
