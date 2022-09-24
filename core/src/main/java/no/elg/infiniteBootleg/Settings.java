@@ -45,6 +45,7 @@ public class Settings {
   public static boolean renderLight = true;
 
   public static boolean renderBox2dDebug;
+  public static boolean debugEntityLight;
   public static boolean renderChunkBounds;
 
   public static boolean enableCameraFollowLerp = true;

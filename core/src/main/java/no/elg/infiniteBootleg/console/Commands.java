@@ -204,6 +204,22 @@ public class Commands extends CommandExecutor {
   }
 
   @ClientsideOnly
+  @ConsoleDoc(description = "Toggles debug rendering of entity lighting")
+  public void debEntLit() {
+    Settings.debugEntityLight = !Settings.debugEntityLight;
+    Settings.debug = true;
+    logger.log(
+        LogLevel.SUCCESS,
+        "Debug rendering of entity light is now "
+            + (Settings.debugEntityLight ? "enabled" : "disabled"));
+    if (Settings.debugEntityLight) {
+      logger.log(
+          LogLevel.DEFAULT,
+          "A white box is rendered over the block each entity source their brightness from");
+    }
+  }
+
+  @ClientsideOnly
   @ConsoleDoc(description = "Toggles smoothed camera movement when following a player")
   public void lerp() {
     Settings.enableCameraFollowLerp = !Settings.enableCameraFollowLerp;

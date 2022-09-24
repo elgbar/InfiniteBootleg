@@ -1,10 +1,12 @@
 package no.elg.infiniteBootleg.util;
 
+import static no.elg.infiniteBootleg.world.Block.BLOCK_SIZE;
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
 import com.badlogic.gdx.math.Vector2;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
+import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -233,5 +235,15 @@ public class CoordUtil {
    */
   public static int worldToBlock(float worldCoord) {
     return (int) Math.floor(worldCoord);
+  }
+
+  /**
+   * @param worldOffset Given by {@link WorldBody#getWorldOffsetX()} and {@link
+   *     WorldBody#getWorldOffsetY()}
+   * @param worldCoord The world coordinate to translate to screen coordinates
+   * @return The world coordinate to translated to screen coordinates
+   */
+  public static float worldToScreen(float worldCoord, float worldOffset) {
+    return (worldCoord + worldOffset) * BLOCK_SIZE;
   }
 }

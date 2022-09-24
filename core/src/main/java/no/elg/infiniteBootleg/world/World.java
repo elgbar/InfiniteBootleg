@@ -741,6 +741,16 @@ public abstract class World implements Disposable, Resizable {
     return getBlock(worldX, worldY, true);
   }
 
+  @Nullable
+  public BlockLight getBlockLight(int worldX, int worldY) {
+    var chunk = getChunkFromWorld(worldX, worldY);
+    if (chunk == null) {
+      Main.logger().debug("World", "Failed to find chunk " + worldX + ", " + worldY);
+      return null;
+    }
+    return chunk.getBlockLight(CoordUtil.chunkOffset(worldX), CoordUtil.chunkOffset(worldY));
+  }
+
   /**
    * Note an air block will be created if the chunk is loaded and there is no other block at the
    * given location
