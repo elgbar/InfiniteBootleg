@@ -32,6 +32,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.concurrent.GuardedBy;
 import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -1100,7 +1101,7 @@ public abstract class World implements Disposable, Resizable {
   @NotNull
   public Array<@NotNull Block> getBlocksAABB(
       float worldX, float worldY, float offsetX, float offsetY, boolean raw, boolean loadChunk) {
-    return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, true, null);
+    return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, true, null, null);
   }
 
   /**
@@ -1124,7 +1125,8 @@ public abstract class World implements Disposable, Resizable {
       boolean raw,
       boolean loadChunk,
       boolean includeAir,
-      @Nullable Function0<Boolean> cancel) {
+      @Nullable Function0<Boolean> cancel,
+      @Nullable Function1<Block, Boolean> filter) {
     boolean effectiveRaw;
     if (!raw && !includeAir) {
       Main.logger()
@@ -1161,10 +1163,9 @@ public abstract class World implements Disposable, Resizable {
         int localY = CoordUtil.chunkOffset(y);
         Block b = effectiveRaw ? chunk.getRawBlock(localX, localY) : chunk.getBlock(localX, localY);
         if (b == null) continue;
-        if (!includeAir && ExtraKt.isAir(b)) {
-          continue;
+        if ((includeAir || !ExtraKt.isAir(b)) && (filter == null || filter.invoke(b))) {
+          blocks.add(b);
         }
-        blocks.add(b);
       }
     }
     return blocks;

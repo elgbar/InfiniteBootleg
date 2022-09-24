@@ -1,12 +1,15 @@
 package no.elg.infiniteBootleg.world
 
+import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.max
 
 class BlockLight(
   val chunk: Chunk,
@@ -106,6 +109,49 @@ class BlockLight(
     var isLitNext = false
     val tmpLightMap = Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) }
 
+    fun calculateLightFrom(neighbor: Block) {
+      isLitNext = true
+      for (dx in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
+        for (dy in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
+          // Calculate distance for each light cell
+          val dist = (
+            Location.distCubed(
+              (
+                worldX + dx.toFloat() / ChunkRenderer.LIGHT_RESOLUTION
+                ).toDouble(),
+              (
+                worldY + dy.toFloat() / ChunkRenderer.LIGHT_RESOLUTION
+                ).toDouble(),
+              neighbor.worldX + 0.5,
+              neighbor.worldY + 0.5
+            ) /
+              (World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS)
+            )
+          val old: Float = tmpLightMap[dx][dy]
+          val normalizedIntensity = if (dist == 0.0) {
+            0f
+          } else if (dist > 0) {
+            1 - dist.toFloat()
+          } else {
+            1 + dist.toFloat()
+          }
+
+          if (old < normalizedIntensity) {
+            tmpLightMap[dx][dy] = normalizedIntensity
+          }
+        }
+      }
+    }
+
+    fun calculateLightFrom(neighbors: GdxArray<Block>) {
+      for (neighbor in neighbors) {
+        if (isCancelled()) {
+          return
+        }
+        calculateLightFrom(neighbor)
+      }
+    }
+
     if (isCancelled()) {
       return
     }
@@ -121,63 +167,39 @@ class BlockLight(
         false,
         false,
         ::isCancelled
-      )
-    if (isCancelled()) {
-      return
-    }
+      ) {
+        val mat = it.material
+        mat.isLuminescent || (mat.isTransparent && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG))
+      }
+    calculateLightFrom(blocksAABB)
+
     // Since we're not creating air blocks above, we will instead just load
     for (offsetWorldX in -floor(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
-      val topWorldX = worldX + offsetWorldX
-      // add one to get the air block above the top-block
-      val topWorldY = 1 + chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
-      val topBlock = chunk.world.getBlock(topWorldX, topWorldY, false)
-      if (topBlock != null) {
-//        Main.logger().debug("BL $strPos") { "topBlock found! (mat: ${topBlock.material}" }
-        blocksAABB.add(topBlock)
-      }
-      if (isCancelled()) {
-        return
-      }
-    }
-    for (neighbor in blocksAABB) {
-      val neiMat = neighbor.material
-      // We assume that if the neighbor is air, it is a topblock
-      if (neiMat.isLuminescent || (neiMat.isTransparent && neighbor.chunk.chunkColumn.isBlockAboveTopBlock(neighbor.localX, neighbor.worldY, BLOCKS_LIGHT_FLAG))) {
+      val topWorldX: Int = worldX + offsetWorldX
+      val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
+
+      val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG)
+      val offsetYR = topWorldY - topWorldYR
+
+      val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG)
+      val offsetYL = topWorldY - topWorldYL
+      val offsetY = max(abs(offsetYL), abs(offsetYR))
+
+      if (offsetY <= MIN_Y_OFFSET) {
+        // Too little offset to bother with columns of skylight
+        // add one to get the air block above the top-block
+        val block = chunk.world.getBlock(topWorldX, 1 + topWorldY, false) ?: continue
+        calculateLightFrom(block)
         if (isCancelled()) {
           return
         }
-        isLitNext = true
-        for (dx in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
-          for (dy in 0 until ChunkRenderer.LIGHT_RESOLUTION) {
-            // Calculate distance for each light cell
-            val dist = (
-              Location.distCubed(
-                (
-                  worldX + dx.toFloat() / ChunkRenderer.LIGHT_RESOLUTION
-                  ).toDouble(),
-                (
-                  worldY + dy.toFloat() / ChunkRenderer.LIGHT_RESOLUTION
-                  ).toDouble(),
-                neighbor.worldX + 0.5,
-                neighbor.worldY + 0.5
-              ) /
-                (World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS)
-              )
-            val old: Float = tmpLightMap[dx][dy]
-            val normalizedIntensity = if (dist == 0.0) {
-              0f
-            } else if (dist > 0) {
-              1 - dist.toFloat()
-            } else {
-              1 + dist.toFloat()
-            }
-
-            if (old < normalizedIntensity) {
-              tmpLightMap[dx][dy] = normalizedIntensity
-            }
-          }
-        }
+        continue
       }
+
+      val skyblocks = chunk.world.getBlocksAABB(topWorldX.toFloat(), topWorldY.toFloat() + 1, 0f, offsetY.toFloat(), false, false, true, ::isCancelled) {
+        it.material == Material.AIR && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
+      }
+      calculateLightFrom(skyblocks)
     }
 
     if (isCancelled()) {
@@ -225,5 +247,7 @@ class BlockLight(
     const val NEVER_CANCEL_UPDATE_ID = -1
     val SKYLIGHT_LIGHT_MAP: Array<FloatArray> = Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) { 1f } }
     val NO_LIGHTS_LIGHT_MAP: Array<FloatArray> = Array(ChunkRenderer.LIGHT_RESOLUTION) { FloatArray(ChunkRenderer.LIGHT_RESOLUTION) { 0f } }
+
+    const val MIN_Y_OFFSET = 1
   }
 }
