@@ -217,11 +217,9 @@ class BlockLight(
         }
       }
       averageBrightness = (total / (ChunkRenderer.LIGHT_RESOLUTION * ChunkRenderer.LIGHT_RESOLUTION)).toFloat()
-//      Main.logger().debug("BL $strPos") { "Recalculation finished normally - is lit" }
     } else {
       lightMap = NO_LIGHTS_LIGHT_MAP
       averageBrightness = 0f
-//      Main.logger().debug("BL $strPos") { "Recalculation finished normally - is not lit" }
     }
   }
 
