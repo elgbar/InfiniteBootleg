@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.events
+package no.elg.infiniteBootleg.events.api
 
 interface CancellableEvent : Event {
 

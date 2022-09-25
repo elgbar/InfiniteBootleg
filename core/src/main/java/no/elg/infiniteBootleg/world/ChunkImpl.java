@@ -29,6 +29,9 @@ import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.events.ChunkLoadEvent;
+import no.elg.infiniteBootleg.events.api.Event;
+import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
@@ -810,6 +813,17 @@ public class ChunkImpl implements Chunk {
     }
     chunkBody.update();
     updateBlockLights();
+    EventManager.INSTANCE.javaFireEvent(new ChunkLoadEvent(this, false), Event.class);
+
+    // Register events
+    EventManager.INSTANCE.javaRegister(
+        (ChunkLoadEvent event) -> {
+          if (event.getChunk() == this) {
+            return;
+          }
+          updateBlockLights();
+        },
+        ChunkLoadEvent.class);
   }
 
   @NotNull
