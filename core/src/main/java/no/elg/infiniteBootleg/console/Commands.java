@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.ReflectionUtil;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
+import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -112,10 +113,13 @@ public class Commands extends CommandExecutor {
   public void lights() {
     Settings.renderLight = !Settings.renderLight;
 
+    World world = getWorld();
+    if (world == null) return;
     if (Settings.renderLight) {
-      World world = getWorld();
-      if (world == null) return;
       world.getRender().update();
+    }
+    for (Chunk chunk : world.getLoadedChunks()) {
+      chunk.dirty();
     }
     logger.log(
         LogLevel.SUCCESS, "Lighting is now " + (Settings.renderLight ? "enabled" : "disabled"));
