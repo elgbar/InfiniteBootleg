@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.stream.Stream;
 import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
-import no.elg.infiniteBootleg.Ticking;
+import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;

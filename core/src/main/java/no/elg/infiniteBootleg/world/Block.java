@@ -4,10 +4,10 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import no.elg.infiniteBootleg.CheckableDisposable;
+import no.elg.infiniteBootleg.api.HUDDebuggable;
+import no.elg.infiniteBootleg.api.Savable;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.HUDDebuggable;
-import no.elg.infiniteBootleg.util.Savable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,5 +112,11 @@ public interface Block
 
   default long getCompactWorldLoc() {
     return CoordUtil.compactLoc(getWorldX(), getWorldY());
+  }
+
+  @NotNull
+  @Override
+  default String hudDebug() {
+    return "Block " + getMaterial();
   }
 }

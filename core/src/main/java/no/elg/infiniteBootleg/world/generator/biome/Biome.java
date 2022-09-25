@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.generator.biome;
 
 import com.badlogic.gdx.utils.Array;
-import no.elg.infiniteBootleg.util.Tuple;
+import kotlin.Pair;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Elg
  */
 public enum Biome {
-  PLAINS(0.1f, 0.9f, 64, 0.009f, 0, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 10)),
+  PLAINS(0.1f, 0.9f, 64, 0.009f, 0, Material.STONE, Material.GRASS, new Pair<>(Material.DIRT, 10)),
   MOUNTAINS(
-      100f, 0.9f, 356, 0.005f, 25, Material.STONE, Material.GRASS, new Tuple<>(Material.DIRT, 6)),
-  DESERT(0.1f, 0.9f, 32, 0.005f, 0, Material.STONE, Material.SAND, new Tuple<>(Material.SAND, 12));
+      100f, 0.9f, 356, 0.005f, 25, Material.STONE, Material.GRASS, new Pair<>(Material.DIRT, 6)),
+  DESERT(0.1f, 0.9f, 32, 0.005f, 0, Material.STONE, Material.SAND, new Pair<>(Material.SAND, 12));
 
   public static final int INTERPOLATION_RADIUS = 25;
 
@@ -38,7 +38,7 @@ public enum Biome {
       int offset,
       @NotNull Material filler,
       @NotNull Material topmostBlock,
-      @NotNull Tuple<@NotNull Material, @NotNull Integer>... topBlocks) {
+      @NotNull Pair<@NotNull Material, @NotNull Integer>... topBlocks) {
     this.y = y;
     this.z = z;
     this.amplitude = amplitude;
@@ -48,10 +48,10 @@ public enum Biome {
     this.topmostBlock = topmostBlock;
 
     Array<Material> mats = new Array<>(true, 16, Material.class);
-    for (Tuple<Material, Integer> tuple : topBlocks) {
-      mats.ensureCapacity(tuple.value);
-      for (int i = 0; i < tuple.value; i++) {
-        mats.add(tuple.key);
+    for (Pair<Material, Integer> tuple : topBlocks) {
+      mats.ensureCapacity(tuple.getSecond());
+      for (int i = 0; i < tuple.getSecond(); i++) {
+        mats.add(tuple.getFirst());
       }
     }
     this.topBlocks = mats.toArray();

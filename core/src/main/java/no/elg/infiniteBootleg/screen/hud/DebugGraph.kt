@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.screen.ScreenRenderer
 import no.elg.infiniteBootleg.screen.hud.helper.TickerGraph
-import no.elg.infiniteBootleg.util.Resizable
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 

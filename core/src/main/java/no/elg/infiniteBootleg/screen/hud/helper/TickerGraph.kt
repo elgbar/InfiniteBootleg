@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.screen.hud.helper
 
+import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.screen.hud.DebugGraph
-import no.elg.infiniteBootleg.util.Resizable
 import no.elg.infiniteBootleg.util.Ticker
 
 class TickerGraph(val ticker: Ticker, val startIndex: (width: Int) -> Int, val endIndex: (width: Int) -> Int) : Resizable {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.ChainShape
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.CheckableDisposable
-import no.elg.infiniteBootleg.Updatable
+import no.elg.infiniteBootleg.api.Updatable
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block

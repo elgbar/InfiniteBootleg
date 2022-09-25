@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks.traits
 
-import no.elg.infiniteBootleg.Ticking
+import no.elg.infiniteBootleg.api.Ticking
 
 /**
  * @author Elg

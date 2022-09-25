@@ -8,7 +8,7 @@ import java.util.concurrent.ForkJoinTask;
 import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.Ticking;
+import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;

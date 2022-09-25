@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Updatable;
+import no.elg.infiniteBootleg.api.Updatable;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.World;

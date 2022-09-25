@@ -1,3 +1,8 @@
 package no.elg.infiniteBootleg.events
 
-abstract class Event @JvmOverloads constructor(val isAsync: Boolean = false)
+interface Event {
+  val async: Boolean
+
+  companion object {
+  }
+}

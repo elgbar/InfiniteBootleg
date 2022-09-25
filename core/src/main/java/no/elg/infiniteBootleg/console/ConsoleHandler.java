@@ -20,9 +20,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.api.Resizable;
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole;
 import no.elg.infiniteBootleg.console.consoles.StdConsole;
-import no.elg.infiniteBootleg.util.Resizable;
 import org.jetbrains.annotations.NotNull;
 
 public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {

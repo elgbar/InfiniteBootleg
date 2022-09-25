@@ -1,3 +1,3 @@
 package no.elg.infiniteBootleg.events
 
-annotation class EventHandler 
+annotation class EventHandler

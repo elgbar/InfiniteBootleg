@@ -2,12 +2,12 @@ package no.elg.infiniteBootleg.screen;
 
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Renderer;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.api.Renderer;
+import no.elg.infiniteBootleg.api.Resizable;
 import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screen.hud.DebugGraph;
 import no.elg.infiniteBootleg.screen.hud.DebugText;
-import no.elg.infiniteBootleg.util.Resizable;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;

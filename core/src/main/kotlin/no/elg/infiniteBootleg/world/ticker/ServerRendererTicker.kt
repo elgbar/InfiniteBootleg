@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.ticker
 
-import no.elg.infiniteBootleg.Ticking
+import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.world.ServerWorld
 

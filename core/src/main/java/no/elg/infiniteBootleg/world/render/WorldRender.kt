@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.utils.Disposable
-import no.elg.infiniteBootleg.Renderer
-import no.elg.infiniteBootleg.Updatable
-import no.elg.infiniteBootleg.util.Resizable
+import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.api.Resizable
+import no.elg.infiniteBootleg.api.Updatable
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.World
 

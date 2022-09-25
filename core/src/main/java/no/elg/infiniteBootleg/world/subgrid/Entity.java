@@ -27,14 +27,14 @@ import kotlin.jvm.functions.Function1;
 import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Ticking;
+import no.elg.infiniteBootleg.api.HUDDebuggable;
+import no.elg.infiniteBootleg.api.Savable;
+import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.ExtraKt;
-import no.elg.infiniteBootleg.util.HUDDebuggable;
-import no.elg.infiniteBootleg.util.Savable;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -691,6 +691,15 @@ public abstract class Entity
                       // don't send packet to the owning player
                       (channel, credentials) -> credentials.getEntityUUID() != getUuid()));
     }
+  }
+
+  @Override
+  public void tickRare() {}
+
+  @NotNull
+  @Override
+  public String hudDebug() {
+    return "";
   }
 
   /**

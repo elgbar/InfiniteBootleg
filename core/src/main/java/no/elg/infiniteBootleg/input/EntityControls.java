@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.input;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Disposable;
-import no.elg.infiniteBootleg.Updatable;
+import no.elg.infiniteBootleg.api.Updatable;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;

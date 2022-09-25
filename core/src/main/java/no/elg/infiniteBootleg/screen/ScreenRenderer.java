@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.util.Resizable;
+import no.elg.infiniteBootleg.api.Resizable;
 import org.jetbrains.annotations.NotNull;
 
 public class ScreenRenderer implements Disposable, Resizable {
