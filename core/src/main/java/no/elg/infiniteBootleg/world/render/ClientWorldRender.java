@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -77,21 +78,24 @@ public class ClientWorldRender implements WorldRender {
     float worldOffsetY = worldBody.getWorldOffsetY() * BLOCK_SIZE;
     int verticalStart = chunksInView.getVerticalStart();
     int verticalEnd = chunksInView.getVerticalEnd();
-    for (int y = verticalStart; y < verticalEnd; y++) {
+    for (int chunkY = verticalStart; chunkY < verticalEnd; chunkY++) {
       int horizontalStart = chunksInView.getHorizontalStart();
       int horizontalEnd = chunksInView.getHorizontalEnd();
-      for (int x = horizontalStart; x < horizontalEnd; x++) {
-        Chunk chunk = world.getChunk(x, y, true);
+      for (int chunkX = horizontalStart; chunkX < horizontalEnd; chunkX++) {
+        Chunk chunk = world.getChunk(chunkX, chunkY, false);
         if (chunk == null) {
+          int loadingChunkX = chunkX;
+          int loadingChunkY = chunkY;
+          Main.inst().getScheduler().executeAsync(()-> world.loadChunk(loadingChunkX, loadingChunkY));
           continue;
         }
         chunk.view();
 
         // No need to update texture when out of view, but in loaded zone
-        if (y == verticalEnd - 1
-            || y == verticalStart
-            || x == horizontalStart
-            || x == horizontalEnd - 1) {
+        if (chunkY == verticalEnd - 1
+            || chunkY == verticalStart
+            || chunkX == horizontalStart
+            || chunkX == horizontalEnd - 1) {
           continue;
         }
 

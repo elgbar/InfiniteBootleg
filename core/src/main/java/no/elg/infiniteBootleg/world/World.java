@@ -37,6 +37,8 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Resizable;
+import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent;
+import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
@@ -368,7 +370,6 @@ public abstract class World implements Disposable, Resizable {
   public Chunk getChunk(long chunkLoc, boolean load) {
     // This is a long lock, it must appear to be an atomic operation though
     @Nullable Chunk readChunk = null;
-    @Nullable Chunk old = null;
     boolean acquiredLock = false;
     try {
       acquiredLock =
@@ -396,39 +397,63 @@ public abstract class World implements Disposable, Resizable {
       if (!load) {
         return null;
       }
-      if (getWorldTicker().isPaused()) {
-        Main.logger().debug("World", "Ticker paused will not load chunk");
-        return null;
-      }
-      chunksLock.writeLock().lock();
-      try {
-        // another thread might have loaded the chunk while we were waiting here
-        if (readChunk != null && readChunk.isLoaded()) {
-          return readChunk;
-        }
-        if (readChunk != null) {
-          readChunk.dispose();
-        }
-        Chunk loadedChunk = chunkLoader.load(chunkLoc);
-        if (loadedChunk == null) {
-          old = chunks.remove(chunkLoc);
-          //          Main.logger().warn("World", "removed chunk " +
-          // CoordUtil.stringifyCompactLoc(chunkLoc) + ": failed to load chunk. Chunk size is now "
-          // + chunks.size);
-          return null;
-        } else {
-          Preconditions.checkState(loadedChunk.isValid());
-          old = chunks.put(chunkLoc, loadedChunk);
-          return loadedChunk;
-        }
-      } finally {
-        chunksLock.writeLock().unlock();
-        if (old != null) {
-          old.dispose();
-        }
-      }
+      return loadChunk(chunkLoc,false);
     }
     return readChunk;
+  }
+
+  /**
+   * Load a chunk into memory, either from disk or generate the chunk from it's position.
+   * <p>
+   * A chunk will not be loaded if there exists a valid chunk at the chunk postition.
+   *
+   * @param chunkX The x-coordinate of the chunk to load(in Chunk coordinate-view)
+   * @param chunkY The y-coordinate of the chunk to load(in Chunk coordinate-view)
+   * @return The loaded chunk
+   */
+  @Nullable
+  public Chunk loadChunk(int chunkX, int chunkY) {
+    return loadChunk(CoordUtil.compactLoc(chunkX, chunkY),true);
+  }
+
+  /**
+   * Load a chunk into memory, either from disk or generate the chunk from it's position
+   *
+   * @param chunkLoc The location of the chunk (in Chunk coordinate-view)
+   * @param checkValidity Whether to check if there is a loaded and valid chunk at the given `chunkLocation` and thus not reload the chunk
+   * @return The loaded chunk
+   */
+  @Nullable
+  public Chunk loadChunk(long chunkLoc, boolean checkValidity) {
+    if (getWorldTicker().isPaused()) {
+      Main.logger().debug("World", "Ticker paused will not load chunk");
+      return null;
+    }
+    @Nullable Chunk old = null;
+    chunksLock.writeLock().lock();
+    try {
+      if(checkValidity){
+        old = chunks.get(chunkLoc);
+        if(old != null && old.isValid()){
+          return old;
+        }
+      }
+      Chunk loadedChunk = chunkLoader.load(chunkLoc);
+      if (loadedChunk == null) {
+        //If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of date, and the loading should be re-tried
+        old = chunks.remove(chunkLoc);
+        return null;
+      } else {
+        Preconditions.checkState(loadedChunk.isValid());
+        old = chunks.put(chunkLoc, loadedChunk);
+        return loadedChunk;
+      }
+    } finally {
+      chunksLock.writeLock().unlock();
+      if (old != null) {
+        old.dispose();
+      }
+    }
   }
 
   /**
@@ -640,7 +665,7 @@ public abstract class World implements Disposable, Resizable {
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY, true);
+    Chunk chunk = getChunk(chunkX, chunkY, false);
     if (chunk == null) {
       // What should we return here? we don't really know as it does not exist.
       // Return false to prevent teleportation and other actions that depend on an empty space.
@@ -989,6 +1014,7 @@ public abstract class World implements Disposable, Resizable {
    * @param loadChunk
    */
   public void addEntity(@NotNull Entity entity, boolean loadChunk) {
+    Main.inst().getScheduler().executeAsync(()->{
     if (entities.containsValue(entity)) {
       Main.logger()
           .error(
@@ -1033,7 +1059,7 @@ public abstract class World implements Disposable, Resizable {
     if (entity instanceof Player player) {
       players.put(player.getUuid(), player);
       saveServerPlayer(player);
-    }
+    }});
   }
 
   /**

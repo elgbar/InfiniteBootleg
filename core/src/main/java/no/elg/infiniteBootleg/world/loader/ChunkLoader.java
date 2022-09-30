@@ -50,7 +50,7 @@ public class ChunkLoader {
    * Load the chunk at the given chunk location
    *
    * @param chunkLoc The coordinates of the chunk (in chunk view)
-   * @return The loaded chunk
+   * @return The loaded chunk or null if something went wrong
    */
   @Nullable
   public synchronized Chunk load(long chunkLoc) {
@@ -66,7 +66,7 @@ public class ChunkLoader {
 
     if (existsOnDisk(chunkX, chunkY)) {
       ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
-      final FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
+      FileHandle chunkFile = getChunkFile(world, chunkX, chunkY);
       if (chunkFile != null) {
         try {
           ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
