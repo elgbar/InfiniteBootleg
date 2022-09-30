@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.api.Ticking;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A helper class that calls a {@link Ticking}'s {@link Ticking#tick()} and {@link
@@ -64,30 +63,6 @@ public class Ticker implements Runnable {
   private volatile boolean started;
 
   /**
-   * Use {@link #DEFAULT_TICKS_PER_SECOND} for {@code #tps} and {@link #DEFAULT_NAG_DELAY} for nag
-   * delay
-   *
-   * @param ticking The ticker to tick
-   * @param start If the thread should start at once
-   */
-  public Ticker(@NotNull Ticking ticking, boolean start) {
-    this(ticking, start, DEFAULT_TICKS_PER_SECOND, DEFAULT_NAG_DELAY);
-  }
-
-  /**
-   * @param ticking The ticker to tick
-   * @param start If the thread should start at once
-   * @param tps Ticks per seconds, must be a strictly positive number
-   * @param nagDelay Minimum seconds between each nag message, If less than or equal to zero there
-   *     will be no delay (note that this will be a lot of spam!)
-   * @see #DEFAULT_TICKS_PER_SECOND
-   * @see #DEFAULT_NAG_DELAY
-   */
-  public Ticker(@NotNull Ticking ticking, boolean start, long tps, double nagDelay) {
-    this(ticking, null, start, tps, nagDelay);
-  }
-
-  /**
    * @param ticking The ticker to tick
    * @param name Name of the ticker thread
    * @param start If the thread should start at once
@@ -98,9 +73,9 @@ public class Ticker implements Runnable {
    * @see #DEFAULT_NAG_DELAY
    */
   public Ticker(
-      @NotNull Ticking ticking, @Nullable String name, boolean start, long tps, double nagDelay) {
+      @NotNull Ticking ticking, @NotNull String name, boolean start, long tps, double nagDelay) {
     this.ticking = ticking;
-    tag = ((name != null) ? name : ticking.toString()) + " ticker";
+    tag = name + " ticker";
     if (tps <= 0) {
       throw new IllegalArgumentException("TPS must be strictly positive! Was given " + tps);
     }

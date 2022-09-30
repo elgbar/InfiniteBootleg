@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.events.api
 
-import no.elg.infiniteBootleg.Main
 import java.lang.ref.WeakReference
 import java.util.WeakHashMap
 import javax.annotation.concurrent.GuardedBy
@@ -10,12 +9,12 @@ object EventManager {
   @GuardedBy("itself")
   private val listeners: WeakHashMap<Class<out Event>, MutableList<WeakReference<EventListener<out Event>>>> = WeakHashMap()
 
-  inline fun <reified T : Event> register(listener: EventListener<T>) {
-    javaRegister(listener, T::class.java)
+  inline fun <reified T : Event> registerListener(listener: EventListener<T>) {
+    javaRegisterListener(T::class.java, listener)
   }
 
-  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("fireEvent(event)"))
-  fun <T : Event> javaRegister(listener: EventListener<T>, eventClass: Class<T>) {
+  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("register(event)"))
+  fun <T : Event> javaRegisterListener(eventClass: Class<T>, listener: EventListener<T>) {
     val eventListeners: MutableList<WeakReference<EventListener<out Event>>>
     synchronized(listeners) {
       eventListeners = listeners.getOrPut(eventClass) { ArrayList() }
@@ -25,12 +24,12 @@ object EventManager {
     }
   }
 
-  inline fun <reified T : Event> fireEvent(event: T) {
-    javaFireEvent(event, T::class.java)
+  inline fun <reified T : Event> dispatchEvent(event: T) {
+    javaDispatchEvent(T::class.java, event)
   }
 
-  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("fireEvent(event)"))
-  fun <T : Event> javaFireEvent(event: T, eventClass: Class<T>) {
+  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("dispatchEvent(event)"))
+  fun <T : Event> javaDispatchEvent(eventClass: Class<T>, event: T) {
     val backingListeners: MutableList<WeakReference<EventListener<out Event>>>
     val correctListeners: List<WeakReference<EventListener<T>>>
     synchronized(listeners) {
@@ -42,7 +41,7 @@ object EventManager {
       for (listenerRef in correctListeners) {
         val listener = listenerRef.get()
         if (listener == null) {
-          Main.logger().log("Listener have been garbage collected!")
+//          Main.logger().log("Listener have been garbage collected!")
           backingListeners.remove(listenerRef as WeakReference<*>)
           continue
         }
