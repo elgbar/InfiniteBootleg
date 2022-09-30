@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.events.ChunkLoadedEvent;
 import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
+import no.elg.infiniteBootleg.util.ChunkUtilKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -816,10 +817,9 @@ public class ChunkImpl implements Chunk {
 
     // Register events
     EventManager.INSTANCE.javaRegisterListener(ChunkLoadedEvent.class, (ChunkLoadedEvent event) -> {
-          if (event.getChunk() == this) {
-            return;
+          if (ChunkUtilKt.isNeighbor(this, event.getChunk())) {
+            updateBlockLights();
           }
-          updateBlockLights();
         }
     );
   }
