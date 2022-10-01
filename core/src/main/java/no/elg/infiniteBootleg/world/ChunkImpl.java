@@ -791,7 +791,10 @@ public class ChunkImpl implements Chunk {
     dirty = true;
   }
 
-  /** Allow textures to be loaded. Only call once per chunk */
+  /**
+   * Internal loading of blocks have been completed, finish setting up the internal state but before
+   * the chunks have been added to the world
+   */
   public synchronized void finishLoading() {
     if (!initializing) {
       return;
@@ -812,9 +815,6 @@ public class ChunkImpl implements Chunk {
       }
     }
     chunkBody.update();
-    updateBlockLights();
-    EventManager.INSTANCE.javaDispatchEvent(new ChunkLoadedEvent(this));
-
     // Register events
     EventManager.INSTANCE.javaRegisterListener(
         ChunkLoadedEvent.class,
@@ -823,6 +823,7 @@ public class ChunkImpl implements Chunk {
             updateBlockLights();
           }
         });
+    updateBlockLights();
   }
 
   @NotNull

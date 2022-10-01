@@ -37,6 +37,7 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Resizable;
+import no.elg.infiniteBootleg.events.ChunkLoadedEvent;
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent;
 import no.elg.infiniteBootleg.events.WorldLoadedEvent;
 import no.elg.infiniteBootleg.events.api.EventManager;
@@ -467,6 +468,7 @@ public abstract class World implements Disposable, Resizable {
       } else {
         Preconditions.checkState(loadedChunk.isValid());
         old = chunks.put(chunkLoc, loadedChunk);
+        EventManager.INSTANCE.javaDispatchEvent(new ChunkLoadedEvent(loadedChunk));
         return loadedChunk;
       }
     } finally {
