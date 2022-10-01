@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
+import javax.annotation.concurrent.GuardedBy
 
 /**
  * @author Elg
@@ -87,6 +88,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
    * @see World.postBox2dRunnable
    * @see WorldBody.postBox2dRunnable
    */
+  @GuardedBy("BOX2D_LOCK")
   fun onBodyCreated(tmpBody: Body) {
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
@@ -156,10 +158,12 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
         newFix
       }
 
-      if (block.material.isBlocksLight()) {
-        fix.filterData = Filters.EN_GR_LI__GROUND_FILTER
-      } else {
-        fix.filterData = Filters.EN_GR__GROUND_FILTER
+      val material = block.material
+      fix.filterData = when {
+        material.isBlocksLight && material.isSolid -> Filters.EN_GR_LI__GROUND_FILTER
+//        material.isBlocksLight -> Filters.GR_LI__GROUND_FILTER
+        material.isSolid -> Filters.EN_GR__GROUND_FILTER
+        else -> Filters.GR__GROUND_FILTER
       }
     }
   }
