@@ -4,6 +4,8 @@ import com.badlogic.gdx.ScreenAdapter
 import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.events.WorldLoadedEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.world.ClientWorld
 
@@ -15,18 +17,31 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   var hud: HUDRenderer = HUDRenderer()
     private set
 
-  override fun render(delta: Float) {
-    //noinspection ConstantConditions
-    world.input.update()
-    if (!world.worldTicker.isPaused) {
-      // only update controls when we're not paused
-      for (player in world.players) {
-        player.update()
+  private var worldFinishedLoading = false
+
+  init {
+    EventManager.registerListener { event: WorldLoadedEvent ->
+      if (event.world !== world) {
+        return@registerListener
       }
+      worldFinishedLoading = true
     }
-    world.render.render()
-    hud.render()
-    Main.inst().console.draw()
+  }
+
+  override fun render(delta: Float) {
+    if (worldFinishedLoading) {
+      //noinspection ConstantConditions
+      world.input.update()
+      if (!world.worldTicker.isPaused) {
+        // only update controls when we're not paused
+        for (player in world.players) {
+          player.update()
+        }
+      }
+      world.render.render()
+      hud.render()
+      Main.inst().console.draw()
+    }
   }
 
   override fun resize(width: Int, height: Int) {

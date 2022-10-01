@@ -38,6 +38,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Resizable;
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent;
+import no.elg.infiniteBootleg.events.WorldLoadedEvent;
 import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -112,7 +113,9 @@ public abstract class World implements Disposable, Resizable {
 
   @NotNull private final String name;
 
+  /** Spawn in world coordinates */
   private Location spawn;
+
   public final ReadWriteLock chunksLock = new ReentrantReadWriteLock();
 
   private boolean transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient();
@@ -177,13 +180,41 @@ public abstract class World implements Disposable, Resizable {
         }
       }
     }
-    if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {
-      ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
-    }
     getRender().update();
-    if (!worldTicker.isStarted()) {
-      worldTicker.start();
-    }
+
+    EventManager.INSTANCE.javaRegisterListener(
+        InitialChunksOfWorldLoadedEvent.class,
+        event -> {
+          if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {
+            ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
+          }
+          if (worldTicker.isStarted()) {
+            throw new IllegalStateException("World has already been started");
+          }
+          worldTicker.start();
+          EventManager.INSTANCE.javaDispatchEvent(
+              WorldLoadedEvent.class, new WorldLoadedEvent(this));
+        });
+
+    Main.inst()
+        .getScheduler()
+        .executeAsync(
+            () -> {
+              Location chunkSpawn = CoordUtil.worldToChunk(spawn);
+              loadChunk(chunkSpawn.x, chunkSpawn.y);
+
+              for (Location location : getRender().getChunkLocationsInView()) {
+                loadChunk(location.x, location.y);
+              }
+
+              Main.inst()
+                  .getScheduler()
+                  .executeSync(
+                      () ->
+                          EventManager.INSTANCE.javaDispatchEvent(
+                              InitialChunksOfWorldLoadedEvent.class,
+                              new InitialChunksOfWorldLoadedEvent(this)));
+            });
   }
 
   @NotNull
@@ -203,16 +234,6 @@ public abstract class World implements Disposable, Resizable {
         ChunkColumn chunkColumn = ChunkColumnImpl.Companion.fromProtobuf(this, protoCC);
         int chunkX = protoCC.getChunkX();
         chunkColumns.put(chunkX, chunkColumn);
-      }
-    }
-
-    if (Main.isSingleplayer() && protoWorld.hasPlayer()) {
-      ProtoWorld.Entity protoWorldPlayer = protoWorld.getPlayer();
-      if (ExtraKt.fromUUIDOrNull(protoWorldPlayer.getUuid()) != null) {
-        ClientMain.inst().setPlayer(new Player(this, protoWorldPlayer));
-      } else {
-        Main.logger()
-            .error("World", "Failed to load player from world. The world might be corrupt.");
       }
     }
   }
@@ -397,34 +418,35 @@ public abstract class World implements Disposable, Resizable {
       if (!load) {
         return null;
       }
-      return loadChunk(chunkLoc,false);
+      return loadChunk(chunkLoc, true);
     }
     return readChunk;
   }
 
   /**
-   * Load a chunk into memory, either from disk or generate the chunk from it's position.
-   * <p>
-   * A chunk will not be loaded if there exists a valid chunk at the chunk postition.
+   * Load a chunk into memory, either from disk or generate the chunk from its position.
    *
-   * @param chunkX The x-coordinate of the chunk to load(in Chunk coordinate-view)
-   * @param chunkY The y-coordinate of the chunk to load(in Chunk coordinate-view)
+   * <p>A chunk will not be loaded if there exists a valid chunk at the chunk position.
+   *
+   * @param chunkX The x-coordinate of the chunk to load (in Chunk coordinate-view)
+   * @param chunkY The y-coordinate of the chunk to load (in Chunk coordinate-view)
    * @return The loaded chunk
    */
   @Nullable
   public Chunk loadChunk(int chunkX, int chunkY) {
-    return loadChunk(CoordUtil.compactLoc(chunkX, chunkY),true);
+    return loadChunk(CoordUtil.compactLoc(chunkX, chunkY), true);
   }
 
   /**
-   * Load a chunk into memory, either from disk or generate the chunk from it's position
+   * Load a chunk into memory, either from disk or generate the chunk from its position
    *
    * @param chunkLoc The location of the chunk (in Chunk coordinate-view)
-   * @param checkValidity Whether to check if there is a loaded and valid chunk at the given `chunkLocation` and thus not reload the chunk
+   * @param returnIfLoaded Whether to check if there is a loaded and valid chunk at the given
+   *     `chunkLocation` and thus not reload the chunk
    * @return The loaded chunk
    */
   @Nullable
-  public Chunk loadChunk(long chunkLoc, boolean checkValidity) {
+  public Chunk loadChunk(long chunkLoc, boolean returnIfLoaded) {
     if (getWorldTicker().isPaused()) {
       Main.logger().debug("World", "Ticker paused will not load chunk");
       return null;
@@ -432,15 +454,16 @@ public abstract class World implements Disposable, Resizable {
     @Nullable Chunk old = null;
     chunksLock.writeLock().lock();
     try {
-      if(checkValidity){
+      if (returnIfLoaded) {
         old = chunks.get(chunkLoc);
-        if(old != null && old.isValid()){
+        if (old != null && old.isValid()) {
           return old;
         }
       }
       Chunk loadedChunk = chunkLoader.load(chunkLoc);
       if (loadedChunk == null) {
-        //If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of date, and the loading should be re-tried
+        // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
+        // date, and the loading should be re-tried
         old = chunks.remove(chunkLoc);
         return null;
       } else {
@@ -1010,10 +1033,20 @@ public abstract class World implements Disposable, Resizable {
    * creating a new entity instance.
    *
    * @param entity The entity to add
-   * @param loadChunk
+   * @param loadChunk Whether to load the chunk the entity will exist in
    */
   public void addEntity(@NotNull Entity entity, boolean loadChunk) {
-    Main.inst().getScheduler().executeAsync(()->{
+    Main.inst().getScheduler().executeAsync(() -> syncAddEntity(entity, loadChunk));
+  }
+
+  /**
+   * Add the given entity to entities in the world. <b>NOTE</b> this is NOT automatically done when
+   * creating a new entity instance.
+   *
+   * @param entity The entity to add
+   * @param loadChunk Whether to load the chunk the entity will exist in
+   */
+  protected void syncAddEntity(@NotNull Entity entity, boolean loadChunk) {
     if (entities.containsValue(entity)) {
       Main.logger()
           .error(
@@ -1058,7 +1091,7 @@ public abstract class World implements Disposable, Resizable {
     if (entity instanceof Player player) {
       players.put(player.getUuid(), player);
       saveServerPlayer(player);
-    }});
+    }
   }
 
   /**
