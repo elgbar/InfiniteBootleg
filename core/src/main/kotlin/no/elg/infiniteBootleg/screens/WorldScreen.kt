@@ -19,15 +19,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
 
   private var worldFinishedLoading = false
 
-  init {
-    EventManager.registerListener { event: WorldLoadedEvent ->
-      if (event.world !== world) {
-        return@registerListener
-      }
-      worldFinishedLoading = true
-    }
-  }
-
   override fun render(delta: Float) {
     if (worldFinishedLoading) {
       //noinspection ConstantConditions
@@ -50,6 +41,15 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   }
 
   override fun show() {
+    require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
+    EventManager.clear()
+
+    EventManager.registerListener { event: WorldLoadedEvent ->
+      if (event.world !== world) {
+        return@registerListener
+      }
+      worldFinishedLoading = true
+    }
     ClientMain.inst().updateStatus(world)
     if (load) {
       world.initialize()
@@ -60,14 +60,14 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   }
 
   override fun hide() {
-    if (Main.isSingleplayer()) {
-      world.save()
-    }
-    ClientMain.inst().updateStatus(null)
     dispose()
   }
 
   override fun dispose() {
+    if (Main.isSingleplayer()) {
+      world.save()
+    }
+    ClientMain.inst().updateStatus(null)
     world.disposeSafely()
   }
 }
