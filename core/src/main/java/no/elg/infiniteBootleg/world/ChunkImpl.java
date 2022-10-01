@@ -29,6 +29,7 @@ import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.events.BlockChangedEvent;
 import no.elg.infiniteBootleg.events.ChunkLoadedEvent;
 import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -256,6 +257,7 @@ public class ChunkImpl implements Chunk {
             .getScheduler()
             .executeAsync(() -> getChunkColumn().updateTopBlock(localX, getWorldY(localY)));
       }
+      EventManager.INSTANCE.javaDispatchEvent(new BlockChangedEvent(currBlock, block));
     }
     int worldX = getWorldX(localX);
     int worldY = getWorldY(localY);
