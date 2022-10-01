@@ -813,7 +813,7 @@ public class ChunkImpl implements Chunk {
     }
     chunkBody.update();
     updateBlockLights();
-    EventManager.INSTANCE.javaDispatchEvent(ChunkLoadedEvent.class, new ChunkLoadedEvent(this));
+    EventManager.INSTANCE.javaDispatchEvent(new ChunkLoadedEvent(this));
 
     // Register events
     EventManager.INSTANCE.javaRegisterListener(

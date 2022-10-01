@@ -192,8 +192,7 @@ public abstract class World implements Disposable, Resizable {
             throw new IllegalStateException("World has already been started");
           }
           worldTicker.start();
-          EventManager.INSTANCE.javaDispatchEvent(
-              WorldLoadedEvent.class, new WorldLoadedEvent(this));
+          EventManager.INSTANCE.javaDispatchEvent(new WorldLoadedEvent(this));
         });
 
     Main.inst()
@@ -212,7 +211,6 @@ public abstract class World implements Disposable, Resizable {
                   .executeSync(
                       () ->
                           EventManager.INSTANCE.javaDispatchEvent(
-                              InitialChunksOfWorldLoadedEvent.class,
                               new InitialChunksOfWorldLoadedEvent(this)));
             });
   }
