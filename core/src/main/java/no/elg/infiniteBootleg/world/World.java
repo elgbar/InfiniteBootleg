@@ -453,9 +453,9 @@ public abstract class World implements Disposable, Resizable {
     chunksLock.writeLock().lock();
     try {
       if (returnIfLoaded) {
-        old = chunks.get(chunkLoc);
-        if (old != null && old.isValid()) {
-          return old;
+        var current = chunks.get(chunkLoc);
+        if (current != null && current.isValid()) {
+          return current;
         }
       }
       Chunk loadedChunk = chunkLoader.load(chunkLoc);
