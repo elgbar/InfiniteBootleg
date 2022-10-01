@@ -196,7 +196,17 @@ class BlockLight(
         continue
       }
 
-      val skyblocks = chunk.world.getBlocksAABB(topWorldX.toFloat(), topWorldY.toFloat() + 1, 0f, offsetY.toFloat(), false, false, true, ::isCancelled) {
+      val clampedWorldY: Float
+      val clampedOffsetY: Float
+      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
+        clampedWorldY = worldY.toFloat() - World.LIGHT_SOURCE_LOOK_BLOCKS
+        clampedOffsetY = World.LIGHT_SOURCE_LOOK_BLOCKS
+      } else {
+        clampedWorldY = topWorldY.toFloat() + 1
+        clampedOffsetY = offsetY.toFloat()
+      }
+
+      val skyblocks = chunk.world.getBlocksAABB(topWorldX.toFloat(), clampedWorldY, 0f, clampedOffsetY, false, false, true, ::isCancelled) {
         it.material == Material.AIR && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
       }
       calculateLightFrom(skyblocks)
