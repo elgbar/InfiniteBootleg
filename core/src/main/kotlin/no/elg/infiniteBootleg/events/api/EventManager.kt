@@ -30,6 +30,8 @@ object EventManager {
 
   @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("dispatchEvent(event)"))
   fun <T : Event> javaDispatchEvent(eventClass: Class<T>, event: T) {
+    require(eventClass == event::class.java) { "Wrong event class" }
+//    Main.logger().debug("Events", "Dispatched event ${eventClass::class.simpleName} $event")
     val backingListeners: MutableList<WeakReference<EventListener<out Event>>>
     val correctListeners: List<WeakReference<EventListener<T>>>
     synchronized(listeners) {

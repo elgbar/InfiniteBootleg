@@ -36,7 +36,7 @@ public class WorldTicker extends Ticker implements Disposable {
   public WorldTicker(@NotNull World world, boolean tick) {
     super(
         new WorldTickee(world),
-      WORLD_TICKER_TAG_PREFIX + world.getName(),
+        WORLD_TICKER_TAG_PREFIX + world.getName(),
         tick,
         Settings.tps,
         Ticker.DEFAULT_NAG_DELAY);
@@ -85,10 +85,10 @@ public class WorldTicker extends Ticker implements Disposable {
             Main.logger().warn("Found null chunk when ticking world");
             chunkIterator.remove();
             continue;
-          } else if (!chunk.isLoaded()) {
+          } else if (chunk.isDisposed()) {
             Main.logger()
                 .warn(
-                    "Found unloaded chunk ("
+                    "Found disposed chunk ("
                         + chunk.getChunkX()
                         + ","
                         + chunk.getChunkY()

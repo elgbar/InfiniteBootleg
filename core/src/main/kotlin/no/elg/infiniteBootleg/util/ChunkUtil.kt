@@ -8,5 +8,7 @@ fun Chunk.isNeighbor(other: Chunk): Boolean = isNeighbor(other.chunkX, other.chu
 fun Chunk.isNeighbor(chunkX: Int, chunkY: Int): Boolean {
   return if (chunkX == this.chunkX && chunkY == this.chunkY) {
     false
-  } else abs(chunkX - this.chunkX) == 1 || abs(chunkY - this.chunkY) == 1
+  } else {
+    abs(chunkX - this.chunkX) == 1 || abs(chunkY - this.chunkY) == 1
+  }
 }

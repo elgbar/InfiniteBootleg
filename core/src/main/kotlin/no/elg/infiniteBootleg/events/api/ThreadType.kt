@@ -37,7 +37,7 @@ enum class ThreadType {
     fun currentThreadType(): ThreadType {
       val threadName = Thread.currentThread().name.lowercase()
       if ("main" in threadName) {
-        return RENDER;
+        return RENDER
       } else if ("pool" in threadName) {
         return ASYNC
       } else if (threadName.startsWith(BOX2D_TICKER_TAG_PREFIX, true)) {
