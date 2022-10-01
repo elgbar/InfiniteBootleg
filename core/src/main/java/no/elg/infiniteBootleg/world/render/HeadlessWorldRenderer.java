@@ -3,11 +3,13 @@ package no.elg.infiniteBootleg.world.render;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.OrderedSet;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
@@ -79,6 +81,17 @@ public class HeadlessWorldRenderer implements WorldRender {
     } finally {
       readLock.unlock();
     }
+  }
+
+  @NotNull
+  @Override
+  public OrderedSet<Location> getChunkLocationsInView() {
+    var locs = new OrderedSet<Location>(viewingChunks.size);
+    locs.orderedItems().ordered = false;
+    for (ServerClientChunksInView inView : viewingChunks.values()) {
+      locs.addAll(ChunksInView.Companion.toSet(inView));
+    }
+    return locs;
   }
 
   public void addClient(@NotNull UUID uuid, @NotNull ServerClientChunksInView civ) {

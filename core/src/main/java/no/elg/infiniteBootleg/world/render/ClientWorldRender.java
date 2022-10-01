@@ -15,11 +15,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.OrderedSet;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import org.jetbrains.annotations.NotNull;
 
@@ -71,7 +73,7 @@ public class ClientWorldRender implements WorldRender {
     chunkRenderer.render(20);
 
     draw.clear();
-    draw.ensureCapacity(chunksInView.getChunksInView());
+    draw.ensureCapacity(chunksInView.getSize());
 
     WorldBody worldBody = world.getWorldBody();
     float worldOffsetX = worldBody.getWorldOffsetX() * BLOCK_SIZE;
@@ -86,7 +88,9 @@ public class ClientWorldRender implements WorldRender {
         if (chunk == null) {
           int loadingChunkX = chunkX;
           int loadingChunkY = chunkY;
-          Main.inst().getScheduler().executeAsync(()-> world.loadChunk(loadingChunkX, loadingChunkY));
+          Main.inst()
+              .getScheduler()
+              .executeAsync(() -> world.loadChunk(loadingChunkX, loadingChunkY));
           continue;
         }
         chunk.view();
@@ -203,7 +207,7 @@ public class ClientWorldRender implements WorldRender {
 
   @Override
   public boolean isOutOfView(@NotNull Chunk chunk) {
-    return getChunksInView().isOutOfView(chunk.getChunkX(), chunk.getChunkY());
+    return chunksInView.isOutOfView(chunk.getChunkX(), chunk.getChunkY());
   }
 
   @NotNull
@@ -221,5 +225,11 @@ public class ClientWorldRender implements WorldRender {
 
   public @NotNull SpriteBatch getBatch() {
     return batch;
+  }
+
+  @NotNull
+  @Override
+  public OrderedSet<Location> getChunkLocationsInView() {
+    return ChunksInView.Companion.toSet(chunksInView);
   }
 }

@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.world.render
 
+import com.badlogic.gdx.utils.OrderedSet
 import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
 
 interface ChunksInView {
@@ -17,7 +19,7 @@ interface ChunksInView {
     get() = horizontalEnd - horizontalStart
   val verticalLength: Int
     get() = verticalEnd - verticalStart
-  val chunksInView: Int
+  val size: Int
     get() = horizontalLength * verticalLength
 
   fun isOutOfView(chunkX: Int, chunkY: Int): Boolean {
@@ -40,6 +42,17 @@ interface ChunksInView {
           apply(chunk)
         }
       }
+    }
+
+    fun ChunksInView.toSet(): OrderedSet<Location> {
+      val locs = OrderedSet<Location>(size)
+      locs.orderedItems().ordered = false
+      for (y in verticalStart until verticalEnd) {
+        for (x in horizontalStart until horizontalEnd) {
+          locs.add(Location(x, y))
+        }
+      }
+      return locs
     }
   }
 }
