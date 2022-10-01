@@ -147,7 +147,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         chunk = renderQueue.remove(0);
         aboveGround = chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY(), TOP_MOST_FLAG);
       } while ((chunk.isAllAir() && aboveGround)
-          || !chunk.isLoaded()
+          || !chunk.isNotDisposed()
           || worldRender.isOutOfView(chunk));
       curr = chunk;
     }

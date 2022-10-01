@@ -537,7 +537,7 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  public boolean isLoaded() {
+  public boolean isNotDisposed() {
     return !disposed;
   }
 
@@ -816,12 +816,13 @@ public class ChunkImpl implements Chunk {
     EventManager.INSTANCE.javaDispatchEvent(ChunkLoadedEvent.class, new ChunkLoadedEvent(this));
 
     // Register events
-    EventManager.INSTANCE.javaRegisterListener(ChunkLoadedEvent.class, (ChunkLoadedEvent event) -> {
+    EventManager.INSTANCE.javaRegisterListener(
+        ChunkLoadedEvent.class,
+        (ChunkLoadedEvent event) -> {
           if (ChunkUtilKt.isNeighbor(this, event.getChunk())) {
             updateBlockLights();
           }
-        }
-    );
+        });
   }
 
   @NotNull

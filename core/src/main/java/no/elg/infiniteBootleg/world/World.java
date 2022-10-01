@@ -825,7 +825,7 @@ public abstract class World implements Disposable, Resizable {
     } finally {
       chunksLock.readLock().unlock();
     }
-    return chunk != null && chunk.isLoaded();
+    return chunk != null && chunk.isNotDisposed();
   }
 
   /**
@@ -908,7 +908,7 @@ public abstract class World implements Disposable, Resizable {
     try {
       var loadedChunks = new Array<@NotNull Chunk>(true, chunks.size, Chunk.class);
       for (Chunk chunk : chunks.values()) {
-        if (chunk != null && chunk.isLoaded()) {
+        if (chunk != null && chunk.isNotDisposed()) {
           loadedChunks.add(chunk);
         }
       }
@@ -945,7 +945,7 @@ public abstract class World implements Disposable, Resizable {
    * @return If the unload was a success
    */
   public boolean unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
-    if (chunk != null && chunk.isLoaded() && (force || chunk.isAllowingUnloading())) {
+    if (chunk != null && chunk.isNotDisposed() && (force || chunk.isAllowingUnloading())) {
       if (chunk.getWorld() != this) {
         Main.logger().warn("Tried to unload chunk from different world");
         return false;

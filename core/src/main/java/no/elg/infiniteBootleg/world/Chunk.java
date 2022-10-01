@@ -188,13 +188,16 @@ public interface Chunk
   /**
    * @return If this chunk has not been unloaded
    */
-  boolean isLoaded();
+  boolean isNotDisposed();
 
   /**
    * @return If this chunk has been fully loaded and has not been unloaded
    */
   boolean isValid();
 
+  /**
+   * @return negated {@link #isValid()}
+   */
   boolean isInvalid();
 
   /**
