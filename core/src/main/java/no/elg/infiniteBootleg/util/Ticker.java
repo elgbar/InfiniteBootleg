@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.PauseableThread;
 import com.badlogic.gdx.utils.TimeUtils;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.api.Ticking;
+import no.elg.infiniteBootleg.events.api.ThreadType;
+import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -207,6 +209,11 @@ public class Ticker implements Runnable {
     if (started) {
       throw new IllegalStateException("Ticker thread has already been started");
     }
+    ThreadType threadType = ThreadType.Companion.currentThreadType();
+    if (threadType != ThreadType.RENDER) {
+      throw new CalledFromWrongThreadTypeException(
+          "Tickers can only be started from the render thread, it was called from " + threadType);
+    }
     started = true;
     Main.inst().getScheduler().executeAsync(tickerThread::start);
   }
@@ -242,6 +249,6 @@ public class Ticker implements Runnable {
    * @see #resume()
    */
   public boolean isPaused() {
-    return tickerThread.isPaused();
+    return started && tickerThread.isPaused();
   }
 }
