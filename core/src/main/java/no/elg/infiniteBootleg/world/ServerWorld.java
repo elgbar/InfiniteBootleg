@@ -48,8 +48,8 @@ public class ServerWorld extends World {
   }
 
   @Override
-  public void addEntity(@NotNull Entity entity) {
-    super.addEntity(entity);
+  protected void syncAddEntity(@NotNull Entity entity, boolean loadChunk) {
+    super.syncAddEntity(entity, loadChunk);
     if (entity instanceof Player player) {
       render.addClient(
           player.getUuid(),
