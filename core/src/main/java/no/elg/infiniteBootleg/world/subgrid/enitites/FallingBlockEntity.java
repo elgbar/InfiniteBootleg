@@ -101,22 +101,22 @@ public class FallingBlockEntity extends Entity {
 
       freeze(true);
       if (Main.isAuthoritative()) {
-        getWorld()
-            .getWorldBody()
-            .postBox2dRunnable(
-                () -> {
-                  var world = getWorld();
-                  int newX = getBlockX();
-                  int newY = getBlockY();
+        var world = getWorld();
+        world.postBox2dRunnable(
+            () -> {
+              int newX = getBlockX();
+              int newY = getBlockY();
 
-                  int deltaY = 0;
-                  while (!world.isAirBlock(newX, newY + deltaY)) {
-                    deltaY++;
-                  }
-                  world.removeEntity(this, Packets.DespawnEntity.DespawnReason.NATURAL);
-                  world.setBlock(newX, newY + deltaY, material, true);
-                  //              //TODO drop as an item
-                });
+              int deltaY = 0;
+              synchronized (world) {
+                while (!world.isAirBlock(newX, newY + deltaY)) {
+                  deltaY++;
+                }
+                world.removeEntity(this, Packets.DespawnEntity.DespawnReason.NATURAL);
+                world.setBlock(newX, newY + deltaY, material, true);
+              }
+              // TODO drop as an item
+            });
       }
     }
   }
