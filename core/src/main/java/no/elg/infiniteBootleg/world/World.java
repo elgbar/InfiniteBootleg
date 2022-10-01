@@ -1418,6 +1418,7 @@ public abstract class World implements Disposable, Resizable {
 
   @Override
   public void dispose() {
+    EventManager.INSTANCE.clear();
     worldTicker.dispose();
     synchronized (BOX2D_LOCK) {
       worldBody.dispose();

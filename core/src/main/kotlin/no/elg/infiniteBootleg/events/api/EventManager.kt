@@ -9,6 +9,12 @@ object EventManager {
   @GuardedBy("itself")
   private val listeners: WeakHashMap<Class<out Event>, MutableList<WeakReference<EventListener<out Event>>>> = WeakHashMap()
 
+  fun clear() {
+    synchronized(listeners) {
+      listeners.clear()
+    }
+  }
+
   inline fun <reified T : Event> registerListener(listener: EventListener<T>) {
     javaRegisterListener(T::class.java, listener)
   }
