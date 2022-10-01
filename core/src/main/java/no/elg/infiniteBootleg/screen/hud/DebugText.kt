@@ -61,7 +61,7 @@ object DebugText {
     val localX = CoordUtil.chunkOffset(mouseBlockX)
     val localY = CoordUtil.chunkOffset(mouseBlockY)
     val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)))
-    val block = chunk?.getBlock(localX, localY)
+    val block = chunk?.getRawBlock(localX, localY)
     val material = block?.material ?: Material.AIR
     val rawX = ClientMain.inst().mouseWorldX
     val rawY = ClientMain.inst().mouseWorldY
