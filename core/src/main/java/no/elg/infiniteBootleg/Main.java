@@ -93,4 +93,7 @@ public interface Main extends ApplicationListener {
    */
   @Nullable
   World getWorld();
+
+  @NotNull
+  String getRenderThreadName();
 }

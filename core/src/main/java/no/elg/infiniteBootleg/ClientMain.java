@@ -59,6 +59,8 @@ public class ClientMain extends CommonMain {
   private boolean singleplayer;
   private boolean multiplayer;
 
+  private String renderThreadName;
+
   @Nullable private volatile Player mainPlayer;
 
   @NotNull
@@ -97,6 +99,7 @@ public class ClientMain extends CommonMain {
     }
     // must load VisUI first
     super.create();
+    renderThreadName = Thread.currentThread().getName();
 
     Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -383,5 +386,9 @@ public class ClientMain extends CommonMain {
    */
   public boolean isMultiplayer() {
     return multiplayer;
+  }
+
+  public @NotNull String getRenderThreadName() {
+    return renderThreadName;
   }
 }

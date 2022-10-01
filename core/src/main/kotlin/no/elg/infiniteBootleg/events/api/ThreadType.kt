@@ -35,15 +35,15 @@ enum class ThreadType {
 
   companion object {
     fun currentThreadType(): ThreadType {
-      val threadName = Thread.currentThread().name.lowercase()
-      if ("main" in threadName) {
+      val threadName = Thread.currentThread().name
+      if (threadName == Main.inst().renderThreadName) {
         return RENDER
-      } else if ("pool" in threadName) {
-        return ASYNC
-      } else if (threadName.startsWith(BOX2D_TICKER_TAG_PREFIX, true)) {
+      } else if (threadName.startsWith(BOX2D_TICKER_TAG_PREFIX, false)) {
         return PHYSICS
-      } else if (threadName.startsWith(WORLD_TICKER_TAG_PREFIX, true)) {
+      } else if (threadName.startsWith(WORLD_TICKER_TAG_PREFIX, false)) {
         return TICKER
+      } else if ("pool" in threadName.lowercase()) {
+        return ASYNC
       }
       Main.logger().warn("Dispatched event from unknown thread: $threadName")
       return UNKNOWN

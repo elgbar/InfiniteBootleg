@@ -20,6 +20,7 @@ public class ServerMain extends CommonMain {
   @Nullable protected ServerWorld serverWorld;
 
   @Nullable public Server server;
+  private String renderThreadName;
 
   public ServerMain(boolean test, @Nullable ProgramArgs progArgs) {
     super(test, progArgs);
@@ -74,6 +75,7 @@ public class ServerMain extends CommonMain {
   @Override
   public void create() {
     super.create();
+    renderThreadName = Thread.currentThread().getName();
 
     server = new Server();
     final Thread thread =
@@ -109,5 +111,10 @@ public class ServerMain extends CommonMain {
     if (serverWorld != null) {
       serverWorld.dispose();
     }
+  }
+
+  @Override
+  public @NotNull String getRenderThreadName() {
+    return renderThreadName;
   }
 }
