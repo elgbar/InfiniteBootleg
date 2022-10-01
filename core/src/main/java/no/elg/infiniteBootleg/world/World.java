@@ -330,10 +330,10 @@ public abstract class World implements Disposable, Resizable {
   }
 
   @Nullable
-  public Chunk getChunkFromWorld(int worldX, int worldY) {
+  public Chunk getChunkFromWorld(int worldX, int worldY, boolean load) {
     int chunkX = CoordUtil.worldToChunk(worldX);
     int chunkY = CoordUtil.worldToChunk(worldY);
-    return getChunk(chunkX, chunkY, true);
+    return getChunk(chunkX, chunkY, load);
   }
 
   public void updateChunk(@NotNull Chunk chunk) {
@@ -767,10 +767,9 @@ public abstract class World implements Disposable, Resizable {
   }
 
   @Nullable
-  public BlockLight getBlockLight(int worldX, int worldY) {
-    var chunk = getChunkFromWorld(worldX, worldY);
+  public BlockLight getBlockLight(int worldX, int worldY, boolean loadChunk) {
+    var chunk = getChunkFromWorld(worldX, worldY, loadChunk);
     if (chunk == null) {
-      Main.logger().debug("World", "Failed to find chunk " + worldX + ", " + worldY);
       return null;
     }
     return chunk.getBlockLight(CoordUtil.chunkOffset(worldX), CoordUtil.chunkOffset(worldY));

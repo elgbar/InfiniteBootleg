@@ -40,17 +40,17 @@ public class WorldTest extends TestGraphic {
   public void getCorrectChunkFromWorldCoords() {
     Chunk originChunk = world.getChunk(loc);
     for (int x = 0; x < CHUNK_SIZE; x++) {
-      Chunk chunk = world.getChunkFromWorld(x, 0);
+      Chunk chunk = world.getChunkFromWorld(x, 0, true);
       assertEquals(originChunk, chunk);
     }
-    assertEquals(world.getChunk(-1, 0), world.getChunkFromWorld(-2, 0));
-    assertEquals(world.getChunk(-2, 0), world.getChunkFromWorld(-CHUNK_SIZE - 1, 0));
-    assertEquals(world.getChunk(-1, 0), world.getChunkFromWorld(-1, 0));
-    assertEquals(world.getChunk(0, -1), world.getChunkFromWorld(0, -CHUNK_SIZE + 1));
-    assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_SIZE, 0));
-    assertEquals(world.getChunk(0, 0), world.getChunkFromWorld(CHUNK_SIZE - 1, 0));
-    assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_SIZE + 1, 0));
-    assertEquals(world.getChunk(2, 0), world.getChunkFromWorld(CHUNK_SIZE * 2, 0));
+    assertEquals(world.getChunk(-1, 0), world.getChunkFromWorld(-2, 0, true));
+    assertEquals(world.getChunk(-2, 0), world.getChunkFromWorld(-CHUNK_SIZE - 1, 0, true));
+    assertEquals(world.getChunk(-1, 0), world.getChunkFromWorld(-1, 0, true));
+    assertEquals(world.getChunk(0, -1), world.getChunkFromWorld(0, -CHUNK_SIZE + 1, true));
+    assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_SIZE, 0, true));
+    assertEquals(world.getChunk(0, 0), world.getChunkFromWorld(CHUNK_SIZE - 1, 0, true));
+    assertEquals(world.getChunk(1, 0), world.getChunkFromWorld(CHUNK_SIZE + 1, 0, true));
+    assertEquals(world.getChunk(2, 0), world.getChunkFromWorld(CHUNK_SIZE * 2, 0, true));
   }
 
   @Test

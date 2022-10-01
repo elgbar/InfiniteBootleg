@@ -32,7 +32,7 @@ public class BlockImplTest extends TestGraphic {
   @Test
   public void getCorrectChunk() {
     Block block = world.getRawBlock(-1, -1);
-    assertEquals(world.getChunkFromWorld(-1, -1), block.getChunk());
+    assertEquals(world.getChunkFromWorld(-1, -1, true), block.getChunk());
     assertEquals(world.getChunk(-1, -1), block.getChunk());
   }
 

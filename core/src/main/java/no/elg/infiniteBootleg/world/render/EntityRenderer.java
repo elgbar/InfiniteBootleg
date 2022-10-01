@@ -45,7 +45,7 @@ public record EntityRenderer(@NotNull ClientWorldRender worldRender) implements 
           lightY = CoordUtil.worldToScreen(topX + 1, worldOffsetY);
           batch.setColor(Color.WHITE);
         } else {
-          var blockLight = world.getBlockLight(blockX, blockY);
+          var blockLight = world.getBlockLight(blockX, blockY, false);
           if (blockLight != null) {
             if (blockLight.isSkylight()) {
               batch.setColor(Color.WHITE);
