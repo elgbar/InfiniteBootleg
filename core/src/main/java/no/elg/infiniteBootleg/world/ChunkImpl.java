@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.events.BlockChangedEvent;
 import no.elg.infiniteBootleg.events.ChunkLoadedEvent;
+import no.elg.infiniteBootleg.events.api.EventListener;
 import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
@@ -100,6 +101,13 @@ public class ChunkImpl implements Chunk {
   private FrameBuffer fbo;
 
   private final Object fboLock = new Object();
+
+  private EventListener<ChunkLoadedEvent> chunkLoadedEventEventListener =
+      (ChunkLoadedEvent event) -> {
+        if (ChunkUtilKt.isNeighbor(this, event.getChunk())) {
+          updateBlockLights();
+        }
+      };
 
   /**
    * Create a new empty chunk
@@ -819,12 +827,7 @@ public class ChunkImpl implements Chunk {
     chunkBody.update();
     // Register events
     EventManager.INSTANCE.javaRegisterListener(
-        ChunkLoadedEvent.class,
-        (ChunkLoadedEvent event) -> {
-          if (ChunkUtilKt.isNeighbor(this, event.getChunk())) {
-            updateBlockLights();
-          }
-        });
+        ChunkLoadedEvent.class, chunkLoadedEventEventListener);
     updateBlockLights();
   }
 
