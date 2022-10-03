@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.events.api.EventEvent;
+import no.elg.infiniteBootleg.events.api.EventManager;
+import no.elg.infiniteBootleg.events.api.EventsTracker;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
@@ -685,5 +688,24 @@ public class Commands extends CommandExecutor {
                                 + ") in view? "
                                 + !world.getRender().isOutOfView(c))
                     .collect(Collectors.joining("\n")));
+  }
+
+  @ConsoleDoc(description = "Toggle whether to track events")
+  public void trackEvents() {
+    boolean haveEventTracker = EventManager.INSTANCE.getEventTracker() != null;
+    EventManager.INSTANCE.setEventTracker(haveEventTracker ? null : new EventsTracker(true));
+    logger.success("Events are now " + (haveEventTracker ? "not " : "") + "tracked");
+  }
+
+  @ConsoleDoc(description = "Toggle whether to track events")
+  public void printTrackedEvents() {
+    EventsTracker eventTracker = EventManager.INSTANCE.getEventTracker();
+    if (eventTracker == null) {
+      logger.error("There is no active event tracker");
+      return;
+    }
+    for (EventEvent recordedEvent : eventTracker.getRecordedEvents()) {
+      logger.log(eventTracker.toString());
+    }
   }
 }

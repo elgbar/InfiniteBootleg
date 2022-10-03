@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.events.api
 
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
 import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.WeakHashMap
@@ -16,7 +17,7 @@ object EventManager {
   private val listeners: WeakHashMap<Class<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
   private val oneShotStrongRefs: MutableMap<EventListener<out Event>, EventListener<out Event>> = ConcurrentHashMap()
 
-  var eventTracker: EventsTracker? = null
+  var eventTracker: EventsTracker? = if (Settings.debug) EventsTracker(true) else null
 
   /**
    * React to events [dispatchEvent]-ed by someone else.
@@ -67,6 +68,7 @@ object EventManager {
     }
     synchronized(eventListeners) {
       eventListeners.add(listener)
+      eventTracker?.onListenerRegistered(eventClass, listener)
     }
     return listener
   }
@@ -113,7 +115,9 @@ object EventManager {
     }
 
     synchronized(backingListeners) {
+      eventTracker?.onEventDispatched(event)
       for (listener in correctListeners) {
+        eventTracker?.onEventListenedTo(event, listener)
         listener.handle(event)
       }
     }
@@ -126,6 +130,7 @@ object EventManager {
       eventListeners = listeners[eventClass] ?: return
     }
     synchronized(eventListeners) {
+      eventTracker?.onListenerUnregistered(eventClass, listener)
       eventListeners.remove(listener)
     }
   }
