@@ -183,7 +183,7 @@ public abstract class World implements Disposable, Resizable {
     }
     getRender().update();
 
-    EventManager.INSTANCE.javaRegisterListener(
+    EventManager.INSTANCE.javaOneShotListener(
         InitialChunksOfWorldLoadedEvent.class,
         event -> {
           if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {

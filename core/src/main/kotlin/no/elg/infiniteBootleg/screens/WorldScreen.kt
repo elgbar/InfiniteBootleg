@@ -44,12 +44,12 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
     require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
     EventManager.clear()
 
-    EventManager.registerListener { event: WorldLoadedEvent ->
-      if (event.world !== world) {
-        return@registerListener
+    EventManager.oneShotListener { event: WorldLoadedEvent ->
+      if (event.world === world) {
+        worldFinishedLoading = true
       }
-      worldFinishedLoading = true
     }
+
     ClientMain.inst().updateStatus(world)
     if (load) {
       world.initialize()
