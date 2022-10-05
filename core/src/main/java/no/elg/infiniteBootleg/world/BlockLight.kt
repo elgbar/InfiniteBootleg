@@ -198,7 +198,7 @@ class BlockLight(
 
       val clampedWorldY: Float
       val clampedOffsetY: Float
-      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
+      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS * 2) {
         clampedWorldY = worldY.toFloat() - World.LIGHT_SOURCE_LOOK_BLOCKS
         clampedOffsetY = World.LIGHT_SOURCE_LOOK_BLOCKS
       } else {
