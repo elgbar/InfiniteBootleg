@@ -34,44 +34,45 @@ class KeyboardControls(worldRender: ClientWorldRender, entity: LivingEntity) : A
   private val tmpVec2 = Vector2()
 
   private fun breakBlocks(blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
-    if (breakBrushSize <= 1) {
-      world.remove(blockX, blockY, true)
-    } else {
-      val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
-      blocksWithin.removeAll { it.material == Material.AIR }
-      if (blocksWithin.isEmpty) {
-        if (world.isAirBlock(blockX, blockY)) {
-          return true
-        }
+    Main.inst().scheduler.executeAsync {
+      if (breakBrushSize <= 1) {
         world.remove(blockX, blockY, true)
       } else {
-        world.removeBlocks(blocksWithin, true)
+        val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
+        blocksWithin.removeAll { it.material == Material.AIR }
+        if (blocksWithin.isEmpty) {
+          if (world.isAirBlock(blockX, blockY)) {
+            return@executeAsync
+          }
+          world.remove(blockX, blockY, true)
+        } else {
+          world.removeBlocks(blocksWithin, true)
+        }
       }
     }
     return true
   }
 
   private fun placeBlocks(blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
-    var update = false
     if (!world.getEntities(worldX, worldY).isEmpty) {
       // cannot place on an entity
       return false
     }
-
-    if (placeBrushSize <= 1) {
-      update = selected.create(world, blockX, blockY, true)
-    } else {
-      val blocksWithin = world.getBlocksWithin(worldX, worldY, placeBrushSize)
-      if (blocksWithin.isEmpty) {
-        update = selected.create(world, blockX, blockY, true)
+    Main.inst().scheduler.executeAsync {
+      if (placeBrushSize <= 1) {
+        selected.create(world, blockX, blockY)
       } else {
-        for (block in blocksWithin) {
-          update = update or selected.create(world, block.worldX, block.worldY, true)
+        val blocksWithin = world.getBlocksWithin(worldX, worldY, placeBrushSize)
+        if (blocksWithin.isEmpty) {
+          selected.create(world, blockX, blockY)
+        } else {
+          for (block in blocksWithin) {
+            selected.create(world, block.worldX, block.worldY)
+          }
         }
       }
     }
-
-    return update
+    return true
   }
 
   private fun teleport() {
