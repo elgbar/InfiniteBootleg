@@ -61,7 +61,7 @@ object EventManager {
    * This is to automatically un-register listeners which no longer can react to events.
    */
   @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("registerListener(event)"))
-  fun <T : Event> javaRegisterListener(eventClass: Class<T>, listener: EventListener<T>): EventListener<T> {
+  fun <T : Event> javaRegisterListener(eventClass: Class<out T>, listener: EventListener<T>): EventListener<T> {
     val eventListeners: MutableSet<EventListener<out Event>>
     synchronized(listeners) {
       eventListeners = listeners.getOrPut(eventClass) { Collections.newSetFromMap(WeakHashMap()) }

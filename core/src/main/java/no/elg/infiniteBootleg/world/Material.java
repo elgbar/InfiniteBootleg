@@ -162,13 +162,10 @@ public enum Material {
   }
 
   public boolean create(@NotNull World world, int worldX, int worldY) {
-    return create(world, worldX, worldY, false);
-  }
-
-  public boolean create(@NotNull World world, int worldX, int worldY, boolean prioritize) {
     Material currentMaterial = world.getMaterial(worldX, worldY);
     if (currentMaterial != this && currentMaterial == AIR) {
       if (isBlock()) {
+
         Block block = world.setBlock(worldX, worldY, this, true, true);
         if (block instanceof TickingBlock tickingBlock) {
           tickingBlock.delayedShouldTick(1L);

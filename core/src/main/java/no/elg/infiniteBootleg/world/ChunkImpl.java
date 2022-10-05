@@ -30,9 +30,9 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.events.BlockChangedEvent;
-import no.elg.infiniteBootleg.events.ChunkLoadedEvent;
 import no.elg.infiniteBootleg.events.api.EventListener;
 import no.elg.infiniteBootleg.events.api.EventManager;
+import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.ChunkUtilKt;
@@ -102,10 +102,33 @@ public class ChunkImpl implements Chunk {
 
   private final Object fboLock = new Object();
 
-  private EventListener<ChunkLoadedEvent> chunkLoadedEventEventListener =
-      (ChunkLoadedEvent event) -> {
+  private final EventListener<ChunkLightUpdatedEvent> updateChunkLightEventListener =
+      (ChunkLightUpdatedEvent event) -> {
         if (ChunkUtilKt.isNeighbor(this, event.getChunk())) {
-          updateBlockLights();
+          Direction dir = ChunkUtilKt.directionTo(event.getChunk(), this);
+
+          int localX = (int) (event.getLocalX() + dir.dx * LIGHT_SOURCE_LOOK_BLOCKS);
+          int localY = (int) (event.getLocalY() + dir.dy * LIGHT_SOURCE_LOOK_BLOCKS);
+
+          boolean xCheck =
+              switch (dir.dx) {
+                case -1 -> localX < 0;
+                case 0 -> true;
+                case 1 -> localX > CHUNK_SIZE;
+                default -> false;
+              };
+
+          boolean yCheck =
+              switch (dir.dy) {
+                case -1 -> localY < 0;
+                case 0 -> true;
+                case 1 -> localY > CHUNK_SIZE;
+                default -> false;
+              };
+
+          if (xCheck && yCheck) {
+            updateBlockLights(CoordUtil.chunkOffset(localX), CoordUtil.chunkOffset(localY), false);
+          }
         }
       };
 
@@ -246,7 +269,7 @@ public class ChunkImpl implements Chunk {
       }
       if ((block != null && block.getMaterial().isLuminescent())
           || (currBlock != null && currBlock.getMaterial().isLuminescent())) {
-        updateBlockLights(localX, localY);
+        updateBlockLights(localX, localY, true);
       }
 
       modified = true;
@@ -393,28 +416,11 @@ public class ChunkImpl implements Chunk {
     }
   }
 
-  public void updateBlockLights(int localX, int localY) {
-    updateBlockLights();
-    // Update all neighboring chunks if any light from the local point given would hit the chunk
-    for (int deltaChunkX = -1; deltaChunkX <= 1; deltaChunkX++) {
-      for (int deltaChunkY = -1; deltaChunkY <= 1; deltaChunkY++) {
-        if (localX - LIGHT_SOURCE_LOOK_BLOCKS < 0
-            || localX + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE
-            || localY - LIGHT_SOURCE_LOOK_BLOCKS < 0
-            || localY + LIGHT_SOURCE_LOOK_BLOCKS > CHUNK_SIZE) {
-          var chunk =
-              getWorld()
-                  .getLoadedChunk(CoordUtil.compactLoc(chunkX + deltaChunkX, chunkY + deltaChunkY));
-          if (chunk != null) {
-            chunk.updateBlockLights();
-          }
-        }
-      }
-    }
-  }
-
-  public void updateBlockLights() {
+  public void updateBlockLights(int localX, int localY, boolean dispatchEvent) {
     if (Settings.renderLight) {
+      if (dispatchEvent) {
+        EventManager.INSTANCE.javaDispatchEvent(new ChunkLightUpdatedEvent(this, localX, localY));
+      }
       synchronized (blockLights) {
         // If we reached this point before the light is done recalculating then we must start again
         cancelCurrentBlockLightUpdate();
@@ -827,7 +833,7 @@ public class ChunkImpl implements Chunk {
     chunkBody.update();
     // Register events
     EventManager.INSTANCE.javaRegisterListener(
-        ChunkLoadedEvent.class, chunkLoadedEventEventListener);
+        ChunkLightUpdatedEvent.class, updateChunkLightEventListener);
     updateBlockLights();
   }
 

@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.api.Ticking;
+import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
@@ -140,18 +141,13 @@ public interface Chunk
    */
   void updateIfDirty();
 
-  /**
-   * Update the light of this chunk and potentially neighboring chunks. A neighboring chunk will be
-   * updated if the given local chunk point is within the {@link World#LIGHT_SOURCE_LOOK_BLOCKS}
-   * radius
-   *
-   * @param localX The local x coordinate a light originated from
-   * @param localY The local y coordinate a light originated from
-   */
-  void updateBlockLights(int localX, int localY);
-
   /** Update the light of the chunk */
-  void updateBlockLights();
+  default void updateBlockLights() {
+    updateBlockLights(
+        ChunkLightUpdatedEvent.CHUNK_CENTER, ChunkLightUpdatedEvent.CHUNK_CENTER, true);
+  }
+
+  void updateBlockLights(int localX, int localY, boolean dispatchEvent);
 
   /** Mark this chunk as viewed during the current tick */
   void view();

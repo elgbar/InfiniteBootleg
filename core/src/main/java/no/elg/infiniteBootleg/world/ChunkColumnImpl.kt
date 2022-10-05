@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world
 
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.isNotAir
@@ -103,17 +104,17 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     val worldX = CoordUtil.chunkToWorld(chunkX, localX)
     for (chunkY in min..max) {
       val newWorldY = CoordUtil.chunkToWorld(chunkY)
-      getLoadedChunk(newWorldY)?.updateBlockLights()
+      getLoadedChunk(newWorldY)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
 
       // Update chunks to the sides, if the light reaches that far
       val leftChunkX = CoordUtil.worldToChunk((worldX - World.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
       if (leftChunkX != chunkX) {
-        getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights()
+        getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
       }
 
       val rightChunkX = CoordUtil.worldToChunk((worldX + World.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
       if (rightChunkX != chunkX) {
-        getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights()
+        getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
       }
     }
   }
