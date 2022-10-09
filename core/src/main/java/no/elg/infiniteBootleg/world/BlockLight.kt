@@ -79,16 +79,13 @@ class BlockLight(
   }
 
   fun recalculateLighting(updateId: Int) {
+    fun isCancelled() = isCancelled(updateId)
+
     //    System.out.println("Recalculating light for " + getMaterial() + " block " + getWorldX() +
     // "," + getWorldY());
     if (!Settings.renderLight) {
       Main.logger().debug("BL $strPos") { "Not rendering light" }
       return
-    }
-
-    fun isCancelled(): Boolean {
-      val diff = updateId != chunkImpl.currentUpdateId.get()
-      return updateId != NEVER_CANCEL_UPDATE_ID && diff
     }
 
     val chunkColumn = chunk.chunkColumn
@@ -156,61 +153,12 @@ class BlockLight(
       return
     }
     // find light sources around this block
-    val blocksAABB = chunk
-      .world
-      .getBlocksAABB(
-        worldX + 0.5f,
-        worldY + 0.5f,
-        World.LIGHT_SOURCE_LOOK_BLOCKS,
-        World.LIGHT_SOURCE_LOOK_BLOCKS,
-        true,
-        false,
-        false,
-        ::isCancelled
-      ) {
-        val mat = it.material
-        mat.isLuminescent || (mat.isTransparent && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG))
-      }
-    calculateLightFrom(blocksAABB)
 
-    // Since we're not creating air blocks above, we will instead just load
-    for (offsetWorldX in -floor(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
-      val topWorldX: Int = worldX + offsetWorldX
-      val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
-
-      val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG)
-      val offsetYR = topWorldY - topWorldYR
-
-      val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG)
-      val offsetYL = topWorldY - topWorldYL
-      val offsetY = max(abs(offsetYL), abs(offsetYR))
-
-      if (offsetY <= MIN_Y_OFFSET) {
-        // Too little offset to bother with columns of skylight
-        // add one to get the air block above the top-block
-        val block = chunk.world.getBlock(topWorldX, 1 + topWorldY, false) ?: continue
-        calculateLightFrom(block)
-        if (isCancelled()) {
-          return
-        }
-        continue
-      }
-
-      val clampedWorldY: Float
-      val clampedOffsetY: Float
-      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
-        clampedWorldY = worldY.toFloat() - World.LIGHT_SOURCE_LOOK_BLOCKS
-        clampedOffsetY = World.LIGHT_SOURCE_LOOK_BLOCKS
-      } else {
-        clampedWorldY = topWorldY.toFloat() + 1
-        clampedOffsetY = offsetY.toFloat()
-      }
-
-      val skyblocks = chunk.world.getBlocksAABB(topWorldX.toFloat(), clampedWorldY, 0f, clampedOffsetY, false, false, true, ::isCancelled) {
-        it.material == Material.AIR && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
-      }
-      calculateLightFrom(skyblocks)
+    calculateLightFrom(findLuminescentBlocks(worldX, worldY, ::isCancelled))
+    if (isCancelled()) {
+      return
     }
+    calculateLightFrom(findSkylightBlocks(worldX, worldY, ::isCancelled))
 
     if (isCancelled()) {
       return
@@ -230,6 +178,77 @@ class BlockLight(
     } else {
       lightMap = NO_LIGHTS_LIGHT_MAP
       averageBrightness = 0f
+    }
+  }
+
+  private fun isCancelled(updateId: Int): Boolean {
+    val diff = updateId != chunkImpl.currentUpdateId.get()
+    return updateId != NEVER_CANCEL_UPDATE_ID && diff
+  }
+
+  fun findLuminescentBlocks(worldX: Int, worldY: Int, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+    return chunk
+      .world
+      .getBlocksAABB(
+        worldX + 0.5f,
+        worldY + 0.5f,
+        World.LIGHT_SOURCE_LOOK_BLOCKS,
+        World.LIGHT_SOURCE_LOOK_BLOCKS,
+        true,
+        false,
+        false,
+        cancelled
+      ) {
+        val mat = it.material
+        mat.isLuminescent || (mat.isTransparent && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG))
+      }
+  }
+
+  fun findSkylightBlocks(worldX: Int, worldY: Int, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+    val skyblocks = GdxArray<Block>()
+    if (cancelled != null && cancelled()) {
+      return skyblocks
+    }
+    // Since we're not creating air blocks above, we will instead just load
+    for (offsetWorldX in -floor(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
+      val topWorldX: Int = worldX + offsetWorldX
+      val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
+
+      val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG)
+      val offsetYR = topWorldY - topWorldYR
+
+      val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG)
+      val offsetYL = topWorldY - topWorldYL
+      val offsetY = max(abs(offsetYL), abs(offsetYR))
+
+      if (offsetY <= MIN_Y_OFFSET) {
+        // Too little offset to bother with columns of skylight
+        // add one to get the air block above the top-block
+        val block = chunk.world.getBlock(topWorldX, 1 + topWorldY, false) ?: continue
+        skyblocks.add(block)
+        if (cancelled != null && cancelled()) {
+          return skyblocks
+        }
+        continue
+      }
+
+      val clampedWorldY: Float
+      val clampedOffsetY: Float
+      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
+        clampedWorldY = worldY.toFloat() - World.LIGHT_SOURCE_LOOK_BLOCKS
+        clampedOffsetY = World.LIGHT_SOURCE_LOOK_BLOCKS
+      } else {
+        clampedWorldY = topWorldY.toFloat() + 1
+        clampedOffsetY = offsetY.toFloat()
+      }
+      skyblocks.addAll(findSkylightBlockColumn(topWorldX.toFloat(), clampedWorldY, clampedOffsetY, cancelled))
+    }
+    return skyblocks
+  }
+
+  fun findSkylightBlockColumn(worldX: Float, worldY: Float, columnHeight: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+    return chunk.world.getBlocksAABB(worldX, worldY, 0f, columnHeight, false, false, true, cancelled) {
+      it.material == Material.AIR && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
     }
   }
 
