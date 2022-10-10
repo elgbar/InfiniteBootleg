@@ -246,9 +246,9 @@ class BlockLight(
     return skyblocks
   }
 
-  fun findSkylightBlockColumn(worldX: Float, worldY: Float, columnHeight: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, columnHeight: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
     return chunk.world.getBlocksAABB(worldX, worldY, 0f, columnHeight, false, false, true, cancelled) {
-      it.material == Material.AIR && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
+      (!it.material.isBlocksLight && !it.material.isLuminescent) && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
     }
   }
 
