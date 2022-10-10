@@ -197,10 +197,7 @@ class BlockLight(
         false,
         false,
         cancelled
-      ) {
-        val mat = it.material
-        mat.isLuminescent || (mat.isTransparent && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG))
-      }
+      ) { it.material.isLuminescent }
   }
 
   fun findSkylightBlocks(worldX: Int, worldY: Int, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
