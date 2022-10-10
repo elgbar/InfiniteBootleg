@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -215,14 +214,15 @@ class BlockLight(
       val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
 
       val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG)
-      val offsetYR = topWorldY - topWorldYR
+      val offsetYR = topWorldYR - topWorldY
 
       val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG)
-      val offsetYL = topWorldY - topWorldYL
-      val offsetY = max(abs(offsetYL), abs(offsetYR))
+      val offsetYL = topWorldYL - topWorldY
+
+      val offsetY = max(offsetYL, offsetYR)
 
       if (offsetY <= MIN_Y_OFFSET) {
-        // Too little offset to bother with columns of skylight
+        // Too little offset to bother with columns of skylight (or the block is above left and right)
         // add one to get the air block above the top-block
         val block = chunk.world.getBlock(topWorldX, 1 + topWorldY, false) ?: continue
         skyblocks.add(block)
