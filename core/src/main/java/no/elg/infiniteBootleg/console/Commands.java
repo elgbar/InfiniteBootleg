@@ -238,7 +238,7 @@ public class Commands extends CommandExecutor {
     if (Settings.debugBlockLight) {
       logger.log(
           LogLevel.DEFAULT,
-          "A red box is rendered over the luminecent blocks and a yellow box represents the skylight each block source their brightness from");
+          "A red box is rendered over the luminescent blocks and a yellow box represents the skylight each block source their brightness from");
     }
   }
 
