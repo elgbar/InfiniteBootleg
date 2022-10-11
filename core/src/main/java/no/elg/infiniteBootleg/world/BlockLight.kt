@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world
 
+import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
@@ -9,6 +10,7 @@ import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
+import kotlin.math.min
 
 class BlockLight(
   val chunk: Chunk,
@@ -222,9 +224,8 @@ class BlockLight(
         // Too little offset to bother with columns of skylight (or the block is above left and right)
         // add one to get the air block above the top-block
         val block = chunk.world.getBlock(topWorldX, 1 + topWorldY, false) ?: continue
-        skyblocks.add(block)
-        if (cancelled != null && cancelled()) {
-          return skyblocks
+        if(skylightblockFilter(worldX.toFloat(), worldY.toFloat(),block)) {
+          skyblocks.add(block)
         }
         continue
       }
@@ -243,9 +244,16 @@ class BlockLight(
     return skyblocks
   }
 
-  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, columnHeight: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
-    return chunk.world.getBlocksAABB(worldX, worldY, 0f, columnHeight, false, false, true, cancelled) {
-      (!it.material.isBlocksLight && !it.material.isLuminescent) && it.chunk.chunkColumn.isBlockAboveTopBlock(it.localX, it.worldY, BLOCKS_LIGHT_FLAG)
+  private fun skylightblockFilter(worldX: Float, worldY: Float, block: Block): Boolean{
+   return (!block.material.isBlocksLight && !block.material.isLuminescent) && block.chunk.chunkColumn.isBlockAboveTopBlock(block.localX, block.worldY, BLOCKS_LIGHT_FLAG) && Vector2.dst2(worldX,worldY, block.worldX.toFloat(),block.worldY.toFloat()) <= World.LIGHT_SOURCE_LOOK_BLOCKS*World.LIGHT_SOURCE_LOOK_BLOCKS
+  }
+
+  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+    val clampedWorldY = min(worldYA, worldYB)
+    val columnHeight = max(worldYA, worldYB) - min(worldYA, worldYB)
+    return chunk.world.getBlocksAABB(topWorldX, clampedWorldY, 0f, columnHeight, false, false, true, cancelled) {
+      true
+//      skylightblockFilter(worldX,worldY,it)
     }
   }
 
