@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
+import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -41,6 +42,7 @@ public class ClientWorldRender implements WorldRender {
   @NotNull private final ChunkRenderer chunkRenderer;
   @NotNull private final Box2DDebugRenderer box2DDebugRenderer;
   @NotNull private final DebugChunkRenderer chunkDebugRenderer;
+  @NotNull private final BlockLightDebugRenderer blockLightDebugRenderer;
   private float lastZoom;
 
   public ClientWorldRender(@NotNull ClientWorld world) {
@@ -65,6 +67,7 @@ public class ClientWorldRender implements WorldRender {
 
     chunkDebugRenderer = new DebugChunkRenderer(this);
     box2DDebugRenderer = new Box2DDebugRenderer(false, false, true, true, true, true);
+    blockLightDebugRenderer = new BlockLightDebugRenderer(this);
   }
 
   @Override
@@ -133,6 +136,9 @@ public class ClientWorldRender implements WorldRender {
       synchronized (BOX2D_LOCK) {
         box2DDebugRenderer.render(worldBody.box2dWorld, m4);
       }
+    }
+    if (Settings.renderLight && Settings.debug && Settings.debugBlockLight) {
+      blockLightDebugRenderer.render();
     }
   }
 

@@ -227,6 +227,22 @@ public class Commands extends CommandExecutor {
   }
 
   @ClientsideOnly
+  @ConsoleDoc(description = "Toggles debug rendering of block lighting")
+  public void debBlkLit() {
+    Settings.debugBlockLight = !Settings.debugBlockLight;
+    Settings.debug = true;
+    logger.log(
+        LogLevel.SUCCESS,
+        "Debug rendering of block light is now "
+            + (Settings.debugBlockLight ? "enabled" : "disabled"));
+    if (Settings.debugBlockLight) {
+      logger.log(
+          LogLevel.DEFAULT,
+          "A red box is rendered over the luminescent blocks and a yellow box represents the skylight each block source their brightness from");
+    }
+  }
+
+  @ClientsideOnly
   @ConsoleDoc(description = "Toggles smoothed camera movement when following a player")
   public void lerp() {
     Settings.enableCameraFollowLerp = !Settings.enableCameraFollowLerp;
