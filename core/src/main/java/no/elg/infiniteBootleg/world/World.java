@@ -726,13 +726,16 @@ public abstract class World implements Disposable, Resizable {
   public void updateBlocksAround(int worldX, int worldY) {
 
     Array<@NotNull Block> blocksAABB =
-        getBlocksAABB(
+        getBlocksAABBFromCenter(
             worldX + HALF_BLOCK_SIZE,
             worldY + HALF_BLOCK_SIZE,
             LIGHT_SOURCE_LOOK_BLOCKS,
             LIGHT_SOURCE_LOOK_BLOCKS,
+            true,
             false,
-            false);
+            false,
+            null,
+            null);
 
     LongMap<Chunk> chunks = new LongMap<>();
     for (Block block : blocksAABB) {
@@ -1157,19 +1160,33 @@ public abstract class World implements Disposable, Resizable {
   }
 
   /**
-   * @param worldX Lower world X coordinate
-   * @param worldY Lower world Y coordinate
-   * @param offsetX Higher world X coordinate
-   * @param offsetY Higher world Y coordinate
+   * @param centerWorldX Center world X coordinate
+   * @param centerWorldY Center world Y coordinate
+   * @param width How far to go on either side of the x-axis.
+   * @param height How far to go on either side of the y-axis.
    * @param raw If non-existing blocks (i.e., air) should be created to be included
    * @param loadChunk Whether to load the chunks the blocks exist in. If false no blocks from
    *     unloaded chunks will be included
    * @return An Axis-Aligned Bounding Box of blocks
    */
   @NotNull
-  public Array<@NotNull Block> getBlocksAABB(
-      float worldX, float worldY, float offsetX, float offsetY, boolean raw, boolean loadChunk) {
-    return getBlocksAABB(worldX, worldY, offsetX, offsetY, raw, loadChunk, true, null, null);
+  public Array<@NotNull Block> getBlocksAABBFromCenter(
+      float centerWorldX,
+      float centerWorldY,
+      float width,
+      float height,
+      boolean raw,
+      boolean loadChunk,
+      boolean includeAir,
+      @Nullable Function0<Boolean> cancel,
+      @Nullable Function1<Block, Boolean> filter) {
+
+    Preconditions.checkArgument(width >= 0, "Width must be >= 0, was " + width);
+    Preconditions.checkArgument(height >= 0, "Height must be >= 0, was " + height);
+    float worldX = centerWorldX - width;
+    float worldY = centerWorldY - height;
+    return getBlocksAABB(
+        worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, cancel, filter);
   }
 
   /**
@@ -1205,15 +1222,18 @@ public abstract class World implements Disposable, Resizable {
     } else {
       effectiveRaw = raw;
     }
+    Preconditions.checkArgument(offsetX >= 0, "offsetX must be >= 0, was " + offsetX);
+    Preconditions.checkArgument(offsetY >= 0, "offsetY must be >= 0, was " + offsetY);
 
     int capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY));
     Array<Block> blocks = new Array<>(true, capacity);
-    int x = MathUtils.floor(worldX - offsetX);
+    int x = MathUtils.floor(worldX);
+    int startY = MathUtils.floor(worldY);
     float maxX = worldX + offsetX;
     float maxY = worldY + offsetY;
     LongMap<Chunk> chunks = new LongMap<>();
     for (; x <= maxX; x++) {
-      for (int y = MathUtils.floor(worldY - offsetY); y <= maxY; y++) {
+      for (int y = startY; y <= maxY; y++) {
         if (cancel != null && cancel.invoke()) {
           return blocks;
         }

@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+import no.elg.infiniteBootleg.world.World.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -123,7 +124,7 @@ class BlockLight(
               neighbor.worldX + 0.5,
               neighbor.worldY + 0.5
             ) /
-              (World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS)
+              (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS)
             )
           val old: Float = tmpLightMap[dx][dy]
           val normalizedIntensity = if (dist == 0.0) {
@@ -190,11 +191,11 @@ class BlockLight(
   fun findLuminescentBlocks(worldX: Int, worldY: Int, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
     return chunk
       .world
-      .getBlocksAABB(
+      .getBlocksAABBFromCenter(
         worldX + 0.5f,
         worldY + 0.5f,
-        World.LIGHT_SOURCE_LOOK_BLOCKS,
-        World.LIGHT_SOURCE_LOOK_BLOCKS,
+        LIGHT_SOURCE_LOOK_BLOCKS,
+        LIGHT_SOURCE_LOOK_BLOCKS,
         true,
         false,
         false,
@@ -208,14 +209,14 @@ class BlockLight(
       return skyblocks
     }
     // Since we're not creating air blocks above, we will instead just load
-    for (offsetWorldX in -floor(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
+    for (offsetWorldX in -floor(LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
       val topWorldX: Int = worldX + offsetWorldX
-      val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG)
+      val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
 
-      val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG)
+      val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG) + 1
       val offsetYR = topWorldYR - topWorldY
 
-      val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG)
+      val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG) + 1
       val offsetYL = topWorldYL - topWorldY
 
       val offsetY: Int
@@ -231,46 +232,50 @@ class BlockLight(
       if (offsetY <= MIN_Y_OFFSET) {
         // Too little offset to bother with columns of skylight (or the block is above left and right)
         // add one to get the air block above the top-block
-        val block = chunk.world.getBlock(topWorldX, 1 + topWorldY, false) ?: continue
-        if (skylightblockFilter(worldX.toFloat(), worldY.toFloat(), block)) {
+        val block = chunk.world.getBlock(topWorldX, topWorldY, false) ?: continue
+        if (skylightBlockFilter(worldX.toFloat(), worldY.toFloat(), block)) {
           skyblocks.add(block)
         }
         continue
       }
-
-//      val clampedWorldY: Float
-//      val clampedOffsetY: Float
-// //      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
-// //        clampedWorldY = max(topWorldYLR.toFloat() + 1, worldY-World.LIGHT_SOURCE_LOOK_BLOCKS)
-// //        clampedOffsetY = min(offsetY.toFloat(), topWorldYLR+World.LIGHT_SOURCE_LOOK_BLOCKS)
-// //      } else {
-//        clampedWorldY = topWorldY.toFloat() + 1
-//        clampedOffsetY = offsetY.toFloat() -1
-// //      }
-      if (worldX == 18 && worldY == 13 && offsetWorldX == 0) {
-        println("Searching for skylight blocks for x=$topWorldX (offset=$offsetWorldX) between $topWorldY and $topWorldYLR")
-      }
-      skyblocks.addAll(findSkylightBlockColumn(worldX.toFloat(), worldY.toFloat(), topWorldX.toFloat(), topWorldY.toFloat(), topWorldYLR.toFloat(), cancelled))
-    }
-    if (worldX == 18 && worldY == 13) {
-      println("---end")
+      val findSkylightBlockColumn = findSkylightBlockColumn(
+        worldX.toFloat(),
+        worldY.toFloat(),
+        topWorldX.toFloat(),
+        topWorldY.toFloat(),
+        topWorldYLR.toFloat(),
+        cancelled
+      ) ?: continue
+      skyblocks.addAll(findSkylightBlockColumn)
     }
     return skyblocks
   }
 
-  private fun skylightblockFilter(worldX: Float, worldY: Float, block: Block): Boolean {
+  /**
+   * @return If the given block is a valid skylight candidate
+   */
+  private fun skylightBlockFilter(worldX: Float, worldY: Float, block: Block): Boolean {
     return !block.material.isBlocksLight &&
       !block.material.isLuminescent &&
       block.chunk.chunkColumn.isBlockAboveTopBlock(block.localX, block.worldY, BLOCKS_LIGHT_FLAG) &&
-      Vector2.dst2(worldX, worldY, block.worldX.toFloat(), block.worldY.toFloat()) <= World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
+      Vector2.dst2(worldX, worldY, block.worldX.toFloat(), block.worldY.toFloat()) <= LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS
   }
 
-  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
-    val clampedWorldY = min(worldYA, worldYB)
-    val columnHeight = max(worldYA, worldYB) - min(worldYA, worldYB)
-    return chunk.world.getBlocksAABB(topWorldX, clampedWorldY, 0f, columnHeight, false, false, true, cancelled) {
-      true
-//      skylightblockFilter(worldX,worldY,it)
+  /**
+   * Given two y-coordinates ([worldYA] and [worldYB]) get a column of blocks between the two
+   */
+  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block>? {
+    val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS)
+    val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS)
+    val columnHeight = worldYTop - worldYBtm
+    if (columnHeight <= 0) {
+      // The bottom world y-coordinate is below (or at) the top world y-coordinate!
+      // This means the worldY coordinate is too far away from the potential skylight column
+      // thus no skylight can reach this block
+      return null
+    }
+    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, false, false, true, cancelled) {
+      skylightBlockFilter(worldX, worldY, it)
     }
   }
 
