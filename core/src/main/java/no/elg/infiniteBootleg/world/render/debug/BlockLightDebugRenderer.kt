@@ -45,7 +45,8 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   companion object {
     val skylightDebugTexture: TextureRegion by lazy {
       val pixmap = Pixmap(BlockImpl.BLOCK_SIZE, BlockImpl.BLOCK_SIZE, Pixmap.Format.RGBA4444)
-      pixmap.setColor(Color.YELLOW)
+      val yellow = Color.YELLOW
+      pixmap.setColor(Color(yellow.r, yellow.g, yellow.b, 0.5f))
       pixmap.fill()
       val texture = Texture(pixmap)
       pixmap.dispose()
@@ -54,7 +55,8 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
     val luminanceDebugTexture: TextureRegion by lazy {
       val pixmap = Pixmap(BlockImpl.BLOCK_SIZE, BlockImpl.BLOCK_SIZE, Pixmap.Format.RGBA4444)
-      pixmap.setColor(Color.FIREBRICK)
+      val fb = Color.FIREBRICK
+      pixmap.setColor(Color(fb.r, fb.g, fb.b, 0.5f))
       pixmap.fill()
       val texture = Texture(pixmap)
       pixmap.dispose()
