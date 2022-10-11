@@ -218,7 +218,15 @@ class BlockLight(
       val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG)
       val offsetYL = topWorldYL - topWorldY
 
-      val offsetY = max(offsetYL, offsetYR)
+      val offsetY: Int
+      val topWorldYLR: Int
+      if(offsetYL > offsetYR){
+        offsetY = offsetYL
+        topWorldYLR = topWorldYL
+      } else {
+        offsetY = offsetYR
+        topWorldYLR = topWorldYR
+      }
 
       if (offsetY <= MIN_Y_OFFSET) {
         // Too little offset to bother with columns of skylight (or the block is above left and right)
@@ -230,16 +238,22 @@ class BlockLight(
         continue
       }
 
-      val clampedWorldY: Float
-      val clampedOffsetY: Float
-      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
-        clampedWorldY = worldY.toFloat() - World.LIGHT_SOURCE_LOOK_BLOCKS
-        clampedOffsetY = World.LIGHT_SOURCE_LOOK_BLOCKS
-      } else {
-        clampedWorldY = topWorldY.toFloat() + 1
-        clampedOffsetY = offsetY.toFloat()
+//      val clampedWorldY: Float
+//      val clampedOffsetY: Float
+////      if (offsetY > World.LIGHT_SOURCE_LOOK_BLOCKS) {
+////        clampedWorldY = max(topWorldYLR.toFloat() + 1, worldY-World.LIGHT_SOURCE_LOOK_BLOCKS)
+////        clampedOffsetY = min(offsetY.toFloat(), topWorldYLR+World.LIGHT_SOURCE_LOOK_BLOCKS)
+////      } else {
+//        clampedWorldY = topWorldY.toFloat() + 1
+//        clampedOffsetY = offsetY.toFloat() -1
+////      }
+      if(worldX == 18 && worldY == 13 &&offsetWorldX==0) {
+        println("Searching for skylight blocks for x=$topWorldX (offset=$offsetWorldX) between $topWorldY and ${topWorldYLR}")
       }
-      skyblocks.addAll(findSkylightBlockColumn(topWorldX.toFloat(), clampedWorldY, clampedOffsetY, cancelled))
+      skyblocks.addAll(findSkylightBlockColumn(worldX.toFloat(), worldY.toFloat(), topWorldX.toFloat(), topWorldY.toFloat(), topWorldYLR.toFloat(), cancelled))
+    }
+    if(worldX == 18 && worldY == 13) {
+      println("---end")
     }
     return skyblocks
   }
