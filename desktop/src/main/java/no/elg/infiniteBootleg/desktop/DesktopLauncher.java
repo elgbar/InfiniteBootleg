@@ -6,7 +6,6 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.ServerMain;
@@ -30,7 +29,6 @@ public class DesktopLauncher {
         }
         config.useVsync(false);
         config.setTitle("Infinite Terraria");
-        config.setOpenGLEmulation(GLEmulation.GL20, 4, 6);
         config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 8);
         config.setForegroundFPS(361); // Max hz reasonably to expect
         new Lwjgl3Application(main, config);
