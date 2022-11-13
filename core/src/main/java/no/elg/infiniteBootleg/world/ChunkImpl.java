@@ -219,10 +219,10 @@ public class ChunkImpl implements Chunk {
       boolean updateTexture,
       boolean prioritize,
       boolean sendUpdatePacket) {
-    if (isInvalid()) {
+    if (isDisposed()) {
       Main.logger()
           .warn(
-              "Changed block in invalid chunk "
+              "Changed block in disposed chunk "
                   + CoordUtil.stringifyChunkToWorld(this, localX, localY)
                   + ", block: "
                   + block);
