@@ -79,7 +79,7 @@ public class BlockImpl implements Block {
   @Override
   @Nullable
   public Block getRelative(@NotNull Direction dir) {
-    return world.getRawBlock(getWorldX() + dir.dx, getWorldY() + dir.dy);
+    return world.getRawBlock(getWorldX() + dir.dx, getWorldY() + dir.dy, true);
   }
 
   @Override
@@ -102,7 +102,7 @@ public class BlockImpl implements Block {
         CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
       return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
     }
-    return world.getRawBlock(newWorldX, newWorldY);
+    return world.getRawBlock(newWorldX, newWorldY, true);
   }
 
   @Override

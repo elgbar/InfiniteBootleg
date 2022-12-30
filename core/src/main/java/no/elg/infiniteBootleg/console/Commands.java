@@ -335,7 +335,7 @@ public class Commands extends CommandExecutor {
     if (player == null) {
       return;
     }
-    for (Block block : player.touchingBlocks()) {
+    for (Block block : player.touchingBlocks(true)) {
       block.setBlock(Material.TORCH);
     }
   }

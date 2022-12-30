@@ -45,6 +45,7 @@ import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.DebugUtilsKt;
 import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
@@ -246,21 +247,26 @@ public abstract class World implements Disposable, Resizable {
       return;
     }
 
-    for (Chunk chunk : getLoadedChunks()) {
-      chunkLoader.save(chunk);
-    }
+    chunksLock.writeLock().lock();
+    try {
+      for (Chunk chunk : chunks.values()) {
+        chunkLoader.save(chunk);
+      }
 
-    for (Player player : players.values()) {
-      saveServerPlayer(player);
-    }
+      for (Player player : players.values()) {
+        saveServerPlayer(player);
+      }
 
-    var builder = toProtobuf();
+      var builder = toProtobuf();
 
-    var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
-    if (worldInfoFile.exists()) {
-      worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
+      var worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH);
+      if (worldInfoFile.exists()) {
+        worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"));
+      }
+      worldInfoFile.writeBytes(builder.toByteArray(), false);
+    } finally {
+      chunksLock.writeLock().unlock();
     }
-    worldInfoFile.writeBytes(builder.toByteArray(), false);
   }
 
   @NotNull
@@ -395,7 +401,6 @@ public abstract class World implements Disposable, Resizable {
       acquiredLock =
           chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS, TimeUnit.MILLISECONDS);
       if (acquiredLock) {
-        //noinspection FieldAccessNotGuarded We do guard it!
         readChunk = chunks.get(chunkLoc);
       }
     } catch (InterruptedException ignore) {
@@ -455,10 +460,20 @@ public abstract class World implements Disposable, Resizable {
     try {
       if (returnIfLoaded) {
         var current = chunks.get(chunkLoc);
-        if (current != null && current.isValid()) {
-          return current;
+        if (current != null) {
+          if (current.isValid()) {
+            return current;
+          }
+          if (current.isNotDisposed()) {
+            // If the current chunk is not valid, but not disposed either, so it should be loading
+            // We don't want to load a new chunk when the current one is finishing its loading
+            return null;
+          }
         }
       }
+
+      //      Main.logger().log("Loading world chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc)
+      // + "\n" + DebugUtilsKt.stacktrace());
       Chunk loadedChunk = chunkLoader.load(chunkLoc);
       if (loadedChunk == null) {
         // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
@@ -649,8 +664,8 @@ public abstract class World implements Disposable, Resizable {
   /**
    * Check if a given location in the world is {@link Material#AIR} (or internally, doesn't exists)
    * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
-   * the {@link #getRawBlock(int, int)} method might createBlock and store a new air block at the
-   * given location
+   * the {@link #getRawBlock(int, int, boolean)} method might createBlock and store a new air block
+   * at the given location
    *
    * <p><b>note</b> this does not if there are entities at this location
    *
@@ -669,8 +684,8 @@ public abstract class World implements Disposable, Resizable {
   /**
    * Check if a given location in the world is {@link Material#AIR} (or internally, does not exist)
    * this is faster than a standard {@code getBlock(worldX, worldY).getMaterial == Material.AIR} as
-   * the {@link #getRawBlock(int, int)} method might create a Block and store a new air block at the
-   * given location.
+   * the {@link #getRawBlock(int, int, boolean)} method might create a Block and store a new air
+   * block at the given location.
    *
    * <p>If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent
    * teleportation and other actions that depend on an empty space.
@@ -751,28 +766,31 @@ public abstract class World implements Disposable, Resizable {
 
   /**
    * @param compactWorldLoc The coordinates from world view in a compact form
+   * @param load Load the chunk at the coordinates
    * @return The block at the given x and y
    */
   @Nullable
-  public Block getRawBlock(long compactWorldLoc) {
-    return getRawBlock(
-        CoordUtil.decompactLocX(compactWorldLoc), CoordUtil.decompactLocY(compactWorldLoc));
+  public Block getRawBlock(long compactWorldLoc, boolean load) {
+    int worldY = CoordUtil.decompactLocY(compactWorldLoc);
+    int worldX = CoordUtil.decompactLocX(compactWorldLoc);
+    return getRawBlock(worldX, worldY, load);
   }
 
   /**
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
+   * @param load Load the chunk at the coordinates
    * @return The block at the given x and y (or null if air block)
    */
   @Nullable
-  public Block getRawBlock(int worldX, int worldY) {
+  public Block getRawBlock(int worldX, int worldY, boolean load) {
     int chunkX = CoordUtil.worldToChunk(worldX);
     int chunkY = CoordUtil.worldToChunk(worldY);
 
     int localX = worldX - chunkX * Chunk.CHUNK_SIZE;
     int localY = worldY - chunkY * Chunk.CHUNK_SIZE;
 
-    Chunk chunk = getChunk(chunkX, chunkY, true);
+    Chunk chunk = getChunk(chunkX, chunkY, load);
     if (chunk == null) {
       return null;
     }
@@ -886,9 +904,7 @@ public abstract class World implements Disposable, Resizable {
                 for (@Nullable Chunk chunk : chunks.values()) {
                   if (chunk != null && !unloadChunk(chunk, true, false)) {
                     Main.logger()
-                        .warn(
-                            "Failed to unload chunk "
-                                + CoordUtil.stringifyCompactLoc(chunk.getCompactLocation()));
+                        .warn("Failed to unload chunk " + CoordUtil.stringifyCompactLoc(chunk));
                   }
                 }
 
@@ -978,24 +994,29 @@ public abstract class World implements Disposable, Resizable {
       Chunk removedChunk;
       chunksLock.writeLock().lock();
       try {
+        Main.logger().log("UNLoading world chunk at " + CoordUtil.stringifyCompactLoc(chunk));
         if (save) {
           chunkLoader.save(chunk);
         }
+
         for (Entity entity : chunk.getEntities()) {
           removeEntity(entity, CHUNK_UNLOADED);
         }
-        long compactLocation = chunk.getCompactLocation();
-        removedChunk = chunks.remove(compactLocation);
-        //        Main.logger().warn("World", "removed chunk " +
-        // CoordUtil.stringifyCompactLoc(compactLocation) + ": unload chunk. Chunk size is now " +
-        // chunks.size);
+        removedChunk = chunks.remove(chunk.getCompactLocation());
       } finally {
         chunksLock.writeLock().unlock();
       }
 
       chunk.dispose();
       if (removedChunk != null && chunk != removedChunk) {
-        Main.logger().warn("Removed unloaded chunk was different from chunk in chunks");
+        Main.logger()
+            .warn(
+                "Removed unloaded chunk "
+                    + CoordUtil.stringifyCompactLoc(chunk)
+                    + " was different from chunk in list of loaded chunks: "
+                    + CoordUtil.stringifyCompactLoc(removedChunk)
+                    + "\n"
+                    + DebugUtilsKt.stacktrace());
         removedChunk.dispose();
       }
       return true;
@@ -1302,7 +1323,7 @@ public abstract class World implements Disposable, Resizable {
    */
   @NotNull
   public Material getMaterial(int worldX, int worldY) {
-    Block block = getRawBlock(worldX, worldY);
+    Block block = getRawBlock(worldX, worldY, true);
     if (block != null) {
       return block.getMaterial();
     }
