@@ -234,7 +234,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
   @Override
   public void resize(int width, int height) {
-    console.refresh();
+    console.refresh(false);
   }
 
   public void addToInputMultiplexer() {
