@@ -1,9 +1,11 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id "java"
   id "idea"
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.11.0"
+  id "com.diffplug.spotless" version "6.12.0"
 }
 
 tasks.named("wrapper") {
@@ -43,7 +45,7 @@ subprojects {
   apply plugin: "org.jetbrains.kotlin.jvm"
   apply plugin: "com.diffplug.spotless"
 
-  sourceCompatibility = 17
+  sourceCompatibility = 19
   targetCompatibility = sourceCompatibility
   [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = sourceCompatibility
 
@@ -52,10 +54,8 @@ subprojects {
   sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
   sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
 
-  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-      freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
-    }
+  tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
   }
 
   spotless {
@@ -108,7 +108,7 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.0.1"
     implementation "com.google.guava:guava:31.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.21.7"
+    implementation "com.google.protobuf:protobuf-java:3.21.12"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
@@ -120,13 +120,12 @@ subprojects {
     implementation "io.github.libktx:ktx-style:$ktxVersion"
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.82.Final"
+    implementation "io.netty:netty-all:4.1.86.Final"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.12.0"
-    implementation "org.jetbrains:annotations:23.0.0"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains:annotations:23.1.0"
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.13.2"
+    testImplementation "io.mockk:mockk:1.13.3"
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
