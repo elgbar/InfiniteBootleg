@@ -121,7 +121,7 @@ object DebugGraph : Resizable {
 
   override fun resize(width: Int, height: Int) {
     fboWidth = width
-    fboHeight = height / 3
+    fboHeight = (height / 3).coerceAtLeast(1)
     fpsIndex = Int.MAX_VALUE
 
     tps?.resize(fboWidth, fboHeight)
