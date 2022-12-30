@@ -87,7 +87,7 @@ public class ChunkLoader {
 
   @Nullable
   public Chunk clientLoad(@NotNull ProtoWorld.Chunk protoChunk) {
-    final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
+    ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
     ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
     return load(chunk, protoChunk);
   }

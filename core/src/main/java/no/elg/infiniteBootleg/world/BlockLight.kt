@@ -110,7 +110,6 @@ class BlockLight(
       isLitNext = true
       for (dx in 0 until LIGHT_RESOLUTION) {
         for (dy in 0 until LIGHT_RESOLUTION) {
-
           fun centerOfSubcell(subcellCoordinate: Int): Double = ((1.0 / LIGHT_RESOLUTION) + subcellCoordinate.toDouble()) / LIGHT_RESOLUTION
 
           // Calculate distance for each light cell

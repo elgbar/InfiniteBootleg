@@ -967,7 +967,7 @@ public abstract class World implements Disposable, Resizable {
    * @param chunk The chunk to unload
    * @param force If the chunk will be forced to unload
    * @param save If the chunk will be saved
-   * @return If the unload was a success
+   * @return If the unloading was successful
    */
   public boolean unloadChunk(@Nullable Chunk chunk, boolean force, boolean save) {
     if (chunk != null && chunk.isNotDisposed() && (force || chunk.isAllowingUnloading())) {

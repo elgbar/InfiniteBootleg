@@ -73,7 +73,6 @@ public class WorldTicker extends Ticker implements Disposable {
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
       ForkJoinPool pool = ForkJoinPool.commonPool();
-
       world.chunksLock.writeLock().lock();
       try {
         chunkIterator.reset();

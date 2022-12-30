@@ -219,7 +219,7 @@ public enum Material {
       return null;
     }
     world.addEntity(entity, false);
-    final ObjectSet<Location> locations = entity.touchingLocations();
+    ObjectSet<Location> locations = entity.touchingLocations();
     for (Location location : locations) {
       Chunk locChunk;
       if (chunk != null
@@ -234,8 +234,8 @@ public enum Material {
         Main.logger().error("MATERIAL", "Failed get chunk for entity block");
         continue;
       }
-      final int localX = CoordUtil.chunkOffset(location.x);
-      final int localY = CoordUtil.chunkOffset(location.y);
+      int localX = CoordUtil.chunkOffset(location.x);
+      int localY = CoordUtil.chunkOffset(location.y);
       var block = new EntityBlock(world, locChunk, localX, localY, this, entity);
       locChunk.setBlock(localX, localY, block, false);
     }
