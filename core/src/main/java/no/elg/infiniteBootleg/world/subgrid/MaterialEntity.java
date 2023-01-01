@@ -18,9 +18,9 @@ public abstract class MaterialEntity extends Entity implements Removable {
     Preconditions.checkArgument(protoEntity.getType() == ProtoWorld.Entity.EntityType.BLOCK);
 
     Preconditions.checkArgument(protoEntity.hasMaterial());
-    final ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
+    ProtoWorld.Entity.Material entityBlock = protoEntity.getMaterial();
 
-    final Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
+    Material material = Material.fromOrdinal(entityBlock.getMaterialOrdinal());
     Preconditions.checkArgument(material == getMaterial(), "Different materials");
   }
 
@@ -50,9 +50,8 @@ public abstract class MaterialEntity extends Entity implements Removable {
 
   @Override
   public ProtoWorld.Entity.@NotNull Builder save() {
-    final ProtoWorld.Entity.Builder builder = super.save();
-    final ProtoWorld.Entity.Material.Builder materialBuilder =
-        ProtoWorld.Entity.Material.newBuilder();
+    ProtoWorld.Entity.Builder builder = super.save();
+    ProtoWorld.Entity.Material.Builder materialBuilder = ProtoWorld.Entity.Material.newBuilder();
 
     materialBuilder.setMaterialOrdinal(getMaterial().ordinal());
 

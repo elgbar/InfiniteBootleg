@@ -57,7 +57,10 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>The position of each entity is recorded in world coordinates and is centered in the middle of
  * the entity.
+ *
+ * @deprecated Use Ashley entities
  */
+@Deprecated()
 public abstract class Entity
     implements Ticking,
         CheckableDisposable,

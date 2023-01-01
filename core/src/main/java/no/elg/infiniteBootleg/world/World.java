@@ -10,6 +10,7 @@ import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOG
 import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.loader.WorldLoader.saveServerPlayer;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -56,6 +57,7 @@ import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.loader.WorldLoader;
+import no.elg.infiniteBootleg.world.nentity.system.MaxVelocitySystem;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
@@ -93,6 +95,8 @@ public abstract class World implements Disposable, Resizable {
   @NotNull private final ChunkLoader chunkLoader;
   @NotNull private final WorldBody worldBody;
   @NotNull private final WorldTime worldTime;
+
+  @NotNull private final Engine engine;
 
   @NotNull
   private final Map<@NotNull UUID, @NotNull Entity> entities =
@@ -138,6 +142,13 @@ public abstract class World implements Disposable, Resizable {
     worldBody = new WorldBody(this);
     worldTime = new WorldTime(this);
     spawn = new Location(0, 0);
+    engine = initializeEngine();
+  }
+
+  private static Engine initializeEngine() {
+    var engine = new Engine();
+    engine.addSystem(new MaxVelocitySystem());
+    return engine;
   }
 
   public void initialize() {
@@ -1410,6 +1421,11 @@ public abstract class World implements Disposable, Resizable {
 
   public void setSpawn(Location spawn) {
     this.spawn = spawn;
+  }
+
+  @NotNull
+  public Engine getEngine() {
+    return engine;
   }
 
   @Override

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -10,6 +11,7 @@ import no.elg.infiniteBootleg.console.ConsoleHandler;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
+import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +70,12 @@ public abstract class CommonMain extends ApplicationAdapter implements Main {
   @Override
   public @NotNull CancellableThreadScheduler getScheduler() {
     return scheduler;
+  }
+
+  @Override
+  public @Nullable Engine getEngine() {
+    World world = getWorld();
+    return (world != null) ? world.getEngine() : null;
   }
 
   @Override

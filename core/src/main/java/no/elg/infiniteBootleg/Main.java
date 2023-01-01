@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.ApplicationListener;
 import java.io.File;
 import no.elg.infiniteBootleg.console.ConsoleHandler;
@@ -83,6 +84,9 @@ public interface Main extends ApplicationListener {
 
   @NotNull
   CancellableThreadScheduler getScheduler();
+
+  @Nullable
+  Engine getEngine();
 
   boolean isNotTest();
 
