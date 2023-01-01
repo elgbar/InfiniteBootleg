@@ -10,8 +10,8 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.world.ecs.OnGroundComp;
-import no.elg.infiniteBootleg.world.ecs.PositionComp;
+import no.elg.infiniteBootleg.world.ecs.components.OnGroundComponent;
+import no.elg.infiniteBootleg.world.ecs.components.PositionComponent;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,12 +37,12 @@ public class ContactManager implements ContactListener {
   }
 
   private static void handleAshleyContact(
-      @NotNull ContactType type,
-      @NotNull Contact contact,
-      @NotNull Engine engine,
-      @NotNull com.badlogic.ashley.core.Entity entity) {
-    var onGroundComp = OnGroundComp.Companion.getMapper().get(entity);
-    var positionComp = PositionComp.Companion.getMapper().get(entity);
+    @NotNull ContactType type,
+    @NotNull Contact contact,
+    @NotNull Engine engine,
+    @NotNull com.badlogic.ashley.core.Entity entity) {
+    var onGroundComp = OnGroundComponent.Companion.getMapper().get(entity);
+    var positionComp = PositionComponent.Companion.getMapper().get(entity);
     if (onGroundComp != null) {
       if (type == ContactType.BEGIN_CONTACT) {
         // newest pos is needed to accurately check if this is on ground
@@ -88,8 +88,10 @@ public class ContactManager implements ContactListener {
   }
 
   @Override
-  public void preSolve(Contact contact, Manifold oldManifold) {}
+  public void preSolve(Contact contact, Manifold oldManifold) {
+  }
 
   @Override
-  public void postSolve(Contact contact, ContactImpulse impulse) {}
+  public void postSolve(Contact contact, ContactImpulse impulse) {
+  }
 }
