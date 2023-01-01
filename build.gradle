@@ -77,6 +77,7 @@ subprojects {
           "indent_size"             : "2",
           "continuation_indent_size": "2",
           "max_line_length"         : "180",
+          "end_of_line"             : "lf",
         ])
     }
   }

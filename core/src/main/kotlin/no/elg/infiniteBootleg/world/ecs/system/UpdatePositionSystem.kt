@@ -1,10 +1,10 @@
-package no.elg.infiniteBootleg.world.nentity.system
+package no.elg.infiniteBootleg.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import no.elg.infiniteBootleg.world.nentity.basicEntityFamily
-import no.elg.infiniteBootleg.world.nentity.box2d
-import no.elg.infiniteBootleg.world.nentity.world
+import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.box2d
+import no.elg.infiniteBootleg.world.ecs.world
 
 class UpdatePositionSystem : IteratingSystem(basicEntityFamily) {
 

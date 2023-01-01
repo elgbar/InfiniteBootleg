@@ -1,8 +1,8 @@
-package no.elg.infiniteBootleg.world.nentity.system
+package no.elg.infiniteBootleg.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import no.elg.infiniteBootleg.world.nentity.basicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
 
 object OnGroundSystem : IteratingSystem(basicEntityFamily) {
 
