@@ -236,7 +236,7 @@ public enum Material {
       }
       int localX = CoordUtil.chunkOffset(location.x);
       int localY = CoordUtil.chunkOffset(location.y);
-      Block block = new EntityBlock(world, locChunk, localX, localY, this, entity);
+      var block = new EntityBlock(world, locChunk, localX, localY, this, entity);
       locChunk.setBlock(localX, localY, block, false);
     }
     return entity;

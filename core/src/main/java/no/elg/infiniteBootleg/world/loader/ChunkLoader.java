@@ -71,7 +71,9 @@ public class ChunkLoader {
         try {
           ProtoWorld.Chunk protoChunk = ProtoWorld.Chunk.parseFrom(chunkFile.readBytes());
           var loaded = load(chunk, protoChunk);
-          if (loaded != null) {
+          if (loaded != null && loaded.isValid()) {
+
+            Main.logger().log("Loaded chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc));
             return loaded;
           }
         } catch (InvalidProtocolBufferException e) {
@@ -79,15 +81,25 @@ public class ChunkLoader {
         }
       }
       Main.logger()
-          .warn("Failed to load chunk " + chunkX + "," + chunkY + " from existing file chunk file");
+          .warn(
+              "Failed to load chunk "
+                  + CoordUtil.stringifyCompactLoc(chunkLoc)
+                  + " from existing file chunk file");
       // Failed to assemble, generate new chunk
     }
-    return generator.generate(world, chunkX, chunkY);
+    Main.logger().log("Generating chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc));
+    Chunk generated = generator.generate(world, chunkX, chunkY);
+    if (generated.isValid()) {
+      return generated;
+    }
+
+    Main.logger().warn("Failed to generate chunk " + CoordUtil.stringifyCompactLoc(chunkLoc));
+    return null;
   }
 
   @Nullable
   public Chunk clientLoad(@NotNull ProtoWorld.Chunk protoChunk) {
-    final ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
+    ProtoWorld.Vector2i chunkPosition = protoChunk.getPosition();
     ChunkImpl chunk = new ChunkImpl(world, chunkPosition.getX(), chunkPosition.getY());
     return load(chunk, protoChunk);
   }
@@ -114,6 +126,7 @@ public class ChunkLoader {
     return chunkFile != null && chunkFile.exists();
   }
 
+  //  @GuardedBy("no.elg.infiniteBootleg.world.World.chunksLock.writeLock()")
   public void save(@NotNull Chunk chunk) {
     if (Settings.loadWorldFromDisk && chunk.shouldSave() && chunk.isNotDisposed()) {
       // only save if valid and changed

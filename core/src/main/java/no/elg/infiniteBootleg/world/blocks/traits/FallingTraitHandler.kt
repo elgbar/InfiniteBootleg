@@ -27,9 +27,9 @@ class FallingTraitHandler(
     }
     val blockBelow = Location.relativeCompact(originWorldX, originWorldY, Direction.SOUTH)
     if (world.isAirBlock(blockBelow)) {
-      val block = world.getRawBlock(originWorldX, originWorldY) ?: return
+      val block = world.getRawBlock(originWorldX, originWorldY, true) ?: return
       falling = true
-      val blockAbove = world.getRawBlock(originWorldX, originWorldY + 1)
+      val blockAbove = world.getRawBlock(originWorldX, originWorldY + 1, true)
       if (blockAbove is TickingTrait) {
         blockAbove.delayedShouldTick(Settings.tps / 10)
       }

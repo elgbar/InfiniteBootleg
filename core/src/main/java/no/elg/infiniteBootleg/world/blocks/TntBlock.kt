@@ -64,7 +64,7 @@ class TntBlock(
         while (x < worldX + strength) {
           var y = MathUtils.floor(worldY - strength)
           while (y < worldY + strength) {
-            val block = world.getRawBlock(x, y)
+            val block = world.getRawBlock(x, y, true)
             val mat = block?.material ?: Material.AIR
             val hardness = mat.hardness
             if (mat != Material.AIR && hardness >= 0 && block != null) {

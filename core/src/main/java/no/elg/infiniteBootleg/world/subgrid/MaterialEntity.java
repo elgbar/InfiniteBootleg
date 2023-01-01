@@ -35,7 +35,7 @@ public abstract class MaterialEntity extends Entity implements Removable {
 
   @Override
   public void onRemove() {
-    for (Block block : touchingBlocks()) {
+    for (Block block : touchingBlocks(false)) {
       block.destroy(true);
     }
   }

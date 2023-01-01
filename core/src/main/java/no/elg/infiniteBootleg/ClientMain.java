@@ -127,7 +127,7 @@ public class ClientMain extends CommonMain {
             clientWorld.save();
             clientWorld.dispose();
           } else if (Main.isClient()) {
-            var serverClient = this.getServerClient();
+            var serverClient = getServerClient();
             if (serverClient != null && serverClient.ctx != null) {
               serverClient.ctx.writeAndFlush(
                   PacketExtraKt.serverBoundClientDisconnectPacket(serverClient, "Client shutdown"));
@@ -139,12 +139,13 @@ public class ClientMain extends CommonMain {
   }
 
   @Override
-  public void resize(int width, int height) {
-    if (Settings.client) {
-      getScreen().resize(width, height);
-      console.resize(width, height);
-      screenRenderer.resize(width, height);
-    }
+  public void resize(int rawWidth, int rawHeight) {
+    int width = Math.max(rawWidth, 1);
+    int height = Math.max(rawHeight, 1);
+    Main.logger().log("Resizing client to " + width + " x " + height);
+    getScreen().resize(width, height);
+    console.resize(width, height);
+    screenRenderer.resize(width, height);
   }
 
   @Override
@@ -156,7 +157,7 @@ public class ClientMain extends CommonMain {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
     if (screen instanceof WorldScreen worldScreen) {
-      final ClientWorld world = worldScreen.getWorld();
+      ClientWorld world = worldScreen.getWorld();
 
       screenInputVec.set(Gdx.input.getX(), Gdx.input.getY(), 0);
       world.getRender().getCamera().unproject(screenInputVec);
@@ -169,7 +170,7 @@ public class ClientMain extends CommonMain {
         previousMouseBlockX = mouseBlockX;
         previousMouseBlockY = mouseBlockY;
 
-        final WorldBody worldBody = world.getWorldBody();
+        WorldBody worldBody = world.getWorldBody();
         mouseWorldX = screenInputVec.x / BLOCK_SIZE - worldBody.getWorldOffsetX();
         mouseWorldY = screenInputVec.y / BLOCK_SIZE - worldBody.getWorldOffsetY();
         mouseWorldInput.set(mouseWorldX, mouseWorldY);
@@ -283,11 +284,11 @@ public class ClientMain extends CommonMain {
       return;
     }
     synchronized (INST_LOCK) {
-      final WorldInputHandler worldInput = world.getInput();
+      WorldInputHandler worldInput = world.getInput();
       if (mainPlayer != player) {
         // if mainPlayer and player are the same, we would dispose the ''new'' mainPlayer
 
-        Player oldPlayer = this.mainPlayer;
+        Player oldPlayer = mainPlayer;
         if (oldPlayer != null && oldPlayer.hasControls()) {
           oldPlayer.removeControls();
         }
@@ -299,7 +300,7 @@ public class ClientMain extends CommonMain {
             player.giveControls();
           }
         }
-        this.mainPlayer = player;
+        mainPlayer = player;
         if (Settings.client) {
           world.getInput().setFollowing(player);
         }

@@ -4,7 +4,7 @@ import no.elg.infiniteBootleg.Main
 
 open class AsyncEvent(vararg expectedThreadType: ThreadType) : Event {
 
-  final val dispatchedThreadType: ThreadType = ThreadType.currentThreadType()
+  val dispatchedThreadType: ThreadType = ThreadType.currentThreadType()
 
   init {
     if (expectedThreadType.isNotEmpty() && dispatchedThreadType !in expectedThreadType) {

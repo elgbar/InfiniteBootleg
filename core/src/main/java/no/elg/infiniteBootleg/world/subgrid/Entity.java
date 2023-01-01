@@ -388,8 +388,8 @@ public abstract class Entity
    * @return An unordered collection of all the blocks this entity is currently touching
    */
   @NotNull
-  public ObjectSet<@NotNull Block> touchingBlocks() {
-    return touchingBlocks(posCache.x, posCache.y);
+  public ObjectSet<@NotNull Block> touchingBlocks(boolean load) {
+    return touchingBlocks(posCache.x, posCache.y, load);
   }
 
   /**
@@ -399,11 +399,11 @@ public abstract class Entity
    *     located here
    */
   @NotNull
-  public ObjectSet<@NotNull Block> touchingBlocks(float worldX, float worldY) {
+  public ObjectSet<@NotNull Block> touchingBlocks(float worldX, float worldY, boolean load) {
     var locations = touchingLocations(worldX, worldY);
     ObjectSet<Block> blocks = new ObjectSet<>();
     for (Location location : locations) {
-      Block block = world.getRawBlock(location.x, location.y);
+      Block block = world.getRawBlock(location.x, location.y, load);
       if (block != null) {
         blocks.add(block);
       }
@@ -494,7 +494,7 @@ public abstract class Entity
       int y = MathUtils.floor(worldY - getHalfBox2dHeight());
       float maxY = worldY + getHalfBox2dHeight();
       for (; y < maxY; y++) {
-        var block = world.getRawBlock(x, y);
+        var block = world.getRawBlock(x, y, true);
         if (block == null
             || block.getMaterial() == Material.AIR
             || (block instanceof EntityBlock entityBlock && entityBlock.getEntity() == this)) {

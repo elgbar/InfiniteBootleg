@@ -213,6 +213,11 @@ public class CoordUtil {
   }
 
   @NotNull
+  public static String stringifyCompactLoc(Chunk chunk) {
+    return stringifyCompactLoc(chunk.getCompactLocation());
+  }
+
+  @NotNull
   public static String stringifyChunkToWorld(@NotNull Chunk chunk, int localX, int localY) {
     return "("
         + CoordUtil.chunkToWorld(chunk.getChunkX(), localX)

@@ -27,6 +27,9 @@ public class Ticker implements Runnable {
   /** How low, in percent (0f..1f), the real tps must reach for the user to be warned */
   public static final float TPS_LOSS_PERCENTAGE = 0.94f;
 
+  public static final long ONE_SECOND_NANO = 1_000_000_000L;
+  public static final long ONE_SECOND_MILLIS = 1_000L;
+
   /**
    * How many ticks between each rare update. Currently, each rare tick is the same as one second
    */
@@ -83,8 +86,8 @@ public class Ticker implements Runnable {
     }
     this.tps = tps;
 
-    msDelayBetweenTicks = 1000L / tps;
-    nanoDelayBetweenTicks = 1_000_000_000L / tps;
+    msDelayBetweenTicks = ONE_SECOND_MILLIS / tps;
+    nanoDelayBetweenTicks = ONE_SECOND_NANO / tps;
     secondsDelayBetweenTicks = 1f / tps;
     tickRareRate = this.tps;
     // Round down ok as realTPS is a long
@@ -126,7 +129,7 @@ public class Ticker implements Runnable {
     tickId++;
 
     // Calculate ticks per second once per second
-    if (start - tpsCalcStartTime >= 1_000_000_000) {
+    if (start - tpsCalcStartTime >= ONE_SECOND_NANO) {
       // tps is number of times we ticked.
       //  We calculate once per second, so no dividing is required
       realTPS = tpsTick;

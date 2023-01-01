@@ -218,10 +218,6 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     }
   }
 
-  private boolean isClientsideOnly(@NotNull Method method) {
-    return method.isAnnotationPresent(ClientsideOnly.class);
-  }
-
   @Override
   public synchronized void dispose() {
     if (disposed) {
@@ -234,7 +230,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
   @Override
   public void resize(int width, int height) {
-    console.refresh();
+    console.refresh(false);
   }
 
   public void addToInputMultiplexer() {
