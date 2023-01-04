@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public abstract class MaterialEntity extends Entity implements Removable {
 
   public MaterialEntity(@NotNull World world, ProtoWorld.@NotNull Entity protoEntity) {

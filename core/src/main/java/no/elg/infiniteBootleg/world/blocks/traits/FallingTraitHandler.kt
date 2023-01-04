@@ -41,7 +41,7 @@ class FallingTraitHandler(
           return@postBox2dRunnable
         }
         block.destroy(true)
-        world.addEntity(fallingBlockEntity)
+//        world.addEntity(fallingBlockEntity)
       }
     }
   }

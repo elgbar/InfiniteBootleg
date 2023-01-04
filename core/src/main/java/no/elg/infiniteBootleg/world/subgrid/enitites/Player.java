@@ -13,8 +13,6 @@ import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.input.KeyboardControls;
 import no.elg.infiniteBootleg.input.WorldInputHandler;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.server.PacketExtraKt;
-import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.InvalidSpawnAction;
@@ -22,6 +20,7 @@ import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class Player extends LivingEntity {
 
   public static final String PLAYER_REGION_NAME = "player";
@@ -164,12 +163,12 @@ public class Player extends LivingEntity {
   public void tick() {
     super.tick();
 
-    if (Main.isServerClient() && hasControls()) {
-      final ServerClient client = ClientMain.inst().getServerClient();
-      if (client != null) {
-        client.ctx.writeAndFlush(PacketExtraKt.serverBoundMoveEntityPacket(client, this));
-      }
-    }
+    //    if (Main.isServerClient() && hasControls()) {
+    //      final ServerClient client = ClientMain.inst().getServerClient();
+    //      if (client != null) {
+    //        client.ctx.writeAndFlush(PacketExtraKt.serverBoundMoveEntityPacket(client, this));
+    //      }
+    //    }
   }
 
   @Override

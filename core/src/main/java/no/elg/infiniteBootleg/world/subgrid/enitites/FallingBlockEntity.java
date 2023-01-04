@@ -13,7 +13,6 @@ import java.util.UUID;
 import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.protobuf.Packets;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Block;
@@ -29,6 +28,7 @@ import no.elg.infiniteBootleg.world.subgrid.contact.ContactType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class FallingBlockEntity extends Entity {
 
   private Material material;
@@ -112,7 +112,8 @@ public class FallingBlockEntity extends Entity {
                 while (!world.isAirBlock(newX, newY + deltaY)) {
                   deltaY++;
                 }
-                world.removeEntity(this, Packets.DespawnEntity.DespawnReason.NATURAL);
+                //              world.removeEntity(this,
+                // Packets.DespawnEntity.DespawnReason.NATURAL);
                 world.setBlock(newX, newY + deltaY, material, true);
               }
               // TODO drop as an item
@@ -163,7 +164,7 @@ public class FallingBlockEntity extends Entity {
     if (!getWorld().isChunkLoaded(chunkX, chunkY) || getVelocity().isZero()) {
       if (Main.isAuthoritative()) {
         // remove entity if it no longer falling and have not become a true block for some reason
-        Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
+        //        Main.inst().getScheduler().executeAsync(() -> getWorld().removeEntity(this));
       } else {
         freeze(true);
       }

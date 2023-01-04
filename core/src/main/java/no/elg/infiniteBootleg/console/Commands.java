@@ -33,10 +33,8 @@ import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
-import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
@@ -340,34 +338,6 @@ public class Commands extends CommandExecutor {
     }
   }
 
-  @CmdArgNames({"x", "y", "width", "height"})
-  @ConsoleDoc(
-      description =
-          "Spawn a generic static entity at the given location with the given width and height",
-      paramDescriptions = {"worldX", "worldY", "width", "height"})
-  public void ent(float worldX, float worldY, int width, int height) {
-    World world = getWorld();
-    if (world == null) {
-      return;
-    }
-
-    var entity = new GenericEntity(world, worldX, worldY, width, height);
-    if (entity.isDisposed()) {
-      logger.error(
-          "GEN ENT",
-          "Failed to create an entity at (% 7.2f,% 7.2f) with width %d and height %d",
-          worldX,
-          worldY,
-          width,
-          height);
-    } else {
-      world.addEntity(entity);
-      logger.logf(
-          "Created an entity at (% 7.2f,% 7.2f) with width %d and height %d",
-          worldX, worldY, width, height);
-    }
-  }
-
   @ConsoleDoc(description = "Kill all non-player entities")
   public void killall() {
     World world = getWorld();
@@ -375,13 +345,13 @@ public class Commands extends CommandExecutor {
       return;
     }
     int entities = 0;
-    for (Entity entity : world.getEntities()) {
-      if (entity instanceof Player) {
-        continue;
-      }
-      entities++;
-      world.removeEntity(entity);
-    }
+    //    for (Entity entity : world.getEntities()) {
+    //      if (entity instanceof Player) {
+    //        continue;
+    //      }
+    //      entities++;
+    //      world.removeEntity(entity);
+    //    }
     logger.log(LogLevel.SUCCESS, "Killed " + entities + " entities");
   }
 
@@ -567,7 +537,7 @@ public class Commands extends CommandExecutor {
           for (Body body : bodies) {
             final Object userData = body.getUserData();
             if (userData instanceof Entity entity) {
-              if (world.containsEntity(entity.getUuid())) {
+              if (world.containsEntity(entity.getUuid().toString())) {
                 continue;
               }
               invalid++;
@@ -592,7 +562,7 @@ public class Commands extends CommandExecutor {
     if (world == null) {
       return;
     }
-    world.createNewPlayer(UUID.randomUUID());
+    world.createNewPlayer(UUID.randomUUID().toString());
   }
 
   @ConsoleDoc(description = "Save the world server side")
@@ -648,47 +618,48 @@ public class Commands extends CommandExecutor {
       return;
     }
     Main.logger().log("Loaded chunks: " + world.getLoadedChunks().size);
-    for (Player player : world.getPlayers()) {
-      var worldRenderer = world.getRender();
-      if (worldRenderer instanceof ClientWorldRender clientWr) {
-        var view = clientWr.getChunksInView();
-        Main.logger()
-            .log(
-                "Player "
-                    + player.getName()
-                    + " from "
-                    + view.getHorizontalStart()
-                    + ", "
-                    + view.getVerticalStart()
-                    + " to "
-                    + view.getHorizontalEnd()
-                    + ","
-                    + view.getVerticalEnd());
-      } else if (worldRenderer instanceof HeadlessWorldRenderer headlessWr) {
-        var view = headlessWr.getClient(player.getUuid());
-        if (view == null) {
-          Main.logger()
-              .error("HeadlessWorldRenderer", "No world renderer for player " + player.hudDebug());
-          continue;
-        }
-        Main.logger()
-            .log(
-                "Player "
-                    + player.getName()
-                    + " view center: ("
-                    + view.getCenterX()
-                    + ","
-                    + view.getCenterY()
-                    + ") from "
-                    + view.getHorizontalStart()
-                    + ", "
-                    + view.getVerticalStart()
-                    + " to "
-                    + view.getHorizontalEnd()
-                    + ","
-                    + view.getVerticalEnd());
-      }
-    }
+    //    for (Player player : world.getPlayers()) {
+    //      var worldRenderer = world.getRender();
+    //      if (worldRenderer instanceof ClientWorldRender clientWr) {
+    //        var view = clientWr.getChunksInView();
+    //        Main.logger()
+    //            .log(
+    //                "Player "
+    //                    + player.getName()
+    //                    + " from "
+    //                    + view.getHorizontalStart()
+    //                    + ", "
+    //                    + view.getVerticalStart()
+    //                    + " to "
+    //                    + view.getHorizontalEnd()
+    //                    + ","
+    //                    + view.getVerticalEnd());
+    //      } else if (worldRenderer instanceof HeadlessWorldRenderer headlessWr) {
+    //        var view = headlessWr.getClient(player.getUuid());
+    //        if (view == null) {
+    //          Main.logger()
+    //              .error("HeadlessWorldRenderer", "No world renderer for player " +
+    // player.hudDebug());
+    //          continue;
+    //        }
+    //        Main.logger()
+    //            .log(
+    //                "Player "
+    //                    + player.getName()
+    //                    + " view center: ("
+    //                    + view.getCenterX()
+    //                    + ","
+    //                    + view.getCenterY()
+    //                    + ") from "
+    //                    + view.getHorizontalStart()
+    //                    + ", "
+    //                    + view.getVerticalStart()
+    //                    + " to "
+    //                    + view.getHorizontalEnd()
+    //                    + ","
+    //                    + view.getVerticalEnd());
+    //      }
+    //    }
 
     Main.logger()
         .log(

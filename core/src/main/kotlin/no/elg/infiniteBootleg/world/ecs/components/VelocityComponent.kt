@@ -1,14 +1,17 @@
 package no.elg.infiniteBootleg.world.ecs.components
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
+import ktx.ashley.optionalPropertyFor
+import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.input.KeyboardControls
 
 data class VelocityComponent(
-  val dx: Double,
-  val dy: Double,
-  val maxDx: Double = KeyboardControls.MAX_X_VEL.toDouble(),
-  val maxDy: Double = KeyboardControls.MAX_X_VEL.toDouble()
+  var dx: Float,
+  var dy: Float,
+  var maxDx: Float = KeyboardControls.MAX_X_VEL,
+  var maxDy: Float = KeyboardControls.MAX_X_VEL
 ) : Component {
 
   init {
@@ -16,5 +19,8 @@ data class VelocityComponent(
     require(maxDy > 0) { "Max dy velocity must be strictly positive" }
   }
 
-  companion object : Mapper<VelocityComponent>()
+  companion object : Mapper<VelocityComponent>() {
+    var Entity.velocity by propertyFor(mapper)
+    var Entity.velocityOrNull by optionalPropertyFor(mapper)
+  }
 }

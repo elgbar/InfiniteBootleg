@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import com.badlogic.ashley.core.Entity
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.ClientMain
@@ -42,13 +43,10 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
-import no.elg.infiniteBootleg.util.toVector2f
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
-import no.elg.infiniteBootleg.world.subgrid.Entity
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import java.time.Instant
 import java.util.UUID
 
@@ -174,17 +172,17 @@ fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Pack
 fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   return serverBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
-      .setUuid(entity.uuid.toString()) //
-      .setPosition(entity.position.toVector2f()) //
-      .setVelocity(entity.velocity.toVector2f()) //
-      .setLookAngleDeg(entity.lookDeg)
+//      .setUuid(entity.uuid.toString()) //
+//      .setPosition(entity.position.toVector2f()) //
+//      .setVelocity(entity.velocity.toVector2f()) //
+//      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
 
-fun ServerClient.serverBoundEntityRequest(uuid: UUID): Packet {
+fun ServerClient.serverBoundEntityRequest(uuid: String): Packet {
   return serverBoundPacket(SB_ENTITY_REQUEST).setEntityRequest(
     EntityRequest.newBuilder()
-      .setUuid(uuid.toString())
+      .setUuid(uuid)
   ).build()
 }
 
@@ -213,25 +211,25 @@ fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packet {
 fun clientBoundMoveEntity(entity: Entity): Packet {
   return clientBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
-      .setUuid(entity.uuid.toString()) //
-      .setPosition(entity.position.toVector2f()) //
-      .setVelocity(entity.velocity.toVector2f()) //
-      .setLookAngleDeg(entity.lookDeg)
+//      .setUuid(entity.uuid.toString()) //
+//      .setPosition(entity.position.toVector2f()) //
+//      .setVelocity(entity.velocity.toVector2f()) //
+//      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
 
 fun clientBoundSpawnEntity(entity: Entity): Packet {
   return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
-      .setEntity(entity.save())
-      .setUuid(entity.uuid.toString())
+//      .setEntity(entity.save())
+//      .setUuid(entity.uuid.toString())
   ).build()
 }
 
-fun clientBoundDespawnEntity(uuid: UUID, reason: DespawnReason): Packet {
+fun clientBoundDespawnEntity(uuid: String, reason: DespawnReason): Packet {
   return clientBoundPacket(CB_DESPAWN_ENTITY).setDespawnEntity(
     DespawnEntity.newBuilder()
-      .setUuid(uuid.toString())
+      .setUuid(uuid)
       .setDespawnReason(reason)
   ).build()
 }
@@ -240,11 +238,11 @@ fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packet
   return clientBoundPacket(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
 }
 
-fun clientBoundStartGamePacket(player: Player): Packet {
+fun clientBoundStartGamePacket(player: com.badlogic.ashley.core.Entity): Packet {
   return clientBoundPacket(CB_START_GAME).setStartGame(
     StartGame.newBuilder()
-      .setWorld(player.world.toProtobuf())
-      .setControlling(player.save())
+//      .setWorld(player.world.toProtobuf())
+//      .setControlling(player.save())
   ).build()
 }
 

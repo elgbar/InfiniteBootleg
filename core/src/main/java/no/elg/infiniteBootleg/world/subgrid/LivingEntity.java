@@ -7,10 +7,12 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.api.Updatable;
 import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
+import no.elg.infiniteBootleg.world.Constants;
 import no.elg.infiniteBootleg.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public abstract class LivingEntity extends Entity implements Updatable {
 
   public static final int DEFAULT_MAX_HEALTH = 10;
@@ -137,7 +139,7 @@ public abstract class LivingEntity extends Entity implements Updatable {
     if (!isDisposed() && Main.isServerClient()) {
       postWorldBodyRunnable(
           (body -> {
-            body.setGravityScale(DEFAULT_GRAVITY_SCALE);
+            body.setGravityScale(Constants.DEFAULT_GRAVITY_SCALE);
             return null;
           }));
     }

@@ -1,51 +1,80 @@
 package no.elg.infiniteBootleg.world.ecs
 
-import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
 import ktx.ashley.allOf
-import ktx.ashley.optionalPropertyFor
-import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import ktx.ashley.onEntityAdded
+import ktx.ashley.onEntityRemoved
+import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
-import no.elg.infiniteBootleg.world.ecs.components.OnGroundComponent
-import no.elg.infiniteBootleg.world.ecs.components.PositionComponent
-import no.elg.infiniteBootleg.world.ecs.components.SizedComponent
+import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
-import no.elg.infiniteBootleg.world.ecs.components.WorldComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
+import kotlin.reflect.KClass
 
 /**
  * The list of components all entities are expected to have
  */
 val BASIC_ENTITY_ARRAY = arrayOf(
   WorldComponent::class,
-  SizedComponent::class,
+  IdComponent::class,
   Box2DBodyComponent::class,
-  PositionComponent::class,
+  PositionComponent::class
 )
 
 val BASIC_DYNAMIC_ENTITY_ARRAY = arrayOf(
   *BASIC_ENTITY_ARRAY,
   VelocityComponent::class,
-  TextureRegionComponent::class,
-  OnGroundComponent::class
+  GroundedComponent::class
 )
 
+val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class, TextureRegionComponent::class).get()
 
-val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY).allOf(MaterialComponent::class).get()
-val playerFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY).get()
+val playerFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY, NamedComponent::class, KillableComponent::class, TextureRegionComponent::class).get()
 
 /**
  * The basic components ALL entities should have
  */
 val basicEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY).get()
+val drawableEntitiesFamily: Family = allOf(*BASIC_ENTITY_ARRAY, TextureRegionComponent::class).get()
 val basicDynamicEntityFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY).get()
 
-var Entity.world by propertyFor(WorldComponent.mapper)
-var Entity.position by propertyFor(PositionComponent.mapper)
-var Entity.velocity by propertyFor(VelocityComponent.mapper)
-var Entity.box2d by propertyFor(Box2DBodyComponent.mapper)
-var Entity.box2dOrNull by optionalPropertyFor(Box2DBodyComponent.mapper)
-var Entity.sized by propertyFor(SizedComponent.mapper)
-var Entity.texture by propertyFor(TextureRegionComponent.mapper)
-var Entity.onGround by propertyFor(OnGroundComponent.mapper)
+fun KClass<out Component>.toFamily(): Family = allOf(this).get()
+
+// ///////////////////////////////////
+// Common system update priorities //
+// ///////////////////////////////////
+
+const val UPDATE_PRIORITY_ID_CHECK = Int.MIN_VALUE
+const val UPDATE_PRIORITY_FIRST = -2_000
+const val UPDATE_PRIORITY_EARLY = -1_000
+const val UPDATE_PRIORITY_DEFAULT = 0
+const val UPDATE_PRIORITY_LATE = 1_000
+const val UPDATE_PRIORITY_LAST = 2_000
+
+fun ensureUniquenessListener(engine: Engine) {
+  val family = IdComponent::class.toFamily()
+  engine.onEntityAdded(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
+    val duplicateEntities = engine.getEntitiesFor(family)
+    if (duplicateEntities.filter { it.id.id == entity.id.id }.size > 1) {
+      Main.logger().warn("Duplicate entity with id '${entity.id.id}' added.")
+      engine.removeEntity(entity)
+    }
+  }
+}
+
+fun disposeEntitiesOnRemoval(engine: Engine) {
+  val family = Box2DBodyComponent::class.toFamily()
+  engine.onEntityRemoved(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
+    entity.box2d.dispose()
+  }
+}

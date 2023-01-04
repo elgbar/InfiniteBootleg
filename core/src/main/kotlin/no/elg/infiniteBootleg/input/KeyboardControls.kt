@@ -8,9 +8,9 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.world.Constants.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.world.subgrid.Entity.GROUND_CHECK_OFFSET
 import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import kotlin.math.abs

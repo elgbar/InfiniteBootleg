@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.ServerWorld;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,18 +29,16 @@ import org.jetbrains.annotations.Nullable;
 public class WorldTicker extends Ticker implements Disposable {
 
   public static final String WORLD_TICKER_TAG_PREFIX = "World-";
-  @Nullable
-  public final ServerRendererTicker serverRendererTicker;
-  @NotNull
-  public final WorldBox2DTicker box2DTicker;
+  @Nullable public final ServerRendererTicker serverRendererTicker;
+  @NotNull public final WorldBox2DTicker box2DTicker;
 
   public WorldTicker(@NotNull World world, boolean tick) {
     super(
-      new WorldTickee(world),
-      WORLD_TICKER_TAG_PREFIX + world.getName(),
-      tick,
-      Settings.tps,
-      Ticker.DEFAULT_NAG_DELAY);
+        new WorldTickee(world),
+        WORLD_TICKER_TAG_PREFIX + world.getName(),
+        tick,
+        Settings.tps,
+        Ticker.DEFAULT_NAG_DELAY);
     if (world instanceof ClientWorld) {
       serverRendererTicker = null;
     } else if (world instanceof ServerWorld serverWorld) {
@@ -58,8 +55,7 @@ public class WorldTicker extends Ticker implements Disposable {
     @NotNull
     private final LongMap.Entries<@Nullable Chunk> chunkIterator;
 
-    @NotNull
-    private final World world;
+    @NotNull private final World world;
 
     private WorldTickee(@NotNull World world) {
       this.world = world;
@@ -91,19 +87,19 @@ public class WorldTicker extends Ticker implements Disposable {
             continue;
           } else if (chunk.isDisposed()) {
             Main.logger()
-              .warn(
-                "Found disposed chunk ("
-                  + chunk.getChunkX()
-                  + ","
-                  + chunk.getChunkY()
-                  + ") when ticking world");
+                .warn(
+                    "Found disposed chunk ("
+                        + chunk.getChunkX()
+                        + ","
+                        + chunk.getChunkY()
+                        + ") when ticking world");
             chunkIterator.remove();
             continue;
           }
 
           if (chunk.isAllowingUnloading()
-            && wr.isOutOfView(chunk)
-            && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
+              && wr.isOutOfView(chunk)
+              && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
             chunkIterator.remove();
             world.unloadChunk(chunk);
@@ -116,22 +112,22 @@ public class WorldTicker extends Ticker implements Disposable {
       } finally {
         world.chunksLock.writeLock().unlock();
       }
-      for (Entity entity : world.getEntities()) {
-        if (entity.isDisposed()) {
-          String message =
-            "Invalid entity in world entities ("
-              + entity.simpleName()
-              + ": "
-              + entity.hudDebug()
-              + ")";
-          Main.logger().debug("WORLD", message);
-          world.removeEntity(entity);
-          continue;
-        }
-        ForkJoinTask<?> task = pool.submit(entity::tick);
-        forks.add(task);
-        task.fork();
-      }
+      //      for (Entity entity : world.getEntities()) {
+      //        if (entity.isDisposed()) {
+      //          String message =
+      //              "Invalid entity in world entities ("
+      //                  + entity.simpleName()
+      //                  + ": "
+      //                  + entity.hudDebug()
+      //                  + ")";
+      //          Main.logger().debug("WORLD", message);
+      //          world.removeEntity(entity);
+      //          continue;
+      //        }
+      //        ForkJoinTask<?> task = pool.submit(entity::tick);
+      //        forks.add(task);
+      //        task.fork();
+      //      }
       for (ForkJoinTask<?> task : forks) {
         try {
           task.join();
@@ -152,17 +148,17 @@ public class WorldTicker extends Ticker implements Disposable {
       for (Chunk chunk : world.getLoadedChunks()) {
         chunk.tickRare();
       }
-      for (Entity entity : world.getEntities()) {
-        if (entity.isDisposed()) {
-          continue;
-        }
-        entity.tickRare();
-      }
+      //      for (Entity entity : world.getEntities()) {
+      //        if (entity.isDisposed()) {
+      //          continue;
+      //        }
+      //        entity.tickRare();
+      //      }
 
       WorldTime time = world.getWorldTime();
       time.setTime(
-        time.getTime()
-          + world.getWorldTicker().getSecondsDelayBetweenTicks() * time.getTimeScale());
+          time.getTime()
+              + world.getWorldTicker().getSecondsDelayBetweenTicks() * time.getTimeScale());
     }
   }
 
@@ -186,9 +182,7 @@ public class WorldTicker extends Ticker implements Disposable {
     }
   }
 
-  /**
-   * Stop this ticker, the tickers thread will not be called anymore
-   */
+  /** Stop this ticker, the tickers thread will not be called anymore */
   @Override
   public void stop() {
     super.stop();

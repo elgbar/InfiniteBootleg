@@ -78,7 +78,7 @@ object EventManager {
    *
    * As the listener is only meant to listen to a single event it is not a requirement to have a strong reference to the [listener].
    */
-  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("oneShotListener(event)"))
+//  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("oneShotListener(event)"))
   fun <T : Event> javaOneShotListener(eventClass: Class<T>, listener: EventListener<T>) {
     var handled = false // Prevents the listener from being called multiple times
     val removalListener = EventListener<T> {
@@ -105,7 +105,7 @@ object EventManager {
    *
    * @param event The event to notify about
    */
-  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("dispatchEvent(event)"))
+//  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("dispatchEvent(event)"))
   fun <T : Event> javaDispatchEvent(event: T) {
     val backingListeners: MutableSet<EventListener<out Event>>
     val correctListeners: List<EventListener<T>>
@@ -123,7 +123,7 @@ object EventManager {
     }
   }
 
-  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("removeListener(event)"))
+  //  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("removeListener(event)"))
   fun <T : Event> javaRemoveListener(eventClass: Class<T>, listener: EventListener<T>) {
     val eventListeners: MutableSet<EventListener<out Event>>
     synchronized(listeners) {

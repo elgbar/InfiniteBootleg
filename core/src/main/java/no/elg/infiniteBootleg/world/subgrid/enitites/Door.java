@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author Elg
  */
+@Deprecated
 public class Door extends MaterialEntity {
 
   public static final String OPEN_DOOR_REGION_NAME = "door_open";

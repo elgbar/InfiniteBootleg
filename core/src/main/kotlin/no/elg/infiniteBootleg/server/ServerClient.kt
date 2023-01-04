@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.server
 
+import com.badlogic.ashley.core.Entity
 import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ClientWorld
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 
 /**
  * A client of a server
@@ -25,15 +25,15 @@ class ServerClient(
   var started: Boolean = false
   var chunksLoaded: Boolean = false
 
-  private var backingPlayer: Player? = null
+  private var backingPlayer: Entity? = null
 
   val uuid get() = sharedInformation!!.entityUUID // FIXME
-  val player: Player?
+  val player: Entity?
     get() {
       val bp = backingPlayer
       val clientWorld = world
-      if (clientWorld != null && (bp == null || bp.isDisposed)) {
-        backingPlayer = clientWorld.getPlayer(uuid)
+      if (clientWorld != null && (bp == null)) {
+        backingPlayer = clientWorld.getEntity(uuid)
       }
       return bp
     }

@@ -142,10 +142,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
     synchronized(BOX2D_LOCK) {
       box2dWorld.step(timeStep, 1, 1)
+      world.engine.update(timeStep)
 
-      for (entity in world.entities) {
-        entity.updatePos()
-      }
       for (runnable in executedRunnablesIterator) {
         runnable.run()
       }
@@ -204,14 +202,11 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       worldOffsetX += deltaOffsetX
       worldOffsetY += deltaOffsetY
       bodies.clear()
-      bodies.ensureCapacity(world.entities.size)
+      bodies.ensureCapacity(world.engine.entities.size())
       box2dWorld.getBodies(bodies)
       bodiesIterator.reset()
       for (body in bodiesIterator) {
         applyShift(body, deltaOffsetX, deltaOffsetY)
-      }
-      for (entity in world.entities) {
-        entity.updatePos()
       }
 
       world.render.update()

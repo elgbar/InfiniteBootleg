@@ -1,17 +1,13 @@
 package no.elg.infiniteBootleg.world.render;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.OrderedSet;
-import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.ServerWorld;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class HeadlessWorldRenderer implements WorldRender {
 
   @NotNull
-  private final ObjectMap<@NotNull UUID, ServerClientChunksInView> viewingChunks =
+  private final ObjectMap<@NotNull String, ServerClientChunksInView> viewingChunks =
       new OrderedMap<>();
 
   @NotNull private final ServerWorld world;
@@ -53,19 +49,20 @@ public class HeadlessWorldRenderer implements WorldRender {
 
   @Override
   public void update() {
-    readLock.lock();
-    try {
-      for (Player player : world.getPlayers()) {
-        @Nullable var chunksInView = viewingChunks.get(player.getUuid());
-        if (chunksInView != null) {
-          Vector2 position = player.getPosition();
-          chunksInView.setCenter(
-              CoordUtil.worldToChunk(position.x), CoordUtil.worldToChunk(position.y));
-        }
-      }
-    } finally {
-      readLock.unlock();
-    }
+    //    readLock.lock();
+    //    try {
+    // ASHLEY TODO: Refactor to be a system
+    //      for (Player player : world.getPlayers()) {
+    //        @Nullable var chunksInView = viewingChunks.get(player.getUuid());
+    //        if (chunksInView != null) {
+    //          Vector2 position = player.getPosition();
+    //          chunksInView.setCenter(
+    //              CoordUtil.worldToChunk(position.x), CoordUtil.worldToChunk(position.y));
+    //        }
+    //      }
+    //    } finally {
+    //      readLock.unlock();
+    //    }
   }
 
   @Override
@@ -94,7 +91,7 @@ public class HeadlessWorldRenderer implements WorldRender {
     return locs;
   }
 
-  public void addClient(@NotNull UUID uuid, @NotNull ServerClientChunksInView civ) {
+  public void addClient(@NotNull String uuid, @NotNull ServerClientChunksInView civ) {
     writeLock.lock();
     try {
       viewingChunks.put(uuid, civ);
@@ -103,7 +100,7 @@ public class HeadlessWorldRenderer implements WorldRender {
     }
   }
 
-  public void removeClient(@NotNull UUID uuid) {
+  public void removeClient(@NotNull String uuid) {
     writeLock.lock();
     try {
       viewingChunks.remove(uuid);
@@ -113,7 +110,7 @@ public class HeadlessWorldRenderer implements WorldRender {
   }
 
   @Nullable
-  public ServerClientChunksInView getClient(@NotNull UUID uuid) {
+  public ServerClientChunksInView getClient(@NotNull String uuid) {
     readLock.lock();
     try {
       return viewingChunks.get(uuid);

@@ -23,12 +23,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
     if (worldFinishedLoading) {
       //noinspection ConstantConditions
       world.input.update()
-      if (!world.worldTicker.isPaused) {
-        // only update controls when we're not paused
-        for (player in world.players) {
-          player.update()
-        }
-      }
       world.render.render()
       hud.render()
       Main.inst().console.draw()

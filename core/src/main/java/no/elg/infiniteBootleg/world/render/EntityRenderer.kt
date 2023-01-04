@@ -9,6 +9,10 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.blocks.TntBlock.Companion.whiteTexture
+import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegion
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import kotlin.math.roundToInt
 
 class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
@@ -19,15 +23,16 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val worldBody = world.worldBody
     val worldOffsetX = worldBody.worldOffsetX
     val worldOffsetY = worldBody.worldOffsetY
-    for (entity in world.entities) {
-      val textureRegion = entity.textureRegion ?: continue
+    for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
+      val textureRegion = entity.textureRegion.texture
       val centerPos = entity.position
-      val worldX = centerPos.x - entity.halfBox2dWidth
-      val worldY = centerPos.y - entity.halfBox2dHeight
+      val box2d = entity.box2d
+      val worldX = centerPos.x - box2d.halfBox2dWidth
+      val worldY = centerPos.y - box2d.halfBox2dHeight
       var lightX = 0f
       var lightY = 0f
       if (Settings.renderLight) {
-        val blockX = (centerPos.x - entity.halfBox2dWidth / 2).roundToInt()
+        val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
         val blockY = centerPos.y.roundToInt()
         val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
         if (blockY > topX) {
@@ -52,7 +57,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
       val screenX = CoordUtil.worldToScreen(worldX, worldOffsetX)
       val screenY = CoordUtil.worldToScreen(worldY, worldOffsetY)
-      batch.draw(textureRegion, screenX, screenY, entity.width.toFloat(), entity.height.toFloat())
+      batch.draw(textureRegion, screenX, screenY, box2d.width, box2d.height)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
         batch.draw(whiteTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())

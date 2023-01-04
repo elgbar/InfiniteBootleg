@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.server
 
 import java.time.Instant
-import java.util.UUID
 import java.util.concurrent.ScheduledFuture
 
 /**
@@ -10,7 +9,7 @@ import java.util.concurrent.ScheduledFuture
  *
  * @author Elg
  */
-data class SharedInformation(val entityUUID: UUID, val secret: String) {
+data class SharedInformation(val entityUUID: String, val secret: String) {
 
   private var lastHeartbeat: Instant = Instant.now()
 

@@ -23,6 +23,7 @@ public final class Packets {
      * @return The enum numeric value on the wire for type.
      */
     int getTypeValue();
+
     /**
      * <code>.packets.Packet.Type type = 1;</code>
      *
@@ -36,6 +37,7 @@ public final class Packets {
      * @return The enum numeric value on the wire for direction.
      */
     int getDirectionValue();
+
     /**
      * <code>.packets.Packet.Direction direction = 2;</code>
      *
@@ -55,6 +57,7 @@ public final class Packets {
      * @return Whether the secret field is set.
      */
     boolean hasSecret();
+
     /**
      *
      *
@@ -67,6 +70,7 @@ public final class Packets {
      * @return The secret.
      */
     java.lang.String getSecret();
+
     /**
      *
      *
@@ -92,6 +96,7 @@ public final class Packets {
      * @return Whether the heartbeat field is set.
      */
     boolean hasHeartbeat();
+
     /**
      *
      *
@@ -104,6 +109,7 @@ public final class Packets {
      * @return The heartbeat.
      */
     no.elg.infiniteBootleg.protobuf.Packets.Heartbeat getHeartbeat();
+
     /**
      *
      *
@@ -127,6 +133,7 @@ public final class Packets {
      * @return Whether the moveEntity field is set.
      */
     boolean hasMoveEntity();
+
     /**
      *
      *
@@ -139,6 +146,7 @@ public final class Packets {
      * @return The moveEntity.
      */
     no.elg.infiniteBootleg.protobuf.Packets.MoveEntity getMoveEntity();
+
     /**
      *
      *
@@ -162,6 +170,7 @@ public final class Packets {
      * @return Whether the updateChunk field is set.
      */
     boolean hasUpdateChunk();
+
     /**
      *
      *
@@ -174,6 +183,7 @@ public final class Packets {
      * @return The updateChunk.
      */
     no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk getUpdateChunk();
+
     /**
      *
      *
@@ -191,12 +201,14 @@ public final class Packets {
      * @return Whether the spawnEntity field is set.
      */
     boolean hasSpawnEntity();
+
     /**
      * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
      *
      * @return The spawnEntity.
      */
     no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getSpawnEntity();
+
     /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder();
 
@@ -206,12 +218,14 @@ public final class Packets {
      * @return Whether the despawnEntity field is set.
      */
     boolean hasDespawnEntity();
+
     /**
      * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
      *
      * @return The despawnEntity.
      */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity getDespawnEntity();
+
     /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder getDespawnEntityOrBuilder();
 
@@ -227,6 +241,7 @@ public final class Packets {
      * @return Whether the updateBlock field is set.
      */
     boolean hasUpdateBlock();
+
     /**
      *
      *
@@ -239,6 +254,7 @@ public final class Packets {
      * @return The updateBlock.
      */
     no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getUpdateBlock();
+
     /**
      *
      *
@@ -262,6 +278,7 @@ public final class Packets {
      * @return Whether the login field is set.
      */
     boolean hasLogin();
+
     /**
      *
      *
@@ -274,6 +291,7 @@ public final class Packets {
      * @return The login.
      */
     no.elg.infiniteBootleg.protobuf.Packets.Login getLogin();
+
     /**
      *
      *
@@ -297,6 +315,7 @@ public final class Packets {
      * @return Whether the startGame field is set.
      */
     boolean hasStartGame();
+
     /**
      *
      *
@@ -309,6 +328,7 @@ public final class Packets {
      * @return The startGame.
      */
     no.elg.infiniteBootleg.protobuf.Packets.StartGame getStartGame();
+
     /**
      *
      *
@@ -332,6 +352,7 @@ public final class Packets {
      * @return Whether the serverLoginStatus field is set.
      */
     boolean hasServerLoginStatus();
+
     /**
      *
      *
@@ -344,6 +365,7 @@ public final class Packets {
      * @return The serverLoginStatus.
      */
     no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus getServerLoginStatus();
+
     /**
      *
      *
@@ -362,12 +384,14 @@ public final class Packets {
      * @return Whether the disconnect field is set.
      */
     boolean hasDisconnect();
+
     /**
      * <code>optional .packets.Disconnect disconnect = 21;</code>
      *
      * @return The disconnect.
      */
     no.elg.infiniteBootleg.protobuf.Packets.Disconnect getDisconnect();
+
     /** <code>optional .packets.Disconnect disconnect = 21;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder getDisconnectOrBuilder();
 
@@ -377,12 +401,14 @@ public final class Packets {
      * @return Whether the secretExchange field is set.
      */
     boolean hasSecretExchange();
+
     /**
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      *
      * @return The secretExchange.
      */
     no.elg.infiniteBootleg.protobuf.Packets.SecretExchange getSecretExchange();
+
     /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder getSecretExchangeOrBuilder();
 
@@ -398,6 +424,7 @@ public final class Packets {
      * @return Whether the chunkRequest field is set.
      */
     boolean hasChunkRequest();
+
     /**
      *
      *
@@ -410,6 +437,7 @@ public final class Packets {
      * @return The chunkRequest.
      */
     no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest getChunkRequest();
+
     /**
      *
      *
@@ -427,12 +455,14 @@ public final class Packets {
      * @return Whether the entityRequest field is set.
      */
     boolean hasEntityRequest();
+
     /**
      * <code>optional .packets.EntityRequest entityRequest = 24;</code>
      *
      * @return The entityRequest.
      */
     no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getEntityRequest();
+
     /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder getEntityRequestOrBuilder();
 
@@ -442,21 +472,25 @@ public final class Packets {
      * @return Whether the worldSettings field is set.
      */
     boolean hasWorldSettings();
+
     /**
      * <code>optional .packets.WorldSettings worldSettings = 25;</code>
      *
      * @return The worldSettings.
      */
     no.elg.infiniteBootleg.protobuf.Packets.WorldSettings getWorldSettings();
+
     /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder getWorldSettingsOrBuilder();
   }
+
   /** Protobuf type {@code packets.Packet} */
   public static final class Packet extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Packet)
       PacketOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use Packet.newBuilder() to construct.
     private Packet(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -800,7 +834,7 @@ public final class Packets {
      * 3. CB (Client Bound) Only sent to client
      * </pre>
      *
-     * Protobuf enum {@code packets.Packet.Type}
+     * <p>Protobuf enum {@code packets.Packet.Type}
      */
     public enum Type implements com.google.protobuf.ProtocolMessageEnum {
       /** <code>DX_HEARTBEAT = 0;</code> */
@@ -1110,6 +1144,7 @@ public final class Packets {
     private int bitField0_;
     public static final int TYPE_FIELD_NUMBER = 1;
     private int type_;
+
     /**
      * <code>.packets.Packet.Type type = 1;</code>
      *
@@ -1119,6 +1154,7 @@ public final class Packets {
     public int getTypeValue() {
       return type_;
     }
+
     /**
      * <code>.packets.Packet.Type type = 1;</code>
      *
@@ -1136,6 +1172,7 @@ public final class Packets {
 
     public static final int DIRECTION_FIELD_NUMBER = 2;
     private int direction_;
+
     /**
      * <code>.packets.Packet.Direction direction = 2;</code>
      *
@@ -1145,6 +1182,7 @@ public final class Packets {
     public int getDirectionValue() {
       return direction_;
     }
+
     /**
      * <code>.packets.Packet.Direction direction = 2;</code>
      *
@@ -1162,6 +1200,7 @@ public final class Packets {
 
     public static final int SECRET_FIELD_NUMBER = 3;
     private volatile java.lang.Object secret_;
+
     /**
      *
      *
@@ -1177,6 +1216,7 @@ public final class Packets {
     public boolean hasSecret() {
       return ((bitField0_ & 0x00000001) != 0);
     }
+
     /**
      *
      *
@@ -1200,6 +1240,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      *
      *
@@ -1226,6 +1267,7 @@ public final class Packets {
 
     public static final int HEARTBEAT_FIELD_NUMBER = 8;
     private no.elg.infiniteBootleg.protobuf.Packets.Heartbeat heartbeat_;
+
     /**
      *
      *
@@ -1241,6 +1283,7 @@ public final class Packets {
     public boolean hasHeartbeat() {
       return ((bitField0_ & 0x00000002) != 0);
     }
+
     /**
      *
      *
@@ -1258,6 +1301,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.getDefaultInstance()
           : heartbeat_;
     }
+
     /**
      *
      *
@@ -1276,6 +1320,7 @@ public final class Packets {
 
     public static final int MOVEENTITY_FIELD_NUMBER = 9;
     private no.elg.infiniteBootleg.protobuf.Packets.MoveEntity moveEntity_;
+
     /**
      *
      *
@@ -1291,6 +1336,7 @@ public final class Packets {
     public boolean hasMoveEntity() {
       return ((bitField0_ & 0x00000004) != 0);
     }
+
     /**
      *
      *
@@ -1308,6 +1354,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.getDefaultInstance()
           : moveEntity_;
     }
+
     /**
      *
      *
@@ -1326,6 +1373,7 @@ public final class Packets {
 
     public static final int UPDATECHUNK_FIELD_NUMBER = 10;
     private no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk updateChunk_;
+
     /**
      *
      *
@@ -1341,6 +1389,7 @@ public final class Packets {
     public boolean hasUpdateChunk() {
       return ((bitField0_ & 0x00000008) != 0);
     }
+
     /**
      *
      *
@@ -1358,6 +1407,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.getDefaultInstance()
           : updateChunk_;
     }
+
     /**
      *
      *
@@ -1376,6 +1426,7 @@ public final class Packets {
 
     public static final int SPAWNENTITY_FIELD_NUMBER = 11;
     private no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity spawnEntity_;
+
     /**
      * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
      *
@@ -1385,6 +1436,7 @@ public final class Packets {
     public boolean hasSpawnEntity() {
       return ((bitField0_ & 0x00000010) != 0);
     }
+
     /**
      * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
      *
@@ -1396,6 +1448,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance()
           : spawnEntity_;
     }
+
     /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder() {
@@ -1406,6 +1459,7 @@ public final class Packets {
 
     public static final int DESPAWNENTITY_FIELD_NUMBER = 12;
     private no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity despawnEntity_;
+
     /**
      * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
      *
@@ -1415,6 +1469,7 @@ public final class Packets {
     public boolean hasDespawnEntity() {
       return ((bitField0_ & 0x00000020) != 0);
     }
+
     /**
      * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
      *
@@ -1426,6 +1481,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.getDefaultInstance()
           : despawnEntity_;
     }
+
     /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder
@@ -1437,6 +1493,7 @@ public final class Packets {
 
     public static final int UPDATEBLOCK_FIELD_NUMBER = 13;
     private no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock updateBlock_;
+
     /**
      *
      *
@@ -1452,6 +1509,7 @@ public final class Packets {
     public boolean hasUpdateBlock() {
       return ((bitField0_ & 0x00000040) != 0);
     }
+
     /**
      *
      *
@@ -1469,6 +1527,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance()
           : updateBlock_;
     }
+
     /**
      *
      *
@@ -1487,6 +1546,7 @@ public final class Packets {
 
     public static final int LOGIN_FIELD_NUMBER = 17;
     private no.elg.infiniteBootleg.protobuf.Packets.Login login_;
+
     /**
      *
      *
@@ -1502,6 +1562,7 @@ public final class Packets {
     public boolean hasLogin() {
       return ((bitField0_ & 0x00000080) != 0);
     }
+
     /**
      *
      *
@@ -1519,6 +1580,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.Login.getDefaultInstance()
           : login_;
     }
+
     /**
      *
      *
@@ -1537,6 +1599,7 @@ public final class Packets {
 
     public static final int STARTGAME_FIELD_NUMBER = 18;
     private no.elg.infiniteBootleg.protobuf.Packets.StartGame startGame_;
+
     /**
      *
      *
@@ -1552,6 +1615,7 @@ public final class Packets {
     public boolean hasStartGame() {
       return ((bitField0_ & 0x00000100) != 0);
     }
+
     /**
      *
      *
@@ -1569,6 +1633,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.StartGame.getDefaultInstance()
           : startGame_;
     }
+
     /**
      *
      *
@@ -1587,6 +1652,7 @@ public final class Packets {
 
     public static final int SERVERLOGINSTATUS_FIELD_NUMBER = 20;
     private no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus serverLoginStatus_;
+
     /**
      *
      *
@@ -1602,6 +1668,7 @@ public final class Packets {
     public boolean hasServerLoginStatus() {
       return ((bitField0_ & 0x00000200) != 0);
     }
+
     /**
      *
      *
@@ -1619,6 +1686,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.getDefaultInstance()
           : serverLoginStatus_;
     }
+
     /**
      *
      *
@@ -1638,6 +1706,7 @@ public final class Packets {
 
     public static final int DISCONNECT_FIELD_NUMBER = 21;
     private no.elg.infiniteBootleg.protobuf.Packets.Disconnect disconnect_;
+
     /**
      * <code>optional .packets.Disconnect disconnect = 21;</code>
      *
@@ -1647,6 +1716,7 @@ public final class Packets {
     public boolean hasDisconnect() {
       return ((bitField0_ & 0x00000400) != 0);
     }
+
     /**
      * <code>optional .packets.Disconnect disconnect = 21;</code>
      *
@@ -1658,6 +1728,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.Disconnect.getDefaultInstance()
           : disconnect_;
     }
+
     /** <code>optional .packets.Disconnect disconnect = 21;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder getDisconnectOrBuilder() {
@@ -1668,6 +1739,7 @@ public final class Packets {
 
     public static final int SECRETEXCHANGE_FIELD_NUMBER = 22;
     private no.elg.infiniteBootleg.protobuf.Packets.SecretExchange secretExchange_;
+
     /**
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      *
@@ -1677,6 +1749,7 @@ public final class Packets {
     public boolean hasSecretExchange() {
       return ((bitField0_ & 0x00000800) != 0);
     }
+
     /**
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      *
@@ -1688,6 +1761,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.getDefaultInstance()
           : secretExchange_;
     }
+
     /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder
@@ -1699,6 +1773,7 @@ public final class Packets {
 
     public static final int CHUNKREQUEST_FIELD_NUMBER = 23;
     private no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest chunkRequest_;
+
     /**
      *
      *
@@ -1714,6 +1789,7 @@ public final class Packets {
     public boolean hasChunkRequest() {
       return ((bitField0_ & 0x00001000) != 0);
     }
+
     /**
      *
      *
@@ -1731,6 +1807,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.getDefaultInstance()
           : chunkRequest_;
     }
+
     /**
      *
      *
@@ -1750,6 +1827,7 @@ public final class Packets {
 
     public static final int ENTITYREQUEST_FIELD_NUMBER = 24;
     private no.elg.infiniteBootleg.protobuf.Packets.EntityRequest entityRequest_;
+
     /**
      * <code>optional .packets.EntityRequest entityRequest = 24;</code>
      *
@@ -1759,6 +1837,7 @@ public final class Packets {
     public boolean hasEntityRequest() {
       return ((bitField0_ & 0x00002000) != 0);
     }
+
     /**
      * <code>optional .packets.EntityRequest entityRequest = 24;</code>
      *
@@ -1770,6 +1849,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()
           : entityRequest_;
     }
+
     /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder
@@ -1781,6 +1861,7 @@ public final class Packets {
 
     public static final int WORLDSETTINGS_FIELD_NUMBER = 25;
     private no.elg.infiniteBootleg.protobuf.Packets.WorldSettings worldSettings_;
+
     /**
      * <code>optional .packets.WorldSettings worldSettings = 25;</code>
      *
@@ -1790,6 +1871,7 @@ public final class Packets {
     public boolean hasWorldSettings() {
       return ((bitField0_ & 0x00004000) != 0);
     }
+
     /**
      * <code>optional .packets.WorldSettings worldSettings = 25;</code>
      *
@@ -1801,6 +1883,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.getDefaultInstance()
           : worldSettings_;
     }
+
     /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder
@@ -2192,6 +2275,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.Packet} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -2617,6 +2701,7 @@ public final class Packets {
       private int bitField0_;
 
       private int type_ = 0;
+
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2626,6 +2711,7 @@ public final class Packets {
       public int getTypeValue() {
         return type_;
       }
+
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2638,6 +2724,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2652,6 +2739,7 @@ public final class Packets {
             ? no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
             : result;
       }
+
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2667,6 +2755,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2680,6 +2769,7 @@ public final class Packets {
       }
 
       private int direction_ = 0;
+
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2689,6 +2779,7 @@ public final class Packets {
       public int getDirectionValue() {
         return direction_;
       }
+
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2701,6 +2792,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2715,6 +2807,7 @@ public final class Packets {
             ? no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.UNRECOGNIZED
             : result;
       }
+
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2730,6 +2823,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2743,6 +2837,7 @@ public final class Packets {
       }
 
       private java.lang.Object secret_ = "";
+
       /**
        *
        *
@@ -2757,6 +2852,7 @@ public final class Packets {
       public boolean hasSecret() {
         return ((bitField0_ & 0x00000001) != 0);
       }
+
       /**
        *
        *
@@ -2779,6 +2875,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        *
        *
@@ -2801,6 +2898,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        *
        *
@@ -2822,6 +2920,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        *
        *
@@ -2839,6 +2938,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        *
        *
@@ -2868,6 +2968,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.HeartbeatOrBuilder>
           heartbeatBuilder_;
+
       /**
        *
        *
@@ -2882,6 +2983,7 @@ public final class Packets {
       public boolean hasHeartbeat() {
         return ((bitField0_ & 0x00000002) != 0);
       }
+
       /**
        *
        *
@@ -2902,6 +3004,7 @@ public final class Packets {
           return heartbeatBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -2924,6 +3027,7 @@ public final class Packets {
         bitField0_ |= 0x00000002;
         return this;
       }
+
       /**
        *
        *
@@ -2944,6 +3048,7 @@ public final class Packets {
         bitField0_ |= 0x00000002;
         return this;
       }
+
       /**
        *
        *
@@ -2978,6 +3083,7 @@ public final class Packets {
         bitField0_ |= 0x00000002;
         return this;
       }
+
       /**
        *
        *
@@ -2997,6 +3103,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
+
       /**
        *
        *
@@ -3011,6 +3118,7 @@ public final class Packets {
         onChanged();
         return getHeartbeatFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -3029,6 +3137,7 @@ public final class Packets {
               : heartbeat_;
         }
       }
+
       /**
        *
        *
@@ -3061,6 +3170,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.MoveEntityOrBuilder>
           moveEntityBuilder_;
+
       /**
        *
        *
@@ -3075,6 +3185,7 @@ public final class Packets {
       public boolean hasMoveEntity() {
         return ((bitField0_ & 0x00000004) != 0);
       }
+
       /**
        *
        *
@@ -3095,6 +3206,7 @@ public final class Packets {
           return moveEntityBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -3117,6 +3229,7 @@ public final class Packets {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /**
        *
        *
@@ -3137,6 +3250,7 @@ public final class Packets {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /**
        *
        *
@@ -3171,6 +3285,7 @@ public final class Packets {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /**
        *
        *
@@ -3190,6 +3305,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
+
       /**
        *
        *
@@ -3204,6 +3320,7 @@ public final class Packets {
         onChanged();
         return getMoveEntityFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -3222,6 +3339,7 @@ public final class Packets {
               : moveEntity_;
         }
       }
+
       /**
        *
        *
@@ -3254,6 +3372,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.UpdateChunkOrBuilder>
           updateChunkBuilder_;
+
       /**
        *
        *
@@ -3268,6 +3387,7 @@ public final class Packets {
       public boolean hasUpdateChunk() {
         return ((bitField0_ & 0x00000008) != 0);
       }
+
       /**
        *
        *
@@ -3288,6 +3408,7 @@ public final class Packets {
           return updateChunkBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -3310,6 +3431,7 @@ public final class Packets {
         bitField0_ |= 0x00000008;
         return this;
       }
+
       /**
        *
        *
@@ -3330,6 +3452,7 @@ public final class Packets {
         bitField0_ |= 0x00000008;
         return this;
       }
+
       /**
        *
        *
@@ -3364,6 +3487,7 @@ public final class Packets {
         bitField0_ |= 0x00000008;
         return this;
       }
+
       /**
        *
        *
@@ -3383,6 +3507,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
+
       /**
        *
        *
@@ -3397,6 +3522,7 @@ public final class Packets {
         onChanged();
         return getUpdateChunkFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -3416,6 +3542,7 @@ public final class Packets {
               : updateChunk_;
         }
       }
+
       /**
        *
        *
@@ -3448,6 +3575,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder>
           spawnEntityBuilder_;
+
       /**
        * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
        *
@@ -3456,6 +3584,7 @@ public final class Packets {
       public boolean hasSpawnEntity() {
         return ((bitField0_ & 0x00000010) != 0);
       }
+
       /**
        * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
        *
@@ -3470,6 +3599,7 @@ public final class Packets {
           return spawnEntityBuilder_.getMessage();
         }
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder setSpawnEntity(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity value) {
         if (spawnEntityBuilder_ == null) {
@@ -3484,6 +3614,7 @@ public final class Packets {
         bitField0_ |= 0x00000010;
         return this;
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder setSpawnEntity(
           no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder builderForValue) {
@@ -3496,6 +3627,7 @@ public final class Packets {
         bitField0_ |= 0x00000010;
         return this;
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder mergeSpawnEntity(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity value) {
         if (spawnEntityBuilder_ == null) {
@@ -3522,6 +3654,7 @@ public final class Packets {
         bitField0_ |= 0x00000010;
         return this;
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder clearSpawnEntity() {
         if (spawnEntityBuilder_ == null) {
@@ -3533,12 +3666,14 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder getSpawnEntityBuilder() {
         bitField0_ |= 0x00000010;
         onChanged();
         return getSpawnEntityFieldBuilder().getBuilder();
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder
           getSpawnEntityOrBuilder() {
@@ -3550,6 +3685,7 @@ public final class Packets {
               : spawnEntity_;
         }
       }
+
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity,
@@ -3574,6 +3710,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder>
           despawnEntityBuilder_;
+
       /**
        * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
        *
@@ -3582,6 +3719,7 @@ public final class Packets {
       public boolean hasDespawnEntity() {
         return ((bitField0_ & 0x00000020) != 0);
       }
+
       /**
        * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
        *
@@ -3596,6 +3734,7 @@ public final class Packets {
           return despawnEntityBuilder_.getMessage();
         }
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder setDespawnEntity(no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity value) {
         if (despawnEntityBuilder_ == null) {
@@ -3610,6 +3749,7 @@ public final class Packets {
         bitField0_ |= 0x00000020;
         return this;
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder setDespawnEntity(
           no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder builderForValue) {
@@ -3622,6 +3762,7 @@ public final class Packets {
         bitField0_ |= 0x00000020;
         return this;
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder mergeDespawnEntity(
           no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity value) {
@@ -3649,6 +3790,7 @@ public final class Packets {
         bitField0_ |= 0x00000020;
         return this;
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder clearDespawnEntity() {
         if (despawnEntityBuilder_ == null) {
@@ -3660,6 +3802,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder
           getDespawnEntityBuilder() {
@@ -3667,6 +3810,7 @@ public final class Packets {
         onChanged();
         return getDespawnEntityFieldBuilder().getBuilder();
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder
           getDespawnEntityOrBuilder() {
@@ -3678,6 +3822,7 @@ public final class Packets {
               : despawnEntity_;
         }
       }
+
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity,
@@ -3702,6 +3847,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder>
           updateBlockBuilder_;
+
       /**
        *
        *
@@ -3716,6 +3862,7 @@ public final class Packets {
       public boolean hasUpdateBlock() {
         return ((bitField0_ & 0x00000040) != 0);
       }
+
       /**
        *
        *
@@ -3736,6 +3883,7 @@ public final class Packets {
           return updateBlockBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -3758,6 +3906,7 @@ public final class Packets {
         bitField0_ |= 0x00000040;
         return this;
       }
+
       /**
        *
        *
@@ -3778,6 +3927,7 @@ public final class Packets {
         bitField0_ |= 0x00000040;
         return this;
       }
+
       /**
        *
        *
@@ -3812,6 +3962,7 @@ public final class Packets {
         bitField0_ |= 0x00000040;
         return this;
       }
+
       /**
        *
        *
@@ -3831,6 +3982,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
+
       /**
        *
        *
@@ -3845,6 +3997,7 @@ public final class Packets {
         onChanged();
         return getUpdateBlockFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -3864,6 +4017,7 @@ public final class Packets {
               : updateBlock_;
         }
       }
+
       /**
        *
        *
@@ -3896,6 +4050,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.Login.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.LoginOrBuilder>
           loginBuilder_;
+
       /**
        *
        *
@@ -3910,6 +4065,7 @@ public final class Packets {
       public boolean hasLogin() {
         return ((bitField0_ & 0x00000080) != 0);
       }
+
       /**
        *
        *
@@ -3930,6 +4086,7 @@ public final class Packets {
           return loginBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -3952,6 +4109,7 @@ public final class Packets {
         bitField0_ |= 0x00000080;
         return this;
       }
+
       /**
        *
        *
@@ -3972,6 +4130,7 @@ public final class Packets {
         bitField0_ |= 0x00000080;
         return this;
       }
+
       /**
        *
        *
@@ -4005,6 +4164,7 @@ public final class Packets {
         bitField0_ |= 0x00000080;
         return this;
       }
+
       /**
        *
        *
@@ -4024,6 +4184,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
+
       /**
        *
        *
@@ -4038,6 +4199,7 @@ public final class Packets {
         onChanged();
         return getLoginFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -4056,6 +4218,7 @@ public final class Packets {
               : login_;
         }
       }
+
       /**
        *
        *
@@ -4088,6 +4251,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.StartGame.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.StartGameOrBuilder>
           startGameBuilder_;
+
       /**
        *
        *
@@ -4102,6 +4266,7 @@ public final class Packets {
       public boolean hasStartGame() {
         return ((bitField0_ & 0x00000100) != 0);
       }
+
       /**
        *
        *
@@ -4122,6 +4287,7 @@ public final class Packets {
           return startGameBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -4144,6 +4310,7 @@ public final class Packets {
         bitField0_ |= 0x00000100;
         return this;
       }
+
       /**
        *
        *
@@ -4164,6 +4331,7 @@ public final class Packets {
         bitField0_ |= 0x00000100;
         return this;
       }
+
       /**
        *
        *
@@ -4198,6 +4366,7 @@ public final class Packets {
         bitField0_ |= 0x00000100;
         return this;
       }
+
       /**
        *
        *
@@ -4217,6 +4386,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
+
       /**
        *
        *
@@ -4231,6 +4401,7 @@ public final class Packets {
         onChanged();
         return getStartGameFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -4249,6 +4420,7 @@ public final class Packets {
               : startGame_;
         }
       }
+
       /**
        *
        *
@@ -4281,6 +4453,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatusOrBuilder>
           serverLoginStatusBuilder_;
+
       /**
        *
        *
@@ -4295,6 +4468,7 @@ public final class Packets {
       public boolean hasServerLoginStatus() {
         return ((bitField0_ & 0x00000200) != 0);
       }
+
       /**
        *
        *
@@ -4315,6 +4489,7 @@ public final class Packets {
           return serverLoginStatusBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -4338,6 +4513,7 @@ public final class Packets {
         bitField0_ |= 0x00000200;
         return this;
       }
+
       /**
        *
        *
@@ -4358,6 +4534,7 @@ public final class Packets {
         bitField0_ |= 0x00000200;
         return this;
       }
+
       /**
        *
        *
@@ -4394,6 +4571,7 @@ public final class Packets {
         bitField0_ |= 0x00000200;
         return this;
       }
+
       /**
        *
        *
@@ -4413,6 +4591,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
+
       /**
        *
        *
@@ -4428,6 +4607,7 @@ public final class Packets {
         onChanged();
         return getServerLoginStatusFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -4447,6 +4627,7 @@ public final class Packets {
               : serverLoginStatus_;
         }
       }
+
       /**
        *
        *
@@ -4479,6 +4660,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder>
           disconnectBuilder_;
+
       /**
        * <code>optional .packets.Disconnect disconnect = 21;</code>
        *
@@ -4487,6 +4669,7 @@ public final class Packets {
       public boolean hasDisconnect() {
         return ((bitField0_ & 0x00000400) != 0);
       }
+
       /**
        * <code>optional .packets.Disconnect disconnect = 21;</code>
        *
@@ -4501,6 +4684,7 @@ public final class Packets {
           return disconnectBuilder_.getMessage();
         }
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder setDisconnect(no.elg.infiniteBootleg.protobuf.Packets.Disconnect value) {
         if (disconnectBuilder_ == null) {
@@ -4515,6 +4699,7 @@ public final class Packets {
         bitField0_ |= 0x00000400;
         return this;
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder setDisconnect(
           no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder builderForValue) {
@@ -4527,6 +4712,7 @@ public final class Packets {
         bitField0_ |= 0x00000400;
         return this;
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder mergeDisconnect(no.elg.infiniteBootleg.protobuf.Packets.Disconnect value) {
         if (disconnectBuilder_ == null) {
@@ -4553,6 +4739,7 @@ public final class Packets {
         bitField0_ |= 0x00000400;
         return this;
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder clearDisconnect() {
         if (disconnectBuilder_ == null) {
@@ -4564,12 +4751,14 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder getDisconnectBuilder() {
         bitField0_ |= 0x00000400;
         onChanged();
         return getDisconnectFieldBuilder().getBuilder();
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder getDisconnectOrBuilder() {
         if (disconnectBuilder_ != null) {
@@ -4580,6 +4769,7 @@ public final class Packets {
               : disconnect_;
         }
       }
+
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.Disconnect,
@@ -4604,6 +4794,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder>
           secretExchangeBuilder_;
+
       /**
        * <code>optional .packets.SecretExchange secretExchange = 22;</code>
        *
@@ -4612,6 +4803,7 @@ public final class Packets {
       public boolean hasSecretExchange() {
         return ((bitField0_ & 0x00000800) != 0);
       }
+
       /**
        * <code>optional .packets.SecretExchange secretExchange = 22;</code>
        *
@@ -4626,6 +4818,7 @@ public final class Packets {
           return secretExchangeBuilder_.getMessage();
         }
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder setSecretExchange(
           no.elg.infiniteBootleg.protobuf.Packets.SecretExchange value) {
@@ -4641,6 +4834,7 @@ public final class Packets {
         bitField0_ |= 0x00000800;
         return this;
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder setSecretExchange(
           no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder builderForValue) {
@@ -4653,6 +4847,7 @@ public final class Packets {
         bitField0_ |= 0x00000800;
         return this;
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder mergeSecretExchange(
           no.elg.infiniteBootleg.protobuf.Packets.SecretExchange value) {
@@ -4680,6 +4875,7 @@ public final class Packets {
         bitField0_ |= 0x00000800;
         return this;
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder clearSecretExchange() {
         if (secretExchangeBuilder_ == null) {
@@ -4691,6 +4887,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder
           getSecretExchangeBuilder() {
@@ -4698,6 +4895,7 @@ public final class Packets {
         onChanged();
         return getSecretExchangeFieldBuilder().getBuilder();
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder
           getSecretExchangeOrBuilder() {
@@ -4709,6 +4907,7 @@ public final class Packets {
               : secretExchange_;
         }
       }
+
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.SecretExchange,
@@ -4733,6 +4932,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.ChunkRequestOrBuilder>
           chunkRequestBuilder_;
+
       /**
        *
        *
@@ -4747,6 +4947,7 @@ public final class Packets {
       public boolean hasChunkRequest() {
         return ((bitField0_ & 0x00001000) != 0);
       }
+
       /**
        *
        *
@@ -4767,6 +4968,7 @@ public final class Packets {
           return chunkRequestBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -4789,6 +4991,7 @@ public final class Packets {
         bitField0_ |= 0x00001000;
         return this;
       }
+
       /**
        *
        *
@@ -4809,6 +5012,7 @@ public final class Packets {
         bitField0_ |= 0x00001000;
         return this;
       }
+
       /**
        *
        *
@@ -4843,6 +5047,7 @@ public final class Packets {
         bitField0_ |= 0x00001000;
         return this;
       }
+
       /**
        *
        *
@@ -4862,6 +5067,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
+
       /**
        *
        *
@@ -4876,6 +5082,7 @@ public final class Packets {
         onChanged();
         return getChunkRequestFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -4895,6 +5102,7 @@ public final class Packets {
               : chunkRequest_;
         }
       }
+
       /**
        *
        *
@@ -4927,6 +5135,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder>
           entityRequestBuilder_;
+
       /**
        * <code>optional .packets.EntityRequest entityRequest = 24;</code>
        *
@@ -4935,6 +5144,7 @@ public final class Packets {
       public boolean hasEntityRequest() {
         return ((bitField0_ & 0x00002000) != 0);
       }
+
       /**
        * <code>optional .packets.EntityRequest entityRequest = 24;</code>
        *
@@ -4949,6 +5159,7 @@ public final class Packets {
           return entityRequestBuilder_.getMessage();
         }
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder setEntityRequest(no.elg.infiniteBootleg.protobuf.Packets.EntityRequest value) {
         if (entityRequestBuilder_ == null) {
@@ -4963,6 +5174,7 @@ public final class Packets {
         bitField0_ |= 0x00002000;
         return this;
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder setEntityRequest(
           no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder builderForValue) {
@@ -4975,6 +5187,7 @@ public final class Packets {
         bitField0_ |= 0x00002000;
         return this;
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder mergeEntityRequest(
           no.elg.infiniteBootleg.protobuf.Packets.EntityRequest value) {
@@ -5002,6 +5215,7 @@ public final class Packets {
         bitField0_ |= 0x00002000;
         return this;
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder clearEntityRequest() {
         if (entityRequestBuilder_ == null) {
@@ -5013,6 +5227,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder
           getEntityRequestBuilder() {
@@ -5020,6 +5235,7 @@ public final class Packets {
         onChanged();
         return getEntityRequestFieldBuilder().getBuilder();
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder
           getEntityRequestOrBuilder() {
@@ -5031,6 +5247,7 @@ public final class Packets {
               : entityRequest_;
         }
       }
+
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.EntityRequest,
@@ -5055,6 +5272,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder>
           worldSettingsBuilder_;
+
       /**
        * <code>optional .packets.WorldSettings worldSettings = 25;</code>
        *
@@ -5063,6 +5281,7 @@ public final class Packets {
       public boolean hasWorldSettings() {
         return ((bitField0_ & 0x00004000) != 0);
       }
+
       /**
        * <code>optional .packets.WorldSettings worldSettings = 25;</code>
        *
@@ -5077,6 +5296,7 @@ public final class Packets {
           return worldSettingsBuilder_.getMessage();
         }
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder setWorldSettings(no.elg.infiniteBootleg.protobuf.Packets.WorldSettings value) {
         if (worldSettingsBuilder_ == null) {
@@ -5091,6 +5311,7 @@ public final class Packets {
         bitField0_ |= 0x00004000;
         return this;
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder setWorldSettings(
           no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder builderForValue) {
@@ -5103,6 +5324,7 @@ public final class Packets {
         bitField0_ |= 0x00004000;
         return this;
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder mergeWorldSettings(
           no.elg.infiniteBootleg.protobuf.Packets.WorldSettings value) {
@@ -5130,6 +5352,7 @@ public final class Packets {
         bitField0_ |= 0x00004000;
         return this;
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder clearWorldSettings() {
         if (worldSettingsBuilder_ == null) {
@@ -5141,6 +5364,7 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder
           getWorldSettingsBuilder() {
@@ -5148,6 +5372,7 @@ public final class Packets {
         onChanged();
         return getWorldSettingsFieldBuilder().getBuilder();
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder
           getWorldSettingsOrBuilder() {
@@ -5159,6 +5384,7 @@ public final class Packets {
               : worldSettings_;
         }
       }
+
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.WorldSettings,
@@ -5240,6 +5466,7 @@ public final class Packets {
      * @return The keepAliveId.
      */
     java.lang.String getKeepAliveId();
+
     /**
      * <code>string keepAliveId = 1;</code>
      *
@@ -5247,6 +5474,7 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getKeepAliveIdBytes();
   }
+
   /**
    *
    *
@@ -5254,13 +5482,14 @@ public final class Packets {
    * Server send this every so often, client must respond with another heartbeat packet with the same keepAliveId
    * </pre>
    *
-   * Protobuf type {@code packets.Heartbeat}
+   * <p>Protobuf type {@code packets.Heartbeat}
    */
   public static final class Heartbeat extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Heartbeat)
       HeartbeatOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use Heartbeat.newBuilder() to construct.
     private Heartbeat(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -5342,6 +5571,7 @@ public final class Packets {
 
     public static final int KEEPALIVEID_FIELD_NUMBER = 1;
     private volatile java.lang.Object keepAliveId_;
+
     /**
      * <code>string keepAliveId = 1;</code>
      *
@@ -5359,6 +5589,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string keepAliveId = 1;</code>
      *
@@ -5537,6 +5768,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      *
      *
@@ -5544,7 +5776,7 @@ public final class Packets {
      * Server send this every so often, client must respond with another heartbeat packet with the same keepAliveId
      * </pre>
      *
-     * Protobuf type {@code packets.Heartbeat}
+     * <p>Protobuf type {@code packets.Heartbeat}
      */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -5697,6 +5929,7 @@ public final class Packets {
       }
 
       private java.lang.Object keepAliveId_ = "";
+
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5713,6 +5946,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5729,6 +5963,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5744,6 +5979,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5755,6 +5991,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5835,12 +6072,14 @@ public final class Packets {
      * @return Whether the pos field is set.
      */
     boolean hasPos();
+
     /**
      * <code>.persistence.Vector2i pos = 1;</code>
      *
      * @return The pos.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i getPos();
+
     /** <code>.persistence.Vector2i pos = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getPosOrBuilder();
 
@@ -5850,21 +6089,25 @@ public final class Packets {
      * @return Whether the block field is set.
      */
     boolean hasBlock();
+
     /**
      * <code>optional .persistence.Block block = 2;</code>
      *
      * @return The block.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Block getBlock();
+
     /** <code>optional .persistence.Block block = 2;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlockOrBuilder();
   }
+
   /** Protobuf type {@code packets.UpdateBlock} */
   public static final class UpdateBlock extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.UpdateBlock)
       UpdateBlockOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use UpdateBlock.newBuilder() to construct.
     private UpdateBlock(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -5973,6 +6216,7 @@ public final class Packets {
     private int bitField0_;
     public static final int POS_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i pos_;
+
     /**
      * <code>.persistence.Vector2i pos = 1;</code>
      *
@@ -5982,6 +6226,7 @@ public final class Packets {
     public boolean hasPos() {
       return pos_ != null;
     }
+
     /**
      * <code>.persistence.Vector2i pos = 1;</code>
      *
@@ -5993,6 +6238,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
           : pos_;
     }
+
     /** <code>.persistence.Vector2i pos = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getPosOrBuilder() {
@@ -6001,6 +6247,7 @@ public final class Packets {
 
     public static final int BLOCK_FIELD_NUMBER = 2;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Block block_;
+
     /**
      * <code>optional .persistence.Block block = 2;</code>
      *
@@ -6010,6 +6257,7 @@ public final class Packets {
     public boolean hasBlock() {
       return ((bitField0_ & 0x00000001) != 0);
     }
+
     /**
      * <code>optional .persistence.Block block = 2;</code>
      *
@@ -6021,6 +6269,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.getDefaultInstance()
           : block_;
     }
+
     /** <code>optional .persistence.Block block = 2;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlockOrBuilder() {
@@ -6209,6 +6458,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.UpdateBlock} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -6405,6 +6655,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder>
           posBuilder_;
+
       /**
        * <code>.persistence.Vector2i pos = 1;</code>
        *
@@ -6413,6 +6664,7 @@ public final class Packets {
       public boolean hasPos() {
         return posBuilder_ != null || pos_ != null;
       }
+
       /**
        * <code>.persistence.Vector2i pos = 1;</code>
        *
@@ -6427,6 +6679,7 @@ public final class Packets {
           return posBuilder_.getMessage();
         }
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder setPos(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (posBuilder_ == null) {
@@ -6441,6 +6694,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder setPos(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder builderForValue) {
@@ -6453,6 +6707,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder mergePos(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (posBuilder_ == null) {
@@ -6476,6 +6731,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder clearPos() {
         if (posBuilder_ == null) {
@@ -6488,12 +6744,14 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder getPosBuilder() {
 
         onChanged();
         return getPosFieldBuilder().getBuilder();
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getPosOrBuilder() {
         if (posBuilder_ != null) {
@@ -6504,6 +6762,7 @@ public final class Packets {
               : pos_;
         }
       }
+
       /** <code>.persistence.Vector2i pos = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i,
@@ -6528,6 +6787,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder>
           blockBuilder_;
+
       /**
        * <code>optional .persistence.Block block = 2;</code>
        *
@@ -6536,6 +6796,7 @@ public final class Packets {
       public boolean hasBlock() {
         return ((bitField0_ & 0x00000001) != 0);
       }
+
       /**
        * <code>optional .persistence.Block block = 2;</code>
        *
@@ -6550,6 +6811,7 @@ public final class Packets {
           return blockBuilder_.getMessage();
         }
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder setBlock(no.elg.infiniteBootleg.protobuf.ProtoWorld.Block value) {
         if (blockBuilder_ == null) {
@@ -6564,6 +6826,7 @@ public final class Packets {
         bitField0_ |= 0x00000001;
         return this;
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder setBlock(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder builderForValue) {
@@ -6576,6 +6839,7 @@ public final class Packets {
         bitField0_ |= 0x00000001;
         return this;
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder mergeBlock(no.elg.infiniteBootleg.protobuf.ProtoWorld.Block value) {
         if (blockBuilder_ == null) {
@@ -6601,6 +6865,7 @@ public final class Packets {
         bitField0_ |= 0x00000001;
         return this;
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder clearBlock() {
         if (blockBuilder_ == null) {
@@ -6612,12 +6877,14 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder getBlockBuilder() {
         bitField0_ |= 0x00000001;
         onChanged();
         return getBlockFieldBuilder().getBuilder();
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlockOrBuilder() {
         if (blockBuilder_ != null) {
@@ -6628,6 +6895,7 @@ public final class Packets {
               : block_;
         }
       }
+
       /** <code>optional .persistence.Block block = 2;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Block,
@@ -6715,6 +6983,7 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
+
     /**
      *
      *
@@ -6734,12 +7003,14 @@ public final class Packets {
      * @return Whether the velocity field is set.
      */
     boolean hasVelocity();
+
     /**
      * <code>.persistence.Vector2f velocity = 2;</code>
      *
      * @return The velocity.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getVelocity();
+
     /** <code>.persistence.Vector2f velocity = 2;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder();
 
@@ -6749,12 +7020,14 @@ public final class Packets {
      * @return Whether the position field is set.
      */
     boolean hasPosition();
+
     /**
      * <code>.persistence.Vector2f position = 3;</code>
      *
      * @return The position.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getPosition();
+
     /** <code>.persistence.Vector2f position = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder();
 
@@ -6765,12 +7038,14 @@ public final class Packets {
      */
     float getLookAngleDeg();
   }
+
   /** Protobuf type {@code packets.MoveEntity} */
   public static final class MoveEntity extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.MoveEntity)
       MoveEntityOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use MoveEntity.newBuilder() to construct.
     private MoveEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -6891,6 +7166,7 @@ public final class Packets {
 
     public static final int UUID_FIELD_NUMBER = 1;
     private volatile java.lang.Object uuid_;
+
     /**
      *
      *
@@ -6914,6 +7190,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      *
      *
@@ -6940,6 +7217,7 @@ public final class Packets {
 
     public static final int VELOCITY_FIELD_NUMBER = 2;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f velocity_;
+
     /**
      * <code>.persistence.Vector2f velocity = 2;</code>
      *
@@ -6949,6 +7227,7 @@ public final class Packets {
     public boolean hasVelocity() {
       return velocity_ != null;
     }
+
     /**
      * <code>.persistence.Vector2f velocity = 2;</code>
      *
@@ -6960,6 +7239,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()
           : velocity_;
     }
+
     /** <code>.persistence.Vector2f velocity = 2;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder() {
@@ -6968,6 +7248,7 @@ public final class Packets {
 
     public static final int POSITION_FIELD_NUMBER = 3;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f position_;
+
     /**
      * <code>.persistence.Vector2f position = 3;</code>
      *
@@ -6977,6 +7258,7 @@ public final class Packets {
     public boolean hasPosition() {
       return position_ != null;
     }
+
     /**
      * <code>.persistence.Vector2f position = 3;</code>
      *
@@ -6988,6 +7270,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()
           : position_;
     }
+
     /** <code>.persistence.Vector2f position = 3;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder() {
@@ -6996,6 +7279,7 @@ public final class Packets {
 
     public static final int LOOKANGLEDEG_FIELD_NUMBER = 4;
     private float lookAngleDeg_;
+
     /**
      * <code>float lookAngleDeg = 4;</code>
      *
@@ -7204,6 +7488,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.MoveEntity} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -7398,6 +7683,7 @@ public final class Packets {
       }
 
       private java.lang.Object uuid_ = "";
+
       /**
        *
        *
@@ -7420,6 +7706,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        *
        *
@@ -7442,6 +7729,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        *
        *
@@ -7463,6 +7751,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        *
        *
@@ -7480,6 +7769,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        *
        *
@@ -7509,6 +7799,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder>
           velocityBuilder_;
+
       /**
        * <code>.persistence.Vector2f velocity = 2;</code>
        *
@@ -7517,6 +7808,7 @@ public final class Packets {
       public boolean hasVelocity() {
         return velocityBuilder_ != null || velocity_ != null;
       }
+
       /**
        * <code>.persistence.Vector2f velocity = 2;</code>
        *
@@ -7531,6 +7823,7 @@ public final class Packets {
           return velocityBuilder_.getMessage();
         }
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder setVelocity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (velocityBuilder_ == null) {
@@ -7545,6 +7838,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder setVelocity(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder builderForValue) {
@@ -7557,6 +7851,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder mergeVelocity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (velocityBuilder_ == null) {
@@ -7580,6 +7875,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder clearVelocity() {
         if (velocityBuilder_ == null) {
@@ -7592,12 +7888,14 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getVelocityBuilder() {
 
         onChanged();
         return getVelocityFieldBuilder().getBuilder();
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder() {
         if (velocityBuilder_ != null) {
@@ -7608,6 +7906,7 @@ public final class Packets {
               : velocity_;
         }
       }
+
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f,
@@ -7632,6 +7931,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder>
           positionBuilder_;
+
       /**
        * <code>.persistence.Vector2f position = 3;</code>
        *
@@ -7640,6 +7940,7 @@ public final class Packets {
       public boolean hasPosition() {
         return positionBuilder_ != null || position_ != null;
       }
+
       /**
        * <code>.persistence.Vector2f position = 3;</code>
        *
@@ -7654,6 +7955,7 @@ public final class Packets {
           return positionBuilder_.getMessage();
         }
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder setPosition(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (positionBuilder_ == null) {
@@ -7668,6 +7970,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder setPosition(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder builderForValue) {
@@ -7680,6 +7983,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder mergePosition(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (positionBuilder_ == null) {
@@ -7703,6 +8007,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder clearPosition() {
         if (positionBuilder_ == null) {
@@ -7715,12 +8020,14 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getPositionBuilder() {
 
         onChanged();
         return getPositionFieldBuilder().getBuilder();
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder() {
         if (positionBuilder_ != null) {
@@ -7731,6 +8038,7 @@ public final class Packets {
               : position_;
         }
       }
+
       /** <code>.persistence.Vector2f position = 3;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f,
@@ -7750,6 +8058,7 @@ public final class Packets {
       }
 
       private float lookAngleDeg_;
+
       /**
        * <code>float lookAngleDeg = 4;</code>
        *
@@ -7759,6 +8068,7 @@ public final class Packets {
       public float getLookAngleDeg() {
         return lookAngleDeg_;
       }
+
       /**
        * <code>float lookAngleDeg = 4;</code>
        *
@@ -7771,6 +8081,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>float lookAngleDeg = 4;</code>
        *
@@ -7846,6 +8157,7 @@ public final class Packets {
      * @return The reason.
      */
     java.lang.String getReason();
+
     /**
      * <code>string reason = 1;</code>
      *
@@ -7853,12 +8165,14 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getReasonBytes();
   }
+
   /** Protobuf type {@code packets.Disconnect} */
   public static final class Disconnect extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Disconnect)
       DisconnectOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use Disconnect.newBuilder() to construct.
     private Disconnect(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -7940,6 +8254,7 @@ public final class Packets {
 
     public static final int REASON_FIELD_NUMBER = 1;
     private volatile java.lang.Object reason_;
+
     /**
      * <code>string reason = 1;</code>
      *
@@ -7957,6 +8272,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string reason = 1;</code>
      *
@@ -8135,6 +8451,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.Disconnect} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -8295,6 +8612,7 @@ public final class Packets {
       }
 
       private java.lang.Object reason_ = "";
+
       /**
        * <code>string reason = 1;</code>
        *
@@ -8311,6 +8629,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string reason = 1;</code>
        *
@@ -8327,6 +8646,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string reason = 1;</code>
        *
@@ -8342,6 +8662,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string reason = 1;</code>
        *
@@ -8353,6 +8674,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string reason = 1;</code>
        *
@@ -8433,6 +8755,7 @@ public final class Packets {
      * @return The entityUUID.
      */
     java.lang.String getEntityUUID();
+
     /**
      * <code>string entityUUID = 1;</code>
      *
@@ -8446,6 +8769,7 @@ public final class Packets {
      * @return The secret.
      */
     java.lang.String getSecret();
+
     /**
      * <code>string secret = 2;</code>
      *
@@ -8453,12 +8777,14 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getSecretBytes();
   }
+
   /** Protobuf type {@code packets.SecretExchange} */
   public static final class SecretExchange extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.SecretExchange)
       SecretExchangeOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use SecretExchange.newBuilder() to construct.
     private SecretExchange(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -8553,6 +8879,7 @@ public final class Packets {
 
     public static final int ENTITYUUID_FIELD_NUMBER = 1;
     private volatile java.lang.Object entityUUID_;
+
     /**
      * <code>string entityUUID = 1;</code>
      *
@@ -8570,6 +8897,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string entityUUID = 1;</code>
      *
@@ -8590,6 +8918,7 @@ public final class Packets {
 
     public static final int SECRET_FIELD_NUMBER = 2;
     private volatile java.lang.Object secret_;
+
     /**
      * <code>string secret = 2;</code>
      *
@@ -8607,6 +8936,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string secret = 2;</code>
      *
@@ -8795,6 +9125,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.SecretExchange} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -8963,6 +9294,7 @@ public final class Packets {
       }
 
       private java.lang.Object entityUUID_ = "";
+
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -8979,6 +9311,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -8995,6 +9328,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9010,6 +9344,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9021,6 +9356,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9039,6 +9375,7 @@ public final class Packets {
       }
 
       private java.lang.Object secret_ = "";
+
       /**
        * <code>string secret = 2;</code>
        *
@@ -9055,6 +9392,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string secret = 2;</code>
        *
@@ -9071,6 +9409,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string secret = 2;</code>
        *
@@ -9086,6 +9425,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string secret = 2;</code>
        *
@@ -9097,6 +9437,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string secret = 2;</code>
        *
@@ -9177,6 +9518,7 @@ public final class Packets {
      * @return Whether the time field is set.
      */
     boolean hasTime();
+
     /**
      * <code>optional float time = 1;</code>
      *
@@ -9190,6 +9532,7 @@ public final class Packets {
      * @return Whether the timeScale field is set.
      */
     boolean hasTimeScale();
+
     /**
      * <code>optional float timeScale = 2;</code>
      *
@@ -9203,15 +9546,18 @@ public final class Packets {
      * @return Whether the spawn field is set.
      */
     boolean hasSpawn();
+
     /**
      * <code>optional .persistence.Vector2i spawn = 3;</code>
      *
      * @return The spawn.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i getSpawn();
+
     /** <code>optional .persistence.Vector2i spawn = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder();
   }
+
   /**
    *
    *
@@ -9219,13 +9565,14 @@ public final class Packets {
    * if not present, do not update setting
    * </pre>
    *
-   * Protobuf type {@code packets.WorldSettings}
+   * <p>Protobuf type {@code packets.WorldSettings}
    */
   public static final class WorldSettings extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.WorldSettings)
       WorldSettingsOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use WorldSettings.newBuilder() to construct.
     private WorldSettings(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -9333,6 +9680,7 @@ public final class Packets {
     private int bitField0_;
     public static final int TIME_FIELD_NUMBER = 1;
     private float time_;
+
     /**
      * <code>optional float time = 1;</code>
      *
@@ -9342,6 +9690,7 @@ public final class Packets {
     public boolean hasTime() {
       return ((bitField0_ & 0x00000001) != 0);
     }
+
     /**
      * <code>optional float time = 1;</code>
      *
@@ -9354,6 +9703,7 @@ public final class Packets {
 
     public static final int TIMESCALE_FIELD_NUMBER = 2;
     private float timeScale_;
+
     /**
      * <code>optional float timeScale = 2;</code>
      *
@@ -9363,6 +9713,7 @@ public final class Packets {
     public boolean hasTimeScale() {
       return ((bitField0_ & 0x00000002) != 0);
     }
+
     /**
      * <code>optional float timeScale = 2;</code>
      *
@@ -9375,6 +9726,7 @@ public final class Packets {
 
     public static final int SPAWN_FIELD_NUMBER = 3;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i spawn_;
+
     /**
      * <code>optional .persistence.Vector2i spawn = 3;</code>
      *
@@ -9384,6 +9736,7 @@ public final class Packets {
     public boolean hasSpawn() {
       return ((bitField0_ & 0x00000004) != 0);
     }
+
     /**
      * <code>optional .persistence.Vector2i spawn = 3;</code>
      *
@@ -9395,6 +9748,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
           : spawn_;
     }
+
     /** <code>optional .persistence.Vector2i spawn = 3;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder() {
@@ -9599,6 +9953,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      *
      *
@@ -9606,7 +9961,7 @@ public final class Packets {
      * if not present, do not update setting
      * </pre>
      *
-     * Protobuf type {@code packets.WorldSettings}
+     * <p>Protobuf type {@code packets.WorldSettings}
      */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -9803,6 +10158,7 @@ public final class Packets {
       private int bitField0_;
 
       private float time_;
+
       /**
        * <code>optional float time = 1;</code>
        *
@@ -9812,6 +10168,7 @@ public final class Packets {
       public boolean hasTime() {
         return ((bitField0_ & 0x00000001) != 0);
       }
+
       /**
        * <code>optional float time = 1;</code>
        *
@@ -9821,6 +10178,7 @@ public final class Packets {
       public float getTime() {
         return time_;
       }
+
       /**
        * <code>optional float time = 1;</code>
        *
@@ -9833,6 +10191,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional float time = 1;</code>
        *
@@ -9846,6 +10205,7 @@ public final class Packets {
       }
 
       private float timeScale_;
+
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -9855,6 +10215,7 @@ public final class Packets {
       public boolean hasTimeScale() {
         return ((bitField0_ & 0x00000002) != 0);
       }
+
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -9864,6 +10225,7 @@ public final class Packets {
       public float getTimeScale() {
         return timeScale_;
       }
+
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -9876,6 +10238,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -9894,6 +10257,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder>
           spawnBuilder_;
+
       /**
        * <code>optional .persistence.Vector2i spawn = 3;</code>
        *
@@ -9902,6 +10266,7 @@ public final class Packets {
       public boolean hasSpawn() {
         return ((bitField0_ & 0x00000004) != 0);
       }
+
       /**
        * <code>optional .persistence.Vector2i spawn = 3;</code>
        *
@@ -9916,6 +10281,7 @@ public final class Packets {
           return spawnBuilder_.getMessage();
         }
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder setSpawn(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (spawnBuilder_ == null) {
@@ -9930,6 +10296,7 @@ public final class Packets {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder setSpawn(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder builderForValue) {
@@ -9942,6 +10309,7 @@ public final class Packets {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder mergeSpawn(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (spawnBuilder_ == null) {
@@ -9968,6 +10336,7 @@ public final class Packets {
         bitField0_ |= 0x00000004;
         return this;
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder clearSpawn() {
         if (spawnBuilder_ == null) {
@@ -9979,12 +10348,14 @@ public final class Packets {
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder getSpawnBuilder() {
         bitField0_ |= 0x00000004;
         onChanged();
         return getSpawnFieldBuilder().getBuilder();
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder() {
         if (spawnBuilder_ != null) {
@@ -9995,6 +10366,7 @@ public final class Packets {
               : spawn_;
         }
       }
+
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i,
@@ -10082,6 +10454,7 @@ public final class Packets {
      * @return Whether the controlling field is set.
      */
     boolean hasControlling();
+
     /**
      *
      *
@@ -10094,6 +10467,7 @@ public final class Packets {
      * @return The controlling.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getControlling();
+
     /**
      *
      *
@@ -10117,6 +10491,7 @@ public final class Packets {
      * @return Whether the world field is set.
      */
     boolean hasWorld();
+
     /**
      *
      *
@@ -10129,6 +10504,7 @@ public final class Packets {
      * @return The world.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.World getWorld();
+
     /**
      *
      *
@@ -10140,12 +10516,14 @@ public final class Packets {
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder getWorldOrBuilder();
   }
+
   /** Protobuf type {@code packets.StartGame} */
   public static final class StartGame extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.StartGame)
       StartGameOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use StartGame.newBuilder() to construct.
     private StartGame(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -10252,6 +10630,7 @@ public final class Packets {
 
     public static final int CONTROLLING_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity controlling_;
+
     /**
      *
      *
@@ -10267,6 +10646,7 @@ public final class Packets {
     public boolean hasControlling() {
       return controlling_ != null;
     }
+
     /**
      *
      *
@@ -10284,6 +10664,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()
           : controlling_;
     }
+
     /**
      *
      *
@@ -10300,6 +10681,7 @@ public final class Packets {
 
     public static final int WORLD_FIELD_NUMBER = 2;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.World world_;
+
     /**
      *
      *
@@ -10315,6 +10697,7 @@ public final class Packets {
     public boolean hasWorld() {
       return world_ != null;
     }
+
     /**
      *
      *
@@ -10332,6 +10715,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.World.getDefaultInstance()
           : world_;
     }
+
     /**
      *
      *
@@ -10525,6 +10909,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.StartGame} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -10703,6 +11088,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
           controllingBuilder_;
+
       /**
        *
        *
@@ -10717,6 +11103,7 @@ public final class Packets {
       public boolean hasControlling() {
         return controllingBuilder_ != null || controlling_ != null;
       }
+
       /**
        *
        *
@@ -10737,6 +11124,7 @@ public final class Packets {
           return controllingBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -10759,6 +11147,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -10779,6 +11168,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -10810,6 +11200,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -10830,6 +11221,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -10844,6 +11236,7 @@ public final class Packets {
         onChanged();
         return getControllingFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -10862,6 +11255,7 @@ public final class Packets {
               : controlling_;
         }
       }
+
       /**
        *
        *
@@ -10894,6 +11288,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder>
           worldBuilder_;
+
       /**
        *
        *
@@ -10908,6 +11303,7 @@ public final class Packets {
       public boolean hasWorld() {
         return worldBuilder_ != null || world_ != null;
       }
+
       /**
        *
        *
@@ -10928,6 +11324,7 @@ public final class Packets {
           return worldBuilder_.getMessage();
         }
       }
+
       /**
        *
        *
@@ -10950,6 +11347,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -10970,6 +11368,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -11001,6 +11400,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -11021,6 +11421,7 @@ public final class Packets {
 
         return this;
       }
+
       /**
        *
        *
@@ -11035,6 +11436,7 @@ public final class Packets {
         onChanged();
         return getWorldFieldBuilder().getBuilder();
       }
+
       /**
        *
        *
@@ -11053,6 +11455,7 @@ public final class Packets {
               : world_;
         }
       }
+
       /**
        *
        *
@@ -11142,15 +11545,18 @@ public final class Packets {
      * @return Whether the chunk field is set.
      */
     boolean hasChunk();
+
     /**
      * <code>.persistence.Chunk chunk = 1;</code>
      *
      * @return The chunk.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk getChunk();
+
     /** <code>.persistence.Chunk chunk = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder getChunkOrBuilder();
   }
+
   /**
    *
    *
@@ -11158,13 +11564,14 @@ public final class Packets {
    * Update all blocks in a chunk
    * </pre>
    *
-   * Protobuf type {@code packets.UpdateChunk}
+   * <p>Protobuf type {@code packets.UpdateChunk}
    */
   public static final class UpdateChunk extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.UpdateChunk)
       UpdateChunkOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use UpdateChunk.newBuilder() to construct.
     private UpdateChunk(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -11254,6 +11661,7 @@ public final class Packets {
 
     public static final int CHUNK_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk chunk_;
+
     /**
      * <code>.persistence.Chunk chunk = 1;</code>
      *
@@ -11263,6 +11671,7 @@ public final class Packets {
     public boolean hasChunk() {
       return chunk_ != null;
     }
+
     /**
      * <code>.persistence.Chunk chunk = 1;</code>
      *
@@ -11274,6 +11683,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.getDefaultInstance()
           : chunk_;
     }
+
     /** <code>.persistence.Chunk chunk = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder getChunkOrBuilder() {
@@ -11446,6 +11856,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      *
      *
@@ -11453,7 +11864,7 @@ public final class Packets {
      * Update all blocks in a chunk
      * </pre>
      *
-     * Protobuf type {@code packets.UpdateChunk}
+     * <p>Protobuf type {@code packets.UpdateChunk}
      */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -11626,6 +12037,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder>
           chunkBuilder_;
+
       /**
        * <code>.persistence.Chunk chunk = 1;</code>
        *
@@ -11634,6 +12046,7 @@ public final class Packets {
       public boolean hasChunk() {
         return chunkBuilder_ != null || chunk_ != null;
       }
+
       /**
        * <code>.persistence.Chunk chunk = 1;</code>
        *
@@ -11648,6 +12061,7 @@ public final class Packets {
           return chunkBuilder_.getMessage();
         }
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder setChunk(no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk value) {
         if (chunkBuilder_ == null) {
@@ -11662,6 +12076,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder setChunk(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder builderForValue) {
@@ -11674,6 +12089,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder mergeChunk(no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk value) {
         if (chunkBuilder_ == null) {
@@ -11697,6 +12113,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder clearChunk() {
         if (chunkBuilder_ == null) {
@@ -11709,12 +12126,14 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder getChunkBuilder() {
 
         onChanged();
         return getChunkFieldBuilder().getBuilder();
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder getChunkOrBuilder() {
         if (chunkBuilder_ != null) {
@@ -11725,6 +12144,7 @@ public final class Packets {
               : chunk_;
         }
       }
+
       /** <code>.persistence.Chunk chunk = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk,
@@ -11806,6 +12226,7 @@ public final class Packets {
      * @return The enum numeric value on the wire for status.
      */
     int getStatusValue();
+
     /**
      * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
      *
@@ -11813,12 +12234,14 @@ public final class Packets {
      */
     no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus getStatus();
   }
+
   /** Protobuf type {@code packets.ServerLoginStatus} */
   public static final class ServerLoginStatus extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.ServerLoginStatus)
       ServerLoginStatusOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use ServerLoginStatus.newBuilder() to construct.
     private ServerLoginStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -12083,6 +12506,7 @@ public final class Packets {
 
     public static final int STATUS_FIELD_NUMBER = 1;
     private int status_;
+
     /**
      * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
      *
@@ -12092,6 +12516,7 @@ public final class Packets {
     public int getStatusValue() {
       return status_;
     }
+
     /**
      * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
      *
@@ -12272,6 +12697,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.ServerLoginStatus} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -12432,6 +12858,7 @@ public final class Packets {
       }
 
       private int status_ = 0;
+
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12441,6 +12868,7 @@ public final class Packets {
       public int getStatusValue() {
         return status_;
       }
+
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12453,6 +12881,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12467,6 +12896,7 @@ public final class Packets {
             ? no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.UNRECOGNIZED
             : result;
       }
+
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12483,6 +12913,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12558,12 +12989,14 @@ public final class Packets {
      * @return Whether the entity field is set.
      */
     boolean hasEntity();
+
     /**
      * <code>.persistence.Entity entity = 1;</code>
      *
      * @return The entity.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntity();
+
     /** <code>.persistence.Entity entity = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder();
 
@@ -12573,6 +13006,7 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
+
     /**
      * <code>string uuid = 2;</code>
      *
@@ -12580,12 +13014,14 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getUuidBytes();
   }
+
   /** Protobuf type {@code packets.SpawnEntity} */
   public static final class SpawnEntity extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.SpawnEntity)
       SpawnEntityOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use SpawnEntity.newBuilder() to construct.
     private SpawnEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -12684,6 +13120,7 @@ public final class Packets {
 
     public static final int ENTITY_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity entity_;
+
     /**
      * <code>.persistence.Entity entity = 1;</code>
      *
@@ -12693,6 +13130,7 @@ public final class Packets {
     public boolean hasEntity() {
       return entity_ != null;
     }
+
     /**
      * <code>.persistence.Entity entity = 1;</code>
      *
@@ -12704,6 +13142,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()
           : entity_;
     }
+
     /** <code>.persistence.Entity entity = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder() {
@@ -12712,6 +13151,7 @@ public final class Packets {
 
     public static final int UUID_FIELD_NUMBER = 2;
     private volatile java.lang.Object uuid_;
+
     /**
      * <code>string uuid = 2;</code>
      *
@@ -12729,6 +13169,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string uuid = 2;</code>
      *
@@ -12922,6 +13363,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.SpawnEntity} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -13101,6 +13543,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
           entityBuilder_;
+
       /**
        * <code>.persistence.Entity entity = 1;</code>
        *
@@ -13109,6 +13552,7 @@ public final class Packets {
       public boolean hasEntity() {
         return entityBuilder_ != null || entity_ != null;
       }
+
       /**
        * <code>.persistence.Entity entity = 1;</code>
        *
@@ -13123,6 +13567,7 @@ public final class Packets {
           return entityBuilder_.getMessage();
         }
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder setEntity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entityBuilder_ == null) {
@@ -13137,6 +13582,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder setEntity(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
@@ -13149,6 +13595,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder mergeEntity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entityBuilder_ == null) {
@@ -13172,6 +13619,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder clearEntity() {
         if (entityBuilder_ == null) {
@@ -13184,12 +13632,14 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder getEntityBuilder() {
 
         onChanged();
         return getEntityFieldBuilder().getBuilder();
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder() {
         if (entityBuilder_ != null) {
@@ -13200,6 +13650,7 @@ public final class Packets {
               : entity_;
         }
       }
+
       /** <code>.persistence.Entity entity = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity,
@@ -13219,6 +13670,7 @@ public final class Packets {
       }
 
       private java.lang.Object uuid_ = "";
+
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13235,6 +13687,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13251,6 +13704,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13266,6 +13720,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13277,6 +13732,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13357,6 +13813,7 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -13370,6 +13827,7 @@ public final class Packets {
      * @return The enum numeric value on the wire for despawnReason.
      */
     int getDespawnReasonValue();
+
     /**
      * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
      *
@@ -13377,12 +13835,14 @@ public final class Packets {
      */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason getDespawnReason();
   }
+
   /** Protobuf type {@code packets.DespawnEntity} */
   public static final class DespawnEntity extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.DespawnEntity)
       DespawnEntityOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use DespawnEntity.newBuilder() to construct.
     private DespawnEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -13688,6 +14148,7 @@ public final class Packets {
 
     public static final int UUID_FIELD_NUMBER = 1;
     private volatile java.lang.Object uuid_;
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -13705,6 +14166,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -13725,6 +14187,7 @@ public final class Packets {
 
     public static final int DESPAWNREASON_FIELD_NUMBER = 2;
     private int despawnReason_;
+
     /**
      * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
      *
@@ -13734,6 +14197,7 @@ public final class Packets {
     public int getDespawnReasonValue() {
       return despawnReason_;
     }
+
     /**
      * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
      *
@@ -13924,6 +14388,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.DespawnEntity} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -14091,6 +14556,7 @@ public final class Packets {
       }
 
       private java.lang.Object uuid_ = "";
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14107,6 +14573,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14123,6 +14590,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14138,6 +14606,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14149,6 +14618,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14167,6 +14637,7 @@ public final class Packets {
       }
 
       private int despawnReason_ = 0;
+
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14176,6 +14647,7 @@ public final class Packets {
       public int getDespawnReasonValue() {
         return despawnReason_;
       }
+
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14188,6 +14660,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14204,6 +14677,7 @@ public final class Packets {
             ? no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNRECOGNIZED
             : result;
       }
+
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14220,6 +14694,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14295,6 +14770,7 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14308,6 +14784,7 @@ public final class Packets {
      * @return The username.
      */
     java.lang.String getUsername();
+
     /**
      * <code>string username = 2;</code>
      *
@@ -14327,6 +14804,7 @@ public final class Packets {
      * @return The version.
      */
     java.lang.String getVersion();
+
     /**
      *
      *
@@ -14340,12 +14818,14 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getVersionBytes();
   }
+
   /** Protobuf type {@code packets.Login} */
   public static final class Login extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Login)
       LoginOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use Login.newBuilder() to construct.
     private Login(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -14443,6 +14923,7 @@ public final class Packets {
 
     public static final int UUID_FIELD_NUMBER = 1;
     private volatile java.lang.Object uuid_;
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14460,6 +14941,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14480,6 +14962,7 @@ public final class Packets {
 
     public static final int USERNAME_FIELD_NUMBER = 2;
     private volatile java.lang.Object username_;
+
     /**
      * <code>string username = 2;</code>
      *
@@ -14497,6 +14980,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string username = 2;</code>
      *
@@ -14517,6 +15001,7 @@ public final class Packets {
 
     public static final int VERSION_FIELD_NUMBER = 3;
     private volatile java.lang.Object version_;
+
     /**
      *
      *
@@ -14540,6 +15025,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      *
      *
@@ -14742,6 +15228,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.Login} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -14907,6 +15394,7 @@ public final class Packets {
       }
 
       private java.lang.Object uuid_ = "";
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14923,6 +15411,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14939,6 +15428,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14954,6 +15444,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14965,6 +15456,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14983,6 +15475,7 @@ public final class Packets {
       }
 
       private java.lang.Object username_ = "";
+
       /**
        * <code>string username = 2;</code>
        *
@@ -14999,6 +15492,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string username = 2;</code>
        *
@@ -15015,6 +15509,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string username = 2;</code>
        *
@@ -15030,6 +15525,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string username = 2;</code>
        *
@@ -15041,6 +15537,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string username = 2;</code>
        *
@@ -15059,6 +15556,7 @@ public final class Packets {
       }
 
       private java.lang.Object version_ = "";
+
       /**
        *
        *
@@ -15081,6 +15579,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        *
        *
@@ -15103,6 +15602,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        *
        *
@@ -15124,6 +15624,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        *
        *
@@ -15141,6 +15642,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        *
        *
@@ -15227,21 +15729,25 @@ public final class Packets {
      * @return Whether the chunkLocation field is set.
      */
     boolean hasChunkLocation();
+
     /**
      * <code>.persistence.Vector2i chunkLocation = 1;</code>
      *
      * @return The chunkLocation.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i getChunkLocation();
+
     /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getChunkLocationOrBuilder();
   }
+
   /** Protobuf type {@code packets.ChunkRequest} */
   public static final class ChunkRequest extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.ChunkRequest)
       ChunkRequestOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use ChunkRequest.newBuilder() to construct.
     private ChunkRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -15335,6 +15841,7 @@ public final class Packets {
 
     public static final int CHUNKLOCATION_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i chunkLocation_;
+
     /**
      * <code>.persistence.Vector2i chunkLocation = 1;</code>
      *
@@ -15344,6 +15851,7 @@ public final class Packets {
     public boolean hasChunkLocation() {
       return chunkLocation_ != null;
     }
+
     /**
      * <code>.persistence.Vector2i chunkLocation = 1;</code>
      *
@@ -15355,6 +15863,7 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
           : chunkLocation_;
     }
+
     /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder
@@ -15528,6 +16037,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.ChunkRequest} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -15701,6 +16211,7 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder>
           chunkLocationBuilder_;
+
       /**
        * <code>.persistence.Vector2i chunkLocation = 1;</code>
        *
@@ -15709,6 +16220,7 @@ public final class Packets {
       public boolean hasChunkLocation() {
         return chunkLocationBuilder_ != null || chunkLocation_ != null;
       }
+
       /**
        * <code>.persistence.Vector2i chunkLocation = 1;</code>
        *
@@ -15723,6 +16235,7 @@ public final class Packets {
           return chunkLocationBuilder_.getMessage();
         }
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder setChunkLocation(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (chunkLocationBuilder_ == null) {
@@ -15737,6 +16250,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder setChunkLocation(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder builderForValue) {
@@ -15749,6 +16263,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder mergeChunkLocation(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (chunkLocationBuilder_ == null) {
@@ -15772,6 +16287,7 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder clearChunkLocation() {
         if (chunkLocationBuilder_ == null) {
@@ -15784,12 +16300,14 @@ public final class Packets {
 
         return this;
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder getChunkLocationBuilder() {
 
         onChanged();
         return getChunkLocationFieldBuilder().getBuilder();
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder
           getChunkLocationOrBuilder() {
@@ -15801,6 +16319,7 @@ public final class Packets {
               : chunkLocation_;
         }
       }
+
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i,
@@ -15882,6 +16401,7 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -15889,12 +16409,14 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getUuidBytes();
   }
+
   /** Protobuf type {@code packets.EntityRequest} */
   public static final class EntityRequest extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.EntityRequest)
       EntityRequestOrBuilder {
     private static final long serialVersionUID = 0L;
+
     // Use EntityRequest.newBuilder() to construct.
     private EntityRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -15980,6 +16502,7 @@ public final class Packets {
 
     public static final int UUID_FIELD_NUMBER = 1;
     private volatile java.lang.Object uuid_;
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -15997,6 +16520,7 @@ public final class Packets {
         return s;
       }
     }
+
     /**
      * <code>string uuid = 1;</code>
      *
@@ -16176,6 +16700,7 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /** Protobuf type {@code packets.EntityRequest} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -16337,6 +16862,7 @@ public final class Packets {
       }
 
       private java.lang.Object uuid_ = "";
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16353,6 +16879,7 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16369,6 +16896,7 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16384,6 +16912,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16395,6 +16924,7 @@ public final class Packets {
         onChanged();
         return this;
       }
+
       /**
        * <code>string uuid = 1;</code>
        *

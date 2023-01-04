@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.world.subgrid.Entity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public class GenericEntity extends Entity implements Removable {
 
   private int width;

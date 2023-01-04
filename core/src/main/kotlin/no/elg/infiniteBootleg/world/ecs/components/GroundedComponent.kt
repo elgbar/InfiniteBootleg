@@ -1,9 +1,12 @@
 package no.elg.infiniteBootleg.world.ecs.components
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
+import ktx.ashley.optionalPropertyFor
+import ktx.ashley.propertyFor
 
-class OnGroundComponent : Component {
+class GroundedComponent : Component {
 
   private var contactPoints: Int = 0
 
@@ -17,5 +20,9 @@ class OnGroundComponent : Component {
 
   val onGround: Boolean get() = contactPoints == 0
 
-  companion object : Mapper<OnGroundComponent>()
+  companion object : Mapper<GroundedComponent>() {
+
+    var Entity.grounded by propertyFor(mapper)
+    var Entity.groundedOrNull by optionalPropertyFor(mapper)
+  }
 }

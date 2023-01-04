@@ -154,10 +154,10 @@ object DebugText {
 
   @JvmStatic
   fun ents(sb: StringBuilder, world: ClientWorld) {
-    val nl = "\n    "
-    sb.append("E = ")
-    for (entity in world.getEntities(ClientMain.inst().mouseWorldX, ClientMain.inst().mouseWorldY)) {
-      sb.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl)
-    }
+//    val nl = "\n    "
+//    sb.append("E = ")
+//    for (entity in world.getEntities(ClientMain.inst().mouseWorldX, ClientMain.inst().mouseWorldY)) {
+//      sb.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl)
+//    }
   }
 }

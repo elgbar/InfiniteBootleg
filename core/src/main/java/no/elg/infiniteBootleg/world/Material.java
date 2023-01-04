@@ -218,7 +218,7 @@ public enum Material {
     if (entity.isDisposed()) {
       return null;
     }
-    world.addEntity(entity, false);
+    //    world.addEntity(entity, false);
     ObjectSet<Location> locations = entity.touchingLocations();
     for (Location location : locations) {
       Chunk locChunk;

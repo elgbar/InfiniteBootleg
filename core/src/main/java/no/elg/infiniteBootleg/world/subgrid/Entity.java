@@ -1,9 +1,5 @@
 package no.elg.infiniteBootleg.world.subgrid;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.signum;
-import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL;
-import static no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL;
 import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.box2d.Filters.NON_INTERACTIVE_FILTER;
 
@@ -25,18 +21,15 @@ import java.util.UUID;
 import javax.annotation.concurrent.GuardedBy;
 import kotlin.jvm.functions.Function1;
 import no.elg.infiniteBootleg.CheckableDisposable;
-import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.api.HUDDebuggable;
 import no.elg.infiniteBootleg.api.Savable;
 import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.server.PacketExtraKt;
-import no.elg.infiniteBootleg.server.ServerClient;
 import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.ExtraKt;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
+import no.elg.infiniteBootleg.world.Constants;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
@@ -62,24 +55,13 @@ import org.jetbrains.annotations.Nullable;
  */
 @Deprecated
 public abstract class Entity
-  implements Ticking,
-  CheckableDisposable,
-  ContactHandler,
-  HUDDebuggable,
-  Savable<ProtoWorld.EntityOrBuilder> {
+    implements Ticking,
+        CheckableDisposable,
+        ContactHandler,
+        HUDDebuggable,
+        Savable<ProtoWorld.EntityOrBuilder> {
 
-  public static final float GROUND_CHECK_OFFSET = 0.1f;
-  public static final float TELEPORT_DIFFERENCE_THRESHOLD = .5f;
-  public static final float TELEPORT_DIFFERENCE_Y_OFFSET = 0.01f;
-  public static final float DEFAULT_GRAVITY_SCALE = 2f;
-  public static final long FREEZE_DESPAWN_TIMEOUT_MS = 1000L;
-  public static final float MIN_CHECK_STEP = 0.1f;
-  public static final long DISPOSED_SANITY_CHECK_DELAY = 10L;
-  public static final float DEFAULT_FIXTURE_DENSITY = 1000f;
-  public static final float DEFAULT_FIXTURE_FRICTION = 10f;
-  public static final float DEFAULT_FIXTURE_RESTITUTION = 0.025f;
-  @NotNull
-  private final World world;
+  @NotNull private final World world;
   private final UUID uuid;
 
   // Note: must only be accessed with getters
@@ -96,8 +78,7 @@ public abstract class Entity
   private final Vector2 posCache;
   private final Vector2 velCache;
   private int groundContacts;
-  @NotNull
-  private Filter filter = Filters.EN_GR__ENTITY_FILTER;
+  @NotNull private Filter filter = Filters.EN_GR__ENTITY_FILTER;
   private float lookDeg;
 
   @GuardedBy("entityLock")
@@ -105,12 +86,12 @@ public abstract class Entity
 
   public Entity(@NotNull World world, @NotNull ProtoWorld.EntityOrBuilder protoEntity) {
     this(
-      world,
-      protoEntity.getPosition().getX(),
-      protoEntity.getPosition().getY(),
-      false,
-      UUID.fromString(protoEntity.getUuid()),
-      false);
+        world,
+        protoEntity.getPosition().getX(),
+        protoEntity.getPosition().getY(),
+        false,
+        UUID.fromString(protoEntity.getUuid()),
+        false);
     if (isDisposed()) {
       return;
     }
@@ -121,10 +102,10 @@ public abstract class Entity
     ProtoWorld.Vector2f velocity = protoEntity.getVelocity();
     if (velocity.getX() != 0f || velocity.getY() != 0f) {
       postWorldBodyRunnable(
-        body -> {
-          body.setLinearVelocity(velocity.getX(), velocity.getY());
-          return null;
-        });
+          body -> {
+            body.setLinearVelocity(velocity.getX(), velocity.getY());
+            return null;
+          });
     }
   }
 
@@ -133,27 +114,27 @@ public abstract class Entity
   }
 
   protected Entity(
-    @NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
+      @NotNull World world, float worldX, float worldY, boolean center, @NotNull UUID uuid) {
     this(world, worldX, worldY, center, uuid, true);
   }
 
   protected Entity(
-    @NotNull World world,
-    float worldX,
-    float worldY,
-    boolean center,
-    @NotNull UUID uuid,
-    boolean validateLocation) {
+      @NotNull World world,
+      float worldX,
+      float worldY,
+      boolean center,
+      @NotNull UUID uuid,
+      boolean validateLocation) {
     this.uuid = uuid;
     this.world = world;
     posCache = new Vector2(worldX, worldY);
     velCache = new Vector2();
 
-    if (world.containsEntity(uuid)) {
-      Main.logger().warn("World already contains entity with uuid " + uuid);
-      dispose();
-      return;
-    }
+    //    if (world.containsEntity(uuid)) {
+    //      Main.logger().warn("World already contains entity with uuid " + uuid);
+    //      dispose();
+    //      return;
+    //    }
 
     if (center) {
       posCache.add(getHalfBox2dWidth(), getHalfBox2dHeight());
@@ -163,17 +144,17 @@ public abstract class Entity
       switch (invalidSpawnLocationAction()) {
         case DELETE -> {
           Main.logger()
-            .debug(
-              "Entity",
-              String.format(
-                "Did not spawn %s at (%.2f,%.2f) as the spawn is invalid",
-                simpleName(), posCache.x, posCache.y));
+              .debug(
+                  "Entity",
+                  String.format(
+                      "Did not spawn %s at (%.2f,%.2f) as the spawn is invalid",
+                      simpleName(), posCache.x, posCache.y));
           dispose();
           return;
         }
         case PUSH_UP -> {
           // make sure we're not stuck in an infinite loop if the given height is zero
-          float checkStep = Math.min(getHalfBox2dHeight(), MIN_CHECK_STEP);
+          float checkStep = Math.min(getHalfBox2dHeight(), Constants.MIN_CHECK_STEP);
           while (isInvalidLocation(posCache.x, posCache.y)) {
             posCache.y += checkStep;
           }
@@ -184,45 +165,45 @@ public abstract class Entity
     if (Main.inst().isNotTest()) {
       BodyDef def = createBodyDef(posCache.x, posCache.y);
       world
-        .getWorldBody()
-        .createBody(
-          def,
-          newBody -> {
-            synchronized (entityLock) {
-              setBody(newBody);
-              createFixture(newBody);
-              newBody.setGravityScale(DEFAULT_GRAVITY_SCALE);
-              newBody.setUserData(this);
+          .getWorldBody()
+          .createBody(
+              def,
+              newBody -> {
+                synchronized (entityLock) {
+                  setBody(newBody);
+                  createFixture(newBody);
+                  newBody.setGravityScale(Constants.DEFAULT_GRAVITY_SCALE);
+                  newBody.setUserData(this);
 
-              for (Function1<@NotNull Body, @Nullable Void> runnable : bodyCreations) {
-                runnable.invoke(newBody);
-              }
-              bodyCreations.clear();
-            }
-            return null;
-          });
+                  for (Function1<@NotNull Body, @Nullable Void> runnable : bodyCreations) {
+                    runnable.invoke(newBody);
+                  }
+                  bodyCreations.clear();
+                }
+                return null;
+              });
     }
 
     // Sanity check
-    Main.inst()
-      .getScheduler()
-      .scheduleSync(
-        DISPOSED_SANITY_CHECK_DELAY,
-        () -> {
-          if (!isDisposed() && !world.containsEntity(uuid)) {
-            Main.logger()
-              .warn(
-                "Failed to find entity "
-                  + simpleName()
-                  + " '"
-                  + hudDebug()
-                  + "' uuid "
-                  + uuid
-                  + " in the world '"
-                  + world
-                  + "'! Did you forget to add it?");
-          }
-        });
+    //    Main.inst()
+    //      .getScheduler()
+    //      .scheduleSync(
+    //        Constants.DISPOSED_SANITY_CHECK_DELAY,
+    //        () -> {
+    //          if (!isDisposed() && !world.containsEntity(uuid)) {
+    //            Main.logger()
+    //              .warn(
+    //                "Failed to find entity "
+    //                  + simpleName()
+    //                  + " '"
+    //                  + hudDebug()
+    //                  + "' uuid "
+    //                  + uuid
+    //                  + " in the world '"
+    //                  + world
+    //                  + "'! Did you forget to add it?");
+    //          }
+    //        });
   }
 
   /**
@@ -242,16 +223,16 @@ public abstract class Entity
       Body currentBody = getUnsafeBody();
       if (currentBody != null) {
         world
-          .getWorldBody()
-          .postBox2dRunnable(
-            () -> {
-              synchronized (entityLock) {
-                if (isDisposed()) {
-                  return;
-                }
-                runnable.invoke(currentBody);
-              }
-            });
+            .getWorldBody()
+            .postBox2dRunnable(
+                () -> {
+                  synchronized (entityLock) {
+                    if (isDisposed()) {
+                      return;
+                    }
+                    runnable.invoke(currentBody);
+                  }
+                });
       } else {
         bodyCreations.add(runnable);
       }
@@ -280,9 +261,9 @@ public abstract class Entity
 
     FixtureDef def = new FixtureDef();
     def.shape = shape;
-    def.density = DEFAULT_FIXTURE_DENSITY;
-    def.friction = DEFAULT_FIXTURE_FRICTION;
-    def.restitution = DEFAULT_FIXTURE_RESTITUTION; // a bit bouncy!
+    def.density = Constants.DEFAULT_FIXTURE_DENSITY;
+    def.friction = Constants.DEFAULT_FIXTURE_FRICTION;
+    def.restitution = Constants.DEFAULT_FIXTURE_RESTITUTION; // a bit bouncy!
 
     Fixture fix = body.createFixture(def);
     fix.setFilterData(Filters.EN_GR__ENTITY_FILTER);
@@ -304,86 +285,87 @@ public abstract class Entity
   }
 
   public void translate(
-    float worldX, float worldY, float velX, float velY, float lookAngleDeg, boolean validate) {
-    if (isDisposed()) {
-      return;
-    }
-    if (validate) {
-      int tries = getHeight() / Block.BLOCK_SIZE;
-      boolean invalid = true;
-      for (int y = tries - 1; y >= -tries; y--) {
-        if (!isInvalidLocation(worldX, worldY + y)) {
-          worldY += y;
-          invalid = false;
-          break;
-        }
-      }
-      if (invalid) {
-        Main.logger()
-          .error(
-            "Entity",
-            String.format(
-              "Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)",
-              this, worldX, worldY, posCache.x, posCache.y));
-        return;
-      }
-    }
-    float newWorldY = worldY;
-
-    WorldBody worldBody = world.getWorldBody();
-    float physicsWorldX = worldX + worldBody.getWorldOffsetX();
-    float physicsWorldY = worldY + worldBody.getWorldOffsetY();
-    setLookDeg(lookAngleDeg);
-
-    world.postBox2dRunnable(
-      () -> {
-        boolean sendMovePacket = false;
-        synchronized (entityLock) {
-          var currentBody = getUnsafeBody();
-          if (isDisposed() || currentBody == null) {
-            return;
-          }
-          updatePos();
-          // If we're too far away teleport the entity to its correct location
-          // and add a bit to the y coordinate, so we don't fall through the floor
-          if ((Main.isServerClient()
-            && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
-            || Math.abs(physicsWorldX - posCache.x) > TELEPORT_DIFFERENCE_THRESHOLD
-            || Math.abs(physicsWorldY - posCache.y) > TELEPORT_DIFFERENCE_THRESHOLD) {
-            posCache.x = worldX;
-            posCache.y = newWorldY;
-            currentBody.setTransform(
-              physicsWorldX, physicsWorldY + TELEPORT_DIFFERENCE_Y_OFFSET, 0);
-            sendMovePacket = true;
-          }
-          currentBody.setLinearVelocity(velX, velY);
-          velCache.x = velX;
-          velCache.y = velY;
-
-          currentBody.setAwake(true);
-        }
-        if (Main.isServer() && sendMovePacket) {
-          //      Main.logger()
-          //          .debug(
-          //              "server",
-          //              "Force updating entity "
-          //                  + hudDebug()
-          //                  + " to position ("
-          //                  + posCache.x
-          //                  + ", "
-          //                  + posCache.y
-          //                  + ")");
-          Main.inst()
-            .getScheduler()
-            .executeAsync(
-              () ->
-                PacketExtraKt.broadcastToInView(
-                  PacketExtraKt.clientBoundMoveEntity(this),
-                  getBlockX(),
-                  getBlockY(),
-                  null));
-        }
-      });
+      float worldX, float worldY, float velX, float velY, float lookAngleDeg, boolean validate) {
+    //    if (isDisposed()) {
+    //      return;
+    //    }
+    //    if (validate) {
+    //      int tries = getHeight() / Block.BLOCK_SIZE;
+    //      boolean invalid = true;
+    //      for (int y = tries - 1; y >= -tries; y--) {
+    //        if (!isInvalidLocation(worldX, worldY + y)) {
+    //          worldY += y;
+    //          invalid = false;
+    //          break;
+    //        }
+    //      }
+    //      if (invalid) {
+    //        Main.logger()
+    //          .error(
+    //            "Entity",
+    //            String.format(
+    //              "Failed to teleport entity %s to (% 4.2f,% 4.2f) from (% 4.2f,% 4.2f)",
+    //              this, worldX, worldY, posCache.x, posCache.y));
+    //        return;
+    //      }
+    //    }
+    //    float newWorldY = worldY;
+    //
+    //    WorldBody worldBody = world.getWorldBody();
+    //    float physicsWorldX = worldX + worldBody.getWorldOffsetX();
+    //    float physicsWorldY = worldY + worldBody.getWorldOffsetY();
+    //    setLookDeg(lookAngleDeg);
+    //
+    //    world.postBox2dRunnable(
+    //      () -> {
+    //        boolean sendMovePacket = false;
+    //        synchronized (entityLock) {
+    //          var currentBody = getUnsafeBody();
+    //          if (isDisposed() || currentBody == null) {
+    //            return;
+    //          }
+    //          updatePos();
+    //          // If we're too far away teleport the entity to its correct location
+    //          // and add a bit to the y coordinate, so we don't fall through the floor
+    //          if ((Main.isServerClient()
+    //            && !ClientMain.inst().getServerClient().getUuid().equals(uuid))
+    //            || Math.abs(physicsWorldX - posCache.x) > Constants.TELEPORT_DIFFERENCE_THRESHOLD
+    //            || Math.abs(physicsWorldY - posCache.y) > Constants.TELEPORT_DIFFERENCE_THRESHOLD)
+    // {
+    //            posCache.x = worldX;
+    //            posCache.y = newWorldY;
+    //            currentBody.setTransform(
+    //              physicsWorldX, physicsWorldY + Constants.TELEPORT_DIFFERENCE_Y_OFFSET, 0);
+    //            sendMovePacket = true;
+    //          }
+    //          currentBody.setLinearVelocity(velX, velY);
+    //          velCache.x = velX;
+    //          velCache.y = velY;
+    //
+    //          currentBody.setAwake(true);
+    //        }
+    //        if (Main.isServer() && sendMovePacket) {
+    //                Main.logger()
+    //                    .debug(
+    //                        "server",
+    //                        "Force updating entity "
+    //                            + hudDebug()
+    //                            + " to position ("
+    //                            + posCache.x
+    //                            + ", "
+    //                            + posCache.y
+    //                            + ")");
+    //          Main.inst()
+    //            .getScheduler()
+    //            .executeAsync(
+    //              () ->
+    //                PacketExtraKt.broadcastToInView(
+    //                  PacketExtraKt.clientBoundMoveEntity(this),
+    //                  getBlockX(),
+    //                  getBlockY(),
+    //                  null));
+    //        }
+    //      });
   }
 
   /**
@@ -398,7 +380,7 @@ public abstract class Entity
    * @param worldX World x coordinate to pretend the player is at
    * @param worldY World y coordinate to pretend the player is at
    * @return An unordered collection of all the blocks this entity would be touching if it was
-   * located here
+   *     located here
    */
   @NotNull
   public ObjectSet<@NotNull Block> touchingBlocks(float worldX, float worldY, boolean load) {
@@ -425,7 +407,7 @@ public abstract class Entity
    * @param worldX World x coordinate to pretend the player is at
    * @param worldY World y coordinate to pretend the player is at
    * @return An unordered collection of all the locations this entity would be touching if it was
-   * located here
+   *     located here
    */
   @NotNull
   public ObjectSet<@NotNull Location> touchingLocations(float worldX, float worldY) {
@@ -498,8 +480,8 @@ public abstract class Entity
       for (; y < maxY; y++) {
         var block = world.getRawBlock(x, y, true);
         if (block == null
-          || block.getMaterial() == Material.AIR
-          || (block instanceof EntityBlock entityBlock && entityBlock.getEntity() == this)) {
+            || block.getMaterial() == Material.AIR
+            || (block instanceof EntityBlock entityBlock && entityBlock.getEntity() == this)) {
           continue;
         }
         return false;
@@ -528,20 +510,21 @@ public abstract class Entity
     var rect = new Rectangle(worldX, worldY, getHalfBox2dWidth() * 2, getHalfBox2dHeight() * 2);
 
     var otherRect = new Rectangle();
-    for (Entity entity : world.getEntities()) {
-      // ignore entities we do not collide with and self
-      if (entity == this
-        || (getFilter().maskBits & entity.getFilter().categoryBits) == 0
-        || (entity.getFilter().maskBits & getFilter().categoryBits) == 0) {
-        continue;
-      }
-
-      Vector2 pos = entity.getPosition();
-      otherRect.set(pos.x, pos.y, entity.getHalfBox2dWidth() * 2, entity.getHalfBox2dHeight() * 2);
-      if (rect.overlaps(otherRect)) {
-        entities.add(entity);
-      }
-    }
+    //    for (var entity : world.getEntities()) {
+    //      // ignore entities we do not collide with and self
+    //      if (entity == this
+    //        || (getFilter().maskBits & entity.getFilter().categoryBits) == 0
+    //        || (entity.getFilter().maskBits & getFilter().categoryBits) == 0) {
+    //        continue;
+    //      }
+    //
+    //      Vector2 pos = entity.getPosition();
+    //      otherRect.set(pos.x, pos.y, entity.getHalfBox2dWidth() * 2, entity.getHalfBox2dHeight()
+    // * 2);
+    //      if (rect.overlaps(otherRect)) {
+    //        entities.add(entity);
+    //      }
+    //    }
     return entities;
   }
 
@@ -562,7 +545,7 @@ public abstract class Entity
 
   /**
    * @return Position of this entity last tick, note that the same vector is returned each time. You
-   * should not edit this vector
+   *     should not edit this vector
    */
   @NotNull
   public Vector2 getPosition() {
@@ -572,8 +555,8 @@ public abstract class Entity
   @NotNull
   public Vector2 getPhysicsPosition() {
     return posCache
-      .cpy()
-      .add(world.getWorldBody().getWorldOffsetX(), world.getWorldBody().getWorldOffsetY());
+        .cpy()
+        .add(world.getWorldBody().getWorldOffsetX(), world.getWorldBody().getWorldOffsetY());
   }
 
   /**
@@ -584,18 +567,18 @@ public abstract class Entity
   public void setFilter(@NotNull Filter filter) {
     this.filter = filter;
     postWorldBodyRunnable(
-      body -> {
-        for (Fixture fixture : body.getFixtureList()) {
-          fixture.setFilterData(filter);
-        }
-        return null;
-      });
+        body -> {
+          for (Fixture fixture : body.getFixtureList()) {
+            fixture.setFilterData(filter);
+          }
+          return null;
+        });
   }
 
   /**
    * Must be called while synchronized under BOX2D_LOCK
    *
-   * @param type    The type of contact
+   * @param type The type of contact
    * @param contact Contact made
    */
   @Override
@@ -608,11 +591,11 @@ public abstract class Entity
         // newest pos is needed to accurately check if this is on ground
         updatePos();
 
-        int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - GROUND_CHECK_OFFSET);
+        int y = MathUtils.floor(posCache.y - getHalfBox2dHeight() - Constants.GROUND_CHECK_OFFSET);
 
         int leftX = MathUtils.ceil(posCache.x - (2 * getHalfBox2dWidth()));
         int middleX = MathUtils.floor(posCache.x - getHalfBox2dWidth());
-        int rightX = MathUtils.ceil(posCache.x - GROUND_CHECK_OFFSET);
+        int rightX = MathUtils.ceil(posCache.x - Constants.GROUND_CHECK_OFFSET);
 
         int detected = 0;
 
@@ -637,72 +620,69 @@ public abstract class Entity
     }
   }
 
-  /**
-   * Update the cached position and velocity
-   */
+  /** Update the cached position and velocity */
   public final void updatePos() {
     // must sync with box2d lock, as the side effect is what we desire
     synchronizeBox2dAndEntity(
-      () -> {
-        Body currentBody = getUnsafeBody();
-        if (isDisposed() || currentBody == null) {
-          return;
-        }
-        WorldBody worldBody = world.getWorldBody();
+        () -> {
+          Body currentBody = getUnsafeBody();
+          if (isDisposed() || currentBody == null) {
+            return;
+          }
+          WorldBody worldBody = world.getWorldBody();
 
-        posCache
-          .set(currentBody.getPosition())
-          .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
-        velCache.set(currentBody.getLinearVelocity());
-      });
+          posCache
+              .set(currentBody.getPosition())
+              .sub(worldBody.getWorldOffsetX(), worldBody.getWorldOffsetY());
+          velCache.set(currentBody.getLinearVelocity());
+        });
   }
 
   @Override
   public void tick() {
-    if (isDisposed()) {
-      return;
-    }
-    float nx;
-    boolean tooFastX = abs(velCache.x) > MAX_X_VEL;
-    if (tooFastX) {
-      nx = signum(velCache.x) * MAX_X_VEL;
-    } else {
-      nx = velCache.x;
-    }
-
-    float ny;
-    boolean tooFastY = abs(velCache.y) > MAX_Y_VEL;
-    if (tooFastY) {
-      ny = signum(velCache.y) * MAX_Y_VEL;
-    } else {
-      ny = velCache.y;
-    }
-
-    if (tooFastX || tooFastY) {
-
-      postWorldBodyRunnable(
-        body -> {
-          body.setLinearVelocity(nx, ny);
-          return null;
-        });
-    }
-    if (Main.isServer()) {
-      Main.inst()
-        .getScheduler()
-        .executeSync(
-          () ->
-            PacketExtraKt.broadcastToInView(
-              PacketExtraKt.clientBoundMoveEntity(this),
-              getBlockX(),
-              getBlockY(),
-              // don't send packet to the owning player
-              (channel, credentials) -> credentials.getEntityUUID() != getUuid()));
-    }
+    //    if (isDisposed()) {
+    //      return;
+    //    }
+    //    float nx;
+    //    boolean tooFastX = abs(velCache.x) > MAX_X_VEL;
+    //    if (tooFastX) {
+    //      nx = signum(velCache.x) * MAX_X_VEL;
+    //    } else {
+    //      nx = velCache.x;
+    //    }
+    //
+    //    float ny;
+    //    boolean tooFastY = abs(velCache.y) > MAX_Y_VEL;
+    //    if (tooFastY) {
+    //      ny = signum(velCache.y) * MAX_Y_VEL;
+    //    } else {
+    //      ny = velCache.y;
+    //    }
+    //
+    //    if (tooFastX || tooFastY) {
+    //
+    //      postWorldBodyRunnable(
+    //        body -> {
+    //          body.setLinearVelocity(nx, ny);
+    //          return null;
+    //        });
+    //    }
+    //    if (Main.isServer()) {
+    //      Main.inst()
+    //        .getScheduler()
+    //        .executeSync(
+    //          () ->
+    //            PacketExtraKt.broadcastToInView(
+    //              PacketExtraKt.clientBoundMoveEntity(this),
+    //              getBlockX(),
+    //              getBlockY(),
+    //              // don't send packet to the owning player
+    //              (channel, credentials) -> credentials.getEntityUUID() != getUuid()));
+    //    }
   }
 
   @Override
-  public void tickRare() {
-  }
+  public void tickRare() {}
 
   @NotNull
   @Override
@@ -714,39 +694,40 @@ public abstract class Entity
    * Freeze the entity, it will not interact with the world anymore
    *
    * @param despawnAfterTimeout Despawn if nothing have happened in {@link
-   *                            #FREEZE_DESPAWN_TIMEOUT_MS} time
+   *     Constants#FREEZE_DESPAWN_TIMEOUT_MS} time
    */
   public void freeze(boolean despawnAfterTimeout) {
     postWorldBodyRunnable(
-      body -> {
-        setFilter(NON_INTERACTIVE_FILTER);
-        body.setLinearVelocity(0, 0);
-        body.setGravityScale(0f);
-        return null;
-      });
+        body -> {
+          setFilter(NON_INTERACTIVE_FILTER);
+          body.setLinearVelocity(0, 0);
+          body.setGravityScale(0f);
+          return null;
+        });
 
     // Remove
-    if (despawnAfterTimeout) {
-
-      Main.inst()
-        .getScheduler()
-        .scheduleSync(
-          FREEZE_DESPAWN_TIMEOUT_MS,
-          () -> {
-            if (isDisposed()) {
-              return;
-            }
-            if (Main.isServerClient()) {
-              // Ask the server about the entity
-              ServerClient client = ClientMain.inst().getServerClient();
-              if (client != null) {
-                client.ctx.writeAndFlush(PacketExtraKt.serverBoundEntityRequest(client, uuid));
-                return;
-              }
-            }
-            world.removeEntity(this);
-          });
-    }
+    //    if (despawnAfterTimeout) {
+    //
+    //      Main.inst()
+    //        .getScheduler()
+    //        .scheduleSync(
+    //          Constants.FREEZE_DESPAWN_TIMEOUT_MS,
+    //          () -> {
+    //            if (isDisposed()) {
+    //              return;
+    //            }
+    //            if (Main.isServerClient()) {
+    //              // Ask the server about the entity
+    //              ServerClient client = ClientMain.inst().getServerClient();
+    //              if (client != null) {
+    //                client.ctx.writeAndFlush(PacketExtraKt.serverBoundEntityRequest(client,
+    // uuid));
+    //                return;
+    //              }
+    //            }
+    //            //            world.removeEntity(this);
+    //          });
+    //    }
   }
 
   /**
@@ -830,16 +811,16 @@ public abstract class Entity
   public void setFlying(boolean flying) {
     this.flying = flying;
     postWorldBodyRunnable(
-      body -> {
-        if (flying) {
-          body.setLinearVelocity(0, 0);
-          body.setGravityScale(0);
-        } else {
-          body.setGravityScale(DEFAULT_GRAVITY_SCALE);
-          body.setAwake(true);
-        }
-        return null;
-      });
+        body -> {
+          if (flying) {
+            body.setLinearVelocity(0, 0);
+            body.setGravityScale(0);
+          } else {
+            body.setGravityScale(Constants.DEFAULT_GRAVITY_SCALE);
+            body.setAwake(true);
+          }
+          return null;
+        });
   }
 
   public World getWorld() {
@@ -858,9 +839,6 @@ public abstract class Entity
     return getClass().getSimpleName();
   }
 
-  /**
-   * Do not call directly. Use {@link World#removeEntity(Entity)}
-   */
   @Override
   public void dispose() {
     synchronized (entityLock) {
@@ -889,11 +867,11 @@ public abstract class Entity
     ProtoWorld.Entity.Builder builder = ProtoWorld.Entity.newBuilder();
 
     synchronizeBox2dAndEntity(
-      () -> {
-        updatePos();
-        builder.setPosition(ProtoWorld.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
-        builder.setVelocity(ProtoWorld.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
-      });
+        () -> {
+          updatePos();
+          builder.setPosition(ProtoWorld.Vector2f.newBuilder().setX(posCache.x).setY(posCache.y));
+          builder.setVelocity(ProtoWorld.Vector2f.newBuilder().setX(velCache.x).setY(velCache.y));
+        });
     builder.setUuid(uuid.toString());
     builder.setType(getEntityType());
     builder.setFlying(flying);
@@ -903,8 +881,8 @@ public abstract class Entity
 
   @Nullable
   public static Entity load(
-    @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
-    var uuid = ExtraKt.fromUUIDOrNull(protoEntity.getUuid());
+      @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
+    var uuid = protoEntity.getUuid();
     if (uuid == null) {
       Main.logger().warn(" " + protoEntity.getUuid());
       return null;
@@ -938,8 +916,8 @@ public abstract class Entity
       }
       default -> {
         Main.logger()
-          .error(
-            "LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
+            .error(
+                "LOAD", "Failed to load entity due to unknown type: " + protoEntity.getTypeValue());
         return null;
       }
     }
@@ -948,7 +926,7 @@ public abstract class Entity
       Main.logger().error("LOAD", "Loaded entity is already disposed!");
       return null;
     }
-    world.addEntity(entity, false);
+    //    world.addEntity(entity, false);
 
     return entity;
   }

@@ -31,12 +31,9 @@ import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ClientBoundHandler.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.CoordUtil
-import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.ServerClientWorld
-import no.elg.infiniteBootleg.world.subgrid.Entity
-import no.elg.infiniteBootleg.world.subgrid.LivingEntity
-import java.util.UUID
+import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
 import java.util.concurrent.TimeUnit
 
 /**
@@ -184,20 +181,15 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return
   }
-  val loaded = Entity.load(world, chunk, spawnEntity.entity)
-  if (loaded is LivingEntity && uuid == loaded.uuid) {
-    // it's us!
-    loaded.enableGravity()
-  }
+//  val loaded = Entity.load(world, chunk, spawnEntity.entity)
+//  if (loaded is LivingEntity && uuid == loaded.uuid) {
+//    // it's us!
+//    loaded.enableGravity()
+//  }
 }
 
 private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
-  val uuid = try {
-    UUID.fromString(secretExchange.entityUUID)
-  } catch (e: IllegalArgumentException) {
-    ctx.fatal("Failed to decode entity UUID ${secretExchange.entityUUID}")
-    return
-  }
+  val uuid = secretExchange.entityUUID
   val sharedInformation = SharedInformation(uuid, secretExchange.secret)
   this.sharedInformation = sharedInformation
   Main.logger().debug("LOGIN", "Secret received from sever sending response")
@@ -262,13 +254,14 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
         return
       }
       ConnectingScreen.info = "Login success!"
-      val player = world.getPlayer(UUID.fromString(entity.uuid))
-      if (player == null || player.isDisposed) {
+      val player = world.getEntity(entity.uuid)
+      if (player == null) {
         ctx.fatal("Invalid player client side reason: ${if (player == null) "Player is null" else "Player invalid"}")
       } else {
         world.worldTicker.start()
         ClientMain.inst().screen = WorldScreen(world, false)
-        player.giveControls()
+        player.add(ControlledComponent(ControlledComponent.Companion.ControlMode.LOCAL))
+
         started = true
 
         // Change the info text to something generic in case the server throws an error and no further information is received
@@ -307,7 +300,7 @@ private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     return
   }
 
-  val uuid = fromUUIDOrNull(moveEntity.uuid)
+  val uuid = moveEntity.uuid
   if (uuid == null) {
     ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
     return
@@ -318,7 +311,7 @@ private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     ctx.writeAndFlush(serverBoundEntityRequest(uuid))
     return
   }
-  entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
+//  entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
 }
 
 private fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
@@ -327,7 +320,7 @@ private fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {
     Main.logger().error("handleDespawnEntity", "Failed to find world")
     return
   }
-  val uuid = fromUUIDOrNull(despawnEntity.uuid)
+  val uuid = despawnEntity.uuid
   if (uuid == null) {
     Main.logger().error("handleDespawnEntity", "Failed to parse UUID '${despawnEntity.uuid}'")
     return
