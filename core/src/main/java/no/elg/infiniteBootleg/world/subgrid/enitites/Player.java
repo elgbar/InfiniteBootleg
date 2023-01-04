@@ -25,7 +25,7 @@ public class Player extends LivingEntity {
 
   public static final String PLAYER_REGION_NAME = "player";
 
-  @Nullable private static final TextureRegion TEXTURE_REGION;
+  //  @Nullable private static final TextureRegion TEXTURE_REGION;
   @Nullable private EntityControls controls;
 
   public Player(@NotNull World world, @NotNull ProtoWorld.Entity protoEntity) {
@@ -61,15 +61,6 @@ public class Player extends LivingEntity {
     }
     if (Settings.client) {
       ClientMain.inst().setPlayer(this);
-    }
-  }
-
-  static {
-    if (Settings.client) {
-      TEXTURE_REGION =
-          new TextureRegion(ClientMain.inst().getEntityAtlas().findRegion(PLAYER_REGION_NAME));
-    } else {
-      TEXTURE_REGION = null;
     }
   }
 
@@ -115,7 +106,7 @@ public class Player extends LivingEntity {
 
   @Override
   public TextureRegion getTextureRegion() {
-    return TEXTURE_REGION;
+    return null;
   }
 
   @Override

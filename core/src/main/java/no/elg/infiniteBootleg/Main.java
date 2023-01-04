@@ -17,10 +17,6 @@ public interface Main extends ApplicationListener {
 
   String EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar;
   String WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar;
-  String TEXTURES_FOLDER = "textures" + File.separatorChar;
-  String FONTS_FOLDER = "fonts" + File.separatorChar;
-  String TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas";
-  String TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas";
   String VERSION_FILE = "version";
 
   Object INST_LOCK = new Object();

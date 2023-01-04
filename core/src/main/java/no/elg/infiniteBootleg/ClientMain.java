@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.kotcrab.vis.ui.VisUI;
@@ -41,8 +40,6 @@ public class ClientMain extends CommonMain {
   @NotNull private final InputMultiplexer inputMultiplexer;
   private final Vector2 mouseWorldInput = new Vector2();
   private final Vector3 screenInputVec = new Vector3();
-  @NotNull private TextureAtlas blockAtlas;
-  @NotNull private TextureAtlas entityAtlas;
   @NotNull private ScreenRenderer screenRenderer;
   private int mouseBlockX;
   private int mouseBlockY;
@@ -59,8 +56,6 @@ public class ClientMain extends CommonMain {
   private boolean multiplayer;
 
   private String renderThreadName;
-
-  @Nullable private volatile Player mainPlayer;
 
   @NotNull
   public static ClientMain inst() {
@@ -115,8 +110,6 @@ public class ClientMain extends CommonMain {
             + //
             "  Apostrophe (') to open console (type help for help)");
     screenRenderer = new ScreenRenderer();
-    blockAtlas = new TextureAtlas(TEXTURES_BLOCK_FILE);
-    entityAtlas = new TextureAtlas(TEXTURES_ENTITY_FILE);
     setScreen(MainMenuScreen.INSTANCE);
 
     Runnable onShutdown =
@@ -195,8 +188,6 @@ public class ClientMain extends CommonMain {
     super.dispose();
     if (Settings.client) {
       screenRenderer.dispose();
-      blockAtlas.dispose();
-      entityAtlas.dispose();
       VisUI.dispose();
       if (screen != null) {
         screen.dispose();
@@ -255,18 +246,18 @@ public class ClientMain extends CommonMain {
     return null;
   }
 
-  @Nullable
-  public Player getPlayer() {
-    ServerClient serverClient = getServerClient();
-    if (serverClient != null) {
-      //      return serverClient.getPlayer();
-    }
-    var world = getWorld();
-    if (world == null) {
-      return null;
-    }
-    return mainPlayer;
-  }
+  //  @Nullable
+  //  public Player getPlayer() {
+  //    ServerClient serverClient = getServerClient();
+  //    if (serverClient != null) {
+  //      //      return serverClient.getPlayer();
+  //    }
+  //    var world = getWorld();
+  //    if (world == null) {
+  //      return null;
+  //    }
+  //    return mainPlayer;
+  //  }
 
   public void setPlayer(@Nullable Player player) {
     if (Main.isMultiplayer()) {
@@ -311,16 +302,6 @@ public class ClientMain extends CommonMain {
 
   public @NotNull InputMultiplexer getInputMultiplexer() {
     return inputMultiplexer;
-  }
-
-  @NotNull
-  public TextureAtlas getBlockAtlas() {
-    return blockAtlas;
-  }
-
-  @NotNull
-  public TextureAtlas getEntityAtlas() {
-    return entityAtlas;
   }
 
   public int getMouseBlockX() {

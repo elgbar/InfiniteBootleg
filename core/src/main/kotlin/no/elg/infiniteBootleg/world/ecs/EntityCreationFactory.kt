@@ -6,11 +6,13 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import ktx.ashley.entity
 import ktx.ashley.plusAssign
 import ktx.ashley.with
+import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -42,6 +44,7 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
 
   with(NamedComponent(name))
   with<KillableComponent>()
+  with(TextureRegionComponent(KAssets.playerTexture))
 
   createBody2DBodyComponent(entity, world, worldX, worldY)
 }

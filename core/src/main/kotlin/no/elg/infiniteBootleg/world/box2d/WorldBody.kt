@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array.ArrayIterator
 import com.badlogic.gdx.utils.OrderedSet
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.CheckableDisposable
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Ticking
@@ -169,22 +168,22 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         if (disposed) {
           return@synchronized
         }
-        val player = ClientMain.inst().player ?: return
-        if (player.isDisposed) {
-          return
-        }
+//        val player = ClientMain.inst().player ?: return
+//        if (player.isDisposed) {
+//          return
+//        }
 
-        val physicsPosition = player.physicsPosition
-        val shiftX = calculateShift(physicsPosition.x)
-        val shiftY = calculateShift(physicsPosition.y)
+//        val physicsPosition = player.physicsPosition
+//        val shiftX = calculateShift(physicsPosition.x)
+//        val shiftY = calculateShift(physicsPosition.y)
 
-        if (shiftX == 0f && shiftY == 0f) {
-          // Still in-bounds
-          return
-        }
+//        if (shiftX == 0f && shiftY == 0f) {
+//          // Still in-bounds
+//          return
+//        }
         // the toShift method assumes no offset, so we must subtract the old offset from the new
-        shiftWorldOffset(shiftX, shiftY)
-        Main.logger().debug("BOX2D", "Shifting world offset by ($shiftX, $shiftY) now ($worldOffsetX, $worldOffsetY)")
+//        shiftWorldOffset(shiftX, shiftY)
+//        Main.logger().debug("BOX2D", "Shifting world offset by ($shiftX, $shiftY) now ($worldOffsetX, $worldOffsetY)")
       }
     }
   }

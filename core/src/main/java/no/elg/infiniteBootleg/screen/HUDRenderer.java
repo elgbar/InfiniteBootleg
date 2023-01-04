@@ -5,11 +5,9 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Renderer;
 import no.elg.infiniteBootleg.api.Resizable;
-import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screen.hud.DebugGraph;
 import no.elg.infiniteBootleg.screen.hud.DebugText;
 import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.subgrid.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +38,6 @@ public class HUDRenderer implements Renderer, Resizable {
     ClientMain main = ClientMain.inst();
     @Nullable ClientWorld world = main.getWorld();
 
-    LivingEntity player = ClientMain.inst().getPlayer();
     ScreenRenderer sr = ClientMain.inst().getScreenRenderer();
 
     reset();
@@ -59,8 +56,8 @@ public class HUDRenderer implements Renderer, Resizable {
       nl();
       DebugText.viewChunk(builder, world);
       nl();
-      DebugText.pos(builder, player);
-      nl();
+      //      DebugText.pos(builder, player);
+      //      nl();
       DebugText.time(builder, world);
       nl();
       DebugText.lights(builder, world, mouseBlockX, mouseBlockY);
@@ -71,9 +68,9 @@ public class HUDRenderer implements Renderer, Resizable {
       sr.drawTop(builder.toString(), 1);
     }
 
-    if (player != null && hasMode(DISPLAY_CURRENT_BLOCK)) {
-      CurrentBlock.INSTANCE.render(sr, player);
-    }
+    //    if (player != null && hasMode(DISPLAY_CURRENT_BLOCK)) {
+    //      CurrentBlock.INSTANCE.render(sr, player);
+    //    }
     if (hasMode(DISPLAY_GRAPH_FPS)) {
       DebugGraph.INSTANCE.render(sr, world);
     }

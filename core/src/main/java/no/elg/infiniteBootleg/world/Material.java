@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import no.elg.infiniteBootleg.ClientMain;
+import no.elg.infiniteBootleg.KAssets;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.items.ItemType;
@@ -124,7 +124,7 @@ public enum Material {
     this.placable = placable;
     this.hardness = hardness;
     if (Settings.client && itemType != ItemType.AIR) {
-      texture = ClientMain.inst().getBlockAtlas().findRegion(name().toLowerCase());
+      texture = KAssets.INSTANCE.getBlockAtlas().findRegion(name().toLowerCase());
       if (texture == null) {
         throw new NullPointerException("Failed to find a texture for " + name());
       }

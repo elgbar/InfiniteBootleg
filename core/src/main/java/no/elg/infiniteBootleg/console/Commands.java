@@ -72,11 +72,12 @@ public class Commands extends CommandExecutor {
 
   @Nullable
   private Player getSPPlayer() {
-    Player player = ClientMain.inst().getPlayer();
-    if (player == null) {
-      logger.error("CMD", "Failed to find any players");
-    }
-    return player;
+    //    Player player = ClientMain.inst().getPlayer();
+    //    if (player == null) {
+    //      logger.error("CMD", "Failed to find any players");
+    //    }
+    //    return player;
+    return null;
   }
 
   @CmdArgNames({"red", "green", "blue", "alpha"})

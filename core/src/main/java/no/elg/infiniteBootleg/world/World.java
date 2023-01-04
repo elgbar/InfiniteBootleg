@@ -32,7 +32,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.concurrent.GuardedBy;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
-import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Resizable;
@@ -67,7 +66,6 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
 import no.elg.infiniteBootleg.world.subgrid.Removable;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.elg.infiniteBootleg.world.ticker.WorldTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
@@ -200,9 +198,9 @@ public abstract class World implements Disposable, Resizable {
     EventManager.INSTANCE.javaOneShotListener(
         InitialChunksOfWorldLoadedEvent.class,
         event -> {
-          if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {
-            ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
-          }
+          //          if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {
+          //            ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
+          //          }
           if (worldTicker.isStarted()) {
             throw new IllegalStateException("World has already been started");
           }
@@ -299,12 +297,12 @@ public abstract class World implements Disposable, Resizable {
       }
     }
 
-    if (Main.isSingleplayer()) {
-      Player player = ClientMain.inst().getPlayer();
-      if (player != null) {
-        builder.setPlayer(player.save());
-      }
-    }
+    //    if (Main.isSingleplayer()) {
+    //      Player player = ClientMain.inst().getPlayer();
+    //      if (player != null) {
+    //        builder.setPlayer(player.save());
+    //      }
+    //    }
     return builder.build();
   }
 

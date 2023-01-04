@@ -69,8 +69,6 @@ public class WorldTicker extends Ticker implements Disposable {
       WorldRender wr = world.getRender();
       long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
 
-      world.getEngine().update((float) ONE_SECOND_MILLIS / Settings.tps);
-
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
       ForkJoinPool pool = ForkJoinPool.commonPool();

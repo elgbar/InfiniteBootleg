@@ -51,7 +51,7 @@ val basicDynamicEntityFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY).get()
 fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 
 // ///////////////////////////////////
-// Common system update priorities //
+// Common system update priorities  //
 // ///////////////////////////////////
 
 const val UPDATE_PRIORITY_ID_CHECK = Int.MIN_VALUE

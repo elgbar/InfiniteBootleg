@@ -576,10 +576,10 @@ public class ChunkImpl implements Chunk {
   @Override
   public boolean isAllowingUnloading() {
     if (Settings.client) {
-      var player = ClientMain.inst().getPlayer();
-      if (player != null && equals(player.getChunk())) {
-        return false;
-      }
+      //      var player = ClientMain.inst().getPlayer();
+      //      if (player != null && equals(player.getChunk())) {
+      //        return false;
+      //      }
     }
     return allowUnload;
   }

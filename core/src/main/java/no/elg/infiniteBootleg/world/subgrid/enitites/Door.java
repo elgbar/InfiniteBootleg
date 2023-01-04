@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.GuardedBy;
-import no.elg.infiniteBootleg.ClientMain;
+import no.elg.infiniteBootleg.KAssets;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
@@ -52,8 +52,8 @@ public class Door extends MaterialEntity {
 
   static {
     if (Settings.client) {
-      openDoorRegion = ClientMain.inst().getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
-      closedDoorRegion = ClientMain.inst().getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
+      openDoorRegion = KAssets.INSTANCE.getEntityAtlas().findRegion(OPEN_DOOR_REGION_NAME);
+      closedDoorRegion = KAssets.INSTANCE.getEntityAtlas().findRegion(CLOSED_DOOR_REGION_NAME);
     } else {
       openDoorRegion = null;
       closedDoorRegion = null;

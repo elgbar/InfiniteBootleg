@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
@@ -21,14 +23,26 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.infiniteBootleg.ClientMain.SCALE
 import no.elg.infiniteBootleg.screen.ScreenRenderer
+import no.elg.infiniteBootleg.world.subgrid.enitites.Player.PLAYER_REGION_NAME
+import java.io.File
 
 /**
  * @author Elg
  */
 object KAssets {
 
+  private val TEXTURES_FOLDER = "textures" + File.separatorChar
+  private val FONTS_FOLDER = "fonts" + File.separatorChar
+  private val TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas"
+  private val TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas"
+
+  public lateinit var blockAtlas: TextureAtlas
+  public lateinit var entityAtlas: TextureAtlas
+
+  lateinit var playerTexture: TextureRegion
+
   val font: BitmapFont by lazy {
-    val generator = FreeTypeFontGenerator(Gdx.files.internal(ClientMain.FONTS_FOLDER.toString() + "UbuntuMono-R.ttf"))
+    val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()
     parameter.size = ScreenRenderer.FONT_SIZE * SCALE
 
@@ -37,6 +51,11 @@ object KAssets {
   }
 
   fun load() {
+    blockAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
+    entityAtlas = TextureAtlas(TEXTURES_ENTITY_FILE)
+
+    playerTexture = TextureRegion(entityAtlas.findRegion(PLAYER_REGION_NAME))
+
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font
       val boldNotFlippedFont = font
