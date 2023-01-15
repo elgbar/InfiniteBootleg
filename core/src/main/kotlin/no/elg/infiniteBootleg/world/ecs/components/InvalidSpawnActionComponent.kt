@@ -11,10 +11,10 @@ data class InvalidSpawnActionComponent(val invalidSpawnAction: InvalidSpawnActio
 
     val Entity.invalidSpawnAction: InvalidSpawnAction
       get() {
-        return controlledOrNull?.invalidSpawnAction ?: DEFAULT_ACTION
+        return invalidSpawnActionOrNull?.invalidSpawnAction ?: DEFAULT_ACTION
       }
 
-    private var Entity.controlledOrNull by optionalPropertyFor(mapper)
+    private var Entity.invalidSpawnActionOrNull by optionalPropertyFor(mapper)
     private val DEFAULT_ACTION = InvalidSpawnAction.PUSH_UP
   }
 }

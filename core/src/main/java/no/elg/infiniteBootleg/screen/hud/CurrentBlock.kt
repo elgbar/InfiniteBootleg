@@ -2,16 +2,16 @@ package no.elg.infiniteBootleg.screen.hud
 
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.ClientMain
+import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.screen.ScreenRenderer
 import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 
 object CurrentBlock {
 
-  fun render(sr: ScreenRenderer, player: LivingEntity) {
+  fun render(sr: ScreenRenderer) {
     val h = Gdx.graphics.height
-    val mat = player.controls?.selected
-    if (mat != null && mat.textureRegion != null) {
+    val mat = KeyboardControls.selected
+    if (mat.textureRegion != null) {
       sr.batch
         .draw(
           mat.textureRegion,

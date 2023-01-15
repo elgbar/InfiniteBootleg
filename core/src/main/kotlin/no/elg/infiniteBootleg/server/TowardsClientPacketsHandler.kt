@@ -33,7 +33,7 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.ServerClientWorld
-import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent.LocallyControlledComponent.locallyControlled
 import java.util.concurrent.TimeUnit
 
 /**
@@ -43,45 +43,33 @@ import java.util.concurrent.TimeUnit
  */
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
-    DX_HEARTBEAT -> {
-      if (packet.hasHeartbeat()) {
-        handleHeartbeat(packet.heartbeat)
-      }
+    DX_HEARTBEAT -> if (packet.hasHeartbeat()) {
+      handleHeartbeat(packet.heartbeat)
     }
 
-    CB_LOGIN_STATUS -> {
-      if (packet.hasServerLoginStatus()) {
-        val loginStatus = packet.serverLoginStatus.status
-        handleLoginStatus(loginStatus)
-      }
+    CB_LOGIN_STATUS -> if (packet.hasServerLoginStatus()) {
+      val loginStatus = packet.serverLoginStatus.status
+      handleLoginStatus(loginStatus)
     }
 
-    CB_START_GAME -> {
-      if (packet.hasStartGame()) {
-        handleStartGame(packet.startGame)
-      }
+    CB_START_GAME -> if (packet.hasStartGame()) {
+      handleStartGame(packet.startGame)
     }
 
-    CB_UPDATE_CHUNK -> {
-      if (packet.hasUpdateChunk()) {
-        handleUpdateChunk(packet.updateChunk)
-      }
+    CB_UPDATE_CHUNK -> if (packet.hasUpdateChunk()) {
+      handleUpdateChunk(packet.updateChunk)
     }
 
-    CB_DESPAWN_ENTITY -> {
-      if (packet.hasDespawnEntity()) {
-        handleDespawnEntity(packet.despawnEntity)
-      }
+    CB_DESPAWN_ENTITY -> if (packet.hasDespawnEntity()) {
+      handleDespawnEntity(packet.despawnEntity)
     }
 
-    CB_SPAWN_ENTITY -> {
-      if (packet.hasSpawnEntity()) {
-        if (chunksLoaded) {
-          handleSpawnEntity(packet.spawnEntity)
-          Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet.\n${packet.spawnEntity.entity}")
-        } else {
-          Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet before chunks loaded packet, ignoring it.\n${packet.spawnEntity.entity}")
-        }
+    CB_SPAWN_ENTITY -> if (packet.hasSpawnEntity()) {
+      if (chunksLoaded) {
+        handleSpawnEntity(packet.spawnEntity)
+        Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet.\n${packet.spawnEntity.entity}")
+      } else {
+        Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet before chunks loaded packet, ignoring it.\n${packet.spawnEntity.entity}")
       }
     }
 
@@ -90,22 +78,16 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       chunksLoaded = true
     }
 
-    DX_MOVE_ENTITY -> {
-      if (packet.hasMoveEntity() && started) {
-        handleMoveEntity(packet.moveEntity)
-      }
+    DX_MOVE_ENTITY -> if (packet.hasMoveEntity() && started) {
+      handleMoveEntity(packet.moveEntity)
     }
 
-    DX_BLOCK_UPDATE -> {
-      if (packet.hasUpdateBlock() && chunksLoaded) {
-        handleBlockUpdate(packet.updateBlock)
-      }
+    DX_BLOCK_UPDATE -> if (packet.hasUpdateBlock() && chunksLoaded) {
+      handleBlockUpdate(packet.updateBlock)
     }
 
-    DX_SECRET_EXCHANGE -> {
-      if (packet.hasSecretExchange()) {
-        handleSecretExchange(packet.secretExchange)
-      }
+    DX_SECRET_EXCHANGE -> if (packet.hasSecretExchange()) {
+      handleSecretExchange(packet.secretExchange)
     }
 
     DX_DISCONNECT -> {
@@ -117,19 +99,12 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
       ctx.close()
     }
 
-    DX_WORLD_SETTINGS -> {
-      if (packet.hasWorldSettings()) {
-        handleWorldSettings(packet.worldSettings)
-      }
+    DX_WORLD_SETTINGS -> if (packet.hasWorldSettings()) {
+      handleWorldSettings(packet.worldSettings)
     }
 
-    UNRECOGNIZED -> {
-      ctx.fatal("Unknown packet type received")
-    }
-
-    else -> {
-      ctx.fatal("Cannot handle packet of type " + packet.type)
-    }
+    UNRECOGNIZED -> ctx.fatal("Unknown packet type received")
+    else -> ctx.fatal("Cannot handle packet of type " + packet.type)
   }
 }
 
@@ -260,7 +235,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       } else {
         world.worldTicker.start()
         ClientMain.inst().screen = WorldScreen(world, false)
-        player.add(ControlledComponent(ControlledComponent.Companion.ControlMode.LOCAL))
+        player.locallyControlled = true
 
         started = true
 

@@ -8,6 +8,8 @@ import ktx.ashley.tagFor
 /**
  * Center the entity when spawned
  */
-object CenterOnSpawnTag : Component, Mapper<CenterOnSpawnTag>() {
-  var Entity.centerOnSpawn by tagFor(CenterOnSpawnTag)
+class CenterOnSpawnTag : Component {
+  companion object : Mapper<CenterOnSpawnTag>() {
+    var Entity.centerOnSpawn by tagFor<CenterOnSpawnTag>()
+  }
 }

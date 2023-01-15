@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 /**
  * Capture events
  */
-class EventsTracker(val log: Boolean) {
+class EventsTracker(var log: Boolean) {
 
   private val recorded = ConcurrentLinkedQueue<EventEvent>()
 

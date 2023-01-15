@@ -5,13 +5,14 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.input.KeyboardControls
+import no.elg.infiniteBootleg.input.KeyboardControls.MAX_X_VEL
+import no.elg.infiniteBootleg.input.KeyboardControls.MAX_Y_VEL
 
 data class VelocityComponent(
   var dx: Float,
   var dy: Float,
-  var maxDx: Float = KeyboardControls.MAX_X_VEL,
-  var maxDy: Float = KeyboardControls.MAX_X_VEL
+  var maxDx: Float = MAX_X_VEL,
+  var maxDy: Float = MAX_Y_VEL
 ) : Component {
 
   init {

@@ -8,6 +8,8 @@ import ktx.ashley.tagFor
 /**
  * Whether to update the box2D position from the entities [no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent]
  */
-object UpdateBox2DVelocityTag : Component, Mapper<UpdateBox2DVelocityTag>() {
-  var Entity.updateBox2DVelocity by tagFor(UpdateBox2DVelocityTag)
+class UpdateBox2DVelocityTag : Component {
+  companion object : Mapper<UpdateBox2DVelocityTag>() {
+    var Entity.updateBox2DVelocity by tagFor<UpdateBox2DVelocityTag>()
+  }
 }

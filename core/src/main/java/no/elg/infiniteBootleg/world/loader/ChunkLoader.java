@@ -73,7 +73,8 @@ public class ChunkLoader {
           var loaded = load(chunk, protoChunk);
           if (loaded != null && loaded.isValid()) {
 
-            Main.logger().log("Loaded chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc));
+            //            Main.logger().log("Loaded chunk at " +
+            // CoordUtil.stringifyCompactLoc(chunkLoc));
             return loaded;
           }
         } catch (InvalidProtocolBufferException e) {
@@ -87,7 +88,7 @@ public class ChunkLoader {
                   + " from existing file chunk file");
       // Failed to assemble, generate new chunk
     }
-    Main.logger().log("Generating chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc));
+    //    Main.logger().log("Generating chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc));
     Chunk generated = generator.generate(world, chunkX, chunkY);
     if (generated.isValid()) {
       return generated;

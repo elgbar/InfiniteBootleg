@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.Mapper
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 
 data class PositionComponent(var x: Float, var y: Float) : Component {
 
@@ -20,5 +21,11 @@ data class PositionComponent(var x: Float, var y: Float) : Component {
 
     val Entity.physicsY: Float
       get() = position.y + world.world.worldBody.worldOffsetY
+
+    fun Entity.teleport(x: Float, y: Float) {
+      position.x = x
+      position.y = y
+      updateBox2DPosition = true
+    }
   }
 }

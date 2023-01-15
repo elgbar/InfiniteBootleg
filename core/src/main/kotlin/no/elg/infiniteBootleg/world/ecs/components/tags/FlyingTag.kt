@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.tagFor
 
-object FlyingTag : Component, Mapper<FlyingTag>() {
-  var Entity.flying by tagFor(FlyingTag)
+class FlyingTag : Component {
+  companion object : Mapper<FlyingTag>() {
+    var Entity.flying by tagFor<FlyingTag>()
+  }
 }

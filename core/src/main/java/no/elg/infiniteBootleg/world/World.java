@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -54,6 +55,8 @@ import no.elg.infiniteBootleg.world.ecs.EntityCreationFactoryKt;
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent;
+import no.elg.infiniteBootleg.world.ecs.system.ControlSystem;
+import no.elg.infiniteBootleg.world.ecs.system.KeyboardInputSystem;
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem;
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem;
@@ -145,6 +148,8 @@ public abstract class World implements Disposable, Resizable {
     engine.addSystem(MaxVelocitySystem.INSTANCE);
     engine.addSystem(ReadBox2DStateSystem.INSTANCE);
     engine.addSystem(WriteBox2DStateSystem.INSTANCE);
+    engine.addSystem(KeyboardInputSystem.INSTANCE);
+    engine.addSystem(ControlSystem.INSTANCE);
 
     ensureUniquenessListener(engine);
     disposeEntitiesOnRemoval(engine);
@@ -198,13 +203,15 @@ public abstract class World implements Disposable, Resizable {
     EventManager.INSTANCE.javaOneShotListener(
         InitialChunksOfWorldLoadedEvent.class,
         event -> {
-          //          if (Main.isSingleplayer() && ClientMain.inst().getPlayer() == null) {
-          //            ClientMain.inst().setPlayer(new Player(this, spawn.x, spawn.y));
-          //          }
           if (worldTicker.isStarted()) {
             throw new IllegalStateException("World has already been started");
           }
           worldTicker.start();
+
+          if (Main.isSingleplayer()
+              && getEngine().getEntitiesFor(AshleyKt.getPlayerFamily()).size() == 0) {
+            createNewPlayer(UUID.randomUUID().toString());
+          }
           EventManager.INSTANCE.javaDispatchEvent(new WorldLoadedEvent(this));
         });
 
@@ -232,10 +239,6 @@ public abstract class World implements Disposable, Resizable {
   public Entity createNewPlayer(@NotNull String playerId) {
     return EntityCreationFactoryKt.createPlayerEntity(
         getEngine(), this, spawn.x, spawn.y, 0f, 0f, "Player", playerId);
-    //    Player player = new Player(this, spawn.x, spawn.y, playerId);
-    //    Preconditions.checkState(!player.isDisposed());
-    //    addEntity(player);
-    //    return player;
   }
 
   public void loadFromProtoWorld(@NotNull ProtoWorld.WorldOrBuilder protoWorld) {

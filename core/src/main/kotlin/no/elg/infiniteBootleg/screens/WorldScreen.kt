@@ -41,6 +41,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
     EventManager.oneShotListener { event: WorldLoadedEvent ->
       if (event.world === world) {
         worldFinishedLoading = true
+        Main.logger().log("Finished loading world ${world.name} (${world.uuid})")
       }
     }
 
@@ -50,7 +51,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
     }
     Main.inst().console.addToInputMultiplexer()
 
-    world.input.also { ClientMain.inst().inputMultiplexer.addProcessor(it) }
+    ClientMain.inst().inputMultiplexer.addProcessor(world.input)
+    ClientMain.inst().inputMultiplexer.addProcessor(world.ecsInput)
   }
 
   override fun hide() {

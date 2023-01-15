@@ -680,9 +680,14 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(description = "Toggle whether to track events")
   public void trackEvents() {
-    boolean haveEventTracker = EventManager.INSTANCE.getEventTracker() != null;
-    EventManager.INSTANCE.setEventTracker(haveEventTracker ? null : new EventsTracker(true));
-    logger.success("Events are now " + (haveEventTracker ? "not " : "") + "tracked");
+    EventsTracker eventTracker = EventManager.INSTANCE.getEventTracker();
+    if (eventTracker != null) {
+      eventTracker.setLog(!eventTracker.getLog());
+    } else {
+      eventTracker = new EventsTracker(true);
+      EventManager.INSTANCE.setEventTracker(eventTracker);
+    }
+    logger.success("Events are now " + (eventTracker.getLog() ? "" : "not ") + "tracked");
   }
 
   @ConsoleDoc(description = "Toggle whether to track events")

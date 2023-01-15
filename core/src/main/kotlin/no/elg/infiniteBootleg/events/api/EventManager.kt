@@ -17,7 +17,7 @@ object EventManager {
   private val listeners: WeakHashMap<Class<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
   private val oneShotStrongRefs: MutableMap<EventListener<out Event>, EventListener<out Event>> = ConcurrentHashMap()
 
-  var eventTracker: EventsTracker? = if (Settings.debug) EventsTracker(true) else null
+  var eventTracker: EventsTracker? = if (Settings.debug) EventsTracker(false) else null
 
   /**
    * React to events [dispatchEvent]-ed by someone else.

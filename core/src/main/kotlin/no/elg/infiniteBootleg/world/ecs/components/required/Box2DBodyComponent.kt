@@ -20,7 +20,6 @@ class Box2DBodyComponent(body: Body, val width: Float, val height: Float) : Comp
   private var disposed = false
 
   val halfBox2dWidth: Float get() = width / (Block.BLOCK_SIZE * 2f)
-
   val halfBox2dHeight: Float get() = height / (Block.BLOCK_SIZE * 2f)
 
   override val isDisposed get() = disposed

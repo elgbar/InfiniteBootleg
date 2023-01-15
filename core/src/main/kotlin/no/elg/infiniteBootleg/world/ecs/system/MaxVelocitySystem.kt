@@ -5,7 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
-import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.updateBox2DVelocity
+import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import no.elg.infiniteBootleg.world.ecs.toFamily
 import kotlin.math.abs
 import kotlin.math.sign

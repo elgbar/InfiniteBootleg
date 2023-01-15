@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Renderer;
 import no.elg.infiniteBootleg.api.Resizable;
+import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screen.hud.DebugGraph;
 import no.elg.infiniteBootleg.screen.hud.DebugText;
 import no.elg.infiniteBootleg.world.ClientWorld;
@@ -68,9 +69,9 @@ public class HUDRenderer implements Renderer, Resizable {
       sr.drawTop(builder.toString(), 1);
     }
 
-    //    if (player != null && hasMode(DISPLAY_CURRENT_BLOCK)) {
-    //      CurrentBlock.INSTANCE.render(sr, player);
-    //    }
+    if (hasMode(DISPLAY_CURRENT_BLOCK)) {
+      CurrentBlock.INSTANCE.render(sr);
+    }
     if (hasMode(DISPLAY_GRAPH_FPS)) {
       DebugGraph.INSTANCE.render(sr, world);
     }
