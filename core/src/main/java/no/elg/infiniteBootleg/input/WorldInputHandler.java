@@ -18,7 +18,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.WorldScreen;
@@ -133,38 +132,6 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
     return following != null && !following.isDisposed() && lockedOn;
   }
 
-  private void cameraFollowUpdate() {
-    OrthographicCamera camera = worldRender.getCamera();
-
-    if (hasValidLockOn()) {
-      assert following != null;
-      final Vector2 position = following.getPhysicsPosition();
-      float x = position.x * Block.BLOCK_SIZE;
-      float y = position.y * Block.BLOCK_SIZE;
-
-      var diffX = (x - camera.position.x);
-      var diffY = (y - camera.position.y);
-
-      var teleportCam =
-          !Settings.enableCameraFollowLerp
-              || Math.abs(diffX) > Gdx.graphics.getWidth()
-              || Math.abs(diffY) > Gdx.graphics.getHeight();
-      if (teleportCam) {
-        camera.position.x = x;
-        camera.position.y = y;
-      } else {
-        float dx = diffX * CAMERA_LERP;
-        float dy = diffY * CAMERA_LERP;
-
-        if (Math.abs(dx) > LERP_CUTOFF || Math.abs(dy) > LERP_CUTOFF) {
-          camera.position.x += dx * Gdx.graphics.getDeltaTime();
-          camera.position.y += dy * Gdx.graphics.getDeltaTime();
-        }
-      }
-      worldRender.update();
-    }
-  }
-
   private void teleportCamera() {
     OrthographicCamera camera = worldRender.getCamera();
     if (hasValidLockOn()) {
@@ -181,7 +148,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
   public void update() {
     if (Main.inst().getConsole().isVisible()) {
       // keep following even when console is visible
-      cameraFollowUpdate();
+      //      cameraFollowUpdate();
       return;
     }
 
@@ -191,7 +158,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
 
     if (vertical == 0 && horizontal == 0) {
       // No input, we're still following the current entity
-      cameraFollowUpdate();
+      //      cameraFollowUpdate();
     } else {
       OrthographicCamera camera = worldRender.getCamera();
       camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;

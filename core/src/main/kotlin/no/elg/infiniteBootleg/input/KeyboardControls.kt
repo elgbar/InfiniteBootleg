@@ -134,6 +134,7 @@ object KeyboardControls {
   }
 
   private fun Entity.jump() {
+//    println("onGround? ${this.grounded.onGround} (contacts ${this.grounded.contactPoints})")
     if (this.grounded.onGround && Gdx.input.isKeyPressed(Keys.W)) {
       setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
     }

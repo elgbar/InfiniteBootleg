@@ -1,26 +1,18 @@
 package no.elg.infiniteBootleg.input
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Disposable
-import ktx.ashley.configureEntity
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.handleEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
-import no.elg.infiniteBootleg.world.ecs.toFamily
-import no.elg.infiniteBootleg.world.ecs.with
 
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   private fun handleEvent(inputEvent: InputEvent): Boolean {
-    if (!Main.inst().console.isVisible) {
-      world.engine.getEntitiesFor(ControlledComponent.LocallyControlledComponent::class.toFamily()).forEach {
-        world.engine.configureEntity(it) {
-          with(inputEvent)
-        }
-      }
-    }
+    world.engine.handleEvent(inputEvent, handleInputFilter)
     return false
   }
 
@@ -42,5 +34,9 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   override fun dispose() {
     ClientMain.inst().inputMultiplexer.removeProcessor(this)
+  }
+
+  companion object {
+    private val handleInputFilter: (Entity) -> Boolean = { !Main.inst().console.isVisible }
   }
 }

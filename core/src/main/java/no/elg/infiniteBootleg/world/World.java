@@ -56,10 +56,12 @@ import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent;
 import no.elg.infiniteBootleg.world.ecs.system.ControlSystem;
-import no.elg.infiniteBootleg.world.ecs.system.KeyboardInputSystem;
+import no.elg.infiniteBootleg.world.ecs.system.FollowEntitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem;
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem;
+import no.elg.infiniteBootleg.world.ecs.system.event.CheckOnGroundSystem;
+import no.elg.infiniteBootleg.world.ecs.system.event.KeyboardInputSystem;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
@@ -137,19 +139,23 @@ public abstract class World implements Disposable, Resizable {
     worldTicker = new WorldTicker(this, false);
 
     chunkLoader = new ChunkLoader(this, generator);
-    worldBody = new WorldBody(this);
     worldTime = new WorldTime(this);
     spawn = new Location(0, 0);
     engine = initializeEngine();
+    worldBody = new WorldBody(this);
   }
 
-  private static Engine initializeEngine() {
+  private Engine initializeEngine() {
     var engine = new PooledEngine();
     engine.addSystem(MaxVelocitySystem.INSTANCE);
     engine.addSystem(ReadBox2DStateSystem.INSTANCE);
     engine.addSystem(WriteBox2DStateSystem.INSTANCE);
     engine.addSystem(KeyboardInputSystem.INSTANCE);
     engine.addSystem(ControlSystem.INSTANCE);
+    engine.addSystem(CheckOnGroundSystem.INSTANCE);
+    if (Main.isClient()) {
+      engine.addSystem(FollowEntitySystem.INSTANCE);
+    }
 
     ensureUniquenessListener(engine);
     disposeEntitiesOnRemoval(engine);

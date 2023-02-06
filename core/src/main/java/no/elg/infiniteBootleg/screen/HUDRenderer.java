@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.screen;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -9,6 +11,7 @@ import no.elg.infiniteBootleg.screen.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screen.hud.DebugGraph;
 import no.elg.infiniteBootleg.screen.hud.DebugText;
 import no.elg.infiniteBootleg.world.ClientWorld;
+import no.elg.infiniteBootleg.world.ecs.AshleyKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,6 +52,8 @@ public class HUDRenderer implements Renderer, Resizable {
     if (hasMode(DISPLAY_DEBUG) && world != null) {
       int mouseBlockX = main.getMouseBlockX();
       int mouseBlockY = main.getMouseBlockY();
+      ImmutableArray<Entity> controlled =
+          world.getEngine().getEntitiesFor(AshleyKt.getControlledEntityFamily());
 
       nl();
       DebugText.pointing(builder, world, mouseBlockX, mouseBlockY);
@@ -57,8 +62,8 @@ public class HUDRenderer implements Renderer, Resizable {
       nl();
       DebugText.viewChunk(builder, world);
       nl();
-      //      DebugText.pos(builder, player);
-      //      nl();
+      DebugText.pos(builder, controlled);
+      nl();
       DebugText.time(builder, world);
       nl();
       DebugText.lights(builder, world, mouseBlockX, mouseBlockY);

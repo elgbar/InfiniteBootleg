@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.screen.hud
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.util.CoordUtil
@@ -10,9 +12,12 @@ import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION
-import no.elg.infiniteBootleg.world.subgrid.LivingEntity
 import java.text.DecimalFormat
 
 object DebugText {
@@ -126,27 +131,32 @@ object DebugText {
   }
 
   @JvmStatic
-  fun pos(sb: StringBuilder, player: LivingEntity?) {
-    if (player == null) {
+  fun pos(sb: StringBuilder, players: ImmutableArray<Entity>) {
+    if (players.size() == 0) {
       sb.append("No player")
       return
     }
+    val player = players.first()
     val velocity = player.velocity
     val position = player.position
-    val physicsPosition = player.physicsPosition
-    val onGround = player.isOnGround
-    val flying = player.isFlying
-    val format = "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b f? %-5b"
+//    val physicsPosition = player.physicsPosition
+    val grounded = player.groundedOrNull
+    val onGround = grounded?.onGround ?: false
+    val groundContactPoints = grounded?.contacts?.size ?: 0
+    val flying = player.flying
+    val format = "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b (%d) f? %-5b"
     sb.append(
       String.format(
         format,
         position.x,
         position.y,
-        velocity.x,
-        velocity.y,
-        physicsPosition.x,
-        physicsPosition.y,
+        velocity.dx,
+        velocity.dy,
+        0f, 0f,
+//        physicsPosition.x,
+//        physicsPosition.y,
         onGround,
+        groundContactPoints,
         flying
       )
     )

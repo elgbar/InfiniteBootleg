@@ -10,7 +10,7 @@ public final class Filters {
   public static final short LIGHTS_CATEGORY = 0x2;
   public static final short ENTITY_CATEGORY = 0x4;
 
-  // for falling blocks
+  // for falling blocks and players foot
   public static final Filter GR__ENTITY_FILTER = new Filter();
   // for falling blocks which blocks light
   public static final Filter GR_LI__ENTITY_FILTER = new Filter();

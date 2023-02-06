@@ -140,7 +140,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 1, 1)
+      box2dWorld.step(timeStep, 8, 4)
       world.engine.update(timeStep)
 
       for (runnable in executedRunnablesIterator) {
@@ -250,7 +250,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     if (Main.inst().isNotTest) {
       synchronized(BOX2D_LOCK) {
         box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
-        box2dWorld.setContactListener(ContactManager())
+        box2dWorld.setContactListener(ContactManager(world.engine))
         timeStep = (1f / Settings.tps) * BOX2D_TPS_DIVIDER
       }
     }
