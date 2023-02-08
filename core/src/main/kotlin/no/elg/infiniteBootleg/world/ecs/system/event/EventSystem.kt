@@ -27,15 +27,8 @@ abstract class EventSystem<T : ECSEvent, Q : ECSEventQueue<T>>(
   final override fun processEntity(entity: Entity, deltaTime: Float) {
     queueMapper.get(entity)?.also {
       val events = it.events
-
-      if (this is CheckOnGroundSystem) {
-        println("---------------------------START CheckOnGroundSystem---------------------------")
-      }
       while (events.isNotEmpty()) {
         handleEvent(entity, deltaTime, events.poll())
-      }
-      if (this is CheckOnGroundSystem) {
-        println("---------------------------STOP CheckOnGroundSystem---------------------------")
       }
     }
   }

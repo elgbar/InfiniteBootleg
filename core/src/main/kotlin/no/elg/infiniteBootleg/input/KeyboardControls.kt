@@ -109,19 +109,21 @@ object KeyboardControls {
 //      }
       val world = world.world
       world.postBox2dRunnable {
-        val body = box2d.body
+        if (grounded.canMove(dir)) {
+          val body = box2d.body
 
-        val currSpeed = body.linearVelocity.x
-        val wantedSpeed = dir * if (grounded.onGround) {
-          MAX_X_VEL
-        } else {
-          MAX_X_VEL * (2f / 3f)
+          val currSpeed = body.linearVelocity.x
+          val wantedSpeed = dir * if (grounded.onGround) {
+            MAX_X_VEL
+          } else {
+            MAX_X_VEL * (2f / 3f)
+          }
+          val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
+
+          tmpVec.set(impulse, velocity.dy)
+
+          body.applyLinearImpulse(tmpVec, body.worldCenter, true)
         }
-        val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
-
-        tmpVec.set(impulse, velocity.dy)
-
-        body.applyLinearImpulse(tmpVec, body.worldCenter, true)
       }
     }
 

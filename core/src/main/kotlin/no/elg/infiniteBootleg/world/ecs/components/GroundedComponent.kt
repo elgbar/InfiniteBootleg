@@ -9,19 +9,19 @@ import ktx.collections.GdxLongArray
 
 class GroundedComponent : Component {
 
-  var contacts: GdxLongArray = GdxLongArray()
-    private set
+  val feetContacts: GdxLongArray = GdxLongArray(false, 16)
+  val leftArmContacts: GdxLongArray = GdxLongArray(false, 16)
+  val rightArmContacts: GdxLongArray = GdxLongArray(false, 16)
 
-  operator fun plusAssign(toAdd: Long) {
-    contacts.add(toAdd)
+  val onGround: Boolean get() = !feetContacts.isEmpty
+  val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty || !rightArmContacts.isEmpty
+  val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty || !leftArmContacts.isEmpty
+
+  fun canMove(dir: Float): Boolean = when {
+    dir < 0 -> canMoveLeft
+    dir > 0 -> canMoveRight
+    else -> true
   }
-
-  operator fun minusAssign(toRemove: Long) {
-    contacts.removeValue(toRemove)
-  }
-
-  val onGround: Boolean get() = !contacts.isEmpty
-//  val is: Boolean get() = !contacts.isEmpty
 
   companion object : Mapper<GroundedComponent>() {
 

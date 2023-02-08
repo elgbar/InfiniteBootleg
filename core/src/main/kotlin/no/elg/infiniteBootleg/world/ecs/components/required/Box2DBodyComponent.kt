@@ -10,17 +10,19 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 
 /**
- * One unit is [Block.BLOCK_SIZE]
  *
- * @param width  The height of this entity in world view
- * @param height The width of this entity in world view
+ * @param box2dWidth  The height of this entity in box2d view
+ * @param box2dHeight The width of this entity in box2d view
  */
-class Box2DBodyComponent(body: Body, val width: Float, val height: Float) : Component, CheckableDisposable {
+class Box2DBodyComponent(body: Body, val box2dWidth: Float, val box2dHeight: Float) : Component, CheckableDisposable {
   private var internalBody: Body? = body
   private var disposed = false
 
-  val halfBox2dWidth: Float get() = width / (Block.BLOCK_SIZE * 2f)
-  val halfBox2dHeight: Float get() = height / (Block.BLOCK_SIZE * 2f)
+  val halfBox2dWidth: Float get() = box2dWidth / 2f
+  val halfBox2dHeight: Float get() = box2dHeight / 2f
+
+  val worldWidth: Float get() = box2dWidth * Block.BLOCK_SIZE
+  val worldHeight: Float get() = box2dHeight * Block.BLOCK_SIZE
 
   override val isDisposed get() = disposed
 

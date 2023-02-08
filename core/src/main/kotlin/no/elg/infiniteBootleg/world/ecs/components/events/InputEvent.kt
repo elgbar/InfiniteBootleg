@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 class InputEventQueue : ECSEventQueue<InputEvent> {
   override val events = ConcurrentLinkedQueue<InputEvent>()
-  
+
   companion object : Mapper<InputEventQueue>() {
     var Entity.inputEventQueueOrNull by optionalPropertyFor(InputEventQueue.mapper)
   }

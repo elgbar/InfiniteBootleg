@@ -13,7 +13,6 @@ import ktx.ashley.plusAssign
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.box2d.Filters
@@ -31,10 +30,13 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 
-const val PLAYER_WIDTH = 2f * Block.BLOCK_SIZE - 1
-const val PLAYER_HEIGHT = 4f * Block.BLOCK_SIZE - 1
+const val PLAYER_WIDTH = 2f
+const val PLAYER_HEIGHT = 4f
 
 const val PLAYERS_FOOT_USER_DATA = "A bloody foot!"
+const val PLAYERS_RIGHT_ARM_USER_DATA = "Righty"
+const val PLAYERS_LEFT_ARM_USER_DATA = "Left hand"
+const val ESSENTIALLY_ZERO = 0.001f
 
 private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Float, worldY: Float, dx: Float, dy: Float) {
   val bodyDef = BodyDef()
@@ -50,6 +52,8 @@ private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Floa
 
     createPlayerFixture(it)
     createPlayerFootFixture(it)
+    createPlayerTouchAreaFixture(it, PLAYERS_LEFT_ARM_USER_DATA, -1)
+    createPlayerTouchAreaFixture(it, PLAYERS_RIGHT_ARM_USER_DATA, 1)
 
     entity += Box2DBodyComponent(it, PLAYER_WIDTH, PLAYER_HEIGHT)
     Main.logger().log("Finishing setting up box2d entity")
@@ -59,7 +63,7 @@ private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Floa
 private fun createPlayerFixture(body: Body) {
   val shape = PolygonShape()
 
-  shape.setAsBox(PLAYER_WIDTH / (Block.BLOCK_SIZE * 2f), PLAYER_HEIGHT / (Block.BLOCK_SIZE * 2f))
+  shape.setAsBox(PLAYER_WIDTH / 2f, PLAYER_HEIGHT / 2f)
 
   val def = FixtureDef()
   def.shape = shape
@@ -75,11 +79,16 @@ private fun createPlayerFixture(body: Body) {
 }
 
 private fun createPlayerFootFixture(body: Body) {
+  createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, height = ESSENTIALLY_ZERO, ry = -PLAYER_HEIGHT / 2f)
+}
+
+private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
+  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, rx = PLAYER_WIDTH * side / 1.75f)
+}
+
+private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float = PLAYER_WIDTH / 2.1f, height: Float = PLAYER_HEIGHT / 2.1f, rx: Float = 0f, ry: Float = 0f) {
   val shape = PolygonShape()
-  val width = PLAYER_WIDTH / (Block.BLOCK_SIZE * 3f)
-  val size = PLAYER_WIDTH / (Block.BLOCK_SIZE * 4f)
-  val a = -PLAYER_WIDTH / (Block.BLOCK_SIZE)
-  shape.setAsBox(width, size, Vector2(0f, a), 0f)
+  shape.setAsBox(width, height, Vector2(rx, ry), 0f)
 
   val def = FixtureDef().apply {
     this.shape = shape
@@ -87,7 +96,7 @@ private fun createPlayerFootFixture(body: Body) {
     filter.set(Filters.GR__ENTITY_FILTER)
   }
   body.createFixture(def).apply {
-    this.userData = PLAYERS_FOOT_USER_DATA
+    this.userData = userData
   }
   shape.dispose()
 }
@@ -109,7 +118,7 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
   with(ControlledComponent.LocallyControlledComponent)
   with<FollowedByCameraTag>()
 
-  //This entity will handle input events
+  // This entity will handle input events
   with<PhysicsEventQueue>()
   with<InputEventQueue>()
 

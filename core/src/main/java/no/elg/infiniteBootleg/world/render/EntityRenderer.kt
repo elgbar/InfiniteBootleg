@@ -57,7 +57,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
       val screenX = CoordUtil.worldToScreen(worldX, worldOffsetX)
       val screenY = CoordUtil.worldToScreen(worldY, worldOffsetY)
-      batch.draw(textureRegion, screenX, screenY, box2d.width, box2d.height)
+      batch.draw(textureRegion, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
         batch.draw(whiteTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
