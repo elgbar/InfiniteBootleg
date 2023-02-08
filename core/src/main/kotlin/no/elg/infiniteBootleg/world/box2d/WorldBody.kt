@@ -140,7 +140,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 20, 20)
+      box2dWorld.step(timeStep, 10, 10)
       world.engine.update(timeStep)
 
       for (runnable in executedRunnablesIterator) {
