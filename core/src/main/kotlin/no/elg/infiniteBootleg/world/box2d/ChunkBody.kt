@@ -116,6 +116,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     chunk.world.postBox2dRunnable {
       val fixture: Fixture? = fixtureMap.get(CoordUtil.compactLoc(block.localX, block.localY))
       fixture?.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
+      fixture?.userData = null
     }
   }
 
