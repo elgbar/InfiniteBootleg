@@ -1,12 +1,8 @@
 package no.elg.infiniteBootleg.util
 
-import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.Contact
-import com.badlogic.gdx.physics.box2d.Fixture
 import com.fasterxml.uuid.Generators
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.ecs.PLAYERS_FOOT_USER_DATA
 import java.util.UUID
 import kotlin.contracts.contract
 
@@ -76,20 +72,4 @@ fun Block?.isNotAir(): Boolean {
 
 fun Block.isNotAir(): Boolean {
   return this.material != Material.AIR
-}
-
-fun Contact.getPlayerStandingOn(entity: Entity): Fixture? {
-  return when {
-    fixtureA.userData == PLAYERS_FOOT_USER_DATA && fixtureA.body.userData === entity -> fixtureB
-    fixtureB.userData == PLAYERS_FOOT_USER_DATA && fixtureB.body.userData === entity -> fixtureA
-    else -> null
-  }
-}
-
-fun Contact.containsEntityFixture(entity: Entity): Boolean {
-  return when {
-    fixtureA.body.userData === entity -> true
-    fixtureB.body.userData === entity -> true
-    else -> false
-  }
 }

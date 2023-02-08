@@ -1,21 +1,27 @@
 package no.elg.infiniteBootleg.world.ecs.components.events
 
-import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.configureEntity
-import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
-import no.elg.infiniteBootleg.world.ecs.with
+import ktx.ashley.allOf
+import no.elg.infiniteBootleg.world.ecs.CONTROLLED_ENTITY_ARRAY
+import kotlin.reflect.KClass
 
-interface ECSEvent : Component {
+interface ECSEvent {
 
   companion object {
     private val defaultFilter: (Entity) -> Boolean = { true }
-    fun Engine.handleEvent(event: ECSEvent, filter: (Entity) -> Boolean = defaultFilter) {
-      this.getEntitiesFor(controlledEntityFamily).filter(filter).forEach {
-        this.configureEntity(it) {
-          with(event)
-        }
+
+    fun <T : ECSEvent, Q : ECSEventQueue<T>> Engine.queueEvent(
+      eventList: KClass<out Q>,
+      queueMapper: ComponentMapper<out Q>,
+      event: T,
+      filter: (Entity) -> Boolean = defaultFilter
+    ) {
+      val family = allOf(*CONTROLLED_ENTITY_ARRAY, eventList).get()
+      this.getEntitiesFor(family).filter(filter).forEach {
+        val ecsEvents = queueMapper.get(it) ?: return@forEach
+        ecsEvents.events += event
       }
     }
   }

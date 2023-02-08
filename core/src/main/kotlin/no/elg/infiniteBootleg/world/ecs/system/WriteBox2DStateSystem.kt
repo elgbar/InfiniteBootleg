@@ -20,12 +20,9 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
   private val tmp = Vector2()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-//    val worldBody = entity.world.world.worldBody
-//    worldBody.postBox2dRunnable {
     val body = entity.box2d.body
     updatePosition(entity, body)
     updateVelocity(entity, body)
-//    }
   }
 
   private fun updatePosition(entity: Entity, body: Body) {

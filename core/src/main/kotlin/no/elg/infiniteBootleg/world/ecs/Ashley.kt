@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.Family
 import ktx.ashley.allOf
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
-import ktx.ashley.oneOf
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
@@ -15,15 +14,8 @@ import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.KeyDownEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.KeyTypedEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.KeyUpEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.MouseMovedEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.ScrolledEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.TouchDownEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.TouchDraggedEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent.TouchUpEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -66,25 +58,9 @@ val basicDynamicEntityFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY).get()
 
 val followEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, FollowedByCameraTag::class).get()
 val controlledEntityFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY).get()
-val controlledEntityWithInputEventFamily: Family =
-  allOf(*CONTROLLED_ENTITY_ARRAY).oneOf(
-    KeyDownEvent::class,
-    KeyUpEvent::class,
-    KeyTypedEvent::class,
-    TouchDownEvent::class,
-    TouchUpEvent::class,
-    TouchDraggedEvent::class,
-    MouseMovedEvent::class,
-    ScrolledEvent::class
-  ).get()
 
-val controlledEntityWithPhysicsEventFamily: Family =
-  allOf(*CONTROLLED_ENTITY_ARRAY).oneOf(
-    PhysicsEvent.ContactBeginsEvent::class,
-    PhysicsEvent.ContactEndsEvent::class,
-    PhysicsEvent.PreSolveContactEvent::class,
-    PhysicsEvent.PostSolveContactEvent::class
-  ).get()
+val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY, InputEventQueue::class).get()
+val controlledEntityWithPhysicsEventFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY, PhysicsEventQueue::class).get()
 
 fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 

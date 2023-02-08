@@ -1,20 +1,30 @@
 package no.elg.infiniteBootleg.world.subgrid.contact
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.ContactImpulse
 import com.badlogic.gdx.physics.box2d.ContactListener
 import com.badlogic.gdx.physics.box2d.Manifold
-import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.handleEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.queueEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 
 class ContactManager(val engine: Engine) : ContactListener {
 
-  override fun beginContact(contact: Contact) = engine.handleEvent(PhysicsEvent.ContactBeginsEvent(contact)) // { contact.containsEntityFixture(it) }
-  override fun endContact(contact: Contact) = engine.handleEvent(PhysicsEvent.ContactEndsEvent(contact)) // { contact.containsEntityFixture(it) }
+  private fun Contact.containsEntityFixture(entity: Entity): Boolean {
+    return fixtureA.body.userData === entity || fixtureB.body.userData === entity
+  }
+
+  private fun queuePhysicsEvent(event: PhysicsEvent, contact: Contact) {
+    engine.queueEvent(PhysicsEventQueue::class, PhysicsEventQueue.mapper, event) { contact.containsEntityFixture(it) }
+  }
+
+  override fun beginContact(contact: Contact) = queuePhysicsEvent(PhysicsEvent.ContactBeginsEvent(contact.fixtureA, contact.fixtureB), contact)
+  override fun endContact(contact: Contact) = queuePhysicsEvent(PhysicsEvent.ContactEndsEvent(contact.fixtureA, contact.fixtureB), contact)
   override fun preSolve(contact: Contact, oldManifold: Manifold) =
-    engine.handleEvent(PhysicsEvent.PreSolveContactEvent(contact, oldManifold)) // { contact.containsEntityFixture(it) }
+    Unit //queuePhysicsEvent(PhysicsEvent.PreSolveContactEvent(contact.fixtureA, contact.fixtureB, oldManifold), contact)
 
   override fun postSolve(contact: Contact, impulse: ContactImpulse) =
-    engine.handleEvent(PhysicsEvent.PostSolveContactEvent(contact, impulse)) // { contact.containsEntityFixture(it) }
+    Unit //queuePhysicsEvent(PhysicsEvent.PostSolveContactEvent(contact.fixtureA, contact.fixtureB, impulse), contact)
 }

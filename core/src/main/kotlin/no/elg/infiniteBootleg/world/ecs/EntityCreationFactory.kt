@@ -23,6 +23,8 @@ import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
@@ -106,6 +108,10 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
 
   with(ControlledComponent.LocallyControlledComponent)
   with<FollowedByCameraTag>()
+
+  //This entity will handle input events
+  with<PhysicsEventQueue>()
+  with<InputEventQueue>()
 
   createBody2DBodyComponent(entity, world, worldX, worldY, dx, dy)
 }

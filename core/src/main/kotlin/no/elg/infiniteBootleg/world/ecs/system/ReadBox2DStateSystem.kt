@@ -8,6 +8,8 @@ import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
+import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 
 /**
  * Read the position of the entity from the box2D entity
@@ -15,22 +17,23 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_FIRST) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-//    val worldBody = entity.world.world.worldBody
-//    worldBody.postBox2dRunnable {
     val body = entity.box2d.body
     readPosition(entity, body)
     readVelocity(entity, body)
-//    }
   }
 
   private fun readPosition(entity: Entity, body: Body) {
-    entity.position.x = body.position.x
-    entity.position.y = body.position.y
+    if (!entity.updateBox2DPosition) {
+      entity.position.x = body.position.x
+      entity.position.y = body.position.y
+    }
   }
 
   private fun readVelocity(entity: Entity, body: Body) {
     val velocity = entity.velocityOrNull ?: return
-    velocity.dx = body.linearVelocity.x
-    velocity.dy = body.linearVelocity.y
+    if (!entity.updateBox2DVelocity) {
+      velocity.dx = body.linearVelocity.x
+      velocity.dy = body.linearVelocity.y
+    }
   }
 }

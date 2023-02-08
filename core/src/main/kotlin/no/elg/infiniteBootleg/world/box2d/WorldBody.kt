@@ -140,7 +140,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 8, 4)
+      box2dWorld.step(timeStep, 20, 20)
       world.engine.update(timeStep)
 
       for (runnable in executedRunnablesIterator) {
@@ -223,7 +223,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   companion object {
     const val X_WORLD_GRAVITY = 0f
-    const val Y_WORLD_GRAVITY = -20f
+    const val Y_WORLD_GRAVITY = -9.8f
 
     const val WORLD_MOVE_OFFSET_THRESHOLD: Float = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE.toFloat()
 

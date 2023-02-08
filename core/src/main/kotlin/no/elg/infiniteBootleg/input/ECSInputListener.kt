@@ -6,13 +6,14 @@ import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.handleEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.queueEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   private fun handleEvent(inputEvent: InputEvent): Boolean {
-    world.engine.handleEvent(inputEvent, handleInputFilter)
+    world.engine.queueEvent(InputEventQueue::class, InputEventQueue.mapper, inputEvent, handleInputFilter)
     return false
   }
 

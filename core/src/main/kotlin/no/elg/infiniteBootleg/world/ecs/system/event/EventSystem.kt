@@ -5,9 +5,16 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue
 import kotlin.reflect.KClass
 
-abstract class EventSystem<T : ECSEvent>(family: Family, priority: Int, eventType: KClass<T>) : IteratingSystem(family, priority) {
+abstract class EventSystem<T : ECSEvent, Q : ECSEventQueue<T>>(
+  family: Family,
+  priority: Int,
+  eventType: KClass<T>,
+  private val queueMapper: ComponentMapper<out Q>
+) :
+  IteratingSystem(family, priority) {
 
   private val sealedSubclasses = eventType.sealedSubclasses
 
@@ -18,15 +25,20 @@ abstract class EventSystem<T : ECSEvent>(family: Family, priority: Int, eventTyp
   }
 
   final override fun processEntity(entity: Entity, deltaTime: Float) {
-    handleEvent(entity, deltaTime)
-    for (subclass in sealedSubclasses) {
-      entity.remove(subclass.java)
+    queueMapper.get(entity)?.also {
+      val events = it.events
+
+      if (this is CheckOnGroundSystem) {
+        println("---------------------------START CheckOnGroundSystem---------------------------")
+      }
+      while (events.isNotEmpty()) {
+        handleEvent(entity, deltaTime, events.poll())
+      }
+      if (this is CheckOnGroundSystem) {
+        println("---------------------------STOP CheckOnGroundSystem---------------------------")
+      }
     }
   }
 
-  abstract fun handleEvent(entity: Entity, deltaTime: Float)
-
-  inline fun <E : T> handleInputEvent(entity: Entity, mapper: ComponentMapper<out E>, action: (E) -> Unit) {
-    mapper.get(entity)?.also(action)
-  }
+  abstract fun handleEvent(entity: Entity, deltaTime: Float, event: T)
 }
