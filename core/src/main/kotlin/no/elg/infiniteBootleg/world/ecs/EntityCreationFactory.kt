@@ -30,8 +30,8 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 
-const val PLAYER_WIDTH = 2f
-const val PLAYER_HEIGHT = 4f
+const val PLAYER_WIDTH = 1.8f
+const val PLAYER_HEIGHT = 3.8f
 
 const val PLAYERS_FOOT_USER_DATA = "A bloody foot!"
 const val PLAYERS_RIGHT_ARM_USER_DATA = "Righty"
@@ -43,7 +43,7 @@ private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Floa
   bodyDef.type = BodyDef.BodyType.DynamicBody
   bodyDef.position.set(worldX, worldY)
   bodyDef.linearVelocity.set(dx, dy)
-  bodyDef.linearDamping = 1f
+  bodyDef.linearDamping = 0.5f
   bodyDef.fixedRotation = true
 
   world.worldBody.createBody(bodyDef) {
@@ -53,6 +53,7 @@ private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Floa
     createPlayerFixture(it)
     createPlayerFootFixture(it)
     createPlayerTouchAreaFixture(it, PLAYERS_LEFT_ARM_USER_DATA, -1)
+
     createPlayerTouchAreaFixture(it, PLAYERS_RIGHT_ARM_USER_DATA, 1)
 
     entity += Box2DBodyComponent(it, PLAYER_WIDTH, PLAYER_HEIGHT)
@@ -63,7 +64,21 @@ private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Floa
 private fun createPlayerFixture(body: Body) {
   val shape = PolygonShape()
 
-  shape.setAsBox(PLAYER_WIDTH / 2f, PLAYER_HEIGHT / 2f)
+  val halfWidth = PLAYER_WIDTH / 2f
+  val halfHeight = PLAYER_HEIGHT / 2f
+  val nearZW = halfWidth - 0.1f
+  val nearZH = halfHeight - 0.1f
+
+  val vertices = Array(8) { Vector2() }
+  vertices[0].set(-nearZW, halfHeight)
+  vertices[1].set(nearZW, halfHeight)
+  vertices[2].set(-halfWidth, -nearZH)
+  vertices[3].set(-halfWidth, nearZH)
+  vertices[4].set(-nearZW, -halfHeight)
+  vertices[5].set(nearZW, -halfHeight)
+  vertices[6].set(halfWidth, -nearZH)
+  vertices[7].set(halfWidth, nearZH)
+  shape.set(vertices)
 
   val def = FixtureDef()
   def.shape = shape
