@@ -14,8 +14,8 @@ class GroundedComponent : Component {
   val rightArmContacts: GdxLongArray = GdxLongArray(false, 16)
 
   val onGround: Boolean get() = !feetContacts.isEmpty
-  val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty || !rightArmContacts.isEmpty
-  val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty || !leftArmContacts.isEmpty
+  val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty
+  val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty
 
   fun canMove(dir: Float): Boolean = when {
     dir < 0 -> canMoveLeft

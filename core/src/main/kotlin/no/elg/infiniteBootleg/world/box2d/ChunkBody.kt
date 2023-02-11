@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.queuePhysicsEvent
 import javax.annotation.concurrent.GuardedBy
 
 /**
@@ -114,9 +116,11 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   fun removeBlock(block: Block) {
     chunk.world.postBox2dRunnable {
-      val fixture: Fixture? = fixtureMap.get(CoordUtil.compactLoc(block.localX, block.localY))
-      fixture?.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
-      fixture?.userData = null
+      fixtureMap.get(CoordUtil.compactLoc(block.localX, block.localY))?.also { fixture ->
+        fixture.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
+        fixture.userData = null
+        chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc))
+      }
     }
   }
 
@@ -133,7 +137,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
       val compactLoc = CoordUtil.compactLoc(localX, localY)
       val cacheFix: Fixture? = fixtureMap.get(compactLoc)
-      val fix: Fixture = if (cacheFix != null) {
+      val fixture: Fixture = if (cacheFix != null) {
         cacheFix
       } else {
         val chainShape = ChainShape()
@@ -160,8 +164,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       }
 
       val material = block.material
-      fix.userData = block
-      fix.filterData = when {
+      fixture.userData = block
+//      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
+      fixture.filterData = when {
         material.isBlocksLight && material.isSolid -> Filters.EN_GR_LI__GROUND_FILTER
 //        material.isBlocksLight -> Filters.GR_LI__GROUND_FILTER
         material.isSolid -> Filters.EN_GR__GROUND_FILTER

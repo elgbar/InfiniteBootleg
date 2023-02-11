@@ -10,13 +10,11 @@ import kotlin.reflect.KClass
 interface ECSEvent {
 
   companion object {
-    private val defaultFilter: (Entity) -> Boolean = { true }
-
-    fun <T : ECSEvent, Q : ECSEventQueue<T>> Engine.queueEvent(
+    inline fun <T : ECSEvent, Q : ECSEventQueue<T>> Engine.queueEvent(
       eventList: KClass<out Q>,
       queueMapper: ComponentMapper<out Q>,
       event: T,
-      filter: (Entity) -> Boolean = defaultFilter
+      filter: (Entity) -> Boolean = { true }
     ) {
       val family = allOf(*CONTROLLED_ENTITY_ARRAY, eventList).get()
       this.getEntitiesFor(family).filter(filter).forEach {

@@ -79,14 +79,14 @@ private fun createPlayerFixture(body: Body) {
 }
 
 private fun createPlayerFootFixture(body: Body) {
-  createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, height = ESSENTIALLY_ZERO, ry = -PLAYER_HEIGHT / 2f)
+  createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, width = PLAYER_WIDTH / 3f, height = ESSENTIALLY_ZERO, ry = -(PLAYER_HEIGHT / 2f))
 }
 
 private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
-  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, rx = PLAYER_WIDTH * side / 1.75f)
+  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 2f, rx = PLAYER_WIDTH * side / 1.5f)
 }
 
-private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float = PLAYER_WIDTH / 2.1f, height: Float = PLAYER_HEIGHT / 2.1f, rx: Float = 0f, ry: Float = 0f) {
+private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float, height: Float, rx: Float = 0f, ry: Float = 0f) {
   val shape = PolygonShape()
   shape.setAsBox(width, height, Vector2(rx, ry), 0f)
 

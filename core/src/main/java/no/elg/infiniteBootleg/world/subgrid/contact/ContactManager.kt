@@ -6,9 +6,8 @@ import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.ContactImpulse
 import com.badlogic.gdx.physics.box2d.ContactListener
 import com.badlogic.gdx.physics.box2d.Manifold
-import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.queueEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.queuePhysicsEvent
 
 class ContactManager(val engine: Engine) : ContactListener {
 
@@ -17,7 +16,8 @@ class ContactManager(val engine: Engine) : ContactListener {
   }
 
   private fun queuePhysicsEvent(event: PhysicsEvent, contact: Contact) {
-    engine.queueEvent(PhysicsEventQueue::class, PhysicsEventQueue.mapper, event) { contact.containsEntityFixture(it) }
+    engine.queuePhysicsEvent(event) { contact.containsEntityFixture(it) }
+//    engine.queueEvent(PhysicsEventQueue::class, PhysicsEventQueue.mapper, event) { contact.containsEntityFixture(it) }
   }
 
   override fun beginContact(contact: Contact) = queuePhysicsEvent(PhysicsEvent.ContactBeginsEvent(contact.fixtureA, contact.fixtureB), contact)
