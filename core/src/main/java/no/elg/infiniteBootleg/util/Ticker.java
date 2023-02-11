@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Ticker implements Runnable {
 
-  public static final long DEFAULT_TICKS_PER_SECOND = 60L;
+  public static final long DEFAULT_TICKS_PER_SECOND = 30L;
   /** How many seconds to wait (based on the tps) between each lag message */
   public static final double DEFAULT_NAG_DELAY = 3d;
   /** How low, in percent (0f..1f), the real tps must reach for the user to be warned */
