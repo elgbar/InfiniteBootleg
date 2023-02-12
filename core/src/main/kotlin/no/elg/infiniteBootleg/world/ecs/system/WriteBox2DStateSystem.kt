@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
@@ -25,20 +26,23 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
     updateVelocity(entity, body)
   }
 
-  private fun updatePosition(entity: Entity, body: Body) {
-    if (entity.updateBox2DPosition) {
-      entity.updateBox2DPosition = false
-      body.setLinearVelocity(entity.position.x, entity.position.y)
-    }
-  }
-
   private fun updateVelocity(entity: Entity, body: Body) {
     if (entity.updateBox2DVelocity) {
       entity.updateBox2DVelocity = false
+      body.setLinearVelocity(entity.velocity.dx, entity.velocity.dy)
+    }
+  }
 
-      tmp.x = entity.velocity.dx
-      tmp.y = entity.velocity.dy
+  private fun updatePosition(entity: Entity, body: Body) {
+    if (entity.updateBox2DPosition) {
+      entity.updateBox2DPosition = false
+
+      entity.groundedOrNull?.clearContacts()
+
+      tmp.x = entity.position.x
+      tmp.y = entity.position.y
       body.setTransform(tmp, 0f)
+      body.isAwake = true
     }
   }
 }

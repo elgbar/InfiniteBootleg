@@ -23,6 +23,12 @@ class GroundedComponent : Component {
     else -> true
   }
 
+  fun clearContacts() {
+    feetContacts.clear()
+    leftArmContacts.clear()
+    rightArmContacts.clear()
+  }
+
   companion object : Mapper<GroundedComponent>() {
 
     var Entity.grounded by propertyFor(mapper)
