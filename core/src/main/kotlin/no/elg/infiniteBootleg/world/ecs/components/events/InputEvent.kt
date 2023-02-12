@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.world.ecs.components.events
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue.Companion.queueEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class InputEventQueue : ECSEventQueue<InputEvent> {
@@ -10,6 +12,9 @@ class InputEventQueue : ECSEventQueue<InputEvent> {
 
   companion object : Mapper<InputEventQueue>() {
     var Entity.inputEventQueueOrNull by optionalPropertyFor(InputEventQueue.mapper)
+    inline fun Engine.queueInputEvent(event: InputEvent, filter: (Entity) -> Boolean = { true }) {
+      queueEvent(InputEventQueue.mapper, event, filter)
+    }
   }
 }
 

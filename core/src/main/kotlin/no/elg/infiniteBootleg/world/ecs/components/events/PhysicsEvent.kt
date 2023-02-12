@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.physics.box2d.Manifold
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
-import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent.Companion.queueEvent
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue.Companion.queueEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class PhysicsEventQueue : ECSEventQueue<PhysicsEvent> {
@@ -16,8 +16,7 @@ class PhysicsEventQueue : ECSEventQueue<PhysicsEvent> {
   companion object : Mapper<PhysicsEventQueue>() {
     var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
     inline fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = { true }) {
-      println("Queueing physics event ${event.javaClass.simpleName}")
-      queueEvent(PhysicsEventQueue::class, PhysicsEventQueue.mapper, event, filter)
+      queueEvent(PhysicsEventQueue.mapper, event, filter)
     }
   }
 }
