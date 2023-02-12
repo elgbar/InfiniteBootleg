@@ -183,6 +183,7 @@ object KeyboardControls {
       val vel = body.linearVelocity
       val (nx, ny) = modify(vel.x, vel.y)
       val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
+//      body.applyLinearImpulse()
       body.setLinearVelocity(cap(nx, MAX_X_VEL), cap(ny, MAX_Y_VEL))
       body.isAwake = true
     }

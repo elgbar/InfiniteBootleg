@@ -1018,7 +1018,6 @@ public abstract class World implements Disposable, Resizable {
       Chunk removedChunk;
       chunksLock.writeLock().lock();
       try {
-        Main.logger().log("UNLoading world chunk at " + CoordUtil.stringifyCompactLoc(chunk));
         if (save) {
           chunkLoader.save(chunk);
         }

@@ -58,6 +58,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   private val executedRunnablesIterator = ArrayIterator(executedRunnables)
   private val bodiesIterator = ArrayIterator(bodies)
 
+  private val contactManager = ContactManager(world.engine)
+
   /**
    * Posts a [Runnable] on the physics thread.
    * The runnable will be executed under the synchronization of [BOX2D_LOCK].
@@ -162,29 +164,27 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       return
     }
 
-    if (Main.isSingleplayer()) {
-      synchronized(BOX2D_LOCK) {
-        if (disposed) {
-          return@synchronized
-        }
+//    if (Main.isSingleplayer()) {
+//      synchronized(BOX2D_LOCK) {
+//        if (disposed) {
+//          return@synchronized
+//        }
 //        val player = ClientMain.inst().player ?: return
 //        if (player.isDisposed) {
 //          return
 //        }
-
 //        val physicsPosition = player.physicsPosition
 //        val shiftX = calculateShift(physicsPosition.x)
 //        val shiftY = calculateShift(physicsPosition.y)
-
 //        if (shiftX == 0f && shiftY == 0f) {
 //          // Still in-bounds
 //          return
 //        }
-        // the toShift method assumes no offset, so we must subtract the old offset from the new
+//        // the toShift method assumes no offset, so we must subtract the old offset from the new
 //        shiftWorldOffset(shiftX, shiftY)
 //        Main.logger().debug("BOX2D", "Shifting world offset by ($shiftX, $shiftY) now ($worldOffsetX, $worldOffsetY)")
-      }
-    }
+//      }
+//    }
   }
 
   private fun applyShift(body: Body, deltaOffsetX: Float, deltaOffsetY: Float) {
@@ -249,8 +249,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     if (Main.inst().isNotTest) {
       synchronized(BOX2D_LOCK) {
         box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
-        box2dWorld.setContactListener(ContactManager(world.engine))
-        timeStep = (1f / Settings.tps) * BOX2D_TPS_DIVIDER
+        box2dWorld.setContactListener(contactManager)
+        timeStep = 1f / BOX2D_TPS
       }
     }
   }
