@@ -30,6 +30,8 @@ square=false
 bleed=true
 limitMemory=false
 useIndexes=true
+prettyPrint=true
+legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
 inputFiles=[{path:blocks,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
@@ -70,6 +72,8 @@ square=false
 bleed=true
 limitMemory=false
 useIndexes=true
+prettyPrint=true
+legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
 inputFiles=[{path:entities,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
@@ -78,7 +82,7 @@ keepInputFileExtensions=false
 
 -PROJ-
 
-version=4.10.2
+version=4.11.0
 fileTypeType=png
 fileTypeData={encoding:RGBA4444}
 previewBackgroundColor=ffffffff
