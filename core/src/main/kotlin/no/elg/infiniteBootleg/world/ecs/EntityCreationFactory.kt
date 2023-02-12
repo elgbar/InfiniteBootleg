@@ -74,11 +74,11 @@ private fun createPlayerFixture(body: Body) {
   val vertices = Array(8) { Vector2() }
   vertices[0].set(-nearZW, halfHeight)
   vertices[1].set(nearZW, halfHeight)
-  vertices[2].set(-halfWidth, -nearZH)
+  vertices[2].set(-halfWidth, -(halfHeight / 2f))
   vertices[3].set(-halfWidth, nearZH)
-  vertices[4].set(-nearZW, -halfHeight)
-  vertices[5].set(nearZW, -halfHeight)
-  vertices[6].set(halfWidth, -nearZH)
+  vertices[4].set(-(halfWidth / 2f), -halfHeight)
+  vertices[5].set((halfWidth / 2f), -halfHeight)
+  vertices[6].set(halfWidth, -(halfHeight / 2f))
   vertices[7].set(halfWidth, nearZH)
   shape.set(vertices)
 
