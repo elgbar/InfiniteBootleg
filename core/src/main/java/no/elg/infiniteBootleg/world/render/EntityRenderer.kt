@@ -28,7 +28,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
       val textureRegion = entity.textureRegion.texture
       val centerPos = entity.position
-      val direction = entity.lookDirectionOrNull?.direction ?: Direction.EAST
       val box2d = entity.box2d
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
@@ -60,7 +59,11 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
       val screenX = CoordUtil.worldToScreen(worldX, worldOffsetX)
       val screenY = CoordUtil.worldToScreen(worldY, worldOffsetY)
-      val shouldFlipX = (direction.dx < 0 && textureRegion.isFlipX) || (direction.dx > 0 && !textureRegion.isFlipX)
+
+      val lookDirectionOrNull = entity.lookDirectionOrNull
+      val direction = lookDirectionOrNull?.direction ?: Direction.WEST
+      val shouldFlipX = lookDirectionOrNull != null && (direction.dx < 0 && textureRegion.isFlipX) || (direction.dx > 0 && !textureRegion.isFlipX)
+
       textureRegion.flip(shouldFlipX, false)
       batch.draw(textureRegion, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
