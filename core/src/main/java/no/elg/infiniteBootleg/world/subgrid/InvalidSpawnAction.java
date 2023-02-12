@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.subgrid;
 /**
  * @author Elg
  */
+@Deprecated
 public enum InvalidSpawnAction {
   /** Delete the entity when the spawn location is invalid */
   DELETE,

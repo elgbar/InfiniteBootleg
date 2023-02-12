@@ -76,7 +76,7 @@ public class Door extends MaterialEntity {
                 position.x + getHalfBox2dWidth() * 2,
                 position.y + getHalfBox2dHeight() * 2,
                 fixture -> {
-                  final Body fixtBody = fixture.getBody();
+                  Body fixtBody = fixture.getBody();
                   if (fixtBody != null && fixtBody.getUserData() != this) {
                     fixtBody.setAwake(true);
                   }

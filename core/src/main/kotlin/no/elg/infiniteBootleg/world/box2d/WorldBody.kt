@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.subgrid.contact.ContactManager
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs

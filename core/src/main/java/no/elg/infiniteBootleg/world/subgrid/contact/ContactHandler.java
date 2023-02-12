@@ -4,6 +4,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public interface ContactHandler {
 
   /**

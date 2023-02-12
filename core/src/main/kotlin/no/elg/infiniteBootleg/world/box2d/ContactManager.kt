@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.subgrid.contact
+package no.elg.infiniteBootleg.world.box2d
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
