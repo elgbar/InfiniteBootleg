@@ -48,7 +48,7 @@ object DebugText {
     val rawX = calcSubCell(ClientMain.inst().mouseWorldX)
     val rawY = calcSubCell(ClientMain.inst().mouseWorldY)
 
-    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)))
+    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)), false)
     val blockLight = chunk?.getBlockLight(localX, localY)
 
     val isLit = blockLight?.isLit ?: "maybe"
@@ -65,7 +65,7 @@ object DebugText {
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val localX = CoordUtil.chunkOffset(mouseBlockX)
     val localY = CoordUtil.chunkOffset(mouseBlockY)
-    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)))
+    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)), false)
     val block = chunk?.getRawBlock(localX, localY)
     val material = block?.material ?: Material.AIR
     val rawX = ClientMain.inst().mouseWorldX
