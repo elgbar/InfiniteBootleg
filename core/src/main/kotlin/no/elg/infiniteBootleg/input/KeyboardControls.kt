@@ -37,10 +37,10 @@ object KeyboardControls {
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()
 
-  private const val JUMP_VERTICAL_VEL = 20f
+  private const val JUMP_VERTICAL_VEL = 7.5f
   private const val FLY_VEL = .075f
 
-  const val MAX_X_VEL = 15f // ie target velocity
+  const val MAX_X_VEL = 7.5f // ie target velocity
   const val MAX_Y_VEL = 100f
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
