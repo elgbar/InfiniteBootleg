@@ -9,6 +9,6 @@ object Constants {
   const val MIN_CHECK_STEP = 0.1f
   const val DISPOSED_SANITY_CHECK_DELAY = 10L
   const val DEFAULT_FIXTURE_DENSITY = 1000f
-  const val DEFAULT_FIXTURE_FRICTION = 1f
+  const val DEFAULT_FIXTURE_FRICTION = 5f
   const val DEFAULT_FIXTURE_RESTITUTION = 0.025f
 }
