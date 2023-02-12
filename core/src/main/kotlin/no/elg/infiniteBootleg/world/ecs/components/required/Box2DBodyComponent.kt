@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Compa
  * @param box2dWidth  The height of this entity in box2d view
  * @param box2dHeight The width of this entity in box2d view
  */
-class Box2DBodyComponent(body: Body, val box2dWidth: Float, val box2dHeight: Float) : Component, CheckableDisposable {
+class Box2DBodyComponent(body: Body, private val box2dWidth: Float, private val box2dHeight: Float) : Component, CheckableDisposable {
   private var internalBody: Body? = body
   private var disposed = false
 

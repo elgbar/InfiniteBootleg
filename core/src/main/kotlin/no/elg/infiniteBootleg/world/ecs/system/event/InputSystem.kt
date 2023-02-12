@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 
-object KeyboardInputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWithInputEventFamily, UPDATE_PRIORITY_DEFAULT, InputEvent::class, InputEventQueue.mapper) {
+object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWithInputEventFamily, UPDATE_PRIORITY_DEFAULT, InputEvent::class, InputEventQueue.mapper) {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     when (event) {

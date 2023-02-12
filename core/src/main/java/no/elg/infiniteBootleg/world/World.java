@@ -60,8 +60,8 @@ import no.elg.infiniteBootleg.world.ecs.system.FollowEntitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem;
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem;
-import no.elg.infiniteBootleg.world.ecs.system.event.CheckOnGroundSystem;
-import no.elg.infiniteBootleg.world.ecs.system.event.KeyboardInputSystem;
+import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem;
+import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
 import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
@@ -150,9 +150,9 @@ public abstract class World implements Disposable, Resizable {
     engine.addSystem(MaxVelocitySystem.INSTANCE);
     engine.addSystem(ReadBox2DStateSystem.INSTANCE);
     engine.addSystem(WriteBox2DStateSystem.INSTANCE);
-    engine.addSystem(KeyboardInputSystem.INSTANCE);
+    engine.addSystem(InputSystem.INSTANCE);
     engine.addSystem(ControlSystem.INSTANCE);
-    engine.addSystem(CheckOnGroundSystem.INSTANCE);
+    engine.addSystem(PhysicsSystem.INSTANCE);
     if (Main.isClient()) {
       engine.addSystem(FollowEntitySystem.INSTANCE);
     }

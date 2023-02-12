@@ -5,7 +5,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
-import no.elg.infiniteBootleg.world.subgrid.enitites.FallingBlockEntity
+import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
 
 class FallingTraitHandler(
   trait: FallingTrait,
@@ -35,13 +35,9 @@ class FallingTraitHandler(
       }
 
       world.postBox2dRunnable {
-        val fallingBlockEntity = FallingBlockEntity(world, block)
-        if (fallingBlockEntity.isDisposed) {
-          Main.logger().error("Failed to create falling block entity at $originWorldX, $originWorldY")
-          return@postBox2dRunnable
-        }
+        val material = block.material
         block.destroy(true)
-//        world.addEntity(fallingBlockEntity)
+        world.engine.createFallingBlockEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material)
       }
     }
   }

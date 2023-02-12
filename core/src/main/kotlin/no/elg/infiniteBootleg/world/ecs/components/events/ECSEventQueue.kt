@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.allOf
-import no.elg.infiniteBootleg.world.ecs.CONTROLLED_ENTITY_ARRAY
+import no.elg.infiniteBootleg.world.ecs.BASIC_DYNAMIC_ENTITY_ARRAY
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
@@ -17,7 +17,7 @@ interface ECSEventQueue<T : ECSEvent> : Component {
 
   companion object {
     inline fun <T : ECSEvent, reified Q : ECSEventQueue<T>> Engine.queueEvent(queueMapper: ComponentMapper<out Q>, event: T, filter: (Entity) -> Boolean = { true }) {
-      val family = allOf(*CONTROLLED_ENTITY_ARRAY, Q::class).get()
+      val family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY, Q::class).get()
       this.getEntitiesFor(family).filter(filter).forEach {
         val ecsEvents = queueMapper.get(it) ?: return@forEach
         ecsEvents.events += event

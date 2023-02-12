@@ -112,8 +112,6 @@ public class FallingBlockEntity extends Entity {
                 while (!world.isAirBlock(newX, newY + deltaY)) {
                   deltaY++;
                 }
-                //              world.removeEntity(this,
-                // Packets.DespawnEntity.DespawnReason.NATURAL);
                 world.setBlock(newX, newY + deltaY, material, true);
               }
               // TODO drop as an item

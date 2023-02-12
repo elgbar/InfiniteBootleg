@@ -37,11 +37,11 @@ val BASIC_ENTITY_ARRAY = arrayOf(
 
 val BASIC_DYNAMIC_ENTITY_ARRAY = arrayOf(
   *BASIC_ENTITY_ARRAY,
-  VelocityComponent::class,
-  GroundedComponent::class
+  VelocityComponent::class
 )
 val CONTROLLED_ENTITY_ARRAY = arrayOf(
   *BASIC_DYNAMIC_ENTITY_ARRAY,
+  GroundedComponent::class,
   ControlledComponent.LocallyControlledComponent::class
 )
 
@@ -60,7 +60,7 @@ val followEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, FollowedByCameraTag:
 val controlledEntityFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY).get()
 
 val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY, InputEventQueue::class).get()
-val controlledEntityWithPhysicsEventFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY, PhysicsEventQueue::class).get()
+val controlledEntityWithPhysicsEventFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY, PhysicsEventQueue::class).get()
 
 fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 
