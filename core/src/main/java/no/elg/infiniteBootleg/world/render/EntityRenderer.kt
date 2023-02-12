@@ -8,7 +8,9 @@ import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ClientWorld
+import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.blocks.TntBlock.Companion.whiteTexture
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegion
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
@@ -26,6 +28,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
       val textureRegion = entity.textureRegion.texture
       val centerPos = entity.position
+      val direction = entity.lookDirectionOrNull?.direction ?: Direction.EAST
       val box2d = entity.box2d
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
@@ -57,6 +60,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
       val screenX = CoordUtil.worldToScreen(worldX, worldOffsetX)
       val screenY = CoordUtil.worldToScreen(worldY, worldOffsetY)
+      val shouldFlipX = (direction.dx < 0 && textureRegion.isFlipX) || (direction.dx > 0 && !textureRegion.isFlipX)
+      textureRegion.flip(shouldFlipX, false)
       batch.draw(textureRegion, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {

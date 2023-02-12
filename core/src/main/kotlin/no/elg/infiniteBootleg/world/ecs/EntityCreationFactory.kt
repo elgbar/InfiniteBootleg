@@ -14,11 +14,13 @@ import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Constants
+import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
@@ -136,6 +138,8 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
   // This entity will handle input events
   with<PhysicsEventQueue>()
   with<InputEventQueue>()
+
+  with(LookDirectionComponent(Direction.WEST))
 
   createBody2DBodyComponent(entity, world, worldX, worldY, dx, dy)
 }
