@@ -22,7 +22,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   override fun render(delta: Float) {
     if (worldFinishedLoading) {
       //noinspection ConstantConditions
-      world.input.update()
       world.render.render()
       hud.render()
       Main.inst().console.draw()

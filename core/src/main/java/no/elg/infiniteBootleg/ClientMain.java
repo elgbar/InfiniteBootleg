@@ -22,7 +22,6 @@ import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.ServerClientWorld;
 import no.elg.infiniteBootleg.world.SinglePlayerWorld;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -244,60 +243,6 @@ public class ClientMain extends CommonMain {
       return worldScreen.getWorld();
     }
     return null;
-  }
-
-  //  @Nullable
-  //  public Player getPlayer() {
-  //    ServerClient serverClient = getServerClient();
-  //    if (serverClient != null) {
-  //      //      return serverClient.getPlayer();
-  //    }
-  //    var world = getWorld();
-  //    if (world == null) {
-  //      return null;
-  //    }
-  //    return mainPlayer;
-  //  }
-
-  public void setPlayer(@Nullable Player player) {
-    if (Main.isMultiplayer()) {
-      // server does not have a main player
-      return;
-    }
-    if (player != null && player.isDisposed()) {
-      Main.logger().error("PLR", "Tried to set main player to an invalid entity");
-      return;
-    }
-    var world = getWorld();
-    if (world == null) {
-      Main.logger().error("PLR", "No world loaded");
-      return;
-    }
-    //    synchronized (INST_LOCK) {
-    //      WorldInputHandler worldInput = world.getInput();
-    //      if (mainPlayer != player) {
-    //        // if mainPlayer and player are the same, we would dispose the ''new'' mainPlayer
-    //
-    //        Player oldPlayer = mainPlayer;
-    //        if (oldPlayer != null && oldPlayer.hasControls()) {
-    //          oldPlayer.removeControls();
-    //        }
-    //        if (player != null) {
-    //          if (!world.containsEntity(player.getUuid())) {
-    //            world.addEntity(player);
-    //          }
-    //          if (!player.hasControls()) {
-    //            player.giveControls();
-    //          }
-    //        }
-    //        mainPlayer = player;
-    //        if (Settings.client) {
-    //          world.getInput().setFollowing(player);
-    //        }
-    //        console.debug("PLR", "Changing main player to " + player);
-    //      }
-    //      worldInput.setFollowing(player);
-    //    }
   }
 
   public @NotNull InputMultiplexer getInputMultiplexer() {

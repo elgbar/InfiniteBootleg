@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.console;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -9,7 +11,6 @@ import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
@@ -18,7 +19,6 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.events.api.EventEvent;
 import no.elg.infiniteBootleg.events.api.EventManager;
 import no.elg.infiniteBootleg.events.api.EventsTracker;
-import no.elg.infiniteBootleg.input.EntityControls;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.ConnectingScreen;
 import no.elg.infiniteBootleg.screens.MainMenuScreen;
@@ -30,12 +30,10 @@ import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.Material;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,16 +66,6 @@ public class Commands extends CommandExecutor {
       logger.error("CMD", "Failed to find world");
     }
     return world;
-  }
-
-  @Nullable
-  private Player getSPPlayer() {
-    //    Player player = ClientMain.inst().getPlayer();
-    //    if (player == null) {
-    //      logger.error("CMD", "Failed to find any players");
-    //    }
-    //    return player;
-    return null;
   }
 
   @CmdArgNames({"red", "green", "blue", "alpha"})
@@ -148,12 +136,14 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Toggle flight for player")
   public void fly() {
-    Player player = getSPPlayer();
-    if (player == null) {
-      return;
-    }
-    player.setFlying(!player.isFlying());
-    logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") + "flying");
+    // TODO for ashley
+    //    Player player = getSPPlayer();
+    //    if (player == null) {
+    //      return;
+    //    }
+    //    player.setFlying(!player.isFlying());
+    //    logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") +
+    // "flying");
   }
 
   @ConsoleDoc(
@@ -267,11 +257,12 @@ public class Commands extends CommandExecutor {
     render.update();
     logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY);
 
-    Player player = getSPPlayer();
-    if (player == null) {
-      return;
-    }
-    player.teleport(worldX, worldY, false);
+    // TODO for ashley
+    //    Player player = getSPPlayer();
+    //    if (player == null) {
+    //      return;
+    //    }
+    //    player.teleport(worldX, worldY, false);
     logger.logf(LogLevel.SUCCESS, "Teleported player to (% .2f,% .2f)", worldX, worldY);
   }
 
@@ -327,18 +318,6 @@ public class Commands extends CommandExecutor {
     logger.success("Zoom level is now " + zoom);
   }
 
-  @HiddenCommand
-  @ClientsideOnly
-  public void paint() {
-    Player player = getSPPlayer();
-    if (player == null) {
-      return;
-    }
-    for (Block block : player.touchingBlocks(true)) {
-      block.setBlock(Material.TORCH);
-    }
-  }
-
   @ConsoleDoc(description = "Kill all non-player entities")
   public void killall() {
     World world = getWorld();
@@ -346,6 +325,7 @@ public class Commands extends CommandExecutor {
       return;
     }
     int entities = 0;
+    // TODO for ashley
     //    for (Entity entity : world.getEntities()) {
     //      if (entity instanceof Player) {
     //        continue;
@@ -359,20 +339,22 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Get the brush sizes")
   public void brush() {
-    Player player = getSPPlayer();
-    if (player == null) {
-      return;
-    }
-    EntityControls controls = player.getControls();
-    if (controls == null) {
-      logger.error("CMD", "The main player does not have any controls");
-    } else {
-      logger.logf(
-          LogLevel.SUCCESS,
-          "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
-          controls.getBreakBrushSize(),
-          controls.getPlaceBrushSize());
-    }
+    // TODO for ashley
+    //    Player player = getSPPlayer();
+    //    if (player == null) {
+    //      return;
+    //    }
+    //    EntityControls controls = player.getControls();
+    //    if (controls == null) {
+    //      logger.error("CMD", "The main player does not have any controls");
+    //    } else {
+    //      logger.logf(
+    //          LogLevel.SUCCESS,
+    //          "Brush size for player are now %.2f blocks for breaking and %.2f blocks for
+    // placing",
+    //          controls.getBreakBrushSize(),
+    //          controls.getPlaceBrushSize());
+    //    }
   }
 
   @CmdArgNames({"type", "size"})
@@ -384,30 +366,31 @@ public class Commands extends CommandExecutor {
         "New brush size, positive integer"
       })
   public void brush(String type, float size) {
-    Player player = getSPPlayer();
-    if (player == null) {
-      return;
-    }
-    EntityControls controls = player.getControls();
-    if (controls == null) {
-      logger.error("CMD", "The main player does not have any controls");
-      return;
-    }
-    if (type == null) {
-      logger.error("CMD", "Valid brush types are 'break' and 'place'");
-      return;
-    }
-    type = type.toLowerCase(Locale.ROOT);
-
-    if (type.startsWith("b")) {
-      controls.setBreakBrushSize(size);
-    } else if (type.startsWith("p")) {
-      controls.setPlaceBrushSize(size);
-    } else {
-      logger.error("CMD", "Valid brush types are 'break' and 'place'");
-      return;
-    }
-    brush();
+    // TODO for ashley
+    //    Player player = getSPPlayer();
+    //    if (player == null) {
+    //      return;
+    //    }
+    //    EntityControls controls = player.getControls();
+    //    if (controls == null) {
+    //      logger.error("CMD", "The main player does not have any controls");
+    //      return;
+    //    }
+    //    if (type == null) {
+    //      logger.error("CMD", "Valid brush types are 'break' and 'place'");
+    //      return;
+    //    }
+    //    type = type.toLowerCase(Locale.ROOT);
+    //
+    //    if (type.startsWith("b")) {
+    //      controls.setBreakBrushSize(size);
+    //    } else if (type.startsWith("p")) {
+    //      controls.setPlaceBrushSize(size);
+    //    } else {
+    //      logger.error("CMD", "Valid brush types are 'break' and 'place'");
+    //      return;
+    //    }
+    //    brush();
   }
 
   @CmdArgNames({"scale"})
@@ -489,25 +472,6 @@ public class Commands extends CommandExecutor {
     logger.success("Changed time from % .3f to % .3f", old, time);
   }
 
-  @ClientsideOnly
-  @ConsoleDoc(description = "Reset camera and zoom")
-  public void reset() {
-    Player player = getSPPlayer();
-    if (player == null) {
-      return;
-    }
-    var world = getClientWorld();
-    if (world == null) {
-      return;
-    }
-    ClientWorldRender render = world.getRender();
-    render.getCamera().zoom = 1f;
-    render.getCamera().position.x = player.getPosition().x * Block.BLOCK_SIZE;
-    render.getCamera().position.y = player.getPosition().y * Block.BLOCK_SIZE;
-    world.getInput().setLockedOn(true);
-    render.update();
-  }
-
   @HiddenCommand
   @ClientsideOnly
   @CmdArgNames({"dx", "dy"})
@@ -529,25 +493,22 @@ public class Commands extends CommandExecutor {
     }
     world.postBox2dRunnable(
         () -> {
-          final com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
+          com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
               world.getWorldBody().getBox2dWorld();
           var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
           worldBox2dWorld.getBodies(bodies);
 
           int invalid = 0;
+          ImmutableArray<Entity> entities = world.getEngine().getEntities();
           for (Body body : bodies) {
-            final Object userData = body.getUserData();
+            Object userData = body.getUserData();
             if (userData instanceof Entity entity) {
-              if (world.containsEntity(entity.getUuid().toString())) {
+              String id = IdComponent.Companion.getId(entity).getId();
+              if (world.containsEntity(id)) {
                 continue;
               }
               invalid++;
-              logger.error(
-                  "Entity",
-                  "Found entity not added to the world! "
-                      + entity.simpleName()
-                      + " "
-                      + entity.hudDebug());
+              logger.error("Entity", "Found entity not added to the world! " + id);
             }
           }
           if (invalid == 0) {
@@ -600,7 +561,7 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Disconnect from the server")
   public void disconnect() {
-    final ServerClient client = ClientMain.inst().getServerClient();
+    ServerClient client = ClientMain.inst().getServerClient();
     if (client != null) {
       client.ctx.writeAndFlush(
           PacketExtraKt.serverBoundClientDisconnectPacket(client, "Disconnect command"));

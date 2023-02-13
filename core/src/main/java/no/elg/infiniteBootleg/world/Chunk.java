@@ -7,14 +7,12 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import java.util.stream.Stream;
 import no.elg.infiniteBootleg.CheckableDisposable;
-import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -209,7 +207,7 @@ public interface Chunk
   boolean isNeighborsLoaded();
 
   /**
-   * If {@link ClientMain#getPlayer()} is in this chunk, unloading should never be allowed
+   * If players are in this chunk, unloading should never be allowed
    *
    * @return If this chunk is allowed to be unloaded
    */
@@ -240,7 +238,7 @@ public interface Chunk
   @NotNull
   Block getBlock(int localX, int localY);
 
-  Array<Entity> getEntities();
+  //  Future<Array<Entity>> getEntities();
 
   @NotNull
   ChunkBody getChunkBody();

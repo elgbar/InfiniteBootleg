@@ -7,5 +7,6 @@ public enum ItemType {
   /** A block in the world */
   BLOCK,
   /** Something that can move between blocks and have a Box2D body */
+  @Deprecated
   ENTITY,
 }

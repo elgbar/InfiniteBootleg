@@ -1,24 +1,17 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import kotlin.NotImplementedError;
 import no.elg.infiniteBootleg.KAssets;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.items.ItemType;
-import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.util.CoordUtil;
-import no.elg.infiniteBootleg.util.Util;
-import no.elg.infiniteBootleg.world.blocks.EntityBlock;
 import no.elg.infiniteBootleg.world.blocks.FallingBlock;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.blocks.TntBlock;
 import no.elg.infiniteBootleg.world.blocks.Torch;
-import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Door;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +28,7 @@ public enum Material {
   SAND(FallingBlock.class, 1f),
   TORCH(Torch.class, ItemType.BLOCK, 0.1f, false, false, true, true, true),
   GLASS(null, ItemType.BLOCK, 0.1f, true, false, true, false, true),
-  DOOR(Door.class, ItemType.ENTITY, 1f, false, true, true, false, true),
+  DOOR(null, ItemType.BLOCK, 1f, false, true, true, false, true),
   ;
   @Nullable private final Constructor<?> constructor;
   @Nullable private final Constructor<?> constructorProtoBuf;
@@ -94,22 +87,6 @@ public enum Material {
               "There is no constructor of "
                   + impl.getSimpleName()
                   + " with the arguments World, Chunk, int, int, Material");
-        }
-      } else if (itemType == ItemType.ENTITY) {
-        Preconditions.checkArgument(
-            Util.hasSuperClass(impl, MaterialEntity.class),
-            name()
-                + " does not have "
-                + MaterialEntity.class.getSimpleName()
-                + " as a super class");
-        try {
-          constructor = impl.getConstructor(World.class, float.class, float.class);
-          constructorProtoBuf = impl.getConstructor(World.class, ProtoWorld.Entity.class);
-        } catch (NoSuchMethodException e) {
-          throw new IllegalStateException(
-              "There is no constructor of "
-                  + impl.getSimpleName()
-                  + " with the arguments World, float, float");
         }
       } else {
         constructor = null;
@@ -172,7 +149,7 @@ public enum Material {
         }
         return block != null;
       } else if (isEntity()) {
-        return createEntity(world, worldX, worldY) != null;
+        throw new NotImplementedError("TODO :)");
       }
       throw new IllegalStateException(
           "This material (" + name() + ") is neither a block nor an entity");
@@ -182,64 +159,6 @@ public enum Material {
 
   public boolean isEntity() {
     return itemType == ItemType.ENTITY;
-  }
-
-  @Nullable
-  public MaterialEntity createEntity(
-      @NotNull World world, @NotNull Chunk chunk, @NotNull ProtoWorld.Entity protoEntity) {
-    Preconditions.checkArgument(itemType == ItemType.ENTITY);
-    Preconditions.checkNotNull(constructorProtoBuf, "Constructor of entity cannot be null");
-    MaterialEntity entity;
-    try {
-      entity = (MaterialEntity) constructorProtoBuf.newInstance(world, protoEntity);
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalStateException(e);
-    }
-    return commonEntity(world, entity, chunk);
-  }
-
-  @Nullable
-  public MaterialEntity createEntity(@NotNull World world, float worldX, float worldY) {
-    Preconditions.checkArgument(itemType == ItemType.ENTITY);
-    Preconditions.checkNotNull(constructor, "Constructor of entity cannot be null");
-    MaterialEntity entity;
-    try {
-      entity = (MaterialEntity) constructor.newInstance(world, worldX, worldY);
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-      throw new IllegalStateException(e);
-    }
-
-    return commonEntity(world, entity, null);
-  }
-
-  @Nullable
-  private MaterialEntity commonEntity(
-      @NotNull World world, @NotNull MaterialEntity entity, @Nullable Chunk chunk) {
-    if (entity.isDisposed()) {
-      return null;
-    }
-    //    world.addEntity(entity, false);
-    ObjectSet<Location> locations = entity.touchingLocations();
-    for (Location location : locations) {
-      Chunk locChunk;
-      if (chunk != null
-          && CoordUtil.worldToChunk(location.x) == chunk.getChunkX()
-          && CoordUtil.worldToChunk(location.y) == chunk.getChunkY()) {
-        locChunk = chunk;
-      } else {
-        locChunk = world.getChunkFromWorld(location);
-      }
-
-      if (locChunk == null || !locChunk.isValid()) {
-        Main.logger().error("MATERIAL", "Failed get chunk for entity block");
-        continue;
-      }
-      int localX = CoordUtil.chunkOffset(location.x);
-      int localY = CoordUtil.chunkOffset(location.y);
-      var block = new EntityBlock(world, locChunk, localX, localY, this, entity);
-      locChunk.setBlock(localX, localY, block, false);
-    }
-    return entity;
   }
 
   @Nullable

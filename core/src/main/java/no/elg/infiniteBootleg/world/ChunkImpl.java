@@ -39,8 +39,6 @@ import no.elg.infiniteBootleg.util.CoordUtil;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -646,8 +644,23 @@ public class ChunkImpl implements Chunk {
    */
   @Override
   public boolean shouldSave() {
-    return modified || !getEntities().isEmpty();
+    return modified;
   }
+
+  //  @Override
+  //  public Future<Array<Entity>> getEntities(Function1<Array<Entity>, Unit> callback) {
+  //    var future = new CompletableFuture<Array<Entity>>();
+  //    var array = new Array<Entity>(false, 16);
+  //    world.getWorldBody().queryAABB(getWorldX(), getWorldY(), getWorldX(Chunk.CHUNK_SIZE - 1),
+  // getWorldY(Chunk.CHUNK_SIZE - 1), fixture -> {
+  //      Object userData = fixture.getUserData();
+  //      if (userData instanceof Entity entity) {
+  //        array.add(entity);
+  //      }
+  //      return true;
+  //    });
+  //    return future;
+  //  }
 
   @Override
   public Stream<@Nullable Block> stream() {
@@ -708,38 +721,6 @@ public class ChunkImpl implements Chunk {
       }
       return block;
     }
-  }
-
-  public boolean hasEntities() {
-    //    float minX = getWorldX();
-    //    float maxX = minX + Chunk.CHUNK_SIZE;
-    //    float minY = getWorldY();
-    //    float maxY = minY + Chunk.CHUNK_SIZE;
-    //    for (Entity entity : world.getEntities()) {
-    //      Vector2 pos = entity.getPosition();
-    //      if (Util.isBetween(minX, pos.x, maxX) && Util.isBetween(minY, pos.y, maxY)) {
-    //        return true;
-    //      }
-    //    }
-    return false;
-  }
-
-  @Override
-  public Array<Entity> getEntities() {
-    Array<Entity> foundEntities = new Array<>(false, 5);
-
-    //    float minX = getWorldX();
-    //    float maxX = minX + Chunk.CHUNK_SIZE;
-    //    float minY = getWorldY();
-    //    float maxY = minY + Chunk.CHUNK_SIZE;
-
-    //    for (Entity entity : world.getEntities()) {
-    //      Vector2 pos = entity.getPosition();
-    //      if (Util.isBetween(minX, pos.x, maxX) && Util.isBetween(minY, pos.y, maxY)) {
-    //        foundEntities.add(entity);
-    //      }
-    //    }
-    return foundEntities;
   }
 
   @Override
@@ -856,12 +837,13 @@ public class ChunkImpl implements Chunk {
       builder.addBlocks(block != null ? block.save() : AIR_BLOCK_BUILDER);
     }
     if (includeEntities) {
-      for (Entity entity : getEntities()) {
-        if (entity instanceof Player) {
-          continue;
-        }
-        builder.addEntities(entity.save());
-      }
+      //      for (Entity entity : getEntities()) {
+      //        if (entity instanceof Player) {
+      //          continue;
+      //        }
+      //        builder.addEntities(entity.save());
+      //      }
+      // TODO do for ashley entities
     }
     return builder.build();
   }
@@ -905,7 +887,7 @@ public class ChunkImpl implements Chunk {
     }
 
     for (ProtoWorld.Entity protoEntity : protoChunk.getEntitiesList()) {
-      Entity.load(world, this, protoEntity);
+      //      Entity.load(world, this, protoEntity);
     }
     return true;
   }

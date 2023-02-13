@@ -69,8 +69,6 @@ import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.loader.WorldLoader;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.MaterialEntity;
-import no.elg.infiniteBootleg.world.subgrid.Removable;
 import no.elg.infiniteBootleg.world.ticker.WorldTicker;
 import no.elg.infiniteBootleg.world.time.WorldTime;
 import org.jetbrains.annotations.NotNull;
@@ -635,12 +633,6 @@ public abstract class World implements Disposable, Resizable {
 
     int localX = CoordUtil.chunkOffset(worldX);
     int localY = CoordUtil.chunkOffset(worldY);
-
-    for (Entity entity : getEntities(worldX, worldY)) {
-      if (entity instanceof Removable) {
-        removeEntity(entity);
-      }
-    }
 
     Chunk chunk = getChunk(chunkX, chunkY, true);
     if (chunk != null) {

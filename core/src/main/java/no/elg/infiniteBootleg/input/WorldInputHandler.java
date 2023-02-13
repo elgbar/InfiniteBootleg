@@ -1,47 +1,33 @@
 package no.elg.infiniteBootleg.input;
 
-import static com.badlogic.gdx.Input.Keys.DOWN;
 import static com.badlogic.gdx.Input.Keys.F12;
 import static com.badlogic.gdx.Input.Keys.F3;
 import static com.badlogic.gdx.Input.Keys.F5;
 import static com.badlogic.gdx.Input.Keys.F9;
-import static com.badlogic.gdx.Input.Keys.LEFT;
-import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.SHIFT_LEFT;
-import static com.badlogic.gdx.Input.Keys.UP;
+import static no.elg.infiniteBootleg.world.ecs.system.FollowEntitySystem.SCROLL_SPEED;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
-import no.elg.infiniteBootleg.api.Updatable;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.util.Ticker;
-import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
-import no.elg.infiniteBootleg.world.subgrid.Entity;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Elg
  */
-public class WorldInputHandler extends InputAdapter implements Disposable, Updatable {
+public class WorldInputHandler extends InputAdapter implements Disposable {
 
-  public static final float SCROLL_SPEED = 0.25f;
-  public static final float CAMERA_LERP = 2.5f;
-  public static final float LERP_CUTOFF = 5f;
-  private static final int CAMERA_SPEED = 100 * Block.BLOCK_SIZE;
   private final ClientWorldRender worldRender;
-  @Nullable private Entity following;
-  private boolean lockedOn = true;
 
   public WorldInputHandler(@NotNull ClientWorldRender world) {
     worldRender = world;
@@ -123,83 +109,5 @@ public class WorldInputHandler extends InputAdapter implements Disposable, Updat
   @Override
   public void dispose() {
     ClientMain.inst().getInputMultiplexer().removeProcessor(this);
-  }
-
-  /**
-   * @return We are following a non-null, valid target, and is locked on
-   */
-  private boolean hasValidLockOn() {
-    return following != null && !following.isDisposed() && lockedOn;
-  }
-
-  private void teleportCamera() {
-    OrthographicCamera camera = worldRender.getCamera();
-    if (hasValidLockOn()) {
-      assert following != null;
-      final Vector2 position = following.getPhysicsPosition();
-
-      camera.position.x = position.x * Block.BLOCK_SIZE;
-      camera.position.y = position.y * Block.BLOCK_SIZE;
-      worldRender.update();
-    }
-  }
-
-  @Override
-  public void update() {
-    if (Main.inst().getConsole().isVisible()) {
-      // keep following even when console is visible
-      //      cameraFollowUpdate();
-      return;
-    }
-
-    int vertical = (Gdx.input.isKeyPressed(UP) ? 1 : 0) - (Gdx.input.isKeyPressed(DOWN) ? 1 : 0);
-    int horizontal =
-        (Gdx.input.isKeyPressed(LEFT) ? 1 : 0) - (Gdx.input.isKeyPressed(RIGHT) ? 1 : 0);
-
-    if (vertical == 0 && horizontal == 0) {
-      // No input, we're still following the current entity
-      //      cameraFollowUpdate();
-    } else {
-      OrthographicCamera camera = worldRender.getCamera();
-      camera.position.x -= Gdx.graphics.getDeltaTime() * horizontal * CAMERA_SPEED * camera.zoom;
-      camera.position.y += Gdx.graphics.getDeltaTime() * vertical * CAMERA_SPEED * camera.zoom;
-      lockedOn = false;
-      worldRender.update();
-    }
-  }
-
-  public Entity getFollowing() {
-    return following;
-  }
-
-  /**
-   * Change who to follow, also automatically lock on and move the camera to the new following
-   * entity
-   *
-   * @param following What to follow, null if none
-   */
-  public void setFollowing(@Nullable Entity following) {
-    if (following != null && following.isDisposed()) {
-      Main.logger().error("World Input", "Cannot pass a non-null invalid entity!");
-      return;
-    }
-    // always update locked on status
-    lockedOn = true;
-    if (following == this.following) {
-      // Do not teleport the camera, it looks very janky
-      return;
-    }
-    this.following = following;
-    teleportCamera();
-  }
-
-  /** Only applies if {@link #getFollowing()} is not {@code null} */
-  public boolean isLockedOn() {
-    return lockedOn;
-  }
-
-  /** Only applies if {@link #getFollowing()} is not {@code null} */
-  public void setLockedOn(boolean lockedOn) {
-    this.lockedOn = lockedOn;
   }
 }

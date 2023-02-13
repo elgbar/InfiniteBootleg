@@ -23,7 +23,6 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.infiniteBootleg.ClientMain.SCALE
 import no.elg.infiniteBootleg.screen.ScreenRenderer
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player.PLAYER_REGION_NAME
 import java.io.File
 
 /**
@@ -36,8 +35,10 @@ object KAssets {
   private val TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas"
   private val TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas"
 
-  public lateinit var blockAtlas: TextureAtlas
-  public lateinit var entityAtlas: TextureAtlas
+  lateinit var blockAtlas: TextureAtlas
+  lateinit var entityAtlas: TextureAtlas
+
+  private const val PLAYER_REGION_NAME = "player"
 
   lateinit var playerTexture: TextureRegion
 
