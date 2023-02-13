@@ -8,6 +8,7 @@ import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
@@ -46,6 +47,7 @@ val CONTROLLED_ENTITY_ARRAY = arrayOf(
 )
 
 val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class, TextureRegionComponent::class).get()
+val doorEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, DoorComponent::class).get()
 
 val playerFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY, NamedComponent::class, KillableComponent::class, TextureRegionComponent::class).get()
 
@@ -60,7 +62,7 @@ val followEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, FollowedByCameraTag:
 val controlledEntityFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY).get()
 
 val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_ENTITY_ARRAY, InputEventQueue::class).get()
-val controlledEntityWithPhysicsEventFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY, PhysicsEventQueue::class).get()
+val entityWithPhysicsEventFamily: Family = allOf(*BASIC_ENTITY_ARRAY, PhysicsEventQueue::class).get()
 
 fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 

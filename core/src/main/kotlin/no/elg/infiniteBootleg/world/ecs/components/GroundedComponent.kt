@@ -5,13 +5,16 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import ktx.collections.GdxLongArray
+import no.elg.infiniteBootleg.world.box2d.LongContactTracker
+import no.elg.infiniteBootleg.world.ecs.PLAYERS_FOOT_USER_DATA
+import no.elg.infiniteBootleg.world.ecs.PLAYERS_LEFT_ARM_USER_DATA
+import no.elg.infiniteBootleg.world.ecs.PLAYERS_RIGHT_ARM_USER_DATA
 
 class GroundedComponent : Component {
 
-  val feetContacts: GdxLongArray = GdxLongArray(false, 16)
-  val leftArmContacts: GdxLongArray = GdxLongArray(false, 16)
-  val rightArmContacts: GdxLongArray = GdxLongArray(false, 16)
+  val feetContacts = LongContactTracker(PLAYERS_FOOT_USER_DATA)
+  val leftArmContacts = LongContactTracker(PLAYERS_LEFT_ARM_USER_DATA)
+  val rightArmContacts = LongContactTracker(PLAYERS_RIGHT_ARM_USER_DATA)
 
   val onGround: Boolean get() = !feetContacts.isEmpty
   val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty

@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.ecs
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
@@ -13,12 +14,14 @@ import ktx.ashley.plusAssign
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
@@ -42,9 +45,21 @@ const val PLAYERS_RIGHT_ARM_USER_DATA = "Righty"
 const val PLAYERS_LEFT_ARM_USER_DATA = "Left hand"
 const val ESSENTIALLY_ZERO = 0.001f
 
-private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Float, worldY: Float, dx: Float, dy: Float, width: Float, height: Float, createBody: (Body) -> Unit) {
+private fun createBody2DBodyComponent(
+  entity: Entity,
+  world: World,
+  worldX: Float,
+  worldY: Float,
+  dx: Float,
+  dy: Float,
+  width: Float,
+  height: Float,
+  wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
+  bodyType: BodyDef.BodyType = BodyDef.BodyType.DynamicBody,
+  createBody: (Body) -> Unit
+) {
   val bodyDef = BodyDef()
-  bodyDef.type = BodyDef.BodyType.DynamicBody
+  bodyDef.type = bodyType
   bodyDef.position.set(worldX, worldY)
   bodyDef.linearVelocity.set(dx, dy)
   bodyDef.linearDamping = 0.5f
@@ -56,8 +71,13 @@ private fun createBody2DBodyComponent(entity: Entity, world: World, worldX: Floa
 
     createBody(it)
     entity += Box2DBodyComponent(it, width, height)
-    check(basicDynamicEntityFamily.matches(entity))
-    Main.logger().log("Finishing setting up box2d entity")
+    if (Settings.debug) {
+      check(basicEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
+      wantedFamilies.forEach { (family: Family, errorStr) ->
+        check(family.matches(entity)) { "Finished entity does not match $errorStr" }
+      }
+      Main.logger().log("Finishing setting up box2d entity")
+    }
   }
 }
 
@@ -84,7 +104,25 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
 
   with(LookDirectionComponent(Direction.WEST))
 
-  createBody2DBodyComponent(entity, world, worldX, worldY, dx, dy, PLAYER_WIDTH, PLAYER_HEIGHT) {
+  createBody2DBodyComponent(
+    entity,
+    world,
+    worldX,
+    worldY,
+    dx,
+    dy,
+    PLAYER_WIDTH,
+    PLAYER_HEIGHT,
+    arrayOf(
+      basicDynamicEntityFamily to "basicDynamicEntityFamily",
+      drawableEntitiesFamily to "drawableEntitiesFamily",
+      playerFamily to "playerFamily",
+      controlledEntityFamily to "controlledEntityFamily",
+      followEntityFamily to "followEntityFamily",
+      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
+      controlledEntityWithInputEventFamily to "controlledEntityWithInputEventFamily"
+    )
+  ) {
     fun createPlayerFixture(body: Body) {
       val shape = PolygonShape()
 
@@ -164,7 +202,15 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
   bodyDef.linearDamping = 0.5f
   bodyDef.fixedRotation = true
 
-  createBody2DBodyComponent(entity, world, worldX, worldY, dx, dy, 1f, 1f) {
+  createBody2DBodyComponent(
+    entity, world, worldX, worldY, dx, dy, 1f, 1f,
+    arrayOf(
+      basicDynamicEntityFamily to "basicDynamicEntityFamily",
+      drawableEntitiesFamily to "drawableEntitiesFamily",
+      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
+      blockEntityFamily to "blockEntityFamily"
+    )
+  ) {
     val shape = PolygonShape()
     shape.setAsBox(0.45f, 0.45f)
 
@@ -177,6 +223,62 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
     val fix: Fixture = it.createFixture(def)
     fix.filterData = Filters.GR__ENTITY_FILTER
     fix.userData = it.userData
+
+    shape.dispose()
+  }
+}
+
+fun Engine.createDoorEntity(
+  world: World,
+  worldX: Float,
+  worldY: Float,
+  id: String? = null
+) = entity {
+  with(WorldComponent(world))
+  with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
+  with(PositionComponent(worldX, worldY))
+
+  val door = Material.DOOR
+  with(TextureRegionComponent(KAssets.doorClosedTexture))
+
+  // This entity will handle input events
+  with(MaterialComponent(door))
+  with<DoorComponent>()
+  with<PhysicsEventQueue>()
+
+  val width = 2f
+  val height = 4f
+
+  createBody2DBodyComponent(
+    entity,
+    world,
+    worldX,
+    worldY,
+    0f,
+    0f,
+    width,
+    height,
+    arrayOf(
+      drawableEntitiesFamily to "drawableEntitiesFamily",
+      blockEntityFamily to "blockEntityFamily",
+      doorEntityFamily to "doorEntityFamily",
+      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
+    ),
+    BodyDef.BodyType.StaticBody
+  ) {
+    val shape = PolygonShape()
+    shape.setAsBox(width / 2, height / 2)
+
+    val def = FixtureDef()
+    def.shape = shape
+    def.density = Constants.DEFAULT_FIXTURE_DENSITY
+    def.friction = Constants.DEFAULT_FIXTURE_FRICTION
+    def.restitution = 0f
+
+    val fix: Fixture = it.createFixture(def)
+    fix.filterData = Filters.EN__GROUND_FILTER
+    fix.userData = it.userData
+    fix.isSensor = true
 
     shape.dispose()
   }

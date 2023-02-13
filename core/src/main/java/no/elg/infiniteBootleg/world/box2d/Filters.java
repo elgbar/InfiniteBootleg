@@ -16,6 +16,7 @@ public final class Filters {
   public static final Filter GR_LI__ENTITY_FILTER = new Filter();
   // ie glass & open door
   public static final Filter EN_GR__GROUND_FILTER = new Filter();
+  public static final Filter EN__GROUND_FILTER = new Filter();
   // ie torch
   public static final Filter GR__GROUND_FILTER = new Filter();
   // base filter for entities
@@ -52,6 +53,9 @@ public final class Filters {
 
     EN_GR__GROUND_FILTER.categoryBits = GROUND_CATEGORY;
     EN_GR__GROUND_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY;
+
+    EN__GROUND_FILTER.categoryBits = GROUND_CATEGORY;
+    EN__GROUND_FILTER.maskBits = ENTITY_CATEGORY;
 
     EN_GR_LI__GROUND_FILTER.categoryBits = GROUND_CATEGORY;
     EN_GR_LI__GROUND_FILTER.maskBits = ENTITY_CATEGORY | GROUND_CATEGORY | LIGHTS_CATEGORY;

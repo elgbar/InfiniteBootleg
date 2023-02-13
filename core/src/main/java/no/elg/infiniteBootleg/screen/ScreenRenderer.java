@@ -37,7 +37,10 @@ public class ScreenRenderer implements Disposable, Resizable {
   }
 
   public void drawBottom(@NotNull String text, float line) {
-    font.draw(batch, text, spacing, spacing * (line + 1f));
+    try {
+      font.draw(batch, text, spacing, spacing * (line + 1f));
+    } catch (ArrayIndexOutOfBoundsException | NullPointerException ignore) {
+    }
   }
 
   public void begin() {

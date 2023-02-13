@@ -7,7 +7,7 @@ import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 
-data class TextureRegionComponent(val texture: TextureRegion) : Component {
+data class TextureRegionComponent(var texture: TextureRegion) : Component {
   companion object : Mapper<TextureRegionComponent>() {
     var Entity.textureRegion by propertyFor(mapper)
     var Entity.textureRegionOrNull by optionalPropertyFor(mapper)

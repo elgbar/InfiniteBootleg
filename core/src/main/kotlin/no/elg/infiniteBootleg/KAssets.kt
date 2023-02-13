@@ -39,8 +39,12 @@ object KAssets {
   lateinit var entityAtlas: TextureAtlas
 
   private const val PLAYER_REGION_NAME = "player"
+  private const val DOOR_OPEN_REGION_NAME = "door_open"
+  private const val DOOR_CLOSED_REGION_NAME = "door_closed"
 
   lateinit var playerTexture: TextureRegion
+  lateinit var doorOpenTexture: TextureRegion
+  lateinit var doorClosedTexture: TextureRegion
 
   val font: BitmapFont by lazy {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
@@ -56,6 +60,8 @@ object KAssets {
     entityAtlas = TextureAtlas(TEXTURES_ENTITY_FILE)
 
     playerTexture = TextureRegion(entityAtlas.findRegion(PLAYER_REGION_NAME))
+    doorOpenTexture = TextureRegion(entityAtlas.findRegion(DOOR_OPEN_REGION_NAME))
+    doorClosedTexture = TextureRegion(entityAtlas.findRegion(DOOR_CLOSED_REGION_NAME))
 
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font
