@@ -45,8 +45,8 @@ object DebugText {
       return ((fixedCoord % 1f) * LIGHT_RESOLUTION).toInt()
     }
 
-    val rawX = calcSubCell(ClientMain.inst().mouseWorldX)
-    val rawY = calcSubCell(ClientMain.inst().mouseWorldY)
+    val rawX = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldX)
+    val rawY = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
 
     val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)), false)
     val blockLight = chunk?.getBlockLight(localX, localY)
@@ -68,8 +68,8 @@ object DebugText {
     val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)), false)
     val block = chunk?.getRawBlock(localX, localY)
     val material = block?.material ?: Material.AIR
-    val rawX = ClientMain.inst().mouseWorldX
-    val rawY = ClientMain.inst().mouseWorldY
+    val rawX = ClientMain.inst().mouseLocator.mouseWorldX
+    val rawY = ClientMain.inst().mouseLocator.mouseWorldY
     val exists = block != null
     val blockDebug = block?.hudDebug() ?: ""
 

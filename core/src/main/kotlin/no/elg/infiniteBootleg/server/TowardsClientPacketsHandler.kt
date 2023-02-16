@@ -33,7 +33,6 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.ServerClientWorld
-import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent.LocallyControlledComponent.locallyControlled
 import java.util.concurrent.TimeUnit
 
 /**
@@ -235,7 +234,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       } else {
         world.worldTicker.start()
         ClientMain.inst().screen = WorldScreen(world, false)
-        player.locallyControlled = true
+//        player.locallyControlled = true
 
         started = true
 

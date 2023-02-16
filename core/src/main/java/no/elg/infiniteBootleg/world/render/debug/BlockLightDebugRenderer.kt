@@ -22,8 +22,8 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     val worldOffsetX = world.worldBody.worldOffsetX
     val worldOffsetY = world.worldBody.worldOffsetY
     val clientMain = Main.inst() as ClientMain
-    val pointerWorldX = clientMain.mouseBlockX
-    val pointerWorldY = clientMain.mouseBlockY
+    val pointerWorldX = clientMain.mouseLocator.mouseBlockX
+    val pointerWorldY = clientMain.mouseLocator.mouseBlockY
 
     val light = world.getBlockLight(pointerWorldX, pointerWorldY, false) ?: return
 

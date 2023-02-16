@@ -50,8 +50,8 @@ public class HUDRenderer implements Renderer, Resizable {
       DebugText.fpsString(builder, world);
     }
     if (hasMode(DISPLAY_DEBUG) && world != null) {
-      int mouseBlockX = main.getMouseBlockX();
-      int mouseBlockY = main.getMouseBlockY();
+      int mouseBlockX = main.getMouseLocator().getMouseBlockX();
+      int mouseBlockY = main.getMouseLocator().getMouseBlockY();
       ImmutableArray<Entity> controlled =
           world.getEngine().getEntitiesFor(AshleyKt.getControlledEntityFamily());
 

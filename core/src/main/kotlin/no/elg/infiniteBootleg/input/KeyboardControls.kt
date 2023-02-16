@@ -5,12 +5,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.Vector2
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
+import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent.Companion.selectedMaterialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -27,9 +29,7 @@ import kotlin.math.sqrt
  *
  * @author Elg
  */
-object KeyboardControls {
-  var selected: Material = Material.BRICK
-    private set
+class KeyboardControls(val world: ClientWorld) {
 
   private var breakBrushSize = 2f
   private var placeBrushSize = 1f
@@ -37,11 +37,7 @@ object KeyboardControls {
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()
 
-  private const val JUMP_VERTICAL_VEL = 7.5f
-  private const val FLY_VEL = .075f
-
-  const val MAX_X_VEL = 7.5f // ie target velocity
-  const val MAX_Y_VEL = 100f
+  private val mouseLocator = MouseLocator()
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
     with(entity) {
@@ -73,6 +69,8 @@ object KeyboardControls {
       return false
     }
     Main.inst().scheduler.executeAsync {
+      val selectedMaterial = entity.selectedMaterialOrNull ?: return@executeAsync
+      val selected = selectedMaterial.material
       if (placeBrushSize <= 1) {
         selected.create(world, blockX, blockY)
       } else {
@@ -152,13 +150,11 @@ object KeyboardControls {
       return
     }
 
-    val update =
-      when {
-        Gdx.input.isButtonPressed(Buttons.LEFT) -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::breakBlocks)
-        Gdx.input.isButtonPressed(Buttons.RIGHT) -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::placeBlocks)
-        Gdx.input.isKeyJustPressed(Keys.Q) -> entity.interpolate(true, this::placeBlocks)
-        else -> false
-      }
+    when {
+      Gdx.input.isButtonPressed(Buttons.LEFT) -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::breakBlocks)
+      Gdx.input.isButtonPressed(Buttons.RIGHT) -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::placeBlocks)
+      Gdx.input.isKeyJustPressed(Keys.Q) -> entity.interpolate(true, this::placeBlocks)
+    }
 
     if (entity.flying) {
       entity.fly()
@@ -192,9 +188,8 @@ object KeyboardControls {
   fun touchDown(entity: Entity, button: Int) {
     val update =
       when (button) {
-        Buttons.LEFT -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::breakBlocks)
-        Buttons.RIGHT -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::placeBlocks)
-        Keys.Q -> entity.interpolate(true, this::placeBlocks)
+        Buttons.LEFT -> entity.interpolate(true, this::breakBlocks)
+        Buttons.RIGHT -> entity.interpolate(true, this::placeBlocks)
         else -> false
       }
 
@@ -205,10 +200,13 @@ object KeyboardControls {
 
   fun keyDown(entity: Entity, keycode: Int): Boolean {
     when (keycode) {
-      Keys.T -> entity.teleport(ClientMain.inst().mouseWorldX, ClientMain.inst().mouseWorldY)
+      Keys.T -> entity.teleport(mouseLocator.mouseWorldX, mouseLocator.mouseWorldY)
+      Keys.Q -> entity.interpolate(true, this::placeBlocks)
     }
 
-    selected = when (keycode) {
+    val selectedMaterial = entity.selectedMaterialOrNull ?: return true
+
+    selectedMaterial.material = when (keycode) {
       Keys.NUM_0, Keys.NUMPAD_0 -> Material.values()[0]
       Keys.NUM_1, Keys.NUMPAD_1 -> Material.values()[1]
       Keys.NUM_2, Keys.NUMPAD_2 -> Material.values()[2]
@@ -219,7 +217,7 @@ object KeyboardControls {
       Keys.NUM_7, Keys.NUMPAD_7 -> Material.values()[7]
       Keys.NUM_8, Keys.NUMPAD_8 -> Material.values()[8]
       Keys.NUM_9, Keys.NUMPAD_9 -> Material.values()[9]
-      else -> selected
+      else -> selectedMaterial.material
     }
     return true
   }
@@ -228,13 +226,12 @@ object KeyboardControls {
    * @param justPressed Whether to interpolate between placements
    */
   private fun Entity.interpolate(justPressed: Boolean, action: (entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float) -> Boolean): Boolean {
-    val main = ClientMain.inst()
-    val blockX = main.mouseBlockX
-    val blockY = main.mouseBlockY
-    val worldX = main.mouseWorldX
-    val worldY = main.mouseWorldY
+    val blockX = mouseLocator.mouseBlockX
+    val blockY = mouseLocator.mouseBlockY
+    val worldX = mouseLocator.mouseWorldX
+    val worldY = mouseLocator.mouseWorldY
 
-    val inSameBlock = main.previousMouseBlockX == blockX && main.previousMouseBlockY == blockY
+    val inSameBlock = mouseLocator.previousMouseBlockX == blockX && mouseLocator.previousMouseBlockY == blockY
     if (justPressed || inSameBlock) {
       return action(this, blockX, blockY, worldX, worldY)
     }
@@ -245,8 +242,8 @@ object KeyboardControls {
     currPos.x = worldX
     currPos.y = worldY
 
-    prevPos.x = main.previousMouseWorldX
-    prevPos.y = main.previousMouseWorldY
+    prevPos.x = mouseLocator.previousMouseWorldX
+    prevPos.y = mouseLocator.previousMouseWorldY
 
     fun Vector2.dstd(v: Vector2): Double {
       val dx: Float = v.x - x
@@ -287,8 +284,8 @@ object KeyboardControls {
 
         fun halfpoint(i1: Float, i2: Float, multiplier: Double): Float = (min(i1, i2) + abs(i1 - i2) * multiplier).toFloat()
 
-        val pWx = halfpoint(worldX, main.previousMouseWorldX, multiplierX)
-        val pWy = halfpoint(worldY, main.previousMouseWorldY, multiplierY)
+        val pWx = halfpoint(worldX, mouseLocator.previousMouseWorldX, multiplierX)
+        val pWy = halfpoint(worldY, mouseLocator.previousMouseWorldY, multiplierY)
         val pBx = CoordUtil.worldToBlock(pWx)
         val pBy = CoordUtil.worldToBlock(pWy)
 
@@ -304,5 +301,24 @@ object KeyboardControls {
     }
 
     return update or action(this, blockX, blockY, worldX, worldY)
+  }
+
+  companion object {
+
+    private const val JUMP_VERTICAL_VEL = 7.5f
+    private const val FLY_VEL = .075f
+
+    const val MAX_X_VEL = 7.5f // ie target velocity
+    const val MAX_Y_VEL = 100f
+
+    private var mouseBlockX = 0
+    private var mouseBlockY = 0
+    private var mouseWorldX = 0f
+    private var mouseWorldY = 0f
+
+    private var previousMouseBlockX = 0
+    private var previousMouseBlockY = 0
+    private var previousMouseWorldX = 0f
+    private var previousMouseWorldY = 0f
   }
 }

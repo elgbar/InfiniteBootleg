@@ -7,12 +7,13 @@ import ktx.ashley.allOf
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.world.ecs.components.ControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
+import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
@@ -43,13 +44,19 @@ val BASIC_DYNAMIC_ENTITY_ARRAY = arrayOf(
 val CONTROLLED_ENTITY_ARRAY = arrayOf(
   *BASIC_DYNAMIC_ENTITY_ARRAY,
   GroundedComponent::class,
-  ControlledComponent.LocallyControlledComponent::class
+  LocallyControlledComponent::class
 )
 
 val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class, TextureRegionComponent::class).get()
 val doorEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, DoorComponent::class).get()
 
-val playerFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY, NamedComponent::class, KillableComponent::class, TextureRegionComponent::class).get()
+val playerFamily: Family = allOf(
+  *CONTROLLED_ENTITY_ARRAY,
+  NamedComponent::class,
+  KillableComponent::class,
+  TextureRegionComponent::class,
+  SelectedMaterialComponent::class
+).get()
 
 /**
  * The basic components ALL entities should have
