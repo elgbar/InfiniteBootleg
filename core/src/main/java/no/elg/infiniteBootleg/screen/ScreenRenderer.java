@@ -16,7 +16,7 @@ public class ScreenRenderer implements Disposable, Resizable {
   public static final int FONT_SIZE = 20;
 
   private final int spacing;
-  private final BitmapFont font;
+  private final BitmapFont font; //font managed by KAssets
   private final SpriteBatch batch;
 
   public ScreenRenderer() {
@@ -72,7 +72,6 @@ public class ScreenRenderer implements Disposable, Resizable {
   @Override
   public void dispose() {
     batch.dispose();
-    font.dispose();
   }
 
   @Override
