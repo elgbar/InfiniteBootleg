@@ -8,7 +8,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.screen.hud.CurrentBlock
 import no.elg.infiniteBootleg.world.Material
 
-class SelectedMaterialComponent() : Component {
+class SelectedMaterialComponent : Component {
 
   var material: Material = Material.BRICK
     set(value) {

@@ -16,7 +16,7 @@ public class ScreenRenderer implements Disposable, Resizable {
   public static final int FONT_SIZE = 20;
 
   private final int spacing;
-  private final BitmapFont font; //font managed by KAssets
+  private final BitmapFont font; // font managed by KAssets
   private final SpriteBatch batch;
 
   public ScreenRenderer() {

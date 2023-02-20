@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Constants
-import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.box2d.Filters
@@ -29,6 +28,7 @@ import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
@@ -106,7 +106,8 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
   with<PhysicsEventQueue>()
   with<InputEventQueue>()
 
-  with(LookDirectionComponent(Direction.WEST))
+  with<LookDirectionComponent>()
+  with<SelectedMaterialComponent>()
 
   createBody2DBodyComponent(
     entity,

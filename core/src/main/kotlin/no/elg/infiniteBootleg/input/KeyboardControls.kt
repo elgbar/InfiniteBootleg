@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.C
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
+import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
@@ -38,6 +39,7 @@ class KeyboardControls(val world: ClientWorld) {
   private val tmpVec2 = Vector2()
 
   private val mouseLocator = MouseLocator()
+  val justPressedButtons = BooleanArray(5)
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
     with(entity) {
@@ -146,13 +148,17 @@ class KeyboardControls(val world: ClientWorld) {
 //  }
 
   fun update(entity: Entity) {
+    val entityWorld = entity.world.world
+    if (entityWorld is ClientWorld) {
+      mouseLocator.update(entityWorld)
+    }
     if (Main.inst().console.isVisible) {
       return
     }
 
     when {
-      Gdx.input.isButtonPressed(Buttons.LEFT) -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::breakBlocks)
-      Gdx.input.isButtonPressed(Buttons.RIGHT) -> entity.interpolate(Gdx.input.isButtonJustPressed(Buttons.RIGHT), this::placeBlocks)
+      Gdx.input.isButtonPressed(Buttons.LEFT) -> entity.interpolate(justPressedButtons[Buttons.RIGHT], this::breakBlocks)
+      Gdx.input.isButtonPressed(Buttons.RIGHT) -> entity.interpolate(justPressedButtons[Buttons.RIGHT], this::placeBlocks)
       Gdx.input.isKeyJustPressed(Keys.Q) -> entity.interpolate(true, this::placeBlocks)
     }
 
@@ -174,18 +180,19 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   private fun Entity.setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-    world.world.postBox2dRunnable {
-      val body = box2d.body
-      val vel = body.linearVelocity
-      val (nx, ny) = modify(vel.x, vel.y)
-      val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
-//      body.applyLinearImpulse()
-      body.setLinearVelocity(cap(nx, MAX_X_VEL), cap(ny, MAX_Y_VEL))
-      body.isAwake = true
-    }
+    val body = box2d.body
+    val vel = body.linearVelocity
+    val (nx, ny) = modify(vel.x, vel.y)
+    val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
+
+    val velocityComponent = this.velocity
+    velocityComponent.dx = cap(nx, MAX_X_VEL)
+    velocityComponent.dy = cap(ny, MAX_Y_VEL)
+    this.updateBox2DVelocity = true
   }
 
   fun touchDown(entity: Entity, button: Int) {
+    justPressedButtons[button] = true
     val update =
       when (button) {
         Buttons.LEFT -> entity.interpolate(true, this::breakBlocks)
@@ -196,6 +203,10 @@ class KeyboardControls(val world: ClientWorld) {
     if (update) {
       entity.world.world.render.update()
     }
+  }
+
+  fun touchUp(entity: Entity, button: Int) {
+    justPressedButtons[button] = false
   }
 
   fun keyDown(entity: Entity, keycode: Int): Boolean {

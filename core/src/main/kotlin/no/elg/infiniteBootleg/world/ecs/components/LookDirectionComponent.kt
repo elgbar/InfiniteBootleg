@@ -6,7 +6,7 @@ import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.world.Direction
 
-data class LookDirectionComponent(var direction: Direction) : Component {
+data class LookDirectionComponent(var direction: Direction = Direction.WEST) : Component {
   companion object : Mapper<LookDirectionComponent>() {
     var Entity.lookDirectionOrNull by optionalPropertyFor(LookDirectionComponent.mapper)
   }
