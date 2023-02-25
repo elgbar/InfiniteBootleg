@@ -24,6 +24,7 @@ def getGitVersion() {
 allprojects {
   apply plugin: "java"
   apply plugin: "kotlin"
+  apply plugin: "com.diffplug.spotless"
 
   version = getGitVersion()
 
@@ -34,27 +35,6 @@ allprojects {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     maven { url "https://raw.githubusercontent.com/elgbar/maven2/repo/" }
-  }
-}
-
-subprojects {
-
-  apply plugin: "idea"
-  apply plugin: "java"
-  apply plugin: "org.jetbrains.kotlin.jvm"
-  apply plugin: "com.diffplug.spotless"
-
-  sourceCompatibility = 17
-  targetCompatibility = sourceCompatibility
-  [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = sourceCompatibility
-
-  [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
-
-  sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
-  sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
-
-  tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
   }
 
   spotless {
@@ -72,13 +52,28 @@ subprojects {
     kotlin {
       ktlint()
         .setUseExperimental(true)
-        .editorConfigOverride([
-          "indent_size"             : "2",
-          "continuation_indent_size": "2",
-          "max_line_length"         : "180",
-          "end_of_line"             : "lf",
-        ])
+        .setEditorConfigPath("$rootDir/.editorconfig")
     }
+  }
+}
+
+subprojects {
+
+  apply plugin: "idea"
+  apply plugin: "java"
+  apply plugin: "org.jetbrains.kotlin.jvm"
+
+  sourceCompatibility = 17
+  targetCompatibility = sourceCompatibility
+  [compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = sourceCompatibility
+
+  [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
+
+  sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
+  sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
+
+  tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
   }
 
   test {
