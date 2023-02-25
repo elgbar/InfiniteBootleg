@@ -31,6 +31,8 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.World;
+import no.elg.infiniteBootleg.world.ecs.AshleyKt;
+import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -326,35 +328,35 @@ public class Commands extends CommandExecutor {
     }
     int entities = 0;
     // TODO for ashley
-    //    for (Entity entity : world.getEntities()) {
-    //      if (entity instanceof Player) {
-    //        continue;
-    //      }
-    //      entities++;
-    //      world.removeEntity(entity);
-    //    }
+//        for (Entity entity : world.getEntities()) {
+//          if (entity instanceof Player) {
+//            continue;
+//          }
+//          entities++;
+//          world.removeEntity(entity);
+//        }
     logger.log(LogLevel.SUCCESS, "Killed " + entities + " entities");
   }
 
   @ClientsideOnly
   @ConsoleDoc(description = "Get the brush sizes")
   public void brush() {
-    // TODO for ashley
-    //    Player player = getSPPlayer();
-    //    if (player == null) {
-    //      return;
-    //    }
-    //    EntityControls controls = player.getControls();
-    //    if (controls == null) {
-    //      logger.error("CMD", "The main player does not have any controls");
-    //    } else {
-    //      logger.logf(
-    //          LogLevel.SUCCESS,
-    //          "Brush size for player are now %.2f blocks for breaking and %.2f blocks for
-    // placing",
-    //          controls.getBreakBrushSize(),
-    //          controls.getPlaceBrushSize());
-    //    }
+    ClientWorld world = getClientWorld();
+    if(world == null){
+      return;
+    }
+    ImmutableArray<Entity> entities = world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+    if(entities.size() == 0){
+      logger.log("There is no local, controlled player in this world");
+    }
+    for (Entity entity : entities) {
+      var controls = LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+      logger.logf(
+        LogLevel.SUCCESS,
+        "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
+        controls.getBreakBrushSize(),
+        controls.getPlaceBrushSize());
+    }
   }
 
   @CmdArgNames({"type", "size"})
@@ -366,31 +368,29 @@ public class Commands extends CommandExecutor {
         "New brush size, positive integer"
       })
   public void brush(String type, float size) {
-    // TODO for ashley
-    //    Player player = getSPPlayer();
-    //    if (player == null) {
-    //      return;
-    //    }
-    //    EntityControls controls = player.getControls();
-    //    if (controls == null) {
-    //      logger.error("CMD", "The main player does not have any controls");
-    //      return;
-    //    }
-    //    if (type == null) {
-    //      logger.error("CMD", "Valid brush types are 'break' and 'place'");
-    //      return;
-    //    }
-    //    type = type.toLowerCase(Locale.ROOT);
-    //
-    //    if (type.startsWith("b")) {
-    //      controls.setBreakBrushSize(size);
-    //    } else if (type.startsWith("p")) {
-    //      controls.setPlaceBrushSize(size);
-    //    } else {
-    //      logger.error("CMD", "Valid brush types are 'break' and 'place'");
-    //      return;
-    //    }
-    //    brush();
+    ClientWorld world = getClientWorld();
+    if(world == null){
+      return;
+    }
+    if (type == null) {
+      logger.error("CMD", "Valid brush types are 'break' and 'place'");
+      return;
+    }
+    ImmutableArray<Entity> entities = world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+    if(entities.size() == 0){
+      logger.log("There is no local, controlled player in this world");
+    }
+    for (Entity entity : entities) {
+      var controls = LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+      if (type.startsWith("b")) {
+        controls.setBreakBrushSize(size);
+      } else if (type.startsWith("p")) {
+        controls.setPlaceBrushSize(size);
+      } else {
+        logger.error("CMD", "Valid brush types are 'break' and 'place'");
+        return;
+      }
+    }
   }
 
   @CmdArgNames({"scale"})

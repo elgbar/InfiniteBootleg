@@ -32,8 +32,8 @@ import kotlin.math.sqrt
  */
 class KeyboardControls(val world: ClientWorld) {
 
-  private var breakBrushSize = 2f
-  private var placeBrushSize = 1f
+  var breakBrushSize = 2f
+  var placeBrushSize = 1f
 
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()

@@ -21,23 +21,28 @@ class FallingTraitHandler(
   var falling: Boolean = false
     private set
 
+  private var scheduledToFall = false
+
   fun tryFall() {
-    if (falling || Main.isServerClient()) {
+    if (scheduledToFall || falling || Main.isServerClient()) {
       return
     }
-    val blockBelow = Location.relativeCompact(originWorldX, originWorldY, Direction.SOUTH)
-    if (world.isAirBlock(blockBelow)) {
-      val block = world.getRawBlock(originWorldX, originWorldY, true) ?: return
-      falling = true
-      val blockAbove = world.getRawBlock(originWorldX, originWorldY + 1, true)
-      if (blockAbove is TickingTrait) {
-        blockAbove.delayedShouldTick(Settings.tps / 10)
-      }
+    scheduledToFall = true
+    world.postBox2dRunnable {
+      val blockBelow = Location.relativeCompact(originWorldX, originWorldY, Direction.SOUTH)
+      if (world.isAirBlock(blockBelow)) {
+        falling = true
+        val block = world.getRawBlock(originWorldX, originWorldY, true) ?: return@postBox2dRunnable
+        val blockAbove = world.getRawBlock(originWorldX, originWorldY + 1, true)
+        if (blockAbove is TickingTrait) {
+          blockAbove.delayedShouldTick(1)
+        }
 
-      world.postBox2dRunnable {
         val material = block.material
         block.destroy(true)
-        world.engine.createFallingBlockEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material)
+        world.engine.createFallingBlockEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, -3f, material)
+      } else {
+        scheduledToFall = false
       }
     }
   }

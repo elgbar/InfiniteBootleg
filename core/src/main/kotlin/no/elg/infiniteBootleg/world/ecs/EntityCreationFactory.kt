@@ -122,6 +122,7 @@ fun Engine.createPlayerEntity(world: World, worldX: Float, worldY: Float, dx: Fl
       basicDynamicEntityFamily to "basicDynamicEntityFamily",
       drawableEntitiesFamily to "drawableEntitiesFamily",
       playerFamily to "playerFamily",
+      localPlayerFamily to "localPlayerFamily",
       controlledEntityFamily to "controlledEntityFamily",
       followEntityFamily to "followEntityFamily",
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
