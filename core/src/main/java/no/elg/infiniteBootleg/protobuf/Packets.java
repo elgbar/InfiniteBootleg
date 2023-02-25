@@ -23,7 +23,6 @@ public final class Packets {
      * @return The enum numeric value on the wire for type.
      */
     int getTypeValue();
-
     /**
      * <code>.packets.Packet.Type type = 1;</code>
      *
@@ -37,7 +36,6 @@ public final class Packets {
      * @return The enum numeric value on the wire for direction.
      */
     int getDirectionValue();
-
     /**
      * <code>.packets.Packet.Direction direction = 2;</code>
      *
@@ -57,7 +55,6 @@ public final class Packets {
      * @return Whether the secret field is set.
      */
     boolean hasSecret();
-
     /**
      *
      *
@@ -70,7 +67,6 @@ public final class Packets {
      * @return The secret.
      */
     java.lang.String getSecret();
-
     /**
      *
      *
@@ -96,7 +92,6 @@ public final class Packets {
      * @return Whether the heartbeat field is set.
      */
     boolean hasHeartbeat();
-
     /**
      *
      *
@@ -109,7 +104,6 @@ public final class Packets {
      * @return The heartbeat.
      */
     no.elg.infiniteBootleg.protobuf.Packets.Heartbeat getHeartbeat();
-
     /**
      *
      *
@@ -133,7 +127,6 @@ public final class Packets {
      * @return Whether the moveEntity field is set.
      */
     boolean hasMoveEntity();
-
     /**
      *
      *
@@ -146,7 +139,6 @@ public final class Packets {
      * @return The moveEntity.
      */
     no.elg.infiniteBootleg.protobuf.Packets.MoveEntity getMoveEntity();
-
     /**
      *
      *
@@ -170,7 +162,6 @@ public final class Packets {
      * @return Whether the updateChunk field is set.
      */
     boolean hasUpdateChunk();
-
     /**
      *
      *
@@ -183,7 +174,6 @@ public final class Packets {
      * @return The updateChunk.
      */
     no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk getUpdateChunk();
-
     /**
      *
      *
@@ -201,14 +191,12 @@ public final class Packets {
      * @return Whether the spawnEntity field is set.
      */
     boolean hasSpawnEntity();
-
     /**
      * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
      *
      * @return The spawnEntity.
      */
     no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity getSpawnEntity();
-
     /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder();
 
@@ -218,14 +206,12 @@ public final class Packets {
      * @return Whether the despawnEntity field is set.
      */
     boolean hasDespawnEntity();
-
     /**
      * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
      *
      * @return The despawnEntity.
      */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity getDespawnEntity();
-
     /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder getDespawnEntityOrBuilder();
 
@@ -241,7 +227,6 @@ public final class Packets {
      * @return Whether the updateBlock field is set.
      */
     boolean hasUpdateBlock();
-
     /**
      *
      *
@@ -254,7 +239,6 @@ public final class Packets {
      * @return The updateBlock.
      */
     no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock getUpdateBlock();
-
     /**
      *
      *
@@ -278,7 +262,6 @@ public final class Packets {
      * @return Whether the login field is set.
      */
     boolean hasLogin();
-
     /**
      *
      *
@@ -291,7 +274,6 @@ public final class Packets {
      * @return The login.
      */
     no.elg.infiniteBootleg.protobuf.Packets.Login getLogin();
-
     /**
      *
      *
@@ -315,7 +297,6 @@ public final class Packets {
      * @return Whether the startGame field is set.
      */
     boolean hasStartGame();
-
     /**
      *
      *
@@ -328,7 +309,6 @@ public final class Packets {
      * @return The startGame.
      */
     no.elg.infiniteBootleg.protobuf.Packets.StartGame getStartGame();
-
     /**
      *
      *
@@ -352,7 +332,6 @@ public final class Packets {
      * @return Whether the serverLoginStatus field is set.
      */
     boolean hasServerLoginStatus();
-
     /**
      *
      *
@@ -365,7 +344,6 @@ public final class Packets {
      * @return The serverLoginStatus.
      */
     no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus getServerLoginStatus();
-
     /**
      *
      *
@@ -384,14 +362,12 @@ public final class Packets {
      * @return Whether the disconnect field is set.
      */
     boolean hasDisconnect();
-
     /**
      * <code>optional .packets.Disconnect disconnect = 21;</code>
      *
      * @return The disconnect.
      */
     no.elg.infiniteBootleg.protobuf.Packets.Disconnect getDisconnect();
-
     /** <code>optional .packets.Disconnect disconnect = 21;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder getDisconnectOrBuilder();
 
@@ -401,14 +377,12 @@ public final class Packets {
      * @return Whether the secretExchange field is set.
      */
     boolean hasSecretExchange();
-
     /**
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      *
      * @return The secretExchange.
      */
     no.elg.infiniteBootleg.protobuf.Packets.SecretExchange getSecretExchange();
-
     /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder getSecretExchangeOrBuilder();
 
@@ -424,7 +398,6 @@ public final class Packets {
      * @return Whether the chunkRequest field is set.
      */
     boolean hasChunkRequest();
-
     /**
      *
      *
@@ -437,7 +410,6 @@ public final class Packets {
      * @return The chunkRequest.
      */
     no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest getChunkRequest();
-
     /**
      *
      *
@@ -455,14 +427,12 @@ public final class Packets {
      * @return Whether the entityRequest field is set.
      */
     boolean hasEntityRequest();
-
     /**
      * <code>optional .packets.EntityRequest entityRequest = 24;</code>
      *
      * @return The entityRequest.
      */
     no.elg.infiniteBootleg.protobuf.Packets.EntityRequest getEntityRequest();
-
     /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder getEntityRequestOrBuilder();
 
@@ -472,25 +442,21 @@ public final class Packets {
      * @return Whether the worldSettings field is set.
      */
     boolean hasWorldSettings();
-
     /**
      * <code>optional .packets.WorldSettings worldSettings = 25;</code>
      *
      * @return The worldSettings.
      */
     no.elg.infiniteBootleg.protobuf.Packets.WorldSettings getWorldSettings();
-
     /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
     no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder getWorldSettingsOrBuilder();
   }
-
   /** Protobuf type {@code packets.Packet} */
   public static final class Packet extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Packet)
       PacketOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use Packet.newBuilder() to construct.
     private Packet(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -506,309 +472,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new Packet();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private Packet(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8:
-              {
-                int rawValue = input.readEnum();
-
-                type_ = rawValue;
-                break;
-              }
-            case 16:
-              {
-                int rawValue = input.readEnum();
-
-                direction_ = rawValue;
-                break;
-              }
-            case 26:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000001;
-                secret_ = s;
-                break;
-              }
-            case 66:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000002) != 0)) {
-                  subBuilder = heartbeat_.toBuilder();
-                }
-                heartbeat_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(heartbeat_);
-                  heartbeat_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000002;
-                break;
-              }
-            case 74:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000004) != 0)) {
-                  subBuilder = moveEntity_.toBuilder();
-                }
-                moveEntity_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(moveEntity_);
-                  moveEntity_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000004;
-                break;
-              }
-            case 82:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000008) != 0)) {
-                  subBuilder = updateChunk_.toBuilder();
-                }
-                updateChunk_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(updateChunk_);
-                  updateChunk_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000008;
-                break;
-              }
-            case 90:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000010) != 0)) {
-                  subBuilder = spawnEntity_.toBuilder();
-                }
-                spawnEntity_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(spawnEntity_);
-                  spawnEntity_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000010;
-                break;
-              }
-            case 98:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000020) != 0)) {
-                  subBuilder = despawnEntity_.toBuilder();
-                }
-                despawnEntity_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(despawnEntity_);
-                  despawnEntity_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000020;
-                break;
-              }
-            case 106:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000040) != 0)) {
-                  subBuilder = updateBlock_.toBuilder();
-                }
-                updateBlock_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(updateBlock_);
-                  updateBlock_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000040;
-                break;
-              }
-            case 138:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.Login.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000080) != 0)) {
-                  subBuilder = login_.toBuilder();
-                }
-                login_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.Login.parser(), extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(login_);
-                  login_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000080;
-                break;
-              }
-            case 146:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.StartGame.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000100) != 0)) {
-                  subBuilder = startGame_.toBuilder();
-                }
-                startGame_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.StartGame.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(startGame_);
-                  startGame_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000100;
-                break;
-              }
-            case 162:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000200) != 0)) {
-                  subBuilder = serverLoginStatus_.toBuilder();
-                }
-                serverLoginStatus_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(serverLoginStatus_);
-                  serverLoginStatus_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000200;
-                break;
-              }
-            case 170:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000400) != 0)) {
-                  subBuilder = disconnect_.toBuilder();
-                }
-                disconnect_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.Disconnect.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(disconnect_);
-                  disconnect_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000400;
-                break;
-              }
-            case 178:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000800) != 0)) {
-                  subBuilder = secretExchange_.toBuilder();
-                }
-                secretExchange_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(secretExchange_);
-                  secretExchange_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000800;
-                break;
-              }
-            case 186:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.Builder subBuilder = null;
-                if (((bitField0_ & 0x00001000) != 0)) {
-                  subBuilder = chunkRequest_.toBuilder();
-                }
-                chunkRequest_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(chunkRequest_);
-                  chunkRequest_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00001000;
-                break;
-              }
-            case 194:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder subBuilder = null;
-                if (((bitField0_ & 0x00002000) != 0)) {
-                  subBuilder = entityRequest_.toBuilder();
-                }
-                entityRequest_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(entityRequest_);
-                  entityRequest_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00002000;
-                break;
-              }
-            case 202:
-              {
-                no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder subBuilder = null;
-                if (((bitField0_ & 0x00004000) != 0)) {
-                  subBuilder = worldSettings_.toBuilder();
-                }
-                worldSettings_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(worldSettings_);
-                  worldSettings_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00004000;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -834,7 +497,7 @@ public final class Packets {
      * 3. CB (Client Bound) Only sent to client
      * </pre>
      *
-     * <p>Protobuf enum {@code packets.Packet.Type}
+     * Protobuf enum {@code packets.Packet.Type}
      */
     public enum Type implements com.google.protobuf.ProtocolMessageEnum {
       /** <code>DX_HEARTBEAT = 0;</code> */
@@ -1143,8 +806,7 @@ public final class Packets {
 
     private int bitField0_;
     public static final int TYPE_FIELD_NUMBER = 1;
-    private int type_;
-
+    private int type_ = 0;
     /**
      * <code>.packets.Packet.Type type = 1;</code>
      *
@@ -1154,7 +816,6 @@ public final class Packets {
     public int getTypeValue() {
       return type_;
     }
-
     /**
      * <code>.packets.Packet.Type type = 1;</code>
      *
@@ -1162,17 +823,15 @@ public final class Packets {
      */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.Packet.Type getType() {
-      @SuppressWarnings("deprecation")
       no.elg.infiniteBootleg.protobuf.Packets.Packet.Type result =
-          no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.valueOf(type_);
+          no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.forNumber(type_);
       return result == null
           ? no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
           : result;
     }
 
     public static final int DIRECTION_FIELD_NUMBER = 2;
-    private int direction_;
-
+    private int direction_ = 0;
     /**
      * <code>.packets.Packet.Direction direction = 2;</code>
      *
@@ -1182,7 +841,6 @@ public final class Packets {
     public int getDirectionValue() {
       return direction_;
     }
-
     /**
      * <code>.packets.Packet.Direction direction = 2;</code>
      *
@@ -1190,17 +848,17 @@ public final class Packets {
      */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction getDirection() {
-      @SuppressWarnings("deprecation")
       no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction result =
-          no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.valueOf(direction_);
+          no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.forNumber(direction_);
       return result == null
           ? no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.UNRECOGNIZED
           : result;
     }
 
     public static final int SECRET_FIELD_NUMBER = 3;
-    private volatile java.lang.Object secret_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object secret_ = "";
     /**
      *
      *
@@ -1216,7 +874,6 @@ public final class Packets {
     public boolean hasSecret() {
       return ((bitField0_ & 0x00000001) != 0);
     }
-
     /**
      *
      *
@@ -1240,7 +897,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      *
      *
@@ -1267,7 +923,6 @@ public final class Packets {
 
     public static final int HEARTBEAT_FIELD_NUMBER = 8;
     private no.elg.infiniteBootleg.protobuf.Packets.Heartbeat heartbeat_;
-
     /**
      *
      *
@@ -1283,7 +938,6 @@ public final class Packets {
     public boolean hasHeartbeat() {
       return ((bitField0_ & 0x00000002) != 0);
     }
-
     /**
      *
      *
@@ -1301,7 +955,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.getDefaultInstance()
           : heartbeat_;
     }
-
     /**
      *
      *
@@ -1320,7 +973,6 @@ public final class Packets {
 
     public static final int MOVEENTITY_FIELD_NUMBER = 9;
     private no.elg.infiniteBootleg.protobuf.Packets.MoveEntity moveEntity_;
-
     /**
      *
      *
@@ -1336,7 +988,6 @@ public final class Packets {
     public boolean hasMoveEntity() {
       return ((bitField0_ & 0x00000004) != 0);
     }
-
     /**
      *
      *
@@ -1354,7 +1005,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.getDefaultInstance()
           : moveEntity_;
     }
-
     /**
      *
      *
@@ -1373,7 +1023,6 @@ public final class Packets {
 
     public static final int UPDATECHUNK_FIELD_NUMBER = 10;
     private no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk updateChunk_;
-
     /**
      *
      *
@@ -1389,7 +1038,6 @@ public final class Packets {
     public boolean hasUpdateChunk() {
       return ((bitField0_ & 0x00000008) != 0);
     }
-
     /**
      *
      *
@@ -1407,7 +1055,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.getDefaultInstance()
           : updateChunk_;
     }
-
     /**
      *
      *
@@ -1426,7 +1073,6 @@ public final class Packets {
 
     public static final int SPAWNENTITY_FIELD_NUMBER = 11;
     private no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity spawnEntity_;
-
     /**
      * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
      *
@@ -1436,7 +1082,6 @@ public final class Packets {
     public boolean hasSpawnEntity() {
       return ((bitField0_ & 0x00000010) != 0);
     }
-
     /**
      * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
      *
@@ -1448,7 +1093,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance()
           : spawnEntity_;
     }
-
     /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder getSpawnEntityOrBuilder() {
@@ -1459,7 +1103,6 @@ public final class Packets {
 
     public static final int DESPAWNENTITY_FIELD_NUMBER = 12;
     private no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity despawnEntity_;
-
     /**
      * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
      *
@@ -1469,7 +1112,6 @@ public final class Packets {
     public boolean hasDespawnEntity() {
       return ((bitField0_ & 0x00000020) != 0);
     }
-
     /**
      * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
      *
@@ -1481,7 +1123,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.getDefaultInstance()
           : despawnEntity_;
     }
-
     /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder
@@ -1493,7 +1134,6 @@ public final class Packets {
 
     public static final int UPDATEBLOCK_FIELD_NUMBER = 13;
     private no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock updateBlock_;
-
     /**
      *
      *
@@ -1509,7 +1149,6 @@ public final class Packets {
     public boolean hasUpdateBlock() {
       return ((bitField0_ & 0x00000040) != 0);
     }
-
     /**
      *
      *
@@ -1527,7 +1166,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance()
           : updateBlock_;
     }
-
     /**
      *
      *
@@ -1546,7 +1184,6 @@ public final class Packets {
 
     public static final int LOGIN_FIELD_NUMBER = 17;
     private no.elg.infiniteBootleg.protobuf.Packets.Login login_;
-
     /**
      *
      *
@@ -1562,7 +1199,6 @@ public final class Packets {
     public boolean hasLogin() {
       return ((bitField0_ & 0x00000080) != 0);
     }
-
     /**
      *
      *
@@ -1580,7 +1216,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.Login.getDefaultInstance()
           : login_;
     }
-
     /**
      *
      *
@@ -1599,7 +1234,6 @@ public final class Packets {
 
     public static final int STARTGAME_FIELD_NUMBER = 18;
     private no.elg.infiniteBootleg.protobuf.Packets.StartGame startGame_;
-
     /**
      *
      *
@@ -1615,7 +1249,6 @@ public final class Packets {
     public boolean hasStartGame() {
       return ((bitField0_ & 0x00000100) != 0);
     }
-
     /**
      *
      *
@@ -1633,7 +1266,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.StartGame.getDefaultInstance()
           : startGame_;
     }
-
     /**
      *
      *
@@ -1652,7 +1284,6 @@ public final class Packets {
 
     public static final int SERVERLOGINSTATUS_FIELD_NUMBER = 20;
     private no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus serverLoginStatus_;
-
     /**
      *
      *
@@ -1668,7 +1299,6 @@ public final class Packets {
     public boolean hasServerLoginStatus() {
       return ((bitField0_ & 0x00000200) != 0);
     }
-
     /**
      *
      *
@@ -1686,7 +1316,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.getDefaultInstance()
           : serverLoginStatus_;
     }
-
     /**
      *
      *
@@ -1706,7 +1335,6 @@ public final class Packets {
 
     public static final int DISCONNECT_FIELD_NUMBER = 21;
     private no.elg.infiniteBootleg.protobuf.Packets.Disconnect disconnect_;
-
     /**
      * <code>optional .packets.Disconnect disconnect = 21;</code>
      *
@@ -1716,7 +1344,6 @@ public final class Packets {
     public boolean hasDisconnect() {
       return ((bitField0_ & 0x00000400) != 0);
     }
-
     /**
      * <code>optional .packets.Disconnect disconnect = 21;</code>
      *
@@ -1728,7 +1355,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.Disconnect.getDefaultInstance()
           : disconnect_;
     }
-
     /** <code>optional .packets.Disconnect disconnect = 21;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder getDisconnectOrBuilder() {
@@ -1739,7 +1365,6 @@ public final class Packets {
 
     public static final int SECRETEXCHANGE_FIELD_NUMBER = 22;
     private no.elg.infiniteBootleg.protobuf.Packets.SecretExchange secretExchange_;
-
     /**
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      *
@@ -1749,7 +1374,6 @@ public final class Packets {
     public boolean hasSecretExchange() {
       return ((bitField0_ & 0x00000800) != 0);
     }
-
     /**
      * <code>optional .packets.SecretExchange secretExchange = 22;</code>
      *
@@ -1761,7 +1385,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.getDefaultInstance()
           : secretExchange_;
     }
-
     /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder
@@ -1773,7 +1396,6 @@ public final class Packets {
 
     public static final int CHUNKREQUEST_FIELD_NUMBER = 23;
     private no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest chunkRequest_;
-
     /**
      *
      *
@@ -1789,7 +1411,6 @@ public final class Packets {
     public boolean hasChunkRequest() {
       return ((bitField0_ & 0x00001000) != 0);
     }
-
     /**
      *
      *
@@ -1807,7 +1428,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.getDefaultInstance()
           : chunkRequest_;
     }
-
     /**
      *
      *
@@ -1827,7 +1447,6 @@ public final class Packets {
 
     public static final int ENTITYREQUEST_FIELD_NUMBER = 24;
     private no.elg.infiniteBootleg.protobuf.Packets.EntityRequest entityRequest_;
-
     /**
      * <code>optional .packets.EntityRequest entityRequest = 24;</code>
      *
@@ -1837,7 +1456,6 @@ public final class Packets {
     public boolean hasEntityRequest() {
       return ((bitField0_ & 0x00002000) != 0);
     }
-
     /**
      * <code>optional .packets.EntityRequest entityRequest = 24;</code>
      *
@@ -1849,7 +1467,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()
           : entityRequest_;
     }
-
     /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder
@@ -1861,7 +1478,6 @@ public final class Packets {
 
     public static final int WORLDSETTINGS_FIELD_NUMBER = 25;
     private no.elg.infiniteBootleg.protobuf.Packets.WorldSettings worldSettings_;
-
     /**
      * <code>optional .packets.WorldSettings worldSettings = 25;</code>
      *
@@ -1871,7 +1487,6 @@ public final class Packets {
     public boolean hasWorldSettings() {
       return ((bitField0_ & 0x00004000) != 0);
     }
-
     /**
      * <code>optional .packets.WorldSettings worldSettings = 25;</code>
      *
@@ -1883,7 +1498,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.getDefaultInstance()
           : worldSettings_;
     }
-
     /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder
@@ -1959,7 +1573,7 @@ public final class Packets {
       if (((bitField0_ & 0x00004000) != 0)) {
         output.writeMessage(25, getWorldSettings());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -2021,7 +1635,7 @@ public final class Packets {
       if (((bitField0_ & 0x00004000) != 0)) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(25, getWorldSettings());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -2099,7 +1713,7 @@ public final class Packets {
       if (hasWorldSettings()) {
         if (!getWorldSettings().equals(other.getWorldSettings())) return false;
       }
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -2174,7 +1788,7 @@ public final class Packets {
         hash = (37 * hash) + WORLDSETTINGS_FIELD_NUMBER;
         hash = (53 * hash) + getWorldSettings().hashCode();
       }
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -2275,7 +1889,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.Packet} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -2327,96 +1940,80 @@ public final class Packets {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         type_ = 0;
-
         direction_ = 0;
-
         secret_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
-        if (heartbeatBuilder_ == null) {
-          heartbeat_ = null;
-        } else {
-          heartbeatBuilder_.clear();
+        heartbeat_ = null;
+        if (heartbeatBuilder_ != null) {
+          heartbeatBuilder_.dispose();
+          heartbeatBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
-        if (moveEntityBuilder_ == null) {
-          moveEntity_ = null;
-        } else {
-          moveEntityBuilder_.clear();
+        moveEntity_ = null;
+        if (moveEntityBuilder_ != null) {
+          moveEntityBuilder_.dispose();
+          moveEntityBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
-        if (updateChunkBuilder_ == null) {
-          updateChunk_ = null;
-        } else {
-          updateChunkBuilder_.clear();
+        updateChunk_ = null;
+        if (updateChunkBuilder_ != null) {
+          updateChunkBuilder_.dispose();
+          updateChunkBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
-        if (spawnEntityBuilder_ == null) {
-          spawnEntity_ = null;
-        } else {
-          spawnEntityBuilder_.clear();
+        spawnEntity_ = null;
+        if (spawnEntityBuilder_ != null) {
+          spawnEntityBuilder_.dispose();
+          spawnEntityBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
-        if (despawnEntityBuilder_ == null) {
-          despawnEntity_ = null;
-        } else {
-          despawnEntityBuilder_.clear();
+        despawnEntity_ = null;
+        if (despawnEntityBuilder_ != null) {
+          despawnEntityBuilder_.dispose();
+          despawnEntityBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
-        if (updateBlockBuilder_ == null) {
-          updateBlock_ = null;
-        } else {
-          updateBlockBuilder_.clear();
+        updateBlock_ = null;
+        if (updateBlockBuilder_ != null) {
+          updateBlockBuilder_.dispose();
+          updateBlockBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
-        if (loginBuilder_ == null) {
-          login_ = null;
-        } else {
-          loginBuilder_.clear();
+        login_ = null;
+        if (loginBuilder_ != null) {
+          loginBuilder_.dispose();
+          loginBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000080);
-        if (startGameBuilder_ == null) {
-          startGame_ = null;
-        } else {
-          startGameBuilder_.clear();
+        startGame_ = null;
+        if (startGameBuilder_ != null) {
+          startGameBuilder_.dispose();
+          startGameBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000100);
-        if (serverLoginStatusBuilder_ == null) {
-          serverLoginStatus_ = null;
-        } else {
-          serverLoginStatusBuilder_.clear();
+        serverLoginStatus_ = null;
+        if (serverLoginStatusBuilder_ != null) {
+          serverLoginStatusBuilder_.dispose();
+          serverLoginStatusBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000200);
-        if (disconnectBuilder_ == null) {
-          disconnect_ = null;
-        } else {
-          disconnectBuilder_.clear();
+        disconnect_ = null;
+        if (disconnectBuilder_ != null) {
+          disconnectBuilder_.dispose();
+          disconnectBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000400);
-        if (secretExchangeBuilder_ == null) {
-          secretExchange_ = null;
-        } else {
-          secretExchangeBuilder_.clear();
+        secretExchange_ = null;
+        if (secretExchangeBuilder_ != null) {
+          secretExchangeBuilder_.dispose();
+          secretExchangeBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000800);
-        if (chunkRequestBuilder_ == null) {
-          chunkRequest_ = null;
-        } else {
-          chunkRequestBuilder_.clear();
+        chunkRequest_ = null;
+        if (chunkRequestBuilder_ != null) {
+          chunkRequestBuilder_.dispose();
+          chunkRequestBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00001000);
-        if (entityRequestBuilder_ == null) {
-          entityRequest_ = null;
-        } else {
-          entityRequestBuilder_.clear();
+        entityRequest_ = null;
+        if (entityRequestBuilder_ != null) {
+          entityRequestBuilder_.dispose();
+          entityRequestBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00002000);
-        if (worldSettingsBuilder_ == null) {
-          worldSettings_ = null;
-        } else {
-          worldSettingsBuilder_.clear();
+        worldSettings_ = null;
+        if (worldSettingsBuilder_ != null) {
+          worldSettingsBuilder_.dispose();
+          worldSettingsBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
 
@@ -2443,164 +2040,96 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.Packet buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.Packet result =
             new no.elg.infiniteBootleg.protobuf.Packets.Packet(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        result.type_ = type_;
-        result.direction_ = direction_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          to_bitField0_ |= 0x00000001;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
-        result.secret_ = secret_;
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          if (heartbeatBuilder_ == null) {
-            result.heartbeat_ = heartbeat_;
-          } else {
-            result.heartbeat_ = heartbeatBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000002;
-        }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          if (moveEntityBuilder_ == null) {
-            result.moveEntity_ = moveEntity_;
-          } else {
-            result.moveEntity_ = moveEntityBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000004;
-        }
-        if (((from_bitField0_ & 0x00000008) != 0)) {
-          if (updateChunkBuilder_ == null) {
-            result.updateChunk_ = updateChunk_;
-          } else {
-            result.updateChunk_ = updateChunkBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000008;
-        }
-        if (((from_bitField0_ & 0x00000010) != 0)) {
-          if (spawnEntityBuilder_ == null) {
-            result.spawnEntity_ = spawnEntity_;
-          } else {
-            result.spawnEntity_ = spawnEntityBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000010;
-        }
-        if (((from_bitField0_ & 0x00000020) != 0)) {
-          if (despawnEntityBuilder_ == null) {
-            result.despawnEntity_ = despawnEntity_;
-          } else {
-            result.despawnEntity_ = despawnEntityBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000020;
-        }
-        if (((from_bitField0_ & 0x00000040) != 0)) {
-          if (updateBlockBuilder_ == null) {
-            result.updateBlock_ = updateBlock_;
-          } else {
-            result.updateBlock_ = updateBlockBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000040;
-        }
-        if (((from_bitField0_ & 0x00000080) != 0)) {
-          if (loginBuilder_ == null) {
-            result.login_ = login_;
-          } else {
-            result.login_ = loginBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000080;
-        }
-        if (((from_bitField0_ & 0x00000100) != 0)) {
-          if (startGameBuilder_ == null) {
-            result.startGame_ = startGame_;
-          } else {
-            result.startGame_ = startGameBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000100;
-        }
-        if (((from_bitField0_ & 0x00000200) != 0)) {
-          if (serverLoginStatusBuilder_ == null) {
-            result.serverLoginStatus_ = serverLoginStatus_;
-          } else {
-            result.serverLoginStatus_ = serverLoginStatusBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000200;
-        }
-        if (((from_bitField0_ & 0x00000400) != 0)) {
-          if (disconnectBuilder_ == null) {
-            result.disconnect_ = disconnect_;
-          } else {
-            result.disconnect_ = disconnectBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000400;
-        }
-        if (((from_bitField0_ & 0x00000800) != 0)) {
-          if (secretExchangeBuilder_ == null) {
-            result.secretExchange_ = secretExchange_;
-          } else {
-            result.secretExchange_ = secretExchangeBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000800;
-        }
-        if (((from_bitField0_ & 0x00001000) != 0)) {
-          if (chunkRequestBuilder_ == null) {
-            result.chunkRequest_ = chunkRequest_;
-          } else {
-            result.chunkRequest_ = chunkRequestBuilder_.build();
-          }
-          to_bitField0_ |= 0x00001000;
-        }
-        if (((from_bitField0_ & 0x00002000) != 0)) {
-          if (entityRequestBuilder_ == null) {
-            result.entityRequest_ = entityRequest_;
-          } else {
-            result.entityRequest_ = entityRequestBuilder_.build();
-          }
-          to_bitField0_ |= 0x00002000;
-        }
-        if (((from_bitField0_ & 0x00004000) != 0)) {
-          if (worldSettingsBuilder_ == null) {
-            result.worldSettings_ = worldSettings_;
-          } else {
-            result.worldSettings_ = worldSettingsBuilder_.build();
-          }
-          to_bitField0_ |= 0x00004000;
-        }
-        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.Packet result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.type_ = type_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.direction_ = direction_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.secret_ = secret_;
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.heartbeat_ = heartbeatBuilder_ == null ? heartbeat_ : heartbeatBuilder_.build();
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.moveEntity_ =
+              moveEntityBuilder_ == null ? moveEntity_ : moveEntityBuilder_.build();
+          to_bitField0_ |= 0x00000004;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.updateChunk_ =
+              updateChunkBuilder_ == null ? updateChunk_ : updateChunkBuilder_.build();
+          to_bitField0_ |= 0x00000008;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.spawnEntity_ =
+              spawnEntityBuilder_ == null ? spawnEntity_ : spawnEntityBuilder_.build();
+          to_bitField0_ |= 0x00000010;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
+          result.despawnEntity_ =
+              despawnEntityBuilder_ == null ? despawnEntity_ : despawnEntityBuilder_.build();
+          to_bitField0_ |= 0x00000020;
+        }
+        if (((from_bitField0_ & 0x00000100) != 0)) {
+          result.updateBlock_ =
+              updateBlockBuilder_ == null ? updateBlock_ : updateBlockBuilder_.build();
+          to_bitField0_ |= 0x00000040;
+        }
+        if (((from_bitField0_ & 0x00000200) != 0)) {
+          result.login_ = loginBuilder_ == null ? login_ : loginBuilder_.build();
+          to_bitField0_ |= 0x00000080;
+        }
+        if (((from_bitField0_ & 0x00000400) != 0)) {
+          result.startGame_ = startGameBuilder_ == null ? startGame_ : startGameBuilder_.build();
+          to_bitField0_ |= 0x00000100;
+        }
+        if (((from_bitField0_ & 0x00000800) != 0)) {
+          result.serverLoginStatus_ =
+              serverLoginStatusBuilder_ == null
+                  ? serverLoginStatus_
+                  : serverLoginStatusBuilder_.build();
+          to_bitField0_ |= 0x00000200;
+        }
+        if (((from_bitField0_ & 0x00001000) != 0)) {
+          result.disconnect_ =
+              disconnectBuilder_ == null ? disconnect_ : disconnectBuilder_.build();
+          to_bitField0_ |= 0x00000400;
+        }
+        if (((from_bitField0_ & 0x00002000) != 0)) {
+          result.secretExchange_ =
+              secretExchangeBuilder_ == null ? secretExchange_ : secretExchangeBuilder_.build();
+          to_bitField0_ |= 0x00000800;
+        }
+        if (((from_bitField0_ & 0x00004000) != 0)) {
+          result.chunkRequest_ =
+              chunkRequestBuilder_ == null ? chunkRequest_ : chunkRequestBuilder_.build();
+          to_bitField0_ |= 0x00001000;
+        }
+        if (((from_bitField0_ & 0x00008000) != 0)) {
+          result.entityRequest_ =
+              entityRequestBuilder_ == null ? entityRequest_ : entityRequestBuilder_.build();
+          to_bitField0_ |= 0x00002000;
+        }
+        if (((from_bitField0_ & 0x00010000) != 0)) {
+          result.worldSettings_ =
+              worldSettingsBuilder_ == null ? worldSettings_ : worldSettingsBuilder_.build();
+          to_bitField0_ |= 0x00004000;
+        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -2623,8 +2152,8 @@ public final class Packets {
           setDirectionValue(other.getDirectionValue());
         }
         if (other.hasSecret()) {
-          bitField0_ |= 0x00000001;
           secret_ = other.secret_;
+          bitField0_ |= 0x00000004;
           onChanged();
         }
         if (other.hasHeartbeat()) {
@@ -2669,7 +2198,7 @@ public final class Packets {
         if (other.hasWorldSettings()) {
           mergeWorldSettings(other.getWorldSettings());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -2684,24 +2213,141 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.Packet parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8:
+                {
+                  type_ = input.readEnum();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 8
+              case 16:
+                {
+                  direction_ = input.readEnum();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 16
+              case 26:
+                {
+                  secret_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 26
+              case 66:
+                {
+                  input.readMessage(getHeartbeatFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000008;
+                  break;
+                } // case 66
+              case 74:
+                {
+                  input.readMessage(getMoveEntityFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000010;
+                  break;
+                } // case 74
+              case 82:
+                {
+                  input.readMessage(getUpdateChunkFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000020;
+                  break;
+                } // case 82
+              case 90:
+                {
+                  input.readMessage(getSpawnEntityFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000040;
+                  break;
+                } // case 90
+              case 98:
+                {
+                  input.readMessage(getDespawnEntityFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000080;
+                  break;
+                } // case 98
+              case 106:
+                {
+                  input.readMessage(getUpdateBlockFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000100;
+                  break;
+                } // case 106
+              case 138:
+                {
+                  input.readMessage(getLoginFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000200;
+                  break;
+                } // case 138
+              case 146:
+                {
+                  input.readMessage(getStartGameFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000400;
+                  break;
+                } // case 146
+              case 162:
+                {
+                  input.readMessage(
+                      getServerLoginStatusFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000800;
+                  break;
+                } // case 162
+              case 170:
+                {
+                  input.readMessage(getDisconnectFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00001000;
+                  break;
+                } // case 170
+              case 178:
+                {
+                  input.readMessage(
+                      getSecretExchangeFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00002000;
+                  break;
+                } // case 178
+              case 186:
+                {
+                  input.readMessage(getChunkRequestFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00004000;
+                  break;
+                } // case 186
+              case 194:
+                {
+                  input.readMessage(getEntityRequestFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00008000;
+                  break;
+                } // case 194
+              case 202:
+                {
+                  input.readMessage(getWorldSettingsFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00010000;
+                  break;
+                } // case 202
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (no.elg.infiniteBootleg.protobuf.Packets.Packet) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
       private int bitField0_;
 
       private int type_ = 0;
-
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2711,7 +2357,6 @@ public final class Packets {
       public int getTypeValue() {
         return type_;
       }
-
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2719,12 +2364,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder setTypeValue(int value) {
-
         type_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2732,14 +2376,12 @@ public final class Packets {
        */
       @java.lang.Override
       public no.elg.infiniteBootleg.protobuf.Packets.Packet.Type getType() {
-        @SuppressWarnings("deprecation")
         no.elg.infiniteBootleg.protobuf.Packets.Packet.Type result =
-            no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.valueOf(type_);
+            no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.forNumber(type_);
         return result == null
             ? no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
             : result;
       }
-
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
@@ -2750,26 +2392,24 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
+        bitField0_ |= 0x00000001;
         type_ = value.getNumber();
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.Packet.Type type = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearType() {
-
+        bitField0_ = (bitField0_ & ~0x00000001);
         type_ = 0;
         onChanged();
         return this;
       }
 
       private int direction_ = 0;
-
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2779,7 +2419,6 @@ public final class Packets {
       public int getDirectionValue() {
         return direction_;
       }
-
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2787,12 +2426,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder setDirectionValue(int value) {
-
         direction_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2800,14 +2438,12 @@ public final class Packets {
        */
       @java.lang.Override
       public no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction getDirection() {
-        @SuppressWarnings("deprecation")
         no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction result =
-            no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.valueOf(direction_);
+            no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.forNumber(direction_);
         return result == null
             ? no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.UNRECOGNIZED
             : result;
       }
-
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
@@ -2818,26 +2454,24 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
+        bitField0_ |= 0x00000002;
         direction_ = value.getNumber();
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.Packet.Direction direction = 2;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearDirection() {
-
+        bitField0_ = (bitField0_ & ~0x00000002);
         direction_ = 0;
         onChanged();
         return this;
       }
 
       private java.lang.Object secret_ = "";
-
       /**
        *
        *
@@ -2850,9 +2484,8 @@ public final class Packets {
        * @return Whether the secret field is set.
        */
       public boolean hasSecret() {
-        return ((bitField0_ & 0x00000001) != 0);
+        return ((bitField0_ & 0x00000004) != 0);
       }
-
       /**
        *
        *
@@ -2875,7 +2508,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        *
        *
@@ -2898,7 +2530,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        *
        *
@@ -2915,12 +2546,11 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000001;
         secret_ = value;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -2933,12 +2563,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder clearSecret() {
-        bitField0_ = (bitField0_ & ~0x00000001);
         secret_ = getDefaultInstance().getSecret();
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -2956,8 +2585,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-        bitField0_ |= 0x00000001;
         secret_ = value;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
@@ -2968,7 +2597,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.HeartbeatOrBuilder>
           heartbeatBuilder_;
-
       /**
        *
        *
@@ -2981,9 +2609,8 @@ public final class Packets {
        * @return Whether the heartbeat field is set.
        */
       public boolean hasHeartbeat() {
-        return ((bitField0_ & 0x00000002) != 0);
+        return ((bitField0_ & 0x00000008) != 0);
       }
-
       /**
        *
        *
@@ -3004,7 +2631,6 @@ public final class Packets {
           return heartbeatBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -3020,14 +2646,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           heartbeat_ = value;
-          onChanged();
         } else {
           heartbeatBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000008;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3041,14 +2666,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.Builder builderForValue) {
         if (heartbeatBuilder_ == null) {
           heartbeat_ = builderForValue.build();
-          onChanged();
         } else {
           heartbeatBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000008;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3060,30 +2684,21 @@ public final class Packets {
        */
       public Builder mergeHeartbeat(no.elg.infiniteBootleg.protobuf.Packets.Heartbeat value) {
         if (heartbeatBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) != 0)
+          if (((bitField0_ & 0x00000008) != 0)
               && heartbeat_ != null
               && heartbeat_
                   != no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.getDefaultInstance()) {
-            heartbeat_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .Heartbeat
-                    .newBuilder(heartbeat_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getHeartbeatBuilder().mergeFrom(value);
           } else {
             heartbeat_ = value;
           }
-          onChanged();
         } else {
           heartbeatBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000008;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3094,16 +2709,15 @@ public final class Packets {
        * <code>optional .packets.Heartbeat heartbeat = 8;</code>
        */
       public Builder clearHeartbeat() {
-        if (heartbeatBuilder_ == null) {
-          heartbeat_ = null;
-          onChanged();
-        } else {
-          heartbeatBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        heartbeat_ = null;
+        if (heartbeatBuilder_ != null) {
+          heartbeatBuilder_.dispose();
+          heartbeatBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3114,11 +2728,10 @@ public final class Packets {
        * <code>optional .packets.Heartbeat heartbeat = 8;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.Builder getHeartbeatBuilder() {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000008;
         onChanged();
         return getHeartbeatFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -3137,7 +2750,6 @@ public final class Packets {
               : heartbeat_;
         }
       }
-
       /**
        *
        *
@@ -3170,7 +2782,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.MoveEntityOrBuilder>
           moveEntityBuilder_;
-
       /**
        *
        *
@@ -3183,9 +2794,8 @@ public final class Packets {
        * @return Whether the moveEntity field is set.
        */
       public boolean hasMoveEntity() {
-        return ((bitField0_ & 0x00000004) != 0);
+        return ((bitField0_ & 0x00000010) != 0);
       }
-
       /**
        *
        *
@@ -3206,7 +2816,6 @@ public final class Packets {
           return moveEntityBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -3222,14 +2831,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           moveEntity_ = value;
-          onChanged();
         } else {
           moveEntityBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000010;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3243,14 +2851,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.Builder builderForValue) {
         if (moveEntityBuilder_ == null) {
           moveEntity_ = builderForValue.build();
-          onChanged();
         } else {
           moveEntityBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000010;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3262,30 +2869,21 @@ public final class Packets {
        */
       public Builder mergeMoveEntity(no.elg.infiniteBootleg.protobuf.Packets.MoveEntity value) {
         if (moveEntityBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) != 0)
+          if (((bitField0_ & 0x00000010) != 0)
               && moveEntity_ != null
               && moveEntity_
                   != no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.getDefaultInstance()) {
-            moveEntity_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .MoveEntity
-                    .newBuilder(moveEntity_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getMoveEntityBuilder().mergeFrom(value);
           } else {
             moveEntity_ = value;
           }
-          onChanged();
         } else {
           moveEntityBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000010;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3296,16 +2894,15 @@ public final class Packets {
        * <code>optional .packets.MoveEntity moveEntity = 9;</code>
        */
       public Builder clearMoveEntity() {
-        if (moveEntityBuilder_ == null) {
-          moveEntity_ = null;
-          onChanged();
-        } else {
-          moveEntityBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        moveEntity_ = null;
+        if (moveEntityBuilder_ != null) {
+          moveEntityBuilder_.dispose();
+          moveEntityBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3316,11 +2913,10 @@ public final class Packets {
        * <code>optional .packets.MoveEntity moveEntity = 9;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.Builder getMoveEntityBuilder() {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000010;
         onChanged();
         return getMoveEntityFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -3339,7 +2935,6 @@ public final class Packets {
               : moveEntity_;
         }
       }
-
       /**
        *
        *
@@ -3372,7 +2967,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.UpdateChunkOrBuilder>
           updateChunkBuilder_;
-
       /**
        *
        *
@@ -3385,9 +2979,8 @@ public final class Packets {
        * @return Whether the updateChunk field is set.
        */
       public boolean hasUpdateChunk() {
-        return ((bitField0_ & 0x00000008) != 0);
+        return ((bitField0_ & 0x00000020) != 0);
       }
-
       /**
        *
        *
@@ -3408,7 +3001,6 @@ public final class Packets {
           return updateChunkBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -3424,14 +3016,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           updateChunk_ = value;
-          onChanged();
         } else {
           updateChunkBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000020;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3445,14 +3036,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.Builder builderForValue) {
         if (updateChunkBuilder_ == null) {
           updateChunk_ = builderForValue.build();
-          onChanged();
         } else {
           updateChunkBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000020;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3464,30 +3054,21 @@ public final class Packets {
        */
       public Builder mergeUpdateChunk(no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk value) {
         if (updateChunkBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) != 0)
+          if (((bitField0_ & 0x00000020) != 0)
               && updateChunk_ != null
               && updateChunk_
                   != no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.getDefaultInstance()) {
-            updateChunk_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .UpdateChunk
-                    .newBuilder(updateChunk_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getUpdateChunkBuilder().mergeFrom(value);
           } else {
             updateChunk_ = value;
           }
-          onChanged();
         } else {
           updateChunkBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000020;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3498,16 +3079,15 @@ public final class Packets {
        * <code>optional .packets.UpdateChunk updateChunk = 10;</code>
        */
       public Builder clearUpdateChunk() {
-        if (updateChunkBuilder_ == null) {
-          updateChunk_ = null;
-          onChanged();
-        } else {
-          updateChunkBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000020);
+        updateChunk_ = null;
+        if (updateChunkBuilder_ != null) {
+          updateChunkBuilder_.dispose();
+          updateChunkBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3518,11 +3098,10 @@ public final class Packets {
        * <code>optional .packets.UpdateChunk updateChunk = 10;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.Builder getUpdateChunkBuilder() {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getUpdateChunkFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -3542,7 +3121,6 @@ public final class Packets {
               : updateChunk_;
         }
       }
-
       /**
        *
        *
@@ -3575,16 +3153,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder>
           spawnEntityBuilder_;
-
       /**
        * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
        *
        * @return Whether the spawnEntity field is set.
        */
       public boolean hasSpawnEntity() {
-        return ((bitField0_ & 0x00000010) != 0);
+        return ((bitField0_ & 0x00000040) != 0);
       }
-
       /**
        * <code>optional .packets.SpawnEntity spawnEntity = 11;</code>
        *
@@ -3599,7 +3175,6 @@ public final class Packets {
           return spawnEntityBuilder_.getMessage();
         }
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder setSpawnEntity(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity value) {
         if (spawnEntityBuilder_ == null) {
@@ -3607,73 +3182,60 @@ public final class Packets {
             throw new NullPointerException();
           }
           spawnEntity_ = value;
-          onChanged();
         } else {
           spawnEntityBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000040;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder setSpawnEntity(
           no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder builderForValue) {
         if (spawnEntityBuilder_ == null) {
           spawnEntity_ = builderForValue.build();
-          onChanged();
         } else {
           spawnEntityBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000040;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder mergeSpawnEntity(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity value) {
         if (spawnEntityBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) != 0)
+          if (((bitField0_ & 0x00000040) != 0)
               && spawnEntity_ != null
               && spawnEntity_
                   != no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.getDefaultInstance()) {
-            spawnEntity_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .SpawnEntity
-                    .newBuilder(spawnEntity_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getSpawnEntityBuilder().mergeFrom(value);
           } else {
             spawnEntity_ = value;
           }
-          onChanged();
         } else {
           spawnEntityBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000040;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public Builder clearSpawnEntity() {
-        if (spawnEntityBuilder_ == null) {
-          spawnEntity_ = null;
-          onChanged();
-        } else {
-          spawnEntityBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000040);
+        spawnEntity_ = null;
+        if (spawnEntityBuilder_ != null) {
+          spawnEntityBuilder_.dispose();
+          spawnEntityBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.Builder getSpawnEntityBuilder() {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000040;
         onChanged();
         return getSpawnEntityFieldBuilder().getBuilder();
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntityOrBuilder
           getSpawnEntityOrBuilder() {
@@ -3685,7 +3247,6 @@ public final class Packets {
               : spawnEntity_;
         }
       }
-
       /** <code>optional .packets.SpawnEntity spawnEntity = 11;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity,
@@ -3710,16 +3271,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder>
           despawnEntityBuilder_;
-
       /**
        * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
        *
        * @return Whether the despawnEntity field is set.
        */
       public boolean hasDespawnEntity() {
-        return ((bitField0_ & 0x00000020) != 0);
+        return ((bitField0_ & 0x00000080) != 0);
       }
-
       /**
        * <code>optional .packets.DespawnEntity despawnEntity = 12;</code>
        *
@@ -3734,7 +3293,6 @@ public final class Packets {
           return despawnEntityBuilder_.getMessage();
         }
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder setDespawnEntity(no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity value) {
         if (despawnEntityBuilder_ == null) {
@@ -3742,75 +3300,62 @@ public final class Packets {
             throw new NullPointerException();
           }
           despawnEntity_ = value;
-          onChanged();
         } else {
           despawnEntityBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder setDespawnEntity(
           no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder builderForValue) {
         if (despawnEntityBuilder_ == null) {
           despawnEntity_ = builderForValue.build();
-          onChanged();
         } else {
           despawnEntityBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder mergeDespawnEntity(
           no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity value) {
         if (despawnEntityBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) != 0)
+          if (((bitField0_ & 0x00000080) != 0)
               && despawnEntity_ != null
               && despawnEntity_
                   != no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.getDefaultInstance()) {
-            despawnEntity_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .DespawnEntity
-                    .newBuilder(despawnEntity_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getDespawnEntityBuilder().mergeFrom(value);
           } else {
             despawnEntity_ = value;
           }
-          onChanged();
         } else {
           despawnEntityBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public Builder clearDespawnEntity() {
-        if (despawnEntityBuilder_ == null) {
-          despawnEntity_ = null;
-          onChanged();
-        } else {
-          despawnEntityBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000080);
+        despawnEntity_ = null;
+        if (despawnEntityBuilder_ != null) {
+          despawnEntityBuilder_.dispose();
+          despawnEntityBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.Builder
           getDespawnEntityBuilder() {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000080;
         onChanged();
         return getDespawnEntityFieldBuilder().getBuilder();
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntityOrBuilder
           getDespawnEntityOrBuilder() {
@@ -3822,7 +3367,6 @@ public final class Packets {
               : despawnEntity_;
         }
       }
-
       /** <code>optional .packets.DespawnEntity despawnEntity = 12;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity,
@@ -3847,7 +3391,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.UpdateBlockOrBuilder>
           updateBlockBuilder_;
-
       /**
        *
        *
@@ -3860,9 +3403,8 @@ public final class Packets {
        * @return Whether the updateBlock field is set.
        */
       public boolean hasUpdateBlock() {
-        return ((bitField0_ & 0x00000040) != 0);
+        return ((bitField0_ & 0x00000100) != 0);
       }
-
       /**
        *
        *
@@ -3883,7 +3425,6 @@ public final class Packets {
           return updateBlockBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -3899,14 +3440,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           updateBlock_ = value;
-          onChanged();
         } else {
           updateBlockBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3920,14 +3460,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder builderForValue) {
         if (updateBlockBuilder_ == null) {
           updateBlock_ = builderForValue.build();
-          onChanged();
         } else {
           updateBlockBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3939,30 +3478,21 @@ public final class Packets {
        */
       public Builder mergeUpdateBlock(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock value) {
         if (updateBlockBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) != 0)
+          if (((bitField0_ & 0x00000100) != 0)
               && updateBlock_ != null
               && updateBlock_
                   != no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.getDefaultInstance()) {
-            updateBlock_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .UpdateBlock
-                    .newBuilder(updateBlock_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getUpdateBlockBuilder().mergeFrom(value);
           } else {
             updateBlock_ = value;
           }
-          onChanged();
         } else {
           updateBlockBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3973,16 +3503,15 @@ public final class Packets {
        * <code>optional .packets.UpdateBlock updateBlock = 13;</code>
        */
       public Builder clearUpdateBlock() {
-        if (updateBlockBuilder_ == null) {
-          updateBlock_ = null;
-          onChanged();
-        } else {
-          updateBlockBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000100);
+        updateBlock_ = null;
+        if (updateBlockBuilder_ != null) {
+          updateBlockBuilder_.dispose();
+          updateBlockBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000040);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -3993,11 +3522,10 @@ public final class Packets {
        * <code>optional .packets.UpdateBlock updateBlock = 13;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.Builder getUpdateBlockBuilder() {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000100;
         onChanged();
         return getUpdateBlockFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -4017,7 +3545,6 @@ public final class Packets {
               : updateBlock_;
         }
       }
-
       /**
        *
        *
@@ -4050,7 +3577,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.Login.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.LoginOrBuilder>
           loginBuilder_;
-
       /**
        *
        *
@@ -4063,9 +3589,8 @@ public final class Packets {
        * @return Whether the login field is set.
        */
       public boolean hasLogin() {
-        return ((bitField0_ & 0x00000080) != 0);
+        return ((bitField0_ & 0x00000200) != 0);
       }
-
       /**
        *
        *
@@ -4086,7 +3611,6 @@ public final class Packets {
           return loginBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -4102,14 +3626,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           login_ = value;
-          onChanged();
         } else {
           loginBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000200;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4123,14 +3646,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.Login.Builder builderForValue) {
         if (loginBuilder_ == null) {
           login_ = builderForValue.build();
-          onChanged();
         } else {
           loginBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000200;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4142,29 +3664,20 @@ public final class Packets {
        */
       public Builder mergeLogin(no.elg.infiniteBootleg.protobuf.Packets.Login value) {
         if (loginBuilder_ == null) {
-          if (((bitField0_ & 0x00000080) != 0)
+          if (((bitField0_ & 0x00000200) != 0)
               && login_ != null
               && login_ != no.elg.infiniteBootleg.protobuf.Packets.Login.getDefaultInstance()) {
-            login_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .Login
-                    .newBuilder(login_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getLoginBuilder().mergeFrom(value);
           } else {
             login_ = value;
           }
-          onChanged();
         } else {
           loginBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000200;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4175,16 +3688,15 @@ public final class Packets {
        * <code>optional .packets.Login login = 17;</code>
        */
       public Builder clearLogin() {
-        if (loginBuilder_ == null) {
-          login_ = null;
-          onChanged();
-        } else {
-          loginBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000200);
+        login_ = null;
+        if (loginBuilder_ != null) {
+          loginBuilder_.dispose();
+          loginBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000080);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4195,11 +3707,10 @@ public final class Packets {
        * <code>optional .packets.Login login = 17;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.Login.Builder getLoginBuilder() {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000200;
         onChanged();
         return getLoginFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -4218,7 +3729,6 @@ public final class Packets {
               : login_;
         }
       }
-
       /**
        *
        *
@@ -4251,7 +3761,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.StartGame.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.StartGameOrBuilder>
           startGameBuilder_;
-
       /**
        *
        *
@@ -4264,9 +3773,8 @@ public final class Packets {
        * @return Whether the startGame field is set.
        */
       public boolean hasStartGame() {
-        return ((bitField0_ & 0x00000100) != 0);
+        return ((bitField0_ & 0x00000400) != 0);
       }
-
       /**
        *
        *
@@ -4287,7 +3795,6 @@ public final class Packets {
           return startGameBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -4303,14 +3810,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           startGame_ = value;
-          onChanged();
         } else {
           startGameBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4324,14 +3830,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.StartGame.Builder builderForValue) {
         if (startGameBuilder_ == null) {
           startGame_ = builderForValue.build();
-          onChanged();
         } else {
           startGameBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4343,30 +3848,21 @@ public final class Packets {
        */
       public Builder mergeStartGame(no.elg.infiniteBootleg.protobuf.Packets.StartGame value) {
         if (startGameBuilder_ == null) {
-          if (((bitField0_ & 0x00000100) != 0)
+          if (((bitField0_ & 0x00000400) != 0)
               && startGame_ != null
               && startGame_
                   != no.elg.infiniteBootleg.protobuf.Packets.StartGame.getDefaultInstance()) {
-            startGame_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .StartGame
-                    .newBuilder(startGame_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getStartGameBuilder().mergeFrom(value);
           } else {
             startGame_ = value;
           }
-          onChanged();
         } else {
           startGameBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4377,16 +3873,15 @@ public final class Packets {
        * <code>optional .packets.StartGame startGame = 18;</code>
        */
       public Builder clearStartGame() {
-        if (startGameBuilder_ == null) {
-          startGame_ = null;
-          onChanged();
-        } else {
-          startGameBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000400);
+        startGame_ = null;
+        if (startGameBuilder_ != null) {
+          startGameBuilder_.dispose();
+          startGameBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000100);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4397,11 +3892,10 @@ public final class Packets {
        * <code>optional .packets.StartGame startGame = 18;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.StartGame.Builder getStartGameBuilder() {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
         onChanged();
         return getStartGameFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -4420,7 +3914,6 @@ public final class Packets {
               : startGame_;
         }
       }
-
       /**
        *
        *
@@ -4453,7 +3946,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatusOrBuilder>
           serverLoginStatusBuilder_;
-
       /**
        *
        *
@@ -4466,9 +3958,8 @@ public final class Packets {
        * @return Whether the serverLoginStatus field is set.
        */
       public boolean hasServerLoginStatus() {
-        return ((bitField0_ & 0x00000200) != 0);
+        return ((bitField0_ & 0x00000800) != 0);
       }
-
       /**
        *
        *
@@ -4489,7 +3980,6 @@ public final class Packets {
           return serverLoginStatusBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -4506,14 +3996,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           serverLoginStatus_ = value;
-          onChanged();
         } else {
           serverLoginStatusBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000800;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4527,14 +4016,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.Builder builderForValue) {
         if (serverLoginStatusBuilder_ == null) {
           serverLoginStatus_ = builderForValue.build();
-          onChanged();
         } else {
           serverLoginStatusBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000800;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4547,31 +4035,22 @@ public final class Packets {
       public Builder mergeServerLoginStatus(
           no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus value) {
         if (serverLoginStatusBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) != 0)
+          if (((bitField0_ & 0x00000800) != 0)
               && serverLoginStatus_ != null
               && serverLoginStatus_
                   != no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
                       .getDefaultInstance()) {
-            serverLoginStatus_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .ServerLoginStatus
-                    .newBuilder(serverLoginStatus_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getServerLoginStatusBuilder().mergeFrom(value);
           } else {
             serverLoginStatus_ = value;
           }
-          onChanged();
         } else {
           serverLoginStatusBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000800;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4582,16 +4061,15 @@ public final class Packets {
        * <code>optional .packets.ServerLoginStatus serverLoginStatus = 20;</code>
        */
       public Builder clearServerLoginStatus() {
-        if (serverLoginStatusBuilder_ == null) {
-          serverLoginStatus_ = null;
-          onChanged();
-        } else {
-          serverLoginStatusBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000800);
+        serverLoginStatus_ = null;
+        if (serverLoginStatusBuilder_ != null) {
+          serverLoginStatusBuilder_.dispose();
+          serverLoginStatusBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000200);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -4603,11 +4081,10 @@ public final class Packets {
        */
       public no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.Builder
           getServerLoginStatusBuilder() {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000800;
         onChanged();
         return getServerLoginStatusFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -4627,7 +4104,6 @@ public final class Packets {
               : serverLoginStatus_;
         }
       }
-
       /**
        *
        *
@@ -4660,16 +4136,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder>
           disconnectBuilder_;
-
       /**
        * <code>optional .packets.Disconnect disconnect = 21;</code>
        *
        * @return Whether the disconnect field is set.
        */
       public boolean hasDisconnect() {
-        return ((bitField0_ & 0x00000400) != 0);
+        return ((bitField0_ & 0x00001000) != 0);
       }
-
       /**
        * <code>optional .packets.Disconnect disconnect = 21;</code>
        *
@@ -4684,7 +4158,6 @@ public final class Packets {
           return disconnectBuilder_.getMessage();
         }
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder setDisconnect(no.elg.infiniteBootleg.protobuf.Packets.Disconnect value) {
         if (disconnectBuilder_ == null) {
@@ -4692,73 +4165,60 @@ public final class Packets {
             throw new NullPointerException();
           }
           disconnect_ = value;
-          onChanged();
         } else {
           disconnectBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00001000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder setDisconnect(
           no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder builderForValue) {
         if (disconnectBuilder_ == null) {
           disconnect_ = builderForValue.build();
-          onChanged();
         } else {
           disconnectBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00001000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder mergeDisconnect(no.elg.infiniteBootleg.protobuf.Packets.Disconnect value) {
         if (disconnectBuilder_ == null) {
-          if (((bitField0_ & 0x00000400) != 0)
+          if (((bitField0_ & 0x00001000) != 0)
               && disconnect_ != null
               && disconnect_
                   != no.elg.infiniteBootleg.protobuf.Packets.Disconnect.getDefaultInstance()) {
-            disconnect_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .Disconnect
-                    .newBuilder(disconnect_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getDisconnectBuilder().mergeFrom(value);
           } else {
             disconnect_ = value;
           }
-          onChanged();
         } else {
           disconnectBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00001000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public Builder clearDisconnect() {
-        if (disconnectBuilder_ == null) {
-          disconnect_ = null;
-          onChanged();
-        } else {
-          disconnectBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00001000);
+        disconnect_ = null;
+        if (disconnectBuilder_ != null) {
+          disconnectBuilder_.dispose();
+          disconnectBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000400);
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.Disconnect.Builder getDisconnectBuilder() {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00001000;
         onChanged();
         return getDisconnectFieldBuilder().getBuilder();
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.DisconnectOrBuilder getDisconnectOrBuilder() {
         if (disconnectBuilder_ != null) {
@@ -4769,7 +4229,6 @@ public final class Packets {
               : disconnect_;
         }
       }
-
       /** <code>optional .packets.Disconnect disconnect = 21;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.Disconnect,
@@ -4794,16 +4253,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder>
           secretExchangeBuilder_;
-
       /**
        * <code>optional .packets.SecretExchange secretExchange = 22;</code>
        *
        * @return Whether the secretExchange field is set.
        */
       public boolean hasSecretExchange() {
-        return ((bitField0_ & 0x00000800) != 0);
+        return ((bitField0_ & 0x00002000) != 0);
       }
-
       /**
        * <code>optional .packets.SecretExchange secretExchange = 22;</code>
        *
@@ -4818,7 +4275,6 @@ public final class Packets {
           return secretExchangeBuilder_.getMessage();
         }
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder setSecretExchange(
           no.elg.infiniteBootleg.protobuf.Packets.SecretExchange value) {
@@ -4827,75 +4283,62 @@ public final class Packets {
             throw new NullPointerException();
           }
           secretExchange_ = value;
-          onChanged();
         } else {
           secretExchangeBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00002000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder setSecretExchange(
           no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder builderForValue) {
         if (secretExchangeBuilder_ == null) {
           secretExchange_ = builderForValue.build();
-          onChanged();
         } else {
           secretExchangeBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00002000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder mergeSecretExchange(
           no.elg.infiniteBootleg.protobuf.Packets.SecretExchange value) {
         if (secretExchangeBuilder_ == null) {
-          if (((bitField0_ & 0x00000800) != 0)
+          if (((bitField0_ & 0x00002000) != 0)
               && secretExchange_ != null
               && secretExchange_
                   != no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.getDefaultInstance()) {
-            secretExchange_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .SecretExchange
-                    .newBuilder(secretExchange_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getSecretExchangeBuilder().mergeFrom(value);
           } else {
             secretExchange_ = value;
           }
-          onChanged();
         } else {
           secretExchangeBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00002000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public Builder clearSecretExchange() {
-        if (secretExchangeBuilder_ == null) {
-          secretExchange_ = null;
-          onChanged();
-        } else {
-          secretExchangeBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00002000);
+        secretExchange_ = null;
+        if (secretExchangeBuilder_ != null) {
+          secretExchangeBuilder_.dispose();
+          secretExchangeBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000800);
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.Builder
           getSecretExchangeBuilder() {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00002000;
         onChanged();
         return getSecretExchangeFieldBuilder().getBuilder();
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.SecretExchangeOrBuilder
           getSecretExchangeOrBuilder() {
@@ -4907,7 +4350,6 @@ public final class Packets {
               : secretExchange_;
         }
       }
-
       /** <code>optional .packets.SecretExchange secretExchange = 22;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.SecretExchange,
@@ -4932,7 +4374,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.ChunkRequestOrBuilder>
           chunkRequestBuilder_;
-
       /**
        *
        *
@@ -4945,9 +4386,8 @@ public final class Packets {
        * @return Whether the chunkRequest field is set.
        */
       public boolean hasChunkRequest() {
-        return ((bitField0_ & 0x00001000) != 0);
+        return ((bitField0_ & 0x00004000) != 0);
       }
-
       /**
        *
        *
@@ -4968,7 +4408,6 @@ public final class Packets {
           return chunkRequestBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -4984,14 +4423,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           chunkRequest_ = value;
-          onChanged();
         } else {
           chunkRequestBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00004000;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -5005,14 +4443,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.Builder builderForValue) {
         if (chunkRequestBuilder_ == null) {
           chunkRequest_ = builderForValue.build();
-          onChanged();
         } else {
           chunkRequestBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00004000;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -5024,30 +4461,21 @@ public final class Packets {
        */
       public Builder mergeChunkRequest(no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest value) {
         if (chunkRequestBuilder_ == null) {
-          if (((bitField0_ & 0x00001000) != 0)
+          if (((bitField0_ & 0x00004000) != 0)
               && chunkRequest_ != null
               && chunkRequest_
                   != no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.getDefaultInstance()) {
-            chunkRequest_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .ChunkRequest
-                    .newBuilder(chunkRequest_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getChunkRequestBuilder().mergeFrom(value);
           } else {
             chunkRequest_ = value;
           }
-          onChanged();
         } else {
           chunkRequestBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00004000;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -5058,16 +4486,15 @@ public final class Packets {
        * <code>optional .packets.ChunkRequest chunkRequest = 23;</code>
        */
       public Builder clearChunkRequest() {
-        if (chunkRequestBuilder_ == null) {
-          chunkRequest_ = null;
-          onChanged();
-        } else {
-          chunkRequestBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00004000);
+        chunkRequest_ = null;
+        if (chunkRequestBuilder_ != null) {
+          chunkRequestBuilder_.dispose();
+          chunkRequestBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00001000);
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -5078,11 +4505,10 @@ public final class Packets {
        * <code>optional .packets.ChunkRequest chunkRequest = 23;</code>
        */
       public no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.Builder getChunkRequestBuilder() {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00004000;
         onChanged();
         return getChunkRequestFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -5102,7 +4528,6 @@ public final class Packets {
               : chunkRequest_;
         }
       }
-
       /**
        *
        *
@@ -5135,16 +4560,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder>
           entityRequestBuilder_;
-
       /**
        * <code>optional .packets.EntityRequest entityRequest = 24;</code>
        *
        * @return Whether the entityRequest field is set.
        */
       public boolean hasEntityRequest() {
-        return ((bitField0_ & 0x00002000) != 0);
+        return ((bitField0_ & 0x00008000) != 0);
       }
-
       /**
        * <code>optional .packets.EntityRequest entityRequest = 24;</code>
        *
@@ -5159,7 +4582,6 @@ public final class Packets {
           return entityRequestBuilder_.getMessage();
         }
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder setEntityRequest(no.elg.infiniteBootleg.protobuf.Packets.EntityRequest value) {
         if (entityRequestBuilder_ == null) {
@@ -5167,75 +4589,62 @@ public final class Packets {
             throw new NullPointerException();
           }
           entityRequest_ = value;
-          onChanged();
         } else {
           entityRequestBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00008000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder setEntityRequest(
           no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder builderForValue) {
         if (entityRequestBuilder_ == null) {
           entityRequest_ = builderForValue.build();
-          onChanged();
         } else {
           entityRequestBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00008000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder mergeEntityRequest(
           no.elg.infiniteBootleg.protobuf.Packets.EntityRequest value) {
         if (entityRequestBuilder_ == null) {
-          if (((bitField0_ & 0x00002000) != 0)
+          if (((bitField0_ & 0x00008000) != 0)
               && entityRequest_ != null
               && entityRequest_
                   != no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.getDefaultInstance()) {
-            entityRequest_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .EntityRequest
-                    .newBuilder(entityRequest_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getEntityRequestBuilder().mergeFrom(value);
           } else {
             entityRequest_ = value;
           }
-          onChanged();
         } else {
           entityRequestBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00008000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public Builder clearEntityRequest() {
-        if (entityRequestBuilder_ == null) {
-          entityRequest_ = null;
-          onChanged();
-        } else {
-          entityRequestBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00008000);
+        entityRequest_ = null;
+        if (entityRequestBuilder_ != null) {
+          entityRequestBuilder_.dispose();
+          entityRequestBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00002000);
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.Builder
           getEntityRequestBuilder() {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00008000;
         onChanged();
         return getEntityRequestFieldBuilder().getBuilder();
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.EntityRequestOrBuilder
           getEntityRequestOrBuilder() {
@@ -5247,7 +4656,6 @@ public final class Packets {
               : entityRequest_;
         }
       }
-
       /** <code>optional .packets.EntityRequest entityRequest = 24;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.EntityRequest,
@@ -5272,16 +4680,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder,
               no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder>
           worldSettingsBuilder_;
-
       /**
        * <code>optional .packets.WorldSettings worldSettings = 25;</code>
        *
        * @return Whether the worldSettings field is set.
        */
       public boolean hasWorldSettings() {
-        return ((bitField0_ & 0x00004000) != 0);
+        return ((bitField0_ & 0x00010000) != 0);
       }
-
       /**
        * <code>optional .packets.WorldSettings worldSettings = 25;</code>
        *
@@ -5296,7 +4702,6 @@ public final class Packets {
           return worldSettingsBuilder_.getMessage();
         }
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder setWorldSettings(no.elg.infiniteBootleg.protobuf.Packets.WorldSettings value) {
         if (worldSettingsBuilder_ == null) {
@@ -5304,75 +4709,62 @@ public final class Packets {
             throw new NullPointerException();
           }
           worldSettings_ = value;
-          onChanged();
         } else {
           worldSettingsBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00010000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder setWorldSettings(
           no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder builderForValue) {
         if (worldSettingsBuilder_ == null) {
           worldSettings_ = builderForValue.build();
-          onChanged();
         } else {
           worldSettingsBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00010000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder mergeWorldSettings(
           no.elg.infiniteBootleg.protobuf.Packets.WorldSettings value) {
         if (worldSettingsBuilder_ == null) {
-          if (((bitField0_ & 0x00004000) != 0)
+          if (((bitField0_ & 0x00010000) != 0)
               && worldSettings_ != null
               && worldSettings_
                   != no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.getDefaultInstance()) {
-            worldSettings_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .Packets
-                    .WorldSettings
-                    .newBuilder(worldSettings_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getWorldSettingsBuilder().mergeFrom(value);
           } else {
             worldSettings_ = value;
           }
-          onChanged();
         } else {
           worldSettingsBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00010000;
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public Builder clearWorldSettings() {
-        if (worldSettingsBuilder_ == null) {
-          worldSettings_ = null;
-          onChanged();
-        } else {
-          worldSettingsBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00010000);
+        worldSettings_ = null;
+        if (worldSettingsBuilder_ != null) {
+          worldSettingsBuilder_.dispose();
+          worldSettingsBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00004000);
+        onChanged();
         return this;
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.WorldSettings.Builder
           getWorldSettingsBuilder() {
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00010000;
         onChanged();
         return getWorldSettingsFieldBuilder().getBuilder();
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       public no.elg.infiniteBootleg.protobuf.Packets.WorldSettingsOrBuilder
           getWorldSettingsOrBuilder() {
@@ -5384,7 +4776,6 @@ public final class Packets {
               : worldSettings_;
         }
       }
-
       /** <code>optional .packets.WorldSettings worldSettings = 25;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.Packets.WorldSettings,
@@ -5436,7 +4827,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Packet(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -5466,7 +4869,6 @@ public final class Packets {
      * @return The keepAliveId.
      */
     java.lang.String getKeepAliveId();
-
     /**
      * <code>string keepAliveId = 1;</code>
      *
@@ -5474,7 +4876,6 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getKeepAliveIdBytes();
   }
-
   /**
    *
    *
@@ -5482,14 +4883,13 @@ public final class Packets {
    * Server send this every so often, client must respond with another heartbeat packet with the same keepAliveId
    * </pre>
    *
-   * <p>Protobuf type {@code packets.Heartbeat}
+   * Protobuf type {@code packets.Heartbeat}
    */
   public static final class Heartbeat extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Heartbeat)
       HeartbeatOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use Heartbeat.newBuilder() to construct.
     private Heartbeat(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -5503,57 +4903,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new Heartbeat();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private Heartbeat(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                keepAliveId_ = s;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -5570,8 +4919,9 @@ public final class Packets {
     }
 
     public static final int KEEPALIVEID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object keepAliveId_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object keepAliveId_ = "";
     /**
      * <code>string keepAliveId = 1;</code>
      *
@@ -5589,7 +4939,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string keepAliveId = 1;</code>
      *
@@ -5625,7 +4974,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(keepAliveId_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, keepAliveId_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -5637,7 +4986,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(keepAliveId_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, keepAliveId_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -5654,7 +5003,7 @@ public final class Packets {
           (no.elg.infiniteBootleg.protobuf.Packets.Heartbeat) obj;
 
       if (!getKeepAliveId().equals(other.getKeepAliveId())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -5667,7 +5016,7 @@ public final class Packets {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + KEEPALIVEID_FIELD_NUMBER;
       hash = (53 * hash) + getKeepAliveId().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -5768,7 +5117,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /**
      *
      *
@@ -5776,7 +5124,7 @@ public final class Packets {
      * Server send this every so often, client must respond with another heartbeat packet with the same keepAliveId
      * </pre>
      *
-     * <p>Protobuf type {@code packets.Heartbeat}
+     * Protobuf type {@code packets.Heartbeat}
      */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -5797,24 +5145,17 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         keepAliveId_ = "";
-
         return this;
       }
 
@@ -5841,44 +5182,18 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.Heartbeat buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.Heartbeat result =
             new no.elg.infiniteBootleg.protobuf.Packets.Heartbeat(this);
-        result.keepAliveId_ = keepAliveId_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.Heartbeat result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.keepAliveId_ = keepAliveId_;
+        }
       }
 
       @java.lang.Override
@@ -5896,9 +5211,10 @@ public final class Packets {
           return this;
         if (!other.getKeepAliveId().isEmpty()) {
           keepAliveId_ = other.keepAliveId_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -5913,23 +5229,43 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.Heartbeat parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  keepAliveId_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.Heartbeat) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object keepAliveId_ = "";
+      private int bitField0_;
 
+      private java.lang.Object keepAliveId_ = "";
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5946,7 +5282,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5963,7 +5298,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -5974,24 +5308,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         keepAliveId_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>string keepAliveId = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearKeepAliveId() {
-
         keepAliveId_ = getDefaultInstance().getKeepAliveId();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        * <code>string keepAliveId = 1;</code>
        *
@@ -6003,8 +5335,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         keepAliveId_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -6042,7 +5374,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Heartbeat(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -6072,14 +5416,12 @@ public final class Packets {
      * @return Whether the pos field is set.
      */
     boolean hasPos();
-
     /**
      * <code>.persistence.Vector2i pos = 1;</code>
      *
      * @return The pos.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i getPos();
-
     /** <code>.persistence.Vector2i pos = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getPosOrBuilder();
 
@@ -6089,25 +5431,21 @@ public final class Packets {
      * @return Whether the block field is set.
      */
     boolean hasBlock();
-
     /**
      * <code>optional .persistence.Block block = 2;</code>
      *
      * @return The block.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Block getBlock();
-
     /** <code>optional .persistence.Block block = 2;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlockOrBuilder();
   }
-
   /** Protobuf type {@code packets.UpdateBlock} */
   public static final class UpdateBlock extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.UpdateBlock)
       UpdateBlockOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use UpdateBlock.newBuilder() to construct.
     private UpdateBlock(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -6119,85 +5457,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new UpdateBlock();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private UpdateBlock(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder subBuilder = null;
-                if (pos_ != null) {
-                  subBuilder = pos_.toBuilder();
-                }
-                pos_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(pos_);
-                  pos_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            case 18:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000001) != 0)) {
-                  subBuilder = block_.toBuilder();
-                }
-                block_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(block_);
-                  block_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000001;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -6216,7 +5475,6 @@ public final class Packets {
     private int bitField0_;
     public static final int POS_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i pos_;
-
     /**
      * <code>.persistence.Vector2i pos = 1;</code>
      *
@@ -6226,7 +5484,6 @@ public final class Packets {
     public boolean hasPos() {
       return pos_ != null;
     }
-
     /**
      * <code>.persistence.Vector2i pos = 1;</code>
      *
@@ -6238,16 +5495,16 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
           : pos_;
     }
-
     /** <code>.persistence.Vector2i pos = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getPosOrBuilder() {
-      return getPos();
+      return pos_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
+          : pos_;
     }
 
     public static final int BLOCK_FIELD_NUMBER = 2;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Block block_;
-
     /**
      * <code>optional .persistence.Block block = 2;</code>
      *
@@ -6257,7 +5514,6 @@ public final class Packets {
     public boolean hasBlock() {
       return ((bitField0_ & 0x00000001) != 0);
     }
-
     /**
      * <code>optional .persistence.Block block = 2;</code>
      *
@@ -6269,7 +5525,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.getDefaultInstance()
           : block_;
     }
-
     /** <code>optional .persistence.Block block = 2;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlockOrBuilder() {
@@ -6298,7 +5553,7 @@ public final class Packets {
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeMessage(2, getBlock());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -6313,7 +5568,7 @@ public final class Packets {
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(2, getBlock());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -6337,7 +5592,7 @@ public final class Packets {
       if (hasBlock()) {
         if (!getBlock().equals(other.getBlock())) return false;
       }
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -6356,7 +5611,7 @@ public final class Packets {
         hash = (37 * hash) + BLOCK_FIELD_NUMBER;
         hash = (53 * hash) + getBlock().hashCode();
       }
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -6458,7 +5713,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.UpdateBlock} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -6494,6 +5748,7 @@ public final class Packets {
 
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {
+          getPosFieldBuilder();
           getBlockFieldBuilder();
         }
       }
@@ -6501,18 +5756,17 @@ public final class Packets {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (posBuilder_ == null) {
-          pos_ = null;
-        } else {
-          pos_ = null;
+        bitField0_ = 0;
+        pos_ = null;
+        if (posBuilder_ != null) {
+          posBuilder_.dispose();
           posBuilder_ = null;
         }
-        if (blockBuilder_ == null) {
-          block_ = null;
-        } else {
-          blockBuilder_.clear();
+        block_ = null;
+        if (blockBuilder_ != null) {
+          blockBuilder_.dispose();
+          blockBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
 
@@ -6543,59 +5797,24 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock result =
             new no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (posBuilder_ == null) {
-          result.pos_ = pos_;
-        } else {
-          result.pos_ = posBuilder_.build();
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          if (blockBuilder_ == null) {
-            result.block_ = block_;
-          } else {
-            result.block_ = blockBuilder_.build();
-          }
-          to_bitField0_ |= 0x00000001;
-        }
-        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.pos_ = posBuilder_ == null ? pos_ : posBuilder_.build();
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.block_ = blockBuilder_ == null ? block_ : blockBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -6617,7 +5836,7 @@ public final class Packets {
         if (other.hasBlock()) {
           mergeBlock(other.getBlock());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -6632,18 +5851,43 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  input.readMessage(getPosFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 18:
+                {
+                  input.readMessage(getBlockFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
@@ -6655,16 +5899,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder>
           posBuilder_;
-
       /**
        * <code>.persistence.Vector2i pos = 1;</code>
        *
        * @return Whether the pos field is set.
        */
       public boolean hasPos() {
-        return posBuilder_ != null || pos_ != null;
+        return ((bitField0_ & 0x00000001) != 0);
       }
-
       /**
        * <code>.persistence.Vector2i pos = 1;</code>
        *
@@ -6679,7 +5921,6 @@ public final class Packets {
           return posBuilder_.getMessage();
         }
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder setPos(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (posBuilder_ == null) {
@@ -6687,71 +5928,59 @@ public final class Packets {
             throw new NullPointerException();
           }
           pos_ = value;
-          onChanged();
         } else {
           posBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder setPos(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder builderForValue) {
         if (posBuilder_ == null) {
           pos_ = builderForValue.build();
-          onChanged();
         } else {
           posBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder mergePos(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (posBuilder_ == null) {
-          if (pos_ != null) {
-            pos_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Vector2i
-                    .newBuilder(pos_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000001) != 0)
+              && pos_ != null
+              && pos_ != no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()) {
+            getPosBuilder().mergeFrom(value);
           } else {
             pos_ = value;
           }
-          onChanged();
         } else {
           posBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public Builder clearPos() {
-        if (posBuilder_ == null) {
-          pos_ = null;
-          onChanged();
-        } else {
-          pos_ = null;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        pos_ = null;
+        if (posBuilder_ != null) {
+          posBuilder_.dispose();
           posBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder getPosBuilder() {
-
+        bitField0_ |= 0x00000001;
         onChanged();
         return getPosFieldBuilder().getBuilder();
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getPosOrBuilder() {
         if (posBuilder_ != null) {
@@ -6762,7 +5991,6 @@ public final class Packets {
               : pos_;
         }
       }
-
       /** <code>.persistence.Vector2i pos = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i,
@@ -6787,16 +6015,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder>
           blockBuilder_;
-
       /**
        * <code>optional .persistence.Block block = 2;</code>
        *
        * @return Whether the block field is set.
        */
       public boolean hasBlock() {
-        return ((bitField0_ & 0x00000001) != 0);
+        return ((bitField0_ & 0x00000002) != 0);
       }
-
       /**
        * <code>optional .persistence.Block block = 2;</code>
        *
@@ -6811,7 +6037,6 @@ public final class Packets {
           return blockBuilder_.getMessage();
         }
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder setBlock(no.elg.infiniteBootleg.protobuf.ProtoWorld.Block value) {
         if (blockBuilder_ == null) {
@@ -6819,72 +6044,59 @@ public final class Packets {
             throw new NullPointerException();
           }
           block_ = value;
-          onChanged();
         } else {
           blockBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder setBlock(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder builderForValue) {
         if (blockBuilder_ == null) {
           block_ = builderForValue.build();
-          onChanged();
         } else {
           blockBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder mergeBlock(no.elg.infiniteBootleg.protobuf.ProtoWorld.Block value) {
         if (blockBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) != 0)
+          if (((bitField0_ & 0x00000002) != 0)
               && block_ != null
               && block_ != no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.getDefaultInstance()) {
-            block_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Block
-                    .newBuilder(block_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getBlockBuilder().mergeFrom(value);
           } else {
             block_ = value;
           }
-          onChanged();
         } else {
           blockBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       public Builder clearBlock() {
-        if (blockBuilder_ == null) {
-          block_ = null;
-          onChanged();
-        } else {
-          blockBuilder_.clear();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        block_ = null;
+        if (blockBuilder_ != null) {
+          blockBuilder_.dispose();
+          blockBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.Builder getBlockBuilder() {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000002;
         onChanged();
         return getBlockFieldBuilder().getBuilder();
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.BlockOrBuilder getBlockOrBuilder() {
         if (blockBuilder_ != null) {
@@ -6895,7 +6107,6 @@ public final class Packets {
               : block_;
         }
       }
-
       /** <code>optional .persistence.Block block = 2;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Block,
@@ -6947,7 +6158,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new UpdateBlock(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -6983,7 +6206,6 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
-
     /**
      *
      *
@@ -7003,14 +6225,12 @@ public final class Packets {
      * @return Whether the velocity field is set.
      */
     boolean hasVelocity();
-
     /**
      * <code>.persistence.Vector2f velocity = 2;</code>
      *
      * @return The velocity.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getVelocity();
-
     /** <code>.persistence.Vector2f velocity = 2;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder();
 
@@ -7020,14 +6240,12 @@ public final class Packets {
      * @return Whether the position field is set.
      */
     boolean hasPosition();
-
     /**
      * <code>.persistence.Vector2f position = 3;</code>
      *
      * @return The position.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f getPosition();
-
     /** <code>.persistence.Vector2f position = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder();
 
@@ -7038,14 +6256,12 @@ public final class Packets {
      */
     float getLookAngleDeg();
   }
-
   /** Protobuf type {@code packets.MoveEntity} */
   public static final class MoveEntity extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.MoveEntity)
       MoveEntityOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use MoveEntity.newBuilder() to construct.
     private MoveEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -7059,96 +6275,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new MoveEntity();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private MoveEntity(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                uuid_ = s;
-                break;
-              }
-            case 18:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder subBuilder = null;
-                if (velocity_ != null) {
-                  subBuilder = velocity_.toBuilder();
-                }
-                velocity_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(velocity_);
-                  velocity_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            case 26:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder subBuilder = null;
-                if (position_ != null) {
-                  subBuilder = position_.toBuilder();
-                }
-                position_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(position_);
-                  position_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            case 37:
-              {
-                lookAngleDeg_ = input.readFloat();
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -7165,8 +6291,9 @@ public final class Packets {
     }
 
     public static final int UUID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object uuid_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object uuid_ = "";
     /**
      *
      *
@@ -7190,7 +6317,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      *
      *
@@ -7217,7 +6343,6 @@ public final class Packets {
 
     public static final int VELOCITY_FIELD_NUMBER = 2;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f velocity_;
-
     /**
      * <code>.persistence.Vector2f velocity = 2;</code>
      *
@@ -7227,7 +6352,6 @@ public final class Packets {
     public boolean hasVelocity() {
       return velocity_ != null;
     }
-
     /**
      * <code>.persistence.Vector2f velocity = 2;</code>
      *
@@ -7239,16 +6363,16 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()
           : velocity_;
     }
-
     /** <code>.persistence.Vector2f velocity = 2;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder() {
-      return getVelocity();
+      return velocity_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()
+          : velocity_;
     }
 
     public static final int POSITION_FIELD_NUMBER = 3;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f position_;
-
     /**
      * <code>.persistence.Vector2f position = 3;</code>
      *
@@ -7258,7 +6382,6 @@ public final class Packets {
     public boolean hasPosition() {
       return position_ != null;
     }
-
     /**
      * <code>.persistence.Vector2f position = 3;</code>
      *
@@ -7270,16 +6393,16 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()
           : position_;
     }
-
     /** <code>.persistence.Vector2f position = 3;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder() {
-      return getPosition();
+      return position_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()
+          : position_;
     }
 
     public static final int LOOKANGLEDEG_FIELD_NUMBER = 4;
-    private float lookAngleDeg_;
-
+    private float lookAngleDeg_ = 0F;
     /**
      * <code>float lookAngleDeg = 4;</code>
      *
@@ -7316,7 +6439,7 @@ public final class Packets {
       if (java.lang.Float.floatToRawIntBits(lookAngleDeg_) != 0) {
         output.writeFloat(4, lookAngleDeg_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -7337,7 +6460,7 @@ public final class Packets {
       if (java.lang.Float.floatToRawIntBits(lookAngleDeg_) != 0) {
         size += com.google.protobuf.CodedOutputStream.computeFloatSize(4, lookAngleDeg_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -7364,7 +6487,7 @@ public final class Packets {
       }
       if (java.lang.Float.floatToIntBits(getLookAngleDeg())
           != java.lang.Float.floatToIntBits(other.getLookAngleDeg())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -7387,7 +6510,7 @@ public final class Packets {
       }
       hash = (37 * hash) + LOOKANGLEDEG_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(getLookAngleDeg());
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -7488,7 +6611,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.MoveEntity} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -7513,38 +6635,28 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         uuid_ = "";
-
-        if (velocityBuilder_ == null) {
-          velocity_ = null;
-        } else {
-          velocity_ = null;
+        velocity_ = null;
+        if (velocityBuilder_ != null) {
+          velocityBuilder_.dispose();
           velocityBuilder_ = null;
         }
-        if (positionBuilder_ == null) {
-          position_ = null;
-        } else {
-          position_ = null;
+        position_ = null;
+        if (positionBuilder_ != null) {
+          positionBuilder_.dispose();
           positionBuilder_ = null;
         }
         lookAngleDeg_ = 0F;
-
         return this;
       }
 
@@ -7575,55 +6687,27 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.MoveEntity buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.MoveEntity result =
             new no.elg.infiniteBootleg.protobuf.Packets.MoveEntity(this);
-        result.uuid_ = uuid_;
-        if (velocityBuilder_ == null) {
-          result.velocity_ = velocity_;
-        } else {
-          result.velocity_ = velocityBuilder_.build();
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
-        if (positionBuilder_ == null) {
-          result.position_ = position_;
-        } else {
-          result.position_ = positionBuilder_.build();
-        }
-        result.lookAngleDeg_ = lookAngleDeg_;
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.MoveEntity result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.uuid_ = uuid_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.velocity_ = velocityBuilder_ == null ? velocity_ : velocityBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.position_ = positionBuilder_ == null ? position_ : positionBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.lookAngleDeg_ = lookAngleDeg_;
+        }
       }
 
       @java.lang.Override
@@ -7641,6 +6725,7 @@ public final class Packets {
           return this;
         if (!other.getUuid().isEmpty()) {
           uuid_ = other.uuid_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
         if (other.hasVelocity()) {
@@ -7652,7 +6737,7 @@ public final class Packets {
         if (other.getLookAngleDeg() != 0F) {
           setLookAngleDeg(other.getLookAngleDeg());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -7667,23 +6752,61 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.MoveEntity parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  uuid_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 18:
+                {
+                  input.readMessage(getVelocityFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+              case 26:
+                {
+                  input.readMessage(getPositionFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 26
+              case 37:
+                {
+                  lookAngleDeg_ = input.readFloat();
+                  bitField0_ |= 0x00000008;
+                  break;
+                } // case 37
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.MoveEntity) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object uuid_ = "";
+      private int bitField0_;
 
+      private java.lang.Object uuid_ = "";
       /**
        *
        *
@@ -7706,7 +6829,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        *
        *
@@ -7729,7 +6851,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        *
        *
@@ -7746,12 +6867,11 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -7764,12 +6884,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder clearUuid() {
-
         uuid_ = getDefaultInstance().getUuid();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -7787,8 +6906,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -7799,16 +6918,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder>
           velocityBuilder_;
-
       /**
        * <code>.persistence.Vector2f velocity = 2;</code>
        *
        * @return Whether the velocity field is set.
        */
       public boolean hasVelocity() {
-        return velocityBuilder_ != null || velocity_ != null;
+        return ((bitField0_ & 0x00000002) != 0);
       }
-
       /**
        * <code>.persistence.Vector2f velocity = 2;</code>
        *
@@ -7823,7 +6940,6 @@ public final class Packets {
           return velocityBuilder_.getMessage();
         }
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder setVelocity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (velocityBuilder_ == null) {
@@ -7831,71 +6947,60 @@ public final class Packets {
             throw new NullPointerException();
           }
           velocity_ = value;
-          onChanged();
         } else {
           velocityBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder setVelocity(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder builderForValue) {
         if (velocityBuilder_ == null) {
           velocity_ = builderForValue.build();
-          onChanged();
         } else {
           velocityBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder mergeVelocity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (velocityBuilder_ == null) {
-          if (velocity_ != null) {
-            velocity_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Vector2f
-                    .newBuilder(velocity_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000002) != 0)
+              && velocity_ != null
+              && velocity_
+                  != no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()) {
+            getVelocityBuilder().mergeFrom(value);
           } else {
             velocity_ = value;
           }
-          onChanged();
         } else {
           velocityBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public Builder clearVelocity() {
-        if (velocityBuilder_ == null) {
-          velocity_ = null;
-          onChanged();
-        } else {
-          velocity_ = null;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        velocity_ = null;
+        if (velocityBuilder_ != null) {
+          velocityBuilder_.dispose();
           velocityBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getVelocityBuilder() {
-
+        bitField0_ |= 0x00000002;
         onChanged();
         return getVelocityFieldBuilder().getBuilder();
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getVelocityOrBuilder() {
         if (velocityBuilder_ != null) {
@@ -7906,7 +7011,6 @@ public final class Packets {
               : velocity_;
         }
       }
-
       /** <code>.persistence.Vector2f velocity = 2;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f,
@@ -7931,16 +7035,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder>
           positionBuilder_;
-
       /**
        * <code>.persistence.Vector2f position = 3;</code>
        *
        * @return Whether the position field is set.
        */
       public boolean hasPosition() {
-        return positionBuilder_ != null || position_ != null;
+        return ((bitField0_ & 0x00000004) != 0);
       }
-
       /**
        * <code>.persistence.Vector2f position = 3;</code>
        *
@@ -7955,7 +7057,6 @@ public final class Packets {
           return positionBuilder_.getMessage();
         }
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder setPosition(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (positionBuilder_ == null) {
@@ -7963,71 +7064,60 @@ public final class Packets {
             throw new NullPointerException();
           }
           position_ = value;
-          onChanged();
         } else {
           positionBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000004;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder setPosition(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder builderForValue) {
         if (positionBuilder_ == null) {
           position_ = builderForValue.build();
-          onChanged();
         } else {
           positionBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000004;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder mergePosition(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f value) {
         if (positionBuilder_ == null) {
-          if (position_ != null) {
-            position_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Vector2f
-                    .newBuilder(position_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000004) != 0)
+              && position_ != null
+              && position_
+                  != no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.getDefaultInstance()) {
+            getPositionBuilder().mergeFrom(value);
           } else {
             position_ = value;
           }
-          onChanged();
         } else {
           positionBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000004;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       public Builder clearPosition() {
-        if (positionBuilder_ == null) {
-          position_ = null;
-          onChanged();
-        } else {
-          position_ = null;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        position_ = null;
+        if (positionBuilder_ != null) {
+          positionBuilder_.dispose();
           positionBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.Builder getPositionBuilder() {
-
+        bitField0_ |= 0x00000004;
         onChanged();
         return getPositionFieldBuilder().getBuilder();
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2fOrBuilder getPositionOrBuilder() {
         if (positionBuilder_ != null) {
@@ -8038,7 +7128,6 @@ public final class Packets {
               : position_;
         }
       }
-
       /** <code>.persistence.Vector2f position = 3;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f,
@@ -8058,7 +7147,6 @@ public final class Packets {
       }
 
       private float lookAngleDeg_;
-
       /**
        * <code>float lookAngleDeg = 4;</code>
        *
@@ -8068,7 +7156,6 @@ public final class Packets {
       public float getLookAngleDeg() {
         return lookAngleDeg_;
       }
-
       /**
        * <code>float lookAngleDeg = 4;</code>
        *
@@ -8078,17 +7165,17 @@ public final class Packets {
       public Builder setLookAngleDeg(float value) {
 
         lookAngleDeg_ = value;
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
-
       /**
        * <code>float lookAngleDeg = 4;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearLookAngleDeg() {
-
+        bitField0_ = (bitField0_ & ~0x00000008);
         lookAngleDeg_ = 0F;
         onChanged();
         return this;
@@ -8127,7 +7214,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new MoveEntity(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -8157,7 +7256,6 @@ public final class Packets {
      * @return The reason.
      */
     java.lang.String getReason();
-
     /**
      * <code>string reason = 1;</code>
      *
@@ -8165,14 +7263,12 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getReasonBytes();
   }
-
   /** Protobuf type {@code packets.Disconnect} */
   public static final class Disconnect extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Disconnect)
       DisconnectOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use Disconnect.newBuilder() to construct.
     private Disconnect(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -8186,57 +7282,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new Disconnect();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private Disconnect(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                reason_ = s;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -8253,8 +7298,9 @@ public final class Packets {
     }
 
     public static final int REASON_FIELD_NUMBER = 1;
-    private volatile java.lang.Object reason_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object reason_ = "";
     /**
      * <code>string reason = 1;</code>
      *
@@ -8272,7 +7318,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string reason = 1;</code>
      *
@@ -8308,7 +7353,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reason_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, reason_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -8320,7 +7365,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(reason_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, reason_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -8337,7 +7382,7 @@ public final class Packets {
           (no.elg.infiniteBootleg.protobuf.Packets.Disconnect) obj;
 
       if (!getReason().equals(other.getReason())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -8350,7 +7395,7 @@ public final class Packets {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + REASON_FIELD_NUMBER;
       hash = (53 * hash) + getReason().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -8451,7 +7496,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.Disconnect} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -8476,24 +7520,17 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.Disconnect.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         reason_ = "";
-
         return this;
       }
 
@@ -8524,44 +7561,18 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.Disconnect buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.Disconnect result =
             new no.elg.infiniteBootleg.protobuf.Packets.Disconnect(this);
-        result.reason_ = reason_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.Disconnect result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.reason_ = reason_;
+        }
       }
 
       @java.lang.Override
@@ -8579,9 +7590,10 @@ public final class Packets {
           return this;
         if (!other.getReason().isEmpty()) {
           reason_ = other.reason_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -8596,23 +7608,43 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.Disconnect parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  reason_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.Disconnect) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object reason_ = "";
+      private int bitField0_;
 
+      private java.lang.Object reason_ = "";
       /**
        * <code>string reason = 1;</code>
        *
@@ -8629,7 +7661,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string reason = 1;</code>
        *
@@ -8646,7 +7677,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string reason = 1;</code>
        *
@@ -8657,24 +7687,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         reason_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>string reason = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearReason() {
-
         reason_ = getDefaultInstance().getReason();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        * <code>string reason = 1;</code>
        *
@@ -8686,8 +7714,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         reason_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -8725,7 +7753,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Disconnect(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -8755,7 +7795,6 @@ public final class Packets {
      * @return The entityUUID.
      */
     java.lang.String getEntityUUID();
-
     /**
      * <code>string entityUUID = 1;</code>
      *
@@ -8769,7 +7808,6 @@ public final class Packets {
      * @return The secret.
      */
     java.lang.String getSecret();
-
     /**
      * <code>string secret = 2;</code>
      *
@@ -8777,14 +7815,12 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getSecretBytes();
   }
-
   /** Protobuf type {@code packets.SecretExchange} */
   public static final class SecretExchange extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.SecretExchange)
       SecretExchangeOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use SecretExchange.newBuilder() to construct.
     private SecretExchange(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -8799,64 +7835,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new SecretExchange();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private SecretExchange(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                entityUUID_ = s;
-                break;
-              }
-            case 18:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                secret_ = s;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -8878,8 +7856,9 @@ public final class Packets {
     }
 
     public static final int ENTITYUUID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object entityUUID_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object entityUUID_ = "";
     /**
      * <code>string entityUUID = 1;</code>
      *
@@ -8897,7 +7876,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string entityUUID = 1;</code>
      *
@@ -8917,8 +7895,9 @@ public final class Packets {
     }
 
     public static final int SECRET_FIELD_NUMBER = 2;
-    private volatile java.lang.Object secret_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object secret_ = "";
     /**
      * <code>string secret = 2;</code>
      *
@@ -8936,7 +7915,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string secret = 2;</code>
      *
@@ -8975,7 +7953,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(secret_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, secret_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -8990,7 +7968,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(secret_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, secret_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -9008,7 +7986,7 @@ public final class Packets {
 
       if (!getEntityUUID().equals(other.getEntityUUID())) return false;
       if (!getSecret().equals(other.getSecret())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -9023,7 +8001,7 @@ public final class Packets {
       hash = (53 * hash) + getEntityUUID().hashCode();
       hash = (37 * hash) + SECRET_FIELD_NUMBER;
       hash = (53 * hash) + getSecret().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -9125,7 +8103,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.SecretExchange} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -9151,26 +8128,18 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         entityUUID_ = "";
-
         secret_ = "";
-
         return this;
       }
 
@@ -9201,45 +8170,21 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.SecretExchange buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.SecretExchange result =
             new no.elg.infiniteBootleg.protobuf.Packets.SecretExchange(this);
-        result.entityUUID_ = entityUUID_;
-        result.secret_ = secret_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.SecretExchange result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.entityUUID_ = entityUUID_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.secret_ = secret_;
+        }
       }
 
       @java.lang.Override
@@ -9257,13 +8202,15 @@ public final class Packets {
           return this;
         if (!other.getEntityUUID().isEmpty()) {
           entityUUID_ = other.entityUUID_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
         if (!other.getSecret().isEmpty()) {
           secret_ = other.secret_;
+          bitField0_ |= 0x00000002;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -9278,23 +8225,49 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.SecretExchange parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  entityUUID_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 18:
+                {
+                  secret_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.SecretExchange) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object entityUUID_ = "";
+      private int bitField0_;
 
+      private java.lang.Object entityUUID_ = "";
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9311,7 +8284,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9328,7 +8300,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9339,24 +8310,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         entityUUID_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>string entityUUID = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearEntityUUID() {
-
         entityUUID_ = getDefaultInstance().getEntityUUID();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        * <code>string entityUUID = 1;</code>
        *
@@ -9368,14 +8337,13 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         entityUUID_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
 
       private java.lang.Object secret_ = "";
-
       /**
        * <code>string secret = 2;</code>
        *
@@ -9392,7 +8360,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string secret = 2;</code>
        *
@@ -9409,7 +8376,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string secret = 2;</code>
        *
@@ -9420,24 +8386,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         secret_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
-
       /**
        * <code>string secret = 2;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearSecret() {
-
         secret_ = getDefaultInstance().getSecret();
+        bitField0_ = (bitField0_ & ~0x00000002);
         onChanged();
         return this;
       }
-
       /**
        * <code>string secret = 2;</code>
        *
@@ -9449,8 +8413,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         secret_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
@@ -9488,7 +8452,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new SecretExchange(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -9518,7 +8494,6 @@ public final class Packets {
      * @return Whether the time field is set.
      */
     boolean hasTime();
-
     /**
      * <code>optional float time = 1;</code>
      *
@@ -9532,7 +8507,6 @@ public final class Packets {
      * @return Whether the timeScale field is set.
      */
     boolean hasTimeScale();
-
     /**
      * <code>optional float timeScale = 2;</code>
      *
@@ -9546,18 +8520,15 @@ public final class Packets {
      * @return Whether the spawn field is set.
      */
     boolean hasSpawn();
-
     /**
      * <code>optional .persistence.Vector2i spawn = 3;</code>
      *
      * @return The spawn.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i getSpawn();
-
     /** <code>optional .persistence.Vector2i spawn = 3;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder();
   }
-
   /**
    *
    *
@@ -9565,14 +8536,13 @@ public final class Packets {
    * if not present, do not update setting
    * </pre>
    *
-   * <p>Protobuf type {@code packets.WorldSettings}
+   * Protobuf type {@code packets.WorldSettings}
    */
   public static final class WorldSettings extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.WorldSettings)
       WorldSettingsOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use WorldSettings.newBuilder() to construct.
     private WorldSettings(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -9584,80 +8554,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new WorldSettings();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private WorldSettings(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 13:
-              {
-                bitField0_ |= 0x00000001;
-                time_ = input.readFloat();
-                break;
-              }
-            case 21:
-              {
-                bitField0_ |= 0x00000002;
-                timeScale_ = input.readFloat();
-                break;
-              }
-            case 26:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000004) != 0)) {
-                  subBuilder = spawn_.toBuilder();
-                }
-                spawn_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(spawn_);
-                  spawn_ = subBuilder.buildPartial();
-                }
-                bitField0_ |= 0x00000004;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -9679,8 +8575,7 @@ public final class Packets {
 
     private int bitField0_;
     public static final int TIME_FIELD_NUMBER = 1;
-    private float time_;
-
+    private float time_ = 0F;
     /**
      * <code>optional float time = 1;</code>
      *
@@ -9690,7 +8585,6 @@ public final class Packets {
     public boolean hasTime() {
       return ((bitField0_ & 0x00000001) != 0);
     }
-
     /**
      * <code>optional float time = 1;</code>
      *
@@ -9702,8 +8596,7 @@ public final class Packets {
     }
 
     public static final int TIMESCALE_FIELD_NUMBER = 2;
-    private float timeScale_;
-
+    private float timeScale_ = 0F;
     /**
      * <code>optional float timeScale = 2;</code>
      *
@@ -9713,7 +8606,6 @@ public final class Packets {
     public boolean hasTimeScale() {
       return ((bitField0_ & 0x00000002) != 0);
     }
-
     /**
      * <code>optional float timeScale = 2;</code>
      *
@@ -9726,7 +8618,6 @@ public final class Packets {
 
     public static final int SPAWN_FIELD_NUMBER = 3;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i spawn_;
-
     /**
      * <code>optional .persistence.Vector2i spawn = 3;</code>
      *
@@ -9736,7 +8627,6 @@ public final class Packets {
     public boolean hasSpawn() {
       return ((bitField0_ & 0x00000004) != 0);
     }
-
     /**
      * <code>optional .persistence.Vector2i spawn = 3;</code>
      *
@@ -9748,7 +8638,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
           : spawn_;
     }
-
     /** <code>optional .persistence.Vector2i spawn = 3;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder() {
@@ -9780,7 +8669,7 @@ public final class Packets {
       if (((bitField0_ & 0x00000004) != 0)) {
         output.writeMessage(3, getSpawn());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -9798,7 +8687,7 @@ public final class Packets {
       if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(3, getSpawn());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -9828,7 +8717,7 @@ public final class Packets {
       if (hasSpawn()) {
         if (!getSpawn().equals(other.getSpawn())) return false;
       }
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -9851,7 +8740,7 @@ public final class Packets {
         hash = (37 * hash) + SPAWN_FIELD_NUMBER;
         hash = (53 * hash) + getSpawn().hashCode();
       }
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -9953,7 +8842,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /**
      *
      *
@@ -9961,7 +8849,7 @@ public final class Packets {
      * if not present, do not update setting
      * </pre>
      *
-     * <p>Protobuf type {@code packets.WorldSettings}
+     * Protobuf type {@code packets.WorldSettings}
      */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -10005,16 +8893,14 @@ public final class Packets {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         time_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000001);
         timeScale_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        if (spawnBuilder_ == null) {
-          spawn_ = null;
-        } else {
-          spawnBuilder_.clear();
+        spawn_ = null;
+        if (spawnBuilder_ != null) {
+          spawnBuilder_.dispose();
+          spawnBuilder_ = null;
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -10045,6 +8931,14 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.WorldSettings buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.WorldSettings result =
             new no.elg.infiniteBootleg.protobuf.Packets.WorldSettings(this);
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.WorldSettings result) {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
@@ -10056,51 +8950,10 @@ public final class Packets {
           to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          if (spawnBuilder_ == null) {
-            result.spawn_ = spawn_;
-          } else {
-            result.spawn_ = spawnBuilder_.build();
-          }
+          result.spawn_ = spawnBuilder_ == null ? spawn_ : spawnBuilder_.build();
           to_bitField0_ |= 0x00000004;
         }
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -10125,7 +8978,7 @@ public final class Packets {
         if (other.hasSpawn()) {
           mergeSpawn(other.getSpawn());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -10140,25 +8993,55 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.WorldSettings parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 13:
+                {
+                  time_ = input.readFloat();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 13
+              case 21:
+                {
+                  timeScale_ = input.readFloat();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 21
+              case 26:
+                {
+                  input.readMessage(getSpawnFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 26
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.WorldSettings) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
       private int bitField0_;
 
       private float time_;
-
       /**
        * <code>optional float time = 1;</code>
        *
@@ -10168,7 +9051,6 @@ public final class Packets {
       public boolean hasTime() {
         return ((bitField0_ & 0x00000001) != 0);
       }
-
       /**
        * <code>optional float time = 1;</code>
        *
@@ -10178,7 +9060,6 @@ public final class Packets {
       public float getTime() {
         return time_;
       }
-
       /**
        * <code>optional float time = 1;</code>
        *
@@ -10186,12 +9067,12 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder setTime(float value) {
-        bitField0_ |= 0x00000001;
+
         time_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>optional float time = 1;</code>
        *
@@ -10205,7 +9086,6 @@ public final class Packets {
       }
 
       private float timeScale_;
-
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -10215,7 +9095,6 @@ public final class Packets {
       public boolean hasTimeScale() {
         return ((bitField0_ & 0x00000002) != 0);
       }
-
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -10225,7 +9104,6 @@ public final class Packets {
       public float getTimeScale() {
         return timeScale_;
       }
-
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -10233,12 +9111,12 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder setTimeScale(float value) {
-        bitField0_ |= 0x00000002;
+
         timeScale_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
-
       /**
        * <code>optional float timeScale = 2;</code>
        *
@@ -10257,7 +9135,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder>
           spawnBuilder_;
-
       /**
        * <code>optional .persistence.Vector2i spawn = 3;</code>
        *
@@ -10266,7 +9143,6 @@ public final class Packets {
       public boolean hasSpawn() {
         return ((bitField0_ & 0x00000004) != 0);
       }
-
       /**
        * <code>optional .persistence.Vector2i spawn = 3;</code>
        *
@@ -10281,7 +9157,6 @@ public final class Packets {
           return spawnBuilder_.getMessage();
         }
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder setSpawn(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (spawnBuilder_ == null) {
@@ -10289,27 +9164,25 @@ public final class Packets {
             throw new NullPointerException();
           }
           spawn_ = value;
-          onChanged();
         } else {
           spawnBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00000004;
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder setSpawn(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder builderForValue) {
         if (spawnBuilder_ == null) {
           spawn_ = builderForValue.build();
-          onChanged();
         } else {
           spawnBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00000004;
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder mergeSpawn(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (spawnBuilder_ == null) {
@@ -10317,45 +9190,34 @@ public final class Packets {
               && spawn_ != null
               && spawn_
                   != no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()) {
-            spawn_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Vector2i
-                    .newBuilder(spawn_)
-                    .mergeFrom(value)
-                    .buildPartial();
+            getSpawnBuilder().mergeFrom(value);
           } else {
             spawn_ = value;
           }
-          onChanged();
         } else {
           spawnBuilder_.mergeFrom(value);
         }
         bitField0_ |= 0x00000004;
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public Builder clearSpawn() {
-        if (spawnBuilder_ == null) {
-          spawn_ = null;
-          onChanged();
-        } else {
-          spawnBuilder_.clear();
-        }
         bitField0_ = (bitField0_ & ~0x00000004);
+        spawn_ = null;
+        if (spawnBuilder_ != null) {
+          spawnBuilder_.dispose();
+          spawnBuilder_ = null;
+        }
+        onChanged();
         return this;
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder getSpawnBuilder() {
         bitField0_ |= 0x00000004;
         onChanged();
         return getSpawnFieldBuilder().getBuilder();
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getSpawnOrBuilder() {
         if (spawnBuilder_ != null) {
@@ -10366,7 +9228,6 @@ public final class Packets {
               : spawn_;
         }
       }
-
       /** <code>optional .persistence.Vector2i spawn = 3;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i,
@@ -10418,7 +9279,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new WorldSettings(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -10454,7 +9327,6 @@ public final class Packets {
      * @return Whether the controlling field is set.
      */
     boolean hasControlling();
-
     /**
      *
      *
@@ -10467,7 +9339,6 @@ public final class Packets {
      * @return The controlling.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getControlling();
-
     /**
      *
      *
@@ -10491,7 +9362,6 @@ public final class Packets {
      * @return Whether the world field is set.
      */
     boolean hasWorld();
-
     /**
      *
      *
@@ -10504,7 +9374,6 @@ public final class Packets {
      * @return The world.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.World getWorld();
-
     /**
      *
      *
@@ -10516,14 +9385,12 @@ public final class Packets {
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder getWorldOrBuilder();
   }
-
   /** Protobuf type {@code packets.StartGame} */
   public static final class StartGame extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.StartGame)
       StartGameOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use StartGame.newBuilder() to construct.
     private StartGame(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -10535,84 +9402,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new StartGame();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private StartGame(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder subBuilder = null;
-                if (controlling_ != null) {
-                  subBuilder = controlling_.toBuilder();
-                }
-                controlling_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(controlling_);
-                  controlling_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            case 18:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Builder subBuilder = null;
-                if (world_ != null) {
-                  subBuilder = world_.toBuilder();
-                }
-                world_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.World.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(world_);
-                  world_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -10630,7 +9419,6 @@ public final class Packets {
 
     public static final int CONTROLLING_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity controlling_;
-
     /**
      *
      *
@@ -10646,7 +9434,6 @@ public final class Packets {
     public boolean hasControlling() {
       return controlling_ != null;
     }
-
     /**
      *
      *
@@ -10664,7 +9451,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()
           : controlling_;
     }
-
     /**
      *
      *
@@ -10676,12 +9462,13 @@ public final class Packets {
      */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getControllingOrBuilder() {
-      return getControlling();
+      return controlling_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()
+          : controlling_;
     }
 
     public static final int WORLD_FIELD_NUMBER = 2;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.World world_;
-
     /**
      *
      *
@@ -10697,7 +9484,6 @@ public final class Packets {
     public boolean hasWorld() {
       return world_ != null;
     }
-
     /**
      *
      *
@@ -10715,7 +9501,6 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.World.getDefaultInstance()
           : world_;
     }
-
     /**
      *
      *
@@ -10727,7 +9512,9 @@ public final class Packets {
      */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder getWorldOrBuilder() {
-      return getWorld();
+      return world_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.World.getDefaultInstance()
+          : world_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -10750,7 +9537,7 @@ public final class Packets {
       if (world_ != null) {
         output.writeMessage(2, getWorld());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -10765,7 +9552,7 @@ public final class Packets {
       if (world_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(2, getWorld());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -10789,7 +9576,7 @@ public final class Packets {
       if (hasWorld()) {
         if (!getWorld().equals(other.getWorld())) return false;
       }
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -10808,7 +9595,7 @@ public final class Packets {
         hash = (37 * hash) + WORLD_FIELD_NUMBER;
         hash = (53 * hash) + getWorld().hashCode();
       }
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -10909,7 +9696,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.StartGame} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -10930,32 +9716,24 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.StartGame.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (controllingBuilder_ == null) {
-          controlling_ = null;
-        } else {
-          controlling_ = null;
+        bitField0_ = 0;
+        controlling_ = null;
+        if (controllingBuilder_ != null) {
+          controllingBuilder_.dispose();
           controllingBuilder_ = null;
         }
-        if (worldBuilder_ == null) {
-          world_ = null;
-        } else {
-          world_ = null;
+        world_ = null;
+        if (worldBuilder_ != null) {
+          worldBuilder_.dispose();
           worldBuilder_ = null;
         }
         return this;
@@ -10984,53 +9762,22 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.StartGame buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.StartGame result =
             new no.elg.infiniteBootleg.protobuf.Packets.StartGame(this);
-        if (controllingBuilder_ == null) {
-          result.controlling_ = controlling_;
-        } else {
-          result.controlling_ = controllingBuilder_.build();
-        }
-        if (worldBuilder_ == null) {
-          result.world_ = world_;
-        } else {
-          result.world_ = worldBuilder_.build();
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.StartGame result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.controlling_ =
+              controllingBuilder_ == null ? controlling_ : controllingBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.world_ = worldBuilder_ == null ? world_ : worldBuilder_.build();
+        }
       }
 
       @java.lang.Override
@@ -11052,7 +9799,7 @@ public final class Packets {
         if (other.hasWorld()) {
           mergeWorld(other.getWorld());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -11067,20 +9814,47 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.StartGame parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  input.readMessage(getControllingFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 18:
+                {
+                  input.readMessage(getWorldFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.StartGame) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
+
+      private int bitField0_;
 
       private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity controlling_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -11088,7 +9862,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
           controllingBuilder_;
-
       /**
        *
        *
@@ -11101,9 +9874,8 @@ public final class Packets {
        * @return Whether the controlling field is set.
        */
       public boolean hasControlling() {
-        return controllingBuilder_ != null || controlling_ != null;
+        return ((bitField0_ & 0x00000001) != 0);
       }
-
       /**
        *
        *
@@ -11124,7 +9896,6 @@ public final class Packets {
           return controllingBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -11140,14 +9911,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           controlling_ = value;
-          onChanged();
         } else {
           controllingBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11161,14 +9931,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
         if (controllingBuilder_ == null) {
           controlling_ = builderForValue.build();
-          onChanged();
         } else {
           controllingBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11180,27 +9949,21 @@ public final class Packets {
        */
       public Builder mergeControlling(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (controllingBuilder_ == null) {
-          if (controlling_ != null) {
-            controlling_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Entity
-                    .newBuilder(controlling_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000001) != 0)
+              && controlling_ != null
+              && controlling_
+                  != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()) {
+            getControllingBuilder().mergeFrom(value);
           } else {
             controlling_ = value;
           }
-          onChanged();
         } else {
           controllingBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11211,17 +9974,15 @@ public final class Packets {
        * <code>.persistence.Entity controlling = 1;</code>
        */
       public Builder clearControlling() {
-        if (controllingBuilder_ == null) {
-          controlling_ = null;
-          onChanged();
-        } else {
-          controlling_ = null;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        controlling_ = null;
+        if (controllingBuilder_ != null) {
+          controllingBuilder_.dispose();
           controllingBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11232,11 +9993,10 @@ public final class Packets {
        * <code>.persistence.Entity controlling = 1;</code>
        */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder getControllingBuilder() {
-
+        bitField0_ |= 0x00000001;
         onChanged();
         return getControllingFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -11255,7 +10015,6 @@ public final class Packets {
               : controlling_;
         }
       }
-
       /**
        *
        *
@@ -11288,7 +10047,6 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder>
           worldBuilder_;
-
       /**
        *
        *
@@ -11301,9 +10059,8 @@ public final class Packets {
        * @return Whether the world field is set.
        */
       public boolean hasWorld() {
-        return worldBuilder_ != null || world_ != null;
+        return ((bitField0_ & 0x00000002) != 0);
       }
-
       /**
        *
        *
@@ -11324,7 +10081,6 @@ public final class Packets {
           return worldBuilder_.getMessage();
         }
       }
-
       /**
        *
        *
@@ -11340,14 +10096,13 @@ public final class Packets {
             throw new NullPointerException();
           }
           world_ = value;
-          onChanged();
         } else {
           worldBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11361,14 +10116,13 @@ public final class Packets {
           no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Builder builderForValue) {
         if (worldBuilder_ == null) {
           world_ = builderForValue.build();
-          onChanged();
         } else {
           worldBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11380,27 +10134,20 @@ public final class Packets {
        */
       public Builder mergeWorld(no.elg.infiniteBootleg.protobuf.ProtoWorld.World value) {
         if (worldBuilder_ == null) {
-          if (world_ != null) {
-            world_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .World
-                    .newBuilder(world_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000002) != 0)
+              && world_ != null
+              && world_ != no.elg.infiniteBootleg.protobuf.ProtoWorld.World.getDefaultInstance()) {
+            getWorldBuilder().mergeFrom(value);
           } else {
             world_ = value;
           }
-          onChanged();
         } else {
           worldBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000002;
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11411,17 +10158,15 @@ public final class Packets {
        * <code>.persistence.World world = 2;</code>
        */
       public Builder clearWorld() {
-        if (worldBuilder_ == null) {
-          world_ = null;
-          onChanged();
-        } else {
-          world_ = null;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        world_ = null;
+        if (worldBuilder_ != null) {
+          worldBuilder_.dispose();
           worldBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -11432,11 +10177,10 @@ public final class Packets {
        * <code>.persistence.World world = 2;</code>
        */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Builder getWorldBuilder() {
-
+        bitField0_ |= 0x00000002;
         onChanged();
         return getWorldFieldBuilder().getBuilder();
       }
-
       /**
        *
        *
@@ -11455,7 +10199,6 @@ public final class Packets {
               : world_;
         }
       }
-
       /**
        *
        *
@@ -11515,7 +10258,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new StartGame(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -11545,18 +10300,15 @@ public final class Packets {
      * @return Whether the chunk field is set.
      */
     boolean hasChunk();
-
     /**
      * <code>.persistence.Chunk chunk = 1;</code>
      *
      * @return The chunk.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk getChunk();
-
     /** <code>.persistence.Chunk chunk = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder getChunkOrBuilder();
   }
-
   /**
    *
    *
@@ -11564,14 +10316,13 @@ public final class Packets {
    * Update all blocks in a chunk
    * </pre>
    *
-   * <p>Protobuf type {@code packets.UpdateChunk}
+   * Protobuf type {@code packets.UpdateChunk}
    */
   public static final class UpdateChunk extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.UpdateChunk)
       UpdateChunkOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use UpdateChunk.newBuilder() to construct.
     private UpdateChunk(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -11583,67 +10334,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new UpdateChunk();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private UpdateChunk(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder subBuilder = null;
-                if (chunk_ != null) {
-                  subBuilder = chunk_.toBuilder();
-                }
-                chunk_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(chunk_);
-                  chunk_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -11661,7 +10351,6 @@ public final class Packets {
 
     public static final int CHUNK_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk chunk_;
-
     /**
      * <code>.persistence.Chunk chunk = 1;</code>
      *
@@ -11671,7 +10360,6 @@ public final class Packets {
     public boolean hasChunk() {
       return chunk_ != null;
     }
-
     /**
      * <code>.persistence.Chunk chunk = 1;</code>
      *
@@ -11683,11 +10371,12 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.getDefaultInstance()
           : chunk_;
     }
-
     /** <code>.persistence.Chunk chunk = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder getChunkOrBuilder() {
-      return getChunk();
+      return chunk_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.getDefaultInstance()
+          : chunk_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -11707,7 +10396,7 @@ public final class Packets {
       if (chunk_ != null) {
         output.writeMessage(1, getChunk());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -11719,7 +10408,7 @@ public final class Packets {
       if (chunk_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, getChunk());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -11739,7 +10428,7 @@ public final class Packets {
       if (hasChunk()) {
         if (!getChunk().equals(other.getChunk())) return false;
       }
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -11754,7 +10443,7 @@ public final class Packets {
         hash = (37 * hash) + CHUNK_FIELD_NUMBER;
         hash = (53 * hash) + getChunk().hashCode();
       }
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -11856,7 +10545,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /**
      *
      *
@@ -11864,7 +10552,7 @@ public final class Packets {
      * Update all blocks in a chunk
      * </pre>
      *
-     * <p>Protobuf type {@code packets.UpdateChunk}
+     * Protobuf type {@code packets.UpdateChunk}
      */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -11889,26 +10577,19 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (chunkBuilder_ == null) {
-          chunk_ = null;
-        } else {
-          chunk_ = null;
+        bitField0_ = 0;
+        chunk_ = null;
+        if (chunkBuilder_ != null) {
+          chunkBuilder_.dispose();
           chunkBuilder_ = null;
         }
         return this;
@@ -11941,48 +10622,18 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk result =
             new no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk(this);
-        if (chunkBuilder_ == null) {
-          result.chunk_ = chunk_;
-        } else {
-          result.chunk_ = chunkBuilder_.build();
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.chunk_ = chunkBuilder_ == null ? chunk_ : chunkBuilder_.build();
+        }
       }
 
       @java.lang.Override
@@ -12001,7 +10652,7 @@ public final class Packets {
         if (other.hasChunk()) {
           mergeChunk(other.getChunk());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -12016,20 +10667,41 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  input.readMessage(getChunkFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
+
+      private int bitField0_;
 
       private no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk chunk_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -12037,16 +10709,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder>
           chunkBuilder_;
-
       /**
        * <code>.persistence.Chunk chunk = 1;</code>
        *
        * @return Whether the chunk field is set.
        */
       public boolean hasChunk() {
-        return chunkBuilder_ != null || chunk_ != null;
+        return ((bitField0_ & 0x00000001) != 0);
       }
-
       /**
        * <code>.persistence.Chunk chunk = 1;</code>
        *
@@ -12061,7 +10731,6 @@ public final class Packets {
           return chunkBuilder_.getMessage();
         }
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder setChunk(no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk value) {
         if (chunkBuilder_ == null) {
@@ -12069,71 +10738,59 @@ public final class Packets {
             throw new NullPointerException();
           }
           chunk_ = value;
-          onChanged();
         } else {
           chunkBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder setChunk(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder builderForValue) {
         if (chunkBuilder_ == null) {
           chunk_ = builderForValue.build();
-          onChanged();
         } else {
           chunkBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder mergeChunk(no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk value) {
         if (chunkBuilder_ == null) {
-          if (chunk_ != null) {
-            chunk_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Chunk
-                    .newBuilder(chunk_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000001) != 0)
+              && chunk_ != null
+              && chunk_ != no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.getDefaultInstance()) {
+            getChunkBuilder().mergeFrom(value);
           } else {
             chunk_ = value;
           }
-          onChanged();
         } else {
           chunkBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public Builder clearChunk() {
-        if (chunkBuilder_ == null) {
-          chunk_ = null;
-          onChanged();
-        } else {
-          chunk_ = null;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        chunk_ = null;
+        if (chunkBuilder_ != null) {
+          chunkBuilder_.dispose();
           chunkBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk.Builder getChunkBuilder() {
-
+        bitField0_ |= 0x00000001;
         onChanged();
         return getChunkFieldBuilder().getBuilder();
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkOrBuilder getChunkOrBuilder() {
         if (chunkBuilder_ != null) {
@@ -12144,7 +10801,6 @@ public final class Packets {
               : chunk_;
         }
       }
-
       /** <code>.persistence.Chunk chunk = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Chunk,
@@ -12196,7 +10852,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new UpdateChunk(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -12226,7 +10894,6 @@ public final class Packets {
      * @return The enum numeric value on the wire for status.
      */
     int getStatusValue();
-
     /**
      * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
      *
@@ -12234,14 +10901,12 @@ public final class Packets {
      */
     no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus getStatus();
   }
-
   /** Protobuf type {@code packets.ServerLoginStatus} */
   public static final class ServerLoginStatus extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.ServerLoginStatus)
       ServerLoginStatusOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use ServerLoginStatus.newBuilder() to construct.
     private ServerLoginStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -12255,57 +10920,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new ServerLoginStatus();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private ServerLoginStatus(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8:
-              {
-                int rawValue = input.readEnum();
-
-                status_ = rawValue;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -12505,8 +11119,7 @@ public final class Packets {
     }
 
     public static final int STATUS_FIELD_NUMBER = 1;
-    private int status_;
-
+    private int status_ = 0;
     /**
      * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
      *
@@ -12516,7 +11129,6 @@ public final class Packets {
     public int getStatusValue() {
       return status_;
     }
-
     /**
      * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
      *
@@ -12524,9 +11136,8 @@ public final class Packets {
      */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus getStatus() {
-      @SuppressWarnings("deprecation")
       no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus result =
-          no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.valueOf(status_);
+          no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.forNumber(status_);
       return result == null
           ? no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.UNRECOGNIZED
           : result;
@@ -12551,7 +11162,7 @@ public final class Packets {
               .getNumber()) {
         output.writeEnum(1, status_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -12565,7 +11176,7 @@ public final class Packets {
               .getNumber()) {
         size += com.google.protobuf.CodedOutputStream.computeEnumSize(1, status_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -12582,7 +11193,7 @@ public final class Packets {
           (no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus) obj;
 
       if (status_ != other.status_) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -12595,7 +11206,7 @@ public final class Packets {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + STATUS_FIELD_NUMBER;
       hash = (53 * hash) + status_;
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -12697,7 +11308,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.ServerLoginStatus} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -12723,24 +11333,17 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         status_ = 0;
-
         return this;
       }
 
@@ -12771,44 +11374,18 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus result =
             new no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus(this);
-        result.status_ = status_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.status_ = status_;
+        }
       }
 
       @java.lang.Override
@@ -12827,7 +11404,7 @@ public final class Packets {
         if (other.status_ != 0) {
           setStatusValue(other.getStatusValue());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -12842,23 +11419,43 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8:
+                {
+                  status_ = input.readEnum();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 8
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private int status_ = 0;
+      private int bitField0_;
 
+      private int status_ = 0;
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12868,7 +11465,6 @@ public final class Packets {
       public int getStatusValue() {
         return status_;
       }
-
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12876,12 +11472,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder setStatusValue(int value) {
-
         status_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12889,14 +11484,13 @@ public final class Packets {
        */
       @java.lang.Override
       public no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus getStatus() {
-        @SuppressWarnings("deprecation")
         no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus result =
-            no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.valueOf(status_);
+            no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.forNumber(
+                status_);
         return result == null
             ? no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.UNRECOGNIZED
             : result;
       }
-
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
@@ -12908,19 +11502,18 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
+        bitField0_ |= 0x00000001;
         status_ = value.getNumber();
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.ServerLoginStatus.ServerStatus status = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearStatus() {
-
+        bitField0_ = (bitField0_ & ~0x00000001);
         status_ = 0;
         onChanged();
         return this;
@@ -12959,7 +11552,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new ServerLoginStatus(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -12989,14 +11594,12 @@ public final class Packets {
      * @return Whether the entity field is set.
      */
     boolean hasEntity();
-
     /**
      * <code>.persistence.Entity entity = 1;</code>
      *
      * @return The entity.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity getEntity();
-
     /** <code>.persistence.Entity entity = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder();
 
@@ -13006,7 +11609,6 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
-
     /**
      * <code>string uuid = 2;</code>
      *
@@ -13014,14 +11616,12 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getUuidBytes();
   }
-
   /** Protobuf type {@code packets.SpawnEntity} */
   public static final class SpawnEntity extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.SpawnEntity)
       SpawnEntityOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use SpawnEntity.newBuilder() to construct.
     private SpawnEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -13035,74 +11635,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new SpawnEntity();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private SpawnEntity(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder subBuilder = null;
-                if (entity_ != null) {
-                  subBuilder = entity_.toBuilder();
-                }
-                entity_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(entity_);
-                  entity_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            case 18:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                uuid_ = s;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -13120,7 +11652,6 @@ public final class Packets {
 
     public static final int ENTITY_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity entity_;
-
     /**
      * <code>.persistence.Entity entity = 1;</code>
      *
@@ -13130,7 +11661,6 @@ public final class Packets {
     public boolean hasEntity() {
       return entity_ != null;
     }
-
     /**
      * <code>.persistence.Entity entity = 1;</code>
      *
@@ -13142,16 +11672,18 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()
           : entity_;
     }
-
     /** <code>.persistence.Entity entity = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder() {
-      return getEntity();
+      return entity_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()
+          : entity_;
     }
 
     public static final int UUID_FIELD_NUMBER = 2;
-    private volatile java.lang.Object uuid_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object uuid_ = "";
     /**
      * <code>string uuid = 2;</code>
      *
@@ -13169,7 +11701,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string uuid = 2;</code>
      *
@@ -13208,7 +11739,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, uuid_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -13223,7 +11754,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, uuid_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -13244,7 +11775,7 @@ public final class Packets {
         if (!getEntity().equals(other.getEntity())) return false;
       }
       if (!getUuid().equals(other.getUuid())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -13261,7 +11792,7 @@ public final class Packets {
       }
       hash = (37 * hash) + UUID_FIELD_NUMBER;
       hash = (53 * hash) + getUuid().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -13363,7 +11894,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.SpawnEntity} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -13388,30 +11918,22 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (entityBuilder_ == null) {
-          entity_ = null;
-        } else {
-          entity_ = null;
+        bitField0_ = 0;
+        entity_ = null;
+        if (entityBuilder_ != null) {
+          entityBuilder_.dispose();
           entityBuilder_ = null;
         }
         uuid_ = "";
-
         return this;
       }
 
@@ -13442,49 +11964,21 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity result =
             new no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity(this);
-        if (entityBuilder_ == null) {
-          result.entity_ = entity_;
-        } else {
-          result.entity_ = entityBuilder_.build();
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
-        result.uuid_ = uuid_;
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.entity_ = entityBuilder_ == null ? entity_ : entityBuilder_.build();
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.uuid_ = uuid_;
+        }
       }
 
       @java.lang.Override
@@ -13505,9 +11999,10 @@ public final class Packets {
         }
         if (!other.getUuid().isEmpty()) {
           uuid_ = other.uuid_;
+          bitField0_ |= 0x00000002;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -13522,20 +12017,47 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  input.readMessage(getEntityFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 18:
+                {
+                  uuid_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
+
+      private int bitField0_;
 
       private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity entity_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -13543,16 +12065,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder>
           entityBuilder_;
-
       /**
        * <code>.persistence.Entity entity = 1;</code>
        *
        * @return Whether the entity field is set.
        */
       public boolean hasEntity() {
-        return entityBuilder_ != null || entity_ != null;
+        return ((bitField0_ & 0x00000001) != 0);
       }
-
       /**
        * <code>.persistence.Entity entity = 1;</code>
        *
@@ -13567,7 +12087,6 @@ public final class Packets {
           return entityBuilder_.getMessage();
         }
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder setEntity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entityBuilder_ == null) {
@@ -13575,71 +12094,60 @@ public final class Packets {
             throw new NullPointerException();
           }
           entity_ = value;
-          onChanged();
         } else {
           entityBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder setEntity(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder builderForValue) {
         if (entityBuilder_ == null) {
           entity_ = builderForValue.build();
-          onChanged();
         } else {
           entityBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder mergeEntity(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity value) {
         if (entityBuilder_ == null) {
-          if (entity_ != null) {
-            entity_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Entity
-                    .newBuilder(entity_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000001) != 0)
+              && entity_ != null
+              && entity_
+                  != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.getDefaultInstance()) {
+            getEntityBuilder().mergeFrom(value);
           } else {
             entity_ = value;
           }
-          onChanged();
         } else {
           entityBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       public Builder clearEntity() {
-        if (entityBuilder_ == null) {
-          entity_ = null;
-          onChanged();
-        } else {
-          entity_ = null;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        entity_ = null;
+        if (entityBuilder_ != null) {
+          entityBuilder_.dispose();
           entityBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Builder getEntityBuilder() {
-
+        bitField0_ |= 0x00000001;
         onChanged();
         return getEntityFieldBuilder().getBuilder();
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder getEntityOrBuilder() {
         if (entityBuilder_ != null) {
@@ -13650,7 +12158,6 @@ public final class Packets {
               : entity_;
         }
       }
-
       /** <code>.persistence.Entity entity = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity,
@@ -13670,7 +12177,6 @@ public final class Packets {
       }
 
       private java.lang.Object uuid_ = "";
-
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13687,7 +12193,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13704,7 +12209,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13715,24 +12219,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         uuid_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 2;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearUuid() {
-
         uuid_ = getDefaultInstance().getUuid();
+        bitField0_ = (bitField0_ & ~0x00000002);
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 2;</code>
        *
@@ -13744,8 +12246,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         uuid_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
@@ -13783,7 +12285,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new SpawnEntity(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -13813,7 +12327,6 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
-
     /**
      * <code>string uuid = 1;</code>
      *
@@ -13827,7 +12340,6 @@ public final class Packets {
      * @return The enum numeric value on the wire for despawnReason.
      */
     int getDespawnReasonValue();
-
     /**
      * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
      *
@@ -13835,14 +12347,12 @@ public final class Packets {
      */
     no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason getDespawnReason();
   }
-
   /** Protobuf type {@code packets.DespawnEntity} */
   public static final class DespawnEntity extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.DespawnEntity)
       DespawnEntityOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use DespawnEntity.newBuilder() to construct.
     private DespawnEntity(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -13857,64 +12367,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new DespawnEntity();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private DespawnEntity(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                uuid_ = s;
-                break;
-              }
-            case 16:
-              {
-                int rawValue = input.readEnum();
-
-                despawnReason_ = rawValue;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -14147,8 +12599,9 @@ public final class Packets {
     }
 
     public static final int UUID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object uuid_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object uuid_ = "";
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14166,7 +12619,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14186,8 +12638,7 @@ public final class Packets {
     }
 
     public static final int DESPAWNREASON_FIELD_NUMBER = 2;
-    private int despawnReason_;
-
+    private int despawnReason_ = 0;
     /**
      * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
      *
@@ -14197,7 +12648,6 @@ public final class Packets {
     public int getDespawnReasonValue() {
       return despawnReason_;
     }
-
     /**
      * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
      *
@@ -14205,9 +12655,8 @@ public final class Packets {
      */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason getDespawnReason() {
-      @SuppressWarnings("deprecation")
       no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason result =
-          no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.valueOf(
+          no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.forNumber(
               despawnReason_);
       return result == null
           ? no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNRECOGNIZED
@@ -14236,7 +12685,7 @@ public final class Packets {
               .getNumber()) {
         output.writeEnum(2, despawnReason_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -14253,7 +12702,7 @@ public final class Packets {
               .getNumber()) {
         size += com.google.protobuf.CodedOutputStream.computeEnumSize(2, despawnReason_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -14271,7 +12720,7 @@ public final class Packets {
 
       if (!getUuid().equals(other.getUuid())) return false;
       if (despawnReason_ != other.despawnReason_) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -14286,7 +12735,7 @@ public final class Packets {
       hash = (53 * hash) + getUuid().hashCode();
       hash = (37 * hash) + DESPAWNREASON_FIELD_NUMBER;
       hash = (53 * hash) + despawnReason_;
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -14388,7 +12837,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.DespawnEntity} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -14414,26 +12862,18 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         uuid_ = "";
-
         despawnReason_ = 0;
-
         return this;
       }
 
@@ -14464,45 +12904,21 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity result =
             new no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity(this);
-        result.uuid_ = uuid_;
-        result.despawnReason_ = despawnReason_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.uuid_ = uuid_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.despawnReason_ = despawnReason_;
+        }
       }
 
       @java.lang.Override
@@ -14520,12 +12936,13 @@ public final class Packets {
           return this;
         if (!other.getUuid().isEmpty()) {
           uuid_ = other.uuid_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
         if (other.despawnReason_ != 0) {
           setDespawnReasonValue(other.getDespawnReasonValue());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -14540,23 +12957,49 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  uuid_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 16:
+                {
+                  despawnReason_ = input.readEnum();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 16
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object uuid_ = "";
+      private int bitField0_;
 
+      private java.lang.Object uuid_ = "";
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14573,7 +13016,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14590,7 +13032,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14601,24 +13042,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearUuid() {
-
         uuid_ = getDefaultInstance().getUuid();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -14630,14 +13069,13 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
 
       private int despawnReason_ = 0;
-
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14647,7 +13085,6 @@ public final class Packets {
       public int getDespawnReasonValue() {
         return despawnReason_;
       }
-
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14655,12 +13092,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder setDespawnReasonValue(int value) {
-
         despawnReason_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14669,15 +13105,13 @@ public final class Packets {
       @java.lang.Override
       public no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
           getDespawnReason() {
-        @SuppressWarnings("deprecation")
         no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason result =
-            no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.valueOf(
+            no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.forNumber(
                 despawnReason_);
         return result == null
             ? no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNRECOGNIZED
             : result;
       }
-
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
@@ -14689,19 +13123,18 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
+        bitField0_ |= 0x00000002;
         despawnReason_ = value.getNumber();
         onChanged();
         return this;
       }
-
       /**
        * <code>.packets.DespawnEntity.DespawnReason despawnReason = 2;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearDespawnReason() {
-
+        bitField0_ = (bitField0_ & ~0x00000002);
         despawnReason_ = 0;
         onChanged();
         return this;
@@ -14740,7 +13173,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new DespawnEntity(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -14770,7 +13215,6 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
-
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14784,7 +13228,6 @@ public final class Packets {
      * @return The username.
      */
     java.lang.String getUsername();
-
     /**
      * <code>string username = 2;</code>
      *
@@ -14804,7 +13247,6 @@ public final class Packets {
      * @return The version.
      */
     java.lang.String getVersion();
-
     /**
      *
      *
@@ -14818,14 +13260,12 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getVersionBytes();
   }
-
   /** Protobuf type {@code packets.Login} */
   public static final class Login extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.Login)
       LoginOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use Login.newBuilder() to construct.
     private Login(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -14843,71 +13283,6 @@ public final class Packets {
       return new Login();
     }
 
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private Login(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                uuid_ = s;
-                break;
-              }
-            case 18:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                username_ = s;
-                break;
-              }
-            case 26:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                version_ = s;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return no.elg.infiniteBootleg.protobuf.Packets.internal_static_packets_Login_descriptor;
     }
@@ -14922,8 +13297,9 @@ public final class Packets {
     }
 
     public static final int UUID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object uuid_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object uuid_ = "";
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14941,7 +13317,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string uuid = 1;</code>
      *
@@ -14961,8 +13336,9 @@ public final class Packets {
     }
 
     public static final int USERNAME_FIELD_NUMBER = 2;
-    private volatile java.lang.Object username_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object username_ = "";
     /**
      * <code>string username = 2;</code>
      *
@@ -14980,7 +13356,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string username = 2;</code>
      *
@@ -15000,8 +13375,9 @@ public final class Packets {
     }
 
     public static final int VERSION_FIELD_NUMBER = 3;
-    private volatile java.lang.Object version_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object version_ = "";
     /**
      *
      *
@@ -15025,7 +13401,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      *
      *
@@ -15073,7 +13448,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(version_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, version_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -15091,7 +13466,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(version_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, version_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -15110,7 +13485,7 @@ public final class Packets {
       if (!getUuid().equals(other.getUuid())) return false;
       if (!getUsername().equals(other.getUsername())) return false;
       if (!getVersion().equals(other.getVersion())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -15127,7 +13502,7 @@ public final class Packets {
       hash = (53 * hash) + getUsername().hashCode();
       hash = (37 * hash) + VERSION_FIELD_NUMBER;
       hash = (53 * hash) + getVersion().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -15228,7 +13603,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.Login} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -15249,28 +13623,19 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.Login.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         uuid_ = "";
-
         username_ = "";
-
         version_ = "";
-
         return this;
       }
 
@@ -15297,46 +13662,24 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.Login buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.Login result =
             new no.elg.infiniteBootleg.protobuf.Packets.Login(this);
-        result.uuid_ = uuid_;
-        result.username_ = username_;
-        result.version_ = version_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.Login result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.uuid_ = uuid_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.username_ = username_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.version_ = version_;
+        }
       }
 
       @java.lang.Override
@@ -15354,17 +13697,20 @@ public final class Packets {
           return this;
         if (!other.getUuid().isEmpty()) {
           uuid_ = other.uuid_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
         if (!other.getUsername().isEmpty()) {
           username_ = other.username_;
+          bitField0_ |= 0x00000002;
           onChanged();
         }
         if (!other.getVersion().isEmpty()) {
           version_ = other.version_;
+          bitField0_ |= 0x00000004;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -15379,22 +13725,55 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.Login parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  uuid_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              case 18:
+                {
+                  username_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000002;
+                  break;
+                } // case 18
+              case 26:
+                {
+                  version_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000004;
+                  break;
+                } // case 26
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (no.elg.infiniteBootleg.protobuf.Packets.Login) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object uuid_ = "";
+      private int bitField0_;
 
+      private java.lang.Object uuid_ = "";
       /**
        * <code>string uuid = 1;</code>
        *
@@ -15411,7 +13790,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -15428,7 +13806,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -15439,24 +13816,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearUuid() {
-
         uuid_ = getDefaultInstance().getUuid();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -15468,14 +13843,13 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
 
       private java.lang.Object username_ = "";
-
       /**
        * <code>string username = 2;</code>
        *
@@ -15492,7 +13866,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string username = 2;</code>
        *
@@ -15509,7 +13882,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string username = 2;</code>
        *
@@ -15520,24 +13892,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         username_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
-
       /**
        * <code>string username = 2;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearUsername() {
-
         username_ = getDefaultInstance().getUsername();
+        bitField0_ = (bitField0_ & ~0x00000002);
         onChanged();
         return this;
       }
-
       /**
        * <code>string username = 2;</code>
        *
@@ -15549,14 +13919,13 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         username_ = value;
+        bitField0_ |= 0x00000002;
         onChanged();
         return this;
       }
 
       private java.lang.Object version_ = "";
-
       /**
        *
        *
@@ -15579,7 +13948,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        *
        *
@@ -15602,7 +13970,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        *
        *
@@ -15619,12 +13986,11 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         version_ = value;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -15637,12 +14003,11 @@ public final class Packets {
        * @return This builder for chaining.
        */
       public Builder clearVersion() {
-
         version_ = getDefaultInstance().getVersion();
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
       }
-
       /**
        *
        *
@@ -15660,8 +14025,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         version_ = value;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
@@ -15699,7 +14064,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Login(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -15729,25 +14106,21 @@ public final class Packets {
      * @return Whether the chunkLocation field is set.
      */
     boolean hasChunkLocation();
-
     /**
      * <code>.persistence.Vector2i chunkLocation = 1;</code>
      *
      * @return The chunkLocation.
      */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i getChunkLocation();
-
     /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
     no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder getChunkLocationOrBuilder();
   }
-
   /** Protobuf type {@code packets.ChunkRequest} */
   public static final class ChunkRequest extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.ChunkRequest)
       ChunkRequestOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use ChunkRequest.newBuilder() to construct.
     private ChunkRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -15759,67 +14132,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new ChunkRequest();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private ChunkRequest(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder subBuilder = null;
-                if (chunkLocation_ != null) {
-                  subBuilder = chunkLocation_.toBuilder();
-                }
-                chunkLocation_ =
-                    input.readMessage(
-                        no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.parser(),
-                        extensionRegistry);
-                if (subBuilder != null) {
-                  subBuilder.mergeFrom(chunkLocation_);
-                  chunkLocation_ = subBuilder.buildPartial();
-                }
-
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -15841,7 +14153,6 @@ public final class Packets {
 
     public static final int CHUNKLOCATION_FIELD_NUMBER = 1;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i chunkLocation_;
-
     /**
      * <code>.persistence.Vector2i chunkLocation = 1;</code>
      *
@@ -15851,7 +14162,6 @@ public final class Packets {
     public boolean hasChunkLocation() {
       return chunkLocation_ != null;
     }
-
     /**
      * <code>.persistence.Vector2i chunkLocation = 1;</code>
      *
@@ -15863,12 +14173,13 @@ public final class Packets {
           ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
           : chunkLocation_;
     }
-
     /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
     @java.lang.Override
     public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder
         getChunkLocationOrBuilder() {
-      return getChunkLocation();
+      return chunkLocation_ == null
+          ? no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()
+          : chunkLocation_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -15888,7 +14199,7 @@ public final class Packets {
       if (chunkLocation_ != null) {
         output.writeMessage(1, getChunkLocation());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -15900,7 +14211,7 @@ public final class Packets {
       if (chunkLocation_ != null) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(1, getChunkLocation());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -15920,7 +14231,7 @@ public final class Packets {
       if (hasChunkLocation()) {
         if (!getChunkLocation().equals(other.getChunkLocation())) return false;
       }
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -15935,7 +14246,7 @@ public final class Packets {
         hash = (37 * hash) + CHUNKLOCATION_FIELD_NUMBER;
         hash = (53 * hash) + getChunkLocation().hashCode();
       }
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -16037,7 +14348,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.ChunkRequest} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -16063,26 +14373,19 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (chunkLocationBuilder_ == null) {
-          chunkLocation_ = null;
-        } else {
-          chunkLocation_ = null;
+        bitField0_ = 0;
+        chunkLocation_ = null;
+        if (chunkLocationBuilder_ != null) {
+          chunkLocationBuilder_.dispose();
           chunkLocationBuilder_ = null;
         }
         return this;
@@ -16115,48 +14418,19 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest result =
             new no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest(this);
-        if (chunkLocationBuilder_ == null) {
-          result.chunkLocation_ = chunkLocation_;
-        } else {
-          result.chunkLocation_ = chunkLocationBuilder_.build();
+        if (bitField0_ != 0) {
+          buildPartial0(result);
         }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.chunkLocation_ =
+              chunkLocationBuilder_ == null ? chunkLocation_ : chunkLocationBuilder_.build();
+        }
       }
 
       @java.lang.Override
@@ -16175,7 +14449,7 @@ public final class Packets {
         if (other.hasChunkLocation()) {
           mergeChunkLocation(other.getChunkLocation());
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -16190,20 +14464,41 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  input.readMessage(getChunkLocationFieldBuilder().getBuilder(), extensionRegistry);
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
+
+      private int bitField0_;
 
       private no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i chunkLocation_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -16211,16 +14506,14 @@ public final class Packets {
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder,
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder>
           chunkLocationBuilder_;
-
       /**
        * <code>.persistence.Vector2i chunkLocation = 1;</code>
        *
        * @return Whether the chunkLocation field is set.
        */
       public boolean hasChunkLocation() {
-        return chunkLocationBuilder_ != null || chunkLocation_ != null;
+        return ((bitField0_ & 0x00000001) != 0);
       }
-
       /**
        * <code>.persistence.Vector2i chunkLocation = 1;</code>
        *
@@ -16235,7 +14528,6 @@ public final class Packets {
           return chunkLocationBuilder_.getMessage();
         }
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder setChunkLocation(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (chunkLocationBuilder_ == null) {
@@ -16243,71 +14535,60 @@ public final class Packets {
             throw new NullPointerException();
           }
           chunkLocation_ = value;
-          onChanged();
         } else {
           chunkLocationBuilder_.setMessage(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder setChunkLocation(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder builderForValue) {
         if (chunkLocationBuilder_ == null) {
           chunkLocation_ = builderForValue.build();
-          onChanged();
         } else {
           chunkLocationBuilder_.setMessage(builderForValue.build());
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder mergeChunkLocation(no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i value) {
         if (chunkLocationBuilder_ == null) {
-          if (chunkLocation_ != null) {
-            chunkLocation_ =
-                no.elg
-                    .infiniteBootleg
-                    .protobuf
-                    .ProtoWorld
-                    .Vector2i
-                    .newBuilder(chunkLocation_)
-                    .mergeFrom(value)
-                    .buildPartial();
+          if (((bitField0_ & 0x00000001) != 0)
+              && chunkLocation_ != null
+              && chunkLocation_
+                  != no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.getDefaultInstance()) {
+            getChunkLocationBuilder().mergeFrom(value);
           } else {
             chunkLocation_ = value;
           }
-          onChanged();
         } else {
           chunkLocationBuilder_.mergeFrom(value);
         }
-
+        bitField0_ |= 0x00000001;
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public Builder clearChunkLocation() {
-        if (chunkLocationBuilder_ == null) {
-          chunkLocation_ = null;
-          onChanged();
-        } else {
-          chunkLocation_ = null;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        chunkLocation_ = null;
+        if (chunkLocationBuilder_ != null) {
+          chunkLocationBuilder_.dispose();
           chunkLocationBuilder_ = null;
         }
-
+        onChanged();
         return this;
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i.Builder getChunkLocationBuilder() {
-
+        bitField0_ |= 0x00000001;
         onChanged();
         return getChunkLocationFieldBuilder().getBuilder();
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2iOrBuilder
           getChunkLocationOrBuilder() {
@@ -16319,7 +14600,6 @@ public final class Packets {
               : chunkLocation_;
         }
       }
-
       /** <code>.persistence.Vector2i chunkLocation = 1;</code> */
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i,
@@ -16371,7 +14651,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new ChunkRequest(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
@@ -16401,7 +14693,6 @@ public final class Packets {
      * @return The uuid.
      */
     java.lang.String getUuid();
-
     /**
      * <code>string uuid = 1;</code>
      *
@@ -16409,14 +14700,12 @@ public final class Packets {
      */
     com.google.protobuf.ByteString getUuidBytes();
   }
-
   /** Protobuf type {@code packets.EntityRequest} */
   public static final class EntityRequest extends com.google.protobuf.GeneratedMessageV3
       implements
       // @@protoc_insertion_point(message_implements:packets.EntityRequest)
       EntityRequestOrBuilder {
     private static final long serialVersionUID = 0L;
-
     // Use EntityRequest.newBuilder() to construct.
     private EntityRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -16430,57 +14719,6 @@ public final class Packets {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(UnusedPrivateParameter unused) {
       return new EntityRequest();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet getUnknownFields() {
-      return this.unknownFields;
-    }
-
-    private EntityRequest(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10:
-              {
-                java.lang.String s = input.readStringRequireUtf8();
-
-                uuid_ = s;
-                break;
-              }
-            default:
-              {
-                if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (com.google.protobuf.UninitializedMessageException e) {
-        throw e.asInvalidProtocolBufferException().setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
@@ -16501,8 +14739,9 @@ public final class Packets {
     }
 
     public static final int UUID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object uuid_;
 
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object uuid_ = "";
     /**
      * <code>string uuid = 1;</code>
      *
@@ -16520,7 +14759,6 @@ public final class Packets {
         return s;
       }
     }
-
     /**
      * <code>string uuid = 1;</code>
      *
@@ -16556,7 +14794,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, uuid_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     @java.lang.Override
@@ -16568,7 +14806,7 @@ public final class Packets {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(uuid_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, uuid_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
     }
@@ -16585,7 +14823,7 @@ public final class Packets {
           (no.elg.infiniteBootleg.protobuf.Packets.EntityRequest) obj;
 
       if (!getUuid().equals(other.getUuid())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
 
@@ -16598,7 +14836,7 @@ public final class Packets {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + UUID_FIELD_NUMBER;
       hash = (53 * hash) + getUuid().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
@@ -16700,7 +14938,6 @@ public final class Packets {
       Builder builder = new Builder(parent);
       return builder;
     }
-
     /** Protobuf type {@code packets.EntityRequest} */
     public static final class Builder
         extends com.google.protobuf.GeneratedMessageV3.Builder<Builder>
@@ -16726,24 +14963,17 @@ public final class Packets {
       }
 
       // Construct using no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
+      private Builder() {}
 
       private Builder(com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
-        maybeForceBuilderInitialization();
-      }
-
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {}
       }
 
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        bitField0_ = 0;
         uuid_ = "";
-
         return this;
       }
 
@@ -16774,44 +15004,18 @@ public final class Packets {
       public no.elg.infiniteBootleg.protobuf.Packets.EntityRequest buildPartial() {
         no.elg.infiniteBootleg.protobuf.Packets.EntityRequest result =
             new no.elg.infiniteBootleg.protobuf.Packets.EntityRequest(this);
-        result.uuid_ = uuid_;
+        if (bitField0_ != 0) {
+          buildPartial0(result);
+        }
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.setField(field, value);
-      }
-
-      @java.lang.Override
-      public Builder clearField(com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-
-      @java.lang.Override
-      public Builder clearOneof(com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index,
-          java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field, java.lang.Object value) {
-        return super.addRepeatedField(field, value);
+      private void buildPartial0(no.elg.infiniteBootleg.protobuf.Packets.EntityRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.uuid_ = uuid_;
+        }
       }
 
       @java.lang.Override
@@ -16829,9 +15033,10 @@ public final class Packets {
           return this;
         if (!other.getUuid().isEmpty()) {
           uuid_ = other.uuid_;
+          bitField0_ |= 0x00000001;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
+        this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
       }
@@ -16846,23 +15051,43 @@ public final class Packets {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        no.elg.infiniteBootleg.protobuf.Packets.EntityRequest parsedMessage = null;
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
         try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10:
+                {
+                  uuid_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000001;
+                  break;
+                } // case 10
+              default:
+                {
+                  if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                    done = true; // was an endgroup tag
+                  }
+                  break;
+                } // default:
+            } // switch (tag)
+          } // while (!done)
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage =
-              (no.elg.infiniteBootleg.protobuf.Packets.EntityRequest) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
+          onChanged();
+        } // finally
         return this;
       }
 
-      private java.lang.Object uuid_ = "";
+      private int bitField0_;
 
+      private java.lang.Object uuid_ = "";
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16879,7 +15104,6 @@ public final class Packets {
           return (java.lang.String) ref;
         }
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16896,7 +15120,6 @@ public final class Packets {
           return (com.google.protobuf.ByteString) ref;
         }
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16907,24 +15130,22 @@ public final class Packets {
         if (value == null) {
           throw new NullPointerException();
         }
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
        * @return This builder for chaining.
        */
       public Builder clearUuid() {
-
         uuid_ = getDefaultInstance().getUuid();
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
-
       /**
        * <code>string uuid = 1;</code>
        *
@@ -16936,8 +15157,8 @@ public final class Packets {
           throw new NullPointerException();
         }
         checkByteStringIsUtf8(value);
-
         uuid_ = value;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
@@ -16975,7 +15196,19 @@ public final class Packets {
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new EntityRequest(input, extensionRegistry);
+            Builder builder = newBuilder();
+            try {
+              builder.mergeFrom(input, extensionRegistry);
+            } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+              throw e.setUnfinishedMessage(builder.buildPartial());
+            } catch (com.google.protobuf.UninitializedMessageException e) {
+              throw e.asInvalidProtocolBufferException()
+                  .setUnfinishedMessage(builder.buildPartial());
+            } catch (java.io.IOException e) {
+              throw new com.google.protobuf.InvalidProtocolBufferException(e)
+                  .setUnfinishedMessage(builder.buildPartial());
+            }
+            return builder.buildPartial();
           }
         };
 
