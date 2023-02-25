@@ -39,7 +39,6 @@ class KeyboardControls(val world: ClientWorld) {
   private val tmpVec2 = Vector2()
 
   private val mouseLocator = MouseLocator()
-  val justPressedButtons = BooleanArray(5)
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
     with(entity) {
@@ -157,8 +156,8 @@ class KeyboardControls(val world: ClientWorld) {
     }
 
     when {
-      Gdx.input.isButtonPressed(Buttons.LEFT) -> entity.interpolate(justPressedButtons[Buttons.RIGHT], this::breakBlocks)
-      Gdx.input.isButtonPressed(Buttons.RIGHT) -> entity.interpolate(justPressedButtons[Buttons.RIGHT], this::placeBlocks)
+      Gdx.input.isButtonPressed(Buttons.LEFT) -> entity.interpolate(false, this::breakBlocks)
+      Gdx.input.isButtonPressed(Buttons.RIGHT) -> entity.interpolate(false, this::placeBlocks)
       Gdx.input.isKeyJustPressed(Keys.Q) -> entity.interpolate(true, this::placeBlocks)
     }
 
@@ -192,7 +191,6 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   fun touchDown(entity: Entity, button: Int) {
-    justPressedButtons[button] = true
     val update =
       when (button) {
         Buttons.LEFT -> entity.interpolate(true, this::breakBlocks)
@@ -203,10 +201,6 @@ class KeyboardControls(val world: ClientWorld) {
     if (update) {
       entity.world.world.render.update()
     }
-  }
-
-  fun touchUp(entity: Entity, button: Int) {
-    justPressedButtons[button] = false
   }
 
   fun keyDown(entity: Entity, keycode: Int): Boolean {
