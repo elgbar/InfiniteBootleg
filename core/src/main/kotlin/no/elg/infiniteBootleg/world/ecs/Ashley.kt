@@ -47,14 +47,14 @@ val CONTROLLED_ENTITY_ARRAY = arrayOf(
   LocallyControlledComponent::class
 )
 
-
 val PLAYERS_ENTITY_ARRAY = arrayOf(
   *BASIC_DYNAMIC_ENTITY_ARRAY,
   GroundedComponent::class,
   NamedComponent::class,
   KillableComponent::class,
   TextureRegionComponent::class,
-  SelectedMaterialComponent::class)
+  SelectedMaterialComponent::class
+)
 
 val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class, TextureRegionComponent::class).get()
 val doorEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, DoorComponent::class).get()

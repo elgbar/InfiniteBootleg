@@ -328,13 +328,13 @@ public class Commands extends CommandExecutor {
     }
     int entities = 0;
     // TODO for ashley
-//        for (Entity entity : world.getEntities()) {
-//          if (entity instanceof Player) {
-//            continue;
-//          }
-//          entities++;
-//          world.removeEntity(entity);
-//        }
+    //        for (Entity entity : world.getEntities()) {
+    //          if (entity instanceof Player) {
+    //            continue;
+    //          }
+    //          entities++;
+    //          world.removeEntity(entity);
+    //        }
     logger.log(LogLevel.SUCCESS, "Killed " + entities + " entities");
   }
 
@@ -342,20 +342,22 @@ public class Commands extends CommandExecutor {
   @ConsoleDoc(description = "Get the brush sizes")
   public void brush() {
     ClientWorld world = getClientWorld();
-    if(world == null){
+    if (world == null) {
       return;
     }
-    ImmutableArray<Entity> entities = world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
-    if(entities.size() == 0){
+    ImmutableArray<Entity> entities =
+        world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+    if (entities.size() == 0) {
       logger.log("There is no local, controlled player in this world");
     }
     for (Entity entity : entities) {
-      var controls = LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+      var controls =
+          LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
       logger.logf(
-        LogLevel.SUCCESS,
-        "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
-        controls.getBreakBrushSize(),
-        controls.getPlaceBrushSize());
+          LogLevel.SUCCESS,
+          "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
+          controls.getBreakBrushSize(),
+          controls.getPlaceBrushSize());
     }
   }
 
@@ -369,19 +371,21 @@ public class Commands extends CommandExecutor {
       })
   public void brush(String type, float size) {
     ClientWorld world = getClientWorld();
-    if(world == null){
+    if (world == null) {
       return;
     }
     if (type == null) {
       logger.error("CMD", "Valid brush types are 'break' and 'place'");
       return;
     }
-    ImmutableArray<Entity> entities = world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
-    if(entities.size() == 0){
+    ImmutableArray<Entity> entities =
+        world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+    if (entities.size() == 0) {
       logger.log("There is no local, controlled player in this world");
     }
     for (Entity entity : entities) {
-      var controls = LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+      var controls =
+          LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
       if (type.startsWith("b")) {
         controls.setBreakBrushSize(size);
       } else if (type.startsWith("p")) {

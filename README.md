@@ -8,4 +8,4 @@ Spiritual successor to Bootleg Terraria
 * Good lighting
 * Multiplayer
 * ...
-* Fun 
+* Fun

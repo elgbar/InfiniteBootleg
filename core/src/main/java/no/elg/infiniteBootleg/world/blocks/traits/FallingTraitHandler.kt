@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks.traits
 
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.World
