@@ -5,7 +5,7 @@ plugins {
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
   id "com.diffplug.spotless" version "6.15.0"
-  id "com.github.ben-manes.versions" version "0.45.0"
+  id "com.github.ben-manes.versions" version "0.46.0"
 }
 
 tasks.named("wrapper") {
@@ -23,7 +23,6 @@ def getGitVersion() {
 
 allprojects {
   apply plugin: "java"
-  apply plugin: "idea"
   apply plugin: "kotlin"
 
   version = getGitVersion()
@@ -109,7 +108,7 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.1.0"
     implementation "com.google.guava:guava:31.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.21.12"
+    implementation "com.google.protobuf:protobuf-java:3.22.0"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
@@ -122,7 +121,7 @@ subprojects {
     implementation "io.github.libktx:ktx-vis:$ktxVersion"
     implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
     implementation "io.github.libktx:ktx-ashley:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.88.Final"
+    implementation "io.netty:netty-all:4.1.89.Final"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "org.jetbrains:annotations:24.0.0"
