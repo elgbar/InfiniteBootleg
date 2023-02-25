@@ -102,10 +102,8 @@ public final class HelpfulConsoleHelpUtil {
       if (names.length != params.length) {
         Main.logger()
             .warn(
-                "Command argument names annotation is present on command '%s', but there are too %s names. "
-                    + "Expected %d "
-                    + "names "
-                    + "found %d",
+                "Command argument names annotation is present on command '%s', but there are too %s"
+                    + " names. Expected %d names found %d",
                 method.getName(),
                 (names.length < params.length) ? "few" : "many",
                 params.length,

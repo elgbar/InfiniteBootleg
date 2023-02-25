@@ -150,8 +150,8 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(
       description =
-          "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
-              + " entity updates and chunks update")
+          "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of"
+              + " chunks, entity updates and chunks update")
   public void pause() {
     World world = getWorld();
     if (world == null) return;
@@ -166,8 +166,8 @@ public class Commands extends CommandExecutor {
 
   @ConsoleDoc(
       description =
-          "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks,"
-              + " entity updates and chunks update")
+          "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of"
+              + " chunks, entity updates and chunks update")
   public void resume() {
     World world = getWorld();
     if (world == null) return;
@@ -229,7 +229,8 @@ public class Commands extends CommandExecutor {
     if (Settings.debugBlockLight) {
       logger.log(
           LogLevel.DEFAULT,
-          "A red box is rendered over the luminescent blocks and a yellow box represents the skylight each block source their brightness from");
+          "A red box is rendered over the luminescent blocks and a yellow box represents the"
+              + " skylight each block source their brightness from");
     }
   }
 

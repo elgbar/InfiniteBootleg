@@ -59,7 +59,8 @@ public abstract class CommonMain extends ApplicationAdapter implements Main {
     console.setAlpha(0.85f);
     console.log(LogLevel.SUCCESS, "Version #" + Util.getVersion());
     console.log(
-        "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options");
+        "You can also start the program with arguments for '--help' or '-?' as arg to see all"
+            + " possible options");
   }
 
   @Override

@@ -110,7 +110,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     Settings.loadWorldFromDisk = false;
     if (Settings.ignoreWorldLock) {
       warn(
-          "The world lock have no effect when not loading worlds. The --force-load argument is useless in with the --no-load argument");
+          "The world lock have no effect when not loading worlds. The --force-load argument is"
+              + " useless in with the --no-load argument");
     }
     log("Worlds will not be loaded/saved from/to disk");
   }
@@ -121,7 +122,8 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
     Settings.ignoreWorldLock = true;
     if (!Settings.loadWorldFromDisk) {
       warn(
-          "The world lock have no effect when not loading worlds. The --force-load argument is useless in with the --no-load argument");
+          "The world lock have no effect when not loading worlds. The --force-load argument is"
+              + " useless in with the --no-load argument");
     }
     log("World will be loaded, even if it is already in use");
   }

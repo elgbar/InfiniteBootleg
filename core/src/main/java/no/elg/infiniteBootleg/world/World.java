@@ -176,7 +176,8 @@ public abstract class World implements Disposable, Resizable {
           Main.logger()
               .warn(
                   "World",
-                  "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!");
+                  "World found is already in use. However, ignore world lock is enabled therefore"
+                      + " the world will be loaded normally. Here be corrupt worlds!");
         }
       }
 
@@ -1249,7 +1250,8 @@ public abstract class World implements Disposable, Resizable {
       Main.logger()
           .warn(
               "getBlocksAABB",
-              "Will not include air AND air blocks will be created! (raw: false, includeAir: false)");
+              "Will not include air AND air blocks will be created! (raw: false, includeAir:"
+                  + " false)");
       effectiveRaw = true;
     } else {
       effectiveRaw = raw;
