@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.screen.hud
+package no.elg.infiniteBootleg.screens.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.screen.ScreenRenderer
-import no.elg.infiniteBootleg.screen.hud.helper.TickerGraph
+import no.elg.infiniteBootleg.screens.hud.helper.TickerGraph
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 
@@ -128,7 +128,7 @@ object DebugGraph : Resizable {
     lps?.resize(fboWidth, fboHeight)
     pps?.resize(fboWidth, fboHeight)
 
-    if (::fbo.isInitialized) {
+    if (DebugGraph::fbo.isInitialized) {
       fbo.dispose()
     }
     fbo = FrameBuffer(Pixmap.Format.RGBA4444, fboWidth, fboHeight, false)

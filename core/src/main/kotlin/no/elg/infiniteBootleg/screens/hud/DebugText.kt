@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.screen.hud
+package no.elg.infiniteBootleg.screens.hud
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray

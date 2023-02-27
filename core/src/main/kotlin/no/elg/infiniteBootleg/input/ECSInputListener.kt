@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.input
 
-import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.ClientMain
@@ -12,7 +11,7 @@ import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue.Compan
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   private fun handleEvent(inputEvent: InputEvent): Boolean {
-    world.engine.queueInputEvent(inputEvent, handleInputFilter)
+    world.engine.queueInputEvent(inputEvent) { !Main.inst().console.isVisible }
     return false
   }
 
@@ -34,9 +33,5 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   override fun dispose() {
     ClientMain.inst().inputMultiplexer.removeProcessor(this)
-  }
-
-  companion object {
-    private val handleInputFilter: (Entity) -> Boolean = { !Main.inst().console.isVisible }
   }
 }
