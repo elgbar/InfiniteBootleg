@@ -768,7 +768,7 @@ public class ChunkImpl implements Chunk {
   @Override
   public boolean isNeighborsLoaded() {
     for (Direction direction : Direction.CARDINAL) {
-      Location relChunk = Location.relative(chunkX, chunkY, direction);
+      Location relChunk = Location.Companion.relative(chunkX, chunkY, direction);
       if (!world.isChunkLoaded(relChunk)) {
         return false;
       }

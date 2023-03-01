@@ -225,10 +225,10 @@ public abstract class World implements Disposable, Resizable {
         .executeAsync(
             () -> {
               Location chunkSpawn = CoordUtil.worldToChunk(spawn);
-              loadChunk(chunkSpawn.x, chunkSpawn.y);
+              loadChunk(chunkSpawn.getX(), chunkSpawn.getY());
 
               for (Location location : getRender().getChunkLocationsInView()) {
-                loadChunk(location.x, location.y);
+                loadChunk(location.getX(), location.getY());
               }
 
               Main.inst()
@@ -243,11 +243,11 @@ public abstract class World implements Disposable, Resizable {
   @NotNull
   public Entity createNewPlayer(@NotNull String playerId) {
     return EntityCreationFactoryKt.createPlayerEntity(
-        getEngine(), this, spawn.x, spawn.y, 0f, 0f, "Player", playerId);
+        getEngine(), this, spawn.getX(), spawn.getY(), 0f, 0f, "Player", playerId);
   }
 
   public void loadFromProtoWorld(@NotNull ProtoWorld.WorldOrBuilder protoWorld) {
-    spawn = Location.fromVector2i(protoWorld.getSpawn());
+    spawn = Location.Companion.fromVector2i(protoWorld.getSpawn());
     worldTime.setTimeScale(protoWorld.getTimeScale());
     worldTime.setTime(protoWorld.getTime());
     synchronized (chunkColumns) {
@@ -535,7 +535,7 @@ public abstract class World implements Disposable, Resizable {
    * @see Chunk#setBlock(int, int, Material, boolean)
    */
   public Block setBlock(@NotNull Location worldLoc, @Nullable Material material, boolean update) {
-    return setBlock(worldLoc.x, worldLoc.y, material, update);
+    return setBlock(worldLoc.getX(), worldLoc.getY(), material, update);
   }
 
   /**
@@ -689,7 +689,7 @@ public abstract class World implements Disposable, Resizable {
    * @return If the block at the given location is air.
    */
   public boolean isAirBlock(@NotNull Location worldLoc) {
-    return isAirBlock(worldLoc.x, worldLoc.y);
+    return isAirBlock(worldLoc.getX(), worldLoc.getY());
   }
 
   public boolean isAirBlock(long compactWorldLoc) {
@@ -1319,7 +1319,7 @@ public abstract class World implements Disposable, Resizable {
     //    for (Entity entity : entities.values()) {
     //      Vector2 pos = entity.getPosition();
     //      if (Util.isBetween(
-    //        pos.x - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth())
+    //        pos.getX() - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth())
     //        && //
     //        Util.isBetween(
     //          pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {

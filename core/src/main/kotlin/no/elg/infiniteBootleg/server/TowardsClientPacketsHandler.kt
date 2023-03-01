@@ -28,7 +28,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
-import no.elg.infiniteBootleg.server.ClientBoundHandler.TAG
+import no.elg.infiniteBootleg.server.ClientBoundHandler.Companion.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.toLocation
@@ -230,7 +230,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       ConnectingScreen.info = "Login success!"
       val player = world.getEntity(entity.uuid)
       if (player == null) {
-        ctx.fatal("Invalid player client side reason: ${if (player == null) "Player is null" else "Player invalid"}")
+        ctx.fatal("Invalid player client side reason: Player is null")
       } else {
         world.worldTicker.start()
         ClientMain.inst().screen = WorldScreen(world, false)

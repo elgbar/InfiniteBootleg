@@ -67,7 +67,7 @@ public class WorldTicker extends Ticker implements Disposable {
     @Override
     public synchronized void tick() {
       WorldRender wr = world.getRender();
-      long chunkUnloadTime = world.getWorldTicker().getTPS() * 5;
+      long chunkUnloadTime = world.getWorldTicker().getTps() * 5;
 
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
