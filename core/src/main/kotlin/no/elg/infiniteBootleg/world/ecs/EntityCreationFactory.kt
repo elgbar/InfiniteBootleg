@@ -195,7 +195,7 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
   // BASIC_DYNAMIC_ENTITY_ARRAY
   with(VelocityComponent(dx, dy))
 
-  with(TextureRegionComponent(material.textureRegion ?: error("Failed to get material texture region")))
+  with(TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")))
 
   // This entity will handle input events
   with<PhysicsEventQueue>()

@@ -23,6 +23,7 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.infiniteBootleg.ClientMain.SCALE
 import no.elg.infiniteBootleg.screen.ScreenRenderer
+import no.elg.infiniteBootleg.world.Material
 import java.io.File
 
 /**
@@ -98,5 +99,8 @@ object KAssets {
       menuItem(extend = "default") { font = notFlippedFont }
       menu { openButtonStyle = newOpenButtonStyle }
     }
+
+    // Do some dummy work to load textures and constructors
+    Main.logger().debug("Material", "Loaded ${Material.values().size} materials")
   }
 }
