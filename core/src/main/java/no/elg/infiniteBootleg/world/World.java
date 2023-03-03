@@ -1164,6 +1164,20 @@ public abstract class World implements Disposable, Resizable {
     ServerHelperKt.despawnEntity(entity, reason);
   }
 
+  @Nullable
+  public Entity getPlayer(@NotNull String uuid){
+    for (Entity entity : engine.getEntitiesFor(AshleyKt.getPlayerFamily())) {
+      if(IdComponent.Companion.getId(entity).getId().equals(uuid)){
+        return entity;
+      }
+    }
+    return null;
+  }
+
+  public boolean hasPlayer(@NotNull String uuid){
+    return getPlayer(uuid) != null;
+  }
+
   /**
    * @param worldX X center (center of each block
    * @param worldY Y center
