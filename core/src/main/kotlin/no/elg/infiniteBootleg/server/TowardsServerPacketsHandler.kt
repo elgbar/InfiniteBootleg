@@ -36,6 +36,7 @@ import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
@@ -252,39 +253,40 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
   Main.logger().debug("LOGIN", "Login request received by " + login.username + " uuid " + login.uuid)
 
   val world = ServerMain.inst().serverWorld
-  val uuid = fromUUIDOrNull(login.uuid)
+  val uuid = login.uuid
   if (uuid == null) {
-    Main.logger().error("handleLoginPacket", "Failed to parse UUID '${login.uuid}'")
+    Main.logger().error("handleLoginPacket", "Given player id was null")
     return
   }
 
-//  if (world.hasPlayer(uuid)) {
-//    ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
-//    ctx.close()
-//    return
-//  }
-//  val player = WorldLoader.spawnServerPlayer(world, uuid)
-//  if (player.isDisposed) {
-//    ctx.fatal("Failed to spawn player server side, player is invalid")
-//    return
-//  }
-//  // Client is good to login
-//  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
-//  require(player.uuid == uuid)
-//  // username might have changed
-//  if (player.name != login.username) {
-//    Main.logger().debug("LOGIN", "Player name has changed from '" + player.name + "' to '" + login.username + "'")
-//    player.name = login.username
-//    WorldLoader.saveServerPlayer(player)
-//  }
+  if (world.hasPlayer(uuid)) {
+    ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
+    ctx.close()
+    return
+  }
 
-//  val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
-//  val sharedInformation = SharedInformation(player.uuid, secret.toString())
-//  ServerBoundHandler.clients[ctx.channel()] = sharedInformation
-//
-//  Main.logger().debug("LOGIN", "Secret sent to player, waiting for confirmation")
-//  // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
-//  ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
+  val player = WorldLoader.spawnServerPlayer(world, uuid)
+  if (player.isDisposed) {
+    ctx.fatal("Failed to spawn player server side, player is invalid")
+    return
+  }
+  // Client is good to login
+  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
+  require(player.uuid == uuid)
+  // username might have changed
+  if (player.name != login.username) {
+    Main.logger().debug("LOGIN", "Player name has changed from '" + player.name + "' to '" + login.username + "'")
+    player.name = login.username
+    WorldLoader.saveServerPlayer(player)
+  }
+
+  val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
+  val sharedInformation = SharedInformation(player.uuid, secret.toString())
+  ServerBoundHandler.clients[ctx.channel()] = sharedInformation
+
+  Main.logger().debug("LOGIN", "Secret sent to player, waiting for confirmation")
+  // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
+  ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
 }
 
 private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {

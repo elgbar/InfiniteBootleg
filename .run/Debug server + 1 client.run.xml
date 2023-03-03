@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Debug server + 1 client" type="CompoundRunConfigurationType">
+    <toRun name="Debug server" type="Application" />
+    <toRun name="debug" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>
