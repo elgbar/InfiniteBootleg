@@ -38,6 +38,7 @@ allprojects {
   }
 
   spotless {
+    String sep = System.getProperty("file.separator")
     format("misc") {
       target("*.gradle", "**/*.md", ".gitignore", "**/*.yml", "**/*.yaml", "**/*.proto")
 
@@ -46,10 +47,42 @@ allprojects {
       endWithNewline()
     }
     java {
+      String path = "src${sep}main${sep}kotlin${sep}no${sep}elg${sep}infiniteBootleg${sep}protobuf${sep}"
+
+      ignoreErrorForPath("${path}Packets.java")
+      ignoreErrorForPath("${path}ProtoWorld.java")
+
       removeUnusedImports()
       googleJavaFormat().reflowLongStrings()
     }
     kotlin {
+      String path = "src${sep}main${sep}kotlin${sep}no${sep}elg${sep}infiniteBootleg${sep}protobuf${sep}"
+
+      ignoreErrorForPath("${path}BlockKt.kt")
+      ignoreErrorForPath("${path}ChunkColumnKt.kt")
+      ignoreErrorForPath("${path}ChunkKt.kt")
+      ignoreErrorForPath("${path}ChunkRequestKt.kt")
+      ignoreErrorForPath("${path}DespawnEntityKt.kt")
+      ignoreErrorForPath("${path}DisconnectKt.kt")
+      ignoreErrorForPath("${path}EntityKt.kt")
+      ignoreErrorForPath("${path}EntityRequestKt.kt")
+      ignoreErrorForPath("${path}HeartbeatKt.kt")
+      ignoreErrorForPath("${path}LoginKt.kt")
+      ignoreErrorForPath("${path}MoveEntityKt.kt")
+      ignoreErrorForPath("${path}PacketKt.kt")
+      ignoreErrorForPath("${path}PacketsKt.kt")
+      ignoreErrorForPath("${path}ProtoWorldKt.kt")
+      ignoreErrorForPath("${path}SecretExchangeKt.kt")
+      ignoreErrorForPath("${path}ServerLoginStatusKt.kt")
+      ignoreErrorForPath("${path}SpawnEntityKt.kt")
+      ignoreErrorForPath("${path}StartGameKt.kt")
+      ignoreErrorForPath("${path}UpdateBlockKt.kt")
+      ignoreErrorForPath("${path}UpdateChunkKt.kt")
+      ignoreErrorForPath("${path}Vector2fKt.kt")
+      ignoreErrorForPath("${path}Vector2iKt.kt")
+      ignoreErrorForPath("${path}WorldKt.kt")
+      ignoreErrorForPath("${path}WorldSettingsKt.kt")
+
       ktlint()
         .setUseExperimental(true)
         .setEditorConfigPath("$rootDir/.editorconfig")
@@ -103,7 +136,8 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.1.0"
     implementation "com.google.guava:guava:31.1-jre"
-    implementation "com.google.protobuf:protobuf-java:3.22.0"
+    implementation "com.google.protobuf:protobuf-java:$protobufVersion"
+    implementation "com.google.protobuf:protobuf-kotlin:$protobufVersion"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
     implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
     implementation "io.github.libktx:ktx-actors:$ktxVersion"
