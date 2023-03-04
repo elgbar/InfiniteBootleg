@@ -59,15 +59,18 @@ object ServerScreen : StageScreen() {
             ClientMain.inst().screen = ConnectingScreen
             ConnectingScreen.startLivelinessTest()
 
-            val serverClient = ServerClient(nameField.text)
+            val username = nameField.text
+            val serverClient = ServerClient(username)
             val clientChannel = ClientChannel(serverClient)
+            val uuid = generateUUIDFromName(username)
             val runnable = Runnable {
-              val channel = clientChannel.channel ?: error("Could not connect to server")
+              val channel = clientChannel.channel
               ConnectingScreen.channel = channel
-              channel.writeAndFlush(serverBoundLoginPacket(nameField.text, generateUUIDFromName(nameField.text)))
+              channel.writeAndFlush(serverBoundLoginPacket(username, uuid))
             }
             val thread = Thread({
               try {
+                Main.logger().info("LOGIN") { "Trying to log into the server '${hostField.text}:${portSpinner.value}' with username $username (uuid: $uuid)" }
                 clientChannel.connect(hostField.text, portSpinner.value, runnable)
               } catch (e: InterruptedException) {
                 Main.logger().log("SERVER", "Server interruption received", e)

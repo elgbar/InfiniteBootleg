@@ -10,8 +10,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
  */
 fun despawnEntity(entity: Entity, despawnReason: DespawnReason) {
   if (Main.isServer()) {
+    val uuid = entity.id
     Main.inst().scheduler.executeAsync {
-      broadcast(clientBoundDespawnEntity(entity.id.id, despawnReason))
+      broadcast(clientBoundDespawnEntity(uuid, despawnReason))
     }
   }
 }

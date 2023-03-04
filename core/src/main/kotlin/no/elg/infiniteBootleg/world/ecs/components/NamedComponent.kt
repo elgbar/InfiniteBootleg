@@ -8,7 +8,9 @@ import ktx.ashley.propertyFor
 
 data class NamedComponent(val name: String) : Component {
   companion object : Mapper<NamedComponent>() {
-    var Entity.name by propertyFor(mapper)
-    var Entity.nameOrNull by optionalPropertyFor(mapper)
+    val Entity.name get() = nameComponent.name
+    val Entity.nameOrNull get() = nameComponentOrNull?.name
+    var Entity.nameComponent by propertyFor(mapper)
+    var Entity.nameComponentOrNull by optionalPropertyFor(mapper)
   }
 }

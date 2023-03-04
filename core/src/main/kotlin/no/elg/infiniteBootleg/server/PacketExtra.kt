@@ -47,6 +47,11 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.save
 import java.time.Instant
 import java.util.UUID
 
@@ -56,14 +61,16 @@ import java.util.UUID
 
 internal fun ChannelHandlerContext.fatal(msg: String) {
   if (Settings.client) {
-    ConnectingScreen.info = msg
-    ClientMain.inst().screen = ConnectingScreen
-    val serverClient = ClientMain.inst().serverClient
-    if (serverClient?.sharedInformation != null) {
-      this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
-    }
-    Main.inst().scheduler.scheduleSync(50L) {
-      close()
+    Main.inst().scheduler.executeSync {
+      ConnectingScreen.info = msg
+      ClientMain.inst().screen = ConnectingScreen
+      val serverClient = ClientMain.inst().serverClient
+      if (serverClient?.sharedInformation != null) {
+        this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
+      }
+      Main.inst().scheduler.scheduleSync(50L) {
+        close()
+      }
     }
   } else {
     this.writeAndFlush(clientBoundDisconnectPlayerPacket(msg))
@@ -144,7 +151,7 @@ fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInform
   return serverBoundPacket(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(sharedInformation.secret)
-      .setEntityUUID(sharedInformation.entityUUID.toString())
+      .setEntityUUID(sharedInformation.entityUUID)
   ).build()
 }
 
@@ -172,9 +179,9 @@ fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Pack
 fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   return serverBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
-//      .setUuid(entity.uuid.toString()) //
-//      .setPosition(entity.position.toVector2f()) //
-//      .setVelocity(entity.velocity.toVector2f()) //
+      .setUuid(entity.id) //
+      .setPosition(entity.position.toVector2f()) //
+      .setVelocity(entity.velocity.toVector2f()) //
 //      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
@@ -211,9 +218,9 @@ fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packet {
 fun clientBoundMoveEntity(entity: Entity): Packet {
   return clientBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
-//      .setUuid(entity.uuid.toString()) //
-//      .setPosition(entity.position.toVector2f()) //
-//      .setVelocity(entity.velocity.toVector2f()) //
+      .setUuid(entity.id) //
+      .setPosition(entity.position.toVector2f()) //
+      .setVelocity(entity.velocity.toVector2f()) //
 //      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
@@ -221,8 +228,8 @@ fun clientBoundMoveEntity(entity: Entity): Packet {
 fun clientBoundSpawnEntity(entity: Entity): Packet {
   return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
-//      .setEntity(entity.save())
-//      .setUuid(entity.uuid.toString())
+      .setEntity(entity.save())
+      .setUuid(entity.id)
   ).build()
 }
 
@@ -238,11 +245,11 @@ fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packet
   return clientBoundPacket(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
 }
 
-fun clientBoundStartGamePacket(player: com.badlogic.ashley.core.Entity): Packet {
+fun clientBoundStartGamePacket(player: Entity): Packet {
   return clientBoundPacket(CB_START_GAME).setStartGame(
     StartGame.newBuilder()
-//      .setWorld(player.world.toProtobuf())
-//      .setControlling(player.save())
+      .setWorld(player.world.world.toProtobuf())
+      .setControlling(player.save())
   ).build()
 }
 
@@ -263,7 +270,7 @@ fun clientBoundSecretExchange(sharedInformation: SharedInformation): Packet {
   return clientBoundPacket(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(sharedInformation.secret)
-      .setEntityUUID(sharedInformation.entityUUID.toString())
+      .setEntityUUID(sharedInformation.entityUUID)
   ).build()
 }
 

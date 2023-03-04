@@ -7,6 +7,7 @@ import ktx.ashley.Mapper
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 
 /**
@@ -27,6 +28,14 @@ class Box2DBodyComponent(body: Body, private val box2dWidth: Float, private val 
   override val isDisposed get() = disposed
 
   val body: Body = (if (disposed) null else internalBody) ?: error("Tried to access a disposed body!")
+
+  fun disableGravity() {
+    body.gravityScale = 0f
+  }
+
+  fun enableGravity() {
+    body.gravityScale = Constants.DEFAULT_GRAVITY_SCALE
+  }
 
   override fun dispose() {
     if (!isDisposed) {

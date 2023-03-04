@@ -30,15 +30,18 @@ import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
-import no.elg.infiniteBootleg.util.fromUUIDOrNull
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
+import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameComponent
+import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import java.security.SecureRandom
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 private val secureRandom = SecureRandom.getInstanceStrong()
@@ -142,7 +145,7 @@ private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntit
     ctx.fatal("No server side player found!")
     return
   }
-  if (player.id.id != moveEntity.uuid) {
+  if (player.id != moveEntity.uuid) {
     ctx.fatal("Client tried to update someone else")
     return
   }
@@ -203,45 +206,47 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     return
   }
 
-  Main.logger().debug("LOGIN", "Client world ready, sending chunks to client ${player.name}")
+  Main.logger().debug("LOGIN", "Client world ready, sending chunks to client ${player.nameComponent}")
 
-  // Send chunk packets to client
-  val ix = CoordUtil.worldToChunk(player.position.blockX)
-  val iy = CoordUtil.worldToChunk(player.position.blockY)
-  for (cx in -Settings.viewDistance..Settings.viewDistance) {
-    for (cy in -Settings.viewDistance..Settings.viewDistance) {
-      val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
-      ctx.write(clientBoundUpdateChunkPacket(chunk))
+  Main.inst().scheduler.executeAsync {
+    // Send chunk packets to client
+    val ix = CoordUtil.worldToChunk(player.position.blockX)
+    val iy = CoordUtil.worldToChunk(player.position.blockY)
+    for (cx in -Settings.viewDistance..Settings.viewDistance) {
+      for (cy in -Settings.viewDistance..Settings.viewDistance) {
+        val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
+        ctx.write(clientBoundUpdateChunkPacket(chunk))
+      }
+      ctx.flush()
+      Main.logger().debug("LOGIN") {
+        val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
+        val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
+        "Sent $sent/$total chunks sent to player ${player.name}"
+      }
     }
+    ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
+    Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
+
+    for (entity in world.engine.getEntitiesFor(basicEntityFamily)) {
+      Main.logger().log("Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client")
+      ctx.write(clientBoundSpawnEntity(entity))
+    }
+
     ctx.flush()
-    Main.logger().debug("LOGIN") {
-      val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
-      val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
-      "Sent $sent/$total chunks sent to player ${player.name}"
-    }
-  }
-  ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
-  Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
+    Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
 
-//  for (entity in world.entities) {
-//    Main.logger().log("Sending entity ${entity.simpleName()} (${entity.uuid}) to client")
-//    ctx.write(clientBoundSpawnEntity(entity))
-//  }
+    ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
 
-  ctx.flush()
-  Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
-
-  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
-
-  shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
+    shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //    Main.logger().log("Sending heartbeat to client")
-    ctx.writeAndFlush(clientBoundHeartbeat())
-    if (shared.lostConnection()) {
-      Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
-      ctx.close()
-    }
-  }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
-  Main.logger().log("Player " + player.name + " joined")
+      ctx.writeAndFlush(clientBoundHeartbeat())
+      if (shared.lostConnection()) {
+        Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
+        ctx.close()
+      }
+    }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+    Main.logger().log("Player ${player.name} joined")
+  }
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {
@@ -250,10 +255,11 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     ctx.fatal("Version mismatch! Client: '${login.version}' Server: '$version'")
     return
   }
-  Main.logger().debug("LOGIN", "Login request received by " + login.username + " uuid " + login.uuid)
+  val uuid = login.uuid
+  val username = login.username
+  Main.logger().debug("LOGIN", "Login request received by $username uuid $uuid")
 
   val world = ServerMain.inst().serverWorld
-  val uuid = login.uuid
   if (uuid == null) {
     Main.logger().error("handleLoginPacket", "Given player id was null")
     return
@@ -264,29 +270,24 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     ctx.close()
     return
   }
-
-  val player = WorldLoader.spawnServerPlayer(world, uuid)
-  if (player.isDisposed) {
-    ctx.fatal("Failed to spawn player server side, player is invalid")
-    return
-  }
-  // Client is good to login
+  // Client is good to login (informational packet)
   ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
-  require(player.uuid == uuid)
-  // username might have changed
-  if (player.name != login.username) {
-    Main.logger().debug("LOGIN", "Player name has changed from '" + player.name + "' to '" + login.username + "'")
-    player.name = login.username
-    WorldLoader.saveServerPlayer(player)
-  }
 
   val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
-  val sharedInformation = SharedInformation(player.uuid, secret.toString())
+  val sharedInformation = SharedInformation(uuid, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
-  Main.logger().debug("LOGIN", "Secret sent to player, waiting for confirmation")
-  // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
-  ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
+  WorldLoader.spawnServerPlayer(world, uuid, username, sharedInformation)
+    .orTimeout(10, TimeUnit.SECONDS)
+    .whenComplete { _, ex ->
+      if (ex == null) {
+        // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
+        ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
+        Main.logger().debug("LOGIN", "Secret sent to player ${sharedInformation.entityUUID}, waiting for confirmation")
+      } else {
+        ctx.fatal("Failed to spawn player ${sharedInformation.entityUUID} server side.\n  ${ex::class.simpleName}: ${ex.message}")
+      }
+    }
 }
 
 private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {

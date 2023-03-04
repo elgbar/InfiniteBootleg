@@ -7,6 +7,8 @@ import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_X_VEL
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_Y_VEL
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.vector2f
 
 data class VelocityComponent(
   var dx: Float,
@@ -14,6 +16,11 @@ data class VelocityComponent(
   var maxDx: Float = MAX_X_VEL,
   var maxDy: Float = MAX_Y_VEL
 ) : Component {
+
+  fun toVector2f(): ProtoWorld.Vector2f = vector2f {
+    x = this@VelocityComponent.dx
+    y = this@VelocityComponent.dy
+  }
 
   init {
     require(maxDx > 0) { "Max dx velocity must be strictly positive" }

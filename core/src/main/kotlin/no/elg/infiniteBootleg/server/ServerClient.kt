@@ -3,7 +3,8 @@ package no.elg.infiniteBootleg.server
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.ClientWorld
+import no.elg.infiniteBootleg.world.ServerClientWorld
+import java.util.concurrent.CompletableFuture
 
 /**
  * A client of a server
@@ -12,7 +13,7 @@ import no.elg.infiniteBootleg.world.ClientWorld
  */
 class ServerClient(
   val name: String,
-  var world: ClientWorld? = null,
+  var world: ServerClientWorld? = null,
   var controllingEntity: ProtoWorld.Entity? = null
 ) {
 
@@ -25,16 +26,7 @@ class ServerClient(
   var started: Boolean = false
   var chunksLoaded: Boolean = false
 
-  private var backingPlayer: Entity? = null
-
   val uuid get() = sharedInformation!!.entityUUID // FIXME
-  val player: Entity?
-    get() {
-      val bp = backingPlayer
-      val clientWorld = world
-      if (clientWorld != null && (bp == null)) {
-        backingPlayer = clientWorld.getEntity(uuid)
-      }
-      return bp
-    }
+  var player: Entity? = null
+  var futurePlayer: CompletableFuture<Entity>? = null
 }

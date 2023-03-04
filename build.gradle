@@ -107,6 +107,7 @@ subprojects {
 
   tasks.withType(KotlinCompile).configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
+    kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
   }
 
   test {

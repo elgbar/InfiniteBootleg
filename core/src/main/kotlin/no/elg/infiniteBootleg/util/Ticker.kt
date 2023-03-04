@@ -120,7 +120,7 @@ open class Ticker(
         ticking.tickRare()
       }
     } catch (e: Throwable) {
-      Main.logger().error(tag, "Failed to tick", e as Throwable?)
+      Main.logger().error(tag, "Failed to tick", e)
     }
     tickId++
 
@@ -139,7 +139,7 @@ open class Ticker(
       try {
         Thread.sleep(ms)
       } catch (e: InterruptedException) {
-        Main.logger().error(tag, "Ticker interrupted", e as Throwable?)
+        Main.logger().error(tag, "Ticker interrupted", e)
       }
     } else if (tickId - lastTickNagged >= nagDelayTicks && tpsWarnThreshold >= realTPS) {
       lastTickNagged = tickId

@@ -51,12 +51,10 @@ val PLAYERS_ENTITY_ARRAY = arrayOf(
   *BASIC_DYNAMIC_ENTITY_ARRAY,
   GroundedComponent::class,
   NamedComponent::class,
-  KillableComponent::class,
-  TextureRegionComponent::class,
-  SelectedMaterialComponent::class
+  KillableComponent::class
 )
 
-val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class, TextureRegionComponent::class).get()
+val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class).get()
 val doorEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, DoorComponent::class).get()
 
 val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
@@ -64,7 +62,9 @@ val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
 val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
   LocallyControlledComponent::class,
-  FollowedByCameraTag::class
+  FollowedByCameraTag::class,
+  SelectedMaterialComponent::class,
+  TextureRegionComponent::class
 ).get()
 
 /**
@@ -97,8 +97,8 @@ fun ensureUniquenessListener(engine: Engine) {
   val family = IdComponent::class.toFamily()
   engine.onEntityAdded(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
     val duplicateEntities = engine.getEntitiesFor(family)
-    if (duplicateEntities.filter { it.id.id == entity.id.id }.size > 1) {
-      Main.logger().warn("Duplicate entity with id '${entity.id.id}' added.")
+    if (duplicateEntities.filter { it.id == entity.id }.size > 1) {
+      Main.logger().warn("Duplicate entity with id '${entity.id}' added.")
       engine.removeEntity(entity)
     }
   }

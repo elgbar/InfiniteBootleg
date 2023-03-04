@@ -9,6 +9,7 @@ import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOG
 import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.ecs.AshleyKt.disposeEntitiesOnRemoval;
 import static no.elg.infiniteBootleg.world.ecs.AshleyKt.ensureUniquenessListener;
+import static no.elg.infiniteBootleg.world.ecs.EntityCreationFactoryKt.createSPPlayerEntity;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -26,7 +27,6 @@ import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.google.common.base.Preconditions;
 import com.google.protobuf.InvalidProtocolBufferException;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -51,7 +51,6 @@ import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
-import no.elg.infiniteBootleg.world.ecs.EntityCreationFactoryKt;
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent;
@@ -213,9 +212,10 @@ public abstract class World implements Disposable, Resizable {
           }
           worldTicker.start();
 
-          if (Main.isSingleplayer()
+          if (this instanceof SinglePlayerWorld spWorld
               && getEngine().getEntitiesFor(AshleyKt.getPlayerFamily()).size() == 0) {
-            createNewPlayer(UUID.randomUUID().toString());
+            createSPPlayerEntity(
+                getEngine(), spWorld, spawn.getX(), spawn.getY(), 0f, 0f, "Player", null);
           }
           EventManager.INSTANCE.javaDispatchEvent(new WorldLoadedEvent(this));
         });
@@ -238,12 +238,6 @@ public abstract class World implements Disposable, Resizable {
                           EventManager.INSTANCE.javaDispatchEvent(
                               new InitialChunksOfWorldLoadedEvent(this)));
             });
-  }
-
-  @NotNull
-  public Entity createNewPlayer(@NotNull String playerId) {
-    return EntityCreationFactoryKt.createPlayerEntity(
-        getEngine(), this, spawn.getX(), spawn.getY(), 0f, 0f, "Player", playerId);
   }
 
   public void loadFromProtoWorld(@NotNull ProtoWorld.WorldOrBuilder protoWorld) {
@@ -1160,21 +1154,21 @@ public abstract class World implements Disposable, Resizable {
 
   public void removeEntity(
       @NotNull Entity entity, @NotNull Packets.DespawnEntity.DespawnReason reason) {
-    engine.removeEntity(entity);
     ServerHelperKt.despawnEntity(entity, reason);
+    engine.removeEntity(entity);
   }
 
   @Nullable
-  public Entity getPlayer(@NotNull String uuid){
+  public Entity getPlayer(@NotNull String uuid) {
     for (Entity entity : engine.getEntitiesFor(AshleyKt.getPlayerFamily())) {
-      if(IdComponent.Companion.getId(entity).getId().equals(uuid)){
+      if (IdComponent.Companion.getIdComponent(entity).getId().equals(uuid)) {
         return entity;
       }
     }
     return null;
   }
 
-  public boolean hasPlayer(@NotNull String uuid){
+  public boolean hasPlayer(@NotNull String uuid) {
     return getPlayer(uuid) != null;
   }
 

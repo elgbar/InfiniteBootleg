@@ -11,6 +11,7 @@ data class IdComponent(val id: String = UUID.randomUUID().toString()) : Componen
 
     fun createRandomId(): IdComponent = IdComponent(UUID.randomUUID().toString())
 
-    val Entity.id by propertyFor(mapper)
+    val Entity.id get() = idComponent.id
+    val Entity.idComponent by propertyFor(mapper)
   }
 }

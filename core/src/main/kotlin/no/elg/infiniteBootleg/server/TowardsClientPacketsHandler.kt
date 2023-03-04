@@ -33,6 +33,8 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.world.ServerClientWorld
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.createMPClientPlayerEntity
 import java.util.concurrent.TimeUnit
 
 /**
@@ -66,9 +68,9 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_SPAWN_ENTITY -> if (packet.hasSpawnEntity()) {
       if (chunksLoaded) {
         handleSpawnEntity(packet.spawnEntity)
-        Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet.\n${packet.spawnEntity.entity}")
+        Main.logger().debug("CB_SPAWN_ENTITY") { "Server sent spawn entity packet\n${packet.spawnEntity.entity}" }
       } else {
-        Main.logger().debug("CB_SPAWN_ENTITY", "Server sent spawn entity packet before chunks loaded packet, ignoring it.\n${packet.spawnEntity.entity}")
+        Main.logger().debug("CB_SPAWN_ENTITY") { "Server sent spawn entity packet before chunks loaded packet, ignoring it.\n${packet.spawnEntity.entity}" }
       }
     }
 
@@ -155,11 +157,14 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return
   }
-//  val loaded = Entity.load(world, chunk, spawnEntity.entity)
-//  if (loaded is LivingEntity && uuid == loaded.uuid) {
-//    // it's us!
-//    loaded.enableGravity()
-//  }
+  Main.logger().debug("handleSpawnEntity") { "" }
+
+  val controlled = uuid == spawnEntity.uuid
+
+  val future = world.engine.createMPClientPlayerEntity(world, spawnEntity.entity, controlled)
+  if (controlled) {
+    futurePlayer = future
+  }
 }
 
 private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
@@ -194,6 +199,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
   this.world = ServerClientWorld(protoWorld, this).apply {
     loadFromProtoWorld(protoWorld)
   }
+
   if (startGame.controlling.type != PLAYER) {
     ctx.fatal("Can only control a player, got ${startGame.controlling.type}")
   } else {
@@ -222,36 +228,47 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
 
     ServerLoginStatus.ServerStatus.LOGIN_SUCCESS -> {
       val world = world
-      val entity = controllingEntity
-      if (world == null || entity == null) {
-        ctx.fatal("Failed to get world and/or entity")
+//      val entity = controllingEntity
+      if (world == null) {
+        ctx.fatal("Failed to get world")
         return
       }
-      ConnectingScreen.info = "Login success!"
-      val player = world.getEntity(entity.uuid)
-      if (player == null) {
-        ctx.fatal("Invalid player client side reason: Player is null")
-      } else {
-        world.worldTicker.start()
-        ClientMain.inst().screen = WorldScreen(world, false)
-//        player.locallyControlled = true
 
-        started = true
+      // Start ticking to create box 2d bodies
+      world.worldTicker.start()
 
-        // Change the info text to something generic in case the server throws an error and no further information is received
-        ConnectingScreen.info = "Connection from server abruptly stopped, no further information received"
+      ConnectingScreen.info = "Waiting for Player to spawn..."
+      futurePlayer?.orTimeout(10, TimeUnit.SECONDS)?.whenCompleteAsync { player, e ->
+        if (e != null) {
+          ctx.fatal("Invalid player client side\n  ${e::class.simpleName}: ${e.message}")
+          return@whenCompleteAsync
+        } else {
+          ConnectingScreen.info = "Login success!"
+          Main.inst().scheduler.executeSync {
+            this@handleLoginStatus.player = player
+            Main.logger().debug("handleSpawnEntity", "Server sent the entity to control")
+            player.box2d.enableGravity()
+            ClientMain.inst().screen = WorldScreen(world, false)
 
-        val sharedInformation = sharedInformation!!
-        sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
+            started = true
+
+            // Change the info text to something generic in case the server throws an error and no further information is received
+            ConnectingScreen.info = "Connection from server abruptly stopped, no further information received"
+
+            val sharedInformation = sharedInformation!!
+            sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //          Main.logger().log("Sending heartbeat to server")
-          ctx.writeAndFlush(serverBoundHeartbeat())
-          if (sharedInformation.lostConnection()) {
-            ctx.fatal("Server stopped responding, heartbeats not received")
-          }
-        }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+              ctx.writeAndFlush(serverBoundHeartbeat())
+              if (sharedInformation.lostConnection()) {
+                ctx.fatal("Server stopped responding, heartbeats not received")
+              }
+            }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
 
-        Main.logger().debug("LOGIN", "Logged into server success")
-      }
+            Main.logger().debug("LOGIN", "Logged into server successfully")
+          }
+        }
+      } ?: kotlin.run { ctx.fatal("Invalid player client side: Did not a receive an entity to control") }
+      futurePlayer = null
     }
 
     ServerLoginStatus.ServerStatus.UNRECOGNIZED -> {

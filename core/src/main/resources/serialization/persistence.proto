@@ -62,6 +62,7 @@ message Entity {
   Vector2f velocity = 3;
   string uuid = 4;
   bool flying = 5;
+  optional string name = 6;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -73,12 +74,10 @@ message Entity {
   optional Living living = 16;
   optional Material material = 17;
   optional Player player = 18;
-  optional Generic generic = 19;
 
   message Living {
-    string name = 1;
-    int32 health = 2;
-    int32 max_health = 3;
+    int32 health = 1;
+    int32 max_health = 2;
   }
 
   message Material {
@@ -89,9 +88,4 @@ message Entity {
     float torch_angle_deg = 1;
     bool controlled = 2;
   }
-
-  message Generic {
-    Vector2i size = 1; //x = width, y = height
-  }
-
 }

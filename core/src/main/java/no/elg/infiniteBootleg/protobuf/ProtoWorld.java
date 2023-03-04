@@ -6309,6 +6309,25 @@ public final class ProtoWorld {
     boolean getFlying();
 
     /**
+     * <code>optional string name = 6;</code>
+     *
+     * @return Whether the name field is set.
+     */
+    boolean hasName();
+    /**
+     * <code>optional string name = 6;</code>
+     *
+     * @return The name.
+     */
+    java.lang.String getName();
+    /**
+     * <code>optional string name = 6;</code>
+     *
+     * @return The bytes for name.
+     */
+    com.google.protobuf.ByteString getNameBytes();
+
+    /**
      * <code>optional .persistence.Entity.Living living = 16;</code>
      *
      * @return Whether the living field is set.
@@ -6382,6 +6401,7 @@ public final class ProtoWorld {
     private Entity() {
       type_ = 0;
       uuid_ = "";
+      name_ = "";
     }
 
     @java.lang.Override
@@ -6543,19 +6563,6 @@ public final class ProtoWorld {
         com.google.protobuf.MessageOrBuilder {
 
       /**
-       * <code>string name = 1;</code>
-       *
-       * @return The name.
-       */
-      java.lang.String getName();
-      /**
-       * <code>string name = 1;</code>
-       *
-       * @return The bytes for name.
-       */
-      com.google.protobuf.ByteString getNameBytes();
-
-      /**
        * <code>int32 health = 2;</code>
        *
        * @return The health.
@@ -6580,9 +6587,7 @@ public final class ProtoWorld {
         super(builder);
       }
 
-      private Living() {
-        name_ = "";
-      }
+      private Living() {}
 
       @java.lang.Override
       @SuppressWarnings({"unused"})
@@ -6606,45 +6611,6 @@ public final class ProtoWorld {
             .ensureFieldAccessorsInitialized(
                 no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living.class,
                 no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living.Builder.class);
-      }
-
-      public static final int NAME_FIELD_NUMBER = 1;
-
-      @SuppressWarnings("serial")
-      private volatile java.lang.Object name_ = "";
-      /**
-       * <code>string name = 1;</code>
-       *
-       * @return The name.
-       */
-      @java.lang.Override
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
-        if (ref instanceof java.lang.String) {
-          return (java.lang.String) ref;
-        } else {
-          com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          name_ = s;
-          return s;
-        }
-      }
-      /**
-       * <code>string name = 1;</code>
-       *
-       * @return The bytes for name.
-       */
-      @java.lang.Override
-      public com.google.protobuf.ByteString getNameBytes() {
-        java.lang.Object ref = name_;
-        if (ref instanceof java.lang.String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
-          name_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
       }
 
       public static final int HEALTH_FIELD_NUMBER = 2;
@@ -6685,9 +6651,6 @@ public final class ProtoWorld {
 
       @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output) throws java.io.IOException {
-        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-          com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
-        }
         if (health_ != 0) {
           output.writeInt32(2, health_);
         }
@@ -6703,9 +6666,6 @@ public final class ProtoWorld {
         if (size != -1) return size;
 
         size = 0;
-        if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(name_)) {
-          size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
-        }
         if (health_ != 0) {
           size += com.google.protobuf.CodedOutputStream.computeInt32Size(2, health_);
         }
@@ -6728,7 +6688,6 @@ public final class ProtoWorld {
         no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living other =
             (no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living) obj;
 
-        if (!getName().equals(other.getName())) return false;
         if (getHealth() != other.getHealth()) return false;
         if (getMaxHealth() != other.getMaxHealth()) return false;
         if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -6742,8 +6701,6 @@ public final class ProtoWorld {
         }
         int hash = 41;
         hash = (19 * hash) + getDescriptor().hashCode();
-        hash = (37 * hash) + NAME_FIELD_NUMBER;
-        hash = (53 * hash) + getName().hashCode();
         hash = (37 * hash) + HEALTH_FIELD_NUMBER;
         hash = (53 * hash) + getHealth();
         hash = (37 * hash) + MAX_HEALTH_FIELD_NUMBER;
@@ -6885,7 +6842,6 @@ public final class ProtoWorld {
         public Builder clear() {
           super.clear();
           bitField0_ = 0;
-          name_ = "";
           health_ = 0;
           maxHealth_ = 0;
           return this;
@@ -6930,12 +6886,9 @@ public final class ProtoWorld {
             no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living result) {
           int from_bitField0_ = bitField0_;
           if (((from_bitField0_ & 0x00000001) != 0)) {
-            result.name_ = name_;
-          }
-          if (((from_bitField0_ & 0x00000002) != 0)) {
             result.health_ = health_;
           }
-          if (((from_bitField0_ & 0x00000004) != 0)) {
+          if (((from_bitField0_ & 0x00000002) != 0)) {
             result.maxHealth_ = maxHealth_;
           }
         }
@@ -6954,11 +6907,6 @@ public final class ProtoWorld {
           if (other
               == no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living.getDefaultInstance())
             return this;
-          if (!other.getName().isEmpty()) {
-            name_ = other.name_;
-            bitField0_ |= 0x00000001;
-            onChanged();
-          }
           if (other.getHealth() != 0) {
             setHealth(other.getHealth());
           }
@@ -6991,22 +6939,16 @@ public final class ProtoWorld {
                 case 0:
                   done = true;
                   break;
-                case 10:
-                  {
-                    name_ = input.readStringRequireUtf8();
-                    bitField0_ |= 0x00000001;
-                    break;
-                  } // case 10
                 case 16:
                   {
                     health_ = input.readInt32();
-                    bitField0_ |= 0x00000002;
+                    bitField0_ |= 0x00000001;
                     break;
                   } // case 16
                 case 24:
                   {
                     maxHealth_ = input.readInt32();
-                    bitField0_ |= 0x00000004;
+                    bitField0_ |= 0x00000002;
                     break;
                   } // case 24
                 default:
@@ -7028,82 +6970,6 @@ public final class ProtoWorld {
 
         private int bitField0_;
 
-        private java.lang.Object name_ = "";
-        /**
-         * <code>string name = 1;</code>
-         *
-         * @return The name.
-         */
-        public java.lang.String getName() {
-          java.lang.Object ref = name_;
-          if (!(ref instanceof java.lang.String)) {
-            com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
-            java.lang.String s = bs.toStringUtf8();
-            name_ = s;
-            return s;
-          } else {
-            return (java.lang.String) ref;
-          }
-        }
-        /**
-         * <code>string name = 1;</code>
-         *
-         * @return The bytes for name.
-         */
-        public com.google.protobuf.ByteString getNameBytes() {
-          java.lang.Object ref = name_;
-          if (ref instanceof String) {
-            com.google.protobuf.ByteString b =
-                com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
-            name_ = b;
-            return b;
-          } else {
-            return (com.google.protobuf.ByteString) ref;
-          }
-        }
-        /**
-         * <code>string name = 1;</code>
-         *
-         * @param value The name to set.
-         * @return This builder for chaining.
-         */
-        public Builder setName(java.lang.String value) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          name_ = value;
-          bitField0_ |= 0x00000001;
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>string name = 1;</code>
-         *
-         * @return This builder for chaining.
-         */
-        public Builder clearName() {
-          name_ = getDefaultInstance().getName();
-          bitField0_ = (bitField0_ & ~0x00000001);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>string name = 1;</code>
-         *
-         * @param value The bytes for name to set.
-         * @return This builder for chaining.
-         */
-        public Builder setNameBytes(com.google.protobuf.ByteString value) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          checkByteStringIsUtf8(value);
-          name_ = value;
-          bitField0_ |= 0x00000001;
-          onChanged();
-          return this;
-        }
-
         private int health_;
         /**
          * <code>int32 health = 2;</code>
@@ -7123,7 +6989,7 @@ public final class ProtoWorld {
         public Builder setHealth(int value) {
 
           health_ = value;
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000001;
           onChanged();
           return this;
         }
@@ -7133,7 +6999,7 @@ public final class ProtoWorld {
          * @return This builder for chaining.
          */
         public Builder clearHealth() {
-          bitField0_ = (bitField0_ & ~0x00000002);
+          bitField0_ = (bitField0_ & ~0x00000001);
           health_ = 0;
           onChanged();
           return this;
@@ -7158,7 +7024,7 @@ public final class ProtoWorld {
         public Builder setMaxHealth(int value) {
 
           maxHealth_ = value;
-          bitField0_ |= 0x00000004;
+          bitField0_ |= 0x00000002;
           onChanged();
           return this;
         }
@@ -7168,7 +7034,7 @@ public final class ProtoWorld {
          * @return This builder for chaining.
          */
         public Builder clearMaxHealth() {
-          bitField0_ = (bitField0_ & ~0x00000004);
+          bitField0_ = (bitField0_ & ~0x00000002);
           maxHealth_ = 0;
           onChanged();
           return this;
@@ -9126,6 +8992,54 @@ public final class ProtoWorld {
       return flying_;
     }
 
+    public static final int NAME_FIELD_NUMBER = 6;
+
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object name_ = "";
+    /**
+     * <code>optional string name = 6;</code>
+     *
+     * @return Whether the name field is set.
+     */
+    @java.lang.Override
+    public boolean hasName() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional string name = 6;</code>
+     *
+     * @return The name.
+     */
+    @java.lang.Override
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string name = 6;</code>
+     *
+     * @return The bytes for name.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     public static final int LIVING_FIELD_NUMBER = 16;
     private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living living_;
     /**
@@ -9135,7 +9049,7 @@ public final class ProtoWorld {
      */
     @java.lang.Override
     public boolean hasLiving() {
-      return ((bitField0_ & 0x00000001) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>optional .persistence.Entity.Living living = 16;</code>
@@ -9165,7 +9079,7 @@ public final class ProtoWorld {
      */
     @java.lang.Override
     public boolean hasMaterial() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
      * <code>optional .persistence.Entity.Material material = 17;</code>
@@ -9196,7 +9110,7 @@ public final class ProtoWorld {
      */
     @java.lang.Override
     public boolean hasPlayer() {
-      return ((bitField0_ & 0x00000004) != 0);
+      return ((bitField0_ & 0x00000008) != 0);
     }
     /**
      * <code>optional .persistence.Entity.Player player = 18;</code>
@@ -9226,7 +9140,7 @@ public final class ProtoWorld {
      */
     @java.lang.Override
     public boolean hasGeneric() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
      * <code>optional .persistence.Entity.Generic generic = 19;</code>
@@ -9280,15 +9194,18 @@ public final class ProtoWorld {
         output.writeBool(5, flying_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeMessage(16, getLiving());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, name_);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeMessage(17, getMaterial());
+        output.writeMessage(16, getLiving());
       }
       if (((bitField0_ & 0x00000004) != 0)) {
-        output.writeMessage(18, getPlayer());
+        output.writeMessage(17, getMaterial());
       }
       if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeMessage(18, getPlayer());
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
         output.writeMessage(19, getGeneric());
       }
       getUnknownFields().writeTo(output);
@@ -9318,15 +9235,18 @@ public final class ProtoWorld {
         size += com.google.protobuf.CodedOutputStream.computeBoolSize(5, flying_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(16, getLiving());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, name_);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(17, getMaterial());
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(16, getLiving());
       }
       if (((bitField0_ & 0x00000004) != 0)) {
-        size += com.google.protobuf.CodedOutputStream.computeMessageSize(18, getPlayer());
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(17, getMaterial());
       }
       if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream.computeMessageSize(18, getPlayer());
+      }
+      if (((bitField0_ & 0x00000010) != 0)) {
         size += com.google.protobuf.CodedOutputStream.computeMessageSize(19, getGeneric());
       }
       size += getUnknownFields().getSerializedSize();
@@ -9356,6 +9276,10 @@ public final class ProtoWorld {
       }
       if (!getUuid().equals(other.getUuid())) return false;
       if (getFlying() != other.getFlying()) return false;
+      if (hasName() != other.hasName()) return false;
+      if (hasName()) {
+        if (!getName().equals(other.getName())) return false;
+      }
       if (hasLiving() != other.hasLiving()) return false;
       if (hasLiving()) {
         if (!getLiving().equals(other.getLiving())) return false;
@@ -9397,6 +9321,10 @@ public final class ProtoWorld {
       hash = (53 * hash) + getUuid().hashCode();
       hash = (37 * hash) + FLYING_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(getFlying());
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
       if (hasLiving()) {
         hash = (37 * hash) + LIVING_FIELD_NUMBER;
         hash = (53 * hash) + getLiving().hashCode();
@@ -9575,6 +9503,7 @@ public final class ProtoWorld {
         }
         uuid_ = "";
         flying_ = false;
+        name_ = "";
         living_ = null;
         if (livingBuilder_ != null) {
           livingBuilder_.dispose();
@@ -9651,20 +9580,24 @@ public final class ProtoWorld {
         }
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000020) != 0)) {
-          result.living_ = livingBuilder_ == null ? living_ : livingBuilder_.build();
+          result.name_ = name_;
           to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000040) != 0)) {
-          result.material_ = materialBuilder_ == null ? material_ : materialBuilder_.build();
+          result.living_ = livingBuilder_ == null ? living_ : livingBuilder_.build();
           to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000080) != 0)) {
-          result.player_ = playerBuilder_ == null ? player_ : playerBuilder_.build();
+          result.material_ = materialBuilder_ == null ? material_ : materialBuilder_.build();
           to_bitField0_ |= 0x00000004;
         }
         if (((from_bitField0_ & 0x00000100) != 0)) {
-          result.generic_ = genericBuilder_ == null ? generic_ : genericBuilder_.build();
+          result.player_ = playerBuilder_ == null ? player_ : playerBuilder_.build();
           to_bitField0_ |= 0x00000008;
+        }
+        if (((from_bitField0_ & 0x00000200) != 0)) {
+          result.generic_ = genericBuilder_ == null ? generic_ : genericBuilder_.build();
+          to_bitField0_ |= 0x00000010;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -9698,6 +9631,11 @@ public final class ProtoWorld {
         }
         if (other.getFlying() != false) {
           setFlying(other.getFlying());
+        }
+        if (other.hasName()) {
+          name_ = other.name_;
+          bitField0_ |= 0x00000020;
+          onChanged();
         }
         if (other.hasLiving()) {
           mergeLiving(other.getLiving());
@@ -9767,28 +9705,34 @@ public final class ProtoWorld {
                   bitField0_ |= 0x00000010;
                   break;
                 } // case 40
+              case 50:
+                {
+                  name_ = input.readStringRequireUtf8();
+                  bitField0_ |= 0x00000020;
+                  break;
+                } // case 50
               case 130:
                 {
                   input.readMessage(getLivingFieldBuilder().getBuilder(), extensionRegistry);
-                  bitField0_ |= 0x00000020;
+                  bitField0_ |= 0x00000040;
                   break;
                 } // case 130
               case 138:
                 {
                   input.readMessage(getMaterialFieldBuilder().getBuilder(), extensionRegistry);
-                  bitField0_ |= 0x00000040;
+                  bitField0_ |= 0x00000080;
                   break;
                 } // case 138
               case 146:
                 {
                   input.readMessage(getPlayerFieldBuilder().getBuilder(), extensionRegistry);
-                  bitField0_ |= 0x00000080;
+                  bitField0_ |= 0x00000100;
                   break;
                 } // case 146
               case 154:
                 {
                   input.readMessage(getGenericFieldBuilder().getBuilder(), extensionRegistry);
-                  bitField0_ |= 0x00000100;
+                  bitField0_ |= 0x00000200;
                   break;
                 } // case 154
               default:
@@ -10217,6 +10161,90 @@ public final class ProtoWorld {
         return this;
       }
 
+      private java.lang.Object name_ = "";
+      /**
+       * <code>optional string name = 6;</code>
+       *
+       * @return Whether the name field is set.
+       */
+      public boolean hasName() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <code>optional string name = 6;</code>
+       *
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string name = 6;</code>
+       *
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8((java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string name = 6;</code>
+       *
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(java.lang.String value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        name_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string name = 6;</code>
+       *
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string name = 6;</code>
+       *
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(com.google.protobuf.ByteString value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+
       private no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living living_;
       private com.google.protobuf.SingleFieldBuilderV3<
               no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living,
@@ -10229,7 +10257,7 @@ public final class ProtoWorld {
        * @return Whether the living field is set.
        */
       public boolean hasLiving() {
-        return ((bitField0_ & 0x00000020) != 0);
+        return ((bitField0_ & 0x00000040) != 0);
       }
       /**
        * <code>optional .persistence.Entity.Living living = 16;</code>
@@ -10255,7 +10283,7 @@ public final class ProtoWorld {
         } else {
           livingBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
@@ -10267,14 +10295,14 @@ public final class ProtoWorld {
         } else {
           livingBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Living living = 16;</code> */
       public Builder mergeLiving(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living value) {
         if (livingBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) != 0)
+          if (((bitField0_ & 0x00000040) != 0)
               && living_ != null
               && living_
                   != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living
@@ -10286,13 +10314,13 @@ public final class ProtoWorld {
         } else {
           livingBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Living living = 16;</code> */
       public Builder clearLiving() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         living_ = null;
         if (livingBuilder_ != null) {
           livingBuilder_.dispose();
@@ -10303,7 +10331,7 @@ public final class ProtoWorld {
       }
       /** <code>optional .persistence.Entity.Living living = 16;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living.Builder getLivingBuilder() {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return getLivingFieldBuilder().getBuilder();
       }
@@ -10348,7 +10376,7 @@ public final class ProtoWorld {
        * @return Whether the material field is set.
        */
       public boolean hasMaterial() {
-        return ((bitField0_ & 0x00000040) != 0);
+        return ((bitField0_ & 0x00000080) != 0);
       }
       /**
        * <code>optional .persistence.Entity.Material material = 17;</code>
@@ -10374,7 +10402,7 @@ public final class ProtoWorld {
         } else {
           materialBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
@@ -10386,7 +10414,7 @@ public final class ProtoWorld {
         } else {
           materialBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
@@ -10394,7 +10422,7 @@ public final class ProtoWorld {
       public Builder mergeMaterial(
           no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Material value) {
         if (materialBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) != 0)
+          if (((bitField0_ & 0x00000080) != 0)
               && material_ != null
               && material_
                   != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Material
@@ -10406,13 +10434,13 @@ public final class ProtoWorld {
         } else {
           materialBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Material material = 17;</code> */
       public Builder clearMaterial() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         material_ = null;
         if (materialBuilder_ != null) {
           materialBuilder_.dispose();
@@ -10424,7 +10452,7 @@ public final class ProtoWorld {
       /** <code>optional .persistence.Entity.Material material = 17;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Material.Builder
           getMaterialBuilder() {
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return getMaterialFieldBuilder().getBuilder();
       }
@@ -10469,7 +10497,7 @@ public final class ProtoWorld {
        * @return Whether the player field is set.
        */
       public boolean hasPlayer() {
-        return ((bitField0_ & 0x00000080) != 0);
+        return ((bitField0_ & 0x00000100) != 0);
       }
       /**
        * <code>optional .persistence.Entity.Player player = 18;</code>
@@ -10495,7 +10523,7 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return this;
       }
@@ -10507,14 +10535,14 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Player player = 18;</code> */
       public Builder mergePlayer(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player value) {
         if (playerBuilder_ == null) {
-          if (((bitField0_ & 0x00000080) != 0)
+          if (((bitField0_ & 0x00000100) != 0)
               && player_ != null
               && player_
                   != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player
@@ -10526,13 +10554,13 @@ public final class ProtoWorld {
         } else {
           playerBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Player player = 18;</code> */
       public Builder clearPlayer() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         player_ = null;
         if (playerBuilder_ != null) {
           playerBuilder_.dispose();
@@ -10543,7 +10571,7 @@ public final class ProtoWorld {
       }
       /** <code>optional .persistence.Entity.Player player = 18;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player.Builder getPlayerBuilder() {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return getPlayerFieldBuilder().getBuilder();
       }
@@ -10588,7 +10616,7 @@ public final class ProtoWorld {
        * @return Whether the generic field is set.
        */
       public boolean hasGeneric() {
-        return ((bitField0_ & 0x00000100) != 0);
+        return ((bitField0_ & 0x00000200) != 0);
       }
       /**
        * <code>optional .persistence.Entity.Generic generic = 19;</code>
@@ -10614,7 +10642,7 @@ public final class ProtoWorld {
         } else {
           genericBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return this;
       }
@@ -10626,14 +10654,14 @@ public final class ProtoWorld {
         } else {
           genericBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Generic generic = 19;</code> */
       public Builder mergeGeneric(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic value) {
         if (genericBuilder_ == null) {
-          if (((bitField0_ & 0x00000100) != 0)
+          if (((bitField0_ & 0x00000200) != 0)
               && generic_ != null
               && generic_
                   != no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic
@@ -10645,13 +10673,13 @@ public final class ProtoWorld {
         } else {
           genericBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return this;
       }
       /** <code>optional .persistence.Entity.Generic generic = 19;</code> */
       public Builder clearGeneric() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         generic_ = null;
         if (genericBuilder_ != null) {
           genericBuilder_.dispose();
@@ -10662,7 +10690,7 @@ public final class ProtoWorld {
       }
       /** <code>optional .persistence.Entity.Generic generic = 19;</code> */
       public no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic.Builder getGenericBuilder() {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return getGenericFieldBuilder().getBuilder();
       }
@@ -10851,35 +10879,36 @@ public final class ProtoWorld {
           + "\013ChunkColumn\022\016\n"
           + "\006chunkX\030\001 \001(\005\022\030\n"
           + "\020top_solid_blocks\030\002 \003(\005\022\036\n"
-          + "\026top_transparent_blocks\030\003 \003(\005\"\264\005\n"
+          + "\026top_transparent_blocks\030\003 \003(\005\"\316\005\n"
           + "\006Entity\022,\n"
           + "\004type\030\001 \001(\0162\036.persistence.Entity.EntityType\022\'\n"
           + "\010position\030\002 \001(\0132\025.persistence.Vector2f\022\'\n"
           + "\010velocity\030\003 \001(\0132\025.persistence.Vector2f\022\014\n"
           + "\004uuid\030\004 \001(\t\022\016\n"
-          + "\006flying\030\005 \001(\010\022/\n"
-          + "\006living\030\020 \001(\0132\032.persistence.Entity.LivingH\000\210\001\001\0223\n"
+          + "\006flying\030\005 \001(\010\022\021\n"
+          + "\004name\030\006 \001(\tH\000\210\001\001\022/\n"
+          + "\006living\030\020 \001(\0132\032.persistence.Entity.LivingH\001\210\001\001\0223\n"
           + "\010material\030\021"
-          + " \001(\0132\034.persistence.Entity.MaterialH\001\210\001\001\022/\n"
-          + "\006player\030\022 \001(\0132\032.persistence.Entity.PlayerH\002\210\001\001\0221\n"
-          + "\007generic\030\023 \001(\0132\033.persistence.Entity.GenericH\003\210\001\001\032:\n"
-          + "\006Living\022\014\n"
-          + "\004name\030\001 \001(\t\022\016\n"
+          + " \001(\0132\034.persistence.Entity.MaterialH\002\210\001\001\022/\n"
+          + "\006player\030\022 \001(\0132\032.persistence.Entity.PlayerH\003\210\001\001\0221\n"
+          + "\007generic\030\023 \001(\0132\033.persistence.Entity.GenericH\004\210\001\001\0328\n"
+          + "\006Living\022\016\n"
           + "\006health\030\002 \001(\005\022\022\n\n"
-          + "max_health\030\003 \001(\005\032$\n"
+          + "max_health\030\003 \001(\005J\004\010\001\020\002R\004name\032$\n"
           + "\010Material\022\030\n"
           + "\020material_ordinal\030\001 \001(\005\0325\n"
           + "\006Player\022\027\n"
           + "\017torch_angle_deg\030\001 \001(\002\022\022\n\n"
           + "controlled\030\002 \001(\010\032.\n"
           + "\007Generic\022#\n"
-          + "\004size\030\001 \001(\0132\025.persistence.Vector2i\"J\n"
-          + "\n"
+          + "\004size\030\001 \001(\0132\025.persistence.Vector2i\"J\n\n"
           + "EntityType\022\022\n"
           + "\016GENERIC_ENTITY\020\000\022\021\n\r"
           + "FALLING_BLOCK\020\001\022\t\n"
-          + "\005BLOCK\020\002\022\n\n"
-          + "\006PLAYER\020\003B\t\n"
+          + "\005BLOCK\020\002\022\n"
+          + "\n"
+          + "\006PLAYER\020\003B\007\n"
+          + "\005_nameB\t\n"
           + "\007_livingB\013\n"
           + "\t_materialB\t\n"
           + "\007_playerB\n\n"
@@ -10958,10 +10987,12 @@ public final class ProtoWorld {
               "Velocity",
               "Uuid",
               "Flying",
+              "Name",
               "Living",
               "Material",
               "Player",
               "Generic",
+              "Name",
               "Living",
               "Material",
               "Player",
@@ -10973,7 +11004,7 @@ public final class ProtoWorld {
         new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
             internal_static_persistence_Entity_Living_descriptor,
             new java.lang.String[] {
-              "Name", "Health", "MaxHealth",
+              "Health", "MaxHealth",
             });
     internal_static_persistence_Entity_Material_descriptor =
         internal_static_persistence_Entity_descriptor.getNestedTypes().get(1);

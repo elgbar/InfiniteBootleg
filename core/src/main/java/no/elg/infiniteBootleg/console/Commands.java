@@ -11,7 +11,6 @@ import com.strongjoshua.console.LogLevel;
 import com.strongjoshua.console.annotation.ConsoleDoc;
 import com.strongjoshua.console.annotation.HiddenCommand;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
@@ -508,7 +507,7 @@ public class Commands extends CommandExecutor {
           for (Body body : bodies) {
             Object userData = body.getUserData();
             if (userData instanceof Entity entity) {
-              String id = IdComponent.Companion.getId(entity).getId();
+              String id = IdComponent.Companion.getIdComponent(entity).getId();
               if (world.containsEntity(id)) {
                 continue;
               }
@@ -522,15 +521,16 @@ public class Commands extends CommandExecutor {
         });
   }
 
-  @ClientsideOnly
-  @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
-  public void spawnPlayer() {
-    var world = getWorld();
-    if (world == null) {
-      return;
-    }
-    world.createNewPlayer(UUID.randomUUID().toString());
-  }
+  //  @ClientsideOnly
+  //  @ConsoleDoc(description = "Spawn a new player at the worlds spawn")
+  //  public void spawnPlayer() {
+  //    var world = getWorld();
+  //    if (world == null) {
+  //      return;
+  //    }
+  //    world.getEngine().createSPPlayerEntity(this, spawn.x.toFloat(), spawn.y.toFloat(), 0f, 0f,
+  // username, playerId);
+  //  }
 
   @ConsoleDoc(description = "Save the world server side")
   public void save() {

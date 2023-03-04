@@ -134,6 +134,30 @@ public object EntityKt {
     }
 
     /**
+     * `optional string name = 6;`
+     */
+    public var name: kotlin.String
+      @JvmName("getName")
+      get() = _builder.getName()
+      @JvmName("setName")
+      set(value) {
+        _builder.setName(value)
+      }
+    /**
+     * `optional string name = 6;`
+     */
+    public fun clearName() {
+      _builder.clearName()
+    }
+    /**
+     * `optional string name = 6;`
+     * @return Whether the name field is set.
+     */
+    public fun hasName(): kotlin.Boolean {
+      return _builder.hasName()
+    }
+
+    /**
      * `optional .persistence.Entity.Living living = 16;`
      */
     public var living: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living
@@ -258,23 +282,6 @@ public object EntityKt {
       @kotlin.jvm.JvmSynthetic
       @kotlin.PublishedApi
       internal fun _build(): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living = _builder.build()
-
-      /**
-       * `string name = 1;`
-       */
-      public var name: kotlin.String
-        @JvmName("getName")
-        get() = _builder.getName()
-        @JvmName("setName")
-        set(value) {
-          _builder.setName(value)
-        }
-      /**
-       * `string name = 1;`
-       */
-      public fun clearName() {
-        _builder.clearName()
-      }
 
       /**
        * `int32 health = 2;`

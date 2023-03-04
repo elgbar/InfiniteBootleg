@@ -1,15 +1,23 @@
 package no.elg.infiniteBootleg.world.loader
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.world.ServerWorld
 import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.createMPServerPlayerEntity
+import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator
 import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator
 import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author Elg
@@ -20,48 +28,47 @@ object WorldLoader {
   const val WORLD_INFO_PATH = "world.dat"
   private const val PLAYERS_PATH = "players"
 
-  fun getServerPlayerFile(world: World, playerId: String): FileHandle? {
+  private fun getServerPlayerFile(world: World, playerId: String): FileHandle? {
     return world.worldFolder?.child(PLAYERS_PATH)?.child(playerId)
   }
 
-//  fun spawnServerPlayer(world: ServerWorld, playerId: String): Entity {
-//    val fileHandle = getServerPlayerFile(world, playerId)
-//    if (fileHandle != null && fileHandle.exists()) {
-//      try {
-//        val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
-//        val player = Player(world, proto)
-//        player.disableGravity()
-//        world.addEntity(player)
-//        if (!player.isDisposed) {
-//          Main.logger().debug("SERVER", "Loading persisted player profile for $playerId")
-//          return player
-//        } else {
-//          Main.logger().error("SERVER", "Invalid player parsed")
-//          // fall through
-//        }
-//      } catch (e: Exception) {
-//        Main.logger().error("SERVER", "Invalid entity protocol", e)
-//        // fall through
-//      }
-//    }
-//    Main.logger().debug("SERVER", "Creating fresh player profile for $playerId")
-//    Invalid / non - existing
-//    var data: player
-//    val player = world.createNewPlayer(playerId)
-//    saveServerPlayer(player)
-//    return player
-//  }
+  fun spawnServerPlayer(world: ServerWorld, uuid: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
+    val fileHandle = getServerPlayerFile(world, uuid)
 
-//  fun saveServerPlayer(player: Entity) {
-//    val fileHandle = getServerPlayerFile(player.world, player.uuid)
-//    if (fileHandle != null) {
-//      try {
-//        fileHandle.writeBytes(player.save().build().toByteArray(), false)
-//      } catch (e: Exception) {
-//        e.printStackTrace()
-//      }
-//    }
-//  }
+    if (fileHandle != null && fileHandle.exists()) {
+      Main.logger().debug("SERVER", "Trying to load persisted player profile for $uuid")
+      try {
+        val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
+        val future = world.engine.createMPServerPlayerEntity(world, proto, sharedInformation)
+        future.thenAccept {
+          Main.logger().debug("SERVER", "Loaded persisted player profile for $uuid")
+        }
+        return future
+      } catch (e: Exception) {
+        Main.logger().warn("SERVER", "Failed to load player profile", e)
+        // fall through
+      }
+    }
+    Main.logger().debug("SERVER", "Creating fresh player profile for $uuid")
+    val spawn = world.spawn
+    val future = world.engine.createMPServerPlayerEntity(world, spawn.x.toFloat(), spawn.y.toFloat(), 0f, 0f, username, uuid, sharedInformation, null)
+    future.thenAccept {
+      saveServerPlayer(it)
+      Main.logger().debug("SERVER", "Created persisted player profile for $uuid")
+    }
+    return future
+  }
+
+  fun saveServerPlayer(player: Entity) {
+    val fileHandle = getServerPlayerFile(player.world.world, player.id)
+    if (fileHandle != null) {
+      try {
+        fileHandle.writeBytes(player.save().toByteArray(), false)
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
+  }
 
   @JvmStatic
   fun getWorldFolder(uuid: String): FileHandle {
