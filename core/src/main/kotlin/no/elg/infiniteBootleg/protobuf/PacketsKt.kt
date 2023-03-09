@@ -3,5 +3,5 @@
 
 // Generated files should ignore deprecation warnings
 @file:Suppress("DEPRECATION")
-package no.elg.infiniteBootleg.protobuf;
 
+package no.elg.infiniteBootleg.protobuf

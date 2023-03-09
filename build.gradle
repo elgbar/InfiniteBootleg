@@ -47,7 +47,7 @@ allprojects {
       endWithNewline()
     }
     java {
-      String path = "src${sep}main${sep}kotlin${sep}no${sep}elg${sep}infiniteBootleg${sep}protobuf${sep}"
+      String path = "src${sep}main${sep}java${sep}no${sep}elg${sep}infiniteBootleg${sep}protobuf${sep}"
 
       ignoreErrorForPath("${path}Packets.java")
       ignoreErrorForPath("${path}ProtoWorld.java")
