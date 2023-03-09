@@ -644,7 +644,7 @@ public class ChunkImpl implements Chunk {
    */
   @Override
   public boolean shouldSave() {
-    return modified;
+    return modified && isValid();
   }
 
   //  @Override

@@ -15,3 +15,4 @@ fun Vector2f.toLocation(): Location = Location(
 )
 
 fun Vector2i.toLocation(): Location = Location(x, y)
+fun Vector2i.compact(): Long = CoordUtil.compactLoc(x, y)

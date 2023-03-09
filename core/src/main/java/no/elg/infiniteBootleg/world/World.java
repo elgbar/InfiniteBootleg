@@ -2,10 +2,6 @@ package no.elg.infiniteBootleg.world;
 
 import static java.lang.Math.abs;
 import static no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_REASON;
-import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
-import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
-import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
-import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOGNIZED;
 import static no.elg.infiniteBootleg.world.GlobalLockKt.BOX2D_LOCK;
 import static no.elg.infiniteBootleg.world.ecs.AshleyKt.disposeEntitiesOnRemoval;
 import static no.elg.infiniteBootleg.world.ecs.AshleyKt.ensureUniquenessListener;
@@ -50,7 +46,11 @@ import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.util.Util;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
+import no.elg.infiniteBootleg.world.chunk.loader.ChunkLoader;
+import no.elg.infiniteBootleg.world.chunk.loader.FullChunkLoader;
+import no.elg.infiniteBootleg.world.chunk.loader.ServerClientChunkLoader;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
+import no.elg.infiniteBootleg.world.ecs.EntityPersistenceKt;
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent;
@@ -62,10 +62,6 @@ import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem;
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
-import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
-import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator;
-import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
-import no.elg.infiniteBootleg.world.loader.ChunkLoader;
 import no.elg.infiniteBootleg.world.loader.WorldLoader;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.ticker.WorldTicker;
@@ -135,7 +131,11 @@ public abstract class World implements Disposable, Resizable {
 
     worldTicker = new WorldTicker(this, false);
 
-    chunkLoader = new ChunkLoader(this, generator);
+    if (this instanceof ServerClientWorld scw) {
+      chunkLoader = new ServerClientChunkLoader(scw, generator);
+    } else {
+      chunkLoader = new FullChunkLoader(this, generator);
+    }
     worldTime = new WorldTime(this);
     spawn = new Location(0, 0);
     engine = initializeEngine();
@@ -276,8 +276,10 @@ public abstract class World implements Disposable, Resizable {
 
     chunksLock.writeLock().lock();
     try {
-      for (Chunk chunk : chunks.values()) {
-        chunkLoader.save(chunk);
+      if (chunkLoader instanceof FullChunkLoader fcl) {
+        for (Chunk chunk : chunks.values()) {
+          fcl.save(chunk);
+        }
       }
 
       //      for (Player player : players.values()) {
@@ -304,19 +306,19 @@ public abstract class World implements Disposable, Resizable {
     builder.setTime(worldTime.getTime());
     builder.setTimeScale(worldTime.getTimeScale());
     builder.setSpawn(spawn.toVector2i());
-    builder.setGenerator(getGeneratorType());
+    builder.setGenerator(ChunkGenerator.getGeneratorType(chunkLoader.getGenerator()));
     synchronized (chunkColumns) {
       for (ChunkColumn chunkColumn : chunkColumns.values()) {
         builder.addChunkColumns(chunkColumn.toProtobuf());
       }
     }
 
-    //    if (Main.isSingleplayer()) {
-    //      Player player = ClientMain.inst().getPlayer();
-    //      if (player != null) {
-    //        builder.setPlayer(player.save());
-    //      }
-    //    }
+    if (Main.isSingleplayer()) {
+      ImmutableArray<Entity> entities = getEngine().getEntitiesFor(AshleyKt.getPlayerFamily());
+      if (entities != null && entities.size() > 0) {
+        builder.setPlayer(EntityPersistenceKt.save(entities.first(), true));
+      }
+    }
     return builder.build();
   }
 
@@ -332,19 +334,6 @@ public abstract class World implements Disposable, Resizable {
       worldFile = WorldLoader.getWorldFolder(uuid);
     }
     return worldFile;
-  }
-
-  private ProtoWorld.World.Generator getGeneratorType() {
-    ChunkGenerator generator = chunkLoader.getGenerator();
-    if (generator instanceof PerlinChunkGenerator) {
-      return PERLIN;
-    } else if (generator instanceof FlatChunkGenerator) {
-      return FLAT;
-    } else if (generator instanceof EmptyChunkGenerator) {
-      return EMPTY;
-    } else {
-      return UNRECOGNIZED;
-    }
   }
 
   @NotNull
@@ -501,7 +490,7 @@ public abstract class World implements Disposable, Resizable {
 
       //      Main.logger().log("Loading world chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc)
       // + "\n" + DebugUtilsKt.stacktrace());
-      Chunk loadedChunk = chunkLoader.load(chunkLoc);
+      Chunk loadedChunk = chunkLoader.fetchChunk(chunkLoc);
       if (loadedChunk == null) {
         // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
         // date, and the loading should be re-tried
@@ -1017,13 +1006,13 @@ public abstract class World implements Disposable, Resizable {
       Chunk removedChunk;
       chunksLock.writeLock().lock();
       try {
-        if (save) {
-          chunkLoader.save(chunk);
+        if (save && chunkLoader instanceof FullChunkLoader fcl) {
+          fcl.save(chunk);
         }
 
-        //        for (Entity entity : chunk.getEntities()) {
-        //          removeEntity(entity, CHUNK_UNLOADED);
-        //        }
+        //                for (Entity entity : chunk.getEntities()) {
+        //                  removeEntity(entity, CHUNK_UNLOADED);
+        //                }
         removedChunk = chunks.remove(chunk.getCompactLocation());
       } finally {
         chunksLock.writeLock().unlock();
@@ -1343,26 +1332,6 @@ public abstract class World implements Disposable, Resizable {
   public Ticker getBox2DTicker() {
     return worldTicker.box2DTicker.getTicker();
   }
-
-  //  /**
-  //   * @return the current entities
-  //   */
-  //  public @NotNull Collection<Entity> getEntities() {
-  //    return new HashSet<>(entities.values());
-  //  }
-  //
-  //  public @NotNull Collection<Player> getPlayers() {
-  //    return new HashSet<>(players.values());
-  //  }
-  //
-  //  public boolean hasPlayer(@NotNull UUID uuid) {
-  //    return players.containsKey(uuid);
-  //  }
-  //
-  //  @Nullable
-  //  public Player getPlayer(@Nullable UUID uuid) {
-  //    return players.get(uuid);
-  //  }
 
   public @NotNull ChunkLoader getChunkLoader() {
     return chunkLoader;

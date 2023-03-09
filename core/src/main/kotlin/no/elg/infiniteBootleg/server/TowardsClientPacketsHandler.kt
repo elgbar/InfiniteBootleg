@@ -202,7 +202,7 @@ private fun ServerClient.handleUpdateChunk(updateChunk: UpdateChunk) {
     ctx.fatal("Tried to update chunk before world was sent")
     return
   }
-  val chunk = world.chunkLoader.clientLoad(updateChunk.chunk)
+  val chunk = world.chunkLoader.loadChunkFromProto(updateChunk.chunk)
   if (chunk == null) {
     Main.logger().warn(TAG, "Failed to load the chunk from proto")
     return

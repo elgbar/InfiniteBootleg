@@ -101,10 +101,7 @@ object WorldLoader {
       val lockPID = try {
         lockInfo.toLong()
       } catch (e: NumberFormatException) {
-        Main.logger()
-          .warn(
-            "World lock file for $uuid did not contain a valid pid, read: $lockInfo"
-          )
+        Main.logger().warn("World lock file for $uuid did not contain a valid pid, read: $lockInfo")
         worldLockFile.delete()
         // Invalid pid, allow writing
         return true
@@ -115,12 +112,7 @@ object WorldLoader {
       }
       if (ProcessHandle.of(lockPID).isEmpty) {
         // If there is no process with the read pid, it was probably left from an old instance
-        Main.logger()
-          .warn(
-            "World lock file for " +
-              uuid +
-              " still existed for a non-existing process, an old lock file found"
-          )
+        Main.logger().warn("World lock file for $uuid still existed for a non-existing process, an old lock file found")
         worldLockFile.delete()
         return true
       }
@@ -135,7 +127,7 @@ object WorldLoader {
         return false
       }
       val worldLockFile = getWorldLockFile(uuid)
-      worldLockFile.writeString(ProcessHandle.current().pid().toString() + "", false)
+      worldLockFile.writeString(ProcessHandle.current().pid().toString(), false)
       return true
     }
   }
@@ -154,7 +146,7 @@ object WorldLoader {
   @JvmStatic
   fun generatorFromProto(protoWorld: ProtoWorld.World): ChunkGenerator {
     return when (protoWorld.generator) {
-      ProtoWorld.World.Generator.PERLIN, ProtoWorld.World.Generator.UNRECOGNIZED -> PerlinChunkGenerator(protoWorld.seed)
+      ProtoWorld.World.Generator.PERLIN, ProtoWorld.World.Generator.UNRECOGNIZED, null -> PerlinChunkGenerator(protoWorld.seed)
       ProtoWorld.World.Generator.FLAT -> FlatChunkGenerator()
       ProtoWorld.World.Generator.EMPTY -> EmptyChunkGenerator()
     }

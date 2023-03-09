@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.math.Vector2
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
@@ -222,13 +223,23 @@ object CoordUtil {
   }
 
   @JvmStatic
+  fun stringifyCompactLoc(x: Int, y: Int): String {
+    return "($x,$y)"
+  }
+
+  @JvmStatic
   fun stringifyCompactLoc(compactLoc: Long): String {
-    return "(" + decompactLocX(compactLoc) + "," + decompactLocY(compactLoc) + ")"
+    return stringifyCompactLoc(decompactLocX(compactLoc), decompactLocY(compactLoc))
   }
 
   @JvmStatic
   fun stringifyCompactLoc(chunk: Chunk): String {
     return stringifyCompactLoc(chunk.compactLocation)
+  }
+
+  @JvmStatic
+  fun stringifyCompactLoc(vector: Vector2i): String {
+    return stringifyCompactLoc(vector.x, vector.y)
   }
 
   @JvmStatic

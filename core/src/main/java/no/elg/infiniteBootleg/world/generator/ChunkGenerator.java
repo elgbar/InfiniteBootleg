@@ -1,5 +1,11 @@
 package no.elg.infiniteBootleg.world.generator;
 
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.EMPTY;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.FLAT;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.PERLIN;
+import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOGNIZED;
+
+import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
@@ -33,4 +39,16 @@ public interface ChunkGenerator {
    */
   @NotNull
   Chunk generate(@NotNull World world, int chunkX, int chunkY);
+
+  static ProtoWorld.World.Generator getGeneratorType(ChunkGenerator generator) {
+    if (generator instanceof PerlinChunkGenerator) {
+      return PERLIN;
+    } else if (generator instanceof FlatChunkGenerator) {
+      return FLAT;
+    } else if (generator instanceof EmptyChunkGenerator) {
+      return EMPTY;
+    } else {
+      return UNRECOGNIZED;
+    }
+  }
 }
