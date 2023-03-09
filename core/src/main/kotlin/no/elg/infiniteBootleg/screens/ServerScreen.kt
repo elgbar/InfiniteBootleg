@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.server.ClientChannel
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
-import no.elg.infiniteBootleg.util.generateUUIDFromName
+import no.elg.infiniteBootleg.util.generateUUIDFromString
 
 /**
  * @author Elg
@@ -62,7 +62,7 @@ object ServerScreen : StageScreen() {
             val username = nameField.text
             val serverClient = ServerClient(username)
             val clientChannel = ClientChannel(serverClient)
-            val uuid = generateUUIDFromName(username)
+            val uuid = generateUUIDFromString(username)
             val runnable = Runnable {
               val channel = clientChannel.channel
               ConnectingScreen.channel = channel

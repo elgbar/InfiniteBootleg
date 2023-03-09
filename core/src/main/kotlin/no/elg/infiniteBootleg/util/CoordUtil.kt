@@ -6,12 +6,19 @@ import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import org.jetbrains.annotations.Contract
 
+fun Int.worldToChunk(): Int = CoordUtil.worldToChunk(this)
+fun Float.worldToChunk(): Int = CoordUtil.worldToChunk(this)
+fun Int.chunkToWorld(): Int = CoordUtil.chunkToWorld(this)
+fun Float.chunkToWorld(): Int = CoordUtil.chunkToWorld(this)
+fun Int.chunkOffset(): Int = CoordUtil.chunkOffset(this)
+
 /**
  * Translate between world(block) and chunk coordinates
  *
  * @author Elg
  */
 object CoordUtil {
+
   /**
    * @param worldLocation A location in world view
    * @return The location in chunk view

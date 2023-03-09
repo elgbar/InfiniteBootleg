@@ -37,7 +37,7 @@ import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import java.security.SecureRandom
@@ -210,8 +210,8 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
 
   Main.inst().scheduler.executeAsync {
     // Send chunk packets to client
-    val ix = CoordUtil.worldToChunk(player.position.blockX)
-    val iy = CoordUtil.worldToChunk(player.position.blockY)
+    val ix = CoordUtil.worldToChunk(player.positionComponent.blockX)
+    val iy = CoordUtil.worldToChunk(player.positionComponent.blockY)
     for (cx in -Settings.viewDistance..Settings.viewDistance) {
       for (cy in -Settings.viewDistance..Settings.viewDistance) {
         val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
@@ -299,7 +299,7 @@ private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: Entit
     return
   }
   val entity = world.getEntity(uuid)
-  if (entity != null && isLocInView(ctx, entity.position.x.toInt(), entity.position.y.toInt())) {
+  if (entity != null && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))
   } else {
     ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))

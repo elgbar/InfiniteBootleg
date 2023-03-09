@@ -26,6 +26,7 @@ object EventManager {
    * This is to automatically un-register listeners which no longer can react to events.
    */
   inline fun <reified T : Event> registerListener(listener: EventListener<T>): EventListener<T> {
+    @Suppress("DEPRECATION")
     return javaRegisterListener(T::class.java, listener)
   }
 
@@ -44,6 +45,7 @@ object EventManager {
    * @param event The event to notify about
    */
   inline fun <reified T : Event> dispatchEvent(event: T) {
+    @Suppress("DEPRECATION")
     javaDispatchEvent(event)
   }
 
@@ -89,7 +91,7 @@ object EventManager {
 
       listener.handle(it)
 
-      // Remove from another thread to not cause
+      // Remove from another thread to not cause concurrent modification
       Main.inst().scheduler.executeAsync {
         val storedThis = oneShotStrongRefs.remove(listener) ?: throw IllegalStateException("Failed to find a strong referance to the oneshot listener")
         javaRemoveListener(eventClass, storedThis as EventListener<T>) // Kotlin is stuped OFC(!!) this wokrs
@@ -105,7 +107,7 @@ object EventManager {
    *
    * @param event The event to notify about
    */
-//  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("dispatchEvent(event)"))
+  @Deprecated("Only to be used by java code", replaceWith = ReplaceWith("dispatchEvent(event)"))
   fun <T : Event> javaDispatchEvent(event: T) {
     val backingListeners: MutableSet<EventListener<out Event>>
     val correctListeners: List<EventListener<T>>

@@ -54,11 +54,11 @@ import no.elg.infiniteBootleg.world.ecs.AshleyKt;
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent;
-import no.elg.infiniteBootleg.world.ecs.system.ControlSystem;
-import no.elg.infiniteBootleg.world.ecs.system.FollowEntitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem;
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem;
+import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem;
+import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem;
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem;
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem;
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator;
@@ -129,7 +129,7 @@ public abstract class World implements Disposable, Resizable {
   public World(@NotNull ChunkGenerator generator, long seed, @NotNull String worldName) {
     this.seed = seed;
     MathUtils.random.setSeed(seed);
-    uuid = String.valueOf(ExtraKt.generateUUIDFromName("" + seed));
+    uuid = String.valueOf(ExtraKt.generateUUIDFromLong(seed));
 
     name = worldName;
 
@@ -140,9 +140,38 @@ public abstract class World implements Disposable, Resizable {
     spawn = new Location(0, 0);
     engine = initializeEngine();
     worldBody = new WorldBody(this);
+
+    EventManager.INSTANCE.javaOneShotListener(
+        InitialChunksOfWorldLoadedEvent.class,
+        event -> {
+          Main.logger()
+              .debug(
+                  "World",
+                  "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!");
+          if (worldTicker.isStarted()) {
+            throw new IllegalStateException("World has already been started");
+          }
+          worldTicker.start();
+
+          if (this instanceof SinglePlayerWorld spWorld) {
+            if (getEngine().getEntitiesFor(AshleyKt.getPlayerFamily()).size() == 0) {
+              Main.logger().debug("World", "Spawning new singleplayer player");
+              createSPPlayerEntity(
+                  getEngine(), spWorld, spawn.getX(), spawn.getY(), 0f, 0f, "Player", null);
+            } else {
+              Main.logger()
+                  .debug(
+                      "World",
+                      "Will not spawn a new player in as the world contains a singleplayer entity");
+            }
+          }
+          Main.logger().debug("World", "World ticker started, sending WorldLoadedEvent");
+          EventManager.INSTANCE.javaDispatchEvent(new WorldLoadedEvent(this));
+        });
   }
 
-  private Engine initializeEngine() {
+  @NotNull
+  protected Engine initializeEngine() {
     var engine = new PooledEngine();
     engine.addSystem(MaxVelocitySystem.INSTANCE);
     engine.addSystem(ReadBox2DStateSystem.INSTANCE);
@@ -203,23 +232,6 @@ public abstract class World implements Disposable, Resizable {
       }
     }
     getRender().update();
-
-    EventManager.INSTANCE.javaOneShotListener(
-        InitialChunksOfWorldLoadedEvent.class,
-        event -> {
-          if (worldTicker.isStarted()) {
-            throw new IllegalStateException("World has already been started");
-          }
-          worldTicker.start();
-
-          if (this instanceof SinglePlayerWorld spWorld
-              && getEngine().getEntitiesFor(AshleyKt.getPlayerFamily()).size() == 0) {
-            createSPPlayerEntity(
-                getEngine(), spWorld, spawn.getX(), spawn.getY(), 0f, 0f, "Player", null);
-          }
-          EventManager.INSTANCE.javaDispatchEvent(new WorldLoadedEvent(this));
-        });
-
     Main.inst()
         .getScheduler()
         .executeAsync(
@@ -1057,87 +1069,6 @@ public abstract class World implements Disposable, Resizable {
       }
     }
     return null;
-  }
-
-  /**
-   * Add the given entity to entities in the world. <b>NOTE</b> this is NOT automatically done when
-   * creating a new entity instance.
-   *
-   * @param entity The entity to add
-   */
-  public void addEntity(@NotNull Entity entity) {
-    addEntity(entity, true);
-  }
-
-  /**
-   * Add the given entity to entities in the world. <b>NOTE</b> this is NOT automatically done when
-   * creating a new entity instance.
-   *
-   * @param entity The entity to add
-   * @param loadChunk Whether to load the chunk the entity will exist in
-   */
-  public void addEntity(@NotNull Entity entity, boolean loadChunk) {
-    Main.inst().getScheduler().executeAsync(() -> syncAddEntity(entity, loadChunk));
-  }
-
-  /**
-   * Add the given entity to entities in the world. <b>NOTE</b> this is NOT automatically done when
-   * creating a new entity instance.
-   *
-   * @param entity The entity to add
-   * @param loadChunk Whether to load the chunk the entity will exist in
-   */
-  protected void syncAddEntity(@NotNull Entity entity, boolean loadChunk) {
-    //    if (engine.addEntity();)
-    //    if (entities.containsValue(entity)) {
-    //      Main.logger()
-    //        .error(
-    //          "World",
-    //          "Tried to add entity twice to world "
-    //            + entity.simpleName()
-    //            + " "
-    //            + entity.hudDebug());
-    //      return;
-    //    }
-    //    if (containsEntity(entity.getUuid())) {
-    //      Main.logger()
-    //        .error(
-    //          "World",
-    //          "Tried to add duplicate entity to world "
-    //            + entity.simpleName()
-    //            + " "
-    //            + entity.hudDebug());
-    //      removeEntity(entity);
-    //      return;
-    //    }
-
-    //    getEngine().getEntitiesFor(AshleyKt.getBasicEntityFamily())
-
-    //    if (IdComponent.Companion.getMapper().has(entity))
-    //
-    //      if (loadChunk) {
-    //        // Load chunk of entity
-    //        var chunk =
-    //          getChunk(
-    //            CoordUtil.worldToChunk(entity.getBlockX()),
-    //            CoordUtil.worldToChunk(entity.getBlockY()),
-    //            true);
-    //        if (chunk == null) {
-    //          // Failed to load chunk, remove entity
-    //          Main.logger()
-    //            .error(
-    //              "World",
-    //              "Failed to add entity to world, as its spawning chunk could not be loaded");
-    //          removeEntity(entity);
-    //          return;
-    //        }
-    //      }
-
-    //    entities.put(entity.getUuid(), entity);
-    //    if (entity instanceof Player player) {
-    //      players.put(player.getUuid(), player);
-    //      saveServerPlayer(player);
-    //    }
   }
 
   /**

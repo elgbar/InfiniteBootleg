@@ -5,7 +5,7 @@ import static com.badlogic.gdx.Input.Keys.F3;
 import static com.badlogic.gdx.Input.Keys.F5;
 import static com.badlogic.gdx.Input.Keys.F9;
 import static com.badlogic.gdx.Input.Keys.SHIFT_LEFT;
-import static no.elg.infiniteBootleg.world.ecs.system.FollowEntitySystem.SCROLL_SPEED;
+import static no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem.SCROLL_SPEED;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;

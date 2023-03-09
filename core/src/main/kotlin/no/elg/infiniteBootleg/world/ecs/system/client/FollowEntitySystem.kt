@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs.system
+package no.elg.infiniteBootleg.world.ecs.system.client
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
@@ -7,10 +7,11 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.followEntityFamily
+import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import kotlin.math.abs
 
@@ -33,7 +34,7 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
     val worldRender = entity.world.world.render
     if (worldRender is ClientWorldRender) {
       val camera: OrthographicCamera = worldRender.camera
-      val position = entity.position
+      val position = entity.positionComponent
       val x = position.x * Block.BLOCK_SIZE
       val y = position.y * Block.BLOCK_SIZE
       val diffX = x - camera.position.x

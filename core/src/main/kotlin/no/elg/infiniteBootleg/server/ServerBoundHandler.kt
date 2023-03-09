@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
-    //        Main.logger().log("Server bound packet " + packet.getType());
+    Main.logger().log("Server bound packet ${packet.type}")
     packetsReceived++
     if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
       ctx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")

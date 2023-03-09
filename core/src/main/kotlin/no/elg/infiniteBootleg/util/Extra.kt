@@ -17,8 +17,12 @@ fun fromUUIDOrNull(string: String?): UUID? {
 private val namespace = UUID.fromString("1aeeb167-a72e-45d3-8b75-8a144e56ca54")
 private val uuidv5Generator = Generators.nameBasedGenerator(namespace)
 
-fun generateUUIDFromName(string: String): UUID {
+fun generateUUIDFromString(string: String): UUID {
   return uuidv5Generator.generate(string)
+}
+
+fun generateUUIDFromLong(long: Long): UUID {
+  return uuidv5Generator.generate(long.toString())
 }
 
 fun StringBuilder.fastIntFormat(int: Int, d: Byte): StringBuilder {

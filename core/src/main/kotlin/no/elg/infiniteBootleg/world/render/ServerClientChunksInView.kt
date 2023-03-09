@@ -1,12 +1,8 @@
 package no.elg.infiniteBootleg.world.render
 
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.world.Location
 
-class ServerClientChunksInView(initialChunk: Location) : ChunksInView {
-
-  var centerX = initialChunk.x
-  var centerY = initialChunk.y
+class ServerClientChunksInView(private var centerX: Int, private var centerY: Int) : ChunksInView {
 
   override var horizontalStart: Int
     get() = centerX - Settings.viewDistance

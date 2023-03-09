@@ -234,32 +234,6 @@ public object EntityKt {
     }
     public val EntityKt.Dsl.playerOrNull: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player?
       get() = _builder.playerOrNull
-
-    /**
-     * `optional .persistence.Entity.Generic generic = 19;`
-     */
-    public var generic: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic
-      @JvmName("getGeneric")
-      get() = _builder.getGeneric()
-      @JvmName("setGeneric")
-      set(value) {
-        _builder.setGeneric(value)
-      }
-    /**
-     * `optional .persistence.Entity.Generic generic = 19;`
-     */
-    public fun clearGeneric() {
-      _builder.clearGeneric()
-    }
-    /**
-     * `optional .persistence.Entity.Generic generic = 19;`
-     * @return Whether the generic field is set.
-     */
-    public fun hasGeneric(): kotlin.Boolean {
-      return _builder.hasGeneric()
-    }
-    public val EntityKt.Dsl.genericOrNull: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic?
-      get() = _builder.genericOrNull
   }
   @kotlin.jvm.JvmName("-initializeliving")
   public inline fun living(block: no.elg.infiniteBootleg.protobuf.EntityKt.LivingKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living =
@@ -284,7 +258,7 @@ public object EntityKt {
       internal fun _build(): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living = _builder.build()
 
       /**
-       * `int32 health = 2;`
+       * `int32 health = 1;`
        */
       public var health: kotlin.Int
         @JvmName("getHealth")
@@ -294,14 +268,14 @@ public object EntityKt {
           _builder.setHealth(value)
         }
       /**
-       * `int32 health = 2;`
+       * `int32 health = 1;`
        */
       public fun clearHealth() {
         _builder.clearHealth()
       }
 
       /**
-       * `int32 max_health = 3;`
+       * `int32 max_health = 2;`
        */
       public var maxHealth: kotlin.Int
         @JvmName("getMaxHealth")
@@ -311,7 +285,7 @@ public object EntityKt {
           _builder.setMaxHealth(value)
         }
       /**
-       * `int32 max_health = 3;`
+       * `int32 max_health = 2;`
        */
       public fun clearMaxHealth() {
         _builder.clearMaxHealth()
@@ -423,65 +397,6 @@ public object EntityKt {
       }
     }
   }
-  @kotlin.jvm.JvmName("-initializegeneric")
-  public inline fun generic(block: no.elg.infiniteBootleg.protobuf.EntityKt.GenericKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic =
-    no.elg.infiniteBootleg.protobuf.EntityKt.GenericKt.Dsl._create(no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic.newBuilder()).apply { block() }._build()
-  /**
-   * Protobuf type `persistence.Entity.Generic`
-   */
-  public object GenericKt {
-    @kotlin.OptIn(com.google.protobuf.kotlin.OnlyForUseByGeneratedProtoCode::class)
-    @com.google.protobuf.kotlin.ProtoDslMarker
-    public class Dsl private constructor(
-      private val _builder: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic.Builder
-    ) {
-      public companion object {
-        @kotlin.jvm.JvmSynthetic
-        @kotlin.PublishedApi
-        internal fun _create(builder: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic.Builder): Dsl = Dsl(builder)
-      }
-
-      @kotlin.jvm.JvmSynthetic
-      @kotlin.PublishedApi
-      internal fun _build(): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic = _builder.build()
-
-      /**
-       * ```
-       *x = width, y = height
-       * ```
-       *
-       * `.persistence.Vector2i size = 1;`
-       */
-      public var size: no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
-        @JvmName("getSize")
-        get() = _builder.getSize()
-        @JvmName("setSize")
-        set(value) {
-          _builder.setSize(value)
-        }
-      /**
-       * ```
-       *x = width, y = height
-       * ```
-       *
-       * `.persistence.Vector2i size = 1;`
-       */
-      public fun clearSize() {
-        _builder.clearSize()
-      }
-      /**
-       * ```
-       *x = width, y = height
-       * ```
-       *
-       * `.persistence.Vector2i size = 1;`
-       * @return Whether the size field is set.
-       */
-      public fun hasSize(): kotlin.Boolean {
-        return _builder.hasSize()
-      }
-    }
-  }
 }
 @kotlin.jvm.JvmSynthetic
 @com.google.errorprone.annotations.CheckReturnValue
@@ -503,14 +418,6 @@ public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Material.cop
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player.copy(block: no.elg.infiniteBootleg.protobuf.EntityKt.PlayerKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player =
   no.elg.infiniteBootleg.protobuf.EntityKt.PlayerKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
-@kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
-public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic.copy(block: no.elg.infiniteBootleg.protobuf.EntityKt.GenericKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic =
-  no.elg.infiniteBootleg.protobuf.EntityKt.GenericKt.Dsl._create(this.toBuilder()).apply { block() }._build()
-
-public val no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.GenericOrBuilder.sizeOrNull: no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i?
-  get() = if (hasSize()) getSize() else null
-
 public val no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder.positionOrNull: no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f?
   get() = if (hasPosition()) getPosition() else null
 
@@ -525,7 +432,4 @@ public val no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder.materialOr
 
 public val no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder.playerOrNull: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player?
   get() = if (hasPlayer()) getPlayer() else null
-
-public val no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityOrBuilder.genericOrNull: no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Generic?
-  get() = if (hasGeneric()) getGeneric() else null
 

@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_X_VEL
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_Y_VEL
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
+import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 
 data class VelocityComponent(
   var dx: Float,
@@ -30,5 +31,13 @@ data class VelocityComponent(
   companion object : Mapper<VelocityComponent>() {
     var Entity.velocity by propertyFor(mapper)
     var Entity.velocityOrNull by optionalPropertyFor(mapper)
+
+    fun Entity.setVelocity(dx: Float, dy: Float) {
+      velocityOrNull?.also {
+        it.dx = dx
+        it.dy = dy
+        this.updateBox2DVelocity = true
+      }
+    }
   }
 }

@@ -325,6 +325,19 @@ fun Engine.createSPPlayerEntity(
   return completableFuture
 }
 
+fun Engine.createFallingBlockEntity(world: World, fallingBlock: ProtoWorld.Entity) {
+  val material = Material.fromOrdinal(fallingBlock.material.materialOrdinal)
+  createFallingBlockEntity(
+    world,
+    fallingBlock.position.x,
+    fallingBlock.position.y,
+    fallingBlock.velocity.x,
+    fallingBlock.velocity.y,
+    material,
+    fallingBlock.uuid
+  )
+}
+
 fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, dx: Float, dy: Float, material: Material, id: String? = null) = entity {
   with(WorldComponent(world))
   with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())

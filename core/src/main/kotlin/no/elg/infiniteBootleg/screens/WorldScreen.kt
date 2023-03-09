@@ -4,8 +4,6 @@ import com.badlogic.gdx.ScreenAdapter
 import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.events.WorldLoadedEvent
-import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.world.ClientWorld
 
@@ -17,15 +15,15 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   var hud: HUDRenderer = HUDRenderer()
     private set
 
-  private var worldFinishedLoading = false
+//  private var worldFinishedLoading = false
 
   override fun render(delta: Float) {
-    if (worldFinishedLoading) {
-      //noinspection ConstantConditions
-      world.render.render()
-      hud.render()
-      Main.inst().console.draw()
-    }
+//    if (worldFinishedLoading) {
+    //noinspection ConstantConditions
+    world.render.render()
+    hud.render()
+    Main.inst().console.draw()
+//    }
   }
 
   override fun resize(width: Int, height: Int) {
@@ -34,15 +32,15 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : ScreenAdap
   }
 
   override fun show() {
-    require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
-    EventManager.clear()
+//    require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
+//    EventManager.clear()
 
-    EventManager.oneShotListener { event: WorldLoadedEvent ->
-      if (event.world === world) {
-        worldFinishedLoading = true
-        Main.logger().log("Finished loading world ${world.name} (${world.uuid})")
-      }
-    }
+//    EventManager.oneShotListener { event: WorldLoadedEvent ->
+//      if (event.world === world) {
+//        worldFinishedLoading = true
+//        Main.logger().log("Finished loading world ${world.name} (${world.uuid})")
+//      }
+//    }
 
     ClientMain.inst().updateStatus(world)
     if (load) {

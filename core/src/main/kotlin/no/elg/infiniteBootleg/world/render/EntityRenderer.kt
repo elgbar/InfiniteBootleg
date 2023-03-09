@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.blocks.TntBlock.Companion.whiteTexture
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegion
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import kotlin.math.roundToInt
 
@@ -27,7 +27,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val worldOffsetY = worldBody.worldOffsetY
     for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
       val textureRegion = entity.textureRegion.texture
-      val centerPos = entity.position
+      val centerPos = entity.positionComponent
       val box2d = entity.box2d
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight

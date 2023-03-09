@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.SharedInformationComponent.Companion.sharedInformationOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 
 fun Entity.save(forceControlled: Boolean = false): ProtoWorld.Entity {
@@ -28,7 +28,7 @@ fun Entity.save(forceControlled: Boolean = false): ProtoWorld.Entity {
     }
 
     position = vector2f {
-      val position = this@save.position
+      val position = this@save.positionComponent
       x = position.x
       y = position.y
     }

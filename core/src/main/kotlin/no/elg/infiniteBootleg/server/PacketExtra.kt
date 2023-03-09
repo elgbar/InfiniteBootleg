@@ -49,7 +49,7 @@ import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.save
 import java.time.Instant
@@ -180,7 +180,7 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   return serverBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
       .setUuid(entity.id) //
-      .setPosition(entity.position.toVector2f()) //
+      .setPosition(entity.positionComponent.toProtoVector2f()) //
       .setVelocity(entity.velocity.toVector2f()) //
 //      .setLookAngleDeg(entity.lookDeg)
   ).build()
@@ -219,7 +219,7 @@ fun clientBoundMoveEntity(entity: Entity): Packet {
   return clientBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
       .setUuid(entity.id) //
-      .setPosition(entity.position.toVector2f()) //
+      .setPosition(entity.positionComponent.toProtoVector2f()) //
       .setVelocity(entity.velocity.toVector2f()) //
 //      .setLookAngleDeg(entity.lookDeg)
   ).build()

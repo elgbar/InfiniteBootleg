@@ -73,7 +73,7 @@ public class ClientWorldRender implements WorldRender {
   @Override
   public void render() {
     batch.setProjectionMatrix(camera.combined);
-    chunkRenderer.render(20);
+    chunkRenderer.renderMultiple();
 
     draw.clear();
     draw.ensureCapacity(chunksInView.getSize());

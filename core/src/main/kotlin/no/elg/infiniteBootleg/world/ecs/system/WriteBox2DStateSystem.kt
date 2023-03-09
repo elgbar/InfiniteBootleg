@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 
@@ -39,8 +39,8 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
 
       entity.groundedOrNull?.clearContacts()
 
-      tmp.x = entity.position.x
-      tmp.y = entity.position.y
+      tmp.x = entity.positionComponent.x
+      tmp.y = entity.positionComponent.y
       body.setTransform(tmp, 0f)
       body.isAwake = true
     }

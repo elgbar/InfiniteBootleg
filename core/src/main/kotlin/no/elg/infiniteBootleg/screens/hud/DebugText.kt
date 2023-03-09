@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION
@@ -138,7 +138,7 @@ object DebugText {
     }
     val player = players.first()
     val velocity = player.velocity
-    val position = player.position
+    val position = player.positionComponent
 //    val physicsPosition = player.physicsPosition
     val grounded = player.groundedOrNull
     val onGround = grounded?.onGround ?: false

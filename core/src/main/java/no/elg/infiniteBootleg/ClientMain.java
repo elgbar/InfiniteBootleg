@@ -186,6 +186,13 @@ public class ClientMain extends CommonMain {
   public void updateStatus(@Nullable ClientWorld world) {
     singleplayer = world instanceof SinglePlayerWorld;
     multiplayer = world instanceof ServerClientWorld;
+    Main.logger()
+        .debug(
+            "STATUS",
+            "World status updated: Multiplayer? "
+                + multiplayer
+                + ", Singleplayer? "
+                + singleplayer);
   }
 
   @NotNull

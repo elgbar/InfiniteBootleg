@@ -47,10 +47,5 @@ interface WorldRender : Updatable, Renderer, Disposable, Resizable {
 
     /** How much must the player zoom to trigger a skylight reset  */
     const val SKYLIGHT_ZOOM_THRESHOLD = 0.25f
-
-    /**
-     * How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks
-     */
-    const val FPS_FAST_CHUNK_RENDER_THRESHOLD = 10
   }
 }

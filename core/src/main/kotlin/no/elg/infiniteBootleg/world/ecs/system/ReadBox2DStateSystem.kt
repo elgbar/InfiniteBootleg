@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import kotlin.math.abs
@@ -27,8 +27,8 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
 
   private fun readPosition(entity: Entity, body: Body) {
     if (!entity.updateBox2DPosition) {
-      entity.position.x = body.position.x
-      entity.position.y = body.position.y
+      entity.positionComponent.x = body.position.x
+      entity.positionComponent.y = body.position.y
     }
   }
 

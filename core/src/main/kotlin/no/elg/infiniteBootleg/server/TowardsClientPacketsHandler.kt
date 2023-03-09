@@ -2,6 +2,10 @@ package no.elg.infiniteBootleg.server
 
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
+import no.elg.infiniteBootleg.events.WorldLoadedEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.api.EventManager.javaOneShotListener
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
@@ -25,6 +29,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.StartGame
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.FALLING_BLOCK
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
@@ -32,9 +37,14 @@ import no.elg.infiniteBootleg.server.ClientBoundHandler.Companion.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.toLocation
+import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.ServerClientWorld
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
+import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
 import no.elg.infiniteBootleg.world.ecs.createMPClientPlayerEntity
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 /**
@@ -157,13 +167,20 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return
   }
-  Main.logger().debug("handleSpawnEntity") { "" }
+  Main.logger().debug("handleSpawnEntity") { "Spawning a ${spawnEntity.entity.type}" }
 
-  val controlled = uuid == spawnEntity.uuid
+  when (spawnEntity.entity.type) {
+    PLAYER -> {
+      val controlled = uuid == spawnEntity.uuid
+      val future = world.engine.createMPClientPlayerEntity(world, spawnEntity.entity, controlled)
+      if (controlled) {
+        futurePlayer = future
+      }
+    }
 
-  val future = world.engine.createMPClientPlayerEntity(world, spawnEntity.entity, controlled)
-  if (controlled) {
-    futurePlayer = future
+    FALLING_BLOCK -> world.engine.createFallingBlockEntity(world, spawnEntity.entity)
+
+    else -> Main.logger().error("Cannot spawn a ${spawnEntity.entity.type} yet")
   }
 }
 
@@ -227,48 +244,7 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
     }
 
     ServerLoginStatus.ServerStatus.LOGIN_SUCCESS -> {
-      val world = world
-//      val entity = controllingEntity
-      if (world == null) {
-        ctx.fatal("Failed to get world")
-        return
-      }
-
-      // Start ticking to create box 2d bodies
-      world.worldTicker.start()
-
-      ConnectingScreen.info = "Waiting for Player to spawn..."
-      futurePlayer?.orTimeout(10, TimeUnit.SECONDS)?.whenCompleteAsync { player, e ->
-        if (e != null) {
-          ctx.fatal("Invalid player client side\n  ${e::class.simpleName}: ${e.message}")
-          return@whenCompleteAsync
-        } else {
-          ConnectingScreen.info = "Login success!"
-          Main.inst().scheduler.executeSync {
-            this@handleLoginStatus.player = player
-            Main.logger().debug("handleSpawnEntity", "Server sent the entity to control")
-            player.box2d.enableGravity()
-            ClientMain.inst().screen = WorldScreen(world, false)
-
-            started = true
-
-            // Change the info text to something generic in case the server throws an error and no further information is received
-            ConnectingScreen.info = "Connection from server abruptly stopped, no further information received"
-
-            val sharedInformation = sharedInformation!!
-            sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
-//          Main.logger().log("Sending heartbeat to server")
-              ctx.writeAndFlush(serverBoundHeartbeat())
-              if (sharedInformation.lostConnection()) {
-                ctx.fatal("Server stopped responding, heartbeats not received")
-              }
-            }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
-
-            Main.logger().debug("LOGIN", "Logged into server successfully")
-          }
-        }
-      } ?: kotlin.run { ctx.fatal("Invalid player client side: Did not a receive an entity to control") }
-      futurePlayer = null
+      Main.inst().scheduler.executeAsync { handleLoginSuccess() }
     }
 
     ServerLoginStatus.ServerStatus.UNRECOGNIZED -> {
@@ -276,6 +252,64 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
       return
     }
   }
+}
+
+private fun ServerClient.handleLoginSuccess() {
+  val world = world
+  if (world == null) {
+    ctx.fatal("Failed to get world")
+    return
+  }
+
+  val futurePlayer = futurePlayer?.orTimeout(10, TimeUnit.SECONDS)
+  if (futurePlayer == null) {
+    ctx.fatal("Invalid player client side: Did not a receive an entity to control")
+    return
+  }
+  this.futurePlayer = null
+
+  Main.inst().scheduler.executeSync {
+    dispatchEvent(InitialChunksOfWorldLoadedEvent(world))
+  }
+
+  val worldFuture: CompletableFuture<ClientWorld> = CompletableFuture<ClientWorld>().orTimeout(10, TimeUnit.SECONDS)
+  javaOneShotListener(WorldLoadedEvent::class.java) {
+    Main.logger().debug("ClientWorld") { "Completing World loaded future" }
+    worldFuture.complete(it.world as ClientWorld)
+  }
+
+  ConnectingScreen.info = "Waiting for world to be ready..."
+
+  val handledPlayer = futurePlayer.whenCompleteAsync { player, e ->
+    if (e != null) {
+      ctx.fatal("Invalid player client side\n  ${e::class.simpleName}: ${e.message}")
+      return@whenCompleteAsync
+    } else {
+      this@handleLoginSuccess.player = player
+      player.box2d.enableGravity()
+      Main.logger().debug("handleSpawnEntity", "Server sent the entity to control")
+    }
+  }
+
+  worldFuture.thenCombine(handledPlayer) { _, _ ->
+    Main.inst().scheduler.executeSync {
+      started = true
+      ClientMain.inst().screen = WorldScreen(world, false)
+      setupHeartbeat()
+      Main.logger().debug("LOGIN", "Logged into server successfully")
+    }
+  }
+}
+
+private fun ServerClient.setupHeartbeat() {
+  val sharedInformation = sharedInformation!!
+  sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
+//          Main.logger().log("Sending heartbeat to server")
+    ctx.writeAndFlush(serverBoundHeartbeat())
+    if (sharedInformation.lostConnection()) {
+      ctx.fatal("Server stopped responding, heartbeats not received")
+    }
+  }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
 }
 
 private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
@@ -302,7 +336,8 @@ private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     ctx.writeAndFlush(serverBoundEntityRequest(uuid))
     return
   }
-//  entity.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
+  entity.teleport(moveEntity.position.x, moveEntity.position.y)
+  entity.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
 }
 
 private fun ServerClient.handleDespawnEntity(despawnEntity: DespawnEntity) {

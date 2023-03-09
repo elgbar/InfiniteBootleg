@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs.system
+package no.elg.infiniteBootleg.world.ecs.system.client
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem

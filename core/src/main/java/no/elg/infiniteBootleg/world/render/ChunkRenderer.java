@@ -10,7 +10,6 @@ import static no.elg.infiniteBootleg.world.Chunk.CHUNK_TEXTURE_SIZE;
 import static no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG;
 import static no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG;
 import static no.elg.infiniteBootleg.world.Material.AIR;
-import static no.elg.infiniteBootleg.world.render.WorldRender.FPS_FAST_CHUNK_RENDER_THRESHOLD;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -40,6 +39,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ChunkRenderer implements Renderer, Disposable {
 
+  /** How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks */
+  public static final int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
+
+  public static final int EXTRA_CHUNKS_TO_RENDER_EACH_FRAME = 4;
   public static final int LIGHT_RESOLUTION = 2;
   private final SpriteBatch batch;
   private final SetUniqueList<Chunk> renderQueue;
@@ -121,11 +124,11 @@ public class ChunkRenderer implements Renderer, Disposable {
             });
   }
 
-  public void render(int times) {
+  public void renderMultiple() {
     render();
     if (Gdx.graphics.getFramesPerSecond() > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
       // only render more chunks when the computer isn't struggling with the rendering
-      for (int i = 0; i < times; i++) {
+      for (int i = 0; i < EXTRA_CHUNKS_TO_RENDER_EACH_FRAME; i++) {
         if (renderQueue.isEmpty()) {
           return;
         }
