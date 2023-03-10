@@ -35,12 +35,12 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
 
   protected fun loadChunkFromFile(chunkX: Int, chunkY: Int): Chunk? {
     val protoChunk = readChunkFile(chunkX, chunkY)
-    if (protoChunk != null) {
+    return if (protoChunk != null) {
       loadChunkFromProto(protoChunk)
     } else {
       Main.logger().debug("ChunkLoader") { "Chunk ${CoordUtil.stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
+      null
     }
-    return null
   }
 
   private fun fullyLoadChunk(chunk: ChunkImpl, protoChunk: ProtoWorld.Chunk): Boolean {
