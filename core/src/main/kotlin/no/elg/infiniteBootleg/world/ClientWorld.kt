@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
  * @author Elg
  */
 abstract class ClientWorld : World {
-  private val render: ClientWorldRender
+  final override val render: ClientWorldRender
   val input: WorldInputHandler
   val ecsInput: ECSInputListener
 
@@ -25,8 +25,6 @@ abstract class ClientWorld : World {
 
   constructor(protoWorld: ProtoWorld.World) : super(protoWorld)
   constructor(generator: ChunkGenerator, seed: Long, worldName: String) : super(generator, seed, worldName)
-
-  override fun getRender(): ClientWorldRender = render
 
   override fun resize(width: Int, height: Int) {
     render.resize(width, height)

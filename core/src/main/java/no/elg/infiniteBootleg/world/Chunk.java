@@ -160,7 +160,7 @@ public interface Chunk
   /**
    * @return The backing array of the chunk, might contain null elements
    */
-  @NotNull
+  @Nullable
   Block[][] getBlocks();
 
   @NotNull

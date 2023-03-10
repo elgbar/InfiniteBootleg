@@ -27,7 +27,7 @@ object DebugText {
   @JvmStatic
   inline fun fpsString(sb: StringBuilder, world: ClientWorld?) {
     val worldTps = world?.worldTicker?.realTPS ?: -1
-    val physicsTps = world?.box2DTicker?.realTPS ?: -1
+    val physicsTps = world?.worldTicker?.box2DTicker?.ticker?.realTPS ?: -1
 
     sb.append("FPS: ").fastIntFormat(Gdx.graphics.framesPerSecond, 4)
       .append(" | delta: ").append(dotFourFormat.format(Gdx.graphics.deltaTime.toDouble())).append(" ms")

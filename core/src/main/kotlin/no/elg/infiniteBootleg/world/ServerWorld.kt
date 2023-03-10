@@ -23,7 +23,7 @@ import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
  * @author Elg
  */
 class ServerWorld : World {
-  private val render = HeadlessWorldRenderer(this)
+  override val render = HeadlessWorldRenderer(this)
 
   constructor(protoWorld: ProtoWorld.World) : super(protoWorld)
   constructor(generator: ChunkGenerator, seed: Long, worldName: String) : super(generator, seed, worldName)
@@ -35,10 +35,6 @@ class ServerWorld : World {
     } else {
       Main.logger().warn("Failed to find player $uuid to remove")
     }
-  }
-
-  override fun getRender(): HeadlessWorldRenderer {
-    return render
   }
 
   override fun initializeEngine(): Engine = super.initializeEngine().also {

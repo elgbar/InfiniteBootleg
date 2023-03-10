@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-import no.elg.infiniteBootleg.world.World.LIGHT_SOURCE_LOOK_BLOCKS
+import no.elg.infiniteBootleg.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -174,7 +174,7 @@ class BlockLight(
     return updateId != NEVER_CANCEL_UPDATE_ID && diff
   }
 
-  fun findLuminescentBlocks(worldX: Int, worldY: Int, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+  fun findLuminescentBlocks(worldX: Int, worldY: Int, cancelled: () -> Boolean = { false }): GdxArray<Block> {
     return chunk
       .world
       .getBlocksAABBFromCenter(
@@ -182,16 +182,16 @@ class BlockLight(
         worldY + 0.5f,
         LIGHT_SOURCE_LOOK_BLOCKS,
         LIGHT_SOURCE_LOOK_BLOCKS,
-        true,
-        false,
-        false,
-        cancelled
+        raw = true,
+        loadChunk = false,
+        includeAir = false,
+        cancel = cancelled
       ) { it.material.isLuminescent }
   }
 
-  fun findSkylightBlocks(worldX: Int, worldY: Int, cancelled: (() -> Boolean)? = null): GdxArray<Block> {
+  fun findSkylightBlocks(worldX: Int, worldY: Int, cancelled: () -> Boolean = { false }): GdxArray<Block> {
     val skyblocks = GdxArray<Block>()
-    if (cancelled != null && cancelled()) {
+    if (cancelled()) {
       return skyblocks
     }
     // Since we're not creating air blocks above, we will instead just load
@@ -250,7 +250,7 @@ class BlockLight(
   /**
    * Given two y-coordinates ([worldYA] and [worldYB]) get a column of blocks between the two
    */
-  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: (() -> Boolean)? = null): GdxArray<Block>? {
+  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: () -> Boolean = { false }): GdxArray<Block>? {
     val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS)
     val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS)
     val columnHeight = worldYTop - worldYBtm
@@ -260,7 +260,7 @@ class BlockLight(
       // thus no skylight can reach this block
       return null
     }
-    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, false, false, true, cancelled) {
+    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true, cancel = cancelled) {
       skylightBlockFilter(worldX, worldY, it)
     }
   }

@@ -45,7 +45,7 @@ class KeyboardControls(val world: ClientWorld) {
       Main.inst().scheduler.executeAsync {
         val world = world.world
         if (breakBrushSize <= 1) {
-          world.remove(blockX, blockY, true)
+          world.removeBlock(blockX, blockY)
         } else {
           val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
           blocksWithin.removeAll { it.material == Material.AIR }
@@ -53,7 +53,7 @@ class KeyboardControls(val world: ClientWorld) {
             if (world.isAirBlock(blockX, blockY)) {
               return@executeAsync
             }
-            world.remove(blockX, blockY, true)
+            world.removeBlock(blockX, blockY)
           } else {
             world.removeBlocks(blocksWithin, true)
           }
