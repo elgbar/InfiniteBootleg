@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.blocks.traits
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
 
@@ -10,11 +11,13 @@ class FallingTraitHandler(
   trait: FallingTrait,
   val world: World,
   private val originWorldX: Int,
-  private val originWorldY: Int
+  private val originWorldY: Int,
+  val material: Material
 ) : TraitHandler<FallingTrait> {
 
   init {
     trait.handlers.set(this)
+    require(material != Material.AIR) { "Air cannot be a falling block!" }
   }
 
   var falling: Boolean = false
@@ -37,7 +40,6 @@ class FallingTraitHandler(
           blockAbove.delayedShouldTick(1)
         }
 
-        val material = block.material
         block.destroy(true)
         world.engine.createFallingBlockEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, -3f, material)
       } else {

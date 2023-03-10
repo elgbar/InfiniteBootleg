@@ -25,7 +25,8 @@ class FallingBlock(
     this,
     world,
     CoordUtil.chunkToWorld(chunk.chunkX, localX),
-    CoordUtil.chunkToWorld(chunk.chunkY, localY)
+    CoordUtil.chunkToWorld(chunk.chunkY, localY),
+    material
   )
 
   override fun tryFall() {

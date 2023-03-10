@@ -23,13 +23,7 @@ import kotlin.math.abs
  *
  * @author Elg
  */
-class TntBlock(
-  world: World,
-  chunk: Chunk,
-  localX: Int,
-  localY: Int,
-  material: Material
-) : TickingBlock(world, chunk, localX, localY, material) {
+class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material) : TickingBlock(world, chunk, localX, localY, material) {
 
   /** How long, in ticks, the fuse time should be  */
   val fuseDurationTicks: Int = (getWorld().worldTicker.tps * FUSE_DURATION_SECONDS).toInt()

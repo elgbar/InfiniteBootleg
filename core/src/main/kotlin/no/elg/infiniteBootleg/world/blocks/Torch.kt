@@ -16,7 +16,8 @@ class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Mate
     this,
     world,
     CoordUtil.chunkToWorld(chunk.chunkX, localX),
-    CoordUtil.chunkToWorld(chunk.chunkY, localY)
+    CoordUtil.chunkToWorld(chunk.chunkY, localY),
+    Material.TORCH
   )
 
   override val falling: Boolean get() = fallingTraitHandler.falling
