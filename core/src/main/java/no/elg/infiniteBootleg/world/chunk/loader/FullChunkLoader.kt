@@ -2,9 +2,9 @@ package no.elg.infiniteBootleg.world.chunk.loader
 
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.util.CoordUtil
-import no.elg.infiniteBootleg.util.CoordUtil.decompactLocX
-import no.elg.infiniteBootleg.util.CoordUtil.decompactLocY
+import no.elg.infiniteBootleg.util.decompactLocX
+import no.elg.infiniteBootleg.util.decompactLocY
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator
@@ -20,8 +20,8 @@ import no.elg.infiniteBootleg.world.generator.ChunkGenerator
 class FullChunkLoader(override val world: World, generator: ChunkGenerator) : ChunkLoader(generator) {
 
   override fun fetchChunk(chunkLoc: Long): Chunk? {
-    val chunkX = decompactLocX(chunkLoc)
-    val chunkY = decompactLocY(chunkLoc)
+    val chunkX = chunkLoc.decompactLocX()
+    val chunkY = chunkLoc.decompactLocY()
     return loadChunkFromFile(chunkX, chunkY) ?: generateChunk(chunkX, chunkY)
   }
 
@@ -30,7 +30,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     if (generated.isValid) {
       return generated
     }
-    Main.logger().warn("Failed to generate chunk ${CoordUtil.stringifyCompactLoc(chunkX, chunkY)}")
+    Main.logger().warn("Failed to generate chunk ${stringifyCompactLoc(chunkX, chunkY)}")
     return null
   }
 

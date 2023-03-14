@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.World
@@ -24,8 +24,8 @@ class FallingBlock(
   private val fallingTraitHandler = FallingTraitHandler(
     this,
     world,
-    CoordUtil.chunkToWorld(chunk.chunkX, localX),
-    CoordUtil.chunkToWorld(chunk.chunkY, localY),
+    chunkToWorld(chunk.chunkX, localX),
+    chunkToWorld(chunk.chunkY, localY),
     material
   )
 

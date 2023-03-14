@@ -4,7 +4,8 @@ import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.chunkToWorld
+import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION
@@ -56,12 +57,12 @@ class BlockLight(
       }
     }
 
-  private val strPos by lazy { CoordUtil.stringifyChunkToWorld(chunk, localX, localY) }
+  private val strPos by lazy { stringifyChunkToWorld(chunk, localX, localY) }
 
   private val chunkImpl = chunk as ChunkImpl
 
   init {
-    isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, CoordUtil.chunkToWorld(chunk.chunkY, localY), BLOCKS_LIGHT_FLAG)
+    isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, chunkToWorld(chunk.chunkY, localY), BLOCKS_LIGHT_FLAG)
     isLit = isSkylight
     averageBrightness = if (isSkylight) {
       1f
@@ -91,8 +92,8 @@ class BlockLight(
     }
 
     val chunkColumn = chunk.chunkColumn
-    val worldX: Int = CoordUtil.chunkToWorld(chunk.chunkX, localX)
-    val worldY: Int = CoordUtil.chunkToWorld(chunk.chunkY, localY)
+    val worldX: Int = chunkToWorld(chunk.chunkX, localX)
+    val worldY: Int = chunkToWorld(chunk.chunkY, localY)
 
     if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
       // This block is a skylight, its always lit fully

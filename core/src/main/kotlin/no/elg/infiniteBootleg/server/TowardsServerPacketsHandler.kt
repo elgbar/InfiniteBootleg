@@ -28,9 +28,9 @@ import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
-import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.toLocation
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
@@ -210,8 +210,8 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
 
   Main.inst().scheduler.executeAsync {
     // Send chunk packets to client
-    val ix = CoordUtil.worldToChunk(player.positionComponent.blockX)
-    val iy = CoordUtil.worldToChunk(player.positionComponent.blockY)
+    val ix = player.positionComponent.blockX.worldToChunk()
+    val iy = player.positionComponent.blockY.worldToChunk()
     for (cx in -Settings.viewDistance..Settings.viewDistance) {
       for (cy in -Settings.viewDistance..Settings.viewDistance) {
         val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
@@ -347,5 +347,5 @@ private fun isChunkInView(ctx: ChannelHandlerContext, chunkX: Int, chunkY: Int):
 }
 
 private fun isLocInView(ctx: ChannelHandlerContext, worldX: Int, worldY: Int): Boolean {
-  return chunksInView(ctx)?.isInView(CoordUtil.worldToChunk(worldX), CoordUtil.worldToChunk(worldY)) ?: false
+  return chunksInView(ctx)?.isInView(worldX.worldToChunk(), worldY.worldToChunk()) ?: false
 }

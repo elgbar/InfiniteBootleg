@@ -3,8 +3,11 @@ package no.elg.infiniteBootleg.world
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.chunkOffset
+import no.elg.infiniteBootleg.util.chunkToWorld
+import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isNotAir
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
@@ -56,7 +59,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   }
 
   override fun isChunkAboveTopBlock(chunkY: Int, features: Int): Boolean {
-    val maxWorldY = CoordUtil.chunkToWorld(chunkY, CHUNK_SIZE - 1)
+    val maxWorldY = chunkToWorld(chunkY, CHUNK_SIZE - 1)
     for (localX in 0 until CHUNK_SIZE) {
       if (!isBlockAboveTopBlock(localX, maxWorldY, features)) {
         return false
@@ -70,7 +73,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   }
 
   private fun getWorldX(localX: Int): Int {
-    return CoordUtil.chunkToWorld(chunkX, localX)
+    return chunkToWorld(chunkX, localX)
   }
 
   private fun getWorldBlock(localX: Int, worldY: Int): Block? {
@@ -78,12 +81,12 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   }
 
   private fun getLoadedChunk(worldY: Int, chunkX: Int = this.chunkX): Chunk? {
-    val compactLoc = CoordUtil.compactLoc(chunkX, CoordUtil.worldToChunk(worldY))
+    val compactLoc = compactLoc(chunkX, worldY.worldToChunk())
     return world.getLoadedChunk(compactLoc)
   }
 
   private fun getChunk(worldY: Int): Chunk? {
-    val chunkY = CoordUtil.worldToChunk(worldY)
+    val chunkY = worldY.worldToChunk()
     return world.getChunk(chunkX, chunkY, true)
   }
 
@@ -97,22 +100,22 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
       top[localX] = worldY
     }
 
-    val oldChunk = CoordUtil.worldToChunk(oldTop)
-    val newChunk = CoordUtil.worldToChunk(worldY)
+    val oldChunk = oldTop.worldToChunk()
+    val newChunk = worldY.worldToChunk()
     val min = min(oldChunk, newChunk) - 1
     val max = max(oldChunk, newChunk)
-    val worldX = CoordUtil.chunkToWorld(chunkX, localX)
+    val worldX = chunkToWorld(chunkX, localX)
     for (chunkY in min..max) {
-      val newWorldY = CoordUtil.chunkToWorld(chunkY)
+      val newWorldY = chunkY.chunkToWorld()
       getLoadedChunk(newWorldY)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
 
       // Update chunks to the sides, if the light reaches that far
-      val leftChunkX = CoordUtil.worldToChunk((worldX - World.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+      val leftChunkX = (worldX - World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (leftChunkX != chunkX) {
         getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
       }
 
-      val rightChunkX = CoordUtil.worldToChunk((worldX + World.LIGHT_SOURCE_LOOK_BLOCKS).toInt())
+      val rightChunkX = (worldX + World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (rightChunkX != chunkX) {
         getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
       }
@@ -151,7 +154,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
         return
       }
 
-      val localY = CoordUtil.chunkOffset(worldYHint)
+      val localY = worldYHint.chunkOffset()
 
       if (worldYHint > currTopHeight) {
         val hintChunk = getLoadedChunk(worldYHint)
@@ -186,7 +189,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
         return false
       }
 
-      val currentTopChunkY = CoordUtil.worldToChunk(currTopHeight)
+      val currentTopChunkY = currTopHeight.worldToChunk()
 
       for (nextChunkY in MAX_CHUNKS_TO_LOOK_UPWARDS downTo 0) {
         val nextChunk = getLoadedChunk(nextChunkY + currentTopChunkY)

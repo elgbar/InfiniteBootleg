@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.google.common.base.Preconditions;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,9 +97,9 @@ public class BlockImpl implements Block {
   public Block getRawRelative(@NotNull Direction dir) {
     int newWorldX = getWorldX() + dir.dx;
     int newWorldY = getWorldY() + dir.dy;
-    if (CoordUtil.worldToChunk(newWorldX) == chunk.getChunkX()
+    if (CoordUtilKt.worldToChunk(newWorldX) == chunk.getChunkX()
         && //
-        CoordUtil.worldToChunk(newWorldY) == chunk.getChunkY()) {
+        CoordUtilKt.worldToChunk(newWorldY) == chunk.getChunkY()) {
       return chunk.getBlocks()[localX + dir.dx][localY + dir.dy];
     }
     return world.getRawBlock(newWorldX, newWorldY, true);

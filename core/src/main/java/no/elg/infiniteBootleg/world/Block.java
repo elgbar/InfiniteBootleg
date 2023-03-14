@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.api.HUDDebuggable;
 import no.elg.infiniteBootleg.api.Savable;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,7 +111,7 @@ public interface Block
   void load(ProtoWorld.Block protoBlock);
 
   default long getCompactWorldLoc() {
-    return CoordUtil.compactLoc(getWorldX(), getWorldY());
+    return CoordUtilKt.compactLoc(getWorldX(), getWorldY());
   }
 
   @NotNull

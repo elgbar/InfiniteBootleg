@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.api.Updatable
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
@@ -116,7 +116,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   fun removeBlock(block: Block) {
     chunk.world.postBox2dRunnable {
-      fixtureMap.get(CoordUtil.compactLoc(block.localX, block.localY))?.also { fixture ->
+      fixtureMap.get(compactLoc(block.localX, block.localY))?.also { fixture ->
         fixture.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
         fixture.userData = null
         chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc))
@@ -135,7 +135,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       val localX = block.localX
       val localY = block.localY
 
-      val compactLoc = CoordUtil.compactLoc(localX, localY)
+      val compactLoc = compactLoc(localX, localY)
       val cacheFix: Fixture? = fixtureMap.get(compactLoc)
       val fixture: Fixture = if (cacheFix != null) {
         cacheFix

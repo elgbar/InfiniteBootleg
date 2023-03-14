@@ -41,8 +41,8 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
-import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
@@ -99,8 +99,8 @@ fun broadcastToInView(packet: Packet, worldX: Int, worldY: Int, filter: ((Channe
   require(Main.isServer()) { "This broadcasting methods can only be used by servers" }
   val world = ServerMain.inst().serverWorld
   val renderer = world.render
-  val chunkX = CoordUtil.worldToChunk(worldX)
-  val chunkY = CoordUtil.worldToChunk(worldY)
+  val chunkX = worldX.worldToChunk()
+  val chunkY = worldY.worldToChunk()
   broadcast(packet) { c, cc ->
     val viewing = renderer.getClient(cc.entityUUID) ?: return@broadcast false
     return@broadcast viewing.isInView(chunkX, chunkY) && (filter == null || filter(c, cc))

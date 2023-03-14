@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world;
 import static org.junit.Assert.assertEquals;
 
 import no.elg.infiniteBootleg.TestGraphic;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import org.junit.Test;
 
 /**
@@ -34,7 +34,7 @@ public class BlockImplTest extends TestGraphic {
   public void getCorrectChunk() {
     Block block = world.getRawBlock(-1, -1, true);
     assertEquals(world.getChunkFromWorld(-1, -1, true), block.getChunk());
-    assertEquals(world.getChunk(CoordUtil.compactLoc(-1, -1)), block.getChunk());
+    assertEquals(world.getChunk(CoordUtilKt.compactLoc(-1, -1)), block.getChunk());
   }
 
   @Test

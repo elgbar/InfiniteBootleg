@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world
 
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.compactLoc
 
 /**
  * Immutable 2D vector in integer space
@@ -36,10 +36,10 @@ class Location(val x: Int, val y: Int) {
 
   /**
    * @return This location compacted into a single long
-   * @see CoordUtil.compactLoc
+   * @see compactLoc
    */
   fun toCompactLocation(): Long {
-    return CoordUtil.compactLoc(x, y)
+    return compactLoc(x, y)
   }
 
   override fun hashCode(): Int {
@@ -67,7 +67,7 @@ class Location(val x: Int, val y: Int) {
     }
 
     fun relativeCompact(x: Int, y: Int, dir: Direction): Long {
-      return CoordUtil.compactLoc(x + dir.dx, y + dir.dy)
+      return compactLoc(x + dir.dx, y + dir.dy)
     }
 
     fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long {

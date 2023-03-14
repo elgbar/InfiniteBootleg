@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.CheckableDisposable;
 import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import org.jetbrains.annotations.Contract;
@@ -97,14 +97,14 @@ public interface Chunk
   /**
    * @param localX The local chunk x coordinate
    * @return The world coordinate from the local position as offset
-   * @see CoordUtil#chunkToWorld(int, int)
+   * @see CoordUtilKt#chunkToWorld(int, int)
    */
   int getWorldX(int localX);
 
   /**
    * @param localY The local chunk y coordinate
    * @return The world coordinate from the local position as offset
-   * @see CoordUtil#chunkToWorld(int, int)
+   * @see CoordUtilKt#chunkToWorld(int, int)
    */
   int getWorldY(int localY);
 

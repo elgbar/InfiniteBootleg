@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.BlockImpl
 import no.elg.infiniteBootleg.world.ClientWorld
@@ -29,14 +29,14 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
     batch.begin()
     for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
-      val lightX = CoordUtil.worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
-      val lightY = CoordUtil.worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
+      val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
+      val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
       batch.draw(luminanceDebugTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
     }
 
     for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
-      val lightX = CoordUtil.worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
-      val lightY = CoordUtil.worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
+      val lightX = worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
+      val lightY = worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
       batch.draw(skylightDebugTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
     }
     batch.end()

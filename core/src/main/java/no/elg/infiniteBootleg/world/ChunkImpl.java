@@ -35,7 +35,7 @@ import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent;
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.util.ChunkUtilKt;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import no.elg.infiniteBootleg.world.blocks.TickingBlock;
 import no.elg.infiniteBootleg.world.box2d.ChunkBody;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
@@ -123,7 +123,8 @@ public class ChunkImpl implements Chunk {
               };
 
           if (xCheck && yCheck) {
-            updateBlockLights(CoordUtil.chunkOffset(localX), CoordUtil.chunkOffset(localY), false);
+            updateBlockLights(
+                CoordUtilKt.chunkOffset(localX), CoordUtilKt.chunkOffset(localY), false);
           }
         }
       };
@@ -219,7 +220,7 @@ public class ChunkImpl implements Chunk {
       Main.logger()
           .warn(
               "Changed block in disposed chunk "
-                  + CoordUtil.stringifyChunkToWorld(this, localX, localY)
+                  + CoordUtilKt.stringifyChunkToWorld(this, localX, localY)
                   + ", block: "
                   + block);
       return null;
@@ -330,12 +331,12 @@ public class ChunkImpl implements Chunk {
 
   @Override
   public int getWorldX(int localX) {
-    return CoordUtil.chunkToWorld(chunkX, localX);
+    return CoordUtilKt.chunkToWorld(chunkX, localX);
   }
 
   @Override
   public int getWorldY(int localY) {
-    return CoordUtil.chunkToWorld(chunkY, localY);
+    return CoordUtilKt.chunkToWorld(chunkY, localY);
   }
 
   @Override
@@ -606,32 +607,28 @@ public class ChunkImpl implements Chunk {
   @Override
   @Contract(pure = true)
   public long getCompactLocation() {
-    return CoordUtil.compactLoc(chunkX, chunkY);
+    return CoordUtilKt.compactLoc(chunkX, chunkY);
   }
 
   /**
    * @return Location of this chunk in world coordinates
-   * @see CoordUtil#chunkToWorld(Location)
    */
   @Override
   public int getWorldX() {
-    return CoordUtil.chunkToWorld(chunkX);
+    return CoordUtilKt.chunkToWorld(chunkX);
   }
 
   /**
    * This is the same as doing {@code CoordUtil.chunkToWorld(getLocation())}
    *
    * @return Location of this chunk in world coordinates
-   * @see CoordUtil#chunkToWorld(Location)
    */
   @Override
   public int getWorldY() {
-    return CoordUtil.chunkToWorld(chunkY);
+    return CoordUtilKt.chunkToWorld(chunkY);
   }
 
   /**
-   * f
-   *
    * @return The last tick this chunk's texture was pulled
    */
   @Override
@@ -708,10 +705,10 @@ public class ChunkImpl implements Chunk {
       Main.logger()
           .warn(
               "Fetched block from invalid chunk "
-                  + CoordUtil.stringifyChunkToWorld(this, localX, localY));
+                  + CoordUtilKt.stringifyChunkToWorld(this, localX, localY));
     }
     Preconditions.checkArgument(
-        CoordUtil.isInsideChunk(localX, localY),
+        CoordUtilKt.isInsideChunk(localX, localY),
         "Given arguments are not inside this chunk, localX=" + localX + " localY=" + localY);
     synchronized (this) {
       Block block = blocks[localX][localY];

@@ -28,15 +28,15 @@ import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder
 import no.elg.infiniteBootleg.server.despawnEntity
-import no.elg.infiniteBootleg.util.CoordUtil.chunkOffset
-import no.elg.infiniteBootleg.util.CoordUtil.compactLoc
-import no.elg.infiniteBootleg.util.CoordUtil.decompactLocX
-import no.elg.infiniteBootleg.util.CoordUtil.decompactLocY
-import no.elg.infiniteBootleg.util.CoordUtil.stringifyCompactLoc
-import no.elg.infiniteBootleg.util.CoordUtil.worldToChunk
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.chunkOffset
+import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.decompactLocX
+import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.generateUUIDFromLong
 import no.elg.infiniteBootleg.util.isAir
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ChunkColumnImpl.Companion.fromProtobuf
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
@@ -226,8 +226,7 @@ abstract class World(
     }
     render.update()
     Main.inst().scheduler.executeAsync {
-      val chunkSpawn = worldToChunk(spawn)
-      loadChunk(chunkSpawn.x, chunkSpawn.y)
+      loadChunk(spawn.x.worldToChunk(), spawn.y.worldToChunk())
       for (location in render.chunkLocationsInView) {
         loadChunk(location.x, location.y)
       }
@@ -330,8 +329,8 @@ abstract class World(
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
   fun getTopBlock(worldX: Int, features: Int): Block? {
-    return getChunkColumn(worldToChunk(worldX))
-      .topBlock(chunkOffset(worldX), features)
+    return getChunkColumn(worldX.worldToChunk())
+      .topBlock(worldX.chunkOffset(), features)
   }
 
   /**
@@ -341,13 +340,13 @@ abstract class World(
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
   fun getTopBlockWorldY(worldX: Int, features: Int): Int {
-    return getChunkColumn(worldToChunk(worldX))
-      .topBlockHeight(chunkOffset(worldX), features)
+    return getChunkColumn(worldX.worldToChunk())
+      .topBlockHeight(worldX.chunkOffset(), features)
   }
 
   fun getChunkFromWorld(worldX: Int, worldY: Int, load: Boolean): Chunk? {
-    val chunkX = worldToChunk(worldX)
-    val chunkY = worldToChunk(worldY)
+    val chunkX = worldX.worldToChunk()
+    val chunkY = worldY.worldToChunk()
     return getChunk(chunkX, chunkY, load)
   }
 
@@ -526,7 +525,7 @@ abstract class World(
    * @param worldLoc The world location to check
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(compactWorldLoc: Long): Boolean = isAirBlock(decompactLocX(compactWorldLoc), decompactLocY(compactWorldLoc))
+  fun isAirBlock(compactWorldLoc: Long): Boolean = isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY())
 
   /**
    * Check if a given location in the world is [Material.AIR] (or internally, does not exist)
@@ -556,17 +555,18 @@ abstract class World(
       !block.material.isSolid
     }
 
-  inline fun <R> actionOnBlock(
+  private inline fun <R> actionOnBlock(
     worldX: Int,
     worldY: Int,
     loadChunk: Boolean = true,
-    crossinline action: (localX: Int, localY: Int, chunk: Chunk?) -> R
+    action: (localX: Int, localY: Int, chunk: Chunk?) -> R
   ): R {
-    val chunkX: Int = worldToChunk(worldX)
-    val chunkY: Int = worldToChunk(worldY)
-    val localX: Int = worldX - chunkX * Chunk.CHUNK_SIZE
-    val localY: Int = worldY - chunkY * Chunk.CHUNK_SIZE
+    val chunkX: Int = worldX.worldToChunk()
+    val chunkY: Int = worldY.worldToChunk()
     val chunk: Chunk? = getChunk(chunkX, chunkY, loadChunk)
+
+    val localX: Int = worldX.chunkOffset()
+    val localY: Int = worldY.chunkOffset()
     return action(localX, localY, chunk)
   }
 
@@ -632,8 +632,8 @@ abstract class World(
    * @return The block at the given x and y
    */
   fun getRawBlock(compactWorldLoc: Long, load: Boolean): Block? {
-    val worldY = decompactLocY(compactWorldLoc)
-    val worldX = decompactLocX(compactWorldLoc)
+    val worldY = compactWorldLoc.decompactLocY()
+    val worldX = compactWorldLoc.decompactLocX()
     return getRawBlock(worldX, worldY, load)
   }
 
@@ -644,8 +644,8 @@ abstract class World(
    * @return The block at the given x and y (or null if air block)
    */
   fun getRawBlock(worldX: Int, worldY: Int, load: Boolean): Block? {
-    val chunkX = worldToChunk(worldX)
-    val chunkY = worldToChunk(worldY)
+    val chunkX = worldX.worldToChunk()
+    val chunkY = worldY.worldToChunk()
     val localX = worldX - chunkX * Chunk.CHUNK_SIZE
     val localY = worldY - chunkY * Chunk.CHUNK_SIZE
     val chunk = getChunk(chunkX, chunkY, load) ?: return null
@@ -666,7 +666,7 @@ abstract class World(
 
   fun getBlockLight(worldX: Int, worldY: Int, loadChunk: Boolean): BlockLight? {
     val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
-    return chunk.getBlockLight(chunkOffset(worldX), chunkOffset(worldY))
+    return chunk.getBlockLight(worldX.chunkOffset(), worldY.chunkOffset())
   }
 
   /**
@@ -679,8 +679,8 @@ abstract class World(
    * @return The block at the given x and y
    */
   fun getBlock(worldX: Int, worldY: Int, loadChunk: Boolean): Block? {
-    val chunkX = worldToChunk(worldX)
-    val chunkY = worldToChunk(worldY)
+    val chunkX = worldX.worldToChunk()
+    val chunkY = worldY.worldToChunk()
     val localX = worldX - chunkX * Chunk.CHUNK_SIZE
     val localY = worldY - chunkY * Chunk.CHUNK_SIZE
     val chunk = getChunk(chunkX, chunkY, loadChunk) ?: return null
@@ -850,14 +850,6 @@ abstract class World(
     return false
   }
 
-  /**
-   * @param worldLoc The world location of this chunk
-   * @return The chunk at the given world location
-   */
-  fun getChunkFromWorld(worldLoc: Location): Chunk? {
-    return getChunk(worldToChunk(worldLoc))
-  }
-
   fun containsEntity(uuid: String): Boolean {
     return getEntity(uuid) != null
   }
@@ -914,8 +906,8 @@ abstract class World(
     val blocks = ObjectSet<Block>()
     val radiusSquare = radius * radius
     for (compact in getLocationsAABB(worldX, worldY, radius, radius).items) {
-      val blockWorldX = decompactLocX(compact)
-      val blockWorldY = decompactLocY(compact)
+      val blockWorldX = compact.decompactLocX()
+      val blockWorldY = compact.decompactLocY()
       if (Math.abs(
           Vector2.dst2(
             worldX,
@@ -1006,7 +998,7 @@ abstract class World(
         if (cancel.invoke()) {
           return blocks
         }
-        val chunkPos = compactLoc(worldToChunk(x), worldToChunk(y))
+        val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
         var chunk = chunks[chunkPos]
         if (chunk == null || chunk.isInvalid) {
           chunk = getChunk(chunkPos, loadChunk)
@@ -1016,8 +1008,8 @@ abstract class World(
           }
           chunks.put(chunkPos, chunk)
         }
-        val localX = chunkOffset(x)
-        val localY = chunkOffset(y)
+        val localX = x.chunkOffset()
+        val localY = y.chunkOffset()
         val b = if (effectiveRaw) chunk.getRawBlock(localX, localY) else chunk.getBlock(localX, localY)
         if (b == null) {
           y++

@@ -4,7 +4,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.google.protobuf.InvalidProtocolBufferException
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.World
@@ -29,7 +29,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
     if (fullyLoadChunk(chunk, protoChunk)) {
       return chunk
     }
-    Main.logger().warn("Failed to load chunk ${CoordUtil.stringifyCompactLoc(chunkPosition)} from a proto chunk")
+    Main.logger().warn("Failed to load chunk ${stringifyCompactLoc(chunkPosition)} from a proto chunk")
     return null
   }
 
@@ -38,7 +38,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
     return if (protoChunk != null) {
       loadChunkFromProto(protoChunk)
     } else {
-      Main.logger().debug("ChunkLoader") { "Chunk ${CoordUtil.stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
+      Main.logger().debug("ChunkLoader") { "Chunk ${stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
       null
     }
   }

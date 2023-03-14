@@ -26,7 +26,7 @@ import java.util.List;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Renderer;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
@@ -186,7 +186,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         var blockLight = chunk.getBlockLight(localX, localY);
         TextureRegion texture;
         TextureRegion secondaryTexture;
-        int worldY = CoordUtil.chunkToWorld(chunk.getChunkY(), localY);
+        int worldY = CoordUtilKt.chunkToWorld(chunk.getChunkY(), localY);
         if (material == AIR) {
           texture = (topBlockHeight > worldY) ? CAVE_TEXTURE : SKY_TEXTURE;
           secondaryTexture = null;

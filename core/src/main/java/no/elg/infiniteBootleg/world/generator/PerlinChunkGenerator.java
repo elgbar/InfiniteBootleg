@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.generator;
 
 import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
 
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import no.elg.infiniteBootleg.util.FastNoise;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
@@ -78,15 +78,15 @@ public class PerlinChunkGenerator implements ChunkGenerator {
 
     ChunkImpl chunk = new ChunkImpl(world, chunkX, chunkY);
     for (int localX = 0; localX < CHUNK_SIZE; localX++) {
-      int worldX = CoordUtil.chunkToWorld(chunkX, localX);
+      int worldX = CoordUtilKt.chunkToWorld(chunkX, localX);
       Biome biome = getBiome(worldX);
 
       int genHeight = biome.heightAt(this, worldX);
 
-      int genChunkY = CoordUtil.worldToChunk(genHeight);
+      int genChunkY = CoordUtilKt.worldToChunk(genHeight);
 
       if (chunkY == genChunkY) {
-        biome.fillUpTo(noise, chunk, localX, CoordUtil.chunkOffset(genHeight) + 1, genHeight);
+        biome.fillUpTo(noise, chunk, localX, CoordUtilKt.chunkOffset(genHeight) + 1, genHeight);
       } else if (chunkY < genChunkY) {
         biome.fillUpTo(noise, chunk, localX, CHUNK_SIZE, genHeight);
       }
@@ -94,7 +94,7 @@ public class PerlinChunkGenerator implements ChunkGenerator {
       // generate caves (where there is something to generate them in
       if (chunkY <= genChunkY) {
         Block[][] blocks = chunk.getBlocks();
-        int worldChunkY = CoordUtil.chunkToWorld(chunkY);
+        int worldChunkY = CoordUtilKt.chunkToWorld(chunkY);
         for (int localY = 0; localY < CHUNK_SIZE; localY++) {
           int worldY = worldChunkY + localY;
 

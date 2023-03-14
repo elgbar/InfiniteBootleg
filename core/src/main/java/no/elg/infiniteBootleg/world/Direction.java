@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world;
 
 import com.badlogic.gdx.utils.LongMap;
-import no.elg.infiniteBootleg.util.CoordUtil;
+import no.elg.infiniteBootleg.util.CoordUtilKt;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,7 +35,7 @@ public enum Direction {
 
   static {
     for (Direction dir : Direction.values()) {
-      directionMap.put(CoordUtil.compactLoc(dir.dx, dir.dy), dir);
+      directionMap.put(CoordUtilKt.compactLoc(dir.dx, dir.dy), dir);
     }
   }
 
@@ -92,7 +92,7 @@ public enum Direction {
   public static Direction direction(int fromX, int fromY, int toX, int toY) {
     var diffX = (int) Math.signum(toX - fromX);
     var diffY = (int) Math.signum(toY - fromY);
-    return directionMap.get(CoordUtil.compactLoc(diffX, diffY));
+    return directionMap.get(CoordUtilKt.compactLoc(diffX, diffY));
   }
 
   @Override

@@ -4,8 +4,10 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.chunkOffset
+import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.fastIntFormat
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
 import no.elg.infiniteBootleg.world.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.world.Chunk
@@ -37,8 +39,8 @@ object DebugText {
 
   @JvmStatic
   fun lights(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
-    val localX = CoordUtil.chunkOffset(mouseBlockX)
-    val localY = CoordUtil.chunkOffset(mouseBlockY)
+    val localX = mouseBlockX.chunkOffset()
+    val localY = mouseBlockY.chunkOffset()
 
     fun calcSubCell(coord: Float): Int {
       val fixedCoord = if (coord < 0f) 1f - (-coord % 1f) else coord % 1f
@@ -48,7 +50,7 @@ object DebugText {
     val rawX = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldX)
     val rawY = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
 
-    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)), false)
+    val chunk = world.getChunk(compactLoc(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
     val blockLight = chunk?.getBlockLight(localX, localY)
 
     val isLit = blockLight?.isLit ?: "maybe"
@@ -63,9 +65,9 @@ object DebugText {
 
   @JvmStatic
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
-    val localX = CoordUtil.chunkOffset(mouseBlockX)
-    val localY = CoordUtil.chunkOffset(mouseBlockY)
-    val chunk = world.getChunk(CoordUtil.compactLoc(CoordUtil.worldToChunk(mouseBlockX), CoordUtil.worldToChunk(mouseBlockY)), false)
+    val localX = mouseBlockX.chunkOffset()
+    val localY = mouseBlockY.chunkOffset()
+    val chunk = world.getChunk(compactLoc(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
     val block = chunk?.getRawBlock(localX, localY)
     val material = block?.material ?: Material.AIR
     val rawX = ClientMain.inst().mouseLocator.mouseWorldX
@@ -79,11 +81,11 @@ object DebugText {
 
   @JvmStatic
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
-    val chunkX = CoordUtil.worldToChunk(mouseBlockX)
-    val chunkY = CoordUtil.worldToChunk(mouseBlockY)
+    val chunkX = mouseBlockX.worldToChunk()
+    val chunkY = mouseBlockY.worldToChunk()
     val pc = world.getChunk(chunkX, chunkY, false)
     val cc = world.getChunkColumn(chunkX)
-    val topBlock = cc.topBlockHeight(CoordUtil.chunkOffset(mouseBlockX))
+    val topBlock = cc.topBlockHeight(mouseBlockX.chunkOffset())
     if (pc == null) {
       val format = "chunk (% 4d,% 4d) [top block %2d]: <not loaded>"
       sb.append(String.format(format, chunkX, chunkY, topBlock))

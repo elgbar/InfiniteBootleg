@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ClientWorld
@@ -38,8 +38,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         val blockY = centerPos.y.roundToInt()
         val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
         if (blockY > topX) {
-          lightX = CoordUtil.worldToScreen(blockX.toFloat(), worldOffsetX)
-          lightY = CoordUtil.worldToScreen((topX + 1).toFloat(), worldOffsetY)
+          lightX = worldToScreen(blockX.toFloat(), worldOffsetX)
+          lightY = worldToScreen((topX + 1).toFloat(), worldOffsetY)
           batch.color = Color.WHITE
         } else {
           val blockLight = world.getBlockLight(blockX, blockY, false)
@@ -52,13 +52,13 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
             } else {
               batch.color = Color.BLACK
             }
-            lightX = CoordUtil.worldToScreen(blockX.toFloat(), worldOffsetX)
-            lightY = CoordUtil.worldToScreen(blockY.toFloat(), worldOffsetY)
+            lightX = worldToScreen(blockX.toFloat(), worldOffsetX)
+            lightY = worldToScreen(blockY.toFloat(), worldOffsetY)
           }
         }
       }
-      val screenX = CoordUtil.worldToScreen(worldX, worldOffsetX)
-      val screenY = CoordUtil.worldToScreen(worldY, worldOffsetY)
+      val screenX = worldToScreen(worldX, worldOffsetX)
+      val screenY = worldToScreen(worldY, worldOffsetY)
 
       val lookDirectionOrNull = entity.lookDirectionOrNull
       val direction = lookDirectionOrNull?.direction ?: Direction.WEST

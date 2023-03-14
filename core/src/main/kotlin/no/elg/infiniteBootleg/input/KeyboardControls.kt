@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
@@ -291,8 +291,8 @@ class KeyboardControls(val world: ClientWorld) {
 
         val pWx = halfpoint(worldX, mouseLocator.previousMouseWorldX, multiplierX)
         val pWy = halfpoint(worldY, mouseLocator.previousMouseWorldY, multiplierY)
-        val pBx = CoordUtil.worldToBlock(pWx)
-        val pBy = CoordUtil.worldToBlock(pWy)
+        val pBx = worldToBlock(pWx)
+        val pBy = worldToBlock(pWy)
 
         if (logging) {
           Main.logger().log("--inter $i mltX: $multiplierX | mltY: $multiplierY, pBx:$pBx | pBy:$pBy | pWx:$pWx | pWy:$pWy")

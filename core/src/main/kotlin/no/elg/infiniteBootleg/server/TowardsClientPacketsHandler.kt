@@ -35,8 +35,9 @@ import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ClientBoundHandler.Companion.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
-import no.elg.infiniteBootleg.util.CoordUtil
 import no.elg.infiniteBootleg.util.toLocation
+import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
@@ -145,7 +146,7 @@ private fun ServerClient.handleBlockUpdate(blockUpdate: UpdateBlock) {
   }
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
-  if (world.isChunkLoaded(CoordUtil.worldXYtoChunkLoc(worldX, worldY))) {
+  if (world.isChunkLoaded(worldXYtoChunkCompactLoc(worldX, worldY))) {
     val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
     world.setBlock(worldX, worldY, protoBlock, false)
   } else {
@@ -160,8 +161,8 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
     return
   }
   val position = spawnEntity.entity.position
-  val chunkPosX = CoordUtil.worldToChunk(position.x)
-  val chunkPosY = CoordUtil.worldToChunk(position.y)
+  val chunkPosX = position.x.worldToChunk()
+  val chunkPosY = position.y.worldToChunk()
   val chunk = world.getChunk(chunkPosX, chunkPosY, true)
   if (chunk == null) {
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
@@ -318,7 +319,7 @@ private fun ServerClient.handleMoveEntity(moveEntity: MoveEntity) {
     Main.logger().warn("handleMoveEntity", "Failed to find world")
     return
   }
-  val chunkLoc = CoordUtil.worldXYtoChunkLoc(moveEntity.position.x.toInt(), moveEntity.position.y.toInt())
+  val chunkLoc = worldXYtoChunkCompactLoc(moveEntity.position.x.toInt(), moveEntity.position.y.toInt())
   if (!world.isChunkLoaded(chunkLoc)) {
     // Chunk is not loaded, so ignore this entity update
     // TODO (from the server) only send entity packets of loaded chunks

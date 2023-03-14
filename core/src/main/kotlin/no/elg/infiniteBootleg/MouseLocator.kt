@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
-import no.elg.infiniteBootleg.util.CoordUtil
+import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ClientWorld
 
@@ -43,8 +43,8 @@ class MouseLocator {
       mouseWorldX = screenInputVec.x / Block.BLOCK_SIZE - worldBody.worldOffsetX
       mouseWorldY = screenInputVec.y / Block.BLOCK_SIZE - worldBody.worldOffsetY
       mouseWorldInput.set(mouseWorldX, mouseWorldY)
-      mouseBlockX = CoordUtil.worldToBlock(mouseWorldX)
-      mouseBlockY = CoordUtil.worldToBlock(mouseWorldY)
+      mouseBlockX = worldToBlock(mouseWorldX)
+      mouseBlockY = worldToBlock(mouseWorldY)
     }
   }
 }
