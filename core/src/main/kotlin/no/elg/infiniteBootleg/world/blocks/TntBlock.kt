@@ -12,6 +12,9 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT
 import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
@@ -26,7 +29,7 @@ import kotlin.math.abs
 class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material) : TickingBlock(world, chunk, localX, localY, material) {
 
   /** How long, in ticks, the fuse time should be  */
-  val fuseDurationTicks: Int = (getWorld().worldTicker.tps * FUSE_DURATION_SECONDS).toInt()
+  val fuseDurationTicks: Int = (world.worldTicker.tps * FUSE_DURATION_SECONDS).toInt()
   private val strength: Float = EXPLOSION_STRENGTH.toFloat()
   private var glowing = false
 
@@ -35,7 +38,7 @@ class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: M
   private var startTick: Long
 
   init {
-    startTick = getWorld().tick
+    startTick = world.tick
   }
 
   override fun shouldTick(): Boolean {
@@ -71,7 +74,7 @@ class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: M
           }
           x++
         }
-        world.removeBlocks(destroyed, false)
+        world.removeBlocks(destroyed)
       }
     }
   }
@@ -90,9 +93,8 @@ class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: M
       Preconditions.checkState(ticksLeft == this.ticksLeft, ticksLeft.toString() + " =/= " + this.ticksLeft)
     }
 
-  override fun getTexture(): TextureRegion? {
-    return if (glowing) whiteTexture else super.getTexture()
-  }
+  override val texture: TextureRegion?
+    get() = if (glowing) whiteTexture else super.texture
 
   override fun save(): ProtoWorld.Block.Builder {
     return super.save().setTnt(TNT.newBuilder().setTicksLeft(ticksLeft))

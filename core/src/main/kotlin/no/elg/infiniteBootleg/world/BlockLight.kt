@@ -6,6 +6,8 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION

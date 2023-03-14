@@ -126,20 +126,18 @@ enum class Material(
   val isBlock: Boolean
     get() = itemType == ItemType.BLOCK || itemType == ItemType.AIR
 
-  fun create(world: World, worldX: Int, worldY: Int): Boolean {
+  fun create(world: World, worldX: Int, worldY: Int, prioritize: Boolean = true): Boolean {
     val currentMaterial = world.getMaterial(worldX, worldY)
     if (currentMaterial != this && currentMaterial == AIR) {
       if (isBlock) {
-        val block = world.setBlock(worldX, worldY, this, true, true)
+        val block = world.setBlock(worldX, worldY, this, true, prioritize)
         (block as? TickingBlock)?.delayedShouldTick(1L)
         return block != null
       } else if (isEntity) {
         createNew?.let { it(world, worldX, worldY) } ?: error("Material with type entity does not have a createNew method")
         return true
       }
-      throw IllegalStateException(
-        "This material ($name) is neither a block nor an entity"
-      )
+      throw IllegalStateException("This material ($name) is neither a block nor an entity")
     }
     return false
   }

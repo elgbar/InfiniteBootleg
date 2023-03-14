@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG

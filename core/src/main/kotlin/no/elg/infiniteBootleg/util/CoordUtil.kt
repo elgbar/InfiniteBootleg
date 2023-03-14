@@ -99,7 +99,7 @@ inline fun isInnerEdgeOfChunk(localX: Int, localY: Int): Boolean = localX == 0 |
 inline fun worldXYtoChunkCompactLoc(worldX: Int, worldY: Int): Long = compactLoc(worldX.worldToChunk(), worldY.worldToChunk())
 
 /**
- * Store two intergers inside a single long
+ * Store two integers inside a single long
  *
  * @param x The x coordinate of the location
  * @param y The y coordinate of the location

@@ -37,6 +37,9 @@ import no.elg.infiniteBootleg.util.generateUUIDFromLong
 import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.Block.Companion.remove
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ChunkColumnImpl.Companion.fromProtobuf
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
@@ -497,11 +500,11 @@ abstract class World(
       chunk.setBlock(localX, localY, block, updateTexture, prioritize)
     }
 
-  fun setBlock(worldX: Int, worldY: Int, protoBlock: ProtoWorld.Block?, sendUpdatePacket: Boolean): Block? =
+  fun setBlock(worldX: Int, worldY: Int, protoBlock: ProtoWorld.Block?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block? =
     actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
       val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
-      chunk.setBlock(localX, localY, block, true, false, sendUpdatePacket)
+      chunk.setBlock(localX, localY, block, updateTexture, prioritize, sendUpdatePacket)
     }
 
   /**
@@ -509,15 +512,15 @@ abstract class World(
    *
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
-   * @param update If the texture of the corresponding chunk should be updated
+   * @param updateTexture If the texture of the corresponding chunk should be updated
    */
-  fun removeBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true, update: Boolean = true) =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk -> chunk?.setBlock(localX, localY, null as Block?, update) }
+  fun removeBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk -> chunk?.removeBlock(localX, localY, updateTexture, prioritize, sendUpdatePacket) }
 
   /**
    * Check if a given location in the world is [Material.AIR] (or internally, doesn't exists)
    * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.AIR` as
-   * the [.getRawBlock] method might createBlock and store a new air block
+   * the [getRawBlock] method might createBlock and store a new air block
    * at the given location
    *
    * **note** this does not if there are entities at this location
@@ -530,7 +533,7 @@ abstract class World(
   /**
    * Check if a given location in the world is [Material.AIR] (or internally, does not exist)
    * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.AIR` as
-   * the [.getRawBlock] method might create a Block and store a new air
+   * the [getRawBlock] method might create a Block and store a new air
    * block at the given location.
    *
    * If the chunk at the given coordinates isn't loaded yet this method return `false` to prevent
@@ -544,14 +547,14 @@ abstract class World(
    */
   fun isAirBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
     val chunk = nullableChunk ?: return@actionOnBlock false
-    val block: Block = chunk.blocks[localX][localY] ?: return@actionOnBlock true
+    val block: Block = chunk.getRawBlock(localX, localY) ?: return@actionOnBlock true
     block.material === Material.AIR
   }
 
   fun canPassThrough(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk ->
-      val nnChunk = chunk ?: return@actionOnBlock false
-      val block: Block = nnChunk.blocks[localX][localY] ?: return@actionOnBlock true
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return@actionOnBlock false
+      val block: Block = chunk.getRawBlock(localX, localY) ?: return@actionOnBlock true
       !block.material.isSolid
     }
 
@@ -570,10 +573,10 @@ abstract class World(
     return action(localX, localY, chunk)
   }
 
-  fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean) {
+  fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false) {
     val blockChunks = ObjectSet<Chunk>()
     for (block in blocks) {
-      block.destroy(false)
+      block.remove(updateTexture = false)
       blockChunks.add(block.chunk)
     }
     for (chunk in blockChunks) {
@@ -688,7 +691,7 @@ abstract class World(
   }
 
   /**
-   * Use [.isChunkLoaded] or [.isChunkLoaded] if possible
+   * Use [isChunkLoaded] or [isChunkLoaded] if possible
    *
    * @param chunkLoc Chunk location in chunk coordinates
    * @return If the given chunk is loaded in memory

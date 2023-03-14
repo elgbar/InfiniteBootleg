@@ -1,6 +1,9 @@
 package no.elg.infiniteBootleg.world.blocks.traits
 
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.world.Block.Companion.removeAsync
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
@@ -40,7 +43,7 @@ class FallingTraitHandler(
           blockAbove.delayedShouldTick(1)
         }
 
-        block.destroy(true)
+        block.removeAsync()
         world.engine.createFallingBlockEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, -3f, material)
       } else {
         scheduledToFall = false

@@ -9,6 +9,8 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.worldToBlock
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
@@ -41,30 +43,21 @@ class KeyboardControls(val world: ClientWorld) {
   private val mouseLocator = MouseLocator()
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
-    with(entity) {
-      Main.inst().scheduler.executeAsync {
-        val world = world.world
-        if (breakBrushSize <= 1) {
-          world.removeBlock(blockX, blockY)
-        } else {
-          val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
-          blocksWithin.removeAll { it.material == Material.AIR }
-          if (blocksWithin.isEmpty) {
-            if (world.isAirBlock(blockX, blockY)) {
-              return@executeAsync
-            }
-            world.removeBlock(blockX, blockY)
-          } else {
-            world.removeBlocks(blocksWithin, true)
-          }
-        }
+    Main.inst().scheduler.executeAsync {
+      val world = entity.world.world
+      if (breakBrushSize <= 1) {
+        world.removeBlock(blockX, blockY)
+      } else {
+        val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
+        blocksWithin.removeAll { it.material == Material.AIR }
+        world.removeBlocks(blocksWithin)
       }
-      return true
     }
+    return true
   }
 
-  private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean = with(entity) {
-    val world = world.world
+  private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
+    val world = entity.world.world
     if (!world.getEntities(worldX, worldY).isEmpty) {
       // cannot place on an entity
       return false

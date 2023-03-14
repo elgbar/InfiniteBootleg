@@ -10,7 +10,9 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.BlockImpl
+import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 
@@ -44,7 +46,7 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
   companion object {
     val skylightDebugTexture: TextureRegion by lazy {
-      val pixmap = Pixmap(BlockImpl.BLOCK_SIZE, BlockImpl.BLOCK_SIZE, Pixmap.Format.RGBA4444)
+      val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
       val yellow = Color.YELLOW
       pixmap.setColor(Color(yellow.r, yellow.g, yellow.b, 0.5f))
       pixmap.fill()
@@ -54,7 +56,7 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     }
 
     val luminanceDebugTexture: TextureRegion by lazy {
-      val pixmap = Pixmap(BlockImpl.BLOCK_SIZE, BlockImpl.BLOCK_SIZE, Pixmap.Format.RGBA4444)
+      val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
       val fb = Color.FIREBRICK
       pixmap.setColor(Color(fb.r, fb.g, fb.b, 0.5f))
       pixmap.fill()

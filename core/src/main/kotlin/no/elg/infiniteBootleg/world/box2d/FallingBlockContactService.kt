@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.remove
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
