@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import org.jetbrains.annotations.Contract
-import java.util.stream.Stream
 import kotlin.math.ln
 
 /**
@@ -44,11 +43,6 @@ interface Chunk : Iterable<Block?>, Ticking, CheckableDisposable, Comparable<Chu
    * @return negated [.isValid]
    */
   val isInvalid: Boolean
-
-  /**
-   * @return `true` if all the [Direction.CARDINAL] neighbors are loaded
-   */
-  val areNeighborsLoaded: Boolean
 
   /**
    * If players are in this chunk, unloading should never be allowed
@@ -159,14 +153,12 @@ interface Chunk : Iterable<Block?>, Ticking, CheckableDisposable, Comparable<Chu
   /**
    * @param localX The local chunk x coordinate
    * @return The world coordinate from the local position as offset
-   * @see CoordUtilKt.chunkToWorld
    */
   fun getWorldX(localX: Int): Int
 
   /**
    * @param localY The local chunk y coordinate
    * @return The world coordinate from the local position as offset
-   * @see CoordUtilKt.chunkToWorld
    */
   fun getWorldY(localY: Int): Int
 
@@ -184,8 +176,6 @@ interface Chunk : Iterable<Block?>, Ticking, CheckableDisposable, Comparable<Chu
   fun setAllowUnload(allowUnload: Boolean)
 
   fun shouldSave(): Boolean
-
-  fun stream(): Stream<Block?>
 
   /** Mark chunk as dirty  */
   fun dirty()

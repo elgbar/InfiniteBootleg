@@ -26,20 +26,15 @@ import no.elg.infiniteBootleg.util.directionTo
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
-import no.elg.infiniteBootleg.world.Location.Companion.relative
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import org.jetbrains.annotations.Contract
-import java.util.Spliterator
-import java.util.Spliterators
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.ForkJoinTask
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.stream.Stream
-import java.util.stream.StreamSupport
 import javax.annotation.concurrent.GuardedBy
 
 @Suppress("GDXKotlinUnsafeIterator")
@@ -518,16 +513,6 @@ class ChunkImpl(
 //      return future;
 //    }
 
-  override fun stream(): Stream<Block?> {
-    val spliterator = Spliterators.spliterator(
-      iterator(),
-      Chunk.CHUNK_SIZE.toLong() * Chunk.CHUNK_SIZE,
-      Spliterator.SIZED
-        or Spliterator.ORDERED
-    )
-    return StreamSupport.stream(spliterator, false)
-  }
-
   override fun iterator(): Iterator<Block?> {
     return object : MutableIterator<Block?> {
       var x = 0
@@ -599,17 +584,6 @@ class ChunkImpl(
       }
     }
   }
-
-  override val areNeighborsLoaded: Boolean
-    get() {
-      for (direction in Direction.CARDINAL) {
-        val relChunk = relative(chunkX, chunkY, direction!!)
-        if (!world.isChunkLoaded(relChunk)) {
-          return false
-        }
-      }
-      return true
-    }
 
   @Synchronized
   override fun dirty() {
