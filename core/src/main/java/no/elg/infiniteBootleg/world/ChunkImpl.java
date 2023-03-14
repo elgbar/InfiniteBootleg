@@ -176,36 +176,16 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  @Contract("_,_,!null->!null;_,_,null->null")
-  public Block setBlock(int localX, int localY, @Nullable Material material) {
-    return setBlock(localX, localY, material, true);
-  }
-
-  @Override
-  @Contract("_,_,!null,_->!null;_,_,null,_->null")
-  public Block setBlock(int localX, int localY, @Nullable Material material, boolean update) {
-    return setBlock(localX, localY, material, update, false);
-  }
-
-  @Override
-  @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
+  @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   public Block setBlock(
-      int localX, int localY, @Nullable Material material, boolean update, boolean prioritize) {
+      int localX,
+      int localY,
+      @Nullable Material material,
+      boolean updateTexture,
+      boolean prioritize,
+      boolean sendPacket) {
     Block block = material == null ? null : material.createBlock(world, this, localX, localY);
-    return setBlock(localX, localY, block, update, prioritize);
-  }
-
-  @Override
-  @Contract("_,_,!null,_->!null;_,_,null,_->null")
-  public Block setBlock(int localX, int localY, @Nullable Block block, boolean updateTexture) {
-    return setBlock(localX, localY, block, updateTexture, false);
-  }
-
-  @Override
-  @Contract("_, _, !null, _, _ -> !null; _, _, null, _, _ -> null")
-  public Block setBlock(
-      int localX, int localY, @Nullable Block block, boolean updateTexture, boolean prioritize) {
-    return setBlock(localX, localY, block, updateTexture, prioritize, true);
+    return setBlock(localX, localY, block, updateTexture, prioritize, sendPacket);
   }
 
   @Override
@@ -216,6 +196,7 @@ public class ChunkImpl implements Chunk {
       boolean updateTexture,
       boolean prioritize,
       boolean sendUpdatePacket) {
+
     if (isDisposed()) {
       Main.logger()
           .warn(
@@ -413,6 +394,12 @@ public class ChunkImpl implements Chunk {
     }
   }
 
+  public void updateBlockLights() {
+    // FIXME remove when this is converted to kotlin
+    updateBlockLights(
+        ChunkLightUpdatedEvent.CHUNK_CENTER, ChunkLightUpdatedEvent.CHUNK_CENTER, true);
+  }
+
   public void updateBlockLights(int localX, int localY, boolean dispatchEvent) {
     if (Settings.renderLight) {
       if (dispatchEvent) {
@@ -427,7 +414,7 @@ public class ChunkImpl implements Chunk {
     }
   }
 
-  /** Should only be used by {@link #updateBlockLights()} */
+  /** Should only be used by {@link #updateBlockLights} */
   private void updateBlockLights(int updateId) {
     var pool = ForkJoinPool.commonPool();
     synchronized (tasks) {
@@ -573,7 +560,7 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  public boolean isAllowingUnloading() {
+  public boolean isAllowedToUnload() {
     if (Settings.client) {
       //      var player = ClientMain.inst().getPlayer();
       //      if (player != null && equals(player.getChunk())) {
@@ -714,7 +701,7 @@ public class ChunkImpl implements Chunk {
       Block block = blocks[localX][localY];
 
       if (block == null) {
-        return setBlock(localX, localY, AIR, false);
+        return setBlock(localX, localY, AIR, false, false, false);
       }
       return block;
     }
@@ -763,7 +750,7 @@ public class ChunkImpl implements Chunk {
   }
 
   @Override
-  public boolean isNeighborsLoaded() {
+  public boolean getAreNeighborsLoaded() {
     for (Direction direction : Direction.CARDINAL) {
       Location relChunk = Location.Companion.relative(chunkX, chunkY, direction);
       if (!world.isChunkLoaded(relChunk)) {

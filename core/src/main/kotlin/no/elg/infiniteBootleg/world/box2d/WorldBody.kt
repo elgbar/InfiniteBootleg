@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
-import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import javax.annotation.concurrent.GuardedBy

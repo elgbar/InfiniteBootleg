@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 
 /**

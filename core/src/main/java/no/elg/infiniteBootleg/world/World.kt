@@ -820,7 +820,7 @@ abstract class World(
    * @return If the unloading was successful
    */
   fun unloadChunk(chunk: Chunk?, force: Boolean, save: Boolean): Boolean {
-    if (chunk != null && chunk.isNotDisposed && (force || chunk.isAllowingUnloading)) {
+    if (chunk != null && chunk.isNotDisposed && (force || chunk.isAllowedToUnload)) {
       if (chunk.world !== this) {
         Main.logger().warn("Tried to unload chunk from different world")
         return false

@@ -112,7 +112,7 @@ public class BlockImpl implements Block {
 
   @Override
   public Block setBlock(@NotNull Material material, boolean update) {
-    return chunk.setBlock(localX, localY, material, update);
+    return chunk.setBlock(localX, localY, material, update, false, true);
   }
 
   @NotNull
@@ -124,7 +124,8 @@ public class BlockImpl implements Block {
   public void destroy(boolean updateTexture) {
     Main.inst()
         .getScheduler()
-        .executeAsync(() -> chunk.setBlock(localX, localY, (Block) null, updateTexture));
+        .executeAsync(
+            () -> chunk.setBlock(localX, localY, (Block) null, updateTexture, false, true));
   }
 
   @Override

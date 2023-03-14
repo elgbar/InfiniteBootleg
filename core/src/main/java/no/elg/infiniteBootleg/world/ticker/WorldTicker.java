@@ -95,7 +95,7 @@ public class WorldTicker extends Ticker implements Disposable {
             continue;
           }
 
-          if (chunk.isAllowingUnloading()
+          if (chunk.isAllowedToUnload()
               && wr.isOutOfView(chunk)
               && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 

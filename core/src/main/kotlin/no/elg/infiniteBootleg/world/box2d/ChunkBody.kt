@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.queuePhysicsEvent
