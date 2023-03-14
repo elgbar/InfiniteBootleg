@@ -29,12 +29,12 @@ public class ChunkTest extends TestGraphic {
 
   @Test
   public void invalidBlocksWidth() {
-    assertEquals(CHUNK_SIZE, chunk.getBlocks().length);
+    assertEquals(CHUNK_SIZE, chunk.blocks.length);
   }
 
   @Test
   public void invalidBlocksHeight() {
-    assertEquals(CHUNK_SIZE, chunk.getBlocks()[0].length);
+    assertEquals(CHUNK_SIZE, chunk.blocks[0].length);
   }
 
   @Test
@@ -46,7 +46,7 @@ public class ChunkTest extends TestGraphic {
   public void allBlocksIterated() {
     List<Block> itrBlocks = chunk.stream().collect(Collectors.toList());
     Set<Block> rawBlocks = new HashSet<>();
-    for (Block[] blocks : chunk.getBlocks()) {
+    for (Block[] blocks : chunk.blocks) {
       rawBlocks.addAll(Arrays.asList(blocks));
     }
 

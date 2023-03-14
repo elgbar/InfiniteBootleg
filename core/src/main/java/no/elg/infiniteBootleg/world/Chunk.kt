@@ -2,12 +2,10 @@ package no.elg.infiniteBootleg.world
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
@@ -18,14 +16,12 @@ import kotlin.math.ln
  *
  * @author Elg
  */
-interface Chunk : Iterable<Block>, Ticking, CheckableDisposable, Comparable<Chunk> {
+interface Chunk : Iterable<Block?>, Ticking, CheckableDisposable, Comparable<Chunk> {
 
   /**
    * @return The backing array of the chunk, might contain null elements
    */
   val blocks: Array<Array<Block?>>
-
-  val tickingBlocks: GdxArray<TickingBlock>
 
   /**
    * Might cause a call to [.updateIfDirty] if the chunk is marked as dirty
@@ -96,7 +92,7 @@ interface Chunk : Iterable<Block>, Ticking, CheckableDisposable, Comparable<Chun
    * @return The backing [FrameBuffer] which holds the texture of this chunk. Will be null if
    * the chunk is disposed, never null otherwise.
    */
-  val fbo: FrameBuffer?
+  val frameBuffer: FrameBuffer?
 
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
@@ -116,10 +112,20 @@ interface Chunk : Iterable<Block>, Ticking, CheckableDisposable, Comparable<Chun
    * @param updateTexture If the texture of this chunk should be updated
    * @param prioritize If `updateTexture` is `true` then if this chunk be prioritized in the rendering order
    * @param sendUpdatePacket If an update should be sent when in multiplayer
-   * @return The given block, equal to the `block` parameter
+   * @return The new block, equal to the `block` parameter (but not necessarily the same object)
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   fun setBlock(localX: Int, localY: Int, block: Block?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
+
+  /**
+   * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
+   * @param localY The local y ie a value between 0 and [CHUNK_SIZE]
+   * @param updateTexture If the texture of this chunk should be updated
+   * @param prioritize If `updateTexture` is `true` then if this chunk be prioritized in the rendering order
+   * @param sendUpdatePacket If an update should be sent when in multiplayer
+   */
+  @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
+  fun removeBlock(localX: Int, localY: Int, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true)
 
   /**
    * Force update of this chunk's texture and invariants
@@ -179,7 +185,7 @@ interface Chunk : Iterable<Block>, Ticking, CheckableDisposable, Comparable<Chun
 
   fun shouldSave(): Boolean
 
-  fun stream(): Stream<Block>
+  fun stream(): Stream<Block?>
 
   /** Mark chunk as dirty  */
   fun dirty()

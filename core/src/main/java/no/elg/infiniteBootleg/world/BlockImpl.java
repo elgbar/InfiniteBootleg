@@ -124,8 +124,7 @@ public class BlockImpl implements Block {
   public void destroy(boolean updateTexture) {
     Main.inst()
         .getScheduler()
-        .executeAsync(
-            () -> chunk.setBlock(localX, localY, (Block) null, updateTexture, false, true));
+        .executeAsync(() -> chunk.removeBlock(localX, localY, updateTexture, false, true));
   }
 
   @Override

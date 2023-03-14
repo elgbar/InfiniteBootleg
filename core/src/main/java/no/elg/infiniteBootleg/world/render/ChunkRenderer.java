@@ -155,7 +155,7 @@ public class ChunkRenderer implements Renderer, Disposable {
       curr = chunk;
     }
 
-    FrameBuffer fbo = chunk.getFbo();
+    FrameBuffer fbo = chunk.getFrameBuffer();
     if (fbo == null) {
       return;
     }
