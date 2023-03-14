@@ -4,9 +4,9 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue.Companion.queueInputEvent
+import no.elg.infiniteBootleg.world.world.World
 
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 

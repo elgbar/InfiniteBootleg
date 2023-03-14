@@ -3,10 +3,10 @@ package no.elg.infiniteBootleg.world.blocks
 import no.elg.infiniteBootleg.world.BlockImpl
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.blocks.traits.TickingTrait
 import no.elg.infiniteBootleg.world.blocks.traits.TickingTraitHandler
 import no.elg.infiniteBootleg.world.blocks.traits.TraitHandlerCollection
+import no.elg.infiniteBootleg.world.world.World
 
 /**
  * Describes a block that implements the [Ticking] interface.

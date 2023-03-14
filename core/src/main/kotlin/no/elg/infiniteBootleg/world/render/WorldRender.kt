@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.api.Updatable
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
-import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.world.World
 
 /**
  * @author Elg

@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.ClientWorld
+import no.elg.infiniteBootleg.world.world.ClientWorld
 
 class MouseLocator {
   var mouseBlockX = 0

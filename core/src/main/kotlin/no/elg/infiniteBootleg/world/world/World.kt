@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
@@ -37,11 +37,19 @@ import no.elg.infiniteBootleg.util.generateUUIDFromLong
 import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.BOX2D_LOCK
+import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Block.Companion.remove
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.BlockLight
+import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.ChunkColumn
+import no.elg.infiniteBootleg.world.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.ChunkColumnImpl.Companion.fromProtobuf
+import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.ecs.basicEntityFamily

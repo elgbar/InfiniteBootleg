@@ -7,8 +7,8 @@ import static no.elg.infiniteBootleg.protobuf.ProtoWorld.World.Generator.UNRECOG
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
+import no.elg.infiniteBootleg.world.world.World;
 import org.jetbrains.annotations.NotNull;
 
 /**

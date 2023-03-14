@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
+import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import kotlin.math.ln
 

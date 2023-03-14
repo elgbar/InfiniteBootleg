@@ -6,8 +6,8 @@ import no.elg.infiniteBootleg.util.compact
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator
+import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.util.concurrent.ConcurrentHashMap
 
 class ServerClientChunkLoader(override val world: ServerClientWorld, generator: ChunkGenerator) : ChunkLoader(generator) {

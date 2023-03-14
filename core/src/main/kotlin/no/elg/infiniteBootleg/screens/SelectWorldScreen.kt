@@ -5,8 +5,8 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.world.SinglePlayerWorld
 import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
+import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
 
 /**
  * @author Elg

@@ -13,8 +13,8 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
-import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
+import no.elg.infiniteBootleg.world.world.ClientWorld
 
 class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Renderer {
 

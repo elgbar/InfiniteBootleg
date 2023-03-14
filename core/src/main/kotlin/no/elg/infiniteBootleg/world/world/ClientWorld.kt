@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.ClientMain

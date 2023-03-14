@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.ticker
 
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.util.Ticker
-import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.world.World
 
 class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
 

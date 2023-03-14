@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.time
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.util.Util
-import no.elg.infiniteBootleg.world.World
+import no.elg.infiniteBootleg.world.world.World
 
 class WorldTime(val world: World) {
   val baseColor = Color(Color.WHITE)

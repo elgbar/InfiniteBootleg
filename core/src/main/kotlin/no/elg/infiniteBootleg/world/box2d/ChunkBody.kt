@@ -14,9 +14,9 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
-import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.queuePhysicsEvent
+import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy
 
 /**

@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.screen.ScreenRenderer
 import no.elg.infiniteBootleg.screens.hud.helper.TickerGraph
-import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
+import no.elg.infiniteBootleg.world.world.ClientWorld
 
 object DebugGraph : Resizable {
 

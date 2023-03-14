@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.world.generator;
 
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ChunkImpl;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.generator.biome.Biome;
+import no.elg.infiniteBootleg.world.world.World;
 import org.jetbrains.annotations.NotNull;
 
 /**

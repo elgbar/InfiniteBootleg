@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.blocks.TntBlock
 import no.elg.infiniteBootleg.world.blocks.Torch
 import no.elg.infiniteBootleg.world.ecs.createDoorEntity
+import no.elg.infiniteBootleg.world.world.World
 import java.lang.reflect.Constructor
 import java.lang.reflect.InvocationTargetException
 import java.util.Locale

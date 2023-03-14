@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Block.Companion.save
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.world.World
 
 /**
  * A block in the world each block is a part of a chunk which is a part of a world. Each block know

@@ -13,9 +13,9 @@ import no.elg.infiniteBootleg.screens.MainMenuScreen;
 import no.elg.infiniteBootleg.screens.WorldScreen;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.ServerClient;
-import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.ServerClientWorld;
-import no.elg.infiniteBootleg.world.SinglePlayerWorld;
+import no.elg.infiniteBootleg.world.world.ClientWorld;
+import no.elg.infiniteBootleg.world.world.ServerClientWorld;
+import no.elg.infiniteBootleg.world.world.SinglePlayerWorld;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -11,11 +11,11 @@ import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Ticking;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.ServerWorld;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.time.WorldTime;
+import no.elg.infiniteBootleg.world.world.ClientWorld;
+import no.elg.infiniteBootleg.world.world.ServerWorld;
+import no.elg.infiniteBootleg.world.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

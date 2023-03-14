@@ -7,8 +7,8 @@ import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
+import no.elg.infiniteBootleg.world.world.World
 
 class FallingTraitHandler(
   trait: FallingTrait,

@@ -21,13 +21,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.livingOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
-import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.ServerClientWorld
-import no.elg.infiniteBootleg.world.ServerWorld
-import no.elg.infiniteBootleg.world.SinglePlayerWorld
-import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
@@ -48,6 +43,11 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
+import no.elg.infiniteBootleg.world.world.ClientWorld
+import no.elg.infiniteBootleg.world.world.ServerClientWorld
+import no.elg.infiniteBootleg.world.world.ServerWorld
+import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
+import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 

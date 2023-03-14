@@ -6,8 +6,8 @@ import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.World
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator
+import no.elg.infiniteBootleg.world.world.World
 
 /**
  * Handle saving and loading of chunks.
@@ -34,7 +34,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     return null
   }
 
-  //    @GuardedBy("no.elg.infiniteBootleg.world.World.chunksLock.writeLock()")
+  //    @GuardedBy("no.elg.infiniteBootleg.world.world.World.chunksLock.writeLock()")
   fun save(chunk: Chunk) {
     if (Settings.loadWorldFromDisk && chunk.shouldSave()) {
       // only save if valid and changed

@@ -10,8 +10,8 @@ import no.elg.infiniteBootleg.api.Resizable;
 import no.elg.infiniteBootleg.screens.hud.CurrentBlock;
 import no.elg.infiniteBootleg.screens.hud.DebugGraph;
 import no.elg.infiniteBootleg.screens.hud.DebugText;
-import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
+import no.elg.infiniteBootleg.world.world.ClientWorld;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -20,10 +20,10 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.ClientWorld;
 import no.elg.infiniteBootleg.world.Location;
 import no.elg.infiniteBootleg.world.box2d.WorldBody;
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer;
+import no.elg.infiniteBootleg.world.world.ClientWorld;
 import org.jetbrains.annotations.NotNull;
 
 /**

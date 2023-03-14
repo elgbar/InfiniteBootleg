@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.world
 
 import no.elg.infiniteBootleg.world.generator.ChunkGenerator
 

@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
+import no.elg.infiniteBootleg.world.world.World
 import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min

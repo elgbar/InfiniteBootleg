@@ -5,7 +5,7 @@ import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.screen.HUDRenderer
-import no.elg.infiniteBootleg.world.ClientWorld
+import no.elg.infiniteBootleg.world.world.ClientWorld
 
 /**
  * @author Elg

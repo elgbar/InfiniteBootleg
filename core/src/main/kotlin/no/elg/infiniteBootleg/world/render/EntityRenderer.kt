@@ -7,7 +7,6 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-import no.elg.infiniteBootleg.world.ClientWorld
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.blocks.TntBlock.Companion.whiteTexture
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionOrNull
@@ -15,6 +14,7 @@ import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Compan
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
+import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.roundToInt
 
 class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {

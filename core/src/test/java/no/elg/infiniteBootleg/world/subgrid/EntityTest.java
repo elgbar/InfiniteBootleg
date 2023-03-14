@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world.subgrid;
 import com.badlogic.gdx.utils.ObjectSet;
 import no.elg.infiniteBootleg.TestGraphic;
 import no.elg.infiniteBootleg.world.Block;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.subgrid.enitites.GenericEntity;
+import no.elg.infiniteBootleg.world.world.World;
 import org.junit.Assert;
 import org.junit.Test;
 

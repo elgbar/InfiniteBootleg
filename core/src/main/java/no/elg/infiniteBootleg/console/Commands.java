@@ -28,14 +28,14 @@ import no.elg.infiniteBootleg.util.ReflectionUtil;
 import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
-import no.elg.infiniteBootleg.world.ClientWorld;
-import no.elg.infiniteBootleg.world.World;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.time.WorldTime;
+import no.elg.infiniteBootleg.world.world.ClientWorld;
+import no.elg.infiniteBootleg.world.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
