@@ -37,7 +37,7 @@ open class BlockImpl(
 
   override fun dispose() {
     if (isDisposed) {
-      Main.logger().warn("Disposed block ${this::class.simpleName} ($worldX, $worldY) twice");
+      Main.logger().warn("Disposed block ${this::class.simpleName} ($worldX, $worldY) twice")
     }
     disposed = true
   }
@@ -66,7 +66,9 @@ open class BlockImpl(
     }
     return if (material !== block.material) {
       false
-    } else chunk == block.chunk
+    } else {
+      chunk == block.chunk
+    }
   }
 
   override fun toString(): String = "Block{material=$material, chunk=$chunk, worldX=$worldX, worldY=$worldY}"
