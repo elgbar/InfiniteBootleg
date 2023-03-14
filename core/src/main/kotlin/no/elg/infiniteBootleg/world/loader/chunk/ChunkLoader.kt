@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.chunk.loader
+package no.elg.infiniteBootleg.world.loader.chunk
 
 import com.badlogic.gdx.files.FileHandle
 import com.google.protobuf.InvalidProtocolBufferException

@@ -44,9 +44,6 @@ import no.elg.infiniteBootleg.world.ChunkColumnImpl.Companion.fromProtobuf
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.WorldBody
-import no.elg.infiniteBootleg.world.chunk.loader.ChunkLoader
-import no.elg.infiniteBootleg.world.chunk.loader.FullChunkLoader
-import no.elg.infiniteBootleg.world.chunk.loader.ServerClientChunkLoader
 import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -71,6 +68,9 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader.deleteLockFile
 import no.elg.infiniteBootleg.world.loader.WorldLoader.generatorFromProto
 import no.elg.infiniteBootleg.world.loader.WorldLoader.getWorldFolder
 import no.elg.infiniteBootleg.world.loader.WorldLoader.writeLockFile
+import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
+import no.elg.infiniteBootleg.world.loader.chunk.FullChunkLoader
+import no.elg.infiniteBootleg.world.loader.chunk.ServerClientChunkLoader
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.world.time.WorldTime

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.chunk.loader
+package no.elg.infiniteBootleg.world.loader.chunk
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.serverBoundChunkRequestPacket
