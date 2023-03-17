@@ -573,7 +573,6 @@ public object PacketKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.Packet.copy(block: no.elg.infiniteBootleg.protobuf.PacketKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.Packet =
   no.elg.infiniteBootleg.protobuf.PacketKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

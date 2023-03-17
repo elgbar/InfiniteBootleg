@@ -53,7 +53,6 @@ public object ChunkRequestKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest.copy(block: no.elg.infiniteBootleg.protobuf.ChunkRequestKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest =
   no.elg.infiniteBootleg.protobuf.ChunkRequestKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

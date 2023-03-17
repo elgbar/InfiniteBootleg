@@ -88,7 +88,6 @@ public object LoginKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.Login.copy(block: no.elg.infiniteBootleg.protobuf.LoginKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.Login =
   no.elg.infiniteBootleg.protobuf.LoginKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

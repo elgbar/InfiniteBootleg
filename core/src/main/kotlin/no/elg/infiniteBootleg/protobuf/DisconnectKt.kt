@@ -46,7 +46,6 @@ public object DisconnectKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.Disconnect.copy(block: no.elg.infiniteBootleg.protobuf.DisconnectKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.Disconnect =
   no.elg.infiniteBootleg.protobuf.DisconnectKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

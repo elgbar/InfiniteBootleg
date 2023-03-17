@@ -132,12 +132,10 @@ public object BlockKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.copy(block: no.elg.infiniteBootleg.protobuf.BlockKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Block =
   no.elg.infiniteBootleg.protobuf.BlockKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT.copy(block: no.elg.infiniteBootleg.protobuf.BlockKt.TNTKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT =
   no.elg.infiniteBootleg.protobuf.BlockKt.TNTKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

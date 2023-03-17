@@ -63,7 +63,6 @@ public object Vector2fKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f.copy(block: no.elg.infiniteBootleg.protobuf.Vector2fKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f =
   no.elg.infiniteBootleg.protobuf.Vector2fKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

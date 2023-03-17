@@ -46,7 +46,6 @@ public object EntityRequestKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.EntityRequest.copy(block: no.elg.infiniteBootleg.protobuf.EntityRequestKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.EntityRequest =
   no.elg.infiniteBootleg.protobuf.EntityRequestKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

@@ -79,7 +79,6 @@ public object UpdateBlockKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock.copy(block: no.elg.infiniteBootleg.protobuf.UpdateBlockKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock =
   no.elg.infiniteBootleg.protobuf.UpdateBlockKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

@@ -176,7 +176,6 @@ public object ChunkColumnKt {
     }}
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn.copy(block: no.elg.infiniteBootleg.protobuf.ChunkColumnKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.ChunkColumn =
   no.elg.infiniteBootleg.protobuf.ChunkColumnKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

@@ -101,7 +101,6 @@ public object StartGameKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.StartGame.copy(block: no.elg.infiniteBootleg.protobuf.StartGameKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.StartGame =
   no.elg.infiniteBootleg.protobuf.StartGameKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

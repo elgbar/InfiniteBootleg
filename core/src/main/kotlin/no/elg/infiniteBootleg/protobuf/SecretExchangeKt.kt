@@ -63,7 +63,6 @@ public object SecretExchangeKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.SecretExchange.copy(block: no.elg.infiniteBootleg.protobuf.SecretExchangeKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.SecretExchange =
   no.elg.infiniteBootleg.protobuf.SecretExchangeKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

@@ -70,7 +70,6 @@ public object SpawnEntityKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity.copy(block: no.elg.infiniteBootleg.protobuf.SpawnEntityKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity =
   no.elg.infiniteBootleg.protobuf.SpawnEntityKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

@@ -70,7 +70,6 @@ public object DespawnEntityKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.copy(block: no.elg.infiniteBootleg.protobuf.DespawnEntityKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity =
   no.elg.infiniteBootleg.protobuf.DespawnEntityKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

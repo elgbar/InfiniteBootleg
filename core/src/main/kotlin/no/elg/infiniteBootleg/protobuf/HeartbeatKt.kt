@@ -50,7 +50,6 @@ public object HeartbeatKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.Heartbeat.copy(block: no.elg.infiniteBootleg.protobuf.HeartbeatKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.Heartbeat =
   no.elg.infiniteBootleg.protobuf.HeartbeatKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

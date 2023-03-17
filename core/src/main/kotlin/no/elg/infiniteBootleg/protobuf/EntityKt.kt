@@ -399,22 +399,18 @@ public object EntityKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.copy(block: no.elg.infiniteBootleg.protobuf.EntityKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity =
   no.elg.infiniteBootleg.protobuf.EntityKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living.copy(block: no.elg.infiniteBootleg.protobuf.EntityKt.LivingKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Living =
   no.elg.infiniteBootleg.protobuf.EntityKt.LivingKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Material.copy(block: no.elg.infiniteBootleg.protobuf.EntityKt.MaterialKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Material =
   no.elg.infiniteBootleg.protobuf.EntityKt.MaterialKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player.copy(block: no.elg.infiniteBootleg.protobuf.EntityKt.PlayerKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Player =
   no.elg.infiniteBootleg.protobuf.EntityKt.PlayerKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

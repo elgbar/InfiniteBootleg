@@ -53,7 +53,6 @@ public object ServerLoginStatusKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.copy(block: no.elg.infiniteBootleg.protobuf.ServerLoginStatusKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus =
   no.elg.infiniteBootleg.protobuf.ServerLoginStatusKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

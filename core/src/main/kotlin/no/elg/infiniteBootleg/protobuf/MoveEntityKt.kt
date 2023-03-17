@@ -119,7 +119,6 @@ public object MoveEntityKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.Packets.MoveEntity.copy(block: no.elg.infiniteBootleg.protobuf.MoveEntityKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.Packets.MoveEntity =
   no.elg.infiniteBootleg.protobuf.MoveEntityKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 

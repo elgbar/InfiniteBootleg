@@ -243,7 +243,6 @@ public object WorldKt {
   }
 }
 @kotlin.jvm.JvmSynthetic
-@com.google.errorprone.annotations.CheckReturnValue
 public inline fun no.elg.infiniteBootleg.protobuf.ProtoWorld.World.copy(block: no.elg.infiniteBootleg.protobuf.WorldKt.Dsl.() -> kotlin.Unit): no.elg.infiniteBootleg.protobuf.ProtoWorld.World =
   no.elg.infiniteBootleg.protobuf.WorldKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
