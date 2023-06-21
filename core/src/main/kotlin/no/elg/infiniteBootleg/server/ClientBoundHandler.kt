@@ -17,11 +17,9 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   }
 
   override fun channelInactive(ctx: ChannelHandlerContext) {
-    Main.inst()
-      .scheduler
-      .executeSync {
-        val serverClient = ClientMain.inst().serverClient
-        if (serverClient != null) {
+    Main.inst().scheduler.executeSync {
+      val serverClient = ClientMain.inst().serverClient
+      if (serverClient != null) {
           val sharedInformation = serverClient.sharedInformation
           if (sharedInformation != null) {
             val task = sharedInformation.heartbeatTask
@@ -33,10 +31,8 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   }
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
-    //        Main.logger().log("Client bound packet " + packet.getType());
-    if (packet.direction == Packets.Packet.Direction.SERVER ||
-      packet.type.name.startsWith("SB_")
-    ) {
+    Main.logger().log("Client bound packet ${packet.type}")
+    if (packet.direction == Packets.Packet.Direction.SERVER || packet.type.name.startsWith("SB_")) {
       ctx.fatal("Client got a server packet ${packet.type} direction ${packet.direction}")
       return
     }

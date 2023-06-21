@@ -144,12 +144,6 @@ public class ClientMain extends CommonMain {
   }
 
   @Override
-  public void pause() {}
-
-  @Override
-  public void resume() {}
-
-  @Override
   public void dispose() {
     super.dispose();
     if (Settings.client) {

@@ -10,6 +10,7 @@ open class AsyncEvent(vararg expectedThreadType: ThreadType) : Event {
     if (expectedThreadType.isNotEmpty() && dispatchedThreadType !in expectedThreadType) {
       Main.logger()
         .warn(
+          "AsyncEvent",
           "Expected the event ${this::class.simpleName} to be dispatched on one of ${expectedThreadType.contentToString()}" +
             ", but it was created on a $dispatchedThreadType thread type"
         )
