@@ -176,6 +176,8 @@ subprojects {
       isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
   }
+
+  tasks.assemble.dependsOn spotlessApply
 }
 
 project(":desktop") {

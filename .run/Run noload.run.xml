@@ -3,7 +3,7 @@
     <envs>
       <env name="vblank_mode" value="0" />
     </envs>
-    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncher" />
+    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncherKt" />
     <module name="InfiniteBootleg.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="--no-load" />
     <option name="VM_PARAMETERS" value="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints" />

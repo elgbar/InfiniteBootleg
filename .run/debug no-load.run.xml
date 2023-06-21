@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="debug no-load" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncher" />
+    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncherKt" />
     <module name="InfiniteBootleg.desktop.main" />
     <option name="PROGRAM_PARAMETERS" value="-dl" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />
