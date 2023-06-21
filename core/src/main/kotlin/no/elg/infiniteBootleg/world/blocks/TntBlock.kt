@@ -1,18 +1,14 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.google.common.base.Preconditions
 import ktx.collections.gdxSetOf
+import no.elg.infiniteBootleg.KAssets.whiteTexture
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT
 import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Chunk
@@ -150,16 +146,5 @@ class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: M
      */
     const val RESISTANCE = 8
     const val FUSE_DURATION_SECONDS = 3f
-
-    val whiteTexture: TextureRegion? = if (Settings.client) {
-      val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
-      pixmap.setColor(Color.WHITE)
-      pixmap.fill()
-      val texture = Texture(pixmap)
-      pixmap.dispose()
-      TextureRegion(texture)
-    } else {
-      null
-    }
   }
 }

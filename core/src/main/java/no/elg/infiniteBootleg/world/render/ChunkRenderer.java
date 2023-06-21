@@ -13,9 +13,7 @@ import static no.elg.infiniteBootleg.world.Material.AIR;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL30;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -23,6 +21,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.LinkedList;
 import java.util.List;
+import no.elg.infiniteBootleg.KAssets;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Renderer;
@@ -51,8 +50,6 @@ public class ChunkRenderer implements Renderer, Disposable {
   // current rendering chunk
   private Chunk curr;
   private static final Object QUEUE_LOCK = new Object();
-  @NotNull private static final TextureRegion CAVE_TEXTURE;
-  @NotNull private static final TextureRegion SKY_TEXTURE;
 
   public static final float CAVE_CLEAR_COLOR_R = 0.408824f;
   public static final float CAVE_CLEAR_COLOR_G = 0.202941f;
@@ -61,17 +58,6 @@ public class ChunkRenderer implements Renderer, Disposable {
   private static final int CHUNK_NOT_IN_QUEUE_INDEX = -1;
 
   static {
-    var skyPixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
-    skyPixmap.setColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
-    skyPixmap.fill();
-    SKY_TEXTURE = new TextureRegion(new Texture(skyPixmap));
-    skyPixmap.dispose();
-
-    var cavePixmap = new Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444);
-    cavePixmap.setColor(CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A);
-    cavePixmap.fill();
-    CAVE_TEXTURE = new TextureRegion(new Texture(cavePixmap));
-    cavePixmap.dispose();
   }
 
   public ChunkRenderer(@NotNull WorldRender worldRender) {
@@ -165,7 +151,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     Block[][] blocks = chunk.getBlocks();
     fbo.begin();
     batch.begin();
-    Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
     if (aboveGround) {
       Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
@@ -188,14 +174,14 @@ public class ChunkRenderer implements Renderer, Disposable {
         TextureRegion secondaryTexture;
         int worldY = CoordUtilKt.chunkToWorld(chunk.getChunkY(), localY);
         if (material == AIR) {
-          texture = (topBlockHeight > worldY) ? CAVE_TEXTURE : SKY_TEXTURE;
+          texture = (topBlockHeight > worldY) ? KAssets.caveTexture : KAssets.skyTexture;
           secondaryTexture = null;
         } else {
           texture = block.getTexture();
           assert texture != null;
 
           if (material.isTransparent()) {
-            secondaryTexture = (topBlockHeight > worldY) ? CAVE_TEXTURE : SKY_TEXTURE;
+            secondaryTexture = (topBlockHeight > worldY) ? KAssets.caveTexture : KAssets.skyTexture;
           } else {
             secondaryTexture = null;
           }

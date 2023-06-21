@@ -1,6 +1,9 @@
 package no.elg.infiniteBootleg
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
@@ -23,7 +26,10 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.infiniteBootleg.ClientMain.SCALE
 import no.elg.infiniteBootleg.screen.ScreenRenderer
+import no.elg.infiniteBootleg.util.use
+import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import java.io.File
 
 /**
@@ -46,6 +52,12 @@ object KAssets {
   lateinit var playerTexture: TextureRegion
   lateinit var doorOpenTexture: TextureRegion
   lateinit var doorClosedTexture: TextureRegion
+
+  lateinit var skyTexture: TextureRegion
+  lateinit var caveTexture: TextureRegion
+  lateinit var whiteTexture: TextureRegion
+  lateinit var skylightDebugTexture: TextureRegion
+  lateinit var luminanceDebugTexture: TextureRegion
 
   val font: BitmapFont by lazy {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
@@ -100,7 +112,22 @@ object KAssets {
       menu { openButtonStyle = newOpenButtonStyle }
     }
 
+    skyTexture = createTextureRegion(ClientMain.CLEAR_COLOR_R, ClientMain.CLEAR_COLOR_G, ClientMain.CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)
+    caveTexture = createTextureRegion(ChunkRenderer.CAVE_CLEAR_COLOR_R, ChunkRenderer.CAVE_CLEAR_COLOR_G, ChunkRenderer.CAVE_CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)
+    whiteTexture = createTextureRegion(Color.WHITE)
+    skylightDebugTexture = createTextureRegion(Color.YELLOW, 0.5f)
+    luminanceDebugTexture = createTextureRegion(Color.FIREBRICK, 0.5f)
+
     // Do some dummy work to load textures and constructors
     Main.logger().debug("Material", "Loaded ${Material.values().size} materials")
   }
+
+  private fun createTextureRegion(color: Color): TextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
+  private fun createTextureRegion(color: Color, a: Float): TextureRegion = createTextureRegion(color.r, color.g, color.b, a)
+  private fun createTextureRegion(r: Float, g: Float, b: Float, a: Float): TextureRegion =
+    Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444).use<Pixmap, TextureRegion> {
+      it.setColor(r, g, b, a)
+      it.fill()
+      return@use TextureRegion(Texture(it))
+    }
 }

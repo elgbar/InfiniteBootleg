@@ -1,15 +1,12 @@
 package no.elg.infiniteBootleg.world.render.debug
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.ClientMain
+import no.elg.infiniteBootleg.KAssets.luminanceDebugTexture
+import no.elg.infiniteBootleg.KAssets.skylightDebugTexture
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
-import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
@@ -33,36 +30,14 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
       val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
-      batch.draw(luminanceDebugTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
+      batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
     }
 
     for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
       val lightY = worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
-      batch.draw(skylightDebugTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
+      batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
     }
     batch.end()
-  }
-
-  companion object {
-    val skylightDebugTexture: TextureRegion by lazy {
-      val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
-      val yellow = Color.YELLOW
-      pixmap.setColor(Color(yellow.r, yellow.g, yellow.b, 0.5f))
-      pixmap.fill()
-      val texture = Texture(pixmap)
-      pixmap.dispose()
-      TextureRegion(texture)
-    }
-
-    val luminanceDebugTexture: TextureRegion by lazy {
-      val pixmap = Pixmap(BLOCK_SIZE, BLOCK_SIZE, Pixmap.Format.RGBA4444)
-      val fb = Color.FIREBRICK
-      pixmap.setColor(Color(fb.r, fb.g, fb.b, 0.5f))
-      pixmap.fill()
-      val texture = Texture(pixmap)
-      pixmap.dispose()
-      TextureRegion(texture)
-    }
   }
 }
