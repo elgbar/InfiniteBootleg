@@ -71,8 +71,8 @@ public class Commands extends CommandExecutor {
 
   @CmdArgNames({"red", "green", "blue", "alpha"})
   @ConsoleDoc(
-    description = "Set the color of the sky. Params are expected to be between 0 and 1",
-    paramDescriptions = {"red", "green", "blue", "alpha"})
+      description = "Set the color of the sky. Params are expected to be between 0 and 1",
+      paramDescriptions = {"red", "green", "blue", "alpha"})
   public void skyColor(float r, float g, float b, float a) {
     World world = getWorld();
     if (world == null) return;
@@ -84,8 +84,8 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @CmdArgNames("color")
   @ConsoleDoc(
-    description = "Set the color of the sky",
-    paramDescriptions = {"Name of color"})
+      description = "Set the color of the sky",
+      paramDescriptions = {"Name of color"})
   public void skyColor(String colorName) {
     World world = getWorld();
     if (world == null) return;
@@ -113,7 +113,7 @@ public class Commands extends CommandExecutor {
       chunk.dirty();
     }
     logger.log(
-      LogLevel.SUCCESS, "Lighting is now " + (Settings.renderLight ? "enabled" : "disabled"));
+        LogLevel.SUCCESS, "Lighting is now " + (Settings.renderLight ? "enabled" : "disabled"));
   }
 
   @ClientsideOnly
@@ -125,8 +125,8 @@ public class Commands extends CommandExecutor {
   @CmdArgNames("force")
   @ClientsideOnly
   @ConsoleDoc(
-    description = "Reload all loaded chunks",
-    paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
+      description = "Reload all loaded chunks",
+      paramDescriptions = "Force unloading of chunks even when unloading is disallowed")
   public void reload(boolean force) {
     World world = getWorld();
     if (world == null) return;
@@ -148,9 +148,9 @@ public class Commands extends CommandExecutor {
   }
 
   @ConsoleDoc(
-    description =
-      "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of"
-        + " chunks, entity updates and chunks update")
+      description =
+          "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of"
+              + " chunks, entity updates and chunks update")
   public void pause() {
     World world = getWorld();
     if (world == null) return;
@@ -164,9 +164,9 @@ public class Commands extends CommandExecutor {
   }
 
   @ConsoleDoc(
-    description =
-      "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of"
-        + " chunks, entity updates and chunks update")
+      description =
+          "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of"
+              + " chunks, entity updates and chunks update")
   public void resume() {
     World world = getWorld();
     if (world == null) return;
@@ -186,8 +186,8 @@ public class Commands extends CommandExecutor {
     Settings.renderBox2dDebug = !Settings.renderBox2dDebug;
     Settings.debug = true;
     logger.log(
-      LogLevel.SUCCESS,
-      "Debug rendering for Box2D is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
+        LogLevel.SUCCESS,
+        "Debug rendering for Box2D is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
   }
 
   @ClientsideOnly
@@ -196,8 +196,8 @@ public class Commands extends CommandExecutor {
     Settings.renderChunkBounds = !Settings.renderChunkBounds;
     Settings.debug = true;
     logger.log(
-      LogLevel.SUCCESS,
-      "Debug rendering of chunks is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
+        LogLevel.SUCCESS,
+        "Debug rendering of chunks is now " + (Settings.renderBox2dDebug ? "enabled" : "disabled"));
   }
 
   @ClientsideOnly
@@ -206,13 +206,13 @@ public class Commands extends CommandExecutor {
     Settings.debugEntityLight = !Settings.debugEntityLight;
     Settings.debug = true;
     logger.log(
-      LogLevel.SUCCESS,
-      "Debug rendering of entity light is now "
-        + (Settings.debugEntityLight ? "enabled" : "disabled"));
+        LogLevel.SUCCESS,
+        "Debug rendering of entity light is now "
+            + (Settings.debugEntityLight ? "enabled" : "disabled"));
     if (Settings.debugEntityLight) {
       logger.log(
-        LogLevel.DEFAULT,
-        "A white box is rendered over the block each entity source their brightness from");
+          LogLevel.DEFAULT,
+          "A white box is rendered over the block each entity source their brightness from");
     }
   }
 
@@ -222,14 +222,14 @@ public class Commands extends CommandExecutor {
     Settings.debugBlockLight = !Settings.debugBlockLight;
     Settings.debug = true;
     logger.log(
-      LogLevel.SUCCESS,
-      "Debug rendering of block light is now "
-        + (Settings.debugBlockLight ? "enabled" : "disabled"));
+        LogLevel.SUCCESS,
+        "Debug rendering of block light is now "
+            + (Settings.debugBlockLight ? "enabled" : "disabled"));
     if (Settings.debugBlockLight) {
       logger.log(
-        LogLevel.DEFAULT,
-        "A red box is rendered over the luminescent blocks and a yellow box represents the"
-          + " skylight each block source their brightness from");
+          LogLevel.DEFAULT,
+          "A red box is rendered over the luminescent blocks and a yellow box represents the"
+              + " skylight each block source their brightness from");
     }
   }
 
@@ -238,15 +238,15 @@ public class Commands extends CommandExecutor {
   public void lerp() {
     Settings.enableCameraFollowLerp = !Settings.enableCameraFollowLerp;
     logger.log(
-      LogLevel.SUCCESS,
-      "Camera lerp is now " + (Settings.enableCameraFollowLerp ? "enabled" : "disabled"));
+        LogLevel.SUCCESS,
+        "Camera lerp is now " + (Settings.enableCameraFollowLerp ? "enabled" : "disabled"));
   }
 
   @CmdArgNames({"x", "y"})
   @ClientsideOnly
   @ConsoleDoc(
-    description = "Teleport to given world coordinate",
-    paramDescriptions = {"World x coordinate", "World y coordinate"})
+      description = "Teleport to given world coordinate",
+      paramDescriptions = {"World x coordinate", "World y coordinate"})
   public void tp(float worldX, float worldY) {
     var clientWorld = getClientWorld();
     if (clientWorld == null) {
@@ -271,8 +271,8 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"mode"})
   @ClientsideOnly
   @ConsoleDoc(
-    description = "Toggle how much information to show",
-    paramDescriptions = "block, debug, graph, mindebug, or none")
+      description = "Toggle how much information to show",
+      paramDescriptions = "block, debug, graph, mindebug, or none")
   public void hud(String modusName) {
     var screen = ClientMain.inst().getScreen();
     if (!(screen instanceof WorldScreen worldScreen)) {
@@ -282,14 +282,14 @@ public class Commands extends CommandExecutor {
     var hud = worldScreen.getHud();
 
     int mode =
-      switch (modusName) {
-        case "block" -> HUDRenderer.DISPLAY_CURRENT_BLOCK;
-        case "mindebug" -> HUDRenderer.DISPLAY_MINIMAL_DEBUG;
-        case "debug" -> HUDRenderer.DISPLAY_DEBUG;
-        case "graph" -> HUDRenderer.DISPLAY_GRAPH_FPS;
-        case "none" -> HUDRenderer.DISPLAY_NOTHING;
-        default -> -1;
-      };
+        switch (modusName) {
+          case "block" -> HUDRenderer.DISPLAY_CURRENT_BLOCK;
+          case "mindebug" -> HUDRenderer.DISPLAY_MINIMAL_DEBUG;
+          case "debug" -> HUDRenderer.DISPLAY_DEBUG;
+          case "graph" -> HUDRenderer.DISPLAY_GRAPH_FPS;
+          case "none" -> HUDRenderer.DISPLAY_NOTHING;
+          default -> -1;
+        };
     if (mode < 0) {
       logger.error("Unknown HUD modus '" + modusName + "'");
     } else if (mode == 0) {
@@ -302,12 +302,12 @@ public class Commands extends CommandExecutor {
   @CmdArgNames({"zoom level"})
   @ClientsideOnly
   @ConsoleDoc(
-    description = "Change the zoom level of the world camera",
-    paramDescriptions = "The new zoom level, min is " + WorldRender.MIN_ZOOM)
+      description = "Change the zoom level of the world camera",
+      paramDescriptions = "The new zoom level, min is " + WorldRender.MIN_ZOOM)
   public void zoom(float zoom) {
     if (zoom < WorldRender.MIN_ZOOM) {
       logger.warn(
-        "Given zoom level (%.3f) is less than the minimum % .3f", zoom, WorldRender.MIN_ZOOM);
+          "Given zoom level (%.3f) is less than the minimum % .3f", zoom, WorldRender.MIN_ZOOM);
       zoom = WorldRender.MIN_ZOOM;
     }
     var clientWorld = getClientWorld();
@@ -346,29 +346,29 @@ public class Commands extends CommandExecutor {
       return;
     }
     ImmutableArray<Entity> entities =
-      world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+        world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
     if (entities.size() == 0) {
       logger.log("There is no local, controlled player in this world");
     }
     for (Entity entity : entities) {
       var controls =
-        LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+          LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
       logger.logf(
-        LogLevel.SUCCESS,
-        "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
-        controls.getBreakBrushSize(),
-        controls.getPlaceBrushSize());
+          LogLevel.SUCCESS,
+          "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
+          controls.getBreakBrushSize(),
+          controls.getPlaceBrushSize());
     }
   }
 
   @CmdArgNames({"type", "size"})
   @ClientsideOnly
   @ConsoleDoc(
-    description = "Set the brush size of the mouse",
-    paramDescriptions = {
-      "Type of brush to change, can be 'break' and 'place'",
-      "New brush size, positive integer"
-    })
+      description = "Set the brush size of the mouse",
+      paramDescriptions = {
+        "Type of brush to change, can be 'break' and 'place'",
+        "New brush size, positive integer"
+      })
   public void brush(String type, float size) {
     ClientWorld world = getClientWorld();
     if (world == null) {
@@ -379,13 +379,13 @@ public class Commands extends CommandExecutor {
       return;
     }
     ImmutableArray<Entity> entities =
-      world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+        world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world");
     }
     for (Entity entity : entities) {
       var controls =
-        LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+          LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
       if (type.startsWith("b")) {
         controls.setBreakBrushSize(size);
       } else if (type.startsWith("p")) {
@@ -399,18 +399,20 @@ public class Commands extends CommandExecutor {
 
   @ClientsideOnly
   @ConsoleDoc(
-    description = "Toggle whether a player can place blocks disconnected from other blocks")
+      description = "Toggle whether a player can place blocks disconnected from other blocks")
   public void placeCheck() {
     ClientWorld world = getClientWorld();
     if (world == null) {
       return;
     }
-    ImmutableArray<Entity> entities = world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+    ImmutableArray<Entity> entities =
+        world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world");
     }
     for (Entity entity : entities) {
-      var controls = LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
+      var controls =
+          LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
       controls.setIgnorePlaceableCheck(controls.getIgnorePlaceableCheck());
       logger.success("Place check is now " + controls.getIgnorePlaceableCheck());
     }
@@ -429,8 +431,8 @@ public class Commands extends CommandExecutor {
     logger.success("Changed time scale from % .3f to % .3f", old, scale);
 
     PacketExtraKt.sendDuplexPacket(
-      () -> PacketExtraKt.clientBoundWorldSettings(null, null, scale),
-      client -> PacketExtraKt.serverBoundWorldSettings(client, null, null, scale));
+        () -> PacketExtraKt.clientBoundWorldSettings(null, null, scale),
+        client -> PacketExtraKt.serverBoundWorldSettings(client, null, null, scale));
   }
 
   @ConsoleDoc(description = "Toggle if time ticks or not")
@@ -440,16 +442,16 @@ public class Commands extends CommandExecutor {
     logger.success("Time is now " + (Settings.dayTicking ? "" : "not ") + "ticking");
 
     PacketExtraKt.sendDuplexPacket(
-      () -> PacketExtraKt.clientBoundWorldSettings(null, null, Settings.dayTicking ? 1f : 0f),
-      client ->
-        PacketExtraKt.serverBoundWorldSettings(
-          client, null, null, Settings.dayTicking ? 1f : 0f));
+        () -> PacketExtraKt.clientBoundWorldSettings(null, null, Settings.dayTicking ? 1f : 0f),
+        client ->
+            PacketExtraKt.serverBoundWorldSettings(
+                client, null, null, Settings.dayTicking ? 1f : 0f));
   }
 
   @CmdArgNames({"time of day"})
   @ConsoleDoc(
-    description = "Set the current time",
-    paramDescriptions = "Time of day such as day, noon, dusk, night")
+      description = "Set the current time",
+      paramDescriptions = "Time of day such as day, noon, dusk, night")
   public void time(String timeOfDay) {
     float time;
     try {
@@ -478,8 +480,8 @@ public class Commands extends CommandExecutor {
 
   @CmdArgNames({"time"})
   @ConsoleDoc(
-    description = "Set the current time",
-    paramDescriptions = "The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc")
+      description = "Set the current time",
+      paramDescriptions = "The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc")
   public void time(float time) {
     var world = getWorld();
     if (world == null) {
@@ -490,8 +492,8 @@ public class Commands extends CommandExecutor {
     worldTime.setTime(time);
 
     PacketExtraKt.sendDuplexPacket(
-      () -> PacketExtraKt.clientBoundWorldSettings(null, time, null),
-      client -> PacketExtraKt.serverBoundWorldSettings(client, null, time, null));
+        () -> PacketExtraKt.clientBoundWorldSettings(null, time, null),
+        client -> PacketExtraKt.serverBoundWorldSettings(client, null, time, null));
     logger.success("Changed time from % .3f to % .3f", old, time);
   }
 
@@ -515,29 +517,29 @@ public class Commands extends CommandExecutor {
       return;
     }
     world.postBox2dRunnable(
-      () -> {
-        com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
-          world.getWorldBody().getBox2dWorld();
-        var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
-        worldBox2dWorld.getBodies(bodies);
+        () -> {
+          com.badlogic.gdx.physics.box2d.World worldBox2dWorld =
+              world.getWorldBody().getBox2dWorld();
+          var bodies = new Array<Body>(worldBox2dWorld.getBodyCount());
+          worldBox2dWorld.getBodies(bodies);
 
-        int invalid = 0;
-        ImmutableArray<Entity> entities = world.getEngine().getEntities();
-        for (Body body : bodies) {
-          Object userData = body.getUserData();
-          if (userData instanceof Entity entity) {
-            String id = IdComponent.Companion.getIdComponent(entity).getId();
-            if (world.containsEntity(id)) {
-              continue;
+          int invalid = 0;
+          ImmutableArray<Entity> entities = world.getEngine().getEntities();
+          for (Body body : bodies) {
+            Object userData = body.getUserData();
+            if (userData instanceof Entity entity) {
+              String id = IdComponent.Companion.getIdComponent(entity).getId();
+              if (world.containsEntity(id)) {
+                continue;
+              }
+              invalid++;
+              logger.error("Entity", "Found entity not added to the world! " + id);
             }
-            invalid++;
-            logger.error("Entity", "Found entity not added to the world! " + id);
           }
-        }
-        if (invalid == 0) {
-          logger.success("No invalid bodies found!");
-        }
-      });
+          if (invalid == 0) {
+            logger.success("No invalid bodies found!");
+          }
+        });
   }
 
   //  @ClientsideOnly
@@ -588,12 +590,12 @@ public class Commands extends CommandExecutor {
     ServerClient client = ClientMain.inst().getServerClient();
     if (client != null) {
       client.ctx.writeAndFlush(
-        PacketExtraKt.serverBoundClientDisconnectPacket(client, "Disconnect command"));
+          PacketExtraKt.serverBoundClientDisconnectPacket(client, "Disconnect command"));
     }
     ConnectingScreen.INSTANCE.setInfo("Disconnected");
     Main.inst()
-      .getScheduler()
-      .scheduleSync(50L, () -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE));
+        .getScheduler()
+        .scheduleSync(50L, () -> ClientMain.inst().setScreen(MainMenuScreen.INSTANCE));
   }
 
   @ConsoleDoc(description = "Some debug info")
@@ -648,19 +650,19 @@ public class Commands extends CommandExecutor {
     //    }
 
     Main.logger()
-      .log(
-        "Chunk pos: \n"
-          + Arrays.stream(world.getLoadedChunks().items)
-          .sorted()
-          .map(
-            c ->
-              "("
-                + c.getChunkX()
-                + ", "
-                + c.getChunkY()
-                + ") in view? "
-                + !world.getRender().isOutOfView(c))
-          .collect(Collectors.joining("\n")));
+        .log(
+            "Chunk pos: \n"
+                + Arrays.stream(world.getLoadedChunks().items)
+                    .sorted()
+                    .map(
+                        c ->
+                            "("
+                                + c.getChunkX()
+                                + ", "
+                                + c.getChunkY()
+                                + ") in view? "
+                                + !world.getRender().isOutOfView(c))
+                    .collect(Collectors.joining("\n")));
   }
 
   @ConsoleDoc(description = "Toggle whether to track events")

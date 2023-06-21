@@ -28,8 +28,7 @@ public class HUDRenderer implements Renderer, Resizable {
 
   private int modus = DISPLAY_CURRENT_BLOCK;
 
-  @NotNull
-  private final StringBuilder builder = new StringBuilder();
+  @NotNull private final StringBuilder builder = new StringBuilder();
 
   public HUDRenderer() {
     modus |= Settings.debug ? DISPLAY_DEBUG : DISPLAY_CURRENT_BLOCK;
@@ -54,7 +53,7 @@ public class HUDRenderer implements Renderer, Resizable {
       int mouseBlockX = main.getMouseLocator().getMouseBlockX();
       int mouseBlockY = main.getMouseLocator().getMouseBlockY();
       ImmutableArray<Entity> controlled =
-        world.getEngine().getEntitiesFor(AshleyKt.getControlledEntityFamily());
+          world.getEngine().getEntitiesFor(AshleyKt.getControlledEntityFamily());
 
       nl();
       DebugText.pointing(builder, world, mouseBlockX, mouseBlockY);

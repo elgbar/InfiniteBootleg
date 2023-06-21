@@ -20,14 +20,14 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
     Main.inst().scheduler.executeSync {
       val serverClient = ClientMain.inst().serverClient
       if (serverClient != null) {
-          val sharedInformation = serverClient.sharedInformation
-          if (sharedInformation != null) {
-            val task = sharedInformation.heartbeatTask
-            task?.cancel(false)
-          }
+        val sharedInformation = serverClient.sharedInformation
+        if (sharedInformation != null) {
+          val task = sharedInformation.heartbeatTask
+          task?.cancel(false)
         }
-        ClientMain.inst().screen = ConnectingScreen
       }
+      ClientMain.inst().screen = ConnectingScreen
+    }
   }
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
