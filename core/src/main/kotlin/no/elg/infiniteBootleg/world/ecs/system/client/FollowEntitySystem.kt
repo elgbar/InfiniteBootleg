@@ -23,11 +23,10 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
   private const val LERP_CUTOFF = 5f
 
   override fun update(deltaTime: Float) {
-    val activeEntities = entities.filter { it.followedByCamera }
-    val entity = activeEntities.firstOrNull() ?: return
+    val entity = entities.firstOrNull() ?: return
     processEntity(entity)
-    if (activeEntities.size > 1) {
-      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName} active. There can only be one at a time. Entities: $entities")
+    if (entities.size() > 1) {
+      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: $entities")
     }
   }
 
