@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import org.jetbrains.annotations.Contract
+import kotlin.math.floor
 
 /**
  * @param this@worldToChunk A location in world view
@@ -155,7 +156,7 @@ inline fun stringifyChunkToWorld(chunk: Chunk, localX: Int, localY: Int): String
  * @param worldCoord A part of a coordinate in the world
  * @return Which coordinate a block at the given world coordinate will have
  */
-inline fun worldToBlock(worldCoord: Float): Int = Math.floor(worldCoord.toDouble()).toInt()
+inline fun worldToBlock(worldCoord: Float): Int = floor(worldCoord.toDouble()).toInt()
 
 /**
  * @param worldOffset Given by [WorldBody.getWorldOffsetX] and [WorldBody.getWorldOffsetY]

@@ -47,6 +47,7 @@ import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkColumn
 import no.elg.infiniteBootleg.world.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.ChunkColumnImpl.Companion.fromProtobuf
+import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.Material
@@ -557,6 +558,21 @@ abstract class World(
     val chunk = nullableChunk ?: return@actionOnBlock false
     val block: Block = chunk.getRawBlock(localX, localY) ?: return@actionOnBlock true
     block.material === Material.AIR
+  }
+
+  /**
+   * Check whether a block can be placed at the given location
+   */
+  fun canPlaceBlock(blockX: Int, blockY: Int): Boolean {
+    if (!canPassThrough(blockX, blockY, false)) {
+      return false
+    }
+    for (direction in Direction.CARDINAL) {
+      if (!canPassThrough(blockX + direction.dx, blockY + direction.dy, false)) {
+        return true
+      }
+    }
+    return false
   }
 
   fun canPassThrough(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean =

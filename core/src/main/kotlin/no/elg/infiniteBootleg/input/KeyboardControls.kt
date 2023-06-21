@@ -36,6 +36,7 @@ class KeyboardControls(val world: ClientWorld) {
 
   var breakBrushSize = 2f
   var placeBrushSize = 1f
+  var ignorePlaceableCheck: Boolean = false
 
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()
@@ -65,15 +66,17 @@ class KeyboardControls(val world: ClientWorld) {
     Main.inst().scheduler.executeAsync {
       val selectedMaterial = entity.selectedMaterialOrNull ?: return@executeAsync
       val selected = selectedMaterial.material
-      if (placeBrushSize <= 1) {
-        selected.create(world, blockX, blockY)
-      } else {
-        val blocksWithin = world.getBlocksWithin(worldX, worldY, placeBrushSize)
-        if (blocksWithin.isEmpty) {
+      if (ignorePlaceableCheck || world.canPlaceBlock(blockX, blockY)) {
+        if (placeBrushSize <= 1) {
           selected.create(world, blockX, blockY)
         } else {
-          for (block in blocksWithin) {
-            selected.create(world, block.worldX, block.worldY)
+          val blocksWithin = world.getBlocksWithin(worldX, worldY, placeBrushSize)
+          if (blocksWithin.isEmpty) {
+            selected.create(world, blockX, blockY)
+          } else {
+            for (block in blocksWithin) {
+              selected.create(world, block.worldX, block.worldY)
+            }
           }
         }
       }
