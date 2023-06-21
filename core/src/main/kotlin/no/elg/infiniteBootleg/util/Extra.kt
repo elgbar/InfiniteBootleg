@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.util
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
@@ -91,4 +92,11 @@ inline fun <T : Disposable, R> T.use(onError: (Exception) -> Unit = {}, action: 
   } finally {
     this.dispose(onError)
   }
+}
+
+inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.g, b: Float = this.color.b, a: Float = this.color.a, action: (SpriteBatch) -> Unit) {
+  val oldColor = this.color.cpy()
+  this.setColor(r, g, b, a)
+  action(this)
+  this.color = oldColor
 }

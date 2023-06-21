@@ -679,19 +679,7 @@ abstract class World(
     return chunk.getRawBlock(localX, localY)
   }
 
-  /**
-   * Note an air block will be created if the chunk is loaded and there is no other block at the
-   * given location
-   *
-   * @param worldX The x coordinate from world view
-   * @param worldY The y coordinate from world view
-   * @return The block at the given x and y
-   */
-  fun getBlock(worldX: Int, worldY: Int): Block? {
-    return getBlock(worldX, worldY, true)
-  }
-
-  fun getBlockLight(worldX: Int, worldY: Int, loadChunk: Boolean): BlockLight? {
+  fun getBlockLight(worldX: Int, worldY: Int, loadChunk: Boolean = true): BlockLight? {
     val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
     return chunk.getBlockLight(worldX.chunkOffset(), worldY.chunkOffset())
   }
@@ -705,7 +693,7 @@ abstract class World(
    * @param loadChunk
    * @return The block at the given x and y
    */
-  fun getBlock(worldX: Int, worldY: Int, loadChunk: Boolean): Block? {
+  fun getBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Block? {
     val chunkX = worldX.worldToChunk()
     val chunkY = worldY.worldToChunk()
     val localX = worldX - chunkX * Chunk.CHUNK_SIZE

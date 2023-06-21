@@ -16,8 +16,11 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.OrderedSet;
+import java.util.ArrayList;
+import java.util.List;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
+import no.elg.infiniteBootleg.api.Renderer;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Location;
@@ -36,7 +39,7 @@ public class ClientWorldRender implements WorldRender {
   @NotNull private final ClientChunksInView chunksInView;
   @NotNull private final Matrix4 m4 = new Matrix4();
   @NotNull OrderedMap<Chunk, TextureRegion> draw;
-  @NotNull private final EntityRenderer entityRenderer;
+  @NotNull private final List<Renderer> renderers = new ArrayList<>();
   @NotNull private final SpriteBatch batch;
   @NotNull private final OrthographicCamera camera;
   @NotNull private final ChunkRenderer chunkRenderer;
@@ -53,7 +56,8 @@ public class ClientWorldRender implements WorldRender {
     draw.orderedKeys().ordered = false; // improve remove
 
     chunkRenderer = new ChunkRenderer(this);
-    entityRenderer = new EntityRenderer(this);
+    renderers.add(new EntityRenderer(this));
+    renderers.add(new HoveringBlockRenderer(this));
 
     camera = new OrthographicCamera();
     camera.setToOrtho(false);
@@ -127,7 +131,9 @@ public class ClientWorldRender implements WorldRender {
       var dy = entry.key.getChunkY() * CHUNK_TEXTURE_SIZE + worldOffsetY;
       batch.draw(entry.value, dx, dy, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE);
     }
-    entityRenderer.render();
+    for (Renderer renderer : renderers) {
+      renderer.render();
+    }
     batch.end();
     if (Settings.renderChunkBounds && Settings.debug) {
       chunkDebugRenderer.render();

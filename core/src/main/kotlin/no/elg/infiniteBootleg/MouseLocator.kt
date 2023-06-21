@@ -26,7 +26,7 @@ class MouseLocator {
     private set
 
   private val mouseWorldInput = Vector2()
-  private val screenInputVec = Vector3()
+  val screenInputVec = Vector3()
 
   fun update(world: ClientWorld) {
     screenInputVec.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
