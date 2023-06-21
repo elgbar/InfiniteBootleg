@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Renderer;
 import no.elg.infiniteBootleg.api.Resizable;
-import no.elg.infiniteBootleg.screens.hud.CurrentBlock;
+import no.elg.infiniteBootleg.screens.hud.CurrentBlockHUDRenderer;
 import no.elg.infiniteBootleg.screens.hud.DebugGraph;
 import no.elg.infiniteBootleg.screens.hud.DebugText;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
@@ -28,7 +28,8 @@ public class HUDRenderer implements Renderer, Resizable {
 
   private int modus = DISPLAY_CURRENT_BLOCK;
 
-  @NotNull private final StringBuilder builder = new StringBuilder();
+  @NotNull
+  private final StringBuilder builder = new StringBuilder();
 
   public HUDRenderer() {
     modus |= Settings.debug ? DISPLAY_DEBUG : DISPLAY_CURRENT_BLOCK;
@@ -53,7 +54,7 @@ public class HUDRenderer implements Renderer, Resizable {
       int mouseBlockX = main.getMouseLocator().getMouseBlockX();
       int mouseBlockY = main.getMouseLocator().getMouseBlockY();
       ImmutableArray<Entity> controlled =
-          world.getEngine().getEntitiesFor(AshleyKt.getControlledEntityFamily());
+        world.getEngine().getEntitiesFor(AshleyKt.getControlledEntityFamily());
 
       nl();
       DebugText.pointing(builder, world, mouseBlockX, mouseBlockY);
@@ -75,7 +76,7 @@ public class HUDRenderer implements Renderer, Resizable {
     }
 
     if (hasMode(DISPLAY_CURRENT_BLOCK)) {
-      CurrentBlock.INSTANCE.render(sr);
+      CurrentBlockHUDRenderer.INSTANCE.render(sr, world);
     }
     if (hasMode(DISPLAY_GRAPH_FPS)) {
       DebugGraph.INSTANCE.render(sr, world);

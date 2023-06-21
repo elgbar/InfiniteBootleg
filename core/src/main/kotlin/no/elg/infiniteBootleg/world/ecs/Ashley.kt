@@ -72,6 +72,7 @@ val localPlayerFamily: Family = allOf(
  */
 val basicEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY).get()
 val drawableEntitiesFamily: Family = allOf(*BASIC_ENTITY_ARRAY, TextureRegionComponent::class).get()
+val selectedMaterialComponentFamily: Family = allOf(*BASIC_ENTITY_ARRAY, SelectedMaterialComponent::class).get()
 val basicDynamicEntityFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY).get()
 
 val followEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, FollowedByCameraTag::class).get()
