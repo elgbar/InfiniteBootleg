@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -18,15 +19,15 @@ import kotlin.math.abs
 object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_DEFAULT) {
 
   const val SCROLL_SPEED = 0.25f
-  const val CAMERA_LERP = 2.5f
-  const val LERP_CUTOFF = 5f
-  private const val CAMERA_SPEED = 100 * Block.BLOCK_SIZE
+  private const val CAMERA_LERP = 2.5f
+  private const val LERP_CUTOFF = 5f
 
   override fun update(deltaTime: Float) {
-    val entity = entities.firstOrNull() ?: return
+    val activeEntities = entities.filter { it.followedByCamera }
+    val entity = activeEntities.firstOrNull() ?: return
     processEntity(entity)
-    if (entities.size() > 1) {
-      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: $entities")
+    if (activeEntities.size > 1) {
+      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName} active. There can only be one at a time. Entities: $entities")
     }
   }
 
