@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.util
 
+import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.uuid.Generators
+import ktx.assets.dispose
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import java.util.UUID
@@ -76,4 +78,17 @@ fun Block?.isNotAir(): Boolean {
 
 fun Block.isNotAir(): Boolean {
   return this.material != Material.AIR
+}
+
+/**
+ * Do an action on a disposable respire then call [Disposable.dispose] on the resource.
+ * @param action The action to do on the resource
+ * @param onError The action to perform if we failed to dispose the resource
+ */
+inline fun <T : Disposable, R> T.use(onError: (Exception) -> Unit = {}, action: (T) -> R): R {
+  try {
+    return action(this)
+  } finally {
+    this.dispose(onError)
+  }
 }
