@@ -96,9 +96,6 @@ class KeyboardControls(val world: ClientWorld) {
 
   private fun Entity.walk() {
     fun moveHorz(dir: Float) {
-//      if (!entity.validLocation(entity.position.x + GROUND_CHECK_OFFSET * dir, entity.position.y)) {
-//        return
-//      }
       val world = world.world
       world.postBox2dRunnable {
         if (grounded.canMove(dir)) {
@@ -128,16 +125,10 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   private fun Entity.jump() {
-//    println("onGround? ${this.grounded.onGround} (contacts ${this.grounded.contactPoints})")
     if (this.grounded.onGround && Gdx.input.isKeyPressed(Keys.W)) {
       setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
     }
   }
-
-//  private fun updateLookDirection(player: Player) {
-//    val angle: Float = tmpVec.set(ClientMain.inst().mouse).sub(player.position).angleDeg()
-//    player.lookDeg = angle
-//  }
 
   fun update(entity: Entity) {
     val entityWorld = entity.world.world
@@ -160,15 +151,6 @@ class KeyboardControls(val world: ClientWorld) {
       entity.jump()
       entity.walk()
     }
-
-//    if (entity is Player) {
-//      val player = entity as Player
-//
-//      if (Gdx.input.isKeyJustPressed(Keys.P)) {
-//        player.toggleTorch()
-//      }
-//      updateLookDirection(player)
-//    }
   }
 
   private fun Entity.setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
@@ -308,15 +290,5 @@ class KeyboardControls(val world: ClientWorld) {
 
     const val MAX_X_VEL = 7.5f // ie target velocity
     const val MAX_Y_VEL = 100f
-
-    private var mouseBlockX = 0
-    private var mouseBlockY = 0
-    private var mouseWorldX = 0f
-    private var mouseWorldY = 0f
-
-    private var previousMouseBlockX = 0
-    private var previousMouseBlockY = 0
-    private var previousMouseWorldX = 0f
-    private var previousMouseWorldY = 0f
   }
 }
