@@ -10,11 +10,11 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
-import com.badlogic.gdx.utils.LongArray
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
+import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
@@ -58,6 +58,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.createSPPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
@@ -87,6 +88,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.concurrent.GuardedBy
+import kotlin.math.abs
 
 /**
  * Different kind of views
@@ -563,7 +565,10 @@ abstract class World(
   /**
    * Check whether a block can be placed at the given location
    */
-  fun canPlaceBlock(blockX: Int, blockY: Int): Boolean {
+  fun canPlaceBlock(blockX: Int, blockY: Int, entity: Entity): Boolean {
+    if (entity.ignorePlaceableCheck) {
+      return true
+    }
     if (!canPassThrough(blockX, blockY, false)) {
       return false
     }
@@ -916,28 +921,41 @@ abstract class World(
    * @param radius Radius to be equal or less from center
    * @return Set of blocks within the given radius
    */
+  fun getBlocksWithin(worldX: Int, worldY: Int, radius: Float): ObjectSet<Block> = getBlocksWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
   fun getBlocksWithin(worldX: Float, worldY: Float, radius: Float): ObjectSet<Block> {
     Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
     val blocks = ObjectSet<Block>()
-    val radiusSquare = radius * radius
-    for (compact in getLocationsAABB(worldX, worldY, radius, radius).items) {
+    for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
       val blockWorldX = compact.decompactLocX()
       val blockWorldY = compact.decompactLocY()
-      if (Math.abs(
-          Vector2.dst2(
-            worldX,
-            worldY,
-            blockWorldX + HALF_BLOCK_SIZE,
-            blockWorldY + HALF_BLOCK_SIZE
-          )
-        )
-        <= radiusSquare
-      ) {
+      val distance = abs(Vector2.dst2(worldX, worldY, blockWorldX + HALF_BLOCK_SIZE, blockWorldY + HALF_BLOCK_SIZE))
+      if (distance < radius * radius) {
         val block = getBlock(blockWorldX, blockWorldY) ?: continue
         blocks.add(block)
       }
     }
     return blocks
+  }
+
+  /**
+   * @param worldX X center (center of each block
+   * @param worldY Y center
+   * @param radius Radius to be equal or less from center
+   * @return Set of blocks within the given radius
+   */
+  fun getLocationsWithin(worldX: Int, worldY: Int, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+  fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
+    Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
+    val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
+    for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
+      val blockWorldX = compact.decompactLocX()
+      val blockWorldY = compact.decompactLocY()
+      val distance = abs(Vector2.dst2(worldX, worldY, blockWorldX + HALF_BLOCK_SIZE, blockWorldY + HALF_BLOCK_SIZE))
+      if (distance < radius * radius) {
+        locs.add(compact)
+      }
+    }
+    return locs.toArray()
   }
 
   /**
@@ -1139,8 +1157,8 @@ abstract class World(
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100
 
     fun getLocationsAABB(worldX: Float, worldY: Float, offsetX: Float, offsetY: Float): LongArray {
-      val capacity = MathUtils.floorPositive(Math.abs(offsetX)) * MathUtils.floorPositive(Math.abs(offsetY))
-      val blocks = LongArray(true, capacity)
+      val capacity = MathUtils.floorPositive(Math.abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
+      val blocks = GdxLongArray(true, capacity)
       var x = MathUtils.floor(worldX - offsetX)
       val maxX = worldX + offsetX
       val maxY = worldY + offsetY
@@ -1152,7 +1170,7 @@ abstract class World(
         }
         x++
       }
-      return blocks
+      return blocks.toArray()
     }
   }
 }

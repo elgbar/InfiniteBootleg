@@ -164,3 +164,6 @@ inline fun worldToBlock(worldCoord: Float): Int = floor(worldCoord.toDouble()).t
  * @return The world coordinate to translated to screen coordinates
  */
 inline fun worldToScreen(worldCoord: Float, worldOffset: Float): Float = (worldCoord + worldOffset) * Block.BLOCK_SIZE
+
+operator fun Long.component1(): Int = this.decompactLocX()
+operator fun Long.component2(): Int = this.decompactLocY()

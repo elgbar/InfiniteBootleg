@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
+import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
 import no.elg.infiniteBootleg.world.time.WorldTime;
@@ -411,10 +412,9 @@ public class Commands extends CommandExecutor {
       logger.error("There is no local, controlled player in this world");
     }
     for (Entity entity : entities) {
-      var controls =
-          LocallyControlledComponent.Companion.getLocallyControlled(entity).getKeyboardControls();
-      controls.setIgnorePlaceableCheck(controls.getIgnorePlaceableCheck());
-      logger.success("Place check is now " + controls.getIgnorePlaceableCheck());
+      var wasIgnoring = IgnorePlaceableCheckTag.Companion.getIgnorePlaceableCheck(entity);
+      IgnorePlaceableCheckTag.Companion.setIgnorePlaceableCheck(entity, !wasIgnoring);
+      logger.success("Place check is now " + (wasIgnoring ? "enabled" : "disabled"));
     }
   }
 

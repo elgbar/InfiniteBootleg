@@ -9,8 +9,6 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.worldToBlock
-import no.elg.infiniteBootleg.world.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
 import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent.Companion.selectedMaterialOrNull
@@ -36,7 +34,6 @@ class KeyboardControls(val world: ClientWorld) {
 
   var breakBrushSize = 2f
   var placeBrushSize = 1f
-  var ignorePlaceableCheck: Boolean = false
 
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()
@@ -49,7 +46,7 @@ class KeyboardControls(val world: ClientWorld) {
       if (breakBrushSize <= 1) {
         world.removeBlock(blockX, blockY)
       } else {
-        val blocksWithin = world.getBlocksWithin(worldX, worldY, breakBrushSize)
+        val blocksWithin = world.getBlocksWithin(blockX, blockY, breakBrushSize)
         blocksWithin.removeAll { it.material == Material.AIR }
         world.removeBlocks(blocksWithin)
       }
@@ -63,23 +60,9 @@ class KeyboardControls(val world: ClientWorld) {
       // cannot place on an entity
       return false
     }
-    Main.inst().scheduler.executeAsync {
-      val selectedMaterial = entity.selectedMaterialOrNull ?: return@executeAsync
-      val selected = selectedMaterial.material
-      if (ignorePlaceableCheck || world.canPlaceBlock(blockX, blockY)) {
-        if (placeBrushSize <= 1) {
-          selected.create(world, blockX, blockY)
-        } else {
-          val blocksWithin = world.getBlocksWithin(worldX, worldY, placeBrushSize)
-          if (blocksWithin.isEmpty) {
-            selected.create(world, blockX, blockY)
-          } else {
-            for (block in blocksWithin) {
-              selected.create(world, block.worldX, block.worldY)
-            }
-          }
-        }
-      }
+    val material = (entity.selectedMaterialOrNull ?: return false).material
+    if (world.canPlaceBlock(blockX, blockY, entity)) {
+      material.create(world, world.getLocationsWithin(blockX, blockY, placeBrushSize).toList())
     }
     return true
   }

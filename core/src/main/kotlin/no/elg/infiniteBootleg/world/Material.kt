@@ -5,6 +5,8 @@ import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.KAssets.blockAtlas
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.blocks.FallingBlock
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.blocks.TntBlock
@@ -127,11 +129,11 @@ enum class Material(
   val isBlock: Boolean
     get() = itemType == ItemType.BLOCK || itemType == ItemType.AIR
 
-  fun create(world: World, worldX: Int, worldY: Int, prioritize: Boolean = true): Boolean {
+  fun create(world: World, worldX: Int, worldY: Int, prioritize: Boolean = true, updateTexture: Boolean = true): Boolean {
     val currentMaterial = world.getMaterial(worldX, worldY)
     if (currentMaterial != this && currentMaterial == AIR) {
       if (isBlock) {
-        val block = world.setBlock(worldX, worldY, this, true, prioritize)
+        val block = world.setBlock(worldX, worldY, this, updateTexture, prioritize)
         (block as? TickingBlock)?.delayedShouldTick(1L)
         return block != null
       } else if (isEntity) {
@@ -141,6 +143,36 @@ enum class Material(
       throw IllegalStateException("This material ($name) is neither a block nor an entity")
     }
     return false
+  }
+
+  fun create(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
+    if (isBlock) {
+      createBlocks(world, locs, prioritize)
+    } else if (isEntity) {
+      createEntities(world, locs, prioritize)
+    }
+  }
+
+  fun createEntities(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
+    for ((worldX, worldY) in locs) {
+      createNew?.let { it(world, worldX, worldY) } ?: error("Material with type entity does not have a createNew method")
+    }
+  }
+
+  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
+    check(isBlock) { "This material ($name) is not a block" }
+    val chunks = mutableSetOf<Chunk>()
+    for ((worldX, worldY) in locs) {
+      val currentMaterial = world.getMaterial(worldX, worldY)
+      if (currentMaterial != this && currentMaterial == AIR) {
+        val block = world.setBlock(worldX, worldY, this, false, prioritize)
+        (block as? TickingBlock)?.delayedShouldTick(1L)
+        chunks += block?.chunk ?: continue
+      }
+    }
+    for (chunk in chunks) {
+      chunk.updateTexture(prioritize)
+    }
   }
 
   val isEntity: Boolean
