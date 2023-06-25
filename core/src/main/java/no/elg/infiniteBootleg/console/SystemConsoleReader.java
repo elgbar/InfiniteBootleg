@@ -14,7 +14,9 @@ public class SystemConsoleReader implements Runnable, Disposable {
 
   public SystemConsoleReader(@NotNull ConsoleHandler consoleHandler) {
     this.consoleHandler = consoleHandler;
+  }
 
+  public void start() {
     Thread thread = new Thread(this, "System Console Reader Thread");
     thread.setDaemon(true);
     thread.start();

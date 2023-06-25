@@ -46,6 +46,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
       console = new StdConsole();
     }
     consoleReader = new SystemConsoleReader(this);
+    consoleReader.start();
     console.setConsoleStackTrace(true);
     exec = new Commands(this);
     console.setCommandExecutor(exec);
