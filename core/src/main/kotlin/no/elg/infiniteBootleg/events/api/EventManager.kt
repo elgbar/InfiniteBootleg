@@ -17,7 +17,10 @@ object EventManager {
   private val listeners: WeakHashMap<Class<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
   private val oneShotStrongRefs: MutableMap<EventListener<out Event>, EventListener<out Event>> = ConcurrentHashMap()
 
-  var eventTracker: EventsTracker? = if (Settings.debug) EventsTracker(false) else null
+  var eventsTracker: EventsTracker? = if (Settings.debug) EventsTracker(false) else null
+    private set
+
+  fun getOrCreateEventsTracker(): EventsTracker = eventsTracker ?: EventsTracker(false).also { eventsTracker = it }
 
   /**
    * React to events [dispatchEvent]-ed by someone else.
@@ -70,7 +73,7 @@ object EventManager {
     }
     synchronized(eventListeners) {
       eventListeners.add(listener)
-      eventTracker?.onListenerRegistered(eventClass, listener)
+      eventsTracker?.onListenerRegistered(eventClass, listener)
     }
     return listener
   }
@@ -117,9 +120,9 @@ object EventManager {
     }
 
     synchronized(backingListeners) {
-      eventTracker?.onEventDispatched(event)
+      eventsTracker?.onEventDispatched(event)
       for (listener in correctListeners) {
-        eventTracker?.onEventListenedTo(event, listener)
+        eventsTracker?.onEventListenedTo(event, listener)
         listener.handle(event)
       }
     }
@@ -132,7 +135,7 @@ object EventManager {
       eventListeners = listeners[eventClass] ?: return
     }
     synchronized(eventListeners) {
-      eventTracker?.onListenerUnregistered(eventClass, listener)
+      eventsTracker?.onListenerUnregistered(eventClass, listener)
       eventListeners.remove(listener)
     }
   }
