@@ -22,7 +22,7 @@ data class Item(
    */
   fun use(usages: UInt = 1u): Item? {
     if (usages >= charge) return null
-    return Item(material, maxCharge)
+    return Item(material, maxCharge, charge - usages)
   }
 
   fun canBeUsed(usages: UInt = 1u): Boolean = usages <= charge
