@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.screen.ScreenRenderer
 import no.elg.infiniteBootleg.screens.hud.helper.TickerGraph
-import no.elg.infiniteBootleg.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 object DebugGraph : Resizable {
@@ -44,7 +43,7 @@ object DebugGraph : Resizable {
   private var pps: TickerGraph? = null
 
   fun render(sr: ScreenRenderer, world: ClientWorld?) {
-    val worldTicker = world?.worldTicker as? WorldTicker?
+    val worldTicker = world?.worldTicker
     if (worldTicker != null && worldTicker != tps?.ticker) {
       tps = TickerGraph(worldTicker, { width -> (width * 0.76).toInt() }, { it })
       pps = TickerGraph(worldTicker.box2DTicker.ticker, { width -> (width * 0.26).toInt() }, { width -> (width * 0.50).toInt() })

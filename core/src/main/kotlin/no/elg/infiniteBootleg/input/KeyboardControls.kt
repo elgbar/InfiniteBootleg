@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
+import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
@@ -61,8 +62,12 @@ class KeyboardControls(val world: ClientWorld) {
       return false
     }
     val material = (entity.selectedOrNull ?: return false).material
-    if (world.canPlaceBlock(blockX, blockY, entity)) {
-      material.create(world, world.getLocationsWithin(blockX, blockY, placeBrushSize).toList())
+    if (world.canEntityPlaceBlock(blockX, blockY, entity)) {
+      val locs = world.getLocationsWithin(blockX, blockY, placeBrushSize).filter { world.isAirBlock(it) }
+      val inventory = entity.inventoryOrNull ?: return false
+      if (inventory.use(material, locs.size.toUInt())) {
+        material.create(world, locs)
+      }
     }
     return true
   }

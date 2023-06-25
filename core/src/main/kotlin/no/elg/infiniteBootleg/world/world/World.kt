@@ -565,7 +565,7 @@ abstract class World(
   /**
    * Check whether a block can be placed at the given location
    */
-  fun canPlaceBlock(blockX: Int, blockY: Int, entity: Entity): Boolean {
+  fun canEntityPlaceBlock(blockX: Int, blockY: Int, entity: Entity): Boolean {
     if (entity.ignorePlaceableCheck) {
       return true
     }

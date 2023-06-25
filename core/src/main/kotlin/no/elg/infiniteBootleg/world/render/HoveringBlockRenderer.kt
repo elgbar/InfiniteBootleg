@@ -21,7 +21,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
       val texture = entity.selected.material.textureRegion ?: continue
 
-      if (world.canPlaceBlock(mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, entity)) {
+      if (world.canEntityPlaceBlock(mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, entity)) {
         val radius = entity.locallyControlledOrNull?.keyboardControls?.placeBrushSize ?: 1f
 //        if (radius <= 1f) {
 //          renderBlock(world, texture, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY)

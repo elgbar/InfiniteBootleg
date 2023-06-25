@@ -209,16 +209,16 @@ private fun EngineEntity.addCommonPlayerComponents(
   with(killableComponent ?: KillableComponent())
   with(
     InventoryComponent(10).also {
-      val charge = UInt.MAX_VALUE
-      it += Item(STONE, charge, charge)
-      it += Item(BRICK, charge, charge)
-      it += Item(DIRT, charge, charge)
-      it += Item(GRASS, charge, charge)
-      it += Item(TNT, charge, charge)
-      it += Item(SAND, charge, charge)
-      it += Item(TORCH, charge, charge)
-      it += Item(GLASS, charge, charge)
-      it += Item(DOOR, charge, charge)
+      val charge = 1_000_000u
+      it += Item(STONE, charge)
+      it += Item(BRICK, charge)
+      it += Item(DIRT, charge)
+      it += Item(GRASS, charge)
+      it += Item(TNT, charge)
+      it += Item(SAND, charge)
+      it += Item(TORCH, charge)
+      it += Item(GLASS, charge)
+      it += Item(DOOR, charge)
     }
   )
 
