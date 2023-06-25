@@ -31,6 +31,8 @@ import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.generateUUIDFromLong
@@ -602,6 +604,8 @@ abstract class World(
     val localY: Int = worldY.chunkOffset()
     return action(localX, localY, chunk)
   }
+
+  fun getBlocks(locs: Collection<Long>, loadChunk: Boolean = true): Iterable<Block> = locs.mapNotNull { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
 
   fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false) {
     val blockChunks = ObjectSet<Chunk>()

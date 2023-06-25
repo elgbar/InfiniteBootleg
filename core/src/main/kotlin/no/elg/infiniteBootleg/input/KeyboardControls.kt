@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.util.breakableBlock
 import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
@@ -44,16 +45,13 @@ class KeyboardControls(val world: ClientWorld) {
   private val mouseLocator = MouseLocator()
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
-    Main.inst().scheduler.executeAsync {
-      val world = entity.world.world
-      if (breakBrushSize <= 1) {
-        world.removeBlock(blockX, blockY)
-      } else {
-        val blocksWithin = world.getBlocksWithin(blockX, blockY, breakBrushSize)
-        blocksWithin.removeAll { it.material == Material.AIR }
-        world.removeBlocks(blocksWithin)
-      }
+    val world = entity.world.world
+    if (!world.getEntities(worldX, worldY).isEmpty) {
+      // cannot place on an entity
+      return false
     }
+    val breakableBlocks = entity.breakableBlock(world, blockX, blockY, placeBrushSize, interactRadius)
+    world.removeBlocks(world.getBlocks(breakableBlocks))
     return true
   }
 
