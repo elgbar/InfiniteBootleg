@@ -30,7 +30,9 @@ import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.ecs.AshleyKt;
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent;
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent;
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent;
+import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag;
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
@@ -138,14 +140,28 @@ public class Commands extends CommandExecutor {
   @ClientsideOnly
   @ConsoleDoc(description = "Toggle flight for player")
   public void fly() {
-    // TODO for ashley
-    //    Player player = getSPPlayer();
-    //    if (player == null) {
-    //      return;
-    //    }
-    //    player.setFlying(!player.isFlying());
-    //    logger.log(LogLevel.SUCCESS, "Player is now " + (player.isFlying() ? "" : "not ") +
-    // "flying");
+
+    ClientWorld world = getClientWorld();
+    if (world == null) {
+      return;
+    }
+    ImmutableArray<Entity> entities =
+        world.getEngine().getEntitiesFor(AshleyKt.getLocalPlayerFamily());
+    if (entities.size() == 0) {
+      logger.log("There is no local, controlled player in this world");
+    }
+    for (Entity entity : entities) {
+      var wasFlying = FlyingTag.Companion.getFlying(entity);
+      FlyingTag.Companion.setFlying(entity, !wasFlying);
+
+      Box2DBodyComponent box2DBodyComponent = Box2DBodyComponent.Companion.getBox2d(entity);
+      if (wasFlying) {
+        box2DBodyComponent.enableGravity();
+      } else {
+        box2DBodyComponent.disableGravity();
+      }
+      logger.log(LogLevel.SUCCESS, "Player is now " + (wasFlying ? "not " : "") + "flying");
+    }
   }
 
   @ConsoleDoc(

@@ -272,7 +272,7 @@ class KeyboardControls(val world: ClientWorld) {
   companion object {
 
     private const val JUMP_VERTICAL_VEL = 7.5f
-    private const val FLY_VEL = .075f
+    private const val FLY_VEL = 1f
 
     const val MAX_X_VEL = 7.5f // ie target velocity
     const val MAX_Y_VEL = 100f
