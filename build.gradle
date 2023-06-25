@@ -21,6 +21,7 @@ def getGitVersion() {
   return file.readLines()[0]
 }
 
+
 allprojects {
   apply plugin: "java"
   apply plugin: "kotlin"
@@ -89,6 +90,7 @@ allprojects {
         .setEditorConfigPath("$rootDir/.editorconfig")
     }
   }
+  tasks.classes.dependsOn spotlessApply
 }
 
 subprojects {
@@ -180,7 +182,6 @@ subprojects {
       isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
   }
-
 }
 
 project(":desktop") {
@@ -193,10 +194,6 @@ project(":desktop") {
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
-}
-
-project(":core") {
-  tasks.classes.dependsOn spotlessApply
 }
 
 def isNonStable = { String version ->
