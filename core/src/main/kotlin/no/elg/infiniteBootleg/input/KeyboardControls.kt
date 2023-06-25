@@ -36,6 +36,7 @@ class KeyboardControls(val world: ClientWorld) {
 
   var breakBrushSize = 2f
   var placeBrushSize = 1f
+  var interactRadius = 32f
 
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()
@@ -64,7 +65,7 @@ class KeyboardControls(val world: ClientWorld) {
     }
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
-    val placeableBlock = entity.placeableBlock(world, blockX, blockY, placeBrushSize)
+    val placeableBlock = entity.placeableBlock(world, blockX, blockY, placeBrushSize, interactRadius)
     if (inventory.use(material, placeableBlock.size.toUInt())) {
       material.create(world, placeableBlock)
     }

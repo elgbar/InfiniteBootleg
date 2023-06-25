@@ -7,7 +7,9 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
+import kotlin.math.abs
 import kotlin.math.floor
 
 /**
@@ -167,3 +169,6 @@ inline fun worldToScreen(worldCoord: Float, worldOffset: Float): Float = (worldC
 
 operator fun Long.component1(): Int = this.decompactLocX()
 operator fun Long.component2(): Int = this.decompactLocY()
+
+inline fun isBlockInsideRadius(worldX: Float, worldY: Float, blockBlockX: Int, targetBlockY: Int, radius: Float): Boolean =
+  abs(Vector2.dst2(worldX, worldY, blockBlockX + World.HALF_BLOCK_SIZE, targetBlockY + World.HALF_BLOCK_SIZE)) < radius * radius

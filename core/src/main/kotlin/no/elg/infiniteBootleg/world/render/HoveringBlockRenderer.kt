@@ -5,7 +5,7 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
-import no.elg.infiniteBootleg.util.forEachPlaceableBlock
+import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledOrNull
@@ -22,12 +22,13 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
       val texture = entity.selected.material.textureRegion ?: continue
 
-      val radius = entity.locallyControlledOrNull?.keyboardControls?.placeBrushSize ?: 1f
-      entity.forEachPlaceableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, radius) { compactLoc ->
-        val blockWorldX = compactLoc.decompactLocX()
-        val blockWorldY = compactLoc.decompactLocY()
-        renderBlock(world, texture, blockWorldX, blockWorldY)
-      }
+      val keyboardControls = entity.locallyControlledOrNull?.keyboardControls ?: continue
+      entity.placeableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.placeBrushSize, keyboardControls.interactRadius)
+        .forEach { compactLoc ->
+          val blockWorldX = compactLoc.decompactLocX()
+          val blockWorldY = compactLoc.decompactLocY()
+          renderBlock(world, texture, blockWorldX, blockWorldY)
+        }
     }
   }
 

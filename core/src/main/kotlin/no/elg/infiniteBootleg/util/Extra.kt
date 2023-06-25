@@ -7,6 +7,7 @@ import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import kotlin.contracts.contract
@@ -103,15 +104,24 @@ inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.
   this.color = oldColor
 }
 
-fun Entity.placeableBlock(world: World, centerBlockX: Int, centerBlockY: Int, radius: Float): Set<Long> =
-  world.getLocationsWithin(centerBlockX, centerBlockY, radius).filterTo(mutableSetOf()) { world.isAirBlock(it) }.let {
-    if (it.any { world.canEntityPlaceBlock(it.decompactLocX(), it.decompactLocY(), this) }) {
-      it
-    } else {
-      emptySet()
+fun Entity.placeableBlock(
+  world: World,
+  centerBlockX: Int,
+  centerBlockY: Int,
+  radius: Float,
+  interactionRadius: Float
+): Set<Long> {
+  val pos = this.position
+  return world.getLocationsWithin(centerBlockX, centerBlockY, radius)
+    .filterTo(mutableSetOf()) {
+      isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius) &&
+        world.isAirBlock(it)
     }
-  }
-
-fun Entity.forEachPlaceableBlock(world: World, centerBlockX: Int, centerBlockY: Int, radius: Float, action: (compactLoc: Long) -> Unit) {
-  placeableBlock(world, centerBlockX, centerBlockY, radius).forEach(action)
+    .let {
+      if (it.any { loc -> world.canEntityPlaceBlock(loc.decompactLocX(), loc.decompactLocY(), this) }) {
+        it
+      } else {
+        emptySet()
+      }
+    }
 }

@@ -35,6 +35,7 @@ import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.generateUUIDFromLong
 import no.elg.infiniteBootleg.util.isAir
+import no.elg.infiniteBootleg.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
@@ -948,10 +949,7 @@ abstract class World(
     Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
     val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
     for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
-      val blockWorldX = compact.decompactLocX()
-      val blockWorldY = compact.decompactLocY()
-      val distance = abs(Vector2.dst2(worldX, worldY, blockWorldX + HALF_BLOCK_SIZE, blockWorldY + HALF_BLOCK_SIZE))
-      if (distance < radius * radius) {
+      if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
         locs.add(compact)
       }
     }
@@ -1157,7 +1155,7 @@ abstract class World(
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100
 
     fun getLocationsAABB(worldX: Float, worldY: Float, offsetX: Float, offsetY: Float): LongArray {
-      val capacity = MathUtils.floorPositive(Math.abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
+      val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
       val blocks = GdxLongArray(true, capacity)
       var x = MathUtils.floor(worldX - offsetX)
       val maxX = worldX + offsetX
