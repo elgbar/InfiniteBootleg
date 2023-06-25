@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent.Companion.selectedMaterial
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selected
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 import java.lang.Math.floorMod
@@ -19,7 +19,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
-      val texture = entity.selectedMaterial.material.textureRegion ?: continue
+      val texture = entity.selected.material.textureRegion ?: continue
 
       if (world.canPlaceBlock(mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, entity)) {
         val radius = entity.locallyControlledOrNull?.keyboardControls?.placeBrushSize ?: 1f

@@ -15,14 +15,13 @@ public class ScreenRenderer implements Disposable, Resizable {
 
   public static final int FONT_SIZE = 20;
 
-  private final int spacing;
+  private final int spacing = (FONT_SIZE * ClientMain.SCALE) / 2;
+  private final int fontSize = FONT_SIZE * ClientMain.SCALE;
   private final BitmapFont font; // font managed by KAssets
   private final SpriteBatch batch;
 
   public ScreenRenderer() {
     font = KAssets.INSTANCE.getFont();
-
-    spacing = (FONT_SIZE * ClientMain.SCALE) / 2;
 
     batch = new SpriteBatch();
     batch.setProjectionMatrix(
@@ -67,6 +66,10 @@ public class ScreenRenderer implements Disposable, Resizable {
 
   public int getSpacing() {
     return spacing;
+  }
+
+  public int getFontSize() {
+    return fontSize;
   }
 
   @Override

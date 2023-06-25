@@ -9,11 +9,12 @@ import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
@@ -51,7 +52,8 @@ val PLAYERS_ENTITY_ARRAY = arrayOf(
   *BASIC_DYNAMIC_ENTITY_ARRAY,
   GroundedComponent::class,
   NamedComponent::class,
-  KillableComponent::class
+  KillableComponent::class,
+  InventoryComponent::class
 )
 
 val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class).get()
@@ -63,7 +65,7 @@ val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
   LocallyControlledComponent::class,
   FollowedByCameraTag::class,
-  SelectedMaterialComponent::class,
+  SelectedInventoryItemComponent::class,
   TextureRegionComponent::class
 ).get()
 
@@ -72,7 +74,7 @@ val localPlayerFamily: Family = allOf(
  */
 val basicEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY).get()
 val drawableEntitiesFamily: Family = allOf(*BASIC_ENTITY_ARRAY, TextureRegionComponent::class).get()
-val selectedMaterialComponentFamily: Family = allOf(*BASIC_ENTITY_ARRAY, SelectedMaterialComponent::class).get()
+val selectedMaterialComponentFamily: Family = allOf(*BASIC_ENTITY_ARRAY, SelectedInventoryItemComponent::class).get()
 val basicDynamicEntityFamily: Family = allOf(*BASIC_DYNAMIC_ENTITY_ARRAY).get()
 
 val followEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, FollowedByCameraTag::class).get()

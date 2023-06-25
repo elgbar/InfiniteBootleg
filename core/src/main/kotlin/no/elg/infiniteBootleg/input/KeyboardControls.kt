@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
-import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent.Companion.selectedMaterialOrNull
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -60,7 +60,7 @@ class KeyboardControls(val world: ClientWorld) {
       // cannot place on an entity
       return false
     }
-    val material = (entity.selectedMaterialOrNull ?: return false).material
+    val material = (entity.selectedOrNull ?: return false).material
     if (world.canPlaceBlock(blockX, blockY, entity)) {
       material.create(world, world.getLocationsWithin(blockX, blockY, placeBrushSize).toList())
     }
@@ -170,7 +170,7 @@ class KeyboardControls(val world: ClientWorld) {
       Keys.Q -> entity.interpolate(true, this::placeBlocks)
     }
 
-    val selectedMaterial = entity.selectedMaterialOrNull ?: return true
+    val selectedMaterial = entity.selectedOrNull ?: return true
 
     selectedMaterial.material = when (keycode) {
       Keys.NUM_0, Keys.NUMPAD_0 -> Material.values()[0]

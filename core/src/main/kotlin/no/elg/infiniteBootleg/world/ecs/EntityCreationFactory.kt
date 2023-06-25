@@ -17,21 +17,32 @@ import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.KeyboardControls
+import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.livingOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.Material.BRICK
+import no.elg.infiniteBootleg.world.Material.DIRT
+import no.elg.infiniteBootleg.world.Material.DOOR
+import no.elg.infiniteBootleg.world.Material.GLASS
+import no.elg.infiniteBootleg.world.Material.GRASS
+import no.elg.infiniteBootleg.world.Material.SAND
+import no.elg.infiniteBootleg.world.Material.STONE
+import no.elg.infiniteBootleg.world.Material.TNT
+import no.elg.infiniteBootleg.world.Material.TORCH
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedMaterialComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.SharedInformationComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
@@ -196,6 +207,20 @@ private fun EngineEntity.addCommonPlayerComponents(
   with(NamedComponent(name))
 
   with(killableComponent ?: KillableComponent())
+  with(
+    InventoryComponent(10).also {
+      val charge = UInt.MAX_VALUE
+      it += Item(STONE, charge, charge)
+      it += Item(BRICK, charge, charge)
+      it += Item(DIRT, charge, charge)
+      it += Item(GRASS, charge, charge)
+      it += Item(TNT, charge, charge)
+      it += Item(SAND, charge, charge)
+      it += Item(TORCH, charge, charge)
+      it += Item(GLASS, charge, charge)
+      it += Item(DOOR, charge, charge)
+    }
+  )
 
   createBody2DBodyComponent(entity, world, worldX, worldY, dx, dy, PLAYER_WIDTH, PLAYER_HEIGHT, wantedFamilies, afterBodyCreated = whenReady) {
     createPlayerFixture(it)
@@ -211,7 +236,7 @@ private fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, con
     with(LocallyControlledComponent(KeyboardControls(world)))
     with<FollowedByCameraTag>()
     with<InputEventQueue>()
-    with<SelectedMaterialComponent>()
+    with<SelectedInventoryItemComponent>()
   }
 
   with<PhysicsEventQueue>()
@@ -395,7 +420,7 @@ fun Engine.createDoorEntity(
   with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
   with(PositionComponent(worldX, worldY))
 
-  val door = Material.DOOR
+  val door = DOOR
   with(TextureRegionComponent(KAssets.doorClosedTexture))
 
   // This entity will handle input events
