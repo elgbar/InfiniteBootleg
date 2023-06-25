@@ -21,7 +21,7 @@ data class Item(
    * @return The resulting item, or `null` if the item would be depleted
    */
   fun use(usages: UInt = 1u): Item? {
-    if (usages >= charge) return null
+    if (usages > charge) return null
     return Item(material, maxCharge, charge - usages)
   }
 
