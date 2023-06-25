@@ -1153,7 +1153,7 @@ abstract class World(
   companion object {
     const val HALF_BLOCK_SIZE = 0.5f
     const val BLOCK_SIZE = 1f
-    const val LIGHT_SOURCE_LOOK_BLOCKS = 7.5f
+    const val LIGHT_SOURCE_LOOK_BLOCKS = 10f
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100
 
     fun getLocationsAABB(worldX: Float, worldY: Float, offsetX: Float, offsetY: Float): LongArray {
