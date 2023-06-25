@@ -1,11 +1,13 @@
 package no.elg.infiniteBootleg.util
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import kotlin.contracts.contract
 
@@ -99,4 +101,17 @@ inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.
   this.setColor(r, g, b, a)
   action(this)
   this.color = oldColor
+}
+
+fun Entity.placeableBlock(world: World, centerBlockX: Int, centerBlockY: Int, radius: Float): Set<Long> =
+  world.getLocationsWithin(centerBlockX, centerBlockY, radius).filterTo(mutableSetOf()) { world.isAirBlock(it) }.let {
+    if (it.any { world.canEntityPlaceBlock(it.decompactLocX(), it.decompactLocY(), this) }) {
+      it
+    } else {
+      emptySet()
+    }
+  }
+
+fun Entity.forEachPlaceableBlock(world: World, centerBlockX: Int, centerBlockY: Int, radius: Float, action: (compactLoc: Long) -> Unit) {
+  placeableBlock(world, centerBlockX, centerBlockY, radius).forEach(action)
 }

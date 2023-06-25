@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
@@ -62,12 +63,10 @@ class KeyboardControls(val world: ClientWorld) {
       return false
     }
     val material = (entity.selectedOrNull ?: return false).material
-    if (world.canEntityPlaceBlock(blockX, blockY, entity)) {
-      val locs = world.getLocationsWithin(blockX, blockY, placeBrushSize).filter { world.isAirBlock(it) }
-      val inventory = entity.inventoryOrNull ?: return false
-      if (inventory.use(material, locs.size.toUInt())) {
-        material.create(world, locs)
-      }
+    val inventory = entity.inventoryOrNull ?: return false
+    val placeableBlock = entity.placeableBlock(world, blockX, blockY, placeBrushSize)
+    if (inventory.use(material, placeableBlock.size.toUInt())) {
+      material.create(world, placeableBlock)
     }
     return true
   }
