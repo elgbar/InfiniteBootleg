@@ -181,7 +181,6 @@ subprojects {
     }
   }
 
-  tasks.assemble.dependsOn spotlessApply
 }
 
 project(":desktop") {
@@ -196,7 +195,9 @@ project(":desktop") {
   }
 }
 
-project(":core") {}
+project(":core") {
+  tasks.classes.dependsOn spotlessApply
+}
 
 def isNonStable = { String version ->
   def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
