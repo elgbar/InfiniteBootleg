@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import no.elg.infiniteBootleg.ClientMain
+import no.elg.infiniteBootleg.screens.WorldScreen
 
 object GlobalInputListener : InputAdapter() {
 
@@ -27,6 +28,13 @@ object GlobalInputListener : InputAdapter() {
             Gdx.graphics.setFullscreenMode(mode)
           }
           return true
+        }
+      }
+
+      Input.Keys.F7 -> {
+        val screen = ClientMain.inst().screen
+        if (screen is WorldScreen) {
+          screen.toggleDebugMenu()
         }
       }
     }

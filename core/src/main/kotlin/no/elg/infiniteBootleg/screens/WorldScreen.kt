@@ -1,8 +1,7 @@
 package no.elg.infiniteBootleg.screens
 
-import com.badlogic.gdx.Input
-import ktx.actors.onEnter
-import ktx.actors.onExit
+import com.kotcrab.vis.ui.widget.VisWindow
+import ktx.actors.isShown
 import ktx.assets.disposeSafely
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -24,6 +23,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     private set
 
   private var worldFinishedLoading = false
+
+  private val debugMenu: VisWindow
 
   override fun render(delta: Float) {
     if (worldFinishedLoading) {
@@ -77,19 +78,16 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     world.disposeSafely()
   }
 
-  var insideDebugWindow = false
-    private set
+  val isDebugMenuVisible: Boolean get() = debugMenu.isVisible || debugMenu.isShown()
+
+  fun toggleDebugMenu() {
+    debugMenu.toggleShown(stage, true)
+  }
 
   init {
     stage.actors {
-      visWindow("Debug Menu") {
-        onKeyDown(Input.Keys.F4, true, onlyWhenShown = false) {
-          toggleShown(stage, false)
-        }
-        onEnter { insideDebugWindow = true }
-        onExit { insideDebugWindow = false }
-
-        addCloseButton()
+      debugMenu = visWindow("Debug Menu") {
+        hide()
         defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
         @Scene2dDsl

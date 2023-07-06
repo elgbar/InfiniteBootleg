@@ -60,8 +60,9 @@ fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, catchEvent: B
   }
 }
 
-/** Add and fade in this window if it is is not [isShown] */
+/** Add and fade in this window if it is not [isShown] */
 fun VisWindow.show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
+  isVisible = true
   if (!isShown()) {
     stage.addActor(fadeIn(fadeTime))
     if (center) {
@@ -73,6 +74,7 @@ fun VisWindow.show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_
 /** Alias for [VisWindow.fadeOut] with a default fadeout duration of `0f` */
 fun VisWindow.hide(fadeTime: Float = 0f) {
   fadeOut(fadeTime)
+  isVisible = false
 }
 
 /** Toggle if this window is shown or not */

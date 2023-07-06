@@ -1020,7 +1020,7 @@ abstract class World(
     }
     Preconditions.checkArgument(offsetX >= 0, "offsetX must be >= 0, was $offsetX")
     Preconditions.checkArgument(offsetY >= 0, "offsetY must be >= 0, was $offsetY")
-    val capacity = MathUtils.floorPositive(Math.abs(offsetX)) * MathUtils.floorPositive(Math.abs(offsetY))
+    val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
     val blocks = Array<Block>(true, capacity)
     var x = MathUtils.floor(worldX)
     val startY = MathUtils.floor(worldY)

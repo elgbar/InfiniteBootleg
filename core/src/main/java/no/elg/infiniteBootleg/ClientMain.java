@@ -252,4 +252,15 @@ public class ClientMain extends CommonMain {
   public MouseLocator getMouseLocator() {
     return mouseLocator;
   }
+
+  public boolean shouldNotIgnoreWorldInput() {
+    return !shouldIgnoreWorldInput();
+  }
+
+  public boolean shouldIgnoreWorldInput() {
+    boolean debugMenuVisible =
+        screen instanceof WorldScreen worldScreen && worldScreen.isDebugMenuVisible();
+    boolean consoleVisible = console.isVisible();
+    return consoleVisible || debugMenuVisible;
+  }
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.Vector2
+import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
@@ -123,7 +124,7 @@ class KeyboardControls(val world: ClientWorld) {
     if (entityWorld is ClientWorld) {
       mouseLocator.update(entityWorld)
     }
-    if (Main.inst().console.isVisible) {
+    if (ClientMain.inst().shouldIgnoreWorldInput()) {
       return
     }
 
@@ -175,16 +176,16 @@ class KeyboardControls(val world: ClientWorld) {
     val selectedMaterial = entity.selectedOrNull ?: return true
 
     selectedMaterial.material = when (keycode) {
-      Keys.NUM_0, Keys.NUMPAD_0 -> Material.values()[0]
-      Keys.NUM_1, Keys.NUMPAD_1 -> Material.values()[1]
-      Keys.NUM_2, Keys.NUMPAD_2 -> Material.values()[2]
-      Keys.NUM_3, Keys.NUMPAD_3 -> Material.values()[3]
-      Keys.NUM_4, Keys.NUMPAD_4 -> Material.values()[4]
-      Keys.NUM_5, Keys.NUMPAD_5 -> Material.values()[5]
-      Keys.NUM_6, Keys.NUMPAD_6 -> Material.values()[6]
-      Keys.NUM_7, Keys.NUMPAD_7 -> Material.values()[7]
-      Keys.NUM_8, Keys.NUMPAD_8 -> Material.values()[8]
-      Keys.NUM_9, Keys.NUMPAD_9 -> Material.values()[9]
+      Keys.NUM_0, Keys.NUMPAD_0 -> Material.entries[0]
+      Keys.NUM_1, Keys.NUMPAD_1 -> Material.entries[1]
+      Keys.NUM_2, Keys.NUMPAD_2 -> Material.entries[2]
+      Keys.NUM_3, Keys.NUMPAD_3 -> Material.entries[3]
+      Keys.NUM_4, Keys.NUMPAD_4 -> Material.entries[4]
+      Keys.NUM_5, Keys.NUMPAD_5 -> Material.entries[5]
+      Keys.NUM_6, Keys.NUMPAD_6 -> Material.entries[6]
+      Keys.NUM_7, Keys.NUMPAD_7 -> Material.entries[7]
+      Keys.NUM_8, Keys.NUMPAD_8 -> Material.entries[8]
+      Keys.NUM_9, Keys.NUMPAD_9 -> Material.entries[9]
       else -> selectedMaterial.material
     }
     return true

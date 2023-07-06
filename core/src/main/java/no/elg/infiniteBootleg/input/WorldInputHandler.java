@@ -35,7 +35,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable {
 
   @Override
   public boolean keyDown(int keycode) {
-    if (Main.inst().getConsole().isVisible() || Main.isMultiplayer() && keycode != F3) {
+    if (ClientMain.inst().shouldIgnoreWorldInput() || Main.isMultiplayer() && keycode != F3) {
       return false;
     }
     ClientWorld world = ClientMain.inst().getWorld();
@@ -88,7 +88,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable {
 
   @Override
   public boolean scrolled(float amountX, float amountY) {
-    if (Main.inst().getConsole().isVisible()) {
+    if (ClientMain.inst().shouldIgnoreWorldInput()) {
       return false;
     }
     OrthographicCamera camera = worldRender.getCamera();
