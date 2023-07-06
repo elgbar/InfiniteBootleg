@@ -110,6 +110,17 @@ object KAssets {
 
       menuItem(extend = "default") { font = notFlippedFont }
       menu { openButtonStyle = newOpenButtonStyle }
+
+      visTextButton(name = "debug-menu-button", extend = "default") {
+        font = notFlippedFont
+        fontColor = Color.WHITE
+        disabledFontColor = Color.WHITE
+        down = newDrawable("white", Color.valueOf("#FF4136"))
+        up = down
+        over = newDrawable("white", Color.FIREBRICK)
+        checkedOver = over
+        disabled = newDrawable("white", Color.FOREST)
+      }
     }
 
     skyTexture = createTextureRegion(ClientMain.CLEAR_COLOR_R, ClientMain.CLEAR_COLOR_G, ClientMain.CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)

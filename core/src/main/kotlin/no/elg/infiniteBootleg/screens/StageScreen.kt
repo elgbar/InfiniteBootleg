@@ -20,7 +20,7 @@ import kotlin.contracts.contract
 /** @author Elg */
 open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false) {
 
-  private val stage by lazy { Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)) }
+  val stage by lazy { Stage(ScalingViewport(fit, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)) }
   lateinit var rootTable: KVisTable
     private set
 

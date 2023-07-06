@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.VisUI;
-import com.strongjoshua.console.CommandExecutor;
 import com.strongjoshua.console.Console;
 import com.strongjoshua.console.ConsoleUtils;
 import com.strongjoshua.console.LogLevel;
@@ -29,7 +28,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
 
   private final boolean inGameConsole;
   private final Console console;
-  private final CommandExecutor exec;
+  private final Commands commands;
   private final SystemConsoleReader consoleReader;
   private boolean disposed;
 
@@ -48,8 +47,8 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     consoleReader = new SystemConsoleReader(this);
     consoleReader.start();
     console.setConsoleStackTrace(true);
-    exec = new Commands(this);
-    console.setCommandExecutor(exec);
+    commands = new Commands(this);
+    console.setCommandExecutor(commands);
   }
 
   public float getAlpha() {
@@ -83,7 +82,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
       System.arraycopy(parts, 1, sArgs, 0, parts.length - 1);
     }
 
-    Method[] methods = ClassReflection.getMethods(exec.getClass());
+    Method[] methods = ClassReflection.getMethods(commands.getClass());
 
     Set<String> potentialMethods =
         Arrays.stream(methods)
@@ -157,7 +156,7 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
           }
           if (canExecute(m)) {
             m.setAccessible(true);
-            m.invoke(exec, args);
+            m.invoke(commands, args);
           } else {
             log(LogLevel.ERROR, "This command can only be executed client side");
             return true;
@@ -227,6 +226,10 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     disposed = true;
     console.dispose();
     consoleReader.dispose();
+  }
+
+  public Commands getExec() {
+    return commands;
   }
 
   @Override

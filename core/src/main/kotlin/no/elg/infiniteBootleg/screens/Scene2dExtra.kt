@@ -24,7 +24,6 @@ fun PopupMenu.separator() {
   add(Separator("menu")).fill().expand().row()
 }
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, catchEvent: Boolean = false, interaction: Button.() -> Unit) {
   this.onInteract(
     stage = stage,

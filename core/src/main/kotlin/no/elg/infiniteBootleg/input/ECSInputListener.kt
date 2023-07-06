@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue.Companion.queueInputEvent
 import no.elg.infiniteBootleg.world.world.World
@@ -11,7 +12,10 @@ import no.elg.infiniteBootleg.world.world.World
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   private fun handleEvent(inputEvent: InputEvent): Boolean {
-    world.engine.queueInputEvent(inputEvent) { !Main.inst().console.isVisible }
+    world.engine.queueInputEvent(inputEvent) {
+      val screen = ClientMain.inst().screen
+      !Main.inst().console.isVisible || (screen is WorldScreen && !screen.insideDebugWindow)
+    }
     return false
   }
 
