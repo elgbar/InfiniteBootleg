@@ -188,7 +188,7 @@ interface Chunk : Iterable<Block?>, Ticking, CheckableDisposable, Comparable<Chu
   fun saveBlocksOnly(): ProtoWorld.Chunk
 
   companion object {
-    const val CHUNK_SIZE = 32
+    const val CHUNK_SIZE = 16
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.BLOCK_SIZE
     val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
   }
