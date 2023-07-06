@@ -23,7 +23,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       val texture = entity.selected.material.textureRegion ?: continue
 
       val keyboardControls = entity.locallyControlledOrNull?.keyboardControls ?: continue
-      entity.placeableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.placeBrushSize, keyboardControls.interactRadius)
+      entity.placeableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
         .forEach { compactLoc ->
           val blockWorldX = compactLoc.decompactLocX()
           val blockWorldY = compactLoc.decompactLocY()

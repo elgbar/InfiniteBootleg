@@ -35,8 +35,7 @@ import kotlin.math.sqrt
  */
 class KeyboardControls(val world: ClientWorld) {
 
-  var breakBrushSize = 2f
-  var placeBrushSize = 1f
+  var brushSize = 2f
   var interactRadius = 32f
 
   private val tmpVec = Vector2()
@@ -50,7 +49,7 @@ class KeyboardControls(val world: ClientWorld) {
       // cannot place on an entity
       return false
     }
-    val breakableBlocks = entity.breakableBlock(world, blockX, blockY, placeBrushSize, interactRadius)
+    val breakableBlocks = entity.breakableBlock(world, blockX, blockY, brushSize, interactRadius)
     world.removeBlocks(world.getBlocks(breakableBlocks))
     return true
   }
@@ -63,7 +62,7 @@ class KeyboardControls(val world: ClientWorld) {
     }
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
-    val placeableBlock = entity.placeableBlock(world, blockX, blockY, placeBrushSize, interactRadius)
+    val placeableBlock = entity.placeableBlock(world, blockX, blockY, brushSize, interactRadius)
     if (inventory.use(material, placeableBlock.size.toUInt())) {
       material.create(world, placeableBlock)
     }

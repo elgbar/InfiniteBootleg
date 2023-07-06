@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
+import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -38,6 +39,7 @@ import no.elg.infiniteBootleg.world.time.WorldTime
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.Locale
+import kotlin.math.max
 
 /**
  * @author Elg
@@ -284,7 +286,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
     val clientWorld = clientWorld ?: return
     val render = clientWorld.render
-    render.camera.zoom = Math.max(zoom, WorldRender.MIN_ZOOM)
+    render.camera.zoom = max(zoom, WorldRender.MIN_ZOOM)
     render.update()
     logger.success("Zoom level is now $zoom")
   }
@@ -299,38 +301,23 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
     for (entity in entities) {
       val controls: KeyboardControls = entity.locallyControlled.keyboardControls
-      logger.logf(
-        LogLevel.SUCCESS,
-        "Brush size for player are now %.2f blocks for breaking and %.2f blocks for placing",
-        controls.breakBrushSize,
-        controls.placeBrushSize
-      )
+      logger.success("Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${controls.brushSize}")
     }
   }
 
-  @CmdArgNames("type", "size")
+  @CmdArgNames("size")
   @ClientsideOnly
-  @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["Type of brush to change, can be 'break' and 'place'", "New brush size, positive integer"])
-  fun brush(type: String?, size: Float) {
+  @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["New brush size, positive integer"])
+  fun brush(size: Float) {
     val world = clientWorld ?: return
-    if (type == null) {
-      logger.error("CMD", "Valid brush types are 'break' and 'place'")
-      return
-    }
     val entities = world.engine.getEntitiesFor(localPlayerFamily)
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world")
     }
     for (entity in entities) {
       val controls: KeyboardControls = entity.locallyControlled.keyboardControls
-      if (type.startsWith("b")) {
-        controls.breakBrushSize = size
-      } else if (type.startsWith("p")) {
-        controls.placeBrushSize = size
-      } else {
-        logger.error("CMD", "Valid brush types are 'break' and 'place'")
-        return
-      }
+      controls.brushSize = size
+      logger.success("New brush size is now $size")
     }
   }
 
@@ -345,7 +332,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     for (entity in entities) {
       val wasIgnoring: Boolean = entity.ignorePlaceableCheck
       entity.ignorePlaceableCheck = !wasIgnoring
-      logger.success("Place check is now " + if (wasIgnoring) "enabled" else "disabled")
+      logger.success("Place check is now ${if (wasIgnoring) "enabled" else "disabled"}")
     }
   }
 
