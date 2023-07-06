@@ -39,6 +39,7 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
     Main.inst().scheduler.executeSync { client.handleClientBoundPackets(packet) }
   }
 
+  @Deprecated("Deprecated in Java")
   override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
     info = "Exception caught, ${cause.javaClass.simpleName}: ${cause.message}"
     cause.printStackTrace()

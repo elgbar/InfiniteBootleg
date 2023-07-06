@@ -142,7 +142,7 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:4.2.0"
-    implementation "com.google.guava:guava:32.0.1-jre"
+    implementation "com.google.guava:guava:32.1.1-jre"
     implementation "com.google.protobuf:protobuf-java:$protobufVersion"
     implementation "com.google.protobuf:protobuf-kotlin:$protobufVersion"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
