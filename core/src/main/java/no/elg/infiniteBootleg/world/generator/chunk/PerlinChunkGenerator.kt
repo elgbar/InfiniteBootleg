@@ -1,49 +1,46 @@
-package no.elg.infiniteBootleg.world.generator
+package no.elg.infiniteBootleg.world.generator.chunk
 
-import no.elg.infiniteBootleg.util.FastNoise
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.biome.Biome
+import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
+import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite.FractalType
+import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite.NoiseType
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise
 import no.elg.infiniteBootleg.world.world.World
+import kotlin.math.abs
+import kotlin.math.min
 
 /**
  * @author Elg
  */
-class PerlinChunkGenerator(seed: Long) : ChunkGenerator {
-  val noise: PerlinNoise
-  private val noise2: FastNoise
+class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
+
+  val noise: PerlinNoise = PerlinNoise(seed)
+  private val noise2: FastNoiseLite = FastNoiseLite(seed.toInt())
 
   init {
-    noise = PerlinNoise(seed)
-    noise2 = FastNoise(seed.toInt())
-    noise2.SetNoiseType(FastNoise.NoiseType.PerlinFractal)
+    noise2.SetNoiseType(NoiseType.Perlin)
     noise2.SetFrequency(0.01f)
-    noise2.SetInterp(FastNoise.Interp.Quintic)
-    noise2.SetFractalType(FastNoise.FractalType.RigidMulti)
+    noise2.SetFractalType(FractalType.Ridged)
     noise2.SetFractalOctaves(1)
     noise2.SetFractalLacunarity(1.0f)
     noise2.SetFractalGain(0.5f)
   }
 
-  fun getBiomeHeight(worldX: Int): Double {
-    val a = 1.25
-    return (noise.noise(worldX.toDouble(), 0.5, 0.5, a, 0.001) + a) / (a * 2)
-  }
+  fun getBiomeHeight(worldX: Int): Double =
+    (noise.noise(worldX.toDouble(), 0.5, 0.5, BIOME_HEIGHT_AMPLITUDE, 0.001) + BIOME_HEIGHT_AMPLITUDE) / (BIOME_HEIGHT_AMPLITUDE * 2)
 
   override fun getBiome(worldX: Int): Biome {
     val height = getBiomeHeight(worldX)
-    return if (height > 0.65) {
-      Biome.MOUNTAINS
-    } else if (height > 0.45) {
-      Biome.PLAINS
-    } else if (height > 0.15) {
-      Biome.DESERT
-    } else {
-      Biome.PLAINS
+    return when {
+      height > 0.65 -> Biome.MOUNTAINS
+      height > 0.45 -> Biome.PLAINS
+      height > 0.15 -> Biome.DESERT
+      else -> Biome.PLAINS
     }
   }
 
@@ -72,13 +69,10 @@ class PerlinChunkGenerator(seed: Long) : ChunkGenerator {
           val worldY = worldChunkY + localY
 
           // calculate the size of the worm
-          val wormSize = (1
-            + Math.abs(
-            noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY)
-          ))
-          val caveNoise = noise2.GetNoise(worldX.toFloat(), worldY.toFloat()) / wormSize
+          val wormSize = (1 + abs(noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY)))
+          val caveNoise = noise2.GetNoise(worldX.toDouble(), worldY.toDouble()) / wormSize
           val diffToSurface = (genHeight - worldY).toDouble()
-          val depthModifier = Math.min(1.0, diffToSurface / CAVELESS_DEPTH)
+          val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
           if (caveNoise > CAVE_CREATION_THRESHOLD / depthModifier) {
             blocks[localX][localY] = null
           }
@@ -101,5 +95,7 @@ class PerlinChunkGenerator(seed: Long) : ChunkGenerator {
 
     /** How many blocks of the surface should not be caved in  */
     private const val CAVELESS_DEPTH = 16.0
+
+    private const val BIOME_HEIGHT_AMPLITUDE = 1.25
   }
 }

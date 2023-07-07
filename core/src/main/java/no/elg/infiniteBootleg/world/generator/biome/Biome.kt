@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.generator.biome
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise
 import kotlin.math.abs
 import kotlin.math.floor

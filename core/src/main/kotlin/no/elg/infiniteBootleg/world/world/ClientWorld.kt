@@ -5,7 +5,7 @@ import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.input.ECSInputListener
 import no.elg.infiniteBootleg.input.WorldInputHandler
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.generator.ChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 
 /**

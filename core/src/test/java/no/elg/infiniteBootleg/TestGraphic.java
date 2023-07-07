@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import de.tomgrill.gdxtesting.GdxTestRunner;
-import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.chunk.EmptyChunkGenerator;
 import no.elg.infiniteBootleg.world.world.ClientWorld;
 import no.elg.infiniteBootleg.world.world.SinglePlayerWorld;
 import org.jetbrains.annotations.NotNull;

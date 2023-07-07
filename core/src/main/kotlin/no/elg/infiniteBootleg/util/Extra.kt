@@ -8,7 +8,6 @@ import ktx.assets.dispose
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
-import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID

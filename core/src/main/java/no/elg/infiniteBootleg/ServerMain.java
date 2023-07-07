@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import no.elg.infiniteBootleg.args.ProgramArgs;
 import no.elg.infiniteBootleg.server.PacketExtraKt;
 import no.elg.infiniteBootleg.server.Server;
-import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator;
+import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator;
 import no.elg.infiniteBootleg.world.world.ServerWorld;
 import no.elg.infiniteBootleg.world.world.World;
 import org.jetbrains.annotations.NotNull;

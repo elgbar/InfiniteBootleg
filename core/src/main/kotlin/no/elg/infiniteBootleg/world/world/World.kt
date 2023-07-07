@@ -76,7 +76,7 @@ import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem
-import no.elg.infiniteBootleg.world.generator.ChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.loader.WorldLoader.canWriteToWorld
 import no.elg.infiniteBootleg.world.loader.WorldLoader.deleteLockFile

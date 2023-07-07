@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.generator
+package no.elg.infiniteBootleg.world.generator.chunk
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Chunk
@@ -11,6 +11,9 @@ import no.elg.infiniteBootleg.world.world.World
  * @author Elg
  */
 interface ChunkGenerator {
+
+  val seed: Long
+
   /**
    * @param worldX World location
    * @return The biome at the calculated location
@@ -32,15 +35,12 @@ interface ChunkGenerator {
   fun generate(world: World, chunkX: Int, chunkY: Int): Chunk
 
   companion object {
-    fun getGeneratorType(generator: ChunkGenerator?): ProtoWorld.World.Generator? {
-      return if (generator is PerlinChunkGenerator) {
-        ProtoWorld.World.Generator.PERLIN
-      } else if (generator is FlatChunkGenerator) {
-        ProtoWorld.World.Generator.FLAT
-      } else if (generator is EmptyChunkGenerator) {
-        ProtoWorld.World.Generator.EMPTY
-      } else {
-        ProtoWorld.World.Generator.UNRECOGNIZED
+    fun getGeneratorType(generator: ChunkGenerator?): ProtoWorld.World.Generator {
+      return when (generator) {
+        is PerlinChunkGenerator -> ProtoWorld.World.Generator.PERLIN
+        is FlatChunkGenerator -> ProtoWorld.World.Generator.FLAT
+        is EmptyChunkGenerator -> ProtoWorld.World.Generator.EMPTY
+        else -> ProtoWorld.World.Generator.UNRECOGNIZED
       }
     }
   }

@@ -11,10 +11,10 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.createMPServerPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.save
-import no.elg.infiniteBootleg.world.generator.ChunkGenerator
-import no.elg.infiniteBootleg.world.generator.EmptyChunkGenerator
-import no.elg.infiniteBootleg.world.generator.FlatChunkGenerator
-import no.elg.infiniteBootleg.world.generator.PerlinChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.EmptyChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.FlatChunkGenerator
+import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
