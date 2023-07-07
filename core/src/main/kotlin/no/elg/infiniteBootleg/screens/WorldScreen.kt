@@ -90,7 +90,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     stage.actors {
       debugMenu = visWindow("Debug Menu") {
         hide()
-        addCloseButton()
         defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
         @Scene2dDsl
@@ -104,7 +103,10 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         }
         aRow {
           toggleableDebugButton("Debug block lighting", Settings.debugBlockLight, Main.inst().console.exec::debBlkLit)
-          toggleableDebugButton("Debug Box2D", Settings.renderBox2dDebug, Main.inst().console.exec::debBox)
+          toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
+        }
+        aRow {
+          toggleableDebugButton("Place check", false, Main.inst().console.exec::placeCheck)
         }
         aRow {
           separator {
@@ -114,6 +116,9 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         }
         val box2dDebug = world.render.box2DDebugRenderer
 
+        aRow {
+          toggleableDebugButton("Debug Box2D", Settings.renderBox2dDebug, Main.inst().console.exec::debBox)
+        }
         aRow {
           toggleableDebugButton("Box2D draw bodies", box2dDebug.isDrawBodies, Main.inst().console.exec::drawBodies)
           toggleableDebugButton("Box2D draw joints", box2dDebug.isDrawJoints, Main.inst().console.exec::drawJoints)
