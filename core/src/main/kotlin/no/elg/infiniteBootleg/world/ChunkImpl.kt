@@ -341,14 +341,15 @@ class ChunkImpl(
 
   override fun updateBlockLights(localX: Int, localY: Int, dispatchEvent: Boolean) {
     if (Settings.renderLight) {
-      if (dispatchEvent) {
-        dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
-      }
       synchronized(blockLights) {
         // If we reached this point before the light is done recalculating then we must start again
         cancelCurrentBlockLightUpdate()
         val updateId = currentUpdateId.incrementAndGet()
         lightUpdater = Main.inst().scheduler.executeAsync { updateBlockLights(updateId) }
+
+        if (dispatchEvent) {
+          dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
+        }
       }
     }
   }

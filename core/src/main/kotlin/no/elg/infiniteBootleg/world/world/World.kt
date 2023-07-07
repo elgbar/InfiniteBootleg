@@ -929,24 +929,6 @@ abstract class World(
   }
 
   /**
-   * @param worldX X center (center of each block
-   * @param worldY Y center
-   * @param radius Radius to be equal or less from center
-   * @return Set of blocks within the given radius
-   */
-  fun getLocationsWithin(worldX: Int, worldY: Int, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
-  fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
-    Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
-    val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
-    for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
-      if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
-        locs.add(compact)
-      }
-    }
-    return locs.toArray()
-  }
-
-  /**
    * @param centerWorldX Center world X coordinate
    * @param centerWorldY Center world Y coordinate
    * @param width        How far to go on either side of the x-axis.
@@ -1159,6 +1141,24 @@ abstract class World(
         x++
       }
       return blocks.toArray()
+    }
+
+    /**
+     * @param worldX X center (center of each block
+     * @param worldY Y center
+     * @param radius Radius to be equal or less from center
+     * @return Set of blocks within the given radius
+     */
+    fun getLocationsWithin(worldX: Int, worldY: Int, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+    fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
+      Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
+      val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
+      for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
+        if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
+          locs.add(compact)
+        }
+      }
+      return locs.toArray()
     }
   }
 }

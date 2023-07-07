@@ -5,7 +5,9 @@ import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl
+import no.elg.infiniteBootleg.world.generator.ChunkGeneratedListener
 import no.elg.infiniteBootleg.world.generator.biome.Biome
+import no.elg.infiniteBootleg.world.generator.features.ForestGenerator
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite.FractalType
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite.NoiseType
@@ -19,16 +21,18 @@ import kotlin.math.min
  */
 class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
 
-  val noise: PerlinNoise = PerlinNoise(seed)
-  private val noise2: FastNoiseLite = FastNoiseLite(seed.toInt())
+  private val chunkGeneratedListener = ChunkGeneratedListener(this)
+  private val sparseTreeGenerator = ForestGenerator(seed, 0.8f)
+  private val denseTreeGenerator = ForestGenerator(seed, 0.6f)
 
-  init {
-    noise2.SetNoiseType(NoiseType.Perlin)
-    noise2.SetFrequency(0.01f)
-    noise2.SetFractalType(FractalType.Ridged)
-    noise2.SetFractalOctaves(1)
-    noise2.SetFractalLacunarity(1.0f)
-    noise2.SetFractalGain(0.5f)
+  val noise: PerlinNoise = PerlinNoise(seed)
+  private val noise2: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
+    it.SetNoiseType(NoiseType.Perlin)
+    it.SetFrequency(0.01f)
+    it.SetFractalType(FractalType.Ridged)
+    it.SetFractalOctaves(1)
+    it.SetFractalLacunarity(1.0f)
+    it.SetFractalGain(0.5f)
   }
 
   fun getBiomeHeight(worldX: Int): Double =
@@ -80,7 +84,24 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
       }
     }
     chunk.finishLoading()
+
     return chunk
+  }
+
+  override fun generateFeatures(chunk: Chunk) {
+    for (localX in 0 until Chunk.CHUNK_SIZE) {
+      val worldX = chunkToWorld(chunk.chunkX, localX)
+      val biome = getBiome(worldX)
+      val genHeight = biome.heightAt(this, worldX)
+      val genChunkY = genHeight.worldToChunk()
+      if (chunk.chunkY == genChunkY) {
+        if (biome == Biome.MOUNTAINS) {
+          sparseTreeGenerator.generateFeature(chunk, worldX, genHeight + 1)
+        } else if (biome == Biome.PLAINS) {
+          denseTreeGenerator.generateFeature(chunk, worldX, genHeight + 1)
+        }
+      }
+    }
   }
 
   companion object {

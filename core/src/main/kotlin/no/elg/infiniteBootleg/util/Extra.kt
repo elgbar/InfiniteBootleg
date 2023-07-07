@@ -105,7 +105,7 @@ fun Entity.interactableBlock(
   interactionRadius: Float
 ): MutableSet<Long> {
   val pos = this.position
-  return world.getLocationsWithin(centerBlockX, centerBlockY, radius)
+  return World.getLocationsWithin(centerBlockX, centerBlockY, radius)
     .filterTo(mutableSetOf()) {
       isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius) &&
         world.getBlockLight(it.decompactLocX(), it.decompactLocY())?.isLit ?: true

@@ -34,6 +34,8 @@ interface ChunkGenerator {
    */
   fun generate(world: World, chunkX: Int, chunkY: Int): Chunk
 
+  fun generateFeatures(chunk: Chunk) {}
+
   companion object {
     fun getGeneratorType(generator: ChunkGenerator?): ProtoWorld.World.Generator {
       return when (generator) {
