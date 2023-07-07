@@ -15,7 +15,7 @@ object FallingBlockContactService {
 
   fun handleFallingBlockContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
     if (Main.isAuthoritative()) {
-      val materialComponent = entity.materialOrNull ?: return
+      val material = entity.materialOrNull ?: return
       val block = event.getOtherFixtureUserData<Block>(entity) { true } ?: return
       val newX: Int = block.worldX
       val newY: Int = block.worldY
@@ -25,7 +25,7 @@ object FallingBlockContactService {
         while (!world.isAirBlock(newX, newY + deltaY)) {
           deltaY++
         }
-        world.setBlock(newX, newY + deltaY, materialComponent.material, true)
+        world.setBlock(newX, newY + deltaY, material, true)
         entity.remove<MaterialComponent>() // prevent the block to collide again
         world.engine.removeEntity(entity)
       }

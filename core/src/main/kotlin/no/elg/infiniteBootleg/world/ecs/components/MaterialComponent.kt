@@ -9,7 +9,9 @@ import no.elg.infiniteBootleg.world.Material
 
 data class MaterialComponent(val material: Material) : Component {
   companion object : Mapper<MaterialComponent>() {
-    var Entity.material by propertyFor(mapper)
-    var Entity.materialOrNull by optionalPropertyFor(mapper)
+    val Entity.material get() = materialComponent.material
+    val Entity.materialOrNull get() = materialComponentOrNull?.material
+    val Entity.materialComponent by propertyFor(mapper)
+    var Entity.materialComponentOrNull by optionalPropertyFor(mapper)
   }
 }

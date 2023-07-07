@@ -59,7 +59,7 @@ fun Entity.save(forceControlled: Boolean = false): ProtoWorld.Entity {
     val materialOrNull = this@save.materialOrNull
     materialOrNull?.also {
       material = material {
-        materialOrdinal = it.material.ordinal
+        materialOrdinal = it.ordinal
       }
     }
 
