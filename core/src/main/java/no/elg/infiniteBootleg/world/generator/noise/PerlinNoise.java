@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.generator.noise;
 
-import com.badlogic.gdx.math.MathUtils;
+import static java.lang.Math.floor;
+
 import com.badlogic.gdx.math.RandomXS128;
 import java.util.Random;
 
@@ -62,11 +63,11 @@ public class PerlinNoise {
    * @return The perlin noise at the given location modified by the number of octaves and the
    *     persistence
    */
-  public float octaveNoise(float x, float y, float z, int octaves, float persistence) {
-    float total = 0;
-    float frequency = 1;
-    float amplitude = 1;
-    float maxValue = 0; // Used for normalizing result to 0.0 - 1.0
+  public double octaveNoise(double x, double y, double z, int octaves, double persistence) {
+    double total = 0;
+    double frequency = 1;
+    double amplitude = 1;
+    double maxValue = 0; // Used for normalizing result to 0.0 - 1.0
     for (int i = 0; i < octaves; i++) {
       total += noise(x, y, z, amplitude, frequency);
 
@@ -87,7 +88,7 @@ public class PerlinNoise {
    * @param frequency How fast it goes up and down (think wave frequency)
    * @return The perlin noise at the given location modified by the frequency and amplitude
    */
-  public float noise(float x, float y, float z, float amplitude, float frequency) {
+  public double noise(double x, double y, double z, double amplitude, double frequency) {
     return noise(x * frequency, y * frequency, z * frequency) * amplitude;
   }
 
@@ -97,15 +98,15 @@ public class PerlinNoise {
    * @param z z coordinate
    * @return The perlin noise at the given location
    */
-  public float noise(float x, float y, float z) {
+  public double noise(double x, double y, double z) {
     // FIND UNIT CUBE THAT CONTAINS POINT.
-    int X = MathUtils.floor(x) & 255, Y = MathUtils.floor(y) & 255, Z = MathUtils.floor(z) & 255;
+    int X = (int) floor(x) & 255, Y = (int) floor(y) & 255, Z = (int) floor(z) & 255;
     // FIND RELATIVE X,Y,Z OF POINT IN CUBE.
-    x -= Math.floor(x);
-    y -= Math.floor(y);
-    z -= Math.floor(z);
+    x -= floor(x);
+    y -= floor(y);
+    z -= floor(z);
     // COMPUTE FADE CURVES FOR EACH OF X,Y,Z.
-    float u = fade(x), v = fade(y), w = fade(z);
+    double u = fade(x), v = fade(y), w = fade(z);
     // HASH COORDINATES OF THE 8 CUBE CORNERS,
     int A = p[X] + Y,
         AA = p[A] + Z,
@@ -129,19 +130,19 @@ public class PerlinNoise {
     // @formatter:on
   }
 
-  private static float fade(float t) {
+  private static double fade(double t) {
     return t * t * t * (t * (t * 6 - 15) + 10);
   }
 
-  private static float lerp(float t, float a, float b) {
+  private static double lerp(double t, double a, double b) {
     return a + t * (b - a);
   }
 
-  private static float grad(int hash, float x, float y, float z) {
+  private static double grad(int hash, double x, double y, double z) {
     // CONVERT LO 4 BITS OF HASH CODE INTO 12 GRADIENT DIRECTIONS.
     int h = hash & 15;
-    float u = h < 8 ? x : y;
-    float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+    double u = h < 8 ? x : y;
+    double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
     return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
   }
 }

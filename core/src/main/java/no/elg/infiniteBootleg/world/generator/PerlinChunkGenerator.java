@@ -18,14 +18,14 @@ import org.jetbrains.annotations.NotNull;
 public class PerlinChunkGenerator implements ChunkGenerator {
 
   /** Noise values above this value will be cave (i.e., air). */
-  private static final float CAVE_CREATION_THRESHOLD = 0.92f;
+  private static final double CAVE_CREATION_THRESHOLD = 0.92;
   /** How much the size of the caves (worms) changes */
-  private static final float WORM_SIZE_AMPLITUDE = 0.15f;
+  private static final double WORM_SIZE_AMPLITUDE = 0.15;
   /** How fast the size of the caves (worms) changes */
-  private static final float WORM_SIZE_FREQUENCY = 0.1f;
+  private static final double WORM_SIZE_FREQUENCY = 0.1;
 
   /** How many blocks of the surface should not be caved in */
-  private static final float CAVELESS_DEPTH = 16f;
+  private static final double CAVELESS_DEPTH = 16;
 
   private final PerlinNoise noise;
   private final FastNoise noise2;
@@ -48,14 +48,14 @@ public class PerlinChunkGenerator implements ChunkGenerator {
     return noise;
   }
 
-  public float getBiomeHeight(int worldX) {
-    float a = 1.25f;
-    return (noise.noise(worldX, 0.5f, 0.5f, a, 0.001f) + a) / (a * 2);
+  public double getBiomeHeight(int worldX) {
+    double a = 1.25d;
+    return (noise.noise(worldX, 0.5d, 0.5d, a, 0.001d) + a) / (a * 2);
   }
 
   @Override
   public @NotNull Biome getBiome(int worldX) {
-    float height = getBiomeHeight(worldX);
+    double height = getBiomeHeight(worldX);
     if (height > 0.65) {
       return Biome.MOUNTAINS;
     } else if (height > 0.45) {
@@ -99,13 +99,13 @@ public class PerlinChunkGenerator implements ChunkGenerator {
           int worldY = worldChunkY + localY;
 
           // calculate the size of the worm
-          float wormSize =
+          double wormSize =
               1
                   + Math.abs(
                       noise.noise(worldX, worldY, 1, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY));
-          float caveNoise = noise2.GetNoise(worldX, worldY) / wormSize;
-          float diffToSurface = genHeight - worldY;
-          float depthModifier = Math.min(1f, diffToSurface / CAVELESS_DEPTH);
+          double caveNoise = noise2.GetNoise(worldX, worldY) / wormSize;
+          double diffToSurface = genHeight - worldY;
+          double depthModifier = Math.min(1f, diffToSurface / CAVELESS_DEPTH);
           if (caveNoise > CAVE_CREATION_THRESHOLD / depthModifier) {
             blocks[localX][localY] = null;
           }
