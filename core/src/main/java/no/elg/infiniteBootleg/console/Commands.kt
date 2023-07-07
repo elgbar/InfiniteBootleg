@@ -9,6 +9,7 @@ import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
+import no.elg.hex.util.toAbled
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
@@ -95,7 +96,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
     logger.log(
       LogLevel.SUCCESS,
-      "Lighting is now ${if (Settings.renderLight) "enabled" else "disabled"}"
+      "Lighting is now ${Settings.renderLight.toAbled()}"
     )
   }
 
@@ -170,7 +171,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
-      "Debug rendering for Box2D is now ${if (Settings.renderBox2dDebug) "enabled" else "disabled"}"
+      "Debug rendering for Box2D is now ${Settings.renderBox2dDebug.toAbled()}"
     )
   }
 
@@ -180,7 +181,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawBodies = !box2dDebugRenderer.isDrawBodies
-    logger.success("Box2D debug draw Bodies is ${if (box2dDebugRenderer.isDrawBodies) "enabled" else "disabled"}")
+    logger.success("Box2D debug draw Bodies is ${box2dDebugRenderer.isDrawBodies.toAbled()}")
   }
 
   @ClientsideOnly
@@ -189,7 +190,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawJoints = !box2dDebugRenderer.isDrawJoints
-    logger.success("Box2D debug draw Joints is ${if (box2dDebugRenderer.isDrawJoints) "enabled" else "disabled"}")
+    logger.success("Box2D debug draw Joints is ${box2dDebugRenderer.isDrawJoints.toAbled()}")
   }
 
   @ClientsideOnly
@@ -198,7 +199,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawAABBs = !box2dDebugRenderer.isDrawAABBs
-    logger.success("Box2D debug draw AABBs is ${if (box2dDebugRenderer.isDrawAABBs) "enabled" else "disabled"}")
+    logger.success("Box2D debug draw AABBs is ${box2dDebugRenderer.isDrawAABBs.toAbled()}")
   }
 
   @ClientsideOnly
@@ -207,7 +208,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawInactiveBodies = !box2dDebugRenderer.isDrawInactiveBodies
-    logger.success("Box2D debug draw InactiveBodies is ${if (box2dDebugRenderer.isDrawInactiveBodies) "enabled" else "disabled"}")
+    logger.success("Box2D debug draw InactiveBodies is ${box2dDebugRenderer.isDrawInactiveBodies.toAbled()}")
   }
 
   @ClientsideOnly
@@ -216,7 +217,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawVelocities = !box2dDebugRenderer.isDrawVelocities
-    logger.success("Box2D debug draw Velocities is ${if (box2dDebugRenderer.isDrawVelocities) "enabled" else "disabled"}")
+    logger.success("Box2D debug draw Velocities is ${box2dDebugRenderer.isDrawVelocities.toAbled()}")
   }
 
   @ClientsideOnly
@@ -225,7 +226,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawContacts = !box2dDebugRenderer.isDrawContacts
-    logger.success("Box2D debug draw Contacts is ${if (box2dDebugRenderer.isDrawContacts) "enabled" else "disabled"}")
+    logger.success("Box2D debug draw Contacts is ${box2dDebugRenderer.isDrawContacts.toAbled()}")
   }
 
   @ClientsideOnly
@@ -235,7 +236,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
-      "Debug rendering of chunks is now ${if (Settings.renderBox2dDebug) "enabled" else "disabled"}"
+      "Debug rendering of chunks is now ${Settings.renderBox2dDebug.toAbled()}"
     )
   }
 
@@ -246,7 +247,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
-      "Debug rendering of entity light is now ${if (Settings.debugEntityLight) "enabled" else "disabled"}"
+      "Debug rendering of entity light is now ${Settings.debugEntityLight.toAbled()}"
     )
     if (Settings.debugEntityLight) {
       logger.log(LogLevel.DEFAULT, "A white box is rendered over the block each entity source their brightness from")
@@ -260,7 +261,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
-      "Debug rendering of block light is now ${if (Settings.debugBlockLight) "enabled" else "disabled"}"
+      "Debug rendering of block light is now ${Settings.debugBlockLight.toAbled()}"
     )
     if (Settings.debugBlockLight) {
       logger.log(LogLevel.DEFAULT, "A red box is rendered over the luminescent blocks and a yellow box represents the skylight each block source their brightness from")
@@ -273,7 +274,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     Settings.enableCameraFollowLerp = !Settings.enableCameraFollowLerp
     logger.log(
       LogLevel.SUCCESS,
-      "Camera leap is now " + if (Settings.enableCameraFollowLerp) "enabled" else "disabled"
+      "Camera leap is now " + Settings.enableCameraFollowLerp.toAbled()
     )
   }
 
@@ -386,7 +387,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     for (entity in entities) {
       val wasIgnoring: Boolean = entity.ignorePlaceableCheck
       entity.ignorePlaceableCheck = !wasIgnoring
-      logger.success("Place check is now ${if (wasIgnoring) "enabled" else "disabled"}")
+      logger.success("Place check is now ${wasIgnoring.toAbled()}")
     }
   }
 
@@ -499,7 +500,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @CmdArgNames("enable")
   fun vsync(enable: Boolean) {
     Gdx.graphics.setVSync(enable)
-    logger.success("VSync is now ${if (enable) "enabled" else "disabled"}")
+    logger.success("VSync is now ${enable.toAbled()}")
   }
 
   @ClientsideOnly

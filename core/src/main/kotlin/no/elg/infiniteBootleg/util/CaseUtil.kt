@@ -7,3 +7,5 @@ fun CharSequence.toTitleCase(): String {
   val first = title.first()
   return "${if (first.isWhitespace()) "" else first.uppercaseChar()}${title.drop(1)}"
 }
+
+fun Boolean.toAbled(): String = if (this) "enabled" else "disabled"
