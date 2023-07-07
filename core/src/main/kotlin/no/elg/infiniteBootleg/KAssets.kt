@@ -127,7 +127,7 @@ object KAssets {
     luminanceDebugTexture = createTextureRegion(Color.FIREBRICK, 0.5f)
 
     // Do some dummy work to load textures and constructors
-    Main.logger().debug("Material", "Loaded ${Material.values().size} materials")
+    Main.logger().debug("Material", "Loaded ${Material.entries.size} materials")
   }
 
   private fun createTextureRegion(color: Color): TextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
