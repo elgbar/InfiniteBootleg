@@ -1,14 +1,11 @@
 package no.elg.infiniteBootleg.screens
 
 import com.kotcrab.vis.ui.widget.VisWindow
-import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import ktx.actors.isShown
-import ktx.actors.onChange
 import ktx.assets.disposeSafely
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.vis.separator
-import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
@@ -18,6 +15,7 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.screen.HUDRenderer
+import no.elg.infiniteBootleg.screens.stage.floatSpinner
 import no.elg.infiniteBootleg.screens.stage.toggleableDebugButton
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -114,21 +112,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
           toggleableDebugButton("Ignore place check", false, Main.inst().console.exec::placeCheck)
         }
         aRow {
-          val brushSpinner = FloatSpinnerModel("$INITIAL_BRUSH_SIZE", "1", "64", "0.25")
-          spinner("Brush size", brushSpinner) {
-            it.fillX()
-            onChange {
-              Main.inst().console.exec.brush(brushSpinner.value.toFloat())
-            }
-          }
-
-          val interactSpinner = FloatSpinnerModel("$INITIAL_INTERACT_RADIUS", "1", "1024", "1")
-          spinner("Interact radius", interactSpinner) {
-            it.fillX()
-            onChange {
-              Main.inst().console.exec.interactRadius(interactSpinner.value.toFloat())
-            }
-          }
+          floatSpinner("Brush size", INITIAL_BRUSH_SIZE, 1f, 64f, 0.25f, Main.inst().console.exec::brush)
+          floatSpinner("Reach radius", INITIAL_INTERACT_RADIUS, 1f, 1024f, 1f, Main.inst().console.exec::interactRadius)
         }
         aRow {
           separator {
