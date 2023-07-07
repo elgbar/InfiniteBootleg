@@ -36,8 +36,8 @@ import kotlin.math.sqrt
  */
 class KeyboardControls(val world: ClientWorld) {
 
-  var brushSize = 2f
-  var interactRadius = 32f
+  var brushSize = INITIAL_BRUSH_SIZE
+  var interactRadius = INITIAL_INTERACT_RADIUS
 
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()
@@ -279,5 +279,8 @@ class KeyboardControls(val world: ClientWorld) {
 
     const val MAX_X_VEL = 7.5f // ie target velocity
     const val MAX_Y_VEL = 100f
+
+    const val INITIAL_BRUSH_SIZE = 2f
+    const val INITIAL_INTERACT_RADIUS = 32f
   }
 }

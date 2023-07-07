@@ -1,17 +1,21 @@
 package no.elg.infiniteBootleg.screens
 
 import com.kotcrab.vis.ui.widget.VisWindow
+import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
 import ktx.actors.isShown
+import ktx.actors.onChange
 import ktx.assets.disposeSafely
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.vis.separator
+import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.screens.stage.toggleableDebugButton
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -107,6 +111,13 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         }
         aRow {
           toggleableDebugButton("Place check", false, Main.inst().console.exec::placeCheck)
+          val model = FloatSpinnerModel("$INITIAL_BRUSH_SIZE", "1", "64", "0.25")
+          spinner("Brush Size", model) {
+            it.fillX()
+            onChange {
+              Main.inst().console.exec.brush(model.value.toFloat())
+            }
+          }
         }
         aRow {
           separator {
