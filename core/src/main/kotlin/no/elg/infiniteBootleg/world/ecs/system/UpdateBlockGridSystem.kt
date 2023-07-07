@@ -6,6 +6,7 @@ import ktx.collections.plusAssign
 import ktx.collections.removeAll
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
@@ -28,7 +29,7 @@ object UpdateBlockGridSystem : IteratingSystem(blockEntityFamily, UPDATE_PRIORIT
     entity.occupyingLocations.removeAll { it !in currentOccupations }
 
     currentOccupations.forEach {
-      if (it !is EntityMarkerBlock || it.entity != entity) {
+      if ((it !is EntityMarkerBlock || it.entity != entity) && it.material == Material.AIR) {
         val block = EntityMarkerBlock.fromOtherBlock(it, entity)
         world.setBlock(it.worldX, it.worldY, block, updateTexture = false)
         entity.occupyingLocations += block
