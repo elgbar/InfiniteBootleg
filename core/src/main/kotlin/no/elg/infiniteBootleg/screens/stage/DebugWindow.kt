@@ -6,7 +6,7 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
-import no.elg.hex.util.toAbled
+import no.elg.infiniteBootleg.util.toAbled
 
 @Scene2dDsl
 fun KVisWindow.toggleableDebugButton(

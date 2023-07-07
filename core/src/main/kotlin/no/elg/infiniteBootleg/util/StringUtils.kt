@@ -1,4 +1,4 @@
-package no.elg.hex.util
+package no.elg.infiniteBootleg.util
 
 val CAMELCASE_REGEX = "([A-Z][a-z]|[A-Z]+(?![a-z]))".toRegex()
 

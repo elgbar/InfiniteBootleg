@@ -1,4 +1,4 @@
-package no.elg.hex.util
+package no.elg.infiniteBootleg.util
 
 import java.awt.DisplayMode
 import java.awt.GraphicsEnvironment

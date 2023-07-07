@@ -4,14 +4,14 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import no.elg.hex.util.defaultDisplayHeight
-import no.elg.hex.util.defaultDisplayWidth
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.util.Ticker
+import no.elg.infiniteBootleg.util.defaultDisplayHeight
+import no.elg.infiniteBootleg.util.defaultDisplayWidth
 
 fun main(args: Array<String>) {
   val progArgs = ProgramArgs(args)
