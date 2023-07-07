@@ -55,7 +55,6 @@ import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
@@ -565,8 +564,7 @@ abstract class World(
    */
   fun isAirBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
     val chunk = nullableChunk ?: return@actionOnBlock false
-    val block: Block = chunk.getRawBlock(localX, localY) ?: return@actionOnBlock true
-    block.material === Material.AIR || block is EntityMarkerBlock
+    chunk.getRawBlock(localX, localY).isAir()
   }
 
   /**
