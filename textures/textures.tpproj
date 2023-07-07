@@ -1,4 +1,4 @@
-name=blocks
+name=textures
 filename=
 output=../core/src/main/resources/textures
 
@@ -34,49 +34,7 @@ prettyPrint=true
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:blocks,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
-keepInputFileExtensions=false
-
-
----
-
-name=entities
-filename=
-output=../core/src/main/resources/textures
-
-alias=true
-alphaThreshold=0
-debug=false
-duplicatePadding=true
-edgePadding=true
-fast=false
-filterMag=Nearest
-filterMin=Nearest
-ignoreBlankImages=true
-maxHeight=2048
-maxWidth=2048
-minHeight=16
-minWidth=16
-paddingX=2
-paddingY=2
-pot=false
-mof=false
-rotation=false
-stripWhitespaceX=false
-stripWhitespaceY=false
-wrapX=Repeat
-wrapY=Repeat
-premultiplyAlpha=false
-grid=false
-square=false
-bleed=true
-limitMemory=false
-useIndexes=true
-prettyPrint=true
-legacyOutput=false
-
-scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:entities,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:blocks,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:entities,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 keepInputFileExtensions=false
 
 
