@@ -7,6 +7,8 @@ import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
+import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
@@ -69,19 +71,13 @@ fun Int.stringSize(): Int {
   return 10 + d
 }
 
-fun Block.isAir(): Boolean = this.material == Material.AIR
-
 @JvmName("isAirOrNull")
-fun Block?.isAir(): Boolean = this == null || this.material == Material.AIR
+fun Block?.isAir(): Boolean = this == null || this.material == Material.AIR || this is EntityMarkerBlock
 
 @JvmName("isNotAirOrNull")
 fun Block?.isNotAir(): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
-  return this != null && this.material != Material.AIR
-}
-
-fun Block.isNotAir(): Boolean {
-  return this.material != Material.AIR
+  return this != null && this.material != Material.AIR && this !is EntityMarkerBlock
 }
 
 /**
