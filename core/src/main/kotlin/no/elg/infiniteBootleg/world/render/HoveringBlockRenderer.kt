@@ -17,6 +17,9 @@ import java.lang.Math.floorMod
 class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   override fun render() {
+    if (ClientMain.inst().shouldIgnoreWorldInput()) {
+      return
+    }
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
