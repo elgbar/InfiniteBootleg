@@ -13,8 +13,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
 data class PositionComponent(var x: Float, var y: Float) : Component {
 
-  val blockX: Int = MathUtils.floor(x)
-  val blockY: Int = MathUtils.floor(y)
+  val blockX: Int get() = MathUtils.floor(x)
+  val blockY: Int get() = MathUtils.floor(y)
 
   fun toProtoVector2f(): ProtoVector2f = vector2f {
     x = this@PositionComponent.x
