@@ -21,13 +21,14 @@ import java.util.Locale
  * @author Elg
  */
 enum class Material(
+  impl: Class<*>? = null,
+  private val itemType: ItemType = ItemType.BLOCK,
   val hardness: Float,
+  val textureName: String? = null,
   /**
    * @return If the texture of the material has any transparency
    */
   val isTransparent: Boolean,
-  impl: Class<*>? = null,
-  private val itemType: ItemType = ItemType.BLOCK,
   val isSolid: Boolean = true,
   val isBlocksLight: Boolean = true,
   val isPlacable: Boolean = true,
@@ -35,25 +36,26 @@ enum class Material(
    * @return If this material emits light
    */
   val isLuminescent: Boolean = false,
-  val textureName: String? = null,
   val createNew: ((world: World, worldX: Int, worldY: Int) -> Any)? = null
 ) {
-  AIR(hardness = 0f, isTransparent = true, itemType = ItemType.AIR, isSolid = false, isBlocksLight = false, isPlacable = false, isLuminescent = false),
+  AIR(itemType = ItemType.AIR, hardness = 0f, isTransparent = true, isSolid = false, isBlocksLight = false, isPlacable = false, isLuminescent = false),
   STONE(hardness = 1.5f, isTransparent = false),
   BRICK(hardness = 2f, isTransparent = false),
   DIRT(hardness = 1f, isTransparent = false),
   GRASS(hardness = 0.8f, isTransparent = false),
-  TNT(hardness = 0.5f, impl = TntBlock::class.java, isLuminescent = true, isTransparent = false),
-  SAND(hardness = 1f, impl = FallingBlock::class.java, isTransparent = false),
-  TORCH(hardness = 0.1f, impl = Torch::class.java, isSolid = false, isBlocksLight = false, isTransparent = true, isLuminescent = true),
+  TNT(impl = TntBlock::class.java, hardness = 0.5f, isTransparent = false, isLuminescent = true),
+  SAND(impl = FallingBlock::class.java, hardness = 1f, isTransparent = false),
+  TORCH(impl = Torch::class.java, hardness = 0.1f, isTransparent = true, isSolid = false, isBlocksLight = false, isLuminescent = true),
   GLASS(hardness = 0.1f, isTransparent = true, isBlocksLight = false),
+  BIRCH_TRUNK(hardness = 1.25f, isTransparent = false, isSolid = false),
+  BIRCH_LEAVES(hardness = 0.1f, isTransparent = true, isSolid = false),
   DOOR(
-    hardness = 1f,
     itemType = ItemType.ENTITY,
-    isTransparent = true,
-    isBlocksLight = false,
-    isSolid = false,
+    hardness = 1f,
     textureName = "door_part",
+    isTransparent = true,
+    isSolid = false,
+    isBlocksLight = false,
     createNew = { world: World, worldX: Int, worldY: Int ->
       world.engine.createDoorEntity(world, worldX.toFloat(), worldY.toFloat())
     }

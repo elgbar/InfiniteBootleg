@@ -1,38 +1,42 @@
 textures.png
-	size: 92, 138
+	size: 102, 140
 	format: RGBA4444
 	repeat: xy
+birch_leaves
+	bounds: 1, 41, 32, 32
+birch_trunk
+	bounds: 19, 5, 16, 16
 breaking_block
-	bounds: 71, 51, 16, 16
+	bounds: 73, 35, 16, 16
 brick
-	bounds: 57, 1, 16, 16
+	bounds: 55, 1, 16, 16
 dirt
-	bounds: 71, 69, 16, 16
+	bounds: 73, 53, 16, 16
 door
-	bounds: 57, 19, 16, 16
+	bounds: 55, 19, 16, 16
 door_bottom
-	bounds: 67, 87, 16, 16
+	bounds: 19, 23, 16, 16
 door_closed
-	bounds: 35, 39, 16, 32
+	bounds: 67, 73, 16, 32
 door_open
-	bounds: 67, 105, 16, 32
+	bounds: 1, 7, 16, 32
 door_part
-	bounds: 1, 39, 32, 32
+	bounds: 67, 107, 32, 32
 door_top
-	bounds: 75, 33, 16, 16
+	bounds: 73, 17, 16, 16
 glass
-	bounds: 21, 3, 16, 16
+	bounds: 85, 71, 16, 16
 grass
-	bounds: 39, 1, 16, 16
+	bounds: 55, 37, 16, 16
 hand
-	bounds: 1, 73, 64, 64
+	bounds: 1, 75, 64, 64
 player
-	bounds: 1, 7, 18, 30
+	bounds: 35, 43, 18, 30
 sand
-	bounds: 39, 19, 16, 16
+	bounds: 55, 55, 16, 16
 stone
-	bounds: 21, 21, 16, 16
+	bounds: 85, 89, 16, 16
 tnt
-	bounds: 53, 55, 16, 16
+	bounds: 37, 25, 16, 16
 torch
-	bounds: 53, 37, 16, 16
+	bounds: 37, 7, 16, 16
