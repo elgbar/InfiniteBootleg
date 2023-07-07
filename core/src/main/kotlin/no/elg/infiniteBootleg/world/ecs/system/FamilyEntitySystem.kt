@@ -7,7 +7,12 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Array
 
-abstract class FamilyEntitySystem(val family: Family, priority: Int) : EntitySystem(priority) {
+/**
+ * Progress a whole family of entities and not just one at a time (which [com.badlogic.ashley.systems.IteratingSystem] does)
+ *
+ * @see com.badlogic.ashley.systems.IteratingSystem
+ */
+abstract class FamilyEntitySystem(private val family: Family, priority: Int) : EntitySystem(priority) {
 
   var entities: ImmutableArray<Entity> = EMPTY_ENTITIES
     private set
