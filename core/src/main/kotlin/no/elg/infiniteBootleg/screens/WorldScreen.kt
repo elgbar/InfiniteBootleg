@@ -9,6 +9,7 @@ import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.screen.HUDRenderer
@@ -97,12 +98,12 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
           row()
         }
         aRow {
-          toggleableDebugButton("Debug entity lighting", Main.inst().console.exec::debEntLit)
-          toggleableDebugButton("Debug render chunks", Main.inst().console.exec::debChu)
+          toggleableDebugButton("Debug entity lighting", Settings.debugEntityLight, Main.inst().console.exec::debEntLit)
+          toggleableDebugButton("Debug render chunks", Settings.renderChunkBounds, Main.inst().console.exec::debChu)
         }
         aRow {
-          toggleableDebugButton("Debug block lighting", Main.inst().console.exec::debBlkLit)
-          toggleableDebugButton("Debug Box2D", Main.inst().console.exec::debBox)
+          toggleableDebugButton("Debug block lighting", Settings.debugBlockLight, Main.inst().console.exec::debBlkLit)
+          toggleableDebugButton("Debug Box2D", Settings.renderBox2dDebug, Main.inst().console.exec::debBox)
         }
         aRow {
           separator {
@@ -110,20 +111,21 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
             it.colspan(2)
           }
         }
+        val box2dDebug = world.render.box2DDebugRenderer
 
         aRow {
-          toggleableDebugButton("Box2D draw bodies", onToggle = Main.inst().console.exec::drawBodies)
-          toggleableDebugButton("Box2D draw joints", onToggle = Main.inst().console.exec::drawJoints)
+          toggleableDebugButton("Box2D draw bodies", box2dDebug.isDrawBodies, Main.inst().console.exec::drawBodies)
+          toggleableDebugButton("Box2D draw joints", box2dDebug.isDrawJoints, Main.inst().console.exec::drawJoints)
         }
 
         aRow {
-          toggleableDebugButton("Box2D draw AABBs", onToggle = Main.inst().console.exec::drawAABBs)
-          toggleableDebugButton("Box2D draw inactiveBodies", onToggle = Main.inst().console.exec::drawInactiveBodies)
+          toggleableDebugButton("Box2D draw AABBs", box2dDebug.isDrawAABBs, Main.inst().console.exec::drawAABBs)
+          toggleableDebugButton("Box2D draw inactiveBodies", box2dDebug.isDrawInactiveBodies, Main.inst().console.exec::drawInactiveBodies)
         }
 
         aRow {
-          toggleableDebugButton("Box2D draw velocities", onToggle = Main.inst().console.exec::drawVelocities)
-          toggleableDebugButton("Box2D draw contacts", onToggle = Main.inst().console.exec::drawContacts)
+          toggleableDebugButton("Box2D draw velocities", box2dDebug.isDrawVelocities, Main.inst().console.exec::drawVelocities)
+          toggleableDebugButton("Box2D draw contacts", box2dDebug.isDrawContacts, Main.inst().console.exec::drawContacts)
         }
         pack()
       }
