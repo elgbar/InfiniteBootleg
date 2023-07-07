@@ -120,6 +120,7 @@ public class ClientWorldRender implements WorldRender {
         //noinspection LibGDXFlushInsideLoop
         TextureRegion textureRegion = chunk.getTextureRegion();
         if (textureRegion == null) {
+          chunkRenderer.queueRendering(chunk, false);
           continue;
         }
         draw.put(chunk, textureRegion);
