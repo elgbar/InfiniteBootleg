@@ -5,6 +5,7 @@ import ktx.actors.isShown
 import ktx.assets.disposeSafely
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
+import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
@@ -91,15 +92,39 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
         @Scene2dDsl
-        fun addToggle(title: String, onToggle: () -> Unit) {
-          toggleableDebugButton(title, onToggle)
+        fun aRow(theRow: () -> Unit) {
+          theRow()
           row()
         }
-        addToggle("Debug entity lighting", Main.inst().console.exec::debEntLit)
-        addToggle("Debug Box2D", Main.inst().console.exec::debBox)
-        addToggle("Debug render chunks", Main.inst().console.exec::debChu)
-        addToggle("Debug block lighting", Main.inst().console.exec::debBlkLit)
+        aRow {
+          toggleableDebugButton("Debug entity lighting", Main.inst().console.exec::debEntLit)
+          toggleableDebugButton("Debug render chunks", Main.inst().console.exec::debChu)
+        }
+        aRow {
+          toggleableDebugButton("Debug block lighting", Main.inst().console.exec::debBlkLit)
+          toggleableDebugButton("Debug Box2D", Main.inst().console.exec::debBox)
+        }
+        aRow {
+          separator {
+            it.fillX()
+            it.colspan(2)
+          }
+        }
 
+        aRow {
+          toggleableDebugButton("Box2D draw bodies", onToggle = Main.inst().console.exec::drawBodies)
+          toggleableDebugButton("Box2D draw joints", onToggle = Main.inst().console.exec::drawJoints)
+        }
+
+        aRow {
+          toggleableDebugButton("Box2D draw AABBs", onToggle = Main.inst().console.exec::drawAABBs)
+          toggleableDebugButton("Box2D draw inactiveBodies", onToggle = Main.inst().console.exec::drawInactiveBodies)
+        }
+
+        aRow {
+          toggleableDebugButton("Box2D draw velocities", onToggle = Main.inst().console.exec::drawVelocities)
+          toggleableDebugButton("Box2D draw contacts", onToggle = Main.inst().console.exec::drawContacts)
+        }
         pack()
       }
     }

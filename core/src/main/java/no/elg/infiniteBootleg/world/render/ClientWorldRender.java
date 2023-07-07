@@ -239,6 +239,10 @@ public class ClientWorldRender implements WorldRender {
     return batch;
   }
 
+  public Box2DDebugRenderer getBox2DDebugRenderer() {
+    return box2DDebugRenderer;
+  }
+
   @NotNull
   @Override
   public OrderedSet<Location> getChunkLocationsInView() {
