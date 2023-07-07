@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.screens.stage.toggleableDebugButton
+import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 /**
@@ -110,7 +111,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
           toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
         }
         aRow {
-          toggleableDebugButton("Place check", false, Main.inst().console.exec::placeCheck)
+          toggleableDebugButton("Ignore place check", false, Main.inst().console.exec::placeCheck)
           val model = FloatSpinnerModel("$INITIAL_BRUSH_SIZE", "1", "64", "0.25")
           spinner("Brush Size", model) {
             it.fillX()
@@ -118,6 +119,9 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
               Main.inst().console.exec.brush(model.value.toFloat())
             }
           }
+        }
+        aRow {
+          toggleableDebugButton("Render entity marker", false, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
         }
         aRow {
           separator {

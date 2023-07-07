@@ -170,15 +170,19 @@ public class ChunkRenderer implements Renderer, Disposable {
           continue;
         }
         var blockLight = chunk.getBlockLight(localX, localY);
-        TextureRegion texture;
-        TextureRegion secondaryTexture;
+
+        @NotNull TextureRegion texture;
+        @Nullable TextureRegion secondaryTexture;
         int worldY = CoordUtilKt.chunkToWorld(chunk.getChunkY(), localY);
         if (material == AIR) {
           texture = (topBlockHeight > worldY) ? KAssets.caveTexture : KAssets.skyTexture;
           secondaryTexture = null;
         } else {
-          texture = block.getTexture();
-          assert texture != null;
+          var nullableTexture = block.getTexture();
+          if (nullableTexture == null) {
+            continue;
+          }
+          texture = nullableTexture;
 
           if (material.isTransparent()) {
             secondaryTexture = (topBlockHeight > worldY) ? KAssets.caveTexture : KAssets.skyTexture;

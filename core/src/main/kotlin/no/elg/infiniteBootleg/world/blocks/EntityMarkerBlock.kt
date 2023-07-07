@@ -63,6 +63,10 @@ class EntityMarkerBlock(
 
   companion object {
     var debugEntityMarkerBlocks = false
+    fun toggleDebugEntityMarkerBlocks() {
+      debugEntityMarkerBlocks = !debugEntityMarkerBlocks
+    }
+
     fun fromOtherBlock(block: Block, entity: Entity): EntityMarkerBlock = EntityMarkerBlock(block.chunk, block.world, block.localX, block.localY, entity)
   }
 }
