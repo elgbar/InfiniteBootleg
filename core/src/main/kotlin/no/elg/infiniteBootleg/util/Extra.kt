@@ -138,7 +138,7 @@ fun Entity.placeableBlock(
 ): Set<Long> {
   return interactableBlock(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { !world.isAirBlock(it) } }
     .let {
-      if (it.any { loc -> world.canEntityPlaceBlock(loc.decompactLocX(), loc.decompactLocY(), this) }) {
+      if (it.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
         it
       } else {
         emptySet()

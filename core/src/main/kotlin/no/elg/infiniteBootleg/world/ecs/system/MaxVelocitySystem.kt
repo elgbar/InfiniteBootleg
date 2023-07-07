@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.v
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import no.elg.infiniteBootleg.world.ecs.toFamily
 import kotlin.math.abs
-import kotlin.math.sign
 
 /**
  * Limit the velocity of a box2D body
@@ -22,8 +21,8 @@ object MaxVelocitySystem : IteratingSystem(VelocityComponent::class.toFamily(), 
 
     if (tooFastX || tooFastY) {
       entity.updateBox2DVelocity = true
-      entity.velocity.dx = if (tooFastX) sign(velocity.dx) * velocity.maxDx else velocity.dx
-      entity.velocity.dy = if (tooFastY) sign(velocity.dy) * velocity.maxDy else velocity.dy
+      entity.velocity.dx = velocity.dx.coerceIn(-velocity.maxDx, velocity.maxDx)
+      entity.velocity.dy = velocity.dy.coerceIn(-velocity.maxDy, velocity.maxDy)
     }
   }
 }

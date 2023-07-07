@@ -34,8 +34,8 @@ data class VelocityComponent(
 
     fun Entity.setVelocity(dx: Float, dy: Float) {
       velocityOrNull?.also {
-        it.dx = dx
-        it.dy = dy
+        it.dx = dx.coerceIn(-it.maxDx, it.maxDx)
+        it.dy = dy.coerceIn(-it.maxDy, it.maxDy)
         this.updateBox2DVelocity = true
       }
     }

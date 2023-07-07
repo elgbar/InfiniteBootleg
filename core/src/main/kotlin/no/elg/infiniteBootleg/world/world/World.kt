@@ -764,19 +764,10 @@ abstract class World(
       }
       Main.inst().scheduler.waitForTasks()
 
-      // remove all entities to speed up unloading
-      //          for (Entity entity : getEntities()) {
-      //            removeEntity(entity);
-      //          }
-      //          if (!entities.isEmpty() || !players.isEmpty()) {
-      //            throw new IllegalStateException("Failed to clear entities during
-      // reload");
-      //          }
-      // ok to include unloaded chunks as they will not cause an error when unloading again
       chunksLock.writeLock().lock()
       try {
         for (chunk in chunks.values()) {
-          if (chunk != null && !unloadChunk(chunk, true, false)) {
+          if (chunk != null && !unloadChunk(chunk, force = true, save = false)) {
             Main.logger().warn("Failed to unload chunk ${stringifyCompactLoc(chunk)}")
           }
         }
@@ -787,14 +778,15 @@ abstract class World(
       } finally {
         chunksLock.writeLock().unlock()
       }
-      synchronized(BOX2D_LOCK) {
-        val bodies = Array<Body>(false, worldBody.box2dWorld.bodyCount)
+      engine.removeAllEntities()
+      postBox2dRunnable {
+        val bodies = GdxArray<Body>(false, worldBody.box2dWorld.bodyCount)
         worldBody.box2dWorld.getBodies(bodies)
         if (!bodies.isEmpty) {
           Main.logger().error("BOX2D", "There existed dangling bodies after reload!")
         }
         for (body in bodies) {
-          worldBody.destroyBody(body!!)
+          worldBody.destroyBody(body)
         }
       }
       initialize()
@@ -837,28 +829,18 @@ abstract class World(
    * Unload the given chunks and save it to disk
    *
    * @param chunk The chunk to unload
-   */
-  fun unloadChunk(chunk: Chunk?) {
-    unloadChunk(chunk, false, true)
-  }
-
-  /**
-   * Unload the given chunks and save it to disk
-   *
-   * @param chunk The chunk to unload
    * @param force If the chunk will be forced to unload
    * @param save  If the chunk will be saved
    * @return If the unloading was successful
    */
-  fun unloadChunk(chunk: Chunk?, force: Boolean, save: Boolean): Boolean {
+  fun unloadChunk(chunk: Chunk?, force: Boolean = false, save: Boolean = true): Boolean {
     if (chunk != null && chunk.isNotDisposed && (force || chunk.isAllowedToUnload)) {
       if (chunk.world !== this) {
         Main.logger().warn("Tried to unload chunk from different world")
         return false
       }
-      val removedChunk: Chunk?
       chunksLock.writeLock().lock()
-      removedChunk = try {
+      val removedChunk: Chunk? = try {
         val loader = chunkLoader
         if (save && loader is FullChunkLoader) {
           loader.save(chunk)

@@ -28,7 +28,7 @@ object UpdateBlockGridSystem : IteratingSystem(blockEntityFamily, UPDATE_PRIORIT
     entity.occupyingLocations.removeAll { it !in currentOccupations }
 
     currentOccupations.forEach {
-      if (it !is EntityMarkerBlock) {
+      if (it !is EntityMarkerBlock || it.entity != entity) {
         val block = EntityMarkerBlock.fromOtherBlock(it, entity)
         world.setBlock(it.worldX, it.worldY, block, updateTexture = false)
         entity.occupyingLocations += block

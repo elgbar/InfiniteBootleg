@@ -100,7 +100,7 @@ public class WorldTicker extends Ticker implements Disposable {
               && tick - chunk.getLastViewedTick() > chunkUnloadTime) {
 
             chunkIterator.remove();
-            world.unloadChunk(chunk);
+            world.unloadChunk(chunk, false, true);
             continue;
           }
           ForkJoinTask<?> task = pool.submit(chunk::tick);
