@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.google.common.base.Preconditions
-import no.elg.infiniteBootleg.KAssets.blockAtlas
+import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.util.component1
@@ -35,6 +35,7 @@ enum class Material(
    * @return If this material emits light
    */
   val isLuminescent: Boolean = false,
+  val textureName: String? = null,
   val createNew: ((world: World, worldX: Int, worldY: Int) -> Any)? = null
 ) {
   AIR(hardness = 0f, isTransparent = true, itemType = ItemType.AIR, isSolid = false, isBlocksLight = false, isPlacable = false, isLuminescent = false),
@@ -46,9 +47,17 @@ enum class Material(
   SAND(hardness = 1f, impl = FallingBlock::class.java, isTransparent = false),
   TORCH(hardness = 0.1f, impl = Torch::class.java, isSolid = false, isBlocksLight = false, isTransparent = true, isLuminescent = true),
   GLASS(hardness = 0.1f, isTransparent = true, isBlocksLight = false),
-  DOOR(hardness = 1f, itemType = ItemType.ENTITY, isTransparent = true, isBlocksLight = false, isSolid = false, createNew = { world: World, worldX: Int, worldY: Int ->
-    world.engine.createDoorEntity(world, worldX.toFloat(), worldY.toFloat())
-  });
+  DOOR(
+    hardness = 1f,
+    itemType = ItemType.BLOCK,
+    isTransparent = true,
+    isBlocksLight = false,
+    isSolid = false,
+    textureName = "door_part",
+    createNew = { world: World, worldX: Int, worldY: Int ->
+      world.engine.createDoorEntity(world, worldX.toFloat(), worldY.toFloat())
+    }
+  );
 
   private val constructor: Constructor<*>?
   private val constructorProtoBuf: Constructor<*>?
@@ -65,27 +74,13 @@ enum class Material(
    * @param transparent
    */
   init {
-    if (impl != null) {
-      if (itemType == ItemType.BLOCK) {
-        Preconditions.checkArgument(
-          Block::class.java.isAssignableFrom(impl),
-          name + " does not have " + Block::class.java.simpleName + " as a super type"
-        )
-        try {
-          constructor = impl.getDeclaredConstructor(World::class.java, Chunk::class.java, Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, Material::class.java)
-          constructorProtoBuf = null
-        } catch (e: NoSuchMethodException) {
-          throw IllegalStateException(
-            "There is no constructor of " +
-              impl.simpleName +
-              " with the arguments World, Chunk, int, int, Material"
-          )
-          constructor = null
-          constructorProtoBuf = null
-        }
-      } else {
-        constructor = null
+    if (impl != null && itemType == ItemType.BLOCK) {
+      Preconditions.checkArgument(Block::class.java.isAssignableFrom(impl), "$name does not have ${Block::class.java.simpleName} as a super type")
+      try {
+        constructor = impl.getDeclaredConstructor(World::class.java, Chunk::class.java, Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, Material::class.java)
         constructorProtoBuf = null
+      } catch (e: NoSuchMethodException) {
+        throw IllegalStateException("There is no constructor of ${impl.simpleName} with the arguments World, Chunk, int, int, Material")
       }
     } else {
       constructor = null
@@ -93,7 +88,8 @@ enum class Material(
     }
 
     if (Settings.client && itemType != ItemType.AIR) {
-      textureRegion = blockAtlas.findRegion(name.lowercase(Locale.getDefault()))
+      val textureName = textureName ?: name.lowercase(Locale.getDefault())
+      textureRegion = textureAtlas.findRegion(textureName)
       if (textureRegion == null) {
         throw NullPointerException("Failed to find a texture for $name")
       }
