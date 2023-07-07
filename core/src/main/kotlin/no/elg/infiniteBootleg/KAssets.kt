@@ -39,16 +39,16 @@ object KAssets {
 
   private val TEXTURES_FOLDER = "textures" + File.separatorChar
   private val FONTS_FOLDER = "fonts" + File.separatorChar
-  private val TEXTURES_BLOCK_FILE = TEXTURES_FOLDER + "blocks.atlas"
-  private val TEXTURES_ENTITY_FILE = TEXTURES_FOLDER + "entities.atlas"
+  private val TEXTURES_BLOCK_FILE = "${TEXTURES_FOLDER}textures.atlas"
 
-  lateinit var blockAtlas: TextureAtlas
-  lateinit var entityAtlas: TextureAtlas
+  lateinit var textureAtlas: TextureAtlas
 
+  private const val HAND_REGION_NAME = "hand"
   private const val PLAYER_REGION_NAME = "player"
   private const val DOOR_OPEN_REGION_NAME = "door_open"
   private const val DOOR_CLOSED_REGION_NAME = "door_closed"
 
+  lateinit var handTexture: TextureRegion
   lateinit var playerTexture: TextureRegion
   lateinit var doorOpenTexture: TextureRegion
   lateinit var doorClosedTexture: TextureRegion
@@ -69,12 +69,12 @@ object KAssets {
   }
 
   fun load() {
-    blockAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
-    entityAtlas = TextureAtlas(TEXTURES_ENTITY_FILE)
+    textureAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
 
-    playerTexture = TextureRegion(entityAtlas.findRegion(PLAYER_REGION_NAME))
-    doorOpenTexture = TextureRegion(entityAtlas.findRegion(DOOR_OPEN_REGION_NAME))
-    doorClosedTexture = TextureRegion(entityAtlas.findRegion(DOOR_CLOSED_REGION_NAME))
+    handTexture = TextureRegion(textureAtlas.findRegion(HAND_REGION_NAME))
+    playerTexture = TextureRegion(textureAtlas.findRegion(PLAYER_REGION_NAME))
+    doorOpenTexture = TextureRegion(textureAtlas.findRegion(DOOR_OPEN_REGION_NAME))
+    doorClosedTexture = TextureRegion(textureAtlas.findRegion(DOOR_CLOSED_REGION_NAME))
 
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font

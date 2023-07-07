@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.
 
 class SelectedInventoryItemComponent : Component {
 
-  var material: Material = Material.BRICK
+  var material: Material = Material.AIR
 
   companion object : Mapper<SelectedInventoryItemComponent>() {
     var Entity.selected by propertyFor(SelectedInventoryItemComponent.mapper)

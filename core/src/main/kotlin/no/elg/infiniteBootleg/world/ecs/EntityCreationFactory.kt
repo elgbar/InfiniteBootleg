@@ -62,8 +62,8 @@ import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-const val PLAYER_WIDTH = 1.8f
-const val PLAYER_HEIGHT = 3.8f
+const val PLAYER_WIDTH = 2f - 0.2f
+const val PLAYER_HEIGHT = 4f - 0.2f
 
 const val PLAYERS_FOOT_USER_DATA = "A bloody foot!"
 const val PLAYERS_RIGHT_ARM_USER_DATA = "Righty"
