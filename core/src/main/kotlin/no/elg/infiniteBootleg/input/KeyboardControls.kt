@@ -167,18 +167,25 @@ class KeyboardControls(val world: ClientWorld) {
 
     val selectedMaterial = entity.selectedOrNull ?: return true
 
-    selectedMaterial.material = when (keycode) {
-      Keys.NUM_0, Keys.NUMPAD_0 -> Material.entries[0]
-      Keys.NUM_1, Keys.NUMPAD_1 -> Material.entries[1]
-      Keys.NUM_2, Keys.NUMPAD_2 -> Material.entries[2]
-      Keys.NUM_3, Keys.NUMPAD_3 -> Material.entries[3]
-      Keys.NUM_4, Keys.NUMPAD_4 -> Material.entries[4]
-      Keys.NUM_5, Keys.NUMPAD_5 -> Material.entries[5]
-      Keys.NUM_6, Keys.NUMPAD_6 -> Material.entries[6]
-      Keys.NUM_7, Keys.NUMPAD_7 -> Material.entries[7]
-      Keys.NUM_8, Keys.NUMPAD_8 -> Material.entries[8]
-      Keys.NUM_9, Keys.NUMPAD_9 -> Material.entries[9]
-      else -> selectedMaterial.material
+    val extra = if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)) 10 else 0
+    try {
+      when (keycode) {
+        Keys.NUM_0, Keys.NUMPAD_0 -> Material.entries[0 + extra]
+        Keys.NUM_1, Keys.NUMPAD_1 -> Material.entries[1 + extra]
+        Keys.NUM_2, Keys.NUMPAD_2 -> Material.entries[2 + extra]
+        Keys.NUM_3, Keys.NUMPAD_3 -> Material.entries[3 + extra]
+        Keys.NUM_4, Keys.NUMPAD_4 -> Material.entries[4 + extra]
+        Keys.NUM_5, Keys.NUMPAD_5 -> Material.entries[5 + extra]
+        Keys.NUM_6, Keys.NUMPAD_6 -> Material.entries[6 + extra]
+        Keys.NUM_7, Keys.NUMPAD_7 -> Material.entries[7 + extra]
+        Keys.NUM_8, Keys.NUMPAD_8 -> Material.entries[8 + extra]
+        Keys.NUM_9, Keys.NUMPAD_9 -> Material.entries[9 + extra]
+        else -> null
+      }?.let {
+        selectedMaterial.material = it
+      }
+    } catch (_: IndexOutOfBoundsException) {
+      // Ignore out of bounds, for materials that don't exist
     }
     return true
   }

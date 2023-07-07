@@ -24,15 +24,7 @@ import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.Material.BRICK
-import no.elg.infiniteBootleg.world.Material.DIRT
 import no.elg.infiniteBootleg.world.Material.DOOR
-import no.elg.infiniteBootleg.world.Material.GLASS
-import no.elg.infiniteBootleg.world.Material.GRASS
-import no.elg.infiniteBootleg.world.Material.SAND
-import no.elg.infiniteBootleg.world.Material.STONE
-import no.elg.infiniteBootleg.world.Material.TNT
-import no.elg.infiniteBootleg.world.Material.TORCH
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
@@ -209,17 +201,10 @@ private fun EngineEntity.addCommonPlayerComponents(
 
   with(killableComponent ?: KillableComponent())
   with(
-    InventoryComponent(10).also {
-      val charge = 1_000_000u
-      it += Item(STONE, charge)
-      it += Item(BRICK, charge)
-      it += Item(DIRT, charge)
-      it += Item(GRASS, charge)
-      it += Item(TNT, charge)
-      it += Item(SAND, charge)
-      it += Item(TORCH, charge)
-      it += Item(GLASS, charge)
-      it += Item(DOOR, charge)
+    InventoryComponent(Material.entries.size).also {
+      for (material in Material.entries) {
+        it += Item(material, 1_000_000u)
+      }
     }
   )
 
