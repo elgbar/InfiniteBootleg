@@ -36,6 +36,7 @@ enum class Material(
    * @return If this material emits light
    */
   val isLuminescent: Boolean = false,
+  val ignoreForTopBlock: Boolean = false,
   val createNew: ((world: World, worldX: Int, worldY: Int) -> Any)? = null
 ) {
   AIR(itemType = ItemType.AIR, hardness = 0f, isTransparent = true, isSolid = false, isBlocksLight = false, isPlacable = false, isLuminescent = false),
@@ -47,8 +48,6 @@ enum class Material(
   SAND(impl = FallingBlock::class.java, hardness = 1f, isTransparent = false),
   TORCH(impl = Torch::class.java, hardness = 0.1f, isTransparent = true, isSolid = false, isBlocksLight = false, isLuminescent = true),
   GLASS(hardness = 0.1f, isTransparent = true, isBlocksLight = false),
-  BIRCH_TRUNK(hardness = 1.25f, isTransparent = false, isSolid = false),
-  BIRCH_LEAVES(hardness = 0.1f, isTransparent = true, isSolid = false),
   DOOR(
     itemType = ItemType.ENTITY,
     hardness = 1f,
@@ -59,7 +58,9 @@ enum class Material(
     createNew = { world: World, worldX: Int, worldY: Int ->
       world.engine.createDoorEntity(world, worldX.toFloat(), worldY.toFloat())
     }
-  );
+  ),
+  BIRCH_TRUNK(hardness = 1.25f, isTransparent = true, isSolid = false, ignoreForTopBlock = true),
+  BIRCH_LEAVES(hardness = 0.1f, isTransparent = true, isSolid = false, ignoreForTopBlock = true);
 
   private val constructor: Constructor<*>?
   private val constructorProtoBuf: Constructor<*>?
