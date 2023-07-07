@@ -542,7 +542,7 @@ class ChunkImpl(
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
    * @param localY The local y ie a value between 0 and [CHUNK_SIZE]
-   * @return A block from the relative coordinates
+   * @return The block instance of the given coordinates, a new air block will be created if there is no existing block
    */
   override fun getBlock(localX: Int, localY: Int): Block {
     if (!isValid) {
@@ -711,7 +711,7 @@ class ChunkImpl(
   }
 
   companion object {
-    private val AIR_BLOCK_BUILDER = Block.save(Material.AIR)
+    val AIR_BLOCK_BUILDER = Block.save(Material.AIR)
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
       val a = blockA?.material ?: Material.AIR

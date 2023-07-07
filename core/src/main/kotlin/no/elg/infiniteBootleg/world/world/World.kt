@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
+import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
@@ -54,6 +55,7 @@ import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
@@ -69,6 +71,7 @@ import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
+import no.elg.infiniteBootleg.world.ecs.system.UpdateBlockGridSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
@@ -200,6 +203,7 @@ abstract class World(
     engine.addSystem(InputSystem)
     engine.addSystem(ControlSystem)
     engine.addSystem(PhysicsSystem)
+    engine.addSystem(UpdateBlockGridSystem)
     if (Main.isClient()) {
       engine.addSystem(FollowEntitySystem)
     }
@@ -562,7 +566,7 @@ abstract class World(
   fun isAirBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
     val chunk = nullableChunk ?: return@actionOnBlock false
     val block: Block = chunk.getRawBlock(localX, localY) ?: return@actionOnBlock true
-    block.material === Material.AIR
+    block.material === Material.AIR || block is EntityMarkerBlock
   }
 
   /**
@@ -605,7 +609,9 @@ abstract class World(
     return action(localX, localY, chunk)
   }
 
-  fun getBlocks(locs: Collection<Long>, loadChunk: Boolean = true): Iterable<Block> = locs.mapNotNull { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
+  fun getBlocks(locs: GdxLongArray, loadChunk: Boolean = true): Iterable<Block> = getBlocks(locs.toArray(), loadChunk)
+  fun getBlocks(locs: LongArray, loadChunk: Boolean = true): Iterable<Block> = locs.map { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }.filterNotNullTo(mutableSetOf())
+  fun getBlocks(locs: Iterable<Long>, loadChunk: Boolean = true): Iterable<Block> = locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
 
   fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false) {
     val blockChunks = ObjectSet<Chunk>()
@@ -1010,7 +1016,7 @@ abstract class World(
     includeAir: Boolean,
     cancel: () -> Boolean = { false },
     filter: (Block) -> Boolean = { true }
-  ): Array<Block> {
+  ): GdxArray<Block> {
     val effectiveRaw: Boolean
     effectiveRaw = if (!raw && !includeAir) {
       Main.logger().warn("getBlocksAABB", "Will not include air AND air blocks will be created! (raw: false, includeAir: false)")

@@ -42,6 +42,7 @@ import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.SharedInformationComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
@@ -376,6 +377,7 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
   // This entity will handle input events
   with<PhysicsEventQueue>()
   with(MaterialComponent(material))
+  with<OccupyingBlocksComponent>()
 
   val bodyDef = BodyDef()
   bodyDef.type = BodyDef.BodyType.DynamicBody
@@ -420,13 +422,13 @@ fun Engine.createDoorEntity(
   with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
   with(PositionComponent(worldX, worldY))
 
-  val door = DOOR
   with(TextureRegionComponent(KAssets.doorClosedTexture))
 
   // This entity will handle input events
-  with(MaterialComponent(door))
+  with(MaterialComponent(DOOR))
   with<DoorComponent>()
   with<PhysicsEventQueue>()
+  with<OccupyingBlocksComponent>()
 
   val width = 2f
   val height = 4f

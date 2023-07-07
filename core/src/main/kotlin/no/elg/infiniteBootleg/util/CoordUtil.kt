@@ -5,6 +5,7 @@ package no.elg.infiniteBootleg.util
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.world.World
@@ -149,6 +150,7 @@ inline fun stringifyCompactLoc(x: Int, y: Int): String = "($x,$y)"
 inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
 
 inline fun stringifyCompactLoc(chunk: Chunk): String = stringifyCompactLoc(chunk.compactLocation)
+inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.compactWorldLoc)
 
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 

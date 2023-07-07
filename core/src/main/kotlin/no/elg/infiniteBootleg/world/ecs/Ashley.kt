@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
@@ -56,7 +57,7 @@ val PLAYERS_ENTITY_ARRAY = arrayOf(
   InventoryComponent::class
 )
 
-val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class).get()
+val blockEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, MaterialComponent::class, OccupyingBlocksComponent::class).get()
 val doorEntityFamily: Family = allOf(*BASIC_ENTITY_ARRAY, DoorComponent::class).get()
 
 val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
