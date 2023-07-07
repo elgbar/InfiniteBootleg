@@ -13,10 +13,33 @@ import org.jetbrains.annotations.NotNull;
  * @author Elg
  */
 public enum Biome {
-  PLAINS(0.1f, 0.9f, 64, 0.009f, 0, Material.STONE, Material.GRASS, new Pair<>(Material.DIRT, 10)),
+  PLAINS(
+    0.1f,
+    0.9f,
+    64,
+    0.009f,
+    0,
+    Material.STONE,
+    Material.GRASS,
+    new Pair<>(Material.GRASS, 4),
+    new Pair<>(Material.DIRT, 10)),
   MOUNTAINS(
-      100f, 0.9f, 356, 0.005f, 25, Material.STONE, Material.GRASS, new Pair<>(Material.DIRT, 6)),
-  DESERT(0.1f, 0.9f, 32, 0.005f, 0, Material.STONE, Material.SAND, new Pair<>(Material.SAND, 12));
+    100f,
+    0.9f,
+    356,
+    0.005f,
+    25,
+    Material.STONE,
+    Material.GRASS,
+    new Pair<>(Material.DIRT, 6)),
+  DESERT(0.1f,
+    0.9f,
+    32,
+    0.005f,
+    0,
+    Material.STONE,
+    Material.SAND,
+    new Pair<>(Material.SAND, 12));
 
   public static final int INTERPOLATION_RADIUS = 25;
 
@@ -31,14 +54,14 @@ public enum Biome {
 
   @SafeVarargs
   Biome(
-      float y,
-      float z,
-      float amplitude,
-      float frequency,
-      int offset,
-      @NotNull Material filler,
-      @NotNull Material topmostBlock,
-      @NotNull Pair<@NotNull Material, @NotNull Integer>... topBlocks) {
+    float y,
+    float z,
+    float amplitude,
+    float frequency,
+    int offset,
+    @NotNull Material filler,
+    @NotNull Material topmostBlock,
+    @NotNull Pair<@NotNull Material, @NotNull Integer>... topBlocks) {
     this.y = y;
     this.z = z;
     this.amplitude = amplitude;
@@ -77,19 +100,19 @@ public enum Biome {
   }
 
   public static float rawHeightAt(
-      @NotNull PerlinNoise noise,
-      int worldX,
-      float y,
-      float z,
-      float amplitude,
-      float frequency,
-      int offset) {
+    @NotNull PerlinNoise noise,
+    int worldX,
+    float y,
+    float z,
+    float amplitude,
+    float frequency,
+    int offset) {
     return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5f) * amplitude
-        + offset;
+      + offset;
   }
 
   public void fillUpTo(
-      @NotNull PerlinNoise noise, @NotNull Chunk chunk, int localX, int localY, int height) {
+    @NotNull PerlinNoise noise, @NotNull Chunk chunk, int localX, int localY, int height) {
     Block[] blocks = chunk.getBlocks()[localX];
     for (int dy = 0; dy < localY; dy++) {
       Material mat = materialAt(noise, height, chunk.getWorldX() + localX, chunk.getWorldY() + dy);
