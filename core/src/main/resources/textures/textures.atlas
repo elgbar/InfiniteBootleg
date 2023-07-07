@@ -1,7 +1,9 @@
 textures.png
-	size: 88, 138
+	size: 92, 138
 	format: RGBA4444
 	repeat: xy
+breaking_block
+	bounds: 71, 51, 16, 16
 brick
 	bounds: 57, 1, 16, 16
 dirt
@@ -17,7 +19,7 @@ door_open
 door_part
 	bounds: 1, 39, 32, 32
 door_top
-	bounds: 71, 51, 16, 16
+	bounds: 75, 33, 16, 16
 glass
 	bounds: 21, 3, 16, 16
 grass

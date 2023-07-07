@@ -2,9 +2,11 @@ package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.ClientMain
+import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.util.decompactLocX
-import no.elg.infiniteBootleg.util.decompactLocY
+import no.elg.infiniteBootleg.util.breakableBlock
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.Block
@@ -23,19 +25,22 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
-      val texture = entity.selected.material.textureRegion ?: continue
-
       val keyboardControls = entity.locallyControlledOrNull?.keyboardControls ?: continue
+
+      entity.breakableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
+        .forEach { (blockWorldX, blockWorldY) ->
+          renderPlaceableBlock(world, KAssets.breakingBlockTexture, blockWorldX, blockWorldY)
+        }
+
+      val texture = entity.selected.material.textureRegion ?: continue
       entity.placeableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
-        .forEach { compactLoc ->
-          val blockWorldX = compactLoc.decompactLocX()
-          val blockWorldY = compactLoc.decompactLocY()
-          renderBlock(world, texture, blockWorldX, blockWorldY)
+        .forEach { (blockWorldX, blockWorldY) ->
+          renderPlaceableBlock(world, texture, blockWorldX, blockWorldY)
         }
     }
   }
 
-  private fun renderBlock(world: World, texture: TextureRegion, blockWorldX: Int, blockWorldY: Int) {
+  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldX: Int, blockWorldY: Int) {
     val averageBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: 1f
     if (averageBrightness == 0f) {
       // no need to render a black block
