@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.world.world.World
 
 data class WorldComponent(val world: World) : Component {
   companion object : Mapper<WorldComponent>() {
-    val Entity.world by propertyFor(mapper)
+    val Entity.world get() = worldComponent.world
+    val Entity.worldComponent by propertyFor(mapper)
   }
 }

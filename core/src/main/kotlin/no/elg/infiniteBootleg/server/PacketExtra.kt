@@ -248,7 +248,7 @@ fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packet
 fun clientBoundStartGamePacket(player: Entity): Packet {
   return clientBoundPacket(CB_START_GAME).setStartGame(
     StartGame.newBuilder()
-      .setWorld(player.world.world.toProtobuf())
+      .setWorld(player.world.toProtobuf())
       .setControlling(player.save())
   ).build()
 }

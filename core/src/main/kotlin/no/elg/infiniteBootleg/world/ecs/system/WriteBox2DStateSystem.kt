@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
-import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
@@ -21,7 +21,7 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
   private val tmp = Vector2()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val body = entity.box2d.body
+    val body = entity.box2dBody
     updatePosition(entity, body)
     updateVelocity(entity, body)
   }

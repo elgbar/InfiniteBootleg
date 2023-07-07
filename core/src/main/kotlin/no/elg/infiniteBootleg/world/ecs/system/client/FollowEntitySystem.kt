@@ -30,7 +30,7 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
   }
 
   private fun processEntity(entity: Entity) {
-    val worldRender = entity.world.world.render
+    val worldRender = entity.world.render
     if (worldRender is ClientWorldRender) {
       val camera: OrthographicCamera = worldRender.camera
       val position = entity.positionComponent

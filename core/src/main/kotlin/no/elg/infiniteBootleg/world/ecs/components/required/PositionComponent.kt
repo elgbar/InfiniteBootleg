@@ -28,10 +28,10 @@ data class PositionComponent(var x: Float, var y: Float) : Component {
     var Entity.positionComponent by propertyFor(mapper)
 
     val Entity.physicsX: Float
-      get() = positionComponent.x + world.world.worldBody.worldOffsetX
+      get() = positionComponent.x + world.worldBody.worldOffsetX
 
     val Entity.physicsY: Float
-      get() = positionComponent.y + world.world.worldBody.worldOffsetY
+      get() = positionComponent.y + world.worldBody.worldOffsetY
 
     fun Entity.teleport(x: Float, y: Float) {
       val position = positionComponent

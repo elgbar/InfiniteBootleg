@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.g
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
-import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -45,7 +45,7 @@ class KeyboardControls(val world: ClientWorld) {
   private val mouseLocator = MouseLocator()
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
-    val world = entity.world.world
+    val world = entity.world
     if (!world.getEntities(worldX, worldY).isEmpty) {
       // cannot place on an entity
       return false
@@ -56,7 +56,7 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
-    val world = entity.world.world
+    val world = entity.world
     if (!world.getEntities(worldX, worldY).isEmpty) {
       // cannot place on an entity
       return false
@@ -85,10 +85,10 @@ class KeyboardControls(val world: ClientWorld) {
 
   private fun Entity.walk() {
     fun moveHorz(dir: Float) {
-      val world = world.world
+      val world = world
       world.postBox2dRunnable {
         if (grounded.canMove(dir)) {
-          val body = box2d.body
+          val body = box2dBody
 
           val currSpeed = body.linearVelocity.x
           val wantedSpeed = dir * if (grounded.onGround) {
@@ -120,7 +120,7 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   fun update(entity: Entity) {
-    val entityWorld = entity.world.world
+    val entityWorld = entity.world
     if (entityWorld is ClientWorld) {
       mouseLocator.update(entityWorld)
     }
@@ -143,7 +143,7 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   private fun Entity.setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
-    val body = box2d.body
+    val body = box2dBody
     val vel = body.linearVelocity
     val (nx, ny) = modify(vel.x, vel.y)
     val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
@@ -163,7 +163,7 @@ class KeyboardControls(val world: ClientWorld) {
       }
 
     if (update) {
-      entity.world.world.render.update()
+      entity.world.render.update()
     }
   }
 

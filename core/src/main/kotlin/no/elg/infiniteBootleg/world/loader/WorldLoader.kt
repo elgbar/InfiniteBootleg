@@ -60,7 +60,7 @@ object WorldLoader {
   }
 
   fun saveServerPlayer(player: Entity) {
-    val fileHandle = getServerPlayerFile(player.world.world, player.id)
+    val fileHandle = getServerPlayerFile(player.world, player.id)
     if (fileHandle != null) {
       try {
         fileHandle.writeBytes(player.save().toByteArray(), false)

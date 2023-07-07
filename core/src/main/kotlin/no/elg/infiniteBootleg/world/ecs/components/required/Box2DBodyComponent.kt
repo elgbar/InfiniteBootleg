@@ -43,11 +43,12 @@ class Box2DBodyComponent(body: Body, private val box2dWidth: Float, private val 
       val currentBody = internalBody ?: return
       this.internalBody = null
       val entity = currentBody.userData as Entity
-      entity.world.world.worldBody.destroyBody(currentBody)
+      entity.world.worldBody.destroyBody(currentBody)
     }
   }
 
   companion object : Mapper<Box2DBodyComponent>() {
+    val Entity.box2dBody get() = box2d.body
     val Entity.box2d by propertyFor(mapper)
   }
 }
