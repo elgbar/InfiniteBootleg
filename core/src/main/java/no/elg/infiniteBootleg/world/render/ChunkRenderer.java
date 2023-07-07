@@ -19,8 +19,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Disposable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import no.elg.infiniteBootleg.KAssets;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -38,7 +40,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ChunkRenderer implements Renderer, Disposable {
 
-  /** How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks */
+  /**
+   * How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks
+   */
   public static final int FPS_FAST_CHUNK_RENDER_THRESHOLD = 10;
 
   public static final int EXTRA_CHUNKS_TO_RENDER_EACH_FRAME = 4;
@@ -49,6 +53,8 @@ public class ChunkRenderer implements Renderer, Disposable {
 
   // current rendering chunk
   private Chunk curr;
+
+  private final Map<TextureRegion, TextureRegion[][]> splitCache = new HashMap<>();
   private static final Object QUEUE_LOCK = new Object();
 
   public static final float CAVE_CLEAR_COLOR_R = 0.408824f;
@@ -67,7 +73,7 @@ public class ChunkRenderer implements Renderer, Disposable {
     List<Chunk> chunkList = new LinkedList<>();
     renderQueue = SetUniqueList.setUniqueList(chunkList);
     batch.setProjectionMatrix(
-        new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
+      new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
   }
 
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
@@ -78,36 +84,36 @@ public class ChunkRenderer implements Renderer, Disposable {
    * Queue rendering of a chunk. If the chunk is already in the queue to be rendered and {@code
    * prioritize} is {@code true} then the chunk will be moved to the front of the queue
    *
-   * @param chunk The chunk to render
+   * @param chunk      The chunk to render
    * @param prioritize If the chunk should be placed at the front of the queue
-   * @param forceAdd If the chunk should be rendered even if it is already in queue or is currently
-   *     being rendered
+   * @param forceAdd   If the chunk should be rendered even if it is already in queue or is currently
+   *                   being rendered
    */
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize, boolean forceAdd) {
     Main.inst()
-        .getScheduler()
-        .executeAsync(
-            () -> {
-              synchronized (QUEUE_LOCK) {
-                var chunkIndex = renderQueue.indexOf(chunk);
+      .getScheduler()
+      .executeAsync(
+        () -> {
+          synchronized (QUEUE_LOCK) {
+            var chunkIndex = renderQueue.indexOf(chunk);
 
-                // Place the chunk at the front of the queue
-                if (prioritize && chunkIndex != CHUNK_NOT_IN_QUEUE_INDEX) {
-                  renderQueue.remove(chunkIndex);
-                  renderQueue.add(0, chunk);
-                  return;
-                }
+            // Place the chunk at the front of the queue
+            if (prioritize && chunkIndex != CHUNK_NOT_IN_QUEUE_INDEX) {
+              renderQueue.remove(chunkIndex);
+              renderQueue.add(0, chunk);
+              return;
+            }
 
-                // do not queue the chunk we're currently rendering
-                if ((forceAdd || chunk != curr) && chunkIndex == CHUNK_NOT_IN_QUEUE_INDEX) {
-                  if (prioritize) {
-                    renderQueue.add(0, chunk);
-                  } else {
-                    renderQueue.add(chunk);
-                  }
-                }
+            // do not queue the chunk we're currently rendering
+            if ((forceAdd || chunk != curr) && chunkIndex == CHUNK_NOT_IN_QUEUE_INDEX) {
+              if (prioritize) {
+                renderQueue.add(0, chunk);
+              } else {
+                renderQueue.add(chunk);
               }
-            });
+            }
+          }
+        });
   }
 
   public void renderMultiple() {
@@ -136,8 +142,8 @@ public class ChunkRenderer implements Renderer, Disposable {
         chunk = renderQueue.remove(0);
         aboveGround = chunk.getChunkColumn().isChunkAboveTopBlock(chunk.getChunkY(), TOP_MOST_FLAG);
       } while ((chunk.isAllAir() && aboveGround)
-          || !chunk.isNotDisposed()
-          || worldRender.isOutOfView(chunk));
+        || !chunk.isNotDisposed()
+        || worldRender.isOutOfView(chunk));
       curr = chunk;
     }
 
@@ -157,7 +163,7 @@ public class ChunkRenderer implements Renderer, Disposable {
       Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A);
     } else {
       Gdx.gl.glClearColor(
-          CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A);
+        CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A);
     }
 
     for (int localX = 0; localX < CHUNK_SIZE; localX++) {
@@ -230,7 +236,8 @@ public class ChunkRenderer implements Renderer, Disposable {
 
     int tileWidth = texture.getRegionWidth() / LIGHT_RESOLUTION;
     int tileHeight = texture.getRegionHeight() / LIGHT_RESOLUTION;
-    TextureRegion[][] split = texture.split(tileWidth, tileHeight);
+    TextureRegion[][] split =
+      splitCache.computeIfAbsent(texture, t -> t.split(tileWidth, tileHeight));
 
     for (int ry = 0, splitLength = split.length; ry < splitLength; ry++) {
       TextureRegion[] regions = split[LIGHT_RESOLUTION - ry - 1];
@@ -240,11 +247,11 @@ public class ChunkRenderer implements Renderer, Disposable {
         var lightIntensity = lights[rx][ry];
         batch.setColor(lightIntensity, lightIntensity, lightIntensity, 1f);
         batch.draw(
-            region,
-            dx + rx * tileWidth,
-            dy + ry * tileHeight,
-            BLOCK_SIZE / (float) LIGHT_RESOLUTION,
-            BLOCK_SIZE / (float) LIGHT_RESOLUTION);
+          region,
+          dx + rx * tileWidth,
+          dy + ry * tileHeight,
+          BLOCK_SIZE / (float) LIGHT_RESOLUTION,
+          BLOCK_SIZE / (float) LIGHT_RESOLUTION);
       }
     }
   }
