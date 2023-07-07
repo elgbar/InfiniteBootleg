@@ -49,7 +49,7 @@ enum class Material(
   GLASS(hardness = 0.1f, isTransparent = true, isBlocksLight = false),
   DOOR(
     hardness = 1f,
-    itemType = ItemType.BLOCK,
+    itemType = ItemType.ENTITY,
     isTransparent = true,
     isBlocksLight = false,
     isSolid = false,
