@@ -65,6 +65,10 @@ public class ConsoleHandler implements ConsoleLogger, Disposable, Resizable {
     return console.isVisible();
   }
 
+  public void setVisible(boolean visible) {
+    console.setVisible(visible);
+  }
+
   public synchronized void draw() {
     console.draw();
   }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import no.elg.infiniteBootleg.ClientMain
+import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.screens.WorldScreen
 
 object GlobalInputListener : InputAdapter() {
@@ -13,6 +14,16 @@ object GlobalInputListener : InputAdapter() {
 
   override fun keyDown(keycode: Int): Boolean {
     when (keycode) {
+      Input.Keys.ESCAPE -> {
+        val screen = ClientMain.inst().screen
+        if (screen is WorldScreen && screen.isDebugMenuVisible) {
+          screen.toggleDebugMenu()
+        }
+        if (Main.inst().console.isVisible) {
+          Main.inst().console.isVisible = false
+        }
+      }
+
       Input.Keys.ENTER -> {
         if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
           val mode = Gdx.graphics.displayMode

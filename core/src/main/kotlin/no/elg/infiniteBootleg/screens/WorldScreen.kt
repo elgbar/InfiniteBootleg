@@ -90,6 +90,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     stage.actors {
       debugMenu = visWindow("Debug Menu") {
         hide()
+        addCloseButton()
         defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
         @Scene2dDsl
