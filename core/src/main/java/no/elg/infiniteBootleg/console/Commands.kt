@@ -369,10 +369,34 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world")
     }
+    if (size < 1) {
+      logger.error("Brush size must be at least 1")
+      return
+    }
     for (entity in entities) {
       val controls: KeyboardControls = entity.locallyControlled.keyboardControls
       controls.brushSize = size
       logger.success("New brush size is now $size")
+    }
+  }
+
+  @CmdArgNames("interactRadius")
+  @ClientsideOnly
+  @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New interact radius, positive integer"])
+  fun interactRadius(interactRadius: Float) {
+    val world = clientWorld ?: return
+    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    if (entities.size() == 0) {
+      logger.error("There is no local, controlled player in this world")
+    }
+    if (interactRadius < 1) {
+      logger.error("Interact radius must be at least 1")
+      return
+    }
+    for (entity in entities) {
+      val controls: KeyboardControls = entity.locallyControlled.keyboardControls
+      controls.interactRadius = interactRadius
+      logger.success("New interact radius is now $interactRadius")
     }
   }
 

@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_BRUSH_SIZE
+import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.screens.stage.toggleableDebugButton
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
@@ -105,28 +106,34 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         aRow {
           toggleableDebugButton("Debug entity lighting", Settings.debugEntityLight, Main.inst().console.exec::debEntLit)
           toggleableDebugButton("Debug render chunks", Settings.renderChunkBounds, Main.inst().console.exec::debChu)
-        }
-        aRow {
           toggleableDebugButton("Debug block lighting", Settings.debugBlockLight, Main.inst().console.exec::debBlkLit)
-          toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
         }
         aRow {
+          toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
+          toggleableDebugButton("Render entity marker", false, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
           toggleableDebugButton("Ignore place check", false, Main.inst().console.exec::placeCheck)
-          val model = FloatSpinnerModel("$INITIAL_BRUSH_SIZE", "1", "64", "0.25")
-          spinner("Brush Size", model) {
+        }
+        aRow {
+          val brushSpinner = FloatSpinnerModel("$INITIAL_BRUSH_SIZE", "1", "64", "0.25")
+          spinner("Brush size", brushSpinner) {
             it.fillX()
             onChange {
-              Main.inst().console.exec.brush(model.value.toFloat())
+              Main.inst().console.exec.brush(brushSpinner.value.toFloat())
+            }
+          }
+
+          val interactSpinner = FloatSpinnerModel("$INITIAL_INTERACT_RADIUS", "1", "1024", "1")
+          spinner("Interact radius", interactSpinner) {
+            it.fillX()
+            onChange {
+              Main.inst().console.exec.interactRadius(interactSpinner.value.toFloat())
             }
           }
         }
         aRow {
-          toggleableDebugButton("Render entity marker", false, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
-        }
-        aRow {
           separator {
             it.fillX()
-            it.colspan(2)
+            it.colspan(4)
           }
         }
         val box2dDebug = world.render.box2DDebugRenderer
@@ -137,14 +144,11 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         aRow {
           toggleableDebugButton("Box2D draw bodies", box2dDebug.isDrawBodies, Main.inst().console.exec::drawBodies)
           toggleableDebugButton("Box2D draw joints", box2dDebug.isDrawJoints, Main.inst().console.exec::drawJoints)
-        }
-
-        aRow {
           toggleableDebugButton("Box2D draw AABBs", box2dDebug.isDrawAABBs, Main.inst().console.exec::drawAABBs)
-          toggleableDebugButton("Box2D draw inactiveBodies", box2dDebug.isDrawInactiveBodies, Main.inst().console.exec::drawInactiveBodies)
         }
 
         aRow {
+          toggleableDebugButton("Box2D draw inactiveBodies", box2dDebug.isDrawInactiveBodies, Main.inst().console.exec::drawInactiveBodies)
           toggleableDebugButton("Box2D draw velocities", box2dDebug.isDrawVelocities, Main.inst().console.exec::drawVelocities)
           toggleableDebugButton("Box2D draw contacts", box2dDebug.isDrawContacts, Main.inst().console.exec::drawContacts)
         }
