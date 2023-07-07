@@ -130,11 +130,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
   override fun updateTopBlock(localX: Int, worldYHint: Int) {
     updateTopBlock(topSolid, localX, worldYHint) {
-      it.material.isSolid
+      it.material.isCollidable
     }
 
     updateTopBlock(topLight, localX, worldYHint) {
-      it.material.isBlocksLight
+      it.material.blocksLight
     }
   }
 

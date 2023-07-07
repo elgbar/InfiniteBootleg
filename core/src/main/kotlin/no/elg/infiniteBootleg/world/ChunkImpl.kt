@@ -215,7 +215,7 @@ class ChunkImpl(
       if (block is TickingBlock) {
         tickingBlocks.setAsync(block)
       }
-      if (block != null && block.material.isLuminescent || currBlock != null && currBlock.material.isLuminescent) {
+      if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
         updateBlockLights(localX, localY, true)
       }
       modified = true

@@ -28,39 +28,47 @@ enum class Material(
   /**
    * @return If the texture of the material has any transparency
    */
-  val isTransparent: Boolean,
-  val isSolid: Boolean = true,
-  val isBlocksLight: Boolean = true,
-  val isPlacable: Boolean = true,
+  val hasTransparentTexture: Boolean,
+  /**
+   * @return If this material can be collided with
+   */
+  val isCollidable: Boolean = true,
+  /**
+   * @return If this material blocks light
+   */
+  val blocksLight: Boolean = true,
   /**
    * @return If this material emits light
    */
-  val isLuminescent: Boolean = false,
-  val ignoreForTopBlock: Boolean = false,
+  val emitsLight: Boolean = false,
+  /**
+   * @return If this material can be used to place blocks near it
+   */
+  val adjacentPlaceable: Boolean = true,
   val createNew: ((world: World, worldX: Int, worldY: Int) -> Any)? = null
 ) {
-  AIR(itemType = ItemType.AIR, hardness = 0f, isTransparent = true, isSolid = false, isBlocksLight = false, isPlacable = false, isLuminescent = false),
-  STONE(hardness = 1.5f, isTransparent = false),
-  BRICK(hardness = 2f, isTransparent = false),
-  DIRT(hardness = 1f, isTransparent = false),
-  GRASS(hardness = 0.8f, isTransparent = false),
-  TNT(impl = TntBlock::class.java, hardness = 0.5f, isTransparent = false, isLuminescent = true),
-  SAND(impl = FallingBlock::class.java, hardness = 1f, isTransparent = false),
-  TORCH(impl = Torch::class.java, hardness = 0.1f, isTransparent = true, isSolid = false, isBlocksLight = false, isLuminescent = true),
-  GLASS(hardness = 0.1f, isTransparent = true, isBlocksLight = false),
+  AIR(itemType = ItemType.AIR, hardness = 0f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, emitsLight = false, adjacentPlaceable = false),
+  STONE(hardness = 1.5f, hasTransparentTexture = false),
+  BRICK(hardness = 2f, hasTransparentTexture = false),
+  DIRT(hardness = 1f, hasTransparentTexture = false),
+  GRASS(hardness = 0.8f, hasTransparentTexture = false),
+  TNT(impl = TntBlock::class.java, hardness = 0.5f, hasTransparentTexture = false, emitsLight = true),
+  SAND(impl = FallingBlock::class.java, hardness = 1f, hasTransparentTexture = false),
+  TORCH(impl = Torch::class.java, hardness = 0.1f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, emitsLight = true, adjacentPlaceable = false),
+  GLASS(hardness = 0.1f, hasTransparentTexture = true, blocksLight = false),
   DOOR(
     itemType = ItemType.ENTITY,
     hardness = 1f,
     textureName = "door_part",
-    isTransparent = true,
-    isSolid = false,
-    isBlocksLight = false,
+    hasTransparentTexture = true,
+    isCollidable = false,
+    blocksLight = false,
     createNew = { world: World, worldX: Int, worldY: Int ->
       world.engine.createDoorEntity(world, worldX.toFloat(), worldY.toFloat())
     }
   ),
-  BIRCH_TRUNK(hardness = 1.25f, isTransparent = true, isSolid = false, ignoreForTopBlock = true),
-  BIRCH_LEAVES(hardness = 0.1f, isTransparent = true, isSolid = false, ignoreForTopBlock = true);
+  BIRCH_TRUNK(hardness = 1.25f, hasTransparentTexture = true, isCollidable = false, blocksLight = false),
+  BIRCH_LEAVES(hardness = 0.1f, hasTransparentTexture = false, isCollidable = false, blocksLight = false, adjacentPlaceable = false);
 
   private val constructor: Constructor<*>?
   private val constructorProtoBuf: Constructor<*>?

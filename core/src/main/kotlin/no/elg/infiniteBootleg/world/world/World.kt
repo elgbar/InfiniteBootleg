@@ -576,22 +576,22 @@ abstract class World(
     if (entity.ignorePlaceableCheck) {
       return true
     }
-    if (!canPassThrough(blockX, blockY, false)) {
-      return false
+    if (canPlaceBlock(blockX, blockY, false)) {
+      return true
     }
     for (direction in Direction.CARDINAL) {
-      if (!canPassThrough(blockX + direction.dx, blockY + direction.dy, false)) {
+      if (canPlaceBlock(blockX + direction.dx, blockY + direction.dy, false)) {
         return true
       }
     }
     return false
   }
 
-  fun canPassThrough(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean =
+  private fun canPlaceBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
-      val block: Block = chunk.getRawBlock(localX, localY) ?: return@actionOnBlock true
-      !block.material.isSolid
+      val material = chunk.getRawBlock(localX, localY)?.material ?: Material.AIR
+      material.adjacentPlaceable
     }
 
   private inline fun <R> actionOnBlock(

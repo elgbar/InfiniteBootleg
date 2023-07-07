@@ -189,7 +189,7 @@ class BlockLight(
         loadChunk = false,
         includeAir = false,
         cancel = cancelled
-      ) { it.material.isLuminescent }
+      ) { it.material.emitsLight }
   }
 
   fun findSkylightBlocks(worldX: Int, worldY: Int, cancelled: () -> Boolean = { false }): GdxArray<Block> {
@@ -244,8 +244,8 @@ class BlockLight(
    * @return If the given block is a valid skylight candidate
    */
   private fun skylightBlockFilter(worldX: Float, worldY: Float, block: Block): Boolean {
-    return !block.material.isBlocksLight &&
-      !block.material.isLuminescent &&
+    return !block.material.blocksLight &&
+      !block.material.emitsLight &&
       block.chunk.chunkColumn.isBlockAboveTopBlock(block.localX, block.worldY, BLOCKS_LIGHT_FLAG) &&
       Vector2.dst2(worldX, worldY, block.worldX.toFloat(), block.worldY.toFloat()) <= LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS
   }

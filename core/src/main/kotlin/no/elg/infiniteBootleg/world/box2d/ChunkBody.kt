@@ -96,7 +96,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
         val block = chunk.getRawBlock(localX, localY)
-        if (block == null || !block.material.isSolid) {
+        if (block == null || !block.material.isCollidable) {
           continue
         }
 
@@ -168,9 +168,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       fixture.userData = block
 //      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
       fixture.filterData = when {
-        material.isBlocksLight && material.isSolid -> Filters.EN_GR_LI__GROUND_FILTER
+        material.blocksLight && material.isCollidable -> Filters.EN_GR_LI__GROUND_FILTER
 //        material.isBlocksLight -> Filters.GR_LI__GROUND_FILTER
-        material.isSolid -> Filters.EN_GR__GROUND_FILTER
+        material.isCollidable -> Filters.EN_GR__GROUND_FILTER
         else -> Filters.GR__GROUND_FILTER
       }
     }

@@ -189,7 +189,7 @@ public class ChunkRenderer implements Renderer, Disposable {
           }
           texture = nullableTexture;
 
-          if (material.isTransparent()) {
+          if (material.getHasTransparentTexture()) {
             secondaryTexture = (topBlockHeight > worldY) ? KAssets.caveTexture : KAssets.skyTexture;
           } else {
             secondaryTexture = null;
@@ -203,7 +203,7 @@ public class ChunkRenderer implements Renderer, Disposable {
         if (Settings.renderLight && blockLight.isLit() && !blockLight.isSkylight()) {
           if (secondaryTexture != null) {
             // If the block is emitting light there is no point in drawing it shaded
-            if (material.isLuminescent()) {
+            if (material.getEmitsLight()) {
               batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
             } else {
               drawShadedBlock(secondaryTexture, blockLight.getLightMap(), dx, dy);
