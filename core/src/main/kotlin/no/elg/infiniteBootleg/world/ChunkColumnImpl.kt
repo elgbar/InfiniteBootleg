@@ -130,11 +130,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
   override fun updateTopBlock(localX: Int, worldYHint: Int) {
     updateTopBlock(topSolid, localX, worldYHint) {
-      it.isNotAir() && it.material.isSolid
+      it.material.isSolid
     }
 
     updateTopBlock(topLight, localX, worldYHint) {
-      it.isNotAir() && it.material.isBlocksLight
+      it.material.isBlocksLight
     }
   }
 
@@ -149,6 +149,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
       val currTopHeight = top[localX]
       val currTopBlock = getWorldBlock(localX, top[localX])
       if (currTopBlock == null) {
+        Main.logger().error("Failed to get the current block at $chunkX, $localX, $currTopHeight. Trying again")
         // failed to get the current block
         Main.inst().scheduler.scheduleAsync(100) {
           updateTopBlock(top, localX, worldYHint, rule)
