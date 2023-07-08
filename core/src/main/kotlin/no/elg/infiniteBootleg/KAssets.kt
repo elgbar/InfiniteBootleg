@@ -26,7 +26,7 @@ import ktx.style.visTextField
 import ktx.style.window
 import no.elg.infiniteBootleg.ClientMain.SCALE
 import no.elg.infiniteBootleg.screen.ScreenRenderer
-import no.elg.infiniteBootleg.util.use
+import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
@@ -138,7 +138,7 @@ object KAssets {
   private fun createTextureRegion(color: Color): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
   private fun createTextureRegion(color: Color, a: Float): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, a)
   private fun createTextureRegion(r: Float, g: Float, b: Float, a: Float): RotatableTextureRegion =
-    Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444).use {
+    Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444).useDispose {
       it.setColor(r, g, b, a)
       it.fill()
       TextureRegion(Texture(it)).disallowedRotation()

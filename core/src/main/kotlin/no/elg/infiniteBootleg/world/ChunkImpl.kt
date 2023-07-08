@@ -371,7 +371,7 @@ class ChunkImpl(
       // Re-render the chunk with the new lighting
       val render = world.render
       if (render is ClientWorldRender) {
-        render.chunkRenderer.queueRendering(this, true, true)
+        render.chunkRenderer.queueRendering(this, true)
       }
     }
   }
@@ -481,21 +481,6 @@ class ChunkImpl(
   override fun shouldSave(): Boolean {
     return modified && isValid
   }
-
-//    @Override
-//    public Future<Array<Entity>> getEntities(Function1<Array<Entity>, Unit> callback) {
-//      var future = new CompletableFuture<Array<Entity>>();
-//      var array = new Array<Entity>(false, 16);
-//      world.getWorldBody().queryAABB(getWorldX(), getWorldY(), getWorldX(Chunk.CHUNK_SIZE - 1),
-//   getWorldY(Chunk.CHUNK_SIZE - 1), fixture -> {
-//        Object userData = fixture.getUserData();
-//        if (userData instanceof Entity entity) {
-//          array.add(entity);
-//        }
-//        return true;
-//      });
-//      return future;
-//    }
 
   override fun iterator(): Iterator<Block?> {
     return object : MutableIterator<Block?> {

@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.v
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
-import no.elg.infiniteBootleg.world.render.ChunkRenderer.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import java.text.DecimalFormat
 

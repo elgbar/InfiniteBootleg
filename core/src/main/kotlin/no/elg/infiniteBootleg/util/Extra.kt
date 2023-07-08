@@ -82,7 +82,7 @@ fun Block?.isNotAir(): Boolean {
  * @param action The action to do on the resource
  * @param onError The action to perform if we failed to dispose the resource
  */
-inline fun <T : Disposable, R> T.use(onError: (Exception) -> Unit = {}, action: (T) -> R): R {
+inline fun <T : Disposable, R> T.useDispose(onError: (Exception) -> Unit = {}, action: (T) -> R): R {
   try {
     return action(this)
   } finally {

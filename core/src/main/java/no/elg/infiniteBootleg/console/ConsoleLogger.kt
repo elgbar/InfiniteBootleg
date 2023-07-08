@@ -68,6 +68,10 @@ interface ConsoleLogger : ApplicationLogger {
     log(LogLevel.DEFAULT, "[$tag] ${message.invoke()}")
   }
 
+  fun warn(tag: String, message: () -> String) {
+    error("WARN", message.invoke())
+  }
+
   fun warn(message: String, vararg objs: Any?) {
     error("WARN", message, *objs)
   }

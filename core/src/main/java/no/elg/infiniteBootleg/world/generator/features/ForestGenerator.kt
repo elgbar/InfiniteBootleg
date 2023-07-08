@@ -15,23 +15,23 @@ class ForestGenerator(override val seed: Long, private val cutoff: Float) : Feat
   }
 
   override fun generateFeature(chunk: Chunk, worldX: Int, worldY: Int) {
-    val warmth = shouldGenerateTreeNoise.getNoise(worldX.toDouble(), worldY.toDouble())
+    val warmth = shouldGenerateTreeNoise.getNoise(worldX, worldY)
     if (warmth > cutoff) {
       createTree(chunk.world, worldX, worldY)
     }
   }
 
   private fun createTree(world: World, worldX: Int, worldY: Int) {
-    val treeHeight = (shouldGenerateTreeNoise.getNoise(worldX.toDouble(), worldY.toDouble(), 1.0) * 16)
+    val treeHeight = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 1) * 16)
     val locs = World.getLocationsAABB(worldX.toFloat(), worldY.toFloat(), 0f, treeHeight)
     Material.BIRCH_TRUNK.createBlocks(world, locs.toSet(), false)
 
-    val leavesRadius = (shouldGenerateTreeNoise.getNoise(worldX.toDouble(), worldY.toDouble(), 2.0) * 5).coerceAtLeast(3f)
+    val leavesRadius = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 2) * 5).coerceAtLeast(3f)
     val leaves = getLocationsWithin(worldX, worldY + treeHeight.toInt(), leavesRadius)
     Material.BIRCH_LEAVES.createBlocks(world, leaves.toSet(), false)
 
     if (treeHeight >= 6) {
-      val leavesRadius2 = (shouldGenerateTreeNoise.getNoise(worldX.toDouble(), worldY.toDouble(), 3.0) * 4).coerceIn(1f, leavesRadius - 0.5f)
+      val leavesRadius2 = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 3) * 4).coerceIn(1f, leavesRadius - 0.5f)
       val leaves2 = getLocationsWithin(worldX, worldY + (treeHeight - leavesRadius).toInt(), leavesRadius2)
       Material.BIRCH_LEAVES.createBlocks(world, leaves2.toSet(), false)
     }
