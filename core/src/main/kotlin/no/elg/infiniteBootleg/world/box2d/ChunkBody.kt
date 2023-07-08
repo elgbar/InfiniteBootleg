@@ -73,7 +73,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     chunk.world.worldBody.updateChunk(this)
   }
 
-  @Synchronized
+  @GuardedBy("BOX2D_LOCK")
   fun shouldCreateBody(): Boolean {
     if (isDisposed) {
       return false
@@ -105,13 +105,11 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     }
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
-    synchronized(this) {
-      if (isDisposed) {
-        box2dBody = null
-        chunk.world.worldBody.destroyBody(tmpBody)
-      } else {
-        box2dBody = tmpBody
-      }
+    if (isDisposed) {
+      box2dBody = null
+      chunk.world.worldBody.destroyBody(tmpBody)
+    } else {
+      box2dBody = tmpBody
     }
   }
 
@@ -176,7 +174,6 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     }
   }
 
-  @Synchronized
   override fun dispose() {
     if (isDisposed) return
     disposed = true
