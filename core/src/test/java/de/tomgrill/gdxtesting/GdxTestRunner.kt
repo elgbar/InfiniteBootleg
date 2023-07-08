@@ -20,6 +20,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.headless.HeadlessApplication
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration
 import io.mockk.mockk
+import no.elg.infiniteBootleg.ServerMain
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.Extension
 
 class GdxTestRunner : ApplicationListener, Extension {
@@ -30,9 +32,17 @@ class GdxTestRunner : ApplicationListener, Extension {
   override fun resume() {}
   override fun dispose() {}
 
-  init {
-    val conf = HeadlessApplicationConfiguration()
-    HeadlessApplication(this, conf)
-    Gdx.gl = mockk(relaxed = true)
+  companion object {
+    @JvmStatic
+    @BeforeAll
+    fun beforeAll(gdxTestRunner: GdxTestRunner) {
+      val conf = HeadlessApplicationConfiguration()
+      HeadlessApplication(ServerMain(true, null), conf)
+      Gdx.gl = mockk(relaxed = true)
+      Gdx.app = mockk(relaxed = true)
+      Gdx.graphics = mockk(relaxed = true)
+      Gdx.input = mockk(relaxed = true)
+      Gdx.net = mockk(relaxed = true)
+    }
   }
 }
