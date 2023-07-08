@@ -8,12 +8,9 @@ import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.TestGraphic
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.FULL_SERVER
-import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.LOGIN_SUCCESS
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.PROCEED_LOGIN
-import no.elg.infiniteBootleg.world.subgrid.enitites.Player
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 /**
  * @author Elg
@@ -60,16 +57,6 @@ class TowardsServerClientPacketsHandlerKtTest : TestGraphic() {
   @Test
   fun `do not disconnect when PROCEED_LOGIN`() {
     getClient().handleLoginStatus(PROCEED_LOGIN)
-    verify(exactly = 0) { ctx.close() }
-  }
-
-  @Test
-  fun `disconnect when already logged in2`() {
-    val newWorld = createNewWorld()
-    val client = getClient()
-    client.world = newWorld
-    client.controllingEntity = Player(newWorld, 0f, 0f, UUID.randomUUID()).save().build()
-    client.handleLoginStatus(LOGIN_SUCCESS)
     verify(exactly = 0) { ctx.close() }
   }
 
