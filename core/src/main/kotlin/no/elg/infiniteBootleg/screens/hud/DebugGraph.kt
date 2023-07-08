@@ -39,7 +39,6 @@ object DebugGraph : Resizable {
   private var fpsDeltaAcc = 0f
 
   private var tps: TickerGraph? = null
-  private var lps: TickerGraph? = null
   private var pps: TickerGraph? = null
 
   fun render(sr: ScreenRenderer, world: ClientWorld?) {
@@ -53,10 +52,9 @@ object DebugGraph : Resizable {
     val updateFps = Gdx.graphics.frameId % COL_WIDTH == 0L
 
     val updateTps = tps?.update ?: false
-    val updateLps = lps?.update ?: false
     val updatePps = pps?.update ?: false
 
-    val updateAny = updateFps || updateTps || updateLps || updatePps
+    val updateAny = updateFps || updateTps || updatePps
 
     if (updateAny) {
       begin()
@@ -67,7 +65,6 @@ object DebugGraph : Resizable {
 
     tps?.draw()
     pps?.draw()
-    lps?.draw()
 
     if (updateAny) {
       end()
@@ -124,7 +121,6 @@ object DebugGraph : Resizable {
     fpsIndex = Int.MAX_VALUE
 
     tps?.resize(fboWidth, fboHeight)
-    lps?.resize(fboWidth, fboHeight)
     pps?.resize(fboWidth, fboHeight)
 
     if (DebugGraph::fbo.isInitialized) {
