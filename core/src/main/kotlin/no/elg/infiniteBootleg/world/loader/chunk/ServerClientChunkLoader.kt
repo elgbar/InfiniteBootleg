@@ -14,16 +14,19 @@ class ServerClientChunkLoader(override val world: ServerClientWorld, generator: 
 
   private val toBeLoadedChunks: ConcurrentHashMap.KeySetView<Long, Boolean> = ConcurrentHashMap.newKeySet()
 
-  override fun fetchChunk(chunkLoc: Long): Chunk? {
+  private val loadedChunk = LoadedChunk(null, false)
+
+  override fun fetchChunk(chunkLoc: Long): LoadedChunk {
+
     if (chunkLoc in toBeLoadedChunks) {
-      return null
+      return loadedChunk
     }
     toBeLoadedChunks += chunkLoc
     val chunkX = chunkLoc.decompactLocX()
     val chunkY = chunkLoc.decompactLocY()
     val serverClient = world.serverClient
     serverClient.ctx.writeAndFlush(serverClient.serverBoundChunkRequestPacket(chunkX, chunkY))
-    return null
+    return loadedChunk
   }
 
   override fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {

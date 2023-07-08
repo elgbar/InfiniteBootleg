@@ -19,10 +19,11 @@ import no.elg.infiniteBootleg.world.world.World
  */
 class FullChunkLoader(override val world: World, generator: ChunkGenerator) : ChunkLoader(generator) {
 
-  override fun fetchChunk(chunkLoc: Long): Chunk? {
+  override fun fetchChunk(chunkLoc: Long): LoadedChunk {
     val chunkX = chunkLoc.decompactLocX()
     val chunkY = chunkLoc.decompactLocY()
-    return loadChunkFromFile(chunkX, chunkY) ?: generateChunk(chunkX, chunkY)
+    val loadChunkFromFile = loadChunkFromFile(chunkX, chunkY)
+    return LoadedChunk(loadChunkFromFile ?: generateChunk(chunkX, chunkY), loadChunkFromFile == null)
   }
 
   private fun generateChunk(chunkX: Int, chunkY: Int): Chunk? {

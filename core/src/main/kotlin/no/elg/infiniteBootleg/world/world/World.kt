@@ -471,16 +471,17 @@ abstract class World(
       //      Main.logger().log("Loading world chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc)
       // + "\n" + DebugUtilsKt.stacktrace());
       val loadedChunk = chunkLoader.fetchChunk(chunkLoc)
-      if (loadedChunk == null) {
+      val chunk = loadedChunk.chunk
+      if (chunk == null) {
         // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
         // date, and the loading should be re-tried
         old = chunks.remove(chunkLoc)
         null
       } else {
-        Preconditions.checkState(loadedChunk.isValid)
-        old = chunks.put(chunkLoc, loadedChunk)
-        dispatchEvent(ChunkLoadedEvent(loadedChunk))
-        loadedChunk
+        Preconditions.checkState(chunk.isValid)
+        old = chunks.put(chunkLoc, chunk)
+        dispatchEvent(ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated))
+        chunk
       }
     } finally {
       chunksLock.writeLock().unlock()

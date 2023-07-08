@@ -21,7 +21,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
    * @param chunkLoc The coordinates of the chunk (in chunk view)
    * @return The loaded chunk or null if something went wrong
    */
-  abstract fun fetchChunk(chunkLoc: Long): Chunk?
+  abstract fun fetchChunk(chunkLoc: Long): LoadedChunk
 
   open fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
     val chunkPosition = protoChunk.position
