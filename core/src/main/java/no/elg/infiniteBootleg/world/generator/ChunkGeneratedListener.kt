@@ -9,7 +9,11 @@ import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 
 class ChunkGeneratedListener(generator: ChunkGenerator) : Disposable {
 
-  private val updateChunkLightEventListener = EventListener { (chunk): ChunkLoadedEvent -> Main.inst().scheduler.executeAsync { generator.generateFeatures(chunk) } }
+  private val updateChunkLightEventListener = EventListener { (chunk, isNewlyGenerated): ChunkLoadedEvent ->
+    if (isNewlyGenerated) {
+      Main.inst().scheduler.executeAsync { generator.generateFeatures(chunk) }
+    }
+  }
 
   init {
     EventManager.registerListener(updateChunkLightEventListener)
