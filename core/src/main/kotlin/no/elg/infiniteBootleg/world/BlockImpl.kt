@@ -4,10 +4,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.world.Block.Companion.getRawRelative
 import no.elg.infiniteBootleg.world.Block.Companion.save
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.render.TextureNeighbor
 import no.elg.infiniteBootleg.world.world.World
+import java.util.EnumMap
 
 /**
  * A block in the world each block is a part of a chunk which is a part of a world. Each block know
@@ -30,7 +33,15 @@ open class BlockImpl(
     return save(material)
   }
 
-  override val texture: TextureRegion? get() = material.textureRegion
+  override val texture: TextureRegion?
+    get() {
+      val map = EnumMap<Direction, Material>(Direction::class.java)
+      for (direction in Direction.CARDINAL) {
+        val relMat = this.getRawRelative(direction, false)?.material ?: Material.AIR
+        map[direction] = relMat
+      }
+      return TextureNeighbor.getTexture(material, map)
+    }
 
   override fun load(protoBlock: ProtoWorld.Block) {
     Preconditions.checkArgument(protoBlock.materialOrdinal == material.ordinal)

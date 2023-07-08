@@ -30,6 +30,7 @@ import no.elg.infiniteBootleg.util.use
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
+import no.elg.infiniteBootleg.world.render.TextureNeighbor
 import java.io.File
 
 /**
@@ -128,6 +129,8 @@ object KAssets {
 
     // Do some dummy work to load textures and constructors
     Main.logger().debug("Material", "Loaded ${Material.entries.size} materials")
+
+    TextureNeighbor.generateNeighborMap(textureAtlas)
   }
 
   private fun createTextureRegion(color: Color): TextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
