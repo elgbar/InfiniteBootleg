@@ -399,7 +399,7 @@ abstract class World(
     var readChunk: Chunk? = null
     var acquiredLock = false
     try {
-      acquiredLock = chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS.toLong(), TimeUnit.MILLISECONDS)
+      acquiredLock = chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS, TimeUnit.MILLISECONDS)
       if (acquiredLock) {
         readChunk = chunks[chunkLoc]
       }
@@ -750,10 +750,8 @@ abstract class World(
    *
    *
    * Must be called on main thread!
-   *
-   * @param force If the chunks will be forced to unload
    */
-  fun reload(force: Boolean) {
+  fun reload() {
     Main.inst().scheduler.executeSync {
       // Reload on render thread to make sure it does not try to load chunks while we're
       // waiting
@@ -1032,36 +1030,11 @@ abstract class World(
   /**
    * @param worldX The x coordinate in world view
    * @param worldY The y coordinate in world view
-   * @return The first entity found within the given coordinates
-   */
-  fun getEntity(worldX: Float, worldY: Float): Entity? {
-    //    for (Entity entity : entities.values()) {
-    //      Vector2 pos = entity.getPosition();
-    //      if (Util.isBetween(
-    //        pos.getX() - entity.getHalfBox2dWidth(), worldX, pos.x + entity.getHalfBox2dWidth())
-    //        && //
-    //        Util.isBetween(
-    //          pos.y - entity.getHalfBox2dHeight(), worldY, pos.y + entity.getHalfBox2dHeight())) {
-    //        return entity;
-    //      }
-    //    }
-    return null
-  }
-
-  /**
-   * @param worldX The x coordinate in world view
-   * @param worldY The y coordinate in world view
    * @return The material at the given location
    */
   fun getMaterial(worldX: Int, worldY: Int): Material {
     val block = getRawBlock(worldX, worldY, true)
     return block?.material ?: Material.AIR
-
-    //    for (Entity entity : getEntities(worldX, worldY)) {
-    //      if (entity instanceof MaterialEntity materialEntity) {
-    //        return materialEntity.getMaterial();
-    //      }
-    //    }
   }
 
   /**
@@ -1077,14 +1050,14 @@ abstract class World(
     return uuid.hashCode()
   }
 
-  override fun equals(o: Any?): Boolean {
-    if (this === o) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) {
       return true
     }
-    if (o == null || javaClass != o.javaClass) {
+    if (other == null || javaClass != other.javaClass) {
       return false
     }
-    val world = o as World
+    val world = other as World
     return uuid == world.uuid
   }
 
@@ -1125,7 +1098,7 @@ abstract class World(
     const val HALF_BLOCK_SIZE = 0.5f
     const val BLOCK_SIZE = 1f
     const val LIGHT_SOURCE_LOOK_BLOCKS = 10f
-    const val TRY_LOCK_CHUNKS_DURATION_MS = 100
+    const val TRY_LOCK_CHUNKS_DURATION_MS = 100L
 
     fun getLocationsAABB(worldX: Float, worldY: Float, offsetX: Float, offsetY: Float): LongArray {
       val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))

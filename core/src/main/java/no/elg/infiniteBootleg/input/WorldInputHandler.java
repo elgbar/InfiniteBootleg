@@ -68,7 +68,7 @@ public class WorldInputHandler extends InputAdapter implements Disposable {
         world.save();
         break;
       case F9:
-        world.reload(true);
+        world.reload();
         break;
       case F12:
         Ticker ticker = world.getWorldTicker();

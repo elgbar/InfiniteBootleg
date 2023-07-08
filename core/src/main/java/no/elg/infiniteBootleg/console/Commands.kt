@@ -40,7 +40,6 @@ import no.elg.infiniteBootleg.world.time.WorldTime
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.Locale
-import kotlin.math.max
 
 /**
  * @author Elg
@@ -103,15 +102,8 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ClientsideOnly
   @ConsoleDoc(description = "Reload all loaded chunks if unloading is allowed")
   fun reload() {
-    reload(false)
-  }
-
-  @CmdArgNames("force")
-  @ClientsideOnly
-  @ConsoleDoc(description = "Reload all loaded chunks", paramDescriptions = ["Force unloading of chunks even when unloading is disallowed"])
-  fun reload(force: Boolean) {
     val world = world ?: return
-    world.reload(force)
+    world.reload()
     logger.log(LogLevel.SUCCESS, "All chunks have been reloaded")
   }
 
@@ -323,20 +315,11 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ClientsideOnly
   @ConsoleDoc(description = "Change the zoom level of the world camera", paramDescriptions = ["The new zoom level, min is " + WorldRender.MIN_ZOOM])
   fun zoom(zoom: Float) {
-    var zoom = zoom
-    if (zoom < WorldRender.MIN_ZOOM) {
-      logger.warn(
-        "Given zoom level (%.3f) is less than the minimum % .3f",
-        zoom,
-        WorldRender.MIN_ZOOM
-      )
-      zoom = WorldRender.MIN_ZOOM
-    }
     val clientWorld = clientWorld ?: return
     val render = clientWorld.render
-    render.camera.zoom = max(zoom, WorldRender.MIN_ZOOM)
+    render.camera.zoom = zoom.coerceIn(WorldRender.MIN_ZOOM, WorldRender.MAX_ZOOM)
     render.update()
-    logger.success("Zoom level is now $zoom")
+    logger.success("Zoom level is now ${render.camera.zoom}")
   }
 
   @ClientsideOnly
@@ -488,7 +471,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       val bodies = Array<Body>(worldBox2dWorld.bodyCount)
       worldBox2dWorld.getBodies(bodies)
       var invalid = 0
-      val entities = world.engine.entities
       for (body in bodies) {
         val userData = body.userData
         if (userData is Entity) {
@@ -508,8 +490,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
 
   @ConsoleDoc(description = "Save the world server side")
   fun save() {
-    val world = world ?: return
-    world.save()
+    world?.save()
   }
 
   @ClientsideOnly
