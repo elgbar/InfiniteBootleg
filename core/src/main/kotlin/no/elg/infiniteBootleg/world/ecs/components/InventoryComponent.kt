@@ -21,9 +21,9 @@ class InventoryComponent(private val maxSize: Int) : Component {
   }
 
   operator fun plusAssign(item: Item) {
-    val existing = this[item]?.charge
+    val existing = this[item]?.stock
     val updatedItem = if (existing != null) {
-      Item(item.material, existing + item.charge)
+      Item(item.material, existing + item.stock)
     } else {
       if (items.size >= maxSize) {
         return
@@ -34,9 +34,9 @@ class InventoryComponent(private val maxSize: Int) : Component {
   }
 
   operator fun minusAssign(item: Item) {
-    val existing = this[item]?.charge
+    val existing = this[item]?.stock
     val updatedItem = if (existing != null) {
-      Item(item.material, existing - item.charge)
+      Item(item.material, existing - item.stock)
     } else {
       item
     }

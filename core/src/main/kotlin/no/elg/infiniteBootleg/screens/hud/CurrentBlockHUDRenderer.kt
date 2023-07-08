@@ -31,7 +31,7 @@ object CurrentBlockHUDRenderer {
     val texture = item.material.textureRegion ?: KAssets.handTexture
     with(screenRenderer) {
       batch.draw(texture.textureRegion, Gdx.graphics.width - x4Block, Gdx.graphics.height - x3Block, x2Block, x2Block)
-      layout.setText(font, "${item.charge} / ${item.maxCharge}", Color.WHITE, x10Block, Align.right, true)
+      layout.setText(font, "${item.stock} / ${item.maxStock}", Color.WHITE, x10Block, Align.right, true)
       font.draw(batch, layout, Gdx.graphics.width - x10Block - blockScale / 2, Gdx.graphics.height - x4Block)
     }
   }
