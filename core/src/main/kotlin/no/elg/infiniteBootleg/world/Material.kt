@@ -69,7 +69,7 @@ enum class Material(
     }
   ),
   BIRCH_TRUNK(hardness = 1.25f, hasTransparentTexture = true, isCollidable = false, blocksLight = false),
-  BIRCH_LEAVES(hardness = 0.1f, hasTransparentTexture = false, isCollidable = false, blocksLight = false, adjacentPlaceable = false);
+  BIRCH_LEAVES(hardness = 0.1f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, adjacentPlaceable = false);
 
   private val constructor: Constructor<*>?
   private val constructorProtoBuf: Constructor<*>?
