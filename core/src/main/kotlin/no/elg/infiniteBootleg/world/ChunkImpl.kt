@@ -31,8 +31,6 @@ import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
-import java.util.concurrent.CancellationException
-import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.ForkJoinTask
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.atomic.AtomicInteger
@@ -356,7 +354,6 @@ class ChunkImpl(
 
   /** Should only be used by [updateBlockLights]  */
   private fun updateBlockLights(updateId: Int) {
-    val pool = ForkJoinPool.commonPool()
     synchronized(tasks) {
       outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
         for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
@@ -364,24 +361,9 @@ class ChunkImpl(
             break@outer
           }
           val bl = blockLights[localX][localY]
-          val task = pool.submit { bl.recalculateLighting(updateId) }
-          task.fork()
-          tasks.add(task)
+          bl.recalculateLighting(updateId)
         }
       }
-      for (task in tasks) {
-        if (updateId == currentUpdateId.get()) {
-          try {
-            task.join()
-          } catch (ignore: CancellationException) {
-          } catch (e: Exception) {
-            e.printStackTrace()
-          }
-        } else {
-          task.cancel(true)
-        }
-      }
-      tasks.clear()
     }
     if (updateId == currentUpdateId.get()) {
       // TODO only re-render if any lights changed
