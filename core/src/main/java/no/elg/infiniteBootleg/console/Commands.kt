@@ -26,12 +26,12 @@ import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.util.toAbled
-import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
@@ -283,20 +283,13 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    val render = clientWorld.render
-    val worldBody = clientWorld.worldBody
-    render.camera.position.x = worldX * Block.BLOCK_SIZE + worldBody.worldOffsetX
-    render.camera.position.y = worldY * Block.BLOCK_SIZE + worldBody.worldOffsetY
-    render.update()
-    logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
+    val entities = clientWorld.engine.getEntitiesFor(localPlayerFamily)
+    if (entities.size() == 0) {
+      logger.log("There is no local, controlled player in this world")
+    }
+    entities.forEach { it.teleport(worldX, worldY) }
 
-    // TODO for ashley
-    //    Player player = getSPPlayer();
-    //    if (player == null) {
-    //      return;
-    //    }
-    //    player.teleport(worldX, worldY, false);
-//    logger.logf(LogLevel.SUCCESS, "Teleported player to (% .2f,% .2f)", worldX, worldY)
+    logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
   }
 
   @CmdArgNames("mode")
