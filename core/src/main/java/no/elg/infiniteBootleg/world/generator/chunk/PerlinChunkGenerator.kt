@@ -23,7 +23,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
 
   private val chunkGeneratedListener = ChunkGeneratedListener(this)
   private val sparseTreeGenerator = ForestGenerator(seed, 0.8f)
-  private val denseTreeGenerator = ForestGenerator(seed, 0.6f)
+  private val denseTreeGenerator = ForestGenerator(seed, 0.7f)
 
   val noise: PerlinNoise = PerlinNoise(seed)
   private val noise2: FastNoiseLite = FastNoiseLite(seed.toInt()).also {

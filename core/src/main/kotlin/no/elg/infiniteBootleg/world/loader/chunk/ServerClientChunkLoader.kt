@@ -17,7 +17,6 @@ class ServerClientChunkLoader(override val world: ServerClientWorld, generator: 
   private val loadedChunk = LoadedChunk(null, false)
 
   override fun fetchChunk(chunkLoc: Long): LoadedChunk {
-
     if (chunkLoc in toBeLoadedChunks) {
       return loadedChunk
     }
