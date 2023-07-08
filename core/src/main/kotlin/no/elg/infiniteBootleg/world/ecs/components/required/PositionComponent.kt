@@ -33,10 +33,10 @@ data class PositionComponent(var x: Float, var y: Float) : Component {
     val Entity.physicsY: Float
       get() = positionComponent.y + world.worldBody.worldOffsetY
 
-    fun Entity.teleport(x: Float, y: Float) {
+    fun Entity.teleport(worldX: Float, worldY: Float) {
       val position = positionComponent
-      position.x = x
-      position.y = y
+      position.x = worldX
+      position.y = worldY
       updateBox2DPosition = true
     }
   }
