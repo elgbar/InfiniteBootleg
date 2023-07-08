@@ -1,10 +1,7 @@
 package no.elg.infiniteBootleg.world.ticker;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.LongMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import javax.annotation.concurrent.GuardedBy;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
@@ -62,8 +59,6 @@ public class WorldTicker extends Ticker implements Disposable {
       chunkIterator = new LongMap.Entries<>(world.getChunks());
     }
 
-    private final Array<ForkJoinTask<?>> forks = new Array<>(false, 48);
-
     @Override
     public synchronized void tick() {
       WorldRender wr = world.getRender();
@@ -71,7 +66,6 @@ public class WorldTicker extends Ticker implements Disposable {
 
       // tick all chunks and blocks in chunks
       long tick = world.getWorldTicker().getTickId();
-      ForkJoinPool pool = ForkJoinPool.commonPool();
       world.chunksLock.writeLock().lock();
       try {
         chunkIterator.reset();
@@ -103,37 +97,11 @@ public class WorldTicker extends Ticker implements Disposable {
             world.unloadChunk(chunk, false, true);
             continue;
           }
-          ForkJoinTask<?> task = pool.submit(chunk::tick);
-          forks.add(task);
-          task.fork();
+          chunk.tick();
         }
       } finally {
         world.chunksLock.writeLock().unlock();
       }
-      //      for (Entity entity : world.getEntities()) {
-      //        if (entity.isDisposed()) {
-      //          String message =
-      //              "Invalid entity in world entities ("
-      //                  + entity.simpleName()
-      //                  + ": "
-      //                  + entity.hudDebug()
-      //                  + ")";
-      //          Main.logger().debug("WORLD", message);
-      //          world.removeEntity(entity);
-      //          continue;
-      //        }
-      //        ForkJoinTask<?> task = pool.submit(entity::tick);
-      //        forks.add(task);
-      //        task.fork();
-      //      }
-      for (ForkJoinTask<?> task : forks) {
-        try {
-          task.join();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-      forks.clear();
     }
 
     @Override
@@ -146,12 +114,6 @@ public class WorldTicker extends Ticker implements Disposable {
       for (Chunk chunk : world.getLoadedChunks()) {
         chunk.tickRare();
       }
-      //      for (Entity entity : world.getEntities()) {
-      //        if (entity.isDisposed()) {
-      //          continue;
-      //        }
-      //        entity.tickRare();
-      //      }
 
       WorldTime time = world.getWorldTime();
       time.setTime(
