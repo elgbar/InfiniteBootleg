@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -8,6 +7,7 @@ import no.elg.infiniteBootleg.world.Block.Companion.getRawRelative
 import no.elg.infiniteBootleg.world.Block.Companion.save
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.TextureNeighbor
 import no.elg.infiniteBootleg.world.world.World
 import java.util.EnumMap
@@ -33,7 +33,7 @@ open class BlockImpl(
     return save(material)
   }
 
-  override val texture: TextureRegion?
+  override val texture: RotatableTextureRegion?
     get() {
       val map = EnumMap<Direction, Material>(Direction::class.java)
       for (direction in Direction.CARDINAL) {

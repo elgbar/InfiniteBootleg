@@ -30,6 +30,8 @@ import no.elg.infiniteBootleg.util.use
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
 import no.elg.infiniteBootleg.world.render.TextureNeighbor
 import java.io.File
 
@@ -44,17 +46,17 @@ object KAssets {
 
   lateinit var textureAtlas: TextureAtlas
 
-  lateinit var breakingBlockTexture: TextureRegion
-  lateinit var handTexture: TextureRegion
-  lateinit var playerTexture: TextureRegion
-  lateinit var doorOpenTexture: TextureRegion
-  lateinit var doorClosedTexture: TextureRegion
+  lateinit var breakingBlockTexture: RotatableTextureRegion
+  lateinit var handTexture: RotatableTextureRegion
+  lateinit var playerTexture: RotatableTextureRegion
+  lateinit var doorOpenTexture: RotatableTextureRegion
+  lateinit var doorClosedTexture: RotatableTextureRegion
 
-  lateinit var skyTexture: TextureRegion
-  lateinit var caveTexture: TextureRegion
-  lateinit var whiteTexture: TextureRegion
-  lateinit var skylightDebugTexture: TextureRegion
-  lateinit var luminanceDebugTexture: TextureRegion
+  lateinit var skyTexture: RotatableTextureRegion
+  lateinit var caveTexture: RotatableTextureRegion
+  lateinit var whiteTexture: RotatableTextureRegion
+  lateinit var skylightDebugTexture: RotatableTextureRegion
+  lateinit var luminanceDebugTexture: RotatableTextureRegion
 
   val font: BitmapFont by lazy {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
@@ -68,11 +70,11 @@ object KAssets {
   fun load() {
     textureAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
 
-    breakingBlockTexture = TextureRegion(textureAtlas.findRegion("breaking_block"))
-    handTexture = TextureRegion(textureAtlas.findRegion("hand"))
-    playerTexture = TextureRegion(textureAtlas.findRegion("player"))
-    doorOpenTexture = TextureRegion(textureAtlas.findRegion("door_open"))
-    doorClosedTexture = TextureRegion(textureAtlas.findRegion("door_closed"))
+    breakingBlockTexture = textureAtlas.findRegion("breaking_block").disallowedRotation()
+    handTexture = textureAtlas.findRegion("hand").disallowedRotation()
+    playerTexture = textureAtlas.findRegion("player").disallowedRotation()
+    doorOpenTexture = textureAtlas.findRegion("door_open").disallowedRotation()
+    doorClosedTexture = textureAtlas.findRegion("door_closed").disallowedRotation()
 
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font
@@ -133,12 +135,12 @@ object KAssets {
     TextureNeighbor.generateNeighborMap(textureAtlas)
   }
 
-  private fun createTextureRegion(color: Color): TextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
-  private fun createTextureRegion(color: Color, a: Float): TextureRegion = createTextureRegion(color.r, color.g, color.b, a)
-  private fun createTextureRegion(r: Float, g: Float, b: Float, a: Float): TextureRegion =
-    Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444).use<Pixmap, TextureRegion> {
+  private fun createTextureRegion(color: Color): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
+  private fun createTextureRegion(color: Color, a: Float): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, a)
+  private fun createTextureRegion(r: Float, g: Float, b: Float, a: Float): RotatableTextureRegion =
+    Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444).use {
       it.setColor(r, g, b, a)
       it.fill()
-      return@use TextureRegion(Texture(it))
+      TextureRegion(Texture(it)).disallowedRotation()
     }
 }

@@ -62,13 +62,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
       val lookDirectionOrNull = entity.lookDirectionOrNull
       val direction = lookDirectionOrNull?.direction ?: Direction.WEST
-      val shouldFlipX = lookDirectionOrNull != null && (direction.dx < 0 && textureRegion.isFlipX) || (direction.dx > 0 && !textureRegion.isFlipX)
+      val texture = textureRegion.textureRegion
+      val shouldFlipX = lookDirectionOrNull != null && (direction.dx < 0 && texture.isFlipX) || (direction.dx > 0 && !texture.isFlipX)
 
-      textureRegion.flip(shouldFlipX, false)
-      batch.draw(textureRegion, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
+      texture.flip(shouldFlipX, false)
+      batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
-        batch.draw(whiteTexture, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
+        batch.draw(whiteTexture.textureRegion, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
       }
     }
     batch.color = Color.WHITE

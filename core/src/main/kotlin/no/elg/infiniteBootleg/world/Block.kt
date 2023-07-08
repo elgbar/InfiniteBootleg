@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.HUDDebuggable
@@ -9,11 +8,12 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.world.Material.Companion.fromOrdinal
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
 interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.Builder> {
 
-  val texture: TextureRegion?
+  val texture: RotatableTextureRegion?
   val material: Material
   val chunk: Chunk
 

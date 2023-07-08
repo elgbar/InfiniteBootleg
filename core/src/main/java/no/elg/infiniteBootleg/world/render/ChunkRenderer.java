@@ -28,9 +28,11 @@ import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.api.Renderer;
 import no.elg.infiniteBootleg.util.CoordUtilKt;
+import no.elg.infiniteBootleg.util.NoiseUtilsKt;
 import no.elg.infiniteBootleg.world.Block;
 import no.elg.infiniteBootleg.world.Chunk;
 import no.elg.infiniteBootleg.world.Material;
+import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,8 +64,7 @@ public class ChunkRenderer implements Renderer, Disposable {
 
   private static final int CHUNK_NOT_IN_QUEUE_INDEX = -1;
 
-  static {
-  }
+  private final FastNoiseLite rotationNoise;
 
   public ChunkRenderer(@NotNull WorldRender worldRender) {
     this.worldRender = worldRender;
@@ -73,6 +74,9 @@ public class ChunkRenderer implements Renderer, Disposable {
     renderQueue = SetUniqueList.setUniqueList(chunkList);
     batch.setProjectionMatrix(
         new Matrix4().setToOrtho2D(0, 0, CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE));
+    rotationNoise = new FastNoiseLite((int) worldRender.getWorld().getSeed());
+    rotationNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+    rotationNoise.SetFrequency(1);
   }
 
   public void queueRendering(@NotNull Chunk chunk, boolean prioritize) {
@@ -176,8 +180,8 @@ public class ChunkRenderer implements Renderer, Disposable {
         }
         var blockLight = chunk.getBlockLight(localX, localY);
 
-        @NotNull TextureRegion texture;
-        @Nullable TextureRegion secondaryTexture;
+        @NotNull RotatableTextureRegion texture;
+        @Nullable RotatableTextureRegion secondaryTexture;
         int worldY = CoordUtilKt.chunkToWorld(chunk.getChunkY(), localY);
         if (material == AIR) {
           texture = (topBlockHeight > worldY) ? KAssets.caveTexture : KAssets.skyTexture;
@@ -200,25 +204,26 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         batch.setColor(Color.WHITE);
 
+        int rotation = calculateRotation(chunk, localX, localY);
         if (Settings.renderLight && blockLight.isLit() && !blockLight.isSkylight()) {
           if (secondaryTexture != null) {
             // If the block is emitting light there is no point in drawing it shaded
             if (material.getEmitsLight()) {
-              batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+              drawRotatedTexture(secondaryTexture, dx, dy, rotation);
             } else {
-              drawShadedBlock(secondaryTexture, blockLight.getLightMap(), dx, dy);
+              drawShadedBlock(secondaryTexture, blockLight.getLightMap(), dx, dy, rotation);
             }
           }
-          drawShadedBlock(texture, blockLight.getLightMap(), dx, dy);
+          drawShadedBlock(texture, blockLight.getLightMap(), dx, dy, rotation);
 
         } else {
           if (Settings.renderLight && !blockLight.isSkylight()) {
             batch.setColor(Color.BLACK);
           }
           if (secondaryTexture != null) {
-            batch.draw(secondaryTexture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+            drawRotatedTexture(secondaryTexture, dx, dy, rotation);
           }
-          batch.draw(texture, dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+          drawRotatedTexture(texture, dx, dy, rotation);
         }
       }
     }
@@ -231,8 +236,39 @@ public class ChunkRenderer implements Renderer, Disposable {
     }
   }
 
-  private void drawShadedBlock(TextureRegion texture, float[][] lights, float dx, float dy) {
+  private int calculateRotation(Chunk chunk, int localX, int localY) {
+    return (int)
+            (NoiseUtilsKt.getNoise(
+                    rotationNoise,
+                    CoordUtilKt.chunkToWorld(chunk.getChunkX(), localX),
+                    CoordUtilKt.chunkToWorld(chunk.getChunkY(), localY))
+                * 4f)
+        * 90;
+  }
 
+  private void drawRotatedTexture(
+      RotatableTextureRegion texture, float dx, float dy, float rotation) {
+    if (rotation == 0 || !texture.getRotationAllowed()) {
+      batch.draw(texture.getTextureRegion(), dx, dy, BLOCK_SIZE, BLOCK_SIZE);
+    } else {
+      batch.draw(
+          texture.getTextureRegion(),
+          dx,
+          dy,
+          BLOCK_SIZE / 2f,
+          BLOCK_SIZE / 2f,
+          BLOCK_SIZE,
+          BLOCK_SIZE,
+          1f,
+          1f,
+          rotation);
+    }
+  }
+
+  private void drawShadedBlock(
+      RotatableTextureRegion textureRegion, float[][] lights, float dx, float dy, int rotation) {
+
+    var texture = textureRegion.getTextureRegion();
     int tileWidth = texture.getRegionWidth() / LIGHT_RESOLUTION;
     int tileHeight = texture.getRegionHeight() / LIGHT_RESOLUTION;
     TextureRegion[][] split =
@@ -245,12 +281,27 @@ public class ChunkRenderer implements Renderer, Disposable {
 
         var lightIntensity = lights[rx][ry];
         batch.setColor(lightIntensity, lightIntensity, lightIntensity, 1f);
-        batch.draw(
-            region,
-            dx + rx * LIGHT_SUBBLOCK_SIZE,
-            dy + ry * LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE);
+
+        if (textureRegion.getRotationAllowed() || rotation == 0) {
+          batch.draw(
+              region,
+              dx + rx * LIGHT_SUBBLOCK_SIZE,
+              dy + ry * LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE / 2,
+              LIGHT_SUBBLOCK_SIZE / 2,
+              LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE,
+              1f,
+              1f,
+              rotation);
+        } else {
+          batch.draw(
+              region,
+              dx + rx * LIGHT_SUBBLOCK_SIZE,
+              dy + ry * LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE,
+              LIGHT_SUBBLOCK_SIZE);
+        }
       }
     }
   }

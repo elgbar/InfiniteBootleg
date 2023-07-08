@@ -30,13 +30,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
       val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
-      batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+      batch.draw(luminanceDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
     }
 
     for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
       val lightY = worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
-      batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+      batch.draw(skylightDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
     }
     batch.end()
   }

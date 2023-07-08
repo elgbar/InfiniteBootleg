@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.google.common.base.Preconditions
 import ktx.collections.gdxSetOf
@@ -14,6 +13,7 @@ import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.abs
 
@@ -89,7 +89,7 @@ class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: M
       Preconditions.checkState(ticksLeft == this.ticksLeft, ticksLeft.toString() + " =/= " + this.ticksLeft)
     }
 
-  override val texture: TextureRegion?
+  override val texture: RotatableTextureRegion?
     get() = if (glowing) whiteTexture else super.texture
 
   override fun save(): ProtoWorld.Block.Builder {

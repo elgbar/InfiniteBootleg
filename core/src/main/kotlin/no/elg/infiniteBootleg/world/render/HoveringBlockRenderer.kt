@@ -29,10 +29,10 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
       entity.breakableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
         .forEach { (blockWorldX, blockWorldY) ->
-          renderPlaceableBlock(world, KAssets.breakingBlockTexture, blockWorldX, blockWorldY)
+          renderPlaceableBlock(world, KAssets.breakingBlockTexture.textureRegion, blockWorldX, blockWorldY)
         }
 
-      val texture = entity.selected.material.textureRegion ?: continue
+      val texture = entity.selected.material.textureRegion?.textureRegion ?: continue
       entity.placeableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
         .forEach { (blockWorldX, blockWorldY) ->
           renderPlaceableBlock(world, texture, blockWorldX, blockWorldY)

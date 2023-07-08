@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -13,6 +12,7 @@ import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl.Companion.AIR_BLOCK_BUILDER
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
 class EntityMarkerBlock(
@@ -58,7 +58,7 @@ class EntityMarkerBlock(
 
   override fun save(): ProtoWorld.Block.Builder = AIR_BLOCK_BUILDER
 
-  override val texture: TextureRegion? = if (debugEntityMarkerBlocks) KAssets.handTexture else null
+  override val texture: RotatableTextureRegion? = if (debugEntityMarkerBlocks) KAssets.handTexture else null
   override fun load(protoBlock: ProtoWorld.Block) {}
 
   companion object {

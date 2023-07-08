@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
@@ -12,6 +11,9 @@ import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.blocks.TntBlock
 import no.elg.infiniteBootleg.world.blocks.Torch
 import no.elg.infiniteBootleg.world.ecs.createDoorEntity
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
+import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
 import no.elg.infiniteBootleg.world.world.World
 import java.lang.reflect.Constructor
 import java.lang.reflect.InvocationTargetException
@@ -59,7 +61,6 @@ enum class Material(
   DOOR(
     itemType = ItemType.ENTITY,
     hardness = 1f,
-    textureName = "door_part",
     hasTransparentTexture = true,
     isCollidable = false,
     blocksLight = false,
@@ -73,7 +74,7 @@ enum class Material(
   private val constructor: Constructor<*>?
   private val constructorProtoBuf: Constructor<*>?
 
-  var textureRegion: TextureRegion? = null
+  var textureRegion: RotatableTextureRegion? = null
 
   /**
    * @param impl The implementation a block of this material must have
@@ -100,7 +101,7 @@ enum class Material(
 
     if (Settings.client && itemType != ItemType.AIR) {
       val textureName = textureName ?: name.lowercase(Locale.getDefault())
-      textureRegion = textureAtlas.findRegion(textureName)
+      textureRegion = textureAtlas.findRegion("${textureName}_rotatable")?.allowedRotation() ?: textureAtlas.findRegion(textureName).disallowedRotation()
       if (textureRegion == null) {
         throw NullPointerException("Failed to find a texture for $name")
       }
