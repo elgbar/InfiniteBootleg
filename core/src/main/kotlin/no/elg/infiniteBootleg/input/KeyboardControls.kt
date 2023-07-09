@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.breakableBlock
+import no.elg.infiniteBootleg.util.dstd
 import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
@@ -27,7 +28,6 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.sign
-import kotlin.math.sqrt
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -212,12 +212,6 @@ class KeyboardControls(val world: ClientWorld) {
 
     prevPos.x = mouseLocator.previousMouseWorldX
     prevPos.y = mouseLocator.previousMouseWorldY
-
-    fun Vector2.dstd(v: Vector2): Double {
-      val dx: Float = v.x - x
-      val dy: Float = v.y - y
-      return sqrt((dx * dx + dy * dy).toDouble())
-    }
 
     val distance = currPos.dstd(prevPos)
     // Limit max distance to draw
