@@ -9,9 +9,9 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
-import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.util.defaultDisplayHeight
 import no.elg.infiniteBootleg.util.defaultDisplayWidth
+import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 
 fun main(args: Array<String>) {
   val progArgs = ProgramArgs(args)
@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
     Lwjgl3Application(main, config)
   } else {
     val config = HeadlessApplicationConfiguration()
-    config.updatesPerSecond = (if (Settings.tps < 0) Ticker.DEFAULT_TICKS_PER_SECOND else Settings.tps).toInt()
+    config.updatesPerSecond = (if (Settings.tps < 0) DEFAULT_TICKS_PER_SECOND else Settings.tps).toInt()
     val main: Main = ServerMain(false, progArgs)
     HeadlessApplication(main, config)
   }

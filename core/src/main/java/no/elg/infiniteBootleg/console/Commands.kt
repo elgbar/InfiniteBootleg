@@ -24,7 +24,6 @@ import no.elg.infiniteBootleg.server.sendDuplexPacket
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
-import no.elg.infiniteBootleg.util.Ticker
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
@@ -36,6 +35,7 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flyi
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.ticker.Ticker
 import no.elg.infiniteBootleg.world.time.WorldTime
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World

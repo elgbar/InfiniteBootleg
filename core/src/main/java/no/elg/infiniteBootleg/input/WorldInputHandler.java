@@ -16,9 +16,9 @@ import no.elg.infiniteBootleg.ClientMain;
 import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.screen.HUDRenderer;
 import no.elg.infiniteBootleg.screens.WorldScreen;
-import no.elg.infiniteBootleg.util.Ticker;
 import no.elg.infiniteBootleg.world.render.ClientWorldRender;
 import no.elg.infiniteBootleg.world.render.WorldRender;
+import no.elg.infiniteBootleg.world.ticker.Ticker;
 import no.elg.infiniteBootleg.world.world.ClientWorld;
 import org.jetbrains.annotations.NotNull;
 

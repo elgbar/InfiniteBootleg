@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks.traits
 
-import no.elg.infiniteBootleg.util.Ticker
+import no.elg.infiniteBootleg.world.ticker.Ticker
 import java.util.concurrent.ThreadLocalRandom
 
 /**

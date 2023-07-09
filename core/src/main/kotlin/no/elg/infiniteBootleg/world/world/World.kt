@@ -1032,23 +1032,18 @@ abstract class World(
    * @param worldY The y coordinate in world view
    * @return The material at the given location
    */
-  fun getMaterial(worldX: Int, worldY: Int): Material {
-    val block = getRawBlock(worldX, worldY, true)
-    return block?.material ?: Material.AIR
-  }
+  fun getMaterial(worldX: Int, worldY: Int): Material = getRawBlock(worldX, worldY, true)?.material ?: Material.AIR
 
   /**
    * Alias to `WorldBody#postBox2dRunnable`
    */
-  fun postBox2dRunnable(runnable: Runnable?) {
-    worldBody.postBox2dRunnable(runnable!!)
-  }
+  fun postBox2dRunnable(runnable: () -> Unit) = worldBody.postBox2dRunnable(runnable)
+
+  fun postWorldTickerRunnable(runnable: () -> Unit) = worldTicker.postRunnable(runnable)
 
   abstract val render: WorldRender
 
-  override fun hashCode(): Int {
-    return uuid.hashCode()
-  }
+  override fun hashCode(): Int = uuid.hashCode()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) {

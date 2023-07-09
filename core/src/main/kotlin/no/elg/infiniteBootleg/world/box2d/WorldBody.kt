@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy
@@ -50,11 +51,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   private val chunksToUpdate = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
   private val updatingChunks = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
 
-  private val runnables = GdxArray<Runnable>()
-  private val executedRunnables = GdxArray<Runnable>()
+  private val postRunnable = PostRunnableHandler()
 
   private val updatingChunksIterator = OrderedSet.OrderedSetIterator(updatingChunks)
-  private val executedRunnablesIterator = ArrayIterator(executedRunnables)
   private val bodiesIterator = ArrayIterator(bodies)
 
   private val contactManager = ContactManager(world.engine)
@@ -65,11 +64,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    *
    * @see [com.badlogic.gdx.Application.postRunnable]
    */
-  fun postBox2dRunnable(runnable: Runnable) {
-    synchronized(runnables) {
-      runnables.add(runnable)
-    }
-  }
+  fun postBox2dRunnable(runnable: () -> Unit) = postRunnable.postRunnable(runnable)
 
   internal fun updateChunk(chunkBody: ChunkBody) {
     synchronized(chunksToUpdate) {
@@ -124,28 +119,19 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       return
     }
 
-    synchronized(runnables) {
-      executedRunnables.clear()
-      executedRunnables.addAll(runnables)
-      runnables.clear()
-    }
-
     synchronized(chunksToUpdate) {
       updatingChunks.clear()
       updatingChunks.addAll(chunksToUpdate)
       chunksToUpdate.clear()
     }
 
-    executedRunnablesIterator.reset()
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
       box2dWorld.step(timeStep, 10, 10)
       world.engine.update(timeStep)
 
-      for (runnable in executedRunnablesIterator) {
-        runnable.run()
-      }
+      postRunnable.executeRunnables()
       for (chunkBody in updatingChunksIterator) {
         if (chunkBody.shouldCreateBody()) {
           createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)

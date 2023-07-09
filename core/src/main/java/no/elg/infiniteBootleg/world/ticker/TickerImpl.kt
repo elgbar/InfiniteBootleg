@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.util
+package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.PauseableThread
 import com.badlogic.gdx.utils.TimeUtils
@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
 import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
 
 /**
- * A helper class that calls a [Ticking]'s [Ticking.tick] and [ ][Ticking.tickRare] method periodically. By default it will call it every [ ][.msDelayBetweenTicks].
+ * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default it will call it every [ ][.msDelayBetweenTicks].
  *
  *
  * The ticker will not update the if [Graphics.getFrameId] is the same as it was last
@@ -17,13 +17,13 @@ import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
  *
  * @author Elg
  */
-open class Ticker(
+class TickerImpl(
   private val ticking: Ticking,
   name: String,
   start: Boolean,
   tps: Long,
   nagDelay: Double
-) : Runnable {
+) : Ticker, Runnable, PostRunnable {
   /**
    * How many ticks between each rare update. Currently, each rare tick is the same as one second
    */
@@ -32,8 +32,8 @@ open class Ticker(
   private val tag: String
 
   /** The ticks per seconds this ticker is using. Defaults to [.DEFAULT_TICKS_PER_SECOND]  */
-  val tps: Long
-  val secondsDelayBetweenTicks: Float
+  override val tps: Long
+  override val secondsDelayBetweenTicks: Float
   private val msDelayBetweenTicks: Long
   private val nanoDelayBetweenTicks: Long
   private val nagDelayTicks: Long
@@ -44,14 +44,14 @@ open class Ticker(
    * @return How many ticks have passed since start
    */
   /** The current tick  */
-  var tickId: Long = 0
+  override var tickId: Long = 0
     private set
   /**
    * @return The current TPS might differ from [.DEFAULT_TICKS_PER_SECOND] but will never be
    * greater than it
    */
   /** The current ticks per second  */
-  var realTPS: Long = -1
+  override var realTPS: Long = -1
     private set
 
   /** At what tick did we start the tps calculation  */
@@ -63,14 +63,14 @@ open class Ticker(
    * @return Nanoseconds between each tick
    */
   /** Last diff between each tick  */
-  var tpsDelta: Long = 0
+  override var tpsDelta: Long = 0
     private set
 
   /** How long ago we last showed a "can't keep up" warning  */
   private var lastTickNagged: Long = 0
 
   @Volatile
-  var isStarted = false
+  override var isStarted = false
     private set
 
   /**
@@ -112,6 +112,10 @@ open class Ticker(
     }
   }
 
+  private val postRunnableHandler: PostRunnableHandler = PostRunnableHandler()
+
+  override fun postRunnable(runnable: () -> Unit) = postRunnableHandler.postRunnable(runnable)
+
   override fun run() {
     val start = TimeUtils.nanoTime()
     try {
@@ -119,6 +123,7 @@ open class Ticker(
       if (tickId % tickRareRate == 0L) {
         ticking.tickRare()
       }
+      postRunnableHandler.executeRunnables()
     } catch (e: Throwable) {
       Main.logger().error(tag, "Failed to tick", e)
     }
@@ -157,7 +162,7 @@ open class Ticker(
     }
   }
 
-  open fun start() {
+  override fun start() {
     check(!isStarted) { "Ticker thread has already been started" }
     val threadType = currentThreadType()
     if (threadType !== ThreadType.RENDER) {
@@ -170,7 +175,7 @@ open class Ticker(
   }
 
   /** Stop this ticker, the tickers thread will not be called anymore  */
-  open fun stop() {
+  override fun stop() {
     tickerThread.stopThread()
   }
 
@@ -180,7 +185,7 @@ open class Ticker(
    * @see .isPaused
    * @see .resume
    */
-  open fun pause() {
+  override fun pause() {
     tickerThread.onPause()
   }
 
@@ -190,11 +195,11 @@ open class Ticker(
    * @see .isPaused
    * @see .pause
    */
-  open fun resume() {
+  override fun resume() {
     tickerThread.onResume()
   }
 
-  val isPaused: Boolean
+  override val isPaused: Boolean
     /**
      * @return If this ticker thread is paused
      * @see .pause

@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg
 
-import no.elg.infiniteBootleg.util.Ticker
+import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import java.awt.GraphicsEnvironment
 
 /**
@@ -43,7 +43,7 @@ object Settings {
    * created.
    */
   @JvmField
-  var tps = Ticker.DEFAULT_TICKS_PER_SECOND
+  var tps = DEFAULT_TICKS_PER_SECOND
 
   @JvmField
   var dayTicking = true

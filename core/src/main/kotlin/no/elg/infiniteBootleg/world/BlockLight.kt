@@ -79,10 +79,6 @@ class BlockLight(
     }
   }
 
-  fun recalculateLighting() {
-    recalculateLighting(NEVER_CANCEL_UPDATE_ID)
-  }
-
   fun recalculateLighting(updateId: Int) {
     fun isCancelled() = isCancelled(updateId)
 
