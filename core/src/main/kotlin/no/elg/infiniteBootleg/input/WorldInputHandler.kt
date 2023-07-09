@@ -23,7 +23,6 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
     if (ClientMain.inst().shouldIgnoreWorldInput() || (Main.isMultiplayer() && keycode != Input.Keys.F3)) {
       return false
     }
-    val world = ClientMain.inst().world ?: return false
     when (keycode) {
       Input.Keys.F3 -> {
         val screen = ClientMain.inst().screen
@@ -59,6 +58,13 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
         }
       }
 
+      Input.Keys.F7 -> {
+        val screen = ClientMain.inst().screen
+        if (screen is WorldScreen) {
+          screen.toggleDebugMenu()
+        }
+      }
+
       else -> return false
     }
     return true
@@ -79,8 +85,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
     return true
   }
 
-  val world: ClientWorld
-    get() = worldRender.world
+  val world: ClientWorld get() = worldRender.world
 
   override fun dispose() {
     ClientMain.inst().inputMultiplexer.removeProcessor(this)

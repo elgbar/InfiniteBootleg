@@ -22,6 +22,7 @@ object GlobalInputListener : InputAdapter() {
         if (Main.inst().console.isVisible) {
           Main.inst().console.isVisible = false
         }
+        return true
       }
 
       Input.Keys.ENTER -> {
@@ -39,13 +40,6 @@ object GlobalInputListener : InputAdapter() {
             Gdx.graphics.setFullscreenMode(mode)
           }
           return true
-        }
-      }
-
-      Input.Keys.F7 -> {
-        val screen = ClientMain.inst().screen
-        if (screen is WorldScreen) {
-          screen.toggleDebugMenu()
         }
       }
     }
