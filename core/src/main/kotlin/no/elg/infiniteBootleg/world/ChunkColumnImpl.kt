@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world
 
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
@@ -92,34 +91,31 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     return world.getChunk(chunkX, chunkY, true)
   }
 
-  private fun setTopBlock(top: IntArray, localX: Int, worldY: Int) {
+  private fun setTopBlock(currentTops: IntArray, localX: Int, worldY: Int) {
     val oldTop: Int
-
-    // sanity check
-
     synchronized(syncLocks[localX]) {
-      oldTop = topBlockHeight(localX)
-      top[localX] = worldY
+      oldTop = currentTops[localX]
+      currentTops[localX] = worldY
     }
 
     val oldChunk = oldTop.worldToChunk()
     val newChunk = worldY.worldToChunk()
-    val min = min(oldChunk, newChunk) - 1
+    val min = min(oldChunk, newChunk)
     val max = max(oldChunk, newChunk)
     val worldX = chunkToWorld(chunkX, localX)
     for (chunkY in min..max) {
       val newWorldY = chunkY.chunkToWorld()
-      getLoadedChunk(newWorldY)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
+      getLoadedChunk(newWorldY)?.updateBlockLights(dispatchEvent = false)
 
       // Update chunks to the sides, if the light reaches that far
       val leftChunkX = (worldX - World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (leftChunkX != chunkX) {
-        getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
+        getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights(dispatchEvent = false)
       }
 
       val rightChunkX = (worldX + World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (rightChunkX != chunkX) {
-        getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights(CHUNK_CENTER, CHUNK_CENTER, false)
+        getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights(dispatchEvent = false)
       }
     }
   }
