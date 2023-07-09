@@ -100,7 +100,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
     val oldChunk = oldTop.worldToChunk()
     val newChunk = worldY.worldToChunk()
-    val min = min(oldChunk, newChunk)
+    val min = min(oldChunk, newChunk) - 1
     val max = max(oldChunk, newChunk)
     val worldX = chunkToWorld(chunkX, localX)
     for (chunkY in min..max) {
