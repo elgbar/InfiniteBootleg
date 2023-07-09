@@ -16,6 +16,8 @@ import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
@@ -114,6 +116,9 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       curr = chunk
     }
     doRenderChunk(chunk, aboveGround)
+    if (Settings.renderChunkUpdates) {
+      EventManager.dispatchEvent(ChunkTextureChangedEvent(chunk))
+    }
     curr = null
   }
 

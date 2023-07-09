@@ -63,6 +63,8 @@ object Settings {
   @JvmField
   var renderChunkBounds = false
 
+  var renderChunkUpdates = true
+
   @JvmField
   var enableCameraFollowLerp = true
 

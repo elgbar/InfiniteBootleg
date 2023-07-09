@@ -228,7 +228,18 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
-      "Debug rendering of chunks is now ${Settings.renderBox2dDebug.toAbled()}"
+      "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}"
+    )
+  }
+
+  @ClientsideOnly
+  @ConsoleDoc(description = "Toggles debug rendering of chunk updates")
+  fun debChuUpd() {
+    Settings.renderChunkUpdates = !Settings.renderChunkUpdates
+    Settings.debug = true
+    logger.log(
+      LogLevel.SUCCESS,
+      "Debug rendering of chunk updates is now ${Settings.renderChunkUpdates.toAbled()}"
     )
   }
 

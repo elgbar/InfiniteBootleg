@@ -136,7 +136,7 @@ public class ClientWorldRender implements WorldRender {
       renderer.render();
     }
     batch.end();
-    if (Settings.renderChunkBounds && Settings.debug) {
+    if (Settings.debug) {
       chunkDebugRenderer.render();
     }
     if (Settings.renderBox2dDebug && Settings.debug) {

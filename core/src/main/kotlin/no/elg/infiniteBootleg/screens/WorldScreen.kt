@@ -102,13 +102,16 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
           row()
         }
         aRow {
-          toggleableDebugButton("Debug entity lighting", Settings.debugEntityLight, Main.inst().console.exec::debEntLit)
+          toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
           toggleableDebugButton("Debug render chunks", Settings.renderChunkBounds, Main.inst().console.exec::debChu)
-          toggleableDebugButton("Debug block lighting", Settings.debugBlockLight, Main.inst().console.exec::debBlkLit)
+          toggleableDebugButton("Debug chunk updates", Settings.renderChunkUpdates, Main.inst().console.exec::debChuUpd)
         }
         aRow {
-          toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
+          toggleableDebugButton("Debug block lighting", Settings.debugBlockLight, Main.inst().console.exec::debBlkLit)
+          toggleableDebugButton("Debug entity lighting", Settings.debugEntityLight, Main.inst().console.exec::debEntLit)
           toggleableDebugButton("Render entity marker", false, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
+        }
+        aRow {
           toggleableDebugButton("Ignore place check", false, Main.inst().console.exec::placeCheck)
         }
         aRow {
