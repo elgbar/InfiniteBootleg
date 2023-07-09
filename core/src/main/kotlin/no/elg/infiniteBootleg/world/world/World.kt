@@ -657,7 +657,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    */
   fun updateBlocksAround(worldX: Int, worldY: Int) {
-    val blocksAABB = getBlocksAABBFromCenter(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, LIGHT_SOURCE_LOOK_BLOCKS, LIGHT_SOURCE_LOOK_BLOCKS, true, false, false)
+    val blocksAABB = getBlocksAABBFromCenter(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, 1f, 1f, true, false, false)
     val chunks = LongMap<Chunk>()
     for (block in blocksAABB) {
       chunks.put(block.chunk.compactLocation, block.chunk)
