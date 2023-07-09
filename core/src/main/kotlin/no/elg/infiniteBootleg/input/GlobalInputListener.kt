@@ -22,7 +22,6 @@ object GlobalInputListener : InputAdapter() {
         if (Main.inst().console.isVisible) {
           Main.inst().console.isVisible = false
         }
-        return true
       }
 
       Input.Keys.ENTER -> {
