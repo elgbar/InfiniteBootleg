@@ -344,10 +344,9 @@ class ChunkImpl(
         cancelCurrentBlockLightUpdate()
         val updateId = currentUpdateId.incrementAndGet()
         lightUpdater = Main.inst().scheduler.executeAsync { updateBlockLights(updateId) }
-
-        if (dispatchEvent) {
-          dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
-        }
+      }
+      if (dispatchEvent) {
+        dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
       }
     }
   }
