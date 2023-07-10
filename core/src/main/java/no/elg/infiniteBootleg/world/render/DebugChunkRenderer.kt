@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
@@ -22,9 +23,9 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
 
   private val newlyUpdatedChunks = LongMap<UpdatedChunk>()
 
-  private val listener = EventManager.registerListener({ e: ChunkTextureChangedEvent ->
+  private val listener = EventManager.registerListener { e: ChunkTextureChangedEvent ->
     newlyUpdatedChunks.put(e.chunk.compactLocation, UpdatedChunk(e.chunk))
-  })
+  }
 
   override fun render() {
     if (!Settings.renderChunkUpdates && !Settings.renderChunkBounds) {
@@ -55,6 +56,8 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
       }
     }
     if (Settings.renderChunkUpdates) {
+      lr.color = FLASH_COLOR
+      Gdx.gl.glEnable(GL30.GL_BLEND)
       lr.use(ShapeRenderer.ShapeType.Filled, camera.combined) {
         for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
           for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
@@ -64,8 +67,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
               newlyUpdatedChunks.remove(compactLoc)
               continue
             }
-            val alpha = updatedChunk.calculateAlpha(Gdx.graphics.deltaTime)
-            lr.color = FLASH_COLOR.apply { a = alpha }
+            lr.color.a = updatedChunk.calculateAlpha(Gdx.graphics.deltaTime)
             lr.rect(x * offset + 0.5f + worldOffsetX, y * offset + 0.5f + worldOffsetY, offset - 1f, offset - 1f)
           }
         }
@@ -90,6 +92,6 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
   companion object {
     val WITHIN_CAMERA_COLOR: Color = Color.TEAL
     val OUTSIDE_CAMERA_COLOR: Color = Color.FIREBRICK
-    val FLASH_COLOR: Color = Color.GREEN.cpy()
+    val FLASH_COLOR: Color = Color.GREEN
   }
 }
