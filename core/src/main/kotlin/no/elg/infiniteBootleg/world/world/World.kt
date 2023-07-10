@@ -69,6 +69,7 @@ import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
+import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.UpdateBlockGridSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
@@ -203,6 +204,7 @@ abstract class World(
     engine.addSystem(ControlSystem)
     engine.addSystem(PhysicsSystem)
     engine.addSystem(UpdateBlockGridSystem)
+    engine.addSystem(OutOfBoundsSystem)
     if (Main.isClient()) {
       engine.addSystem(FollowEntitySystem)
     }

@@ -28,11 +28,12 @@ object UpdateBlockGridSystem : IteratingSystem(blockEntityFamily, UPDATE_PRIORIT
     entity.occupyingLocations.filter { it !in currentOccupations }.forEach(EntityMarkerBlock::remove)
     entity.occupyingLocations.removeAll { it !in currentOccupations }
 
-    currentOccupations.forEach {
-      if ((it !is EntityMarkerBlock || it.entity != entity) && it.material == Material.AIR) {
-        val block = EntityMarkerBlock.fromOtherBlock(it, entity)
-        world.setBlock(it.worldX, it.worldY, block, updateTexture = false)
-        entity.occupyingLocations += block
+    for (currentOccupation in currentOccupations) {
+      if ((currentOccupation !is EntityMarkerBlock || currentOccupation.entity != entity) && currentOccupation.material == Material.AIR) {
+        val block = EntityMarkerBlock.fromOtherBlock(currentOccupation, entity).let { block ->
+          world.setBlock(currentOccupation.worldX, currentOccupation.worldY, block, updateTexture = false)
+        } ?: continue
+        entity.occupyingLocations += block as EntityMarkerBlock
       }
     }
   }
