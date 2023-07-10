@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
@@ -108,7 +109,7 @@ fun Entity.interactableBlock(
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius)
     .filterTo(mutableSetOf()) {
       isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius) &&
-        world.getBlockLight(it.decompactLocX(), it.decompactLocY())?.isLit ?: true
+        (!Settings.renderLight || world.getBlockLight(it.decompactLocX(), it.decompactLocY())?.isLit ?: true)
     }
 }
 
