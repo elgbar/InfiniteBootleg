@@ -165,7 +165,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
             batch.color = Color.WHITE
             val blockLight = chunk.getBlockLight(localX, localY)
-            if (Settings.renderLight && blockLight.isLit && !blockLight.isSkylight) {
+            if (Settings.renderLight && blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
               if (secondaryTexture != null) {
                 // If the block is emitting light there is no point in drawing it shaded
                 if (material.emitsLight) {
