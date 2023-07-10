@@ -13,7 +13,7 @@ data class UpdatedChunk(val chunk: Chunk, val durationSeconds: Float = 0.25f) {
   fun calculateAlpha(delta: Float): Float {
     timeToTarget -= delta
     val progress: Float = if (timeToTarget < 0) 1f else 1f - timeToTarget / durationSeconds
-    return Interpolation.smooth.apply(1f, 0f, progress)
+    return Interpolation.smooth.apply(0.5f, 0f, progress)
   }
 
   fun isDone(): Boolean = timeToTarget <= 0f
