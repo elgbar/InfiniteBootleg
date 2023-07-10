@@ -44,14 +44,14 @@ class KeyboardControls(val world: ClientWorld) {
 
   private val mouseLocator = MouseLocator()
 
-  private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
+  private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
     val world = entity.world
     val breakableBlocks = entity.breakableBlock(world, blockX, blockY, brushSize, interactRadius)
     world.removeBlocks(world.getBlocks(breakableBlocks))
     return true
   }
 
-  private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float): Boolean {
+  private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
     val world = entity.world
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
@@ -193,7 +193,7 @@ class KeyboardControls(val world: ClientWorld) {
   /**
    * @param justPressed Whether to interpolate between placements
    */
-  private fun Entity.interpolate(justPressed: Boolean, action: (entity: Entity, blockX: Int, blockY: Int, worldX: Float, worldY: Float) -> Boolean): Boolean {
+  private fun Entity.interpolate(justPressed: Boolean, action: (entity: Entity, blockX: Int, blockY: Int) -> Boolean): Boolean {
     val blockX = mouseLocator.mouseBlockX
     val blockY = mouseLocator.mouseBlockY
     val worldX = mouseLocator.mouseWorldX
@@ -201,7 +201,7 @@ class KeyboardControls(val world: ClientWorld) {
 
     val inSameBlock = mouseLocator.previousMouseBlockX == blockX && mouseLocator.previousMouseBlockY == blockY
     if (justPressed || inSameBlock) {
-      return action(this, blockX, blockY, worldX, worldY)
+      return action(this, blockX, blockY)
     }
 
     val currPos = tmpVec
@@ -254,7 +254,7 @@ class KeyboardControls(val world: ClientWorld) {
         if (logging) {
           Main.logger().log("--inter $i mltX: $multiplierX | mltY: $multiplierY, pBx:$pBx | pBy:$pBy | pWx:$pWx | pWy:$pWy")
         }
-        update = update or action(this, pBx, pBy, pWx, pWy)
+        update = update or action(this, pBx, pBy)
       }
 
       if (logging) {
@@ -262,7 +262,7 @@ class KeyboardControls(val world: ClientWorld) {
       }
     }
 
-    return update or action(this, blockX, blockY, worldX, worldY)
+    return update or action(this, blockX, blockY)
   }
 
   companion object {
