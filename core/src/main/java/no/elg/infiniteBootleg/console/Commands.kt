@@ -100,6 +100,13 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   }
 
   @ClientsideOnly
+  @ConsoleDoc(description = "Toggle debug")
+  fun debug() {
+    Settings.debug = !Settings.debug
+    logger.log(LogLevel.SUCCESS, "Debug is now ${Settings.debug.toAbled()}")
+  }
+
+  @ClientsideOnly
   @ConsoleDoc(description = "Reload all loaded chunks if unloading is allowed")
   fun reload() {
     val world = world ?: return
