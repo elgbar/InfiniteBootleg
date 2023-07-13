@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.CheckableDisposable
-import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
@@ -16,7 +15,7 @@ import kotlin.math.ln
  *
  * @author Elg
  */
-interface Chunk : Iterable<Block?>, Ticking, CheckableDisposable, Comparable<Chunk> {
+interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   /**
    * @return The backing array of the chunk, might contain null elements

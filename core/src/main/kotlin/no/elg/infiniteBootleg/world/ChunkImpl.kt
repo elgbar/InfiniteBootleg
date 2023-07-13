@@ -27,7 +27,6 @@ import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
-import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
@@ -37,7 +36,6 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.atomic.AtomicInteger
 import javax.annotation.concurrent.GuardedBy
 
-@Suppress("GDXKotlinUnsafeIterator")
 class ChunkImpl(
   override val world: World,
   override val chunkX: Int,
@@ -49,7 +47,6 @@ class ChunkImpl(
   override val blocks: Array<Array<Block?>> = Array(Chunk.CHUNK_SIZE) { arrayOfNulls(Chunk.CHUNK_SIZE) }
   private val blockLights = Array(Chunk.CHUNK_SIZE) { x -> Array(Chunk.CHUNK_SIZE) { y -> BlockLight(this, x, y) } }
 
-  private val tickingBlocks = TickingBlocks()
   override val chunkBody: ChunkBody = ChunkBody(this)
 
   @Volatile
@@ -206,14 +203,8 @@ class ChunkImpl(
       }
       if (currBlock != null) {
         currBlock.dispose()
-        if (currBlock is TickingBlock) {
-          tickingBlocks.removeAsync(currBlock)
-        }
       }
       blocks[localX][localY] = block
-      if (block is TickingBlock) {
-        tickingBlocks.setAsync(block)
-      }
       if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
         updateBlockLights(localX, localY, true)
       }
@@ -399,21 +390,6 @@ class ChunkImpl(
       }
     }
 
-  /** Update all updatable blocks in this chunk  */
-  override fun tick() {
-    if (isInvalid) {
-      return
-    }
-    tickingBlocks.tick(rare = false)
-  }
-
-  override fun tickRare() {
-    if (isInvalid) {
-      return
-    }
-    tickingBlocks.tick(rare = true)
-  }
-
   override fun getBlockLight(localX: Int, localY: Int): BlockLight {
     return blockLights[localX][localY]
   }
@@ -544,7 +520,6 @@ class ChunkImpl(
       fboRegion = null
     }
     chunkBody.dispose()
-    tickingBlocks.clear()
     for (blockArr in blocks) {
       for (block in blockArr) {
         if (block != null && !block.isDisposed) {
@@ -570,7 +545,6 @@ class ChunkImpl(
     }
     initializing = false
     dirty()
-    tickingBlocks.setAll(blocks)
     chunkBody.update()
     // Register events
     registerListener(updateChunkLightEventListener)
