@@ -1,9 +1,10 @@
-package no.elg.infiniteBootleg.world.ecs.components.required
+package no.elg.infiniteBootleg.world.ecs.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.Body
 import ktx.ashley.Mapper
+import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.world.Block
@@ -50,5 +51,6 @@ class Box2DBodyComponent(body: Body, private val box2dWidth: Float, private val 
   companion object : Mapper<Box2DBodyComponent>() {
     val Entity.box2dBody get() = box2d.body
     val Entity.box2d by propertyFor(mapper)
+    val Entity.box2dOrNull by optionalPropertyFor(mapper)
   }
 }

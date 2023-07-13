@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world
 
+import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.HUDDebuggable
@@ -31,6 +32,11 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
    * @return The offset/local position of this block within its chunk
    */
   val localY: Int
+
+  /**
+   * Connected blocks to ashley engine
+   */
+  val entity: Entity?
 
   fun load(protoBlock: ProtoWorld.Block)
 

@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.world.world.World
  *
  * @see TntBlock TntBlock
  */
+@Deprecated("Use ashley entity instead")
 abstract class TickingBlock protected constructor(
   world: World,
   chunk: Chunk,

@@ -32,7 +32,7 @@ import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Location
-import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
@@ -227,7 +227,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
     Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
-    for (entity in world.engine.getEntitiesFor(basicEntityFamily)) {
+    for (entity in world.engine.getEntitiesFor(basicStandaloneEntityFamily)) {
       Main.logger().log("Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client")
       ctx.write(clientBoundSpawnEntity(entity))
     }

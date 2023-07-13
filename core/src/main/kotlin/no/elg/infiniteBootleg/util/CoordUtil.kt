@@ -127,6 +127,8 @@ inline fun Long.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
 
 inline fun Long.decompactLocY(): Int = toInt()
 
+inline fun Long.worldCompactToChunk(): Long = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
+
 inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
 
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl java.lang.Short.SIZE or (b.toInt() and 0xffff)

@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.api.Ticking
 /**
  * @author Elg
  */
+@Deprecated("Use ashley entity components instead")
 interface TickingTrait : Trait, Ticking {
 
   /**

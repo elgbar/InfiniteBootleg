@@ -58,8 +58,8 @@ import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.WorldBody
-import no.elg.infiniteBootleg.world.ecs.basicEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
@@ -72,8 +72,9 @@ import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
-import no.elg.infiniteBootleg.world.ecs.system.UpdateBlockGridSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
+import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
+import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
@@ -204,8 +205,9 @@ abstract class World(
     engine.addSystem(InputSystem)
     engine.addSystem(ControlSystem)
     engine.addSystem(PhysicsSystem)
-    engine.addSystem(UpdateBlockGridSystem)
+    engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)
+    engine.addSystem(FallingBlockSystem)
     if (Main.isClient()) {
       engine.addSystem(FollowEntitySystem)
     }
@@ -483,7 +485,8 @@ abstract class World(
       } else {
         Preconditions.checkState(chunk.isValid)
         old = chunks.put(chunkLoc, chunk)
-        dispatchEvent(ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated))
+        val event = ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated)
+        dispatchEvent(event)
         chunk
       }
     } finally {
@@ -592,7 +595,7 @@ abstract class World(
   private fun canPlaceBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
-      val material = chunk.getRawBlock(localX, localY)?.material ?: Material.AIR
+      val material = chunk.getRawBlock(localX, localY).materialOrAir()
       material.adjacentPlaceable
     }
 
@@ -632,7 +635,7 @@ abstract class World(
 
   fun getEntities(worldX: Float, worldY: Float): Array<Entity> {
     val foundEntities = Array<Entity>(false, 4)
-    for (entity in engine.getEntitiesFor(basicEntityFamily)) {
+    for (entity in engine.getEntitiesFor(basicStandaloneEntityFamily)) {
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
       if (Util.isBetween(
@@ -871,7 +874,7 @@ abstract class World(
   }
 
   fun getEntity(uuid: String): Entity? {
-    val entitiesFor = engine.getEntitiesFor(basicEntityFamily)
+    val entitiesFor = engine.getEntitiesFor(basicStandaloneEntityFamily)
     for (entity in entitiesFor) {
       if (entity.getComponent(IdComponent::class.java).id == uuid) {
         return entity

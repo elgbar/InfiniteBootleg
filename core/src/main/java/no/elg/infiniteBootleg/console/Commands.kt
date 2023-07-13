@@ -25,10 +25,10 @@ import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
-import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying

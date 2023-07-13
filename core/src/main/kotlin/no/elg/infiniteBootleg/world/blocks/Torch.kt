@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.world.World
 /**
  * A block that lights up the surrounding area
  */
+@Deprecated("Use ashley entity components instead")
 class Torch(world: World, chunk: Chunk, localX: Int, localY: Int, material: Material) : TickingBlock(world, chunk, localX, localY, material), FallingTrait {
 
   private val fallingTraitHandler = FallingTraitHandler(

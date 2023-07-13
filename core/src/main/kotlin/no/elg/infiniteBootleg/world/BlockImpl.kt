@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world
 
+import com.badlogic.ashley.core.Entity
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -24,7 +25,8 @@ open class BlockImpl(
   override val chunk: Chunk,
   override val localX: Int,
   override val localY: Int,
-  override val material: Material
+  override val material: Material,
+  override val entity: Entity? = null
 ) : Block {
   private var disposed = false
 

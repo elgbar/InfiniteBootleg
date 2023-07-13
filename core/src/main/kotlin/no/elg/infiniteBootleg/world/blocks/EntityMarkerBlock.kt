@@ -20,20 +20,15 @@ class EntityMarkerBlock(
   override val world: World,
   override val localX: Int,
   override val localY: Int,
-  val entity: Entity
+  override val entity: Entity
 ) : Block {
 
   private var removeEntityListener: EntityListener? = null
 
   init {
     val world = Main.inst().world ?: throw IllegalStateException("World is null")
-
     world.postBox2dRunnable {
-      removeEntityListener = EntityRemoveListener {
-        if (it === entity) {
-          remove()
-        }
-      }
+      removeEntityListener = EntityRemoveListener { if (it === entity) remove() }
       world.engine.addEntityListener(removeEntityListener)
     }
   }

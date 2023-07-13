@@ -1,29 +1,24 @@
 package no.elg.infiniteBootleg.world
 
+import com.badlogic.ashley.core.Entity
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
-import no.elg.infiniteBootleg.world.blocks.FallingBlock
-import no.elg.infiniteBootleg.world.blocks.TickingBlock
-import no.elg.infiniteBootleg.world.blocks.TntBlock
-import no.elg.infiniteBootleg.world.blocks.Torch
-import no.elg.infiniteBootleg.world.ecs.createDoorEntity
+import no.elg.infiniteBootleg.world.ecs.createDoorBlockEntity
+import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
 import no.elg.infiniteBootleg.world.world.World
-import java.lang.reflect.Constructor
-import java.lang.reflect.InvocationTargetException
 import java.util.Locale
 
 /**
  * @author Elg
  */
 enum class Material(
-  impl: Class<*>? = null,
   private val itemType: ItemType = ItemType.BLOCK,
   val hardness: Float,
   val textureName: String? = null,
@@ -55,25 +50,35 @@ enum class Material(
   BRICK(hardness = 2f, hasTransparentTexture = false),
   DIRT(hardness = 1f, hasTransparentTexture = false),
   GRASS(hardness = 0.8f, hasTransparentTexture = false),
-  TNT(impl = TntBlock::class.java, hardness = 0.5f, hasTransparentTexture = false, emitsLight = true),
-  SAND(impl = FallingBlock::class.java, hardness = 1f, hasTransparentTexture = false),
-  TORCH(impl = Torch::class.java, hardness = 0.1f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, emitsLight = true, adjacentPlaceable = false),
+  TNT(hardness = 0.5f, hasTransparentTexture = false, emitsLight = true),
+  SAND(hardness = 1f, hasTransparentTexture = false, isGravityAffected = true, createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
+    world.engine.createFallingBlockEntity(world, chunk, worldX, worldY, material)
+  }),
+  TORCH(
+    hardness = 0.1f,
+    hasTransparentTexture = true,
+    isCollidable = false,
+    blocksLight = false,
+    emitsLight = true,
+    adjacentPlaceable = false,
+    isGravityAffected = true,
+    createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
+      world.engine.createFallingBlockEntity(world, chunk, worldX, worldY, material)
+    }
+  ),
   GLASS(hardness = 0.1f, hasTransparentTexture = true, blocksLight = false),
   DOOR(
-    itemType = ItemType.ENTITY,
+    itemType = ItemType.BLOCK,
     hardness = 1f,
     hasTransparentTexture = true,
     isCollidable = false,
     blocksLight = false,
-    createNew = { world: World, worldX: Int, worldY: Int ->
-      world.engine.createDoorEntity(world, worldX.toFloat(), worldY.toFloat())
+    createNew = { world: World, chunk, worldX: Int, worldY: Int, material: Material ->
+      world.engine.createDoorBlockEntity(world, chunk, worldX, worldY, material)
     }
   ),
   BIRCH_TRUNK(hardness = 1.25f, hasTransparentTexture = true, isCollidable = false, blocksLight = false),
   BIRCH_LEAVES(hardness = 0.1f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, adjacentPlaceable = false);
-
-  private val constructor: Constructor<*>?
-  private val constructorProtoBuf: Constructor<*>?
 
   var textureRegion: RotatableTextureRegion? = null
 
@@ -87,19 +92,6 @@ enum class Material(
    * @param transparent
    */
   init {
-    if (impl != null && itemType == ItemType.BLOCK) {
-      Preconditions.checkArgument(Block::class.java.isAssignableFrom(impl), "$name does not have ${Block::class.java.simpleName} as a super type")
-      try {
-        constructor = impl.getDeclaredConstructor(World::class.java, Chunk::class.java, Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, Material::class.java)
-        constructorProtoBuf = null
-      } catch (e: NoSuchMethodException) {
-        throw IllegalStateException("There is no constructor of ${impl.simpleName} with the arguments World, Chunk, int, int, Material")
-      }
-    } else {
-      constructor = null
-      constructorProtoBuf = null
-    }
-
     if (Settings.client && itemType != ItemType.AIR) {
       val textureName = textureName ?: name.lowercase(Locale.getDefault())
       textureRegion = textureAtlas.findRegion("${textureName}_rotatable")?.allowedRotation() ?: textureAtlas.findRegion(textureName).disallowedRotation()
@@ -120,52 +112,8 @@ enum class Material(
    */
   fun createBlock(world: World, chunk: Chunk, localX: Int, localY: Int): Block {
     Preconditions.checkArgument(isBlock)
-    return if (constructor == null) {
-      BlockImpl(world, chunk, localX, localY, this)
-    } else {
-      try {
-        constructor.newInstance(world, chunk, localX, localY, this) as Block
-      } catch (e: InstantiationException) {
-        throw IllegalStateException(e)
-      } catch (e: IllegalAccessException) {
-        throw IllegalStateException(e)
-      } catch (e: InvocationTargetException) {
-        throw IllegalStateException(e)
-      }
-    }
-  }
-
-  val isBlock: Boolean
-    get() = itemType == ItemType.BLOCK || itemType == ItemType.AIR
-
-  fun create(world: World, worldX: Int, worldY: Int, prioritize: Boolean = true, updateTexture: Boolean = true): Boolean {
-    val currentMaterial = world.getMaterial(worldX, worldY)
-    if (currentMaterial != this && currentMaterial == AIR) {
-      if (isBlock) {
-        val block = world.setBlock(worldX, worldY, this, updateTexture, prioritize)
-        (block as? TickingBlock)?.delayedShouldTick(1L)
-        return block != null
-      } else if (isEntity) {
-        createNew?.let { it(world, worldX, worldY) } ?: error("Material with type entity does not have a createNew method")
-        return true
-      }
-      throw IllegalStateException("This material ($name) is neither a block nor an entity")
-    }
-    return false
-  }
-
-  fun create(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
-    if (isBlock) {
-      createBlocks(world, locs, prioritize)
-    } else if (isEntity) {
-      createEntities(world, locs, prioritize)
-    }
-  }
-
-  fun createEntities(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
-    for ((worldX, worldY) in locs) {
-      createNew?.let { it(world, worldX, worldY) } ?: error("Material with type entity does not have a createNew method")
-    }
+    val entity = createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
+    return BlockImpl(world, chunk, localX, localY, this, entity)
   }
 
   fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
@@ -173,9 +121,8 @@ enum class Material(
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
       val currentMaterial = world.getMaterial(worldX, worldY)
-      if (currentMaterial != this && currentMaterial == AIR) {
+      if (currentMaterial == AIR) {
         val block = world.setBlock(worldX, worldY, this, false, prioritize)
-        (block as? TickingBlock)?.delayedShouldTick(1L)
         chunks += block?.chunk ?: continue
       }
     }
@@ -184,16 +131,11 @@ enum class Material(
     }
   }
 
+  val isBlock: Boolean
+    get() = itemType == ItemType.BLOCK || itemType == ItemType.AIR
+
   val isEntity: Boolean
     get() = itemType == ItemType.ENTITY
-
-  fun isSuperclassOf(interfaze: Class<*>): Boolean {
-    return if (constructor == null) {
-      false
-    } else {
-      interfaze.isAssignableFrom(constructor.getDeclaringClass())
-    }
-  }
 
   companion object {
     private val VALUES = values()

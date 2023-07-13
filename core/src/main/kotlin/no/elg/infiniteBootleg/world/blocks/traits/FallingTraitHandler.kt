@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
 import no.elg.infiniteBootleg.world.world.World
 
+@Deprecated("Use ashley entity components instead")
 class FallingTraitHandler(
   trait: FallingTrait,
   val world: World,

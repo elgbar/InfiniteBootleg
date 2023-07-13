@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.blocks.traits
 import ktx.collections.GdxIdentityMap
 import kotlin.reflect.KClass
 
+@Deprecated("Use ashley entity components instead")
 class TraitHandlerCollection : Collection<TraitHandler<out Trait>> {
 
   private val handlers = GdxIdentityMap<KClass<out Trait>, TraitHandler<out Trait>>()

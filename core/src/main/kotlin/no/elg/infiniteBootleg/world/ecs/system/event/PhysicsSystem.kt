@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.ecs.system.event
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.world.box2d.DoorService
 import no.elg.infiniteBootleg.world.box2d.FallingBlockContactService
 import no.elg.infiniteBootleg.world.box2d.OnGroundService
@@ -18,19 +17,14 @@ object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueue>(
 ) {
 
   inline fun <reified T : Any> PhysicsEvent.getOtherFixtureUserData(entity: Entity, filter: (userData: Any?) -> Boolean): T? {
-    val userDataA = fixtureA.userData
-    val userDataB = fixtureB?.userData
-    val otherUserData = when {
+    val userDataA: Any = fixtureA.userData
+    val userDataB: Any? = fixtureB?.userData
+    val otherUserData: Any = when {
       filter(userDataA) && fixtureA.body.userData === entity -> userDataB
       filter(userDataB) && fixtureB?.body?.userData === entity -> userDataA
       else -> null
     } ?: return null
-    return if (otherUserData is T) {
-      Main.logger()
-      otherUserData
-    } else {
-      null
-    }
+    return if (otherUserData is T) otherUserData else null
   }
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: PhysicsEvent) {

@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom
 /**
  * @author Elg
  */
+@Deprecated("Use ashley entity components instead")
 class TickingTraitHandler(private val tickingTrait: TickingTrait, private val worldTicker: Ticker) : TraitHandler<TickingTrait> {
 
   @Volatile
