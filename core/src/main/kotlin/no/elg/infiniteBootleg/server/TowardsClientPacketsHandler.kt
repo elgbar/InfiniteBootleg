@@ -41,7 +41,7 @@ import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
-import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
+import no.elg.infiniteBootleg.world.ecs.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.createMPClientPlayerEntity
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
@@ -179,7 +179,7 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
       }
     }
 
-    FALLING_BLOCK -> world.engine.createFallingBlockEntity(world, spawnEntity.entity)
+    FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, spawnEntity.entity)
 
     else -> Main.logger().error("Cannot spawn a ${spawnEntity.entity.type} yet")
   }

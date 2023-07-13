@@ -22,7 +22,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.livingOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
-import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
@@ -344,9 +343,9 @@ fun Engine.createSPPlayerEntity(
   return completableFuture
 }
 
-fun Engine.createFallingBlockEntity(world: World, fallingBlock: ProtoWorld.Entity) {
+fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoWorld.Entity) {
   val material = Material.fromOrdinal(fallingBlock.material.materialOrdinal)
-  createFallingBlockEntity(
+  createFallingBlockStandaloneEntity(
     world,
     fallingBlock.position.x,
     fallingBlock.position.y,
@@ -357,7 +356,7 @@ fun Engine.createFallingBlockEntity(world: World, fallingBlock: ProtoWorld.Entit
   )
 }
 
-fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, dx: Float, dy: Float, material: Material, id: String? = null) = entity {
+fun Engine.createFallingBlockStandaloneEntity(world: World, worldX: Float, worldY: Float, dx: Float, dy: Float, material: Material, id: String? = null) = entity {
   with(WorldComponent(world))
   with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
   with(PositionComponent(worldX, worldY))
@@ -384,8 +383,7 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
     arrayOf(
       basicDynamicEntityFamily to "basicDynamicEntityFamily",
       drawableEntitiesFamily to "drawableEntitiesFamily",
-      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
-      blockEntityFamily to "blockEntityFamily"
+      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
     )
   ) {
     val shape = PolygonShape()
@@ -405,6 +403,9 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
   }
 }
 
+/**
+ * Baseline static entities which have some system attached
+ */
 fun Engine.createBlockEntity(
   world: World,
   chunk: Chunk,
@@ -469,7 +470,7 @@ fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY
     }
   }
 
-fun Engine.createFallingBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
+fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
     with<GravityAffectedTag>()
   }

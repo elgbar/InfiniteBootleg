@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.ecs.createDoorBlockEntity
-import no.elg.infiniteBootleg.world.ecs.createFallingBlockEntity
+import no.elg.infiniteBootleg.world.ecs.createGravityAffectedBlockEntity
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
@@ -52,7 +52,7 @@ enum class Material(
   GRASS(hardness = 0.8f, hasTransparentTexture = false),
   TNT(hardness = 0.5f, hasTransparentTexture = false, emitsLight = true),
   SAND(hardness = 1f, hasTransparentTexture = false, isGravityAffected = true, createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
-    world.engine.createFallingBlockEntity(world, chunk, worldX, worldY, material)
+    world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
   }),
   TORCH(
     hardness = 0.1f,
@@ -63,7 +63,7 @@ enum class Material(
     adjacentPlaceable = false,
     isGravityAffected = true,
     createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
-      world.engine.createFallingBlockEntity(world, chunk, worldX, worldY, material)
+      world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
     }
   ),
   GLASS(hardness = 0.1f, hasTransparentTexture = true, blocksLight = false),

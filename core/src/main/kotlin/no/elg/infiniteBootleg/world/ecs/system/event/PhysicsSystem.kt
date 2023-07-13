@@ -24,7 +24,7 @@ object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueue>(
       filter(userDataB) && fixtureB?.body?.userData === entity -> userDataA
       else -> null
     } ?: return null
-    return if (otherUserData is T) otherUserData else null
+    return otherUserData as? T?
   }
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: PhysicsEvent) {
