@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Block.TNT
 import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Chunk
@@ -58,7 +59,7 @@ class TntBlock(world: World, chunk: Chunk, localX: Int, localY: Int, material: M
           var y = MathUtils.floor(worldY - strength)
           while (y < worldY + strength) {
             val block = world.getRawBlock(x, y, true)
-            val mat = block?.material ?: Material.AIR
+            val mat = block.materialOrAir()
             val hardness = mat.hardness
             if (mat != Material.AIR && hardness >= 0 && block != null) {
               val dist = (Location.distCubed(worldX, worldY, block.worldX, block.worldY) * hardness * abs(MathUtils.random.nextGaussian() + RESISTANCE))

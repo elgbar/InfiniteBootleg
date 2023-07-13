@@ -26,6 +26,7 @@ import no.elg.infiniteBootleg.util.directionTo
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
+import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -681,9 +682,7 @@ class ChunkImpl(
     val AIR_BLOCK_BUILDER = Block.save(Material.AIR)
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
-      val a = blockA?.material ?: Material.AIR
-      val b = blockB?.material ?: Material.AIR
-      return a === Material.AIR && b === Material.AIR
+      return blockA.materialOrAir() === Material.AIR && blockB.materialOrAir() === Material.AIR
     }
   }
 }

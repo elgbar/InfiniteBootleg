@@ -8,11 +8,11 @@ import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.fastIntFormat
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
 import no.elg.infiniteBootleg.world.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkImpl
-import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -69,7 +69,7 @@ object DebugText {
     val localY = mouseBlockY.chunkOffset()
     val chunk = world.getChunk(compactLoc(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
     val block = chunk?.getRawBlock(localX, localY)
-    val material = block?.material ?: Material.AIR
+    val material = block.materialOrAir()
     val rawX = ClientMain.inst().mouseLocator.mouseWorldX
     val rawY = ClientMain.inst().mouseLocator.mouseWorldY
     val exists = block != null

@@ -72,6 +72,8 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       }
     }
 
+    fun Block?.materialOrAir(): Material = this?.material ?: Material.AIR
+
     fun fromProto(world: World, chunk: Chunk, localX: Int, localY: Int, protoBlock: ProtoWorld.Block?): Block? {
       if (protoBlock == null) {
         return null

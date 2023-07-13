@@ -43,6 +43,7 @@ import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.Block.Companion.remove
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
@@ -1037,7 +1038,8 @@ abstract class World(
    * @param worldY The y coordinate in world view
    * @return The material at the given location
    */
-  fun getMaterial(worldX: Int, worldY: Int): Material = getRawBlock(worldX, worldY, true)?.material ?: Material.AIR
+  fun getMaterial(worldX: Int, worldY: Int): Material = getRawBlock(worldX, worldY, true).materialOrAir()
+  fun getMaterial(compactLoc: Long): Material = getRawBlock(compactLoc, true).materialOrAir()
 
   /**
    * Alias to `WorldBody#postBox2dRunnable`

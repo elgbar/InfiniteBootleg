@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
@@ -140,7 +141,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           val topBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {
             val block = blocks[localX][localY]
-            val material = block?.material ?: Material.AIR
+            val material = block.materialOrAir()
             if (material.isEntity) {
               continue
             }

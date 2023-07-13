@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Block.Companion.getRawRelative
+import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.Block.Companion.save
 import no.elg.infiniteBootleg.world.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.Block.Companion.worldY
@@ -37,7 +38,7 @@ open class BlockImpl(
     get() {
       val map = EnumMap<Direction, Material>(Direction::class.java)
       for (direction in Direction.CARDINAL) {
-        val relMat = this.getRawRelative(direction, false)?.material ?: Material.AIR
+        val relMat = this.getRawRelative(direction, false).materialOrAir()
         map[direction] = relMat
       }
       return TextureNeighbor.getTexture(material, map)
