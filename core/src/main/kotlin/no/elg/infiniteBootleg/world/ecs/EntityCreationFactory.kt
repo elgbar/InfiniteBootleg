@@ -151,7 +151,7 @@ private fun createPlayerFixture(body: Body) {
   def.restitution = Constants.DEFAULT_FIXTURE_RESTITUTION // a bit bouncy!
 
   val fix: Fixture = body.createFixture(def)
-  fix.filterData = Filters.EN_GR__ENTITY_FILTER
+  fix.filterData = Filters.GR_EN_ENTITY_FILTER
   fix.userData = body.userData
 
   shape.dispose()
@@ -390,7 +390,7 @@ fun Engine.createFallingBlockEntity(world: World, worldX: Float, worldY: Float, 
     def.restitution = 0f
 
     val fix: Fixture = it.createFixture(def)
-    fix.filterData = Filters.GR__ENTITY_FILTER
+    fix.filterData = Filters.GR_EN__GROUND_FILTER
     fix.userData = it.userData
 
     shape.dispose()

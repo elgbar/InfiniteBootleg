@@ -96,10 +96,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
         val block = chunk.getRawBlock(localX, localY)
-        if (block == null || !block.material.isCollidable) {
+        if (block == null || (!block.material.isCollidable && !block.material.isGravityAffected)) {
           continue
         }
-
         addBlock(block)
       }
     }
@@ -166,9 +165,9 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       fixture.userData = block
 //      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
       fixture.filterData = when {
-        material.blocksLight && material.isCollidable -> Filters.EN_GR_LI__GROUND_FILTER
-//        material.isBlocksLight -> Filters.GR_LI__GROUND_FILTER
-        material.isCollidable -> Filters.EN_GR__GROUND_FILTER
+        material.isCollidable && material.isGravityAffected -> Filters.GR_FB_EN__GROUND_FILTER
+        material.isCollidable -> Filters.GR_EN__GROUND_FILTER
+        material.isGravityAffected -> Filters.GR_FB__GROUND_FILTER
         else -> Filters.GR__GROUND_FILTER
       }
     }
@@ -180,13 +179,10 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     box2dBody = null
   }
 
-  fun hasBody(): Boolean = box2dBody != null
-
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is ChunkBody) return false
-    if (chunk != other.chunk) return false
-    return true
+    return chunk == other.chunk
   }
 
   override fun hashCode(): Int {

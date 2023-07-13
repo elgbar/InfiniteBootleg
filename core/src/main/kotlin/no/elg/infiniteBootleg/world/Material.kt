@@ -47,7 +47,8 @@ enum class Material(
    * @return If this material can be used to place blocks near it
    */
   val adjacentPlaceable: Boolean = true,
-  val createNew: ((world: World, worldX: Int, worldY: Int) -> Any)? = null
+  val isGravityAffected: Boolean = false,
+  val createNew: ((world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) -> Entity)? = null
 ) {
   AIR(itemType = ItemType.AIR, hardness = 0f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, emitsLight = false, adjacentPlaceable = false),
   STONE(hardness = 1.5f, hasTransparentTexture = false),
