@@ -62,8 +62,11 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
     /**
      * Remove this block by setting it to air, done asynchronous
      */
-    fun Block.removeAsync(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) {
-      Main.inst().scheduler.executeAsync { remove(updateTexture, prioritize, sendUpdatePacket) }
+    fun Block.removeAsync(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true, postRemove: () -> Unit = {}) {
+      Main.inst().scheduler.executeAsync {
+        remove(updateTexture, prioritize, sendUpdatePacket)
+        postRemove()
+      }
     }
 
     fun Block.getRawRelative(dir: Direction, load: Boolean = true): Block? {
