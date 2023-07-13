@@ -1,7 +1,8 @@
-package no.elg.infiniteBootleg.world.box2d
+package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.KAssets
+import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent.Companion.doorOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.box2d
+package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.remove
@@ -22,10 +22,10 @@ object FallingBlockContactService {
       val newY: Int = block.worldY
       var deltaY = 0
       val world = block.world
-      if (entity.isScheduledForRemoval || entity.isRemoving) {
-        return
-      }
       synchronized(world) {
+        if (entity.isScheduledForRemoval || entity.isRemoving) {
+          return
+        }
         var materialUp: Material
 
         do {

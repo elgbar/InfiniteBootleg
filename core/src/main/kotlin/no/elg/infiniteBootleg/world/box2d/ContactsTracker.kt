@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.box2d
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
 
-class LongContactTracker(val userData: Any) {
+class LongContactTracker(private val userData: Any) {
 
   val filter: (userData: Any?) -> Boolean = { it == userData }
   private val contactFixtures = GdxLongArray(false, 16)
@@ -19,9 +19,8 @@ class LongContactTracker(val userData: Any) {
     contactFixtures.add(value)
   }
 
-  fun remove(value: Long) {
-    contactFixtures.removeValue(value)
-  }
+  fun remove(value: Long) = contactFixtures.removeValue(value)
+
 
   fun removeAll(value: Long) {
     while (contactFixtures.removeValue(value)) {
@@ -45,9 +44,8 @@ class ObjectContactTracker<T : Any> {
     contactFixtures.add(value)
   }
 
-  fun remove(value: T) {
-    contactFixtures.removeValue(value, true)
-  }
+  fun remove(value: T) = contactFixtures.removeValue(value, true)
+
 
   fun removeAll(value: T) {
     while (contactFixtures.removeValue(value, true)) {

@@ -1,8 +1,9 @@
-package no.elg.infiniteBootleg.world.box2d
+package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
