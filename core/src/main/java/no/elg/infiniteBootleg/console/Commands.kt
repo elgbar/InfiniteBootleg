@@ -465,15 +465,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   }
 
   @HiddenCommand
-  @ClientsideOnly
-  @CmdArgNames("dx", "dy")
-  @ConsoleDoc(description = "Shift world offset")
-  fun swo(x: Float, y: Float) {
-    val world = world ?: return
-    world.worldBody.shiftWorldOffset(x, y)
-  }
-
-  @HiddenCommand
   @ConsoleDoc(description = "check dangling entities")
   fun cde() {
     val world = world ?: return

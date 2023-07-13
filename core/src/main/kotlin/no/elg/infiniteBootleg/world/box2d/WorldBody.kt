@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
-import com.badlogic.gdx.utils.Array.ArrayIterator
 import com.badlogic.gdx.utils.OrderedSet
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.CheckableDisposable
@@ -54,7 +53,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   private val postRunnable = PostRunnableHandler()
 
   private val updatingChunksIterator = OrderedSet.OrderedSetIterator(updatingChunks)
-  private val bodiesIterator = ArrayIterator(bodies)
 
   private val contactManager = ContactManager(world.engine)
 
@@ -89,7 +87,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   @GuardedBy("BOX2D_LOCK")
   private fun createBodyNow(def: BodyDef, callback: (Body) -> Unit) {
     val body = box2dWorld.createBody(def)
-    applyShift(body, worldOffsetX, worldOffsetY)
     callback(body)
   }
 
@@ -140,61 +137,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     }
   }
 
-  /**
-   * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
-   */
-  override fun tickRare() {
-    if (Main.isServer()) {
-      // We only short because of the light, no point is shifting when there is no client
-      return
-    }
-
-//    if (Main.isSingleplayer()) {
-//      synchronized(BOX2D_LOCK) {
-//        if (disposed) {
-//          return@synchronized
-//        }
-//        val player = ClientMain.inst().player ?: return
-//        if (player.isDisposed) {
-//          return
-//        }
-//        val physicsPosition = player.physicsPosition
-//        val shiftX = calculateShift(physicsPosition.x)
-//        val shiftY = calculateShift(physicsPosition.y)
-//        if (shiftX == 0f && shiftY == 0f) {
-//          // Still in-bounds
-//          return
-//        }
-//        // the toShift method assumes no offset, so we must subtract the old offset from the new
-//        shiftWorldOffset(shiftX, shiftY)
-//        Main.logger().debug("BOX2D", "Shifting world offset by ($shiftX, $shiftY) now ($worldOffsetX, $worldOffsetY)")
-//      }
-//    }
-  }
-
-  private fun applyShift(body: Body, deltaOffsetX: Float, deltaOffsetY: Float) {
-    val old = body.transform
-    body.setTransform(old.position.x + deltaOffsetX, old.position.y + deltaOffsetY, old.rotation)
-  }
-
-  /**
-   * Move world offset to make sure physics don't go haywire by floating point rounding error
-   */
-  fun shiftWorldOffset(deltaOffsetX: Float, deltaOffsetY: Float) {
-    postBox2dRunnable {
-      worldOffsetX += deltaOffsetX
-      worldOffsetY += deltaOffsetY
-      bodies.clear()
-      bodies.ensureCapacity(world.engine.entities.size())
-      box2dWorld.getBodies(bodies)
-      bodiesIterator.reset()
-      for (body in bodiesIterator) {
-        applyShift(body, deltaOffsetX, deltaOffsetY)
-      }
-
-      world.render.update()
-    }
-  }
 
   /**
    * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
