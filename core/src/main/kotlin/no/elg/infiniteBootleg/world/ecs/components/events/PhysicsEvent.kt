@@ -23,7 +23,7 @@ class PhysicsEventQueue : ECSEventQueue<PhysicsEvent> {
 
 sealed interface PhysicsEvent : ECSEvent {
 
-  val fixtureA: Fixture
+  val fixtureA: Fixture?
   val fixtureB: Fixture?
 
   data class ContactBeginsEvent(override val fixtureA: Fixture, override val fixtureB: Fixture) : PhysicsEvent
