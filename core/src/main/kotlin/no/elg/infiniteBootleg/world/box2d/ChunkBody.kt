@@ -165,10 +165,8 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       fixture.userData = block
 //      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
       fixture.filterData = when {
-        material.isCollidable && material.isGravityAffected -> Filters.GR_FB_EN__GROUND_FILTER
-        material.isCollidable -> Filters.GR_EN__GROUND_FILTER
-        material.isGravityAffected -> Filters.GR_FB__GROUND_FILTER
-        else -> Filters.GR__GROUND_FILTER
+        material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
+        else -> Filters.GR_FB__GROUND_FILTER
       }
     }
   }

@@ -396,9 +396,8 @@ fun Engine.createFallingBlockStandaloneEntity(world: World, worldX: Float, world
     def.restitution = 0f
 
     val fix: Fixture = it.createFixture(def)
-    fix.filterData = Filters.GR_EN__GROUND_FILTER
+    fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
     fix.userData = it.userData
-
     shape.dispose()
   }
 }
