@@ -10,19 +10,21 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.breakableBlock
+import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.dstd
 import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.grounded
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
-import no.elg.infiniteBootleg.world.ecs.components.required.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
+import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -43,8 +45,11 @@ class KeyboardControls(val world: ClientWorld) {
   private val tmpVec2 = Vector2()
 
   private val mouseLocator = MouseLocator()
+  private var lastCreateBlockLoc: Long = 0
+  private var lastCreateBlockTick: Long = 0
 
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
+    if (canNotInteract(blockX, blockY)) return false
     val world = entity.world
     val breakableBlocks = entity.breakableBlock(world, blockX, blockY, brushSize, interactRadius)
     world.removeBlocks(world.getBlocks(breakableBlocks))
@@ -52,14 +57,26 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
+    if (canNotInteract(blockX, blockY)) return false
     val world = entity.world
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
     val placeableBlock = entity.placeableBlock(world, blockX, blockY, brushSize, interactRadius)
     if (inventory.use(material, placeableBlock.size.toUInt())) {
-      material.create(world, placeableBlock)
+      material.createBlocks(world, placeableBlock)
     }
     return true
+  }
+
+  private fun canNotInteract(blockX: Int, blockY: Int): Boolean {
+    val compactLoc = compactLoc(blockX, blockY)
+    val tick = world.tick
+    if (lastCreateBlockLoc == compactLoc && world.tick - lastCreateBlockTick < BOX2D_TPS / 10f) {
+      return true
+    }
+    lastCreateBlockLoc = compactLoc
+    lastCreateBlockTick = tick
+    return false
   }
 
   private fun Entity.fly() {
