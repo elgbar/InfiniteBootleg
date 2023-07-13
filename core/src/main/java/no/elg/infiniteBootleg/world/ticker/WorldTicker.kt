@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.world.world.World
  */
 class WorldTicker(world: World, tick: Boolean) : Ticker, Disposable {
   private val worldTicker =
-    TickerImpl(ticking = WorldTickee(world), name = WORLD_TICKER_TAG_PREFIX + world.name, start = tick, tps = Settings.tps, nagDelay = TickerImpl.DEFAULT_NAG_DELAY)
+    TickerImpl(WorldTickee(world), WORLD_TICKER_TAG_PREFIX + world.name, tick, Settings.tps, TickerImpl.DEFAULT_NAG_DELAY)
   private var serverRendererTicker: ServerRendererTicker? = null
   val box2DTicker: WorldBox2DTicker
 

@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.LongMap
+import ktx.collections.GdxArray
+import ktx.collections.plusAssign
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.world.Chunk
@@ -12,6 +14,8 @@ internal class WorldTickee(private val world: World) : Ticking {
   @GuardedBy("world.chunksLock")
   private val chunkIterator: LongMap.Entries<Chunk> = LongMap.Entries(world.chunks)
 
+  private val chunksToTick = GdxArray<Chunk>(false, 64)
+
   @Synchronized
   override fun tick() {
     val wr = world.render
@@ -19,11 +23,12 @@ internal class WorldTickee(private val world: World) : Ticking {
 
     // tick all chunks and blocks in chunks
     val tick = world.worldTicker.tickId
+    chunksToTick.clear()
     world.chunksLock.writeLock().lock()
     try {
       chunkIterator.reset()
       while (chunkIterator.hasNext()) {
-        val chunk = chunkIterator.next().value
+        val chunk: Chunk? = chunkIterator.next().value
 
         // clean up dead chunks
         if (chunk == null) {
@@ -31,25 +36,16 @@ internal class WorldTickee(private val world: World) : Ticking {
           chunkIterator.remove()
           continue
         } else if (chunk.isDisposed) {
-          Main.logger()
-            .warn(
-              "Found disposed chunk (" +
-                chunk.chunkX +
-                "," +
-                chunk.chunkY +
-                ") when ticking world"
-            )
+          Main.logger().warn("Found disposed chunk (${chunk.chunkX},${chunk.chunkY}) when ticking world")
           chunkIterator.remove()
           continue
         }
-        if (chunk.isAllowedToUnload &&
-          wr.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime
-        ) {
+        if (chunk.isAllowedToUnload && wr.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime) {
           chunkIterator.remove()
-          world.unloadChunk(chunk, false, true)
+          world.unloadChunk(chunk, force = false, save = true)
           continue
         }
-        chunk.tick()
+        chunksToTick += chunk
       }
     } finally {
       world.chunksLock.writeLock().unlock()
@@ -57,18 +53,7 @@ internal class WorldTickee(private val world: World) : Ticking {
   }
 
   override fun tickRare() {
-    //      if(Main.isServer()){
-    //        Main.logger().debug("PACKET INFO", "Server received " +
-    // ServerBoundHandler.packetsReceived+" packets");
-    //        ServerBoundHandler.packetsReceived = 0;
-    //      }
-    for (chunk in world.loadedChunks) {
-      chunk.tickRare()
-    }
     val time = world.worldTime
-    time.time = (
-      time.time +
-        world.worldTicker.secondsDelayBetweenTicks * time.timeScale
-      )
+    time.time += world.worldTicker.secondsDelayBetweenTicks * time.timeScale
   }
 }
