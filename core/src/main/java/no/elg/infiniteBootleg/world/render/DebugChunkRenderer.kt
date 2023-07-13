@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.world.Chunk
 
 class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
   private val lr: ShapeRenderer = ShapeRenderer(1000)
-  private val camera: OrthographicCamera = worldRender.camera
+  private val camera: OrthographicCamera get() = worldRender.camera
 
   private val newlyUpdatedChunks = LongMap<UpdatedChunk>()
 
