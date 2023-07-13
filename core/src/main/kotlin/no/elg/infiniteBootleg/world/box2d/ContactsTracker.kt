@@ -21,7 +21,6 @@ class LongContactTracker(private val userData: Any) {
 
   fun remove(value: Long) = contactFixtures.removeValue(value)
 
-
   fun removeAll(value: Long) {
     while (contactFixtures.removeValue(value)) {
       // Empty on purpose, removeValue has side effects
@@ -45,7 +44,6 @@ class ObjectContactTracker<T : Any> {
   }
 
   fun remove(value: T) = contactFixtures.removeValue(value, true)
-
 
   fun removeAll(value: T) {
     while (contactFixtures.removeValue(value, true)) {

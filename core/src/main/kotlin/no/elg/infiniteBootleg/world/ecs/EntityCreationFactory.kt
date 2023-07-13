@@ -416,7 +416,7 @@ fun Engine.createBlockEntity(
   additionalConfiguration: EngineEntity.() -> Unit = {}
 ) = entity {
   with(WorldComponent(world))
-  with(IdComponent(compactLoc(worldX, worldY).toString()))
+  with(IdComponent.createRandomId())
   with(PositionComponent(worldX.toFloat(), worldY.toFloat()))
   with(ChunkComponent(chunk))
   with(MaterialComponent(material))

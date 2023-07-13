@@ -137,7 +137,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     }
   }
 
-
   /**
    * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
    */
