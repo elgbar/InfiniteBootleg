@@ -55,6 +55,9 @@ open class BlockImpl(
       Main.logger().warn("Disposed block ${this::class.simpleName} ($worldX, $worldY) twice")
     }
     disposed = true
+    entity?.also {
+      world.engine.removeEntity(it)
+    }
   }
 
   override fun hashCode(): Int {
