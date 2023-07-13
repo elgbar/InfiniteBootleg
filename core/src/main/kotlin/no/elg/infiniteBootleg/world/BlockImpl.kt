@@ -56,7 +56,9 @@ open class BlockImpl(
     }
     disposed = true
     entity?.also {
-      world.engine.removeEntity(it)
+      if (!it.isScheduledForRemoval) {
+        world.engine.removeEntity(it)
+      }
     }
   }
 
