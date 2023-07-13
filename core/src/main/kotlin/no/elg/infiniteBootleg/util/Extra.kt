@@ -71,7 +71,10 @@ fun Int.stringSize(): Int {
   return 10 + d
 }
 
-fun Block?.isAir(): Boolean = this == null || this is EntityMarkerBlock || this.material == Material.AIR
+fun Block?.isAir(): Boolean {
+  contract { returns(false) implies (this@isAir != null) }
+  return this == null || this is EntityMarkerBlock || this.material == Material.AIR
+}
 
 fun Block?.isNotAir(): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }

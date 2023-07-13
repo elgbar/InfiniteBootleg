@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.api.Updatable
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Block.Companion.compactWorldLoc
@@ -96,7 +97,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     for (localX in 0 until CHUNK_SIZE) {
       for (localY in 0 until CHUNK_SIZE) {
         val block = chunk.getRawBlock(localX, localY)
-        if (block == null || (!block.material.isCollidable && !block.material.isGravityAffected)) {
+        if (block.isAir()) {
           continue
         }
         addBlock(block)
