@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.ecs.system.block
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.MathUtils
+import ktx.ashley.hasNot
 import ktx.ashley.remove
 import ktx.collections.gdxSetOf
 import no.elg.infiniteBootleg.Main
@@ -46,7 +47,8 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
         val hardness = mat.hardness
         if (mat != Material.AIR && hardness >= 0 && block != null) {
           val dist = (Location.distCubed(worldX, worldY, block.worldX, block.worldY) * hardness * abs(MathUtils.random.nextGaussian() + ExplosiveComponent.RESISTANCE))
-          if (dist < strength * strength && (block !is TntBlock)) {
+          val otherBlockEntity = block.entity
+          if (dist < strength * strength && (otherBlockEntity == null || otherBlockEntity.hasNot(ExplosiveComponent.mapper))) {
             destroyed.add(block)
           }
         }
