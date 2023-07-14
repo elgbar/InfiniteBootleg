@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.utils.OrderedSet
-import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 
 interface ChunksInView {

@@ -1,10 +1,13 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract

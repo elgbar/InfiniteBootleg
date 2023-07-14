@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk
 
 class ChunkComponent(val chunk: Chunk) : Component {
   companion object : Mapper<ChunkComponent>() {

@@ -6,12 +6,12 @@ import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.remove
 import ktx.collections.gdxSetOf
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
-import no.elg.infiniteBootleg.world.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.block.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.block.ExplosiveComponent.Companion.explosiveComponent

@@ -7,6 +7,9 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.BlockImpl
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.block.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.createDoorBlockEntity

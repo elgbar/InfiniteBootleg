@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.biome.Biome
 import no.elg.infiniteBootleg.world.world.World
 

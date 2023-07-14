@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.generator.features
 
-import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk
 
 interface FeatureGenerator {
   val seed: Long

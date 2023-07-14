@@ -1,14 +1,17 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.HUDDebuggable
 import no.elg.infiniteBootleg.api.Savable
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
+import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Material.Companion.fromOrdinal
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 

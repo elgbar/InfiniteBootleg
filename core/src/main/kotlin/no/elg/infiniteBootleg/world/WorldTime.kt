@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.time
+package no.elg.infiniteBootleg.world
 
 import com.badlogic.gdx.graphics.Color
 import no.elg.infiniteBootleg.util.Util

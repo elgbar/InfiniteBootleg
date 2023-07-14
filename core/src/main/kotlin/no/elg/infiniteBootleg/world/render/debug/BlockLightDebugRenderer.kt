@@ -7,9 +7,9 @@ import no.elg.infiniteBootleg.KAssets.skylightDebugTexture
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
-import no.elg.infiniteBootleg.world.Block.Companion.BLOCK_SIZE
-import no.elg.infiniteBootleg.world.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.ClientWorld
 

@@ -6,11 +6,10 @@ import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.EntityRemoveListener
-import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Block.Companion.remove
-import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.ChunkImpl.Companion.AIR_BLOCK_BUILDER
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
+import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_BUILDER
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World

@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.generator.features
 
 import no.elg.infiniteBootleg.util.getNoise
-import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.world.world.World
 import no.elg.infiniteBootleg.world.world.World.Companion.getLocationsWithin

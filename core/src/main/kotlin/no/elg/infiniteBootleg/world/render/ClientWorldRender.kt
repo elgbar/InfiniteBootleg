@@ -14,10 +14,10 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
-import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.toSet
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld

@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.withColor
-import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selected
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily

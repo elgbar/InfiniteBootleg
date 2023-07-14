@@ -8,11 +8,11 @@ import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.fastIntFormat
 import no.elg.infiniteBootleg.util.worldToChunk
-import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
-import no.elg.infiniteBootleg.world.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
-import no.elg.infiniteBootleg.world.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
-import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.ChunkImpl
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
+import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent

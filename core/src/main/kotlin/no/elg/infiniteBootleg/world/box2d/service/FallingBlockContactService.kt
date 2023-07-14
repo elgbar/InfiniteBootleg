@@ -2,10 +2,10 @@ package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData

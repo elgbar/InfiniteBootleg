@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.util;
 
-import static no.elg.infiniteBootleg.world.Chunk.CHUNK_SIZE;
+import static no.elg.infiniteBootleg.world.chunks.Chunk.CHUNK_SIZE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

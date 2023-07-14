@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.chunks
 
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -7,10 +7,11 @@ import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.worldToChunk
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
-import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
-import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.contracts.contract
 import kotlin.math.max

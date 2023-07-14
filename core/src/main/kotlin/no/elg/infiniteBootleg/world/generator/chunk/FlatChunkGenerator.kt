@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
-import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.ChunkImpl
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.biome.Biome
 import no.elg.infiniteBootleg.world.world.World
 

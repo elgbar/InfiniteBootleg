@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_INTERACT_RADIUS
-import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.screens.stage.floatSpinner
 import no.elg.infiniteBootleg.screens.stage.toggleableDebugButton
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock

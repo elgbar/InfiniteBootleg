@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.screen
+package no.elg.infiniteBootleg.screens
 
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
@@ -37,39 +37,39 @@ class HUDRenderer : Renderer, Resizable {
     val world = main.world
     val sr = ClientMain.inst().screenRenderer
     reset()
-    sr.begin()
-    if (hasMode(DISPLAY_MINIMAL_DEBUG) || hasMode(DISPLAY_DEBUG)) {
-      fpsString(builder, world)
+    sr.use {
+      if (hasMode(DISPLAY_MINIMAL_DEBUG) || hasMode(DISPLAY_DEBUG)) {
+        fpsString(builder, world)
+      }
+      if (hasMode(DISPLAY_DEBUG) && world != null) {
+        val mouseBlockX = main.mouseLocator.mouseBlockX
+        val mouseBlockY = main.mouseLocator.mouseBlockY
+        val controlled = world.engine.getEntitiesFor(controlledEntityFamily)
+        nl()
+        pointing(builder, world, mouseBlockX, mouseBlockY)
+        nl()
+        chunk(builder, world, mouseBlockX, mouseBlockY)
+        nl()
+        viewChunk(builder, world)
+        nl()
+        pos(builder, controlled)
+        nl()
+        time(builder, world)
+        nl()
+        lights(builder, world, mouseBlockX, mouseBlockY)
+        nl()
+        ents(builder, world)
+      }
+      if (builder.isNotEmpty()) {
+        sr.drawTop(builder.toString(), 1f)
+      }
+      if (hasMode(DISPLAY_CURRENT_BLOCK)) {
+        CurrentBlockHUDRenderer.render(sr, world)
+      }
+      if (hasMode(DISPLAY_GRAPH_FPS)) {
+        render(sr, world)
+      }
     }
-    if (hasMode(DISPLAY_DEBUG) && world != null) {
-      val mouseBlockX = main.mouseLocator.mouseBlockX
-      val mouseBlockY = main.mouseLocator.mouseBlockY
-      val controlled = world.engine.getEntitiesFor(controlledEntityFamily)
-      nl()
-      pointing(builder, world, mouseBlockX, mouseBlockY)
-      nl()
-      chunk(builder, world, mouseBlockX, mouseBlockY)
-      nl()
-      viewChunk(builder, world)
-      nl()
-      pos(builder, controlled)
-      nl()
-      time(builder, world)
-      nl()
-      lights(builder, world, mouseBlockX, mouseBlockY)
-      nl()
-      ents(builder, world)
-    }
-    if (builder.isNotEmpty()) {
-      sr.drawTop(builder.toString(), 1f)
-    }
-    if (hasMode(DISPLAY_CURRENT_BLOCK)) {
-      CurrentBlockHUDRenderer.render(sr, world)
-    }
-    if (hasMode(DISPLAY_GRAPH_FPS)) {
-      render(sr, world)
-    }
-    sr.end()
   }
 
   private fun reset() = builder.setLength(0)

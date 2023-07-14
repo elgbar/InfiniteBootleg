@@ -15,8 +15,8 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.input.KeyboardControls
-import no.elg.infiniteBootleg.screen.HUDRenderer
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
+import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.MainMenuScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.clientBoundWorldSettings
@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
+import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
@@ -36,7 +37,6 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.Ticker
-import no.elg.infiniteBootleg.world.time.WorldTime
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.Locale

@@ -5,7 +5,7 @@ import no.elg.infiniteBootleg.server.serverBoundChunkRequestPacket
 import no.elg.infiniteBootleg.util.compact
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
-import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.util.concurrent.ConcurrentHashMap

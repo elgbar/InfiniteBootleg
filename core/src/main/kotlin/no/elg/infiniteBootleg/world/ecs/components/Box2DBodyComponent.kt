@@ -6,9 +6,9 @@ import com.badlogic.gdx.physics.box2d.Body
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.CheckableDisposable
-import no.elg.infiniteBootleg.world.Block
+import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.Constants
+import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 
 /**

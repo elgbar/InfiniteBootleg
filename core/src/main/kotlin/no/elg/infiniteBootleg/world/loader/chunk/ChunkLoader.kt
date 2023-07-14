@@ -5,8 +5,8 @@ import com.google.protobuf.InvalidProtocolBufferException
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
-import no.elg.infiniteBootleg.world.Chunk
-import no.elg.infiniteBootleg.world.ChunkImpl
+import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File

@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.events.chunks
 
-import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk
 
 data class ChunkLightUpdatedEvent(override val chunk: Chunk, val localX: Int, val localY: Int) : ChunkEvent {
 

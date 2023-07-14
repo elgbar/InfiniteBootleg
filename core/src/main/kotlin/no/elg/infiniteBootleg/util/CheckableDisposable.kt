@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg
+package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.utils.Disposable
 

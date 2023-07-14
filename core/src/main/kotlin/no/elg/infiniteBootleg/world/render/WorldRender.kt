@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.OrderedSet
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.api.Updatable
-import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 
 /**

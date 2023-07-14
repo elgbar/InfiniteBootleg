@@ -6,7 +6,7 @@ import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.screen.HUDRenderer
+import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem.SCROLL_SPEED
 import no.elg.infiniteBootleg.world.render.ClientWorldRender

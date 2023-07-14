@@ -6,11 +6,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.OrderedSet
 import ktx.collections.GdxArray
-import no.elg.infiniteBootleg.CheckableDisposable
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Ticking
+import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
-import no.elg.infiniteBootleg.world.Chunk.Companion.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import no.elg.infiniteBootleg.world.world.World

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxArray
@@ -6,9 +6,12 @@ import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
-import no.elg.infiniteBootleg.world.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
-import no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import kotlin.math.ceil

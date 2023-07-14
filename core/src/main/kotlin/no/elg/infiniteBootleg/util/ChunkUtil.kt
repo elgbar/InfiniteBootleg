@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.util
 
-import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import kotlin.math.abs
 
 fun Chunk.isNeighbor(other: Chunk): Boolean = isNeighbor(other.chunkX, other.chunkY)

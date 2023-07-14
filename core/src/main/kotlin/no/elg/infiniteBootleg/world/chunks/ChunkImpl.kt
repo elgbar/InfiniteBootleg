@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -26,7 +26,10 @@ import no.elg.infiniteBootleg.util.directionTo
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
-import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World

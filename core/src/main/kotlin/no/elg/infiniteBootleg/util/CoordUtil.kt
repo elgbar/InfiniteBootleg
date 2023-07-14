@@ -4,10 +4,10 @@ package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
-import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Block.Companion.compactWorldLoc
-import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import kotlin.math.abs

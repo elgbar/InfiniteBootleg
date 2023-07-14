@@ -25,10 +25,10 @@ import ktx.style.visTextButton
 import ktx.style.visTextField
 import ktx.style.window
 import no.elg.infiniteBootleg.ClientMain.SCALE
-import no.elg.infiniteBootleg.screen.ScreenRenderer
+import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.util.useDispose
-import no.elg.infiniteBootleg.world.Block
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation

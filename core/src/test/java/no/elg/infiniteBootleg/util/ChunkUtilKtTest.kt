@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.util
 
 import io.mockk.every
 import io.mockk.mockk
-import no.elg.infiniteBootleg.world.Chunk
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

@@ -1,14 +1,17 @@
-package no.elg.infiniteBootleg.world
+package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.Block.Companion.getRawRelative
-import no.elg.infiniteBootleg.world.Block.Companion.materialOrAir
-import no.elg.infiniteBootleg.world.Block.Companion.save
-import no.elg.infiniteBootleg.world.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.getRawRelative
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.save
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.TextureNeighbor
 import no.elg.infiniteBootleg.world.world.World

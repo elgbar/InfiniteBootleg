@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.util.compactLoc
-import no.elg.infiniteBootleg.world.Block
-import no.elg.infiniteBootleg.world.Chunk
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.chunks.Chunk
 
 class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
   private val lr: ShapeRenderer = ShapeRenderer(1000)
