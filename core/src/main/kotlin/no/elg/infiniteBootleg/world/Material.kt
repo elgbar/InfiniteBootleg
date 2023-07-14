@@ -7,8 +7,12 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.world.ecs.components.block.ExplosiveComponent
+import no.elg.infiniteBootleg.world.ecs.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.createDoorBlockEntity
 import no.elg.infiniteBootleg.world.ecs.createGravityAffectedBlockEntity
+import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
+import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
@@ -50,7 +54,11 @@ enum class Material(
   BRICK(hardness = 2f, hasTransparentTexture = false),
   DIRT(hardness = 1f, hasTransparentTexture = false),
   GRASS(hardness = 0.8f, hasTransparentTexture = false),
-  TNT(hardness = 0.5f, hasTransparentTexture = false, emitsLight = true),
+  TNT(hardness = 0.5f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
+    world.engine.createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
+      with(ExplosiveComponent())
+    }
+  }),
   SAND(hardness = 1f, hasTransparentTexture = false, isGravityAffected = true, createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
     world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
   }),

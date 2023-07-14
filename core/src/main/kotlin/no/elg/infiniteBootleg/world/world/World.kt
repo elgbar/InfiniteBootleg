@@ -56,7 +56,6 @@ import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.blocks.TickingBlock
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
@@ -73,6 +72,7 @@ import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
+import no.elg.infiniteBootleg.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
@@ -208,6 +208,7 @@ abstract class World(
     engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)
     engine.addSystem(FallingBlockSystem)
+    engine.addSystem(ExplosiveBlockSystem)
     if (Main.isClient()) {
       engine.addSystem(FollowEntitySystem)
     }
