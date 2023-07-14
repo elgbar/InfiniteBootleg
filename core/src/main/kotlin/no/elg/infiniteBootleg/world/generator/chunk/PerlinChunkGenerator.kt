@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
+import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -19,7 +20,7 @@ import kotlin.math.min
 /**
  * @author Elg
  */
-class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
+class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable {
 
   private val chunkGeneratedListener = ChunkGeneratedListener(this)
   private val sparseTreeGenerator = ForestGenerator(seed, 0.8f)
@@ -73,7 +74,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
           val worldY = worldChunkY + localY
 
           // calculate the size of the worm
-          val wormSize = (1 + abs(noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY)))
+          val wormSize = 1 + abs(noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY))
           val caveNoise = noise2.GetNoise(worldX.toDouble(), worldY.toDouble()) / wormSize
           val diffToSurface = (genHeight - worldY).toDouble()
           val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
@@ -118,5 +119,9 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator {
     private const val CAVELESS_DEPTH = 16.0
 
     private const val BIOME_HEIGHT_AMPLITUDE = 1.25
+  }
+
+  override fun dispose() {
+    chunkGeneratedListener.dispose()
   }
 }
