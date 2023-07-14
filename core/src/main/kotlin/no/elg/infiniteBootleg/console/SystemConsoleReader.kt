@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.console
 
 import com.badlogic.gdx.utils.Disposable
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import java.util.Scanner
 
 /** Read input from [System.console] or [System. in] if no console exists.  */

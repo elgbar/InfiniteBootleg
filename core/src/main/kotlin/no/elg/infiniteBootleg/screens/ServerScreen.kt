@@ -10,8 +10,8 @@ import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.ClientChannel
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
@@ -21,10 +21,10 @@ import no.elg.infiniteBootleg.util.generateUUIDFromString
  * @author Elg
  */
 object ServerScreen : StageScreen() {
-  init {
+  override fun create() {
+    super.create()
     rootTable {
       visTable(defaultSpacing = true) {
-
         val nameField = VisTextField("Elg")
         val hostField = VisTextField("localhost")
         val portSpinner = IntSpinnerModel(8558, 0, Char.MAX_VALUE.code)

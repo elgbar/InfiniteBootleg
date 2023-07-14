@@ -1,11 +1,11 @@
 package no.elg.infiniteBootleg.server
 
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.javaOneShotListener
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity

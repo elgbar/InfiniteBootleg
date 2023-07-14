@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.events.api
 
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
 import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.WeakHashMap

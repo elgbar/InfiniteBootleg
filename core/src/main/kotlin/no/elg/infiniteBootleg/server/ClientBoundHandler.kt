@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.server
 
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info

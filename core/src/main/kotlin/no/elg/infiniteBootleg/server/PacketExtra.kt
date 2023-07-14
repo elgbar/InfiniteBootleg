@@ -3,10 +3,10 @@ package no.elg.infiniteBootleg.server
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
@@ -96,7 +96,7 @@ fun broadcast(packet: Packet, filter: ((Channel, SharedInformation) -> Boolean)?
  * Can only be used by a server instance
  */
 fun broadcastToInView(packet: Packet, worldX: Int, worldY: Int, filter: ((Channel, SharedInformation) -> Boolean)? = null) {
-  require(Main.isServer()) { "This broadcasting methods can only be used by servers" }
+  require(Main.isServer) { "This broadcasting methods can only be used by servers" }
   val world = ServerMain.inst().serverWorld
   val renderer = world.render
   val chunkX = worldX.worldToChunk()
@@ -293,9 +293,9 @@ fun clientBoundHeartbeat(): Packet {
  * @param ifIsClient The packet to send if we are a server client
  */
 fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Packet) {
-  if (Main.isServer()) {
+  if (Main.isServer) {
     broadcast(ifIsServer())
-  } else if (Main.isServerClient()) {
+  } else if (Main.isServerClient) {
     val client = ClientMain.inst().serverClient ?: error("Server client null after check")
     client.ctx.writeAndFlush(client.ifIsClient())
   }

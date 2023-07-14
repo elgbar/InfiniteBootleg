@@ -20,7 +20,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.headless.HeadlessApplication
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration
 import io.mockk.mockk
-import no.elg.infiniteBootleg.ServerMain
+import no.elg.infiniteBootleg.main.ServerMain
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.Extension
 

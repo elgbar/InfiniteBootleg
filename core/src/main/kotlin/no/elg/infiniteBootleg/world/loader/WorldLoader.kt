@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world.loader
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id

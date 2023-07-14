@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.chunks
 
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld

@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.WorldScreen
 
 object GlobalInputListener : InputAdapter() {

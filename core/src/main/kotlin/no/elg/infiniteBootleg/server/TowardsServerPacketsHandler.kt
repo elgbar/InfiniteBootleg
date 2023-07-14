@@ -2,9 +2,9 @@ package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.ChannelHandlerContext
-import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.ServerMain
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY

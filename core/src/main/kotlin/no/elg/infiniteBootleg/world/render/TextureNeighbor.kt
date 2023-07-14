@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation

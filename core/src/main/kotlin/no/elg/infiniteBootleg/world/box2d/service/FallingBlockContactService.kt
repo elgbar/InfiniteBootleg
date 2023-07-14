@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem.getOtherFixtu
 object FallingBlockContactService {
 
   fun handleFallingBlockContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
-    if (Main.isAuthoritative()) {
+    if (Main.isAuthoritative) {
       val material = entity.materialOrNull ?: return
       val block = event.getOtherFixtureUserData<Block>(entity) { true } ?: return
       val newX: Int = block.worldX

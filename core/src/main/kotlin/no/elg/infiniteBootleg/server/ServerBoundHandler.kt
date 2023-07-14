@@ -6,8 +6,8 @@ import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
-import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.ServerMain
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import java.util.concurrent.ConcurrentHashMap
 

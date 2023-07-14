@@ -2,11 +2,11 @@ package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.PauseableThread
 import com.badlogic.gdx.utils.TimeUtils
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.api.ThreadType
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
 import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
+import no.elg.infiniteBootleg.main.Main
 
 /**
  * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default it will call it every [ ][.msDelayBetweenTicks].

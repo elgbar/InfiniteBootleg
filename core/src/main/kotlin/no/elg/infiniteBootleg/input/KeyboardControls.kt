@@ -5,10 +5,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.Vector2
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
-import no.elg.infiniteBootleg.MouseLocator
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.breakableBlock
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.dstd

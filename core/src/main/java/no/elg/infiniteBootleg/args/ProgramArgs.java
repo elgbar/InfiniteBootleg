@@ -9,9 +9,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import no.elg.infiniteBootleg.Main;
 import no.elg.infiniteBootleg.Settings;
 import no.elg.infiniteBootleg.console.ConsoleLogger;
+import no.elg.infiniteBootleg.main.Main;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import org.apache.commons.lang3.tuple.Pair;
@@ -92,7 +92,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         10,
         () -> {
           for (String cmd : val.split(";")) {
-            Main.inst().getConsole().execCommand(cmd);
+            Main.Companion.inst().getConsole().execCommand(cmd);
           }
         });
   }

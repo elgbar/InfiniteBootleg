@@ -16,7 +16,6 @@ import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
@@ -25,6 +24,7 @@ import no.elg.infiniteBootleg.events.api.EventManager.clear
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.oneShotListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder
@@ -163,7 +163,7 @@ abstract class World(
   @JvmField
   val chunksLock: ReadWriteLock = ReentrantReadWriteLock()
 
-  private var transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient()
+  private var transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient
 
   val tick get() = worldTicker.tickId
 
@@ -207,7 +207,7 @@ abstract class World(
     engine.addSystem(OutOfBoundsSystem)
     engine.addSystem(FallingBlockSystem)
     engine.addSystem(ExplosiveBlockSystem)
-    if (Main.isClient()) {
+    if (Main.isClient) {
       engine.addSystem(FollowEntitySystem)
     }
     ensureUniquenessListener(engine)
@@ -312,7 +312,7 @@ abstract class World(
         builder.addChunkColumns(chunkColumn.toProtobuf())
       }
     }
-    if (Main.isSingleplayer()) {
+    if (Main.isSingleplayer) {
       val entities = engine.getEntitiesFor(playerFamily)
       if (entities != null && entities.size() > 0) {
         builder.player = entities.first().save(true)

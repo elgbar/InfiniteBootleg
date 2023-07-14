@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.events.api
 
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import java.time.ZonedDateTime
 import java.util.concurrent.ConcurrentLinkedQueue
 

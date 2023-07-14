@@ -1,10 +1,10 @@
 package no.elg.infiniteBootleg.screens
 
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.api.Resizable
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hud.CurrentBlockHUDRenderer
 import no.elg.infiniteBootleg.screens.hud.DebugGraph
 import no.elg.infiniteBootleg.screens.hud.DebugGraph.render
@@ -30,7 +30,7 @@ class HUDRenderer : Renderer, Resizable {
   }
 
   override fun render() {
-    if (modus == DISPLAY_NOTHING || Main.isServer()) {
+    if (modus == DISPLAY_NOTHING || Main.isServer) {
       return
     }
     val main = ClientMain.inst()

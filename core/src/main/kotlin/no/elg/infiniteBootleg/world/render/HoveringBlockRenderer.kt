@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.breakableBlock
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2

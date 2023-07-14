@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import ktx.graphics.use
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Resizable
+import no.elg.infiniteBootleg.main.ClientMain
 
 class ScreenRenderer : Disposable, Resizable {
   private val spacing = FONT_SIZE * ClientMain.SCALE / 2

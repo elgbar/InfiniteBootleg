@@ -6,14 +6,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.server.broadcastToInView
@@ -230,14 +230,14 @@ class ChunkImpl(
     val worldX = getWorldX(localX)
     val worldY = getWorldY(localY)
     if (sendUpdatePacket && isValid && !bothAirish) {
-      if (Main.isServer()) {
+      if (Main.isServer) {
         Main.inst()
           .scheduler
           .executeAsync {
             val packet = clientBoundBlockUpdate(worldX, worldY, block)
             broadcastToInView(packet, worldX, worldY, null)
           }
-      } else if (Main.isServerClient()) {
+      } else if (Main.isServerClient) {
         Main.inst()
           .scheduler
           .executeAsync {

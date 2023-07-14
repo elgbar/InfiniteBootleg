@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.gdx.Gdx
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.input.ECSInputListener
 import no.elg.infiniteBootleg.input.WorldInputHandler
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.render.ClientWorldRender

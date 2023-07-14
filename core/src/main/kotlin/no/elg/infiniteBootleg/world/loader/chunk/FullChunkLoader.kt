@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.loader.chunk
 
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.stringifyCompactLoc

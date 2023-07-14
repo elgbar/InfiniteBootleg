@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.Family
 import ktx.ashley.allOf
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent

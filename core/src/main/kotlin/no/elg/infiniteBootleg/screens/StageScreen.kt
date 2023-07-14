@@ -10,9 +10,9 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.visTable
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -32,7 +32,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
     rootTable.init()
   }
 
-  init {
+  override fun create() {
     if (Main.inst().isNotTest) {
       if (Settings.stageDebug) {
         stage.isDebugAll = true

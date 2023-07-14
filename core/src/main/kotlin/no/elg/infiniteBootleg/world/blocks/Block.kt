@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.HUDDebuggable
 import no.elg.infiniteBootleg.api.Savable
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.compactLoc

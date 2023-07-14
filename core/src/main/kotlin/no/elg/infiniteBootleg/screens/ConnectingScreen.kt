@@ -6,8 +6,8 @@ import io.netty.channel.Channel
 import ktx.scene2d.actor
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.fatal
 import java.util.concurrent.ScheduledFuture
 
@@ -57,7 +57,8 @@ object ConnectingScreen : StageScreen() {
     livelinessTest = null
   }
 
-  init {
+  override fun create() {
+    super.create()
     if (Main.inst().isNotTest) {
       rootTable {
         visTable(defaultSpacing = true) {

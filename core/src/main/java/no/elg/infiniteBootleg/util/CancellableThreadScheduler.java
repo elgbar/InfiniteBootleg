@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.main.Main;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,7 +85,7 @@ public class CancellableThreadScheduler {
       try {
         runnable.run();
       } catch (Exception e) {
-        Main.logger().log("SCHEDULER", "Exception caught on secondary thread", e);
+        Main.Companion.logger().log("SCHEDULER", "Exception caught on secondary thread", e);
       }
     };
   }

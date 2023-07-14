@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.loader.chunk
 
 import com.badlogic.gdx.files.FileHandle
 import com.google.protobuf.InvalidProtocolBufferException
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk

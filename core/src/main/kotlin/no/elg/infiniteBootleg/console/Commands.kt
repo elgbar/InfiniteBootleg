@@ -9,12 +9,12 @@ import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.input.KeyboardControls
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
 import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.MainMenuScreen

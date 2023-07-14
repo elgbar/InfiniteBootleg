@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.hasNot
 import ktx.ashley.remove
 import ktx.collections.gdxSetOf
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block

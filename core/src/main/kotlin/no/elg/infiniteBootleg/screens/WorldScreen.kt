@@ -7,13 +7,13 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visWindow
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.INITIAL_INTERACT_RADIUS
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.stage.floatSpinner
 import no.elg.infiniteBootleg.screens.stage.toggleableDebugButton
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
@@ -29,7 +29,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
 
   private var worldFinishedLoading = false
 
-  private val debugMenu: VisWindow
+  private lateinit var debugMenu: VisWindow
 
   override fun render(delta: Float) {
     if (worldFinishedLoading) {
@@ -76,7 +76,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
 
   override fun dispose() {
     super.dispose()
-    if (Main.isSingleplayer()) {
+    if (Main.isSingleplayer) {
       world.save()
     }
     ClientMain.inst().updateStatus(null)
@@ -89,7 +89,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     debugMenu.toggleShown(stage, true)
   }
 
-  init {
+  override fun create() {
+    super.create()
     stage.actors {
       debugMenu = visWindow("Debug Menu") {
         hide()

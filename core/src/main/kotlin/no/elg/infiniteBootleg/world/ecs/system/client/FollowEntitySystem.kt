@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world.ecs.system.client
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent

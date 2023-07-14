@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.events.api
 
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 
 open class AsyncEvent(vararg expectedThreadType: ThreadType) : Event {
 

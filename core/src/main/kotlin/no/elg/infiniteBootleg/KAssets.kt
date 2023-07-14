@@ -24,7 +24,9 @@ import ktx.style.visImageTextButton
 import ktx.style.visTextButton
 import ktx.style.visTextField
 import ktx.style.window
-import no.elg.infiniteBootleg.ClientMain.SCALE
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.ClientMain.Companion.SCALE
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Material
@@ -67,7 +69,7 @@ object KAssets {
     generator.generateFont(parameter)
   }
 
-  fun load() {
+  fun loadAssets() {
     textureAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
 
     breakingBlockTexture = textureAtlas.findRegion("breaking_block").disallowedRotation()

@@ -10,11 +10,11 @@ import com.kotcrab.vis.ui.VisUI
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole
 import no.elg.infiniteBootleg.console.consoles.StdConsole
+import no.elg.infiniteBootleg.main.ClientMain
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -72,7 +72,7 @@ class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolea
     val methods: Array<Method> = ClassReflection.getMethods(exec.javaClass)
     val potentialMethods = methods.asSequence()
       .filter { method: Method -> HelpfulConsoleHelpUtil.allowedToExecute(method) && method.name.startsWith(command, ignoreCase = true) }
-      .map { method: Method? -> HelpfulConsoleHelpUtil.generateCommandSignature(method) }
+      .map { method: Method -> HelpfulConsoleHelpUtil.generateCommandSignature(method) }
       .toList()
 
     val possible = IntArray(false, 8)

@@ -7,19 +7,28 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 
 /** @author Elg */
-abstract class AbstractScreen(val yDown: Boolean = true) : ScreenAdapter() {
+abstract class AbstractScreen(private val yDown: Boolean = true) : ScreenAdapter() {
 
   val batch: SpriteBatch by lazy { SpriteBatch() }
-  protected val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
+  private val lineRenderer: ShapeRenderer by lazy { ShapeRenderer() }
 
-  var isDisposed = false
-    private set
+  private var isDisposed = false
+  private var hasBeenShown = false
 
   val camera: OrthographicCamera by lazy {
     OrthographicCamera().apply { setToOrtho(yDown) }
   }
 
   abstract override fun render(delta: Float)
+
+  abstract fun create()
+
+  fun tryCreate() {
+    if (!hasBeenShown) {
+      create()
+      hasBeenShown = true
+    }
+  }
 
   fun updateCamera() {
     camera.update()

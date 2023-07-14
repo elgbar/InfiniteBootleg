@@ -14,10 +14,10 @@ import ktx.ashley.entity
 import ktx.ashley.plusAssign
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.items.Item
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.livingOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
@@ -281,7 +281,7 @@ fun Engine.createMPServerPlayerEntity(
   killableComponent: KillableComponent?
 ): CompletableFuture<Entity> {
   val completableFuture = CompletableFuture<Entity>()
-  if (Main.isServer()) {
+  if (Main.isServer) {
     entity {
       with(SharedInformationComponent(sharedInformation))
       addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES) {
@@ -306,7 +306,7 @@ fun Engine.createMPClientPlayerEntity(
   killableComponent: KillableComponent?
 ): CompletableFuture<Entity> {
   val completableFuture = CompletableFuture<Entity>()
-//  if (Main.isServerClient()) {
+//  if (Main.isServerClient) {
   entity {
     addCommonClientPlayerComponents(world, controlled)
     addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES) {
@@ -330,7 +330,7 @@ fun Engine.createSPPlayerEntity(
   id: String? = null
 ): CompletableFuture<Entity> {
   val completableFuture = CompletableFuture<Entity>()
-  if (Main.isSingleplayer()) {
+  if (Main.isSingleplayer) {
     entity {
       addCommonClientPlayerComponents(world, true)
       addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES) {

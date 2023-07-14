@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.screens.hud
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
-import no.elg.infiniteBootleg.ClientMain
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.fastIntFormat

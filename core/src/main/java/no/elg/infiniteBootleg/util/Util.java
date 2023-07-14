@@ -15,8 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import no.elg.infiniteBootleg.ClientMain;
-import no.elg.infiniteBootleg.Main;
+import no.elg.infiniteBootleg.main.ClientMain;
+import no.elg.infiniteBootleg.main.Main;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -173,7 +173,7 @@ public class Util {
 
     for (String arg : args) {
       if (!arg.startsWith("-")) {
-        Main.logger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
+        Main.Companion.logger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
       } else {
         // we only care about the first equals sign, the rest is a part of the value
         int equal = arg.indexOf('=');
@@ -219,7 +219,7 @@ public class Util {
       savedHash = FALLBACK_VERSION;
     }
     if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
-      Main.logger().log(LogLevel.ERROR, "Failed to get the current version");
+      Main.Companion.logger().log(LogLevel.ERROR, "Failed to get the current version");
       return FALLBACK_VERSION;
     }
     if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
@@ -227,7 +227,7 @@ public class Util {
       try {
         versionFile.writeString(calcHash, false);
       } catch (Exception ignore) {
-        Main.logger().log(LogLevel.ERROR, "Failed to write new version to file");
+        Main.Companion.logger().log(LogLevel.ERROR, "Failed to write new version to file");
       }
     }
     return calcHash.equals(FALLBACK_VERSION) ? savedHash : calcHash;

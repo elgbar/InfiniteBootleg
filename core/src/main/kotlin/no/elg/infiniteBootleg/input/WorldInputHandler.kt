@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.utils.Disposable
-import no.elg.infiniteBootleg.ClientMain
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem.SCROLL_SPEED
@@ -20,7 +20,7 @@ import no.elg.infiniteBootleg.world.world.ClientWorld
 class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapter(), Disposable {
 
   override fun keyDown(keycode: Int): Boolean {
-    if (ClientMain.inst().shouldIgnoreWorldInput() || (Main.isMultiplayer() && keycode != Input.Keys.F3)) {
+    if (ClientMain.inst().shouldIgnoreWorldInput() || (Main.isMultiplayer && keycode != Input.Keys.F3)) {
       return false
     }
     when (keycode) {

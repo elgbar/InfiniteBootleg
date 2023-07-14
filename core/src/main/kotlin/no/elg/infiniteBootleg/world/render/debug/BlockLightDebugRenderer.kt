@@ -1,11 +1,11 @@
 package no.elg.infiniteBootleg.world.render.debug
 
 import com.badlogic.gdx.graphics.g2d.Batch
-import no.elg.infiniteBootleg.ClientMain
 import no.elg.infiniteBootleg.KAssets.luminanceDebugTexture
 import no.elg.infiniteBootleg.KAssets.skylightDebugTexture
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX

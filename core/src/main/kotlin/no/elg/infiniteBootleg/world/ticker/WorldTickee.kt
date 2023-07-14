@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world.ticker
 import com.badlogic.gdx.utils.LongMap
 import ktx.collections.GdxArray
 import ktx.collections.plusAssign
-import no.elg.infiniteBootleg.Main
 import no.elg.infiniteBootleg.api.Ticking
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy

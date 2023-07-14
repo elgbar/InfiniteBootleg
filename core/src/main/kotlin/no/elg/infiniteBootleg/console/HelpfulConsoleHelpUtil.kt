@@ -8,7 +8,7 @@ import com.strongjoshua.console.Console
 import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
-import no.elg.infiniteBootleg.Main
+import no.elg.infiniteBootleg.main.Main
 
 object HelpfulConsoleHelpUtil {
 
@@ -58,7 +58,7 @@ object HelpfulConsoleHelpUtil {
     }
   }
 
-  fun allowedToExecute(method: Method): Boolean = !Main.isServer() || !method.isAnnotationPresent(ClientsideOnly::class.java)
+  fun allowedToExecute(method: Method): Boolean = !Main.isServer || !method.isAnnotationPresent(ClientsideOnly::class.java)
 
   private fun StringBuilder.appendCmdSignature(method: Method): StringBuilder {
     val params = method.parameterTypes
