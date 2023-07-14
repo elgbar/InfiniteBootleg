@@ -40,21 +40,6 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
     val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
     val offset = Chunk.CHUNK_SIZE * Block.BLOCK_SIZE
 
-    if (Settings.renderChunkBounds) {
-      lr.use(ShapeRenderer.ShapeType.Line, camera.combined) {
-        for (y in chunksInView.verticalStart until yEnd) {
-          for (x in chunksInView.horizontalStart until xEnd) {
-            val canNotSeeChunk = y == (chunksInView.verticalEnd - 1) || x == chunksInView.horizontalStart || x == (chunksInView.horizontalEnd - 1)
-            lr.color = if (canNotSeeChunk) {
-              OUTSIDE_CAMERA_COLOR
-            } else {
-              WITHIN_CAMERA_COLOR
-            }
-            lr.rect(x * offset + 0.5f + worldOffsetX, y * offset + 0.5f + worldOffsetY, offset - 1f, offset - 1f)
-          }
-        }
-      }
-    }
     if (Settings.renderChunkUpdates) {
       lr.color = FLASH_COLOR
       Gdx.gl.glEnable(GL30.GL_BLEND)
@@ -73,15 +58,30 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
         }
       }
     }
-    val sr = ClientMain.inst().screenRenderer
-    sr.batch.use {
-      sr.drawBottom("Debug Chunk outline legend", 5f)
-      sr.font.color = WITHIN_CAMERA_COLOR
-      sr.drawBottom("  Chunks within the camera boarders", 3f)
-      sr.font.color = OUTSIDE_CAMERA_COLOR
-      sr.drawBottom("  Chunks outside camera boarders, only physics active", 1f)
+    if (Settings.renderChunkBounds) {
+      lr.use(ShapeRenderer.ShapeType.Line, camera.combined) {
+        for (y in chunksInView.verticalStart until yEnd) {
+          for (x in chunksInView.horizontalStart until xEnd) {
+            val canNotSeeChunk = y == (chunksInView.verticalEnd - 1) || x == chunksInView.horizontalStart || x == (chunksInView.horizontalEnd - 1)
+            lr.color = if (canNotSeeChunk) {
+              OUTSIDE_CAMERA_COLOR
+            } else {
+              WITHIN_CAMERA_COLOR
+            }
+            lr.rect(x * offset + 0.5f + worldOffsetX, y * offset + 0.5f + worldOffsetY, offset - 1f, offset - 1f)
+          }
+        }
+      }
+      val sr = ClientMain.inst().screenRenderer
+      sr.batch.use {
+        sr.drawBottom("Debug Chunk outline legend", 5f)
+        sr.font.color = WITHIN_CAMERA_COLOR
+        sr.drawBottom("  Chunks within the camera boarders", 3f)
+        sr.font.color = OUTSIDE_CAMERA_COLOR
+        sr.drawBottom("  Chunks outside camera boarders, only physics active", 1f)
+      }
+      sr.resetFontColor()
     }
-    sr.resetFontColor()
   }
 
   override fun dispose() {
