@@ -50,8 +50,6 @@ import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -628,10 +626,6 @@ abstract class World(
     for (chunk in blockChunks) {
       chunk.updateTexture(prioritize)
     }
-    // only update once all the correct blocks have been removed
-    for (block in blocks) {
-      updateBlocksAround(block.worldX, block.worldY)
-    }
   }
 
   fun getEntities(worldX: Float, worldY: Float): Array<Entity> {
@@ -655,27 +649,6 @@ abstract class World(
       }
     }
     return foundEntities
-  }
-
-  /**
-   * Update blocks around the given location
-   *
-   * @param worldX The x coordinate from world view
-   * @param worldY The y coordinate from world view
-   */
-  fun updateBlocksAround(worldX: Int, worldY: Int) {
-    val blocksAABB = getBlocksAABBFromCenter(
-      centerWorldX = worldX + HALF_BLOCK_SIZE,
-      centerWorldY = worldY + HALF_BLOCK_SIZE,
-      width = 1f,
-      height = 1f,
-      raw = true,
-      loadChunk = false,
-      includeAir = false
-    )
-    for (block in blocksAABB) {
-      (block as? TickingBlock)?.enableTick()
-    }
   }
 
   /**

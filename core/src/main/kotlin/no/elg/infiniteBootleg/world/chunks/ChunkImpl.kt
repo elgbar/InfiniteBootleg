@@ -249,9 +249,6 @@ class ChunkImpl(
           }
       }
     }
-    if (updateTexture) {
-      Main.inst().scheduler.executeAsync { world.updateBlocksAround(worldX, worldY) }
-    }
     return block
   }
 
