@@ -22,17 +22,13 @@ class EntityMarkerBlock(
   override val entity: Entity
 ) : Block {
 
-  private var removeEntityListener: EntityListener? = null
+  private var removeEntityListener: EntityListener? = EntityRemoveListener { if (it === entity) removeEntityMarker() }
 
   init {
-    val world = Main.inst().world ?: throw IllegalStateException("World is null")
-    world.postBox2dRunnable {
-      removeEntityListener = EntityRemoveListener { if (it === entity) remove() }
-      world.engine.addEntityListener(removeEntityListener)
-    }
+    world.engine.addEntityListener(removeEntityListener)
   }
 
-  fun remove() {
+  fun removeEntityMarker() {
     remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
   }
 
@@ -44,8 +40,8 @@ class EntityMarkerBlock(
   override fun dispose() {
     isDisposed = true
 
-    Main.inst().world?.postBox2dRunnable {
-      Main.inst().world?.engine?.removeEntityListener(removeEntityListener)
+    world.postBox2dRunnable {
+      world.engine.removeEntityListener(removeEntityListener)
     }
     removeEntityListener = null
   }

@@ -27,7 +27,7 @@ object UpdateGridBlockSystem : IteratingSystem(fallingBlockFamily, UPDATE_PRIORI
     val halfBox2dHeight = entity.box2d.halfBox2dHeight
 
     val currentOccupations = world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true)
-    entity.occupyingLocations.filter { it !in currentOccupations }.forEach(EntityMarkerBlock::remove)
+    entity.occupyingLocations.filter { it !in currentOccupations }.forEach(EntityMarkerBlock::removeEntityMarker)
     entity.occupyingLocations.removeAll { it !in currentOccupations }
 
     for (currentOccupation in currentOccupations) {
