@@ -2,22 +2,24 @@ package no.elg.infiniteBootleg.world.ecs.system.block
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import ktx.ashley.remove
 import no.elg.infiniteBootleg.util.worldCompactToChunk
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
-import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LATE
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.isAffectedByGravity
 import no.elg.infiniteBootleg.world.ecs.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
 
-object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_DEFAULT) {
+/**
+ * About the priority: We want this to run after the [UpdateGridBlockSystem] so that the block is properly removed
+ */
+object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_LATE) {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val material = entity.materialOrNull ?: return
     val world = entity.world
@@ -26,7 +28,7 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
 
     if (world.isChunkLoaded(locBelow.worldCompactToChunk()) && world.isAirBlock(locBelow)) {
       val block = world.getRawBlock(pos.blockX, pos.blockY, false) ?: return
-      entity.remove<GravityAffectedTag>() // Prevent the block to fall multiple times
+      entity.isAffectedByGravity = false // Prevent the block to fall multiple times
       block.remove()
       world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material)
     }
