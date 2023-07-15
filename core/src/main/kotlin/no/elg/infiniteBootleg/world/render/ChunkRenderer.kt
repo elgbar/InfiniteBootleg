@@ -20,7 +20,7 @@ import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_R
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
-import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -63,11 +63,10 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
    *
    * @param chunk The chunk to render
    * @param prioritize If the chunk should be placed at the front of the queue
-   * @param forceAdd If the chunk should be rendered even if it is already in queue or is currently
    * being rendered
    */
   @JvmOverloads
-  fun queueRendering(chunk: Chunk, prioritize: Boolean, forceAdd: Boolean = false) {
+  fun queueRendering(chunk: Chunk, prioritize: Boolean) {
     Main.inst().scheduler.executeAsync {
       synchronized(QUEUE_LOCK) {
         val chunkIndex = renderQueue.indexOf(chunk)
@@ -142,14 +141,11 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           for (localY in 0 until Chunk.CHUNK_SIZE) {
             val block = blocks[localX][localY]
             val material = block.materialOrAir()
-            if (material.isEntity) {
-              continue
-            }
             var texture: RotatableTextureRegion
             var secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunkToWorld(chunk.chunkY, localY)
-            if (material === Material.AIR || block == null) {
+            if (block.isAir()) {
               texture = if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
               secondaryTexture = null
             } else {
