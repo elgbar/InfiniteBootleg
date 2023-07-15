@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.isAir
+import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -65,7 +66,6 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
    * @param prioritize If the chunk should be placed at the front of the queue
    * being rendered
    */
-  @JvmOverloads
   fun queueRendering(chunk: Chunk, prioritize: Boolean) {
     Main.inst().scheduler.executeAsync {
       synchronized(QUEUE_LOCK) {
@@ -145,11 +145,11 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
             var secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunkToWorld(chunk.chunkY, localY)
-            if (block.isAir()) {
+            if (block.isAir() && !(Settings.debugEntityMarkerBlocks && block.isMarkerBlock())) {
               texture = if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
               secondaryTexture = null
             } else {
-              texture = block.texture ?: continue
+              texture = block?.texture ?: continue
               secondaryTexture = if (material.hasTransparentTexture) {
                 if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
               } else {
