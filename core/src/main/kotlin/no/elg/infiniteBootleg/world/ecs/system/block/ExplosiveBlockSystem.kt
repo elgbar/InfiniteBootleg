@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.components.block.ExplosiveComponent.Comp
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
+import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.abs
 
 object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIORITY_DEFAULT) {
@@ -28,16 +29,17 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
     explosiveComponent.fuse -= deltaTime
     if (explosiveComponent.fuse <= 0) {
       entity.remove<ExplosiveComponent>()
-      Main.inst().scheduler.executeAsync { explosiveComponent.explode(entity) }
+
+      val positionComponent = entity.positionComponent
+      val worldX = positionComponent.blockX
+      val worldY = positionComponent.blockY
+      val world = entity.world
+      Main.inst().scheduler.executeAsync { explosiveComponent.explode(world, worldX, worldY) }
     }
   }
 
-  private fun ExplosiveComponent.explode(entity: Entity) {
+  private fun ExplosiveComponent.explode(world: World, worldX: Int, worldY: Int) {
     val destroyed = gdxSetOf<Block>()
-    val positionComponent = entity.positionComponent
-    val worldX = positionComponent.blockX
-    val worldY = positionComponent.blockY
-    val world = entity.world
     var x = MathUtils.floor(worldX - strength)
     while (x < worldX + strength) {
       var y = MathUtils.floor(worldY - strength)
