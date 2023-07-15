@@ -23,7 +23,7 @@ import java.util.EnumMap
  *
  * @author Elg
  */
-open class BlockImpl(
+class BlockImpl(
   override val world: World,
   override val chunk: Chunk,
   override val localX: Int,
@@ -31,9 +31,9 @@ open class BlockImpl(
   override val material: Material,
   override val entity: Entity? = null
 ) : Block {
-  private var disposed = false
 
-  final override val isDisposed: Boolean get() = disposed
+  override var isDisposed: Boolean = false
+    private set
 
   override fun save(): ProtoWorld.Block.Builder {
     return save(material)
@@ -57,7 +57,7 @@ open class BlockImpl(
     if (isDisposed) {
       Main.logger().warn("Disposed block ${this::class.simpleName} ($worldX, $worldY) twice")
     }
-    disposed = true
+    isDisposed = true
     entity?.also {
       if (!it.isScheduledForRemoval) {
         world.engine.removeEntity(it)

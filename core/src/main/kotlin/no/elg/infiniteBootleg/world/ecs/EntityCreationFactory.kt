@@ -48,7 +48,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
-import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.isAffectedByGravity
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.world.ServerWorld
@@ -471,5 +471,5 @@ fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY
 
 fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
-    with<GravityAffectedTag>()
+    this.entity.isAffectedByGravity = true
   }

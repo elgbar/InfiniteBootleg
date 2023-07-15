@@ -204,9 +204,7 @@ class ChunkImpl(
         block?.dispose()
         return currBlock
       }
-      if (currBlock != null) {
-        currBlock.dispose()
-      }
+      currBlock?.dispose()
       blocks[localX][localY] = block
       if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
         updateBlockLights(localX, localY, true)
@@ -231,22 +229,18 @@ class ChunkImpl(
     val worldY = getWorldY(localY)
     if (sendUpdatePacket && isValid && !bothAirish) {
       if (Main.isServer) {
-        Main.inst()
-          .scheduler
-          .executeAsync {
-            val packet = clientBoundBlockUpdate(worldX, worldY, block)
-            broadcastToInView(packet, worldX, worldY, null)
-          }
+        Main.inst().scheduler.executeAsync {
+          val packet = clientBoundBlockUpdate(worldX, worldY, block)
+          broadcastToInView(packet, worldX, worldY, null)
+        }
       } else if (Main.isServerClient) {
-        Main.inst()
-          .scheduler
-          .executeAsync {
-            val client = ClientMain.inst().serverClient
-            if (client != null) {
-              val packet = client.serverBoundBlockUpdate(worldX, worldY, block)
-              client.ctx.writeAndFlush(packet)
-            }
+        Main.inst().scheduler.executeAsync {
+          val client = ClientMain.inst().serverClient
+          if (client != null) {
+            val packet = client.serverBoundBlockUpdate(worldX, worldY, block)
+            client.ctx.writeAndFlush(packet)
           }
+        }
       }
     }
     return block

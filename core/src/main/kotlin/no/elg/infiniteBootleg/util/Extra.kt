@@ -73,13 +73,15 @@ fun Int.stringSize(): Int {
 
 fun Block?.isAir(): Boolean {
   contract { returns(false) implies (this@isAir != null) }
-  return this == null || this is EntityMarkerBlock || this.material == Material.AIR
+  return this == null || this.isMarkerBlock() || this.material == Material.AIR
 }
 
 fun Block?.isNotAir(): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
   return !this.isAir()
 }
+
+fun Block?.isMarkerBlock(): Boolean = this is EntityMarkerBlock
 
 /**
  * Do an action on a disposable respire then call [Disposable.dispose] on the resource.

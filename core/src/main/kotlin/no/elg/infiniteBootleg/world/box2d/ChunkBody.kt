@@ -10,10 +10,10 @@ import no.elg.infiniteBootleg.api.Updatable
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isAir
+import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
-import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
@@ -67,9 +67,6 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   /**
    * Update the box2d fixture of this chunk
-   *
-   * @param recalculateNeighbors
-   * If the neighbors also should be updated
    */
   override fun update() {
     chunk.world.worldBody.updateChunk(this)
@@ -156,18 +153,17 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
             localY + 0f
           )
         )
-        val newFix = body.createFixture(chainShape, 0f)
-        fixtureMap.put(compactLoc, newFix)
-
-        chainShape.dispose()
-        newFix
+        body.createFixture(chainShape, 0f).also {
+          fixtureMap.put(compactLoc, it)
+          chainShape.dispose()
+        }
       }
 
       val material = block.material
       fixture.userData = block
 //      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
       fixture.filterData = when {
-        block is EntityMarkerBlock -> Filters.NON_INTERACTIVE__GROUND_FILTER
+        block.isMarkerBlock() -> Filters.NON_INTERACTIVE__GROUND_FILTER
         material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
         else -> Filters.GR_FB__GROUND_FILTER
       }

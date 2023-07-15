@@ -35,7 +35,7 @@ object UpdateGridBlockSystem : IteratingSystem(fallingStandaloneBlockFamily, UPD
         val block = EntityMarkerBlock.fromOtherBlock(currentOccupation, entity).let { block ->
           world.setBlock(currentOccupation.worldX, currentOccupation.worldY, block, updateTexture = true)
         } ?: continue
-        entity.occupyingLocations += block as EntityMarkerBlock
+        entity.occupyingLocations += block as? EntityMarkerBlock ?: error("Failed to set marker block at ${block.worldX}, ${block.worldY} was given a ${block::class}")
       }
     }
   }
