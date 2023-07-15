@@ -199,7 +199,7 @@ class ChunkImpl(
       }
       // accounts for both being null also ofc
       bothAirish = areBothAirish(currBlock, block)
-      if (bothAirish && currBlock != null) {
+      if (bothAirish && currBlock != null && (block == null || block::class == currBlock::class)) {
         // Ok to return here, an air block exists here and the new block is also air (or null)
         block?.dispose()
         return currBlock
