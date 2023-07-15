@@ -1,20 +1,17 @@
-package no.elg.infiniteBootleg.world.ecs
+package no.elg.infiniteBootleg.world.ecs.creation
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.ashley.EngineEntity
 import ktx.ashley.entity
-import ktx.ashley.plusAssign
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
@@ -25,30 +22,32 @@ import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.box2d.Filters
-import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
-import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.SharedInformationComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
-import no.elg.infiniteBootleg.world.ecs.components.block.ChunkComponent
-import no.elg.infiniteBootleg.world.ecs.components.block.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
-import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.isAffectedByGravity
+import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
+import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
+import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
+import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
+import no.elg.infiniteBootleg.world.ecs.followEntityFamily
+import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
+import no.elg.infiniteBootleg.world.ecs.playerFamily
+import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.world.ServerWorld
@@ -59,23 +58,19 @@ import java.util.concurrent.CompletableFuture
 
 const val PLAYER_WIDTH = 2f - 0.2f
 const val PLAYER_HEIGHT = 4f - 0.2f
-
 const val PLAYERS_FOOT_USER_DATA = "A bloody foot!"
 const val PLAYERS_RIGHT_ARM_USER_DATA = "Righty"
 const val PLAYERS_LEFT_ARM_USER_DATA = "Left hand"
-const val ESSENTIALLY_ZERO = 0.001f
 
 val COMMON_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   playerFamily to "playerFamily",
   basicDynamicEntityFamily to "basicDynamicEntityFamily"
 )
-
 val CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   *COMMON_PLAYER_FAMILIES,
   drawableEntitiesFamily to "drawableEntitiesFamily",
   entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
 )
-
 val CONTROLLED_CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   *CLIENT_PLAYER_FAMILIES,
   drawableEntitiesFamily to "drawableEntitiesFamily",
@@ -85,52 +80,6 @@ val CONTROLLED_CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
   controlledEntityWithInputEventFamily to "controlledEntityWithInputEventFamily"
 )
-
-private fun createBody2DBodyComponent(
-  entity: Entity,
-  world: World,
-  worldX: Float,
-  worldY: Float,
-  dx: Float,
-  dy: Float,
-  width: Float,
-  height: Float,
-  wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
-  bodyType: BodyDef.BodyType = BodyDef.BodyType.DynamicBody,
-  afterBodyCreated: (Entity) -> Unit = {},
-  createBody: (Body) -> Unit
-) {
-  val bodyDef = BodyDef()
-  bodyDef.type = bodyType
-  bodyDef.position.set(worldX, worldY)
-  bodyDef.linearVelocity.set(dx, dy)
-  bodyDef.linearDamping = 0.5f
-  bodyDef.fixedRotation = true
-
-  world.worldBody.createBody(bodyDef) {
-    it.gravityScale = Constants.DEFAULT_GRAVITY_SCALE
-    it.userData = entity
-
-    createBody(it)
-    entity += Box2DBodyComponent(it, width, height)
-    if (Settings.debug) {
-      check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
-      checkFamilies(entity, wantedFamilies)
-      Main.logger().log("Finishing setting up box2d entity")
-    }
-    afterBodyCreated(entity)
-  }
-}
-
-private fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, String>>) {
-  check(basicRequiredEntityFamily.matches(entity)) { "Finished entity does not match the required entity family" }
-  wantedFamilies.forEach { (family: Family, errorStr) ->
-    check(family.matches(entity)) {
-      val currComponents = entity.components.map { c -> c::class.simpleName }
-      "Finished entity does not match $errorStr, current components: $currComponents"
-    }
-  }
-}
 
 private fun createPlayerFixture(body: Body) {
   val shape = PolygonShape()
@@ -166,7 +115,7 @@ private fun createPlayerFixture(body: Body) {
 
 private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float, height: Float, rx: Float = 0f, ry: Float = 0f) {
   val shape = PolygonShape()
-  shape.setAsBox(width, height, Vector2(rx, ry), 0f)
+  shape.setAsBox(width.coerceAtLeast(ESSENTIALLY_ZERO), height.coerceAtLeast(ESSENTIALLY_ZERO), Vector2(rx, ry), 0f)
 
   val def = FixtureDef().apply {
     this.shape = shape
@@ -342,147 +291,3 @@ fun Engine.createSPPlayerEntity(
   }
   return completableFuture
 }
-
-fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoWorld.Entity) {
-  val material = Material.fromOrdinal(fallingBlock.material.materialOrdinal)
-  createFallingBlockStandaloneEntity(
-    world,
-    fallingBlock.position.x,
-    fallingBlock.position.y,
-    fallingBlock.velocity.x,
-    fallingBlock.velocity.y,
-    material,
-    fallingBlock.uuid
-  )
-}
-
-fun Engine.createFallingBlockStandaloneEntity(
-  world: World,
-  worldX: Float,
-  worldY: Float,
-  dx: Float,
-  dy: Float,
-  material: Material,
-  id: String? = null,
-  onReady: (Entity) -> Unit = {}
-) {
-  entity {
-    with(WorldComponent(world))
-    with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
-    with(PositionComponent(worldX, worldY))
-
-    // BASIC_DYNAMIC_ENTITY_ARRAY
-    with(VelocityComponent(dx, dy))
-
-    with(TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")))
-
-    // This entity will handle input events
-    with<PhysicsEventQueue>()
-    with(MaterialComponent(material))
-    with<OccupyingBlocksComponent>()
-
-    val bodyDef = BodyDef()
-    bodyDef.type = BodyDef.BodyType.DynamicBody
-    bodyDef.position.set(worldX, worldY)
-    bodyDef.linearVelocity.set(dx, dy)
-    bodyDef.linearDamping = 0.5f
-    bodyDef.fixedRotation = true
-
-    createBody2DBodyComponent(
-      entity, world, worldX, worldY, dx, dy, 1f, 1f,
-      arrayOf(
-        basicDynamicEntityFamily to "basicDynamicEntityFamily",
-        drawableEntitiesFamily to "drawableEntitiesFamily",
-        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
-      )
-    ) {
-      val shape = PolygonShape()
-      shape.setAsBox(0.45f, 0.45f)
-
-      val def = FixtureDef()
-      def.shape = shape
-      def.density = Constants.DEFAULT_FIXTURE_DENSITY
-      def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-      def.restitution = 0f
-//      it.gravityScale = 0.01f
-
-      val fix: Fixture = it.createFixture(def)
-      fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
-      fix.userData = it.userData
-      shape.dispose()
-      onReady(this.entity)
-    }
-  }
-}
-
-/**
- * Baseline static entities which have some system attached
- */
-fun Engine.createBlockEntity(
-  world: World,
-  chunk: Chunk,
-  worldX: Int,
-  worldY: Int,
-  material: Material,
-  wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
-  additionalConfiguration: EngineEntity.() -> Unit = {}
-) = entity {
-  with(WorldComponent(world))
-  with(IdComponent.createRandomId())
-  with(PositionComponent(worldX.toFloat(), worldY.toFloat()))
-  with(ChunkComponent(chunk))
-  with(MaterialComponent(material))
-  additionalConfiguration()
-  checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
-}
-
-fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
-  createBlockEntity(world, chunk, worldX, worldY, material) {
-    with(TextureRegionComponent(KAssets.doorClosedTexture))
-    // This entity will handle input events
-    with<DoorComponent>()
-    with<PhysicsEventQueue>()
-    with<OccupyingBlocksComponent>()
-
-    val width = 2f
-    val height = 4f
-
-    createBody2DBodyComponent(
-      entity,
-      world,
-      worldX.toFloat(),
-      worldY.toFloat(),
-      0f,
-      0f,
-      width,
-      height,
-      arrayOf(
-        drawableEntitiesFamily to "drawableEntitiesFamily",
-        blockEntityFamily to "blockEntityFamily",
-        doorEntityFamily to "doorEntityFamily",
-        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
-      ),
-      BodyDef.BodyType.StaticBody
-    ) {
-      val shape = PolygonShape()
-      shape.setAsBox(width / 2, height / 2)
-
-      val def = FixtureDef()
-      def.shape = shape
-      def.density = Constants.DEFAULT_FIXTURE_DENSITY
-      def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-      def.restitution = 0f
-
-      val fix: Fixture = it.createFixture(def)
-      fix.filterData = Filters.EN__GROUND_FILTER
-      fix.userData = it.userData
-      fix.isSensor = true
-
-      shape.dispose()
-    }
-  }
-
-fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
-  createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
-    this.entity.isAffectedByGravity = true
-  }

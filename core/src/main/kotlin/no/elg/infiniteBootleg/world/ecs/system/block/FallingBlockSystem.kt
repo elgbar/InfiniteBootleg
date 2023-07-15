@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.world.ecs.components.block.OccupyingBlocksComponen
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.isAffectedByGravity
-import no.elg.infiniteBootleg.world.ecs.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
+import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 
 /**
  * About the priority: We want this to run after the [UpdateGridBlockSystem] so that the block is properly removed

@@ -41,8 +41,8 @@ import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
-import no.elg.infiniteBootleg.world.ecs.createFallingBlockStandaloneEntity
-import no.elg.infiniteBootleg.world.ecs.createMPClientPlayerEntity
+import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
+import no.elg.infiniteBootleg.world.ecs.creation.createMPClientPlayerEntity
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.util.concurrent.CompletableFuture

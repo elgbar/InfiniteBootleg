@@ -6,9 +6,9 @@ import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.world.box2d.LongContactTracker
-import no.elg.infiniteBootleg.world.ecs.PLAYERS_FOOT_USER_DATA
-import no.elg.infiniteBootleg.world.ecs.PLAYERS_LEFT_ARM_USER_DATA
-import no.elg.infiniteBootleg.world.ecs.PLAYERS_RIGHT_ARM_USER_DATA
+import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_FOOT_USER_DATA
+import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_LEFT_ARM_USER_DATA
+import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_RIGHT_ARM_USER_DATA
 
 class GroundedComponent : Component {
 
