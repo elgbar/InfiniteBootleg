@@ -79,7 +79,6 @@ enum class Material(
   ),
   GLASS(hardness = 0.1f, hasTransparentTexture = true, blocksLight = false),
   DOOR(
-    itemType = ItemType.BLOCK,
     hardness = 1f,
     hasTransparentTexture = true,
     isCollidable = false,

@@ -356,49 +356,62 @@ fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoW
   )
 }
 
-fun Engine.createFallingBlockStandaloneEntity(world: World, worldX: Float, worldY: Float, dx: Float, dy: Float, material: Material, id: String? = null) = entity {
-  with(WorldComponent(world))
-  with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
-  with(PositionComponent(worldX, worldY))
+fun Engine.createFallingBlockStandaloneEntity(
+  world: World,
+  worldX: Float,
+  worldY: Float,
+  dx: Float,
+  dy: Float,
+  material: Material,
+  id: String? = null,
+  onReady: (Entity) -> Unit = {}
+) {
+  entity {
+    with(WorldComponent(world))
+    with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
+    with(PositionComponent(worldX, worldY))
 
-  // BASIC_DYNAMIC_ENTITY_ARRAY
-  with(VelocityComponent(dx, dy))
+    // BASIC_DYNAMIC_ENTITY_ARRAY
+    with(VelocityComponent(dx, dy))
 
-  with(TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")))
+    with(TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")))
 
-  // This entity will handle input events
-  with<PhysicsEventQueue>()
-  with(MaterialComponent(material))
-  with<OccupyingBlocksComponent>()
+    // This entity will handle input events
+    with<PhysicsEventQueue>()
+    with(MaterialComponent(material))
+    with<OccupyingBlocksComponent>()
 
-  val bodyDef = BodyDef()
-  bodyDef.type = BodyDef.BodyType.DynamicBody
-  bodyDef.position.set(worldX, worldY)
-  bodyDef.linearVelocity.set(dx, dy)
-  bodyDef.linearDamping = 0.5f
-  bodyDef.fixedRotation = true
+    val bodyDef = BodyDef()
+    bodyDef.type = BodyDef.BodyType.DynamicBody
+    bodyDef.position.set(worldX, worldY)
+    bodyDef.linearVelocity.set(dx, dy)
+    bodyDef.linearDamping = 0.5f
+    bodyDef.fixedRotation = true
 
-  createBody2DBodyComponent(
-    entity, world, worldX, worldY, dx, dy, 1f, 1f,
-    arrayOf(
-      basicDynamicEntityFamily to "basicDynamicEntityFamily",
-      drawableEntitiesFamily to "drawableEntitiesFamily",
-      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
-    )
-  ) {
-    val shape = PolygonShape()
-    shape.setAsBox(0.45f, 0.45f)
+    createBody2DBodyComponent(
+      entity, world, worldX, worldY, dx, dy, 1f, 1f,
+      arrayOf(
+        basicDynamicEntityFamily to "basicDynamicEntityFamily",
+        drawableEntitiesFamily to "drawableEntitiesFamily",
+        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
+      )
+    ) {
+      val shape = PolygonShape()
+      shape.setAsBox(0.45f, 0.45f)
 
-    val def = FixtureDef()
-    def.shape = shape
-    def.density = Constants.DEFAULT_FIXTURE_DENSITY
-    def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-    def.restitution = 0f
+      val def = FixtureDef()
+      def.shape = shape
+      def.density = Constants.DEFAULT_FIXTURE_DENSITY
+      def.friction = Constants.DEFAULT_FIXTURE_FRICTION
+      def.restitution = 0f
+//      it.gravityScale = 0.01f
 
-    val fix: Fixture = it.createFixture(def)
-    fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
-    fix.userData = it.userData
-    shape.dispose()
+      val fix: Fixture = it.createFixture(def)
+      fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
+      fix.userData = it.userData
+      shape.dispose()
+      onReady(this.entity)
+    }
   }
 }
 

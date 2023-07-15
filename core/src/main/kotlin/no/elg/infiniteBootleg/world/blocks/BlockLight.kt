@@ -85,8 +85,6 @@ class BlockLight(
   fun recalculateLighting(updateId: Int) {
     fun isCancelled() = isCancelled(updateId)
 
-    //    System.out.println("Recalculating light for " + getMaterial() + " block " + getWorldX() +
-    // "," + getWorldY());
     if (!Settings.renderLight) {
       Main.logger().debug("BL $strPos") { "Not rendering light" }
       return

@@ -53,6 +53,7 @@ class ChunkImpl(
   override val chunkBody: ChunkBody = ChunkBody(this)
 
   @Volatile
+  @GuardedBy("field")
   private var lightUpdater: ScheduledFuture<*>? = null
   private val tasks = ObjectSet<ForkJoinTask<*>>(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE, 0.99f)
 
@@ -114,10 +115,7 @@ class ChunkImpl(
   private var fbo: FrameBuffer? = null
 
   private val updateChunkLightEventListener = EventListener { (chunk, localX1, localY1): ChunkLightUpdatedEvent ->
-    if (this.isNeighbor(
-        chunk
-      )
-    ) {
+    if (this.isNeighbor(chunk)) {
       val dir = chunk.directionTo(this)
       val localX = (localX1 + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
       val localY = (localY1 + dir.dy * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
@@ -134,11 +132,7 @@ class ChunkImpl(
         else -> false
       }
       if (xCheck && yCheck) {
-        updateBlockLights(
-          localX.chunkOffset(),
-          localY.chunkOffset(),
-          false
-        )
+        updateBlockLights(localX.chunkOffset(), localY.chunkOffset(), false)
       }
     }
   }

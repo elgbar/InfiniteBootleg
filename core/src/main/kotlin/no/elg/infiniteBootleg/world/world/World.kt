@@ -50,6 +50,8 @@ import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -503,7 +505,7 @@ abstract class World(
    * @param updateTexture If the texture of the corresponding chunk should be updated
    * @see Chunk.setBlock
    */
-  fun setBlock(worldX: Int, worldY: Int, material: Material?, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
+  fun setBlock(worldX: Int, worldY: Int, material: Material, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
       chunk.setBlock(localX, localY, material, updateTexture, prioritize)
@@ -512,13 +514,11 @@ abstract class World(
   /**
    * Set a block at a given location
    *
-   * @param worldX The x coordinate from world view
-   * @param worldY The y coordinate from world view
    * @param block  The block at the given location
    * @param updateTexture If the texture of the corresponding chunk should be updated
    */
-  fun setBlock(worldX: Int, worldY: Int, block: Block?, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+  fun setBlock(block: Block, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
+    actionOnBlock(block.worldX, block.worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
       chunk.setBlock(localX, localY, block, updateTexture, prioritize)
     }
@@ -1074,8 +1074,8 @@ abstract class World(
   }
 
   companion object {
-    const val HALF_BLOCK_SIZE = 0.5f
     const val BLOCK_SIZE = 1f
+    const val HALF_BLOCK_SIZE = BLOCK_SIZE / 2f
     const val LIGHT_SOURCE_LOOK_BLOCKS = 10f
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100L
 
