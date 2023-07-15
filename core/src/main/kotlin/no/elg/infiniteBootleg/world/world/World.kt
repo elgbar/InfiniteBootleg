@@ -39,6 +39,8 @@ import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.generateUUIDFromLong
 import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.isBlockInsideRadius
+import no.elg.infiniteBootleg.util.isMarkerBlock
+import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
@@ -961,8 +963,7 @@ abstract class World(
     cancel: () -> Boolean = { false },
     filter: (Block) -> Boolean = { true }
   ): GdxArray<Block> {
-    val effectiveRaw: Boolean
-    effectiveRaw = if (!raw && !includeAir) {
+    val effectiveRaw: Boolean = if (!raw && !includeAir) {
       Main.logger().warn("getBlocksAABB", "Will not include air AND air blocks will be created! (raw: false, includeAir: false)")
       true
     } else {
@@ -1000,7 +1001,7 @@ abstract class World(
           y++
           continue
         }
-        if ((includeAir || !b.isAir()) && filter.invoke(b)) {
+        if ((includeAir || b.isMarkerBlock() || b.isNotAir()) && filter.invoke(b)) {
           blocks.add(b)
         }
         y++

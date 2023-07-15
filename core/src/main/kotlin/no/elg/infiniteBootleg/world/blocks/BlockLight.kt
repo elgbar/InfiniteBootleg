@@ -184,7 +184,7 @@ class BlockLight(
         LIGHT_SOURCE_LOOK_BLOCKS,
         raw = true,
         loadChunk = false,
-        includeAir = true,
+        includeAir = false,
         cancel = cancelled
       ) { it.material.emitsLight }
   }
