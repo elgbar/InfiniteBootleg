@@ -13,12 +13,12 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.
 import no.elg.infiniteBootleg.world.ecs.components.block.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.fallingBlockFamily
+import no.elg.infiniteBootleg.world.ecs.fallingStandaloneBlockFamily
 
 /**
  * Sets a marker block in the world to indicate that an entity is occupying that block
  */
-object UpdateGridBlockSystem : IteratingSystem(fallingBlockFamily, UPDATE_PRIORITY_DEFAULT) {
+object UpdateGridBlockSystem : IteratingSystem(fallingStandaloneBlockFamily, UPDATE_PRIORITY_DEFAULT) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
