@@ -4,14 +4,12 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.world.box2d.service.DoorService
 import no.elg.infiniteBootleg.world.box2d.service.FallingBlockContactService
 import no.elg.infiniteBootleg.world.box2d.service.OnGroundService
-import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 
 object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueue>(
   family = entityWithPhysicsEventFamily,
-  priority = UPDATE_PRIORITY_DEFAULT,
   eventType = PhysicsEvent::class,
   queueMapper = PhysicsEventQueue.mapper
 ) {

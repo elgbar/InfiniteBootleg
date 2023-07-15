@@ -4,17 +4,17 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EVENT_HANDLING
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue
 import kotlin.reflect.KClass
 
 abstract class EventSystem<T : ECSEvent, Q : ECSEventQueue<T>>(
   family: Family,
-  priority: Int,
   eventType: KClass<T>,
   private val queueMapper: ComponentMapper<out Q>
 ) :
-  IteratingSystem(family, priority) {
+  IteratingSystem(family, UPDATE_PRIORITY_EVENT_HANDLING) {
 
   private val sealedSubclasses = eventType.sealedSubclasses
 

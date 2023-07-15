@@ -1,13 +1,12 @@
 package no.elg.infiniteBootleg.world.ecs.system.event
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 
-object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWithInputEventFamily, UPDATE_PRIORITY_DEFAULT, InputEvent::class, InputEventQueue.mapper) {
+object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueue.mapper) {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     val controls = entity.locallyControlled.keyboardControls
