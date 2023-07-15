@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
@@ -166,6 +167,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       fixture.userData = block
 //      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
       fixture.filterData = when {
+        block is EntityMarkerBlock -> Filters.NON_INTERACTIVE__GROUND_FILTER
         material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
         else -> Filters.GR_FB__GROUND_FILTER
       }
