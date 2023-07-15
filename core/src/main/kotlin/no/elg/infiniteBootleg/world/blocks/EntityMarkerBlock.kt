@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.blocks
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.KAssets
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.Settings.debugEntityMarkerBlocks
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.EntityRemoveListener
 import no.elg.infiniteBootleg.world.Material
@@ -56,7 +56,6 @@ class EntityMarkerBlock(
   override fun load(protoBlock: ProtoWorld.Block) {}
 
   companion object {
-    var debugEntityMarkerBlocks = false
     fun toggleDebugEntityMarkerBlocks() {
       debugEntityMarkerBlocks = !debugEntityMarkerBlocks
     }

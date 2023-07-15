@@ -60,6 +60,8 @@ object Settings {
   @JvmField
   var debugBlockLight = false
 
+  var debugEntityMarkerBlocks = true
+
   @JvmField
   var renderChunkBounds = false
 
