@@ -5,11 +5,12 @@ import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.util.worldCompactToChunk
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LATE
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
+import no.elg.infiniteBootleg.world.ecs.components.block.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.isAffectedByGravity
@@ -29,8 +30,9 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
     if (world.isChunkLoaded(locBelow.worldCompactToChunk()) && world.isAirBlock(locBelow)) {
       val block = world.getRawBlock(pos.blockX, pos.blockY, false) ?: return
       entity.isAffectedByGravity = false // Prevent the block to fall multiple times
-      block.remove()
-      world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material)
+      world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material) {
+        it.occupyingLocations.add(EntityMarkerBlock.replaceBlock(block, it))
+      }
     }
   }
 }

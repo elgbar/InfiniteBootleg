@@ -5,8 +5,6 @@ import com.badlogic.ashley.systems.IteratingSystem
 import ktx.collections.plusAssign
 import ktx.collections.removeAll
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -32,10 +30,7 @@ object UpdateGridBlockSystem : IteratingSystem(fallingStandaloneBlockFamily, UPD
 
     for (currentOccupation in currentOccupations) {
       if ((currentOccupation !is EntityMarkerBlock || currentOccupation.entity != entity) && currentOccupation.material == Material.AIR) {
-        val block = EntityMarkerBlock.fromOtherBlock(currentOccupation, entity).let { block ->
-          world.setBlock(currentOccupation.worldX, currentOccupation.worldY, block, updateTexture = true)
-        } ?: continue
-        entity.occupyingLocations += block as? EntityMarkerBlock ?: error("Failed to set marker block at ${block.worldX}, ${block.worldY} was given a ${block::class}")
+        entity.occupyingLocations += EntityMarkerBlock.replaceBlock(currentOccupation, entity)
       }
     }
   }

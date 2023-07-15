@@ -8,6 +8,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.EntityRemoveListener
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_BUILDER
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
@@ -56,6 +58,15 @@ class EntityMarkerBlock(
       debugEntityMarkerBlocks = !debugEntityMarkerBlocks
     }
 
-    fun fromOtherBlock(block: Block, entity: Entity): EntityMarkerBlock = EntityMarkerBlock(block.chunk, block.world, block.localX, block.localY, entity)
+    /**
+     * Replace a block with a [EntityMarkerBlock].
+     *
+     * @return the new block
+     */
+    fun replaceBlock(block: Block, entity: Entity): EntityMarkerBlock {
+      return EntityMarkerBlock(block.chunk, block.world, block.localX, block.localY, entity).let { emb ->
+        emb.world.setBlock(emb) as? EntityMarkerBlock ?: error("Failed to set marker block at ${emb.worldX}, ${emb.worldY} was given a ${emb::class}")
+      }
+    }
   }
 }
