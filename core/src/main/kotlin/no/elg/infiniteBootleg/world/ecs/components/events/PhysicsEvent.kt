@@ -5,12 +5,13 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.ContactImpulse
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.physics.box2d.Manifold
+import com.badlogic.gdx.utils.Pool
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue.Companion.queueEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class PhysicsEventQueue : ECSEventQueue<PhysicsEvent> {
+class PhysicsEventQueue : ECSEventQueue<PhysicsEvent>, Pool.Poolable {
   override val events = ConcurrentLinkedQueue<PhysicsEvent>()
 
   companion object : Mapper<PhysicsEventQueue>() {
@@ -18,6 +19,10 @@ class PhysicsEventQueue : ECSEventQueue<PhysicsEvent> {
     inline fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = { true }) {
       queueEvent(PhysicsEventQueue.mapper, event, filter)
     }
+  }
+
+  override fun reset() {
+    events.clear()
   }
 }
 

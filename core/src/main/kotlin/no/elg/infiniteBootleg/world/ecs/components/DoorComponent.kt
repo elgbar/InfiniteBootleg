@@ -2,15 +2,20 @@ package no.elg.infiniteBootleg.world.ecs.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.utils.Pool
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker
 
-class DoorComponent : Component {
+class DoorComponent : Component, Pool.Poolable {
 
   val contacts = ObjectContactTracker<Entity>()
   val closed: Boolean get() = contacts.isEmpty
+
+  override fun reset() {
+    contacts.clear()
+  }
 
   companion object : Mapper<DoorComponent>() {
     var Entity.door by propertyFor(mapper)
