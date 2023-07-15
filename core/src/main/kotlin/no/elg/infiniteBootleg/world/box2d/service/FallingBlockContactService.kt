@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -18,23 +19,24 @@ object FallingBlockContactService {
       val block = event.getOtherFixtureUserData<Block>(entity) { true } ?: return
       val newX: Int = block.worldX
       val newY: Int = block.worldY
-      var deltaY = 0
       val world = block.world
       synchronized(world) {
         if (entity.isScheduledForRemoval || entity.isRemoving) {
           return
         }
-        var materialUp: Material
+        world.engine.removeEntity(entity)
 
+        var deltaY = 0
+        var blockUp: Block?
         do {
           deltaY++
-          materialUp = world.getMaterial(newX, newY + deltaY)
-        } while (materialUp == material)
+          blockUp = world.getBlock(newX, newY + deltaY, false)
+        } while (blockUp?.material == material && !blockUp.isMarkerBlock())
 
-        if (materialUp == Material.AIR) {
-          world.setBlock(newX, newY + deltaY, material, true)
+        // Only place the block if there is actual free space above
+        if (blockUp?.material == Material.AIR || blockUp.isMarkerBlock()) {
+          world.setBlock(newX, newY + deltaY, material)
         }
-        world.engine.removeEntity(entity)
       }
     }
   }
