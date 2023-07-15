@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import kotlin.contracts.contract
@@ -113,7 +114,7 @@ fun Entity.interactableBlock(
   val pos = this.position
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius)
     .filterTo(mutableSetOf()) {
-      isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius) &&
+      (ignorePlaceableCheck || isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius)) &&
         (!Settings.renderLight || world.getBlockLight(it.decompactLocX(), it.decompactLocY())?.isLit ?: true)
     }
 }
