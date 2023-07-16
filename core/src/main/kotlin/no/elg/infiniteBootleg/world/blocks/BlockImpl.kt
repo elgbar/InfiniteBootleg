@@ -11,8 +11,8 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.save
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.TextureNeighbor
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.world.world.World
 import java.util.EnumMap
 

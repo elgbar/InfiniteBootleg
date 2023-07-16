@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.render
+package no.elg.infiniteBootleg.world.render.debug
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.render.ClientWorldRender
 
 class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
   private val lr: ShapeRenderer = ShapeRenderer(1000)

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.render
+package no.elg.infiniteBootleg.world.render.texture
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 

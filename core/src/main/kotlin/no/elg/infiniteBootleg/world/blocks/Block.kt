@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Material.Companion.fromOrdinal
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
 interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.Builder> {

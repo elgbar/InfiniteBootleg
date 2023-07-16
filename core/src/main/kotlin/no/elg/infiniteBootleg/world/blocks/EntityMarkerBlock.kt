@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO_BUILDER
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
 class EntityMarkerBlock(

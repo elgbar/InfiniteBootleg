@@ -28,6 +28,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import org.apache.commons.collections4.list.SetUniqueList
 import java.util.LinkedList
 import javax.annotation.concurrent.GuardedBy

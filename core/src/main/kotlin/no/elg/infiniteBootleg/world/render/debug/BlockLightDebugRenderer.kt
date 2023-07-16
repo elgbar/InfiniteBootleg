@@ -24,7 +24,6 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.world.render.VisualizeUpdate
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {

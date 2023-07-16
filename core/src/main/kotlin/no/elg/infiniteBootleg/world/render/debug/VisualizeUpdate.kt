@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.render
+package no.elg.infiniteBootleg.world.render.debug
 
 import com.badlogic.gdx.math.Interpolation
 

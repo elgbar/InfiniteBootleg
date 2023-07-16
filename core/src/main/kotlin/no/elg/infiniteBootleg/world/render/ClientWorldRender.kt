@@ -20,6 +20,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.toSet
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
+import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 

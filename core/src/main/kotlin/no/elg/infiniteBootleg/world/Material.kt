@@ -18,9 +18,9 @@ import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntit
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.with
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.allowedRotation
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 import no.elg.infiniteBootleg.world.world.World
 import java.util.Locale
 

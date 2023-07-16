@@ -1,10 +1,10 @@
-package no.elg.infiniteBootleg.world.render
+package no.elg.infiniteBootleg.world.render.texture
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 import java.util.EnumMap
 
 object TextureNeighbor {

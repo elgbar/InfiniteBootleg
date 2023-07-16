@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
 data class TextureRegionComponent(var texture: RotatableTextureRegion) : Component {
   companion object : Mapper<TextureRegionComponent>() {

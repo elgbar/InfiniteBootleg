@@ -32,9 +32,9 @@ import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.disallowedRotation
-import no.elg.infiniteBootleg.world.render.TextureNeighbor
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
+import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
 import java.io.File
 
 /**
