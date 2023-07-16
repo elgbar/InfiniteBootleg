@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionCompo
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
+import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
 
@@ -74,7 +75,8 @@ fun Engine.createFallingBlockStandaloneEntity(
       arrayOf(
         basicDynamicEntityFamily to "basicDynamicEntityFamily",
         drawableEntitiesFamily to "drawableEntitiesFamily",
-        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
+        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
+        standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
       )
     ) {
       val shape = PolygonShape()

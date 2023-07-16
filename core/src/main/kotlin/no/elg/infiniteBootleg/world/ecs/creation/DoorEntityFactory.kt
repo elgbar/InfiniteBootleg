@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionCompo
 import no.elg.infiniteBootleg.world.ecs.doorEntityFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
+import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
 
@@ -46,7 +47,8 @@ fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY
         drawableEntitiesFamily to "drawableEntitiesFamily",
         blockEntityFamily to "blockEntityFamily",
         doorEntityFamily to "doorEntityFamily",
-        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
+        entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
+        standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
       ),
       BodyDef.BodyType.StaticBody
     ) {
