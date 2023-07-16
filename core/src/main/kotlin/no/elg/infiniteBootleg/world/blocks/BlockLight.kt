@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.world.blocks
 import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.events.BlockLightChangedEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Location
@@ -164,6 +166,9 @@ class BlockLight(
     } else {
       lightMap = NO_LIGHTS_LIGHT_MAP
       averageBrightness = 0f
+    }
+    if (Settings.renderBlockLightUpdates) {
+      EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY))
     }
   }
 

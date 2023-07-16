@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.box2d
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
@@ -140,9 +141,21 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   /**
    * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
    */
-  fun queryAABB(worldX: Float, worldY: Float, worldWidth: Float, worldHeight: Float, callback: ((Fixture) -> Boolean)) {
+  fun queryFixtures(worldX: Number, worldY: Number, worldWidth: Number, worldHeight: Number, callback: ((Fixture) -> Boolean)) {
     postBox2dRunnable {
-      box2dWorld.QueryAABB(callback, worldX + worldOffsetX, worldY + worldOffsetY, worldWidth, worldHeight)
+      box2dWorld.QueryAABB(callback, worldX.toFloat() + worldOffsetX, worldY.toFloat() + worldOffsetY, worldWidth.toFloat(), worldHeight.toFloat())
+    }
+  }
+
+  fun queryEntities(worldX: Number, worldY: Number, worldWidth: Number, worldHeight: Number, callback: ((Iterable<Entity>) -> Boolean)) {
+    postBox2dRunnable {
+      val entities = mutableSetOf<Entity>()
+      val queryCallback: (Fixture) -> Boolean = {
+        (it.body.userData as? Entity)?.also { entity -> entities += entity }
+        true
+      }
+      box2dWorld.QueryAABB(queryCallback, worldX.toFloat() + worldOffsetX, worldY.toFloat() + worldOffsetY, worldWidth.toFloat(), worldHeight.toFloat())
+      callback(entities)
     }
   }
 

@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_BUILDER
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO_BUILDER
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
@@ -48,10 +48,9 @@ class EntityMarkerBlock(
     removeEntityListener = null
   }
 
-  override fun save(): ProtoWorld.Block.Builder = AIR_BLOCK_BUILDER
+  override fun save(): ProtoWorld.Block.Builder = AIR_BLOCK_PROTO_BUILDER
 
   override val texture: RotatableTextureRegion? = if (debugEntityMarkerBlocks) KAssets.handTexture else null
-  override fun load(protoBlock: ProtoWorld.Block) {}
 
   companion object {
     fun toggleDebugEntityMarkerBlocks() {

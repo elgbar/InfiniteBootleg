@@ -40,7 +40,9 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     if (Settings.loadWorldFromDisk && chunk.shouldSave()) {
       // only save if valid and changed
       val fh = getChunkFile(world, chunk.chunkX, chunk.chunkY) ?: return
-      fh.writeBytes(chunk.save().toByteArray(), false)
+      chunk.save().thenApply {
+        fh.writeBytes(it.toByteArray(), false)
+      }
     }
   }
 

@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
+import java.util.concurrent.CompletableFuture
 import kotlin.math.ln
 
 /**
@@ -185,7 +186,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   fun load(protoChunk: ProtoWorld.Chunk): Boolean
 
-  fun save(): ProtoWorld.Chunk
+  fun save(): CompletableFuture<ProtoWorld.Chunk>
 
   fun saveBlocksOnly(): ProtoWorld.Chunk
 

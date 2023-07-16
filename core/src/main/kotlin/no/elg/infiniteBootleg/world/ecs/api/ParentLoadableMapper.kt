@@ -6,9 +6,9 @@ import ktx.ashley.Mapper
 
 abstract class ParentLoadableMapper<T : Component, P> : Mapper<T>() {
 
-  fun EngineEntity.load(protoEntity: P) {
+  fun load(engineEntity: EngineEntity, protoEntity: P) {
     if (protoEntity.checkShouldLoad()) {
-      loadInternal(protoEntity)
+      engineEntity.loadInternal(protoEntity)
     }
   }
 

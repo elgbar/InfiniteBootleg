@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.chunks
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -15,7 +16,8 @@ import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
+import no.elg.infiniteBootleg.protobuf.chunk
+import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
@@ -25,15 +27,20 @@ import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.directionTo
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
+import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
+import no.elg.infiniteBootleg.world.ecs.components.EntityTypeComponent.Companion.entityTypeComponent
+import no.elg.infiniteBootleg.world.ecs.load
+import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ForkJoinTask
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.atomic.AtomicInteger
@@ -540,31 +547,33 @@ class ChunkImpl(
     updateBlockLights()
   }
 
-  override fun save(): ProtoWorld.Chunk {
-    return save(true)
-  }
+  fun queryEntities(callback: ((Iterable<Entity>) -> Boolean)) =
+    world.worldBody.queryEntities(chunkX.chunkToWorld(), chunkY.chunkToWorld(), chunkToWorld(chunkX, Chunk.CHUNK_SIZE), chunkToWorld(chunkY, Chunk.CHUNK_SIZE), callback)
 
-  override fun saveBlocksOnly(): ProtoWorld.Chunk {
-    return save(false)
-  }
-
-  private fun save(includeEntities: Boolean): ProtoWorld.Chunk {
-    val builder = ProtoWorld.Chunk.newBuilder()
-    builder.position = Vector2i.newBuilder().setX(chunkX).setY(chunkY).build()
-    for (block in this) {
-      builder.addBlocks(if (block != null) block.save() else AIR_BLOCK_BUILDER)
+  override fun save(): CompletableFuture<ProtoWorld.Chunk> {
+    val future = CompletableFuture<ProtoWorld.Chunk>()
+    chunk {
+      position = vector2i {
+        x = chunkX
+        y = chunkY
+      }
+      blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
+      queryEntities { entities ->
+        this.entities += entities.filterNot { it.entityTypeComponent.entityType == ProtoWorld.Entity.EntityType.BLOCK }.map { it.save() }
+        future.complete(this._build())
+      }
     }
-//    if (includeEntities) {
-    //      for (Entity entity : getEntities()) {
-    //        if (entity instanceof Player) {
-    //          continue;
-    //        }
-    //        builder.addEntities(entity.save());
-    //      }
-    // TODO do for ashley entities
-//    }
-    return builder.build()
+    return future
   }
+
+  override fun saveBlocksOnly() =
+    chunk {
+      position = vector2i {
+        x = chunkX
+        y = chunkY
+      }
+      blocks += this@ChunkImpl.asSequence().filter { it.isNotAir() }.mapNotNull { it?.save()?.build() }.toSet()
+    }
 
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
     Preconditions.checkState(
@@ -572,23 +581,12 @@ class ChunkImpl(
       "Cannot load from proto chunk after chunk has been initialized"
     )
     val chunkPosition = protoChunk.position
-    val posErrorMsg = (
-      "Invalid chunk coordinates given. Expected (" +
-        chunkX +
-        ", " +
-        chunkY +
-        ") but got (" +
-        chunkPosition.x +
-        ", " +
-        chunkPosition.y +
-        ")"
-      )
+    val posErrorMsg = "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})"
     Preconditions.checkArgument(chunkPosition.x == chunkX, posErrorMsg)
     Preconditions.checkArgument(chunkPosition.y == chunkY, posErrorMsg)
     Preconditions.checkArgument(
       protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
-      "Invalid number of bytes. expected " + Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE + ", but got " +
-        protoChunk.blocksCount
+      "Invalid number of bytes. expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
     )
     var index = 0
     val protoBlocks = protoChunk.blocksList
@@ -602,7 +600,7 @@ class ChunkImpl(
       }
     }
     for (protoEntity in protoChunk.entitiesList) {
-//            Entity.load(world, this, protoEntity);
+      world.engine.load(protoEntity, world)
     }
     return true
   }
@@ -641,7 +639,8 @@ class ChunkImpl(
   }
 
   companion object {
-    val AIR_BLOCK_BUILDER = Block.save(Material.AIR)
+    val AIR_BLOCK_PROTO_BUILDER = Block.save(Material.AIR)
+    val AIR_BLOCK_PROTO = AIR_BLOCK_PROTO_BUILDER.build()
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
       return blockA.materialOrAir() === Material.AIR && blockB.materialOrAir() === Material.AIR

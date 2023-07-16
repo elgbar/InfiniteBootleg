@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.api.Savable
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
+import no.elg.infiniteBootleg.protobuf.entityOrNull
 import no.elg.infiniteBootleg.protobuf.material
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.compactLoc
@@ -42,8 +43,6 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
    * Connected blocks to ashley engine
    */
   val entity: Entity?
-
-  fun load(protoBlock: ProtoWorld.Block)
 
   override fun hudDebug(): String {
     return "Block $material"
@@ -96,9 +95,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       if (mat === Material.AIR || mat.isEntity) {
         return null
       }
-      val block = mat.createBlock(world, chunk, localX, localY)
-      block.load(protoBlock)
-      return block
+      return mat.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
     }
 
     fun save(material: Material): ProtoWorld.Block.Builder = block {

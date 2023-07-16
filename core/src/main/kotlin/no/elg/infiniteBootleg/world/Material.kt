@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -15,6 +16,7 @@ import no.elg.infiniteBootleg.world.ecs.creation.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntity
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
+import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
@@ -120,9 +122,9 @@ enum class Material(
    * @param localY Relative y in the chunk
    * @return A block of this type
    */
-  fun createBlock(world: World, chunk: Chunk, localX: Int, localY: Int): Block {
+  fun createBlock(world: World, chunk: Chunk, localX: Int, localY: Int, protoEntity: ProtoWorld.Entity? = null): Block {
     Preconditions.checkArgument(isBlock)
-    val entity = createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
+    val entity = protoEntity?.let { world.engine.load(it, world, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
     return BlockImpl(world, chunk, localX, localY, this, entity)
   }
 

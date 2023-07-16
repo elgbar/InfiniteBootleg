@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
-import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Direction
@@ -48,10 +47,6 @@ class BlockImpl(
       }
       return TextureNeighbor.getTexture(material, map)
     }
-
-  override fun load(protoBlock: ProtoWorld.Block) {
-    Preconditions.checkArgument(protoBlock.material.ordinal == material.ordinal)
-  }
 
   override fun dispose() {
     if (isDisposed) {
