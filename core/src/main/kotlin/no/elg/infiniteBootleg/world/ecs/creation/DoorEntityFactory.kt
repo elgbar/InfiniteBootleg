@@ -23,6 +23,9 @@ import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
 
+const val DOOR_WIDTH: Int = 2
+const val DOOR_HEIGHT: Int = 4
+
 fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material) {
     with(TextureRegionComponent(KAssets.doorClosedTexture))
@@ -31,18 +34,15 @@ fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY
     with<PhysicsEventQueue>()
     with<OccupyingBlocksComponent>()
 
-    val width = 2f
-    val height = 4f
-
     createBody2DBodyComponent(
       entity,
       world,
-      worldX.toFloat(),
-      worldY.toFloat(),
+      worldX.toFloat() + DOOR_WIDTH / 2f,
+      worldY.toFloat() + DOOR_HEIGHT / 2f,
       0f,
       0f,
-      width,
-      height,
+      DOOR_WIDTH.toFloat(),
+      DOOR_HEIGHT.toFloat(),
       arrayOf(
         drawableEntitiesFamily to "drawableEntitiesFamily",
         blockEntityFamily to "blockEntityFamily",
@@ -53,7 +53,7 @@ fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY
       BodyDef.BodyType.StaticBody
     ) {
       val shape = PolygonShape()
-      shape.setAsBox((width / 2f).coerceAtLeast(ESSENTIALLY_ZERO), (height / 2f).coerceAtLeast(ESSENTIALLY_ZERO))
+      shape.setAsBox(DOOR_WIDTH / 2f, DOOR_HEIGHT / 2f)
 
       val def = FixtureDef()
       def.shape = shape

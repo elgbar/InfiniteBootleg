@@ -67,7 +67,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
-        val size = Block.BLOCK_SIZE / 4f
+        val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
         val offset = Block.BLOCK_SIZE / 2f - size / 2f
         batch.draw(whiteTexture.textureRegion, lightX + offset, lightY + offset, size, size)
       }
