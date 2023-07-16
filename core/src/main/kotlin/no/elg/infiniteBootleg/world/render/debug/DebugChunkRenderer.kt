@@ -25,7 +25,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
   private val newlyUpdatedChunks = LongMap<VisualizeUpdate>()
 
   private val listener = EventManager.registerListener { e: ChunkTextureChangedEvent ->
-    newlyUpdatedChunks.put(e.chunk.compactLocation, VisualizeUpdate(2f))
+    newlyUpdatedChunks.put(e.chunk.compactLocation, VisualizeUpdate(0.25f))
   }
 
   override fun render() {

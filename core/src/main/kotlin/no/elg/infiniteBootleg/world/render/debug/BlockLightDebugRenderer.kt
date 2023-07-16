@@ -34,7 +34,7 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
   private val newlyUpdatedChunks = LongMap<VisualizeUpdate>()
   private val listener = EventManager.registerListener { e: BlockLightChangedEvent ->
-    newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), VisualizeUpdate())
+    newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), VisualizeUpdate(0.5f))
   }
 
   override fun render() {
