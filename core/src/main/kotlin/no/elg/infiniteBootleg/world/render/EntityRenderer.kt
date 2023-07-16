@@ -8,8 +8,8 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.transients.LookDirectionComponent.Companion.lookDirectionOrNull
 import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent.Companion.textureRegion
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -26,8 +26,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val worldOffsetY = worldBody.worldOffsetY
     for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
       val textureRegion = entity.textureRegion.texture
-      val centerPos = entity.positionComponent
       val box2d = entity.box2d
+      val centerPos = entity.box2dBody.position
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
       var lightX = 0f
