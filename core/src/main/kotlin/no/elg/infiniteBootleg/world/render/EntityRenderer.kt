@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.KAssets.whiteTexture
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
-import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -61,15 +60,16 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val screenY = worldToScreen(worldY, worldOffsetY)
 
       val lookDirectionOrNull = entity.lookDirectionOrNull
-      val direction = lookDirectionOrNull?.direction ?: Direction.WEST
       val texture = textureRegion.textureRegion
-      val shouldFlipX = lookDirectionOrNull != null && (direction.dx < 0 && texture.isFlipX) || (direction.dx > 0 && !texture.isFlipX)
+      val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
 
       texture.flip(shouldFlipX, false)
       batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
-        batch.draw(whiteTexture.textureRegion, lightX, lightY, Block.BLOCK_SIZE.toFloat(), Block.BLOCK_SIZE.toFloat())
+        val size = Block.BLOCK_SIZE / 4f
+        val offset = Block.BLOCK_SIZE / 2f - size / 2f
+        batch.draw(whiteTexture.textureRegion, lightX + offset, lightY + offset, size, size)
       }
     }
     batch.color = Color.WHITE
