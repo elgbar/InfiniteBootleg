@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.util.LongMapUtil.component1
+import no.elg.infiniteBootleg.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
@@ -90,7 +92,4 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   companion object {
     val BLOCK_LIGHT_UPDATE_COLOR: Color = Color.PURPLE
   }
-
-  operator fun LongMap.Entry<*>.component1(): Long = key
-  operator fun <V> LongMap.Entry<V>.component2(): V = value
 }
