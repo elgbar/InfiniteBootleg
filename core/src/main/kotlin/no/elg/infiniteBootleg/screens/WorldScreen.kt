@@ -114,6 +114,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         aRow {
           toggleableDebugButton("Ignore place check", false, Main.inst().console.exec::placeCheck)
           toggleableDebugButton("Render lights", Settings.renderLight, Main.inst().console.exec::lights)
+          toggleableDebugButton("Render light updates", Settings.renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
         }
         aRow {
           floatSpinner("Brush size", INITIAL_BRUSH_SIZE, 1f, 64f, 0.25f, Main.inst().console.exec::brush)

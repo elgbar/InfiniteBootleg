@@ -21,10 +21,10 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
   private val lr: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 
-  private val newlyUpdatedChunks = LongMap<UpdatedChunk>()
+  private val newlyUpdatedChunks = LongMap<VisualizeUpdate>()
 
   private val listener = EventManager.registerListener { e: ChunkTextureChangedEvent ->
-    newlyUpdatedChunks.put(e.chunk.compactLocation, UpdatedChunk(e.chunk))
+    newlyUpdatedChunks.put(e.chunk.compactLocation, VisualizeUpdate(2f))
   }
 
   override fun render() {
@@ -38,10 +38,10 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
     val worldBody = worldRender.world.worldBody
     val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
     val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
-    val offset = Chunk.CHUNK_SIZE * Block.BLOCK_SIZE
+    val textureSize = Chunk.CHUNK_TEXTURE_SIZE
 
     if (Settings.renderChunkUpdates) {
-      lr.color = FLASH_COLOR
+      lr.color = CHUNK_UPDATE_COLOR
       Gdx.gl.glEnable(GL30.GL_BLEND)
       lr.use(ShapeRenderer.ShapeType.Filled, camera.combined) {
         for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
@@ -53,7 +53,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
               continue
             }
             lr.color.a = updatedChunk.calculateAlpha(Gdx.graphics.deltaTime)
-            lr.rect(x * offset + 0.5f + worldOffsetX, y * offset + 0.5f + worldOffsetY, offset - 1f, offset - 1f)
+            lr.rect(x * textureSize + 0.5f + worldOffsetX, y * textureSize + 0.5f + worldOffsetY, textureSize - 1f, textureSize - 1f)
           }
         }
       }
@@ -68,7 +68,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
             } else {
               WITHIN_CAMERA_COLOR
             }
-            lr.rect(x * offset + 0.5f + worldOffsetX, y * offset + 0.5f + worldOffsetY, offset - 1f, offset - 1f)
+            lr.rect(x * textureSize + 0.5f + worldOffsetX, y * textureSize + 0.5f + worldOffsetY, textureSize - 1f, textureSize - 1f)
           }
         }
       }
@@ -86,12 +86,12 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
 
   override fun dispose() {
     lr.dispose()
-    EventManager.registerListener(listener)
+    EventManager.removeListener(listener)
   }
 
   companion object {
     val WITHIN_CAMERA_COLOR: Color = Color.TEAL
     val OUTSIDE_CAMERA_COLOR: Color = Color.FIREBRICK
-    val FLASH_COLOR: Color = Color.GREEN
+    val CHUNK_UPDATE_COLOR: Color = Color.GREEN
   }
 }

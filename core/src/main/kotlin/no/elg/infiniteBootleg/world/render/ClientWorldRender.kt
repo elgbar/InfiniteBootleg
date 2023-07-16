@@ -110,7 +110,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
         box2DDebugRenderer.render(worldBody.box2dWorld, m4)
       }
     }
-    if (Settings.renderLight && Settings.debug && Settings.debugBlockLight) {
+    if (Settings.renderLight && Settings.debug) {
       blockLightDebugRenderer.render()
     }
   }

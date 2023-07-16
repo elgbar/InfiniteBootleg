@@ -244,10 +244,15 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun debChuUpd() {
     Settings.renderChunkUpdates = !Settings.renderChunkUpdates
     Settings.debug = true
-    logger.log(
-      LogLevel.SUCCESS,
-      "Debug rendering of chunk updates is now ${Settings.renderChunkUpdates.toAbled()}"
-    )
+    logger.log(LogLevel.SUCCESS, "Debug rendering of chunk updates is now ${Settings.renderChunkUpdates.toAbled()}")
+  }
+
+  @ClientsideOnly
+  @ConsoleDoc(description = "Toggles debug rendering of block light updates")
+  fun debLitUpd() {
+    Settings.renderBlockLightUpdates = !Settings.renderBlockLightUpdates
+    Settings.debug = true
+    logger.log(LogLevel.SUCCESS, "Debug rendering of block light updates is now ${Settings.renderBlockLightUpdates.toAbled()}")
   }
 
   @ClientsideOnly

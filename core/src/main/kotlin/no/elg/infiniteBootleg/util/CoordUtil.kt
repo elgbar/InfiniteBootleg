@@ -133,6 +133,8 @@ inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactL
 
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl java.lang.Short.SIZE or (b.toInt() and 0xffff)
 
+inline fun compactChunkToWorld(chunk: Chunk, localX: Int, localY: Int): Long = compactLoc(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
+
 /**
  * @param this@decompactShortA A long created by [.compactLoc]
  * @return The x coordinate of the compacted location

@@ -67,6 +67,8 @@ object Settings {
 
   var renderChunkUpdates = false
 
+  var renderBlockLightUpdates = false
+
   @JvmField
   var enableCameraFollowLerp = true
 

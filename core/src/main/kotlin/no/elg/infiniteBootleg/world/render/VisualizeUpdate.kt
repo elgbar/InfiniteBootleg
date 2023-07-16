@@ -1,9 +1,8 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.math.Interpolation
-import no.elg.infiniteBootleg.world.chunks.Chunk
 
-data class UpdatedChunk(val chunk: Chunk, val durationSeconds: Float = 0.25f) {
+data class VisualizeUpdate(val durationSeconds: Float = 0.25f) {
 
   private var timeToTarget = durationSeconds
 
