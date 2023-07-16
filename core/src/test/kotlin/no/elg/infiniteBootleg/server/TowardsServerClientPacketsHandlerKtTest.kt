@@ -6,9 +6,6 @@ import io.mockk.verify
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.TestGraphic
-import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN
-import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.FULL_SERVER
-import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus.ServerStatus.PROCEED_LOGIN
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

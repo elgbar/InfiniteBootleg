@@ -15,8 +15,11 @@ message Vector2i {
   sint32 y = 2;
 }
 
-message World {
+message Material {
+  int32 ordinal = 1; //ordinal from Material enum
+}
 
+message World {
   int64 seed = 1;
   string name = 2;
   float time = 3;
@@ -35,13 +38,8 @@ message World {
 }
 
 message Block {
-  int32 material_ordinal = 1; //ordinal from Material enum
-
-  optional TNT tnt = 16; //TntBlock, only applicable if material is TNT
-
-  message TNT {
-    int64 ticks_left = 1;
-  }
+  Material material = 1;
+  optional Entity entity = 2;
 }
 
 message Chunk {
@@ -59,33 +57,54 @@ message ChunkColumn {
 message Entity {
   EntityType type = 1;
   Vector2f position = 2;
-  Vector2f velocity = 3;
+  optional Tags tags = 3;
   string uuid = 4;
-  bool flying = 5;
-  optional string name = 6;
+  optional string name = 5;
+
+  optional Killable killable = 16;
+  optional Material material = 17;
+  optional Player player = 18;
+  optional Vector2f velocity = 19;
+  optional Explosive explosive = 20;
+  optional Inventory inventory = 21;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
-    FALLING_BLOCK = 1;
-    BLOCK = 2;
-    PLAYER = 3;
+    FALLING_BLOCK = 1; //Standalone falling block
+    BLOCK = 2; // Entity related to a grid block
+    PLAYER = 3; // A human controlled entity
   }
 
-  optional Living living = 16;
-  optional Material material = 17;
-  optional Player player = 18;
+  message Tags {
+    optional bool flying = 1;
+    optional bool followedByCamera = 2;
+    optional bool gravityAffected = 3;
+    optional bool ignorePlaceableCheck = 4;
+  }
 
-  message Living {
+  message Killable {
     int32 health = 1;
     int32 max_health = 2;
-  }
-
-  message Material {
-    int32 material_ordinal = 1; //ordinal from Material enum
   }
 
   message Player {
     float torch_angle_deg = 1;
     bool controlled = 2;
+  }
+
+  message Explosive{
+    float fuse = 1;
+    float strength = 2;
+  }
+
+  message Inventory {
+    int32 maxSize = 1;
+    repeated Item items = 2;
+
+    message Item {
+      Material material = 1;
+      uint32 stock = 2;
+      uint32 maxStock = 3;
+    }
   }
 }

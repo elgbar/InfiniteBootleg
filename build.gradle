@@ -6,6 +6,7 @@ plugins {
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
   id "com.diffplug.spotless" version "6.15.0" apply false
   id "com.github.ben-manes.versions" version "0.47.0" apply false
+  id "com.google.protobuf" version "0.9.4" apply false
 }
 
 tasks.named("wrapper") {
@@ -40,7 +41,6 @@ allprojects {
   }
 
   spotless {
-    String sep = System.getProperty("file.separator")
     format("misc") {
       target("*.gradle", "**/*.md", ".gitignore", "**/*.yml", "**/*.yaml", "**/*.proto")
 
@@ -49,41 +49,13 @@ allprojects {
       endWithNewline()
     }
     java {
-      String path = "src${sep}main${sep}java${sep}no${sep}elg${sep}infiniteBootleg${sep}protobuf${sep}"
-
-      ignoreErrorForPath("${path}Packets.java")
-      ignoreErrorForPath("${path}ProtoWorld.java")
+      targetExclude fileTree(projectDir) { include '**/generated/**' }
 
       removeUnusedImports()
       googleJavaFormat().reflowLongStrings()
     }
     kotlin {
-      String path = "src${sep}main${sep}kotlin${sep}no${sep}elg${sep}infiniteBootleg${sep}protobuf${sep}"
-
-      ignoreErrorForPath("${path}BlockKt.kt")
-      ignoreErrorForPath("${path}ChunkColumnKt.kt")
-      ignoreErrorForPath("${path}ChunkKt.kt")
-      ignoreErrorForPath("${path}ChunkRequestKt.kt")
-      ignoreErrorForPath("${path}DespawnEntityKt.kt")
-      ignoreErrorForPath("${path}DisconnectKt.kt")
-      ignoreErrorForPath("${path}EntityKt.kt")
-      ignoreErrorForPath("${path}EntityRequestKt.kt")
-      ignoreErrorForPath("${path}HeartbeatKt.kt")
-      ignoreErrorForPath("${path}LoginKt.kt")
-      ignoreErrorForPath("${path}MoveEntityKt.kt")
-      ignoreErrorForPath("${path}PacketKt.kt")
-      ignoreErrorForPath("${path}PacketsKt.kt")
-      ignoreErrorForPath("${path}ProtoWorldKt.kt")
-      ignoreErrorForPath("${path}SecretExchangeKt.kt")
-      ignoreErrorForPath("${path}ServerLoginStatusKt.kt")
-      ignoreErrorForPath("${path}SpawnEntityKt.kt")
-      ignoreErrorForPath("${path}StartGameKt.kt")
-      ignoreErrorForPath("${path}UpdateBlockKt.kt")
-      ignoreErrorForPath("${path}UpdateChunkKt.kt")
-      ignoreErrorForPath("${path}Vector2fKt.kt")
-      ignoreErrorForPath("${path}Vector2iKt.kt")
-      ignoreErrorForPath("${path}WorldKt.kt")
-      ignoreErrorForPath("${path}WorldSettingsKt.kt")
+      targetExclude fileTree(projectDir) { include '**/generated/**' }
 
       ktlint()
         .setUseExperimental(true)
@@ -98,7 +70,6 @@ subprojects {
   apply plugin: "idea"
   apply plugin: "java"
   apply plugin: "org.jetbrains.kotlin.jvm"
-
 
   java {
     toolchain {
@@ -193,6 +164,25 @@ project(":desktop") {
     implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  }
+}
+
+project(":core") {
+  apply plugin: "com.google.protobuf"
+
+  protobuf {
+    protoc {
+      // Download from repositories
+      artifact = 'com.google.protobuf:protoc:3.23.4'
+    }
+    generateProtoTasks {
+      all().each { task ->
+        task.builtins {
+          java {}
+          kotlin {}
+        }
+      }
+    }
   }
 }
 
