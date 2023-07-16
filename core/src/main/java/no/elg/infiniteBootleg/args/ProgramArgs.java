@@ -156,9 +156,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   /** Enable debug rendering (ie box2d) */
   @Argument(value = "Enable debugging, including debug rendering for box2d", alt = 'd')
   private void debug(@Nullable String val) {
-    log("Debug view is enabled. To disable this at runtime use command 'debug'");
-    Settings.renderBox2dDebug = true;
-    Settings.renderChunkBounds = true;
+    log("Debug is enabled. To disable this at runtime use command 'debug'");
     Settings.debug = true;
   }
 
