@@ -8,9 +8,9 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.save
+import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.creation.createMPServerPlayerEntity
+import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.generator.chunk.EmptyChunkGenerator
 import no.elg.infiniteBootleg.world.generator.chunk.FlatChunkGenerator

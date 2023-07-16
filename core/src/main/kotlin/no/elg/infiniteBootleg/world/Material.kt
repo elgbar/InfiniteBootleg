@@ -10,11 +10,11 @@ import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.ecs.components.block.ExplosiveComponent
-import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
+import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntity
+import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.RotatableTextureRegion.Companion.allowedRotation
@@ -148,11 +148,9 @@ enum class Material(
     get() = itemType == ItemType.ENTITY
 
   companion object {
-    private val VALUES = values()
 
-    @JvmStatic
-    fun fromOrdinal(b: Int): Material {
-      return VALUES[b]
+    fun fromOrdinal(ordinal: Int): Material {
+      return entries[ordinal]
     }
   }
 }

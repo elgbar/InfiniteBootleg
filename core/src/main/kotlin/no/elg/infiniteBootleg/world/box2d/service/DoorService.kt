@@ -3,11 +3,11 @@ package no.elg.infiniteBootleg.world.box2d.service
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker
-import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
-import no.elg.infiniteBootleg.world.ecs.components.DoorComponent.Companion.doorOrNull
-import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
-import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
+import no.elg.infiniteBootleg.world.ecs.components.transients.DoorComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.DoorComponent.Companion.doorOrNull
+import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent.Companion.textureRegionOrNull
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
 
 object DoorService {

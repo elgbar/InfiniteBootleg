@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs.components.block
+package no.elg.infiniteBootleg.world.ecs.components.transients
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity

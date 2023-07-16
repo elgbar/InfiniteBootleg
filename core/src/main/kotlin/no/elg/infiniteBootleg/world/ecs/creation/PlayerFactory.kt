@@ -16,30 +16,27 @@ import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.livingOrNull
+import no.elg.infiniteBootleg.protobuf.killableOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
-import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
 import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
-import no.elg.infiniteBootleg.world.ecs.components.SharedInformationComponent
-import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
+import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.LookDirectionComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -144,9 +141,7 @@ private fun EngineEntity.addCommonPlayerComponents(
   wantedFamilies: Array<Pair<Family, String>>,
   whenReady: (Entity) -> Unit
 ) {
-  with(WorldComponent(world))
-  with(IdComponent(id))
-  with(PositionComponent(worldX, worldY))
+  withRequiredComponents(ProtoWorld.Entity.EntityType.PLAYER, world, worldX, worldY, id)
 
   // BASIC_DYNAMIC_ENTITY_ARRAY
   with(VelocityComponent(dx, dy))
@@ -188,7 +183,7 @@ private fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, con
 
 fun Engine.createMPServerPlayerEntity(world: ServerWorld, protoEntity: ProtoWorld.Entity, sharedInformation: SharedInformation): CompletableFuture<Entity> {
   val protoPlayer = protoEntity.playerOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
-  val living = protoEntity.livingOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
+  val living = protoEntity.killableOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
   return createMPServerPlayerEntity(
     world,
     protoEntity.position.x,
@@ -204,7 +199,7 @@ fun Engine.createMPServerPlayerEntity(world: ServerWorld, protoEntity: ProtoWorl
 
 fun Engine.createMPClientPlayerEntity(world: ServerClientWorld, protoEntity: ProtoWorld.Entity, controlled: Boolean): CompletableFuture<Entity> {
   val protoPlayer = protoEntity.playerOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
-  val living = protoEntity.livingOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
+  val living = protoEntity.killableOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
   return createMPClientPlayerEntity(
     world,
     protoEntity.position.x,

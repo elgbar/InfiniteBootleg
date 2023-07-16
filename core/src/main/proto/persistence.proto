@@ -92,7 +92,7 @@ message Entity {
     bool controlled = 2;
   }
 
-  message Explosive{
+  message Explosive {
     float fuse = 1;
     float strength = 2;
   }

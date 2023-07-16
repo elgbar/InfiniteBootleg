@@ -38,9 +38,9 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
-import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
+import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createMPClientPlayerEntity
 import no.elg.infiniteBootleg.world.world.ClientWorld

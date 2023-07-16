@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.util.placeableBlock
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selected
+import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent.Companion.selected
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 import java.lang.Math.floorMod

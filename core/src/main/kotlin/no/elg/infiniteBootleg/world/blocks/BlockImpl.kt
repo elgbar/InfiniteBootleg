@@ -50,7 +50,7 @@ class BlockImpl(
     }
 
   override fun load(protoBlock: ProtoWorld.Block) {
-    Preconditions.checkArgument(protoBlock.materialOrdinal == material.ordinal)
+    Preconditions.checkArgument(protoBlock.material.ordinal == material.ordinal)
   }
 
   override fun dispose() {

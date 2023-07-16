@@ -5,6 +5,8 @@ import no.elg.infiniteBootleg.api.HUDDebuggable
 import no.elg.infiniteBootleg.api.Savable
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.block
+import no.elg.infiniteBootleg.protobuf.material
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
@@ -90,7 +92,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       if (protoBlock == null) {
         return null
       }
-      val mat = fromOrdinal(protoBlock.materialOrdinal)
+      val mat = fromOrdinal(protoBlock.material.ordinal)
       if (mat === Material.AIR || mat.isEntity) {
         return null
       }
@@ -99,9 +101,11 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       return block
     }
 
-    fun save(material: Material): ProtoWorld.Block.Builder {
-      return ProtoWorld.Block.newBuilder().setMaterialOrdinal(material.ordinal)
-    }
+    fun save(material: Material): ProtoWorld.Block.Builder = block {
+      this.material = material {
+        ordinal = material.ordinal
+      }
+    }.toBuilder()
 
     const val BLOCK_SIZE = 16
   }

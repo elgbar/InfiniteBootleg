@@ -13,10 +13,10 @@ import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.NO_LIGHTS_LIGHT_
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl
-import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
+import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.world.ClientWorld

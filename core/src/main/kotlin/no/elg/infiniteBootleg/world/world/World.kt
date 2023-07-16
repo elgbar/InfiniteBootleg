@@ -61,11 +61,12 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.world.ecs.playerFamily
@@ -79,7 +80,6 @@ import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
-import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator

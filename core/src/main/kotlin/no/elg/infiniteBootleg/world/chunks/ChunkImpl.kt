@@ -368,7 +368,7 @@ class ChunkImpl(
         if (fbo != null) {
           return fbo
         }
-        val fbo = FrameBuffer(Pixmap.Format.RGBA4444, Chunk.CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, true)
+        val fbo = FrameBuffer(Pixmap.Format.RGBA8888, Chunk.CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, true)
         fbo.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         val fboRegion = TextureRegion(fbo.colorBufferTexture)
         fboRegion.flip(false, true)

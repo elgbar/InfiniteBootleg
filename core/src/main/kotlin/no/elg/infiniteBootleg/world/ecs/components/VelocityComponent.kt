@@ -1,22 +1,26 @@
 package no.elg.infiniteBootleg.world.ecs.components
 
-import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.Mapper
+import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_X_VEL
 import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_Y_VEL
+import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
-import no.elg.infiniteBootleg.world.ecs.components.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
+import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
+import no.elg.infiniteBootleg.world.ecs.with
 
 data class VelocityComponent(
   var dx: Float,
-  var dy: Float,
-  var maxDx: Float = MAX_X_VEL,
-  var maxDy: Float = MAX_Y_VEL
-) : Component {
+  var dy: Float
+) : EntitySavableComponent {
+
+  val maxDx: Float = MAX_X_VEL
+  val maxDy: Float = MAX_Y_VEL
 
   fun toVector2f(): ProtoWorld.Vector2f = vector2f {
     x = this@VelocityComponent.dx
@@ -28,7 +32,14 @@ data class VelocityComponent(
     require(maxDy > 0) { "Max dy velocity must be strictly positive" }
   }
 
-  companion object : Mapper<VelocityComponent>() {
+  override fun EntityKt.Dsl.save() {
+    velocity = vector2f {
+      x = dx
+      y = dy
+    }
+  }
+
+  companion object : EntityParentLoadableMapper<VelocityComponent>() {
     var Entity.velocity by propertyFor(mapper)
     var Entity.velocityOrNull by optionalPropertyFor(mapper)
 
@@ -39,5 +50,11 @@ data class VelocityComponent(
         this.updateBox2DVelocity = true
       }
     }
+
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) {
+      with(VelocityComponent(protoEntity.velocity.x, protoEntity.velocity.y))
+    }
+
+    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasVelocity()
   }
 }

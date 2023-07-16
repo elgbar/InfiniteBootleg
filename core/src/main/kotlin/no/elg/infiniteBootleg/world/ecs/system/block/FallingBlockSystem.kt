@@ -10,12 +10,12 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LATE
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
-import no.elg.infiniteBootleg.world.ecs.components.block.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.isAffectedByGravity
-import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
+import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
+import no.elg.infiniteBootleg.world.ecs.components.transients.OccupyingBlocksComponent.Companion.occupyingLocations
+import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
+import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
 
 /**
  * About the priority: We want this to run after the [UpdateGridBlockSystem] so that the block is properly removed
@@ -29,7 +29,7 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
 
     if (world.isChunkLoaded(locBelow.worldCompactToChunk()) && world.isAirBlock(locBelow)) {
       val block = world.getRawBlock(pos.blockX, pos.blockY, false) ?: return
-      entity.isAffectedByGravity = false // Prevent the block to fall multiple times
+      entity.gravityAffected = false // Prevent the block to fall multiple times
       world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material) {
         it.occupyingLocations.add(EntityMarkerBlock.replaceBlock(block, it))
       }

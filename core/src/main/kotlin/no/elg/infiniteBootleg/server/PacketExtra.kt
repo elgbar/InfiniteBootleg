@@ -50,7 +50,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.save
 import java.time.Instant
 import java.util.UUID

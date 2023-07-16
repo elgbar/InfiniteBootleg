@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 

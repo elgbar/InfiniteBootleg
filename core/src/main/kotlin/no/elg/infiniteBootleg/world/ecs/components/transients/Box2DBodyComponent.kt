@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs.components
+package no.elg.infiniteBootleg.world.ecs.components.transients
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
@@ -9,7 +9,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.blocks.Block
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 
 /**
  *

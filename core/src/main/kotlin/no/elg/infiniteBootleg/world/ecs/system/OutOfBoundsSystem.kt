@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 
 object OutOfBoundsSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
   override fun processEntity(entity: Entity, deltaTime: Float) {

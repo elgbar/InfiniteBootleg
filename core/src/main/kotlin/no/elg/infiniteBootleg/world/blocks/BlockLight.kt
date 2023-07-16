@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.world.blocks
 import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Location
@@ -86,7 +85,6 @@ class BlockLight(
     fun isCancelled() = isCancelled(updateId)
 
     if (!Settings.renderLight) {
-      Main.logger().debug("BL $strPos") { "Not rendering light" }
       return
     }
 

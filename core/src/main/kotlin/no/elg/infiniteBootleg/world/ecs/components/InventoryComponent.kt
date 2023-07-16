@@ -1,17 +1,23 @@
 package no.elg.infiniteBootleg.world.ecs.components
 
-import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.Mapper
+import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import ktx.collections.GdxSet
 import ktx.collections.minusAssign
 import ktx.collections.plusAssign
 import no.elg.infiniteBootleg.items.Item
+import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
+import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.asProto
 
-class InventoryComponent(private val maxSize: Int) : Component {
+class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
 
   private val items = GdxSet<Item>()
 
@@ -60,8 +66,31 @@ class InventoryComponent(private val maxSize: Int) : Component {
     return true
   }
 
-  companion object : Mapper<InventoryComponent>() {
+  companion object : EntityParentLoadableMapper<InventoryComponent>() {
     var Entity.inventory by propertyFor(InventoryComponent.mapper)
     var Entity.inventoryOrNull by optionalPropertyFor(InventoryComponent.mapper)
+
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) {
+      with(InventoryComponent(protoEntity.inventory.maxSize)) {
+        protoEntity.inventory.itemsList.forEach {
+          this += Item(Material.fromOrdinal(it.material.ordinal), it.stock.toUInt(), it.maxStock.toUInt())
+        }
+      }
+    }
+
+    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasInventory()
+  }
+
+  override fun EntityKt.Dsl.save() {
+    inventory = inventory {
+      maxSize = this@InventoryComponent.maxSize
+      items += this@InventoryComponent.items.map {
+        item {
+          material = it.material.asProto()
+          stock = it.stock.toInt()
+          maxStock = it.maxStock.toInt()
+        }
+      }
+    }
   }
 }
