@@ -49,11 +49,11 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
           for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
             val compactLoc = compactLoc(x, y)
             val updatedChunk = newlyUpdatedChunks.get(compactLoc) ?: continue
+            lr.color.a = updatedChunk.calculateAlpha(Gdx.graphics.deltaTime)
             if (updatedChunk.isDone()) {
               newlyUpdatedChunks.remove(compactLoc)
               continue
             }
-            lr.color.a = updatedChunk.calculateAlpha(Gdx.graphics.deltaTime)
             lr.rect(x * textureSize + 0.5f + worldOffsetX, y * textureSize + 0.5f + worldOffsetY, textureSize - 1f, textureSize - 1f)
           }
         }
