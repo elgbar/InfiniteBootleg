@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.render.debug
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
@@ -47,13 +48,14 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   }
 
   private fun renderLightUpdates() {
-    val offset = BLOCK_SIZE.toFloat()
-    newlyUpdatedChunks.removeAll { (_, it) -> it == null || it.isDone() }
+    val textureSize = BLOCK_SIZE.toFloat()
+    newlyUpdatedChunks.removeAll { (_, it: VisualizeUpdate?) -> it == null || it.isDone() }
+    Gdx.gl.glEnable(GL30.GL_BLEND)
     lr.use(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
       for ((compactLoc, visualizeUpdate: VisualizeUpdate?) in newlyUpdatedChunks.entries()) {
         val (worldX, worldY) = compactLoc
         lr.color.a = visualizeUpdate?.calculateAlpha(Gdx.graphics.deltaTime) ?: continue
-        lr.rect(worldX * offset + 0.5f, worldY * offset + 0.5f, offset / 4f, offset / 4f)
+        lr.rect(worldX * textureSize + textureSize / 2f, worldY * textureSize + textureSize / 2f, textureSize / 4f, textureSize / 4f)
       }
     }
   }
