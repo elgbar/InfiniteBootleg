@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs
+package no.elg.infiniteBootleg.util
 
 import com.badlogic.ashley.core.Component
 import ktx.ashley.AshleyDsl

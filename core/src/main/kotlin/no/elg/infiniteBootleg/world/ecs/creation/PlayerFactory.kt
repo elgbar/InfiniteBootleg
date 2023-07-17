@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.killableOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.box2d.Filters
@@ -44,7 +45,6 @@ import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
-import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.world.ServerWorld
@@ -167,7 +167,7 @@ private fun EngineEntity.addCommonPlayerComponents(
   }
 }
 
-private fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, controlled: Boolean) {
+fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, controlled: Boolean) {
   if (controlled) {
     // This entity will handle input events
     with(LocallyControlledComponent(KeyboardControls(world)))

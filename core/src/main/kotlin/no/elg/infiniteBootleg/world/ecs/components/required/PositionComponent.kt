@@ -8,13 +8,13 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.ParentLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
-import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
 data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponent {
@@ -55,9 +55,7 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
       updateBox2DPosition = true
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) {
-      with(PositionComponent(protoEntity.position.x, protoEntity.position.y))
-    }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(PositionComponent(protoEntity.position.x, protoEntity.position.y))
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasPosition()
   }

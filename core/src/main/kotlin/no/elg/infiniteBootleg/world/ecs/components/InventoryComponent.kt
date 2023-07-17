@@ -70,13 +70,12 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
     var Entity.inventory by propertyFor(InventoryComponent.mapper)
     var Entity.inventoryOrNull by optionalPropertyFor(InventoryComponent.mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) {
-      with(InventoryComponent(protoEntity.inventory.maxSize)) {
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
+      InventoryComponent(protoEntity.inventory.maxSize).apply {
         protoEntity.inventory.itemsList.forEach {
           this += Item(Material.fromOrdinal(it.material.ordinal), it.stock.toUInt(), it.maxStock.toUInt())
         }
       }
-    }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasInventory()
   }

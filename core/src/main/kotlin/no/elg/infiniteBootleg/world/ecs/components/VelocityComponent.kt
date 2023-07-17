@@ -9,10 +9,10 @@ import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_Y_VEL
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
-import no.elg.infiniteBootleg.world.ecs.with
 
 data class VelocityComponent(
   var dx: Float,
@@ -51,9 +51,7 @@ data class VelocityComponent(
       }
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) {
-      with(VelocityComponent(protoEntity.velocity.x, protoEntity.velocity.y))
-    }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(VelocityComponent(protoEntity.velocity.x, protoEntity.velocity.y))
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasVelocity()
   }

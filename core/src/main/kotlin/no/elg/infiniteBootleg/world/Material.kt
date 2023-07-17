@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -17,7 +18,6 @@ import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntity
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.ecs.load
-import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.allowedRotation
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation

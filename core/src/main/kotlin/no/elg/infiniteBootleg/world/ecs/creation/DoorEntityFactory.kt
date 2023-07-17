@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.box2d.Filters
@@ -20,7 +21,6 @@ import no.elg.infiniteBootleg.world.ecs.doorEntityFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
-import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
 
 const val DOOR_WIDTH: Int = 2

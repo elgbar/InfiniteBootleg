@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.ashley.entity
 import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.box2d.Filters
@@ -24,7 +25,6 @@ import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
-import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
 
 fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoWorld.Entity) {

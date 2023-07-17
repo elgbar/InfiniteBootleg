@@ -7,9 +7,9 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
-import no.elg.infiniteBootleg.world.ecs.with
 
 data class EntityTypeComponent(val entityType: EntityType) : EntitySavableComponent {
 
@@ -35,9 +35,7 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
       }
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) {
-      with(EntityTypeComponent(protoEntity.type))
-    }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): EntityTypeComponent = with(EntityTypeComponent(protoEntity.type))
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = true
   }

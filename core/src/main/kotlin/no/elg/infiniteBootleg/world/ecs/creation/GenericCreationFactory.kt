@@ -11,6 +11,7 @@ import ktx.ashley.plusAssign
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -24,7 +25,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent
-import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
 
 const val ESSENTIALLY_ZERO = 0.001f

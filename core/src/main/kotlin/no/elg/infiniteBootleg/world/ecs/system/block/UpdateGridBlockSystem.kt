@@ -24,13 +24,15 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
     val halfBox2dWidth = entity.box2d.halfBox2dWidth
     val halfBox2dHeight = entity.box2d.halfBox2dHeight
 
-    val currentOccupations = world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true)
-    entity.occupyingLocations.filter { it !in currentOccupations }.forEach(EntityMarkerBlock::removeEntityMarker)
-    entity.occupyingLocations.removeAll { it !in currentOccupations }
+    val currentOccupations =
+      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true)
+    val occupyingLocations = entity.occupyingLocations
+    occupyingLocations.filter { it !in currentOccupations }.forEach(EntityMarkerBlock::removeEntityMarker)
+    occupyingLocations.removeAll { it !in currentOccupations }
 
     for (currentOccupation in currentOccupations) {
       if ((currentOccupation !is EntityMarkerBlock || currentOccupation.entity != entity) && currentOccupation.material == Material.AIR) {
-        entity.occupyingLocations += EntityMarkerBlock.replaceBlock(currentOccupation, entity)
+        occupyingLocations += EntityMarkerBlock.replaceBlock(currentOccupation, entity)
       }
     }
   }
