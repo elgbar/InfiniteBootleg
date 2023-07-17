@@ -52,9 +52,22 @@ enum class Material(
    */
   val adjacentPlaceable: Boolean = true,
   val isGravityAffected: Boolean = false,
+  /**
+   * @return If this material can be rotated, but the entity can handle the rendering
+   */
+  val invisibleBlock: Boolean = false,
   val createNew: ((world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) -> Entity)? = null
 ) {
-  AIR(itemType = ItemType.AIR, hardness = 0f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, emitsLight = false, adjacentPlaceable = false),
+  AIR(
+    itemType = ItemType.AIR,
+    hardness = 0f,
+    hasTransparentTexture = true,
+    isCollidable = false,
+    blocksLight = false,
+    emitsLight = false,
+    adjacentPlaceable = false,
+    invisibleBlock = true
+  ),
   STONE(hardness = 1.5f, hasTransparentTexture = false),
   BRICK(hardness = 2f, hasTransparentTexture = false),
   DIRT(hardness = 1f, hasTransparentTexture = false),
@@ -85,6 +98,7 @@ enum class Material(
     hasTransparentTexture = true,
     isCollidable = false,
     blocksLight = false,
+    invisibleBlock = true,
     createNew = { world: World, chunk, worldX: Int, worldY: Int, material: Material ->
       world.engine.createDoorBlockEntity(world, chunk, worldX, worldY, material)
     }
