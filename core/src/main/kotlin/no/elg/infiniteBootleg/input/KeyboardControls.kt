@@ -51,7 +51,8 @@ class KeyboardControls(val world: ClientWorld) {
     if (canNotInteract(blockX, blockY)) return false
     val world = entity.world
     val breakableBlocks = entity.breakableBlock(world, blockX, blockY, brushSize, interactRadius)
-    world.removeBlocks(world.getBlocks(breakableBlocks))
+    if (breakableBlocks.isEmpty()) return false
+    world.removeBlocks(world.getBlocks(breakableBlocks), true)
     return true
   }
 
@@ -61,6 +62,7 @@ class KeyboardControls(val world: ClientWorld) {
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
     val placeableBlock = entity.placeableBlock(world, blockX, blockY, brushSize, interactRadius)
+    if (placeableBlock.isEmpty()) return false
     if (inventory.use(material, placeableBlock.size.toUInt())) {
       material.createBlocks(world, placeableBlock)
     }
