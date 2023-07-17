@@ -1,5 +1,5 @@
 textures.png
-	size: 186, 140
+	size: 172, 140
 	format: RGBA4444
 	repeat: xy
 birch_leaves-air-north-air-east-birch_leaves-south-birch_leaves-west
@@ -7,13 +7,13 @@ birch_leaves-air-north-air-east-birch_leaves-south-birch_leaves-west
 birch_leaves-air-north-air-west-birch_leaves-south-birch_leaves-east
 	bounds: 1, 41, 32, 32
 birch_leaves-air-south-air-east-birch_leaves-north-birch_leaves-west
-	bounds: 121, 73, 32, 32
+	bounds: 87, 73, 32, 32
 birch_leaves-air-south-air-west-birch_leaves-north-birch_leaves-east
 	bounds: 35, 7, 32, 32
 birch_leaves_rotatable
-	bounds: 87, 39, 32, 32
+	bounds: 121, 73, 32, 32
 birch_trunk
-	bounds: 169, 105, 16, 16
+	bounds: 105, 55, 16, 16
 birch_trunk-birch_leaves-east
 	bounds: 101, 107, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west
@@ -23,48 +23,42 @@ birch_trunk-birch_leaves-east-birch_leaves-west-birch_leaves-north
 birch_trunk-birch_leaves-west
 	bounds: 135, 107, 32, 32
 breaking_block
-	bounds: 159, 33, 16, 16
+	bounds: 141, 17, 16, 16
 brick
-	bounds: 123, 19, 16, 16
+	bounds: 155, 89, 16, 16
 dirt_rotatable
-	bounds: 169, 123, 16, 16
+	bounds: 87, 55, 16, 16
 door
-	bounds: 155, 87, 16, 16
-door_bottom
-	bounds: 121, 55, 16, 16
+	bounds: 123, 37, 16, 16
 door_closed
 	bounds: 69, 7, 16, 32
 door_open
 	bounds: 69, 41, 16, 32
-door_part
-	bounds: 87, 73, 32, 32
-door_top
-	bounds: 159, 15, 16, 16
 glass
-	bounds: 87, 3, 16, 16
-grass-dirt-east
-	bounds: 141, 1, 16, 16
-grass-dirt-south
-	bounds: 123, 1, 16, 16
-grass-dirt-south-dirt-east
-	bounds: 141, 19, 16, 16
-grass-dirt-south-dirt-west
-	bounds: 157, 69, 16, 16
-grass-dirt-south-dirt-west-dirt-east
-	bounds: 139, 55, 16, 16
-grass-dirt-west
-	bounds: 157, 51, 16, 16
-grass_rotatable
 	bounds: 105, 19, 16, 16
+grass-dirt-east
+	bounds: 123, 1, 16, 16
+grass-dirt-south
+	bounds: 87, 1, 16, 16
+grass-dirt-south-dirt-east
+	bounds: 105, 1, 16, 16
+grass-dirt-south-dirt-west
+	bounds: 141, 53, 16, 16
+grass-dirt-south-dirt-west-dirt-east
+	bounds: 105, 37, 16, 16
+grass-dirt-west
+	bounds: 141, 35, 16, 16
+grass_rotatable
+	bounds: 123, 19, 16, 16
 hand
 	bounds: 1, 75, 64, 64
 player
 	bounds: 67, 75, 18, 30
 sand_rotatable
-	bounds: 105, 1, 16, 16
+	bounds: 155, 71, 16, 16
 stone_rotatable
-	bounds: 139, 37, 16, 16
+	bounds: 123, 55, 16, 16
 tnt
-	bounds: 121, 37, 16, 16
+	bounds: 87, 19, 16, 16
 torch
-	bounds: 87, 21, 16, 16
+	bounds: 87, 37, 16, 16
