@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.chunkToWorld
-import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
@@ -62,8 +61,6 @@ class BlockLight(
         field = value
       }
     }
-
-  private val strPos by lazy { stringifyChunkToWorld(chunk, localX, localY) }
 
   private val chunkImpl = chunk as ChunkImpl
 
@@ -274,9 +271,7 @@ class BlockLight(
 
     if (chunk != other.chunk) return false
     if (localX != other.localX) return false
-    if (localY != other.localY) return false
-
-    return true
+    return localY == other.localY
   }
 
   override fun hashCode(): Int {

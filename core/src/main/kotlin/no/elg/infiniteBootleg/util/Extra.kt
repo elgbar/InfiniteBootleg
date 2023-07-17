@@ -72,14 +72,14 @@ fun Int.stringSize(): Int {
   return 10 + d
 }
 
-fun Block?.isAir(): Boolean {
+fun Block?.isAir(markerIsAir: Boolean = true): Boolean {
   contract { returns(false) implies (this@isAir != null) }
-  return this == null || this.isMarkerBlock() || this.material == Material.AIR
+  return this == null || (markerIsAir && this.isMarkerBlock()) || this.material == Material.AIR
 }
 
-fun Block?.isNotAir(): Boolean {
+fun Block?.isNotAir(markerIsAir: Boolean = true): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
-  return !this.isAir()
+  return !this.isAir(markerIsAir)
 }
 
 fun Block?.isMarkerBlock(): Boolean = this is EntityMarkerBlock
@@ -104,7 +104,7 @@ inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.
   this.color = oldColor
 }
 
-fun Entity.interactableBlock(
+fun Entity.interactableLocations(
   world: World,
   centerBlockX: Int,
   centerBlockY: Int,
@@ -126,7 +126,7 @@ fun Entity.breakableBlock(
   radius: Float,
   interactionRadius: Float
 ): Set<Long> {
-  return interactableBlock(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { world.isAirBlock(it) } }
+  return interactableLocations(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { world.isAirBlock(it, markerIsAir = false) } }
 }
 
 fun Entity.placeableBlock(
@@ -136,7 +136,7 @@ fun Entity.placeableBlock(
   radius: Float,
   interactionRadius: Float
 ): Set<Long> {
-  return interactableBlock(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { !world.isAirBlock(it) } }
+  return interactableLocations(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { !world.isAirBlock(it, markerIsAir = false) } }
     .let {
       if (it.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
         it

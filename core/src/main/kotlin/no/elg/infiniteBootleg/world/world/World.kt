@@ -553,7 +553,8 @@ abstract class World(
    * @param worldLoc The world location to check
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(compactWorldLoc: Long): Boolean = isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY())
+  fun isAirBlock(compactWorldLoc: Long, markerIsAir: Boolean = true): Boolean =
+    isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), markerIsAir = markerIsAir)
 
   /**
    * Check if a given location in the world is [Material.AIR] (or internally, does not exist)
@@ -570,10 +571,11 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
-    val chunk = nullableChunk ?: return@actionOnBlock false
-    chunk.getRawBlock(localX, localY).isAir()
-  }
+  fun isAirBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return@actionOnBlock false
+      chunk.getRawBlock(localX, localY).isAir(markerIsAir)
+    }
 
   /**
    * Check whether a block can be placed at the given location
