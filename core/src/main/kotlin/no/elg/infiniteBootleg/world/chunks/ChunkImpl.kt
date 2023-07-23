@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.Settings
@@ -13,6 +14,7 @@ import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -21,7 +23,6 @@ import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
-import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.directionTo
@@ -121,11 +122,11 @@ class ChunkImpl(
   @GuardedBy("fboLock")
   private var fbo: FrameBuffer? = null
 
-  private val updateChunkLightEventListener = EventListener { (chunk, localX1, localY1): ChunkLightUpdatedEvent ->
+  private val updateChunkLightEventListener = EventListener { (chunk, originLocalX, originLocalY): ChunkLightUpdatedEvent ->
     if (this.isNeighbor(chunk)) {
       val dir = chunk.directionTo(this)
-      val localX = (localX1 + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
-      val localY = (localY1 + dir.dy * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
+      val localX = (originLocalX + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
+      val localY = (originLocalY + dir.dy * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
       val xCheck = when (dir.dx) {
         -1 -> localX < 0
         0 -> true
@@ -139,7 +140,7 @@ class ChunkImpl(
         else -> false
       }
       if (xCheck && yCheck) {
-        updateBlockLights(localX.chunkOffset(), localY.chunkOffset(), false)
+        Main.inst().scheduler.executeAsync { updateBlockLights(0, chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY)) }
       }
     }
   }
@@ -208,7 +209,7 @@ class ChunkImpl(
       currBlock?.dispose()
       blocks[localX][localY] = block
       if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
-        updateBlockLights(localX, localY, true)
+        blockLightUpdatedAt(localX, localY)
       }
       modified = true
       if (updateTexture) {
@@ -324,27 +325,37 @@ class ChunkImpl(
     }
   }
 
-  override fun updateBlockLights(localX: Int, localY: Int, dispatchEvent: Boolean) {
+  override fun updateAllBlockLights() {
     if (Settings.renderLight) {
-      synchronized(blockLights) {
-        // If we reached this point before the light is done recalculating then we must start again
-        cancelCurrentBlockLightUpdate()
-        val updateId = currentUpdateId.incrementAndGet()
-        lightUpdater = Main.inst().scheduler.executeAsync { updateBlockLights(updateId) }
-      }
-      if (dispatchEvent) {
-        dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
+      Main.inst().scheduler.executeAsync { updateBlockLights(0, CHUNK_CENTER, CHUNK_CENTER, false) }
+    }
+  }
+
+  override fun blockLightUpdatedAt(localX: Int, localY: Int) {
+    if (Settings.renderLight) {
+      dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
+      Main.inst().scheduler.executeAsync {
+        updateBlockLights(0, getWorldX(localX), getWorldY(localY))
       }
     }
   }
 
-  /** Should only be used by [updateBlockLights]  */
-  private fun updateBlockLights(updateId: Int) {
+  /** Should only be used by [blockLightUpdatedAt]  */
+  private fun updateBlockLights(updateId: Int, originWorldX: Int, originWorldY: Int, checkDistance: Boolean = true) {
     synchronized(tasks) {
       outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
         for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
           if (updateId != currentUpdateId.get()) {
             break@outer
+          }
+          if (checkDistance && Vector2.dst2(
+              originWorldX.toFloat(),
+              originWorldY.toFloat(),
+              getWorldX(localX).toFloat(),
+              getWorldY(localY).toFloat()
+            ) > World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
+          ) {
+            continue
           }
           val bl = blockLights[localX][localY]
           bl.recalculateLighting(updateId)
@@ -544,7 +555,7 @@ class ChunkImpl(
     // Register events
     registerListener(updateChunkLightEventListener)
 
-    updateBlockLights()
+    updateAllBlockLights()
   }
 
   fun queryEntities(callback: ((Iterable<Entity>) -> Boolean)) =

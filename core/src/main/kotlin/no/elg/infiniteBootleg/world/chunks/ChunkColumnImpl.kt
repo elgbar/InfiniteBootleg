@@ -106,17 +106,17 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     val worldX = chunkToWorld(chunkX, localX)
     for (chunkY in min..max) {
       val newWorldY = chunkY.chunkToWorld()
-      getLoadedChunk(newWorldY)?.updateBlockLights(dispatchEvent = false)
+      getLoadedChunk(newWorldY)?.updateAllBlockLights()
 
       // Update chunks to the sides, if the light reaches that far
       val leftChunkX = (worldX - World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (leftChunkX != chunkX) {
-        getLoadedChunk(newWorldY, leftChunkX)?.updateBlockLights(dispatchEvent = false)
+        getLoadedChunk(newWorldY, leftChunkX)?.updateAllBlockLights()
       }
 
       val rightChunkX = (worldX + World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (rightChunkX != chunkX) {
-        getLoadedChunk(newWorldY, rightChunkX)?.updateBlockLights(dispatchEvent = false)
+        getLoadedChunk(newWorldY, rightChunkX)?.updateAllBlockLights()
       }
     }
   }
