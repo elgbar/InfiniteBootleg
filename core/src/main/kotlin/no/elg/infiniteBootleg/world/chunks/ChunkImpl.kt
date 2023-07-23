@@ -467,9 +467,7 @@ class ChunkImpl(
   /**
    * @return If the chunk has been modified since creation
    */
-  override fun shouldSave(): Boolean {
-    return modified && isValid
-  }
+  override fun shouldSave(): Boolean = modified
 
   override fun iterator(): Iterator<Block?> {
     return object : MutableIterator<Block?> {
