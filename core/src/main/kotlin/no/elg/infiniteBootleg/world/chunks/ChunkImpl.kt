@@ -140,7 +140,7 @@ class ChunkImpl(
         else -> false
       }
       if (xCheck && yCheck) {
-        Main.inst().scheduler.executeAsync { updateBlockLights(0, chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY)) }
+        doUpdateLight(chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY), true)
       }
     }
   }
@@ -327,21 +327,28 @@ class ChunkImpl(
 
   override fun updateAllBlockLights() {
     if (Settings.renderLight) {
-      Main.inst().scheduler.executeAsync { updateBlockLights(0, CHUNK_CENTER, CHUNK_CENTER, false) }
+      doUpdateLight(CHUNK_CENTER, CHUNK_CENTER, false)
     }
   }
 
   override fun blockLightUpdatedAt(localX: Int, localY: Int) {
     if (Settings.renderLight) {
       dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
-      Main.inst().scheduler.executeAsync {
-        updateBlockLights(0, getWorldX(localX), getWorldY(localY))
-      }
+      doUpdateLight(getWorldX(localX), getWorldY(localY), true)
+    }
+  }
+
+  private fun doUpdateLight(originWorldX: Int, originWorldY: Int, checkDistance: Boolean = true) {
+    synchronized(blockLights) {
+      // If we reached this point before the light is done recalculating then we must start again
+      cancelCurrentBlockLightUpdate()
+      val updateId = currentUpdateId.incrementAndGet()
+      lightUpdater = Main.inst().scheduler.executeAsync { updateBlockLights(updateId, originWorldX, originWorldY, checkDistance) }
     }
   }
 
   /** Should only be used by [blockLightUpdatedAt]  */
-  private fun updateBlockLights(updateId: Int, originWorldX: Int, originWorldY: Int, checkDistance: Boolean = true) {
+  private fun updateBlockLights(updateId: Int, originWorldX: Int, originWorldY: Int, checkDistance: Boolean) {
     synchronized(tasks) {
       outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
         for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
@@ -368,7 +375,7 @@ class ChunkImpl(
       // Re-render the chunk with the new lighting
       val render = world.render
       if (render is ClientWorldRender) {
-        render.chunkRenderer.queueRendering(this, true)
+        render.chunkRenderer.queueRendering(this, false)
       }
     }
   }
