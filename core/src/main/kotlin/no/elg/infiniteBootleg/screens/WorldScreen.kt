@@ -103,7 +103,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
         }
         aRow {
           toggleableDebugButton("General debug", Settings.debug, Main.inst().console.exec::debug)
-          toggleableDebugButton("Debug render chunks", Settings.renderChunkBounds, Main.inst().console.exec::debChu)
+          toggleableDebugButton("Render chunks borders", Settings.renderChunkBounds, Main.inst().console.exec::debChu)
           toggleableDebugButton("Debug chunk updates", Settings.renderChunkUpdates, Main.inst().console.exec::debChuUpd)
         }
         aRow {
