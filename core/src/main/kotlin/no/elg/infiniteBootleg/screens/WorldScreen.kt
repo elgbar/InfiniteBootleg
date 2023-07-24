@@ -5,8 +5,8 @@ import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.screens.stage.DebugWindow
-import no.elg.infiniteBootleg.screens.stage.addDebugOverlay
+import no.elg.infiniteBootleg.screens.hud.DebugWindow
+import no.elg.infiniteBootleg.screens.hud.addDebugOverlay
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 /**

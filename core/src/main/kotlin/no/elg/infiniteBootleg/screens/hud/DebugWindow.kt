@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.screens.stage
+package no.elg.infiniteBootleg.screens.hud
 
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.kotcrab.vis.ui.widget.VisLabel
