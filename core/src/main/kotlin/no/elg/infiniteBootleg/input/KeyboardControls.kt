@@ -8,10 +8,10 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.util.breakableBlock
+import no.elg.infiniteBootleg.util.breakableBlocks
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.dstd
-import no.elg.infiniteBootleg.util.placeableBlock
+import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryOrNull
@@ -50,7 +50,7 @@ class KeyboardControls(val world: ClientWorld) {
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
     if (canNotInteract(blockX, blockY)) return false
     val world = entity.world
-    val breakableBlocks = entity.breakableBlock(world, blockX, blockY, brushSize, interactRadius)
+    val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, brushSize, interactRadius).asIterable()
     world.removeBlocks(world.getBlocks(breakableBlocks))
     return true
   }
@@ -60,7 +60,7 @@ class KeyboardControls(val world: ClientWorld) {
     val world = entity.world
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
-    val placeableBlock = entity.placeableBlock(world, blockX, blockY, brushSize, interactRadius)
+    val placeableBlock = entity.placeableBlocks(world, blockX, blockY, brushSize, interactRadius).toSet()
     if (inventory.use(material, placeableBlock.size.toUInt())) {
       material.createBlocks(world, placeableBlock)
     }

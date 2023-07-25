@@ -128,6 +128,10 @@ enum class Material(
     return BlockImpl(world, chunk, localX, localY, this, entity)
   }
 
+  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true) {
+    createBlocks(world, locs.asIterable(), prioritize)
+  }
+
   fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
     check(isBlock) { "This material ($name) is not a block" }
     val chunks = mutableSetOf<Chunk>()

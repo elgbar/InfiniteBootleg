@@ -104,44 +104,45 @@ inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.
   this.color = oldColor
 }
 
-fun Entity.interactableBlock(
+fun Entity.interactableBlocks(
   world: World,
   centerBlockX: Int,
   centerBlockY: Int,
   radius: Float,
   interactionRadius: Float
-): MutableSet<Long> {
+): Sequence<Long> {
   val pos = this.position
-  return World.getLocationsWithin(centerBlockX, centerBlockY, radius)
-    .filterTo(mutableSetOf()) {
+  return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
+    .filter {
       (ignorePlaceableCheck || isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius)) &&
         (!Settings.renderLight || world.getBlockLight(it.decompactLocX(), it.decompactLocY())?.isLit ?: true)
     }
 }
 
-fun Entity.breakableBlock(
+fun Entity.breakableBlocks(
   world: World,
   centerBlockX: Int,
   centerBlockY: Int,
   radius: Float,
   interactionRadius: Float
-): Set<Long> {
-  return interactableBlock(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { world.isAirBlock(it) } }
+): Sequence<Long> {
+  return interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filter { !world.isAirBlock(it) }
 }
 
-fun Entity.placeableBlock(
+fun Entity.placeableBlocks(
   world: World,
   centerBlockX: Int,
   centerBlockY: Int,
   radius: Float,
   interactionRadius: Float
-): Set<Long> {
-  return interactableBlock(world, centerBlockX, centerBlockY, radius, interactionRadius).apply { removeIf { !world.isAirBlock(it) } }
+): Sequence<Long> {
+  return interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius)
+    .filter { world.isAirBlock(it) }
     .let {
       if (it.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
         it
       } else {
-        emptySet()
+        emptySequence()
       }
     }
 }
