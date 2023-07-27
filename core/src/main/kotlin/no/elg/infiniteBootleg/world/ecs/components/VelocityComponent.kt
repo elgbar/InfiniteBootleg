@@ -14,10 +14,12 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import no.elg.infiniteBootleg.world.ecs.with
 
-data class VelocityComponent(
-  var dx: Float,
-  var dy: Float
-) : EntitySavableComponent {
+class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
+
+  var dx: Float = dx
+    private set
+  var dy: Float = dy
+    private set
 
   val maxDx: Float = MAX_X_VEL
   val maxDy: Float = MAX_Y_VEL
@@ -33,10 +35,7 @@ data class VelocityComponent(
   }
 
   override fun EntityKt.Dsl.save() {
-    velocity = vector2f {
-      x = dx
-      y = dy
-    }
+    velocity = toVector2f()
   }
 
   companion object : EntityParentLoadableMapper<VelocityComponent>() {

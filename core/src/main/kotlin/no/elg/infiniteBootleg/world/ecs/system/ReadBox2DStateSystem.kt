@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_FIRST
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2dBody
@@ -35,8 +36,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
   private fun readVelocity(entity: Entity, body: Body) {
     val velocity = entity.velocityOrNull ?: return
     if (!entity.updateBox2DVelocity) {
-      velocity.dx = body.linearVelocity.x
-      velocity.dy = body.linearVelocity.y
+      entity.setVelocity(body.linearVelocity.x, body.linearVelocity.y)
     }
     val lookDirection = entity.lookDirectionOrNull ?: return
     if (abs(velocity.dx) > 0.2f) {
