@@ -16,9 +16,9 @@ interface ECSEventQueue<T : ECSEvent> : Component {
   val events: ConcurrentLinkedQueue<T>
 
   companion object {
-    inline fun <T : ECSEvent, reified Q : ECSEventQueue<T>> Engine.queueEvent(queueMapper: ComponentMapper<out Q>, event: T, filter: (Entity) -> Boolean = { true }) {
+    inline fun <T : ECSEvent, reified Q : ECSEventQueue<T>> Engine.queueEvent(queueMapper: ComponentMapper<out Q>, event: T, noinline filter: (Entity) -> Boolean = { true }) {
       val family = allOf(*BASIC_STANDALONE_ENTITY, Q::class).get()
-      this.getEntitiesFor(family).filter(filter).forEach {
+      this.getEntitiesFor(family).asSequence().filter(filter).forEach {
         val ecsEvents = queueMapper.get(it) ?: return@forEach
         ecsEvents.events += event
       }

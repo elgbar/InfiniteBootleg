@@ -12,7 +12,7 @@ class InputEventQueue : ECSEventQueue<InputEvent> {
 
   companion object : Mapper<InputEventQueue>() {
     var Entity.inputEventQueueOrNull by optionalPropertyFor(InputEventQueue.mapper)
-    inline fun Engine.queueInputEvent(event: InputEvent, filter: (Entity) -> Boolean = { true }) {
+    fun Engine.queueInputEvent(event: InputEvent, filter: (Entity) -> Boolean = { true }) {
       queueEvent(InputEventQueue.mapper, event, filter)
     }
   }
