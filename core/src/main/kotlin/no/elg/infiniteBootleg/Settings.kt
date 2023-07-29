@@ -86,6 +86,9 @@ object Settings {
       Gdx.graphics.setVSync(field)
     }
 
+  /**
+   * Default value is max hz of displays reasonably to expect
+   */
   var foregroundFPS = 361
     set(value) {
       field = value.coerceAtLeast(0)
