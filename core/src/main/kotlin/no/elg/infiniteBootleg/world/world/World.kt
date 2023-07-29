@@ -179,7 +179,7 @@ abstract class World(
     name = worldName
     worldTicker = WorldTicker(this, false)
     worldTime = WorldTime(this)
-    spawn = Location(0, 0)
+    spawn = Location(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
     worldBody = WorldBody(this)
     oneShotListener<InitialChunksOfWorldLoadedEvent> {

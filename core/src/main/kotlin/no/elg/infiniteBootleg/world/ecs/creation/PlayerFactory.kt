@@ -277,7 +277,7 @@ fun Engine.createSPPlayerEntity(
   if (Main.isSingleplayer) {
     entity {
       addCommonClientPlayerComponents(world, true)
-      addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES) {
+      addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES) {
         completableFuture.complete(it)
       }
     }
