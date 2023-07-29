@@ -76,7 +76,7 @@ private fun KVisWindow.toggleableDebugButton(
 }
 
 @Scene2dDsl
-private fun KVisWindow.floatSpinner(name: String, initialValue: Float, min: Float, max: Float, step: Float, onChange: (Float) -> Unit) {
+private fun KVisWindow.floatSpinner(name: String, initialValue: Number, min: Number, max: Number, step: Number, onChange: (Float) -> Unit) {
   val model = FloatSpinnerModel(initialValue.toString(), min.toString(), max.toString(), step.toString())
   spinner(name, model) {
     it.fillX()
@@ -157,6 +157,10 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("Box2D draw inactiveBodies", box2dDebug::isDrawInactiveBodies, Main.inst().console.exec::drawInactiveBodies)
         toggleableDebugButton("Box2D draw velocities", box2dDebug::isDrawVelocities, Main.inst().console.exec::drawVelocities)
         toggleableDebugButton("Box2D draw contacts", box2dDebug::isDrawContacts, Main.inst().console.exec::drawContacts)
+      }
+      aRow {
+        toggleableDebugButton("Vsync", Settings::vsync) { Settings.vsync = !Settings.vsync }
+        floatSpinner("Max FPS", Settings.foregroundFPS, 0, 512, 1) { Settings.foregroundFPS = it.toInt() }
       }
       pack()
     }

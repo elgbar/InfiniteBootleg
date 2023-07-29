@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg
 
+import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import java.awt.GraphicsEnvironment
 
@@ -78,4 +79,16 @@ object Settings {
   var host = ""
   var stageDebug = false
   var viewDistance = 4 // ish max chunks when fully zoomed out
+
+  var vsync = true
+    set(value) {
+      field = value
+      Gdx.graphics.setVSync(field)
+    }
+
+  var foregroundFPS = 361
+    set(value) {
+      field = value.coerceAtLeast(0)
+      Gdx.graphics.setForegroundFPS(field)
+    }
 }
