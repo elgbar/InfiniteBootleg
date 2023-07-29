@@ -59,7 +59,7 @@ internal fun createBody2DBodyComponent(
     if (Settings.debug) {
       check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
       checkFamilies(entity, wantedFamilies)
-      Main.logger().log("Finishing setting up box2d entity")
+      Main.logger().debug("BOX2D", "Finishing setting up box2d entity")
     }
     afterBodyCreated(entity)
   }
