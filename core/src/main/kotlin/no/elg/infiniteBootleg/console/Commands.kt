@@ -35,7 +35,8 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
-import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
+import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MIN_ZOOM
 import no.elg.infiniteBootleg.world.ticker.Ticker
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
@@ -336,11 +337,11 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
 
   @CmdArgNames("zoom level")
   @ClientsideOnly
-  @ConsoleDoc(description = "Change the zoom level of the world camera", paramDescriptions = ["The new zoom level, min is " + WorldRender.MIN_ZOOM])
+  @ConsoleDoc(description = "Change the zoom level of the world camera", paramDescriptions = ["The new zoom level must be between $MIN_ZOOM and $MAX_ZOOM"])
   fun zoom(zoom: Float) {
     val clientWorld = clientWorld ?: return
     val render = clientWorld.render
-    render.camera.zoom = zoom.coerceIn(WorldRender.MIN_ZOOM, WorldRender.MAX_ZOOM)
+    render.camera.zoom = zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
     render.update()
     logger.success("Zoom level is now ${render.camera.zoom}")
   }
