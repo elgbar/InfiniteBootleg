@@ -10,14 +10,18 @@ import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
+import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.spinner
+import ktx.scene2d.vis.visLabel
+import ktx.scene2d.vis.visSlider
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.KeyboardControls
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
 import no.elg.infiniteBootleg.screens.toggleShown
@@ -25,6 +29,7 @@ import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
+import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow) {
@@ -81,6 +86,22 @@ private fun KVisWindow.floatSpinner(name: String, initialValue: Float, min: Floa
   }
 }
 
+@Scene2dDsl
+private fun KVisWindow.floatSlider(name: String, initialValue: Float, min: Float, max: Float, step: Float, onChange: (Float) -> Unit) {
+  horizontalGroup {
+    it.fillX()
+    space(5f)
+    visLabel(name)
+    visSlider(min, max, step) {
+      this.name = name
+      setValue(initialValue)
+      onChange {
+        onChange(this.value)
+      }
+    }
+  }
+}
+
 fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
   actors {
     val debugMenu = visWindow("Debug Menu") {
@@ -109,7 +130,11 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       }
       aRow {
         floatSpinner("Brush size", KeyboardControls.INITIAL_BRUSH_SIZE, 1f, 64f, 0.25f, Main.inst().console.exec::brush)
-        floatSpinner("Reach radius", KeyboardControls.INITIAL_INTERACT_RADIUS, 1f, 1024f, 1f, Main.inst().console.exec::interactRadius)
+        floatSpinner("Reach radius", KeyboardControls.INITIAL_INTERACT_RADIUS, 1f, 512f, 1f, Main.inst().console.exec::interactRadius)
+        floatSlider("Zoom", 1f, 0.1f, MAX_ZOOM * 5, 0.1f) {
+          val clientWorld = ClientMain.inst().world ?: return@floatSlider
+          clientWorld.render.camera.zoom = it
+        }
       }
       aRow {
         separator {
