@@ -18,11 +18,13 @@ import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
+import no.elg.infiniteBootleg.world.ecs.components.tags.LeafTag.Companion.leaf
 import no.elg.infiniteBootleg.world.ecs.components.transients.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
+import no.elg.infiniteBootleg.world.ecs.leafBlockFamily
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 import no.elg.infiniteBootleg.world.ecs.with
 import no.elg.infiniteBootleg.world.world.World
@@ -101,4 +103,9 @@ fun Engine.createFallingBlockStandaloneEntity(
 fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
     this.entity.gravityAffected = true
+  }
+
+fun Engine.createLeafEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
+  createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
+    this.entity.leaf = true
   }

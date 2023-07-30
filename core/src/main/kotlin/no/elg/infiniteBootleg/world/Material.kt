@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntity
+import no.elg.infiniteBootleg.world.ecs.creation.createLeafEntity
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.with
@@ -90,7 +91,16 @@ enum class Material(
     }
   ),
   BIRCH_TRUNK(hardness = 1.25f, hasTransparentTexture = true, isCollidable = false, blocksLight = false),
-  BIRCH_LEAVES(hardness = 0.1f, hasTransparentTexture = true, isCollidable = false, blocksLight = false, adjacentPlaceable = false);
+  BIRCH_LEAVES(
+    hardness = 0.1f,
+    hasTransparentTexture = true,
+    isCollidable = false,
+    blocksLight = false,
+    adjacentPlaceable = false,
+    createNew = { world: World, chunk, worldX: Int, worldY: Int, material: Material ->
+      world.engine.createLeafEntity(world, chunk, worldX, worldY, material)
+    }
+  );
 
   var textureRegion: RotatableTextureRegion? = null
 
