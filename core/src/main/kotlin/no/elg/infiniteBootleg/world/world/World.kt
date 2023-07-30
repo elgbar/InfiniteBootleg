@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
@@ -200,7 +199,7 @@ abstract class World(
   }
 
   protected open fun initializeEngine(): Engine {
-    val engine = PooledEngine()
+    val engine = Engine()
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(ReadBox2DStateSystem)
     engine.addSystem(WriteBox2DStateSystem)
