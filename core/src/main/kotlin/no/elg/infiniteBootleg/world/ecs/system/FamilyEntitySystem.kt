@@ -14,8 +14,7 @@ import com.badlogic.gdx.utils.Array
  */
 abstract class FamilyEntitySystem(private val family: Family, priority: Int) : EntitySystem(priority) {
 
-  var entities: ImmutableArray<Entity> = EMPTY_ENTITIES
-    private set
+  private var entities: ImmutableArray<Entity> = EMPTY_ENTITIES
 
   override fun addedToEngine(engine: Engine) {
     entities = engine.getEntitiesFor(family)
@@ -25,7 +24,12 @@ abstract class FamilyEntitySystem(private val family: Family, priority: Int) : E
     entities = EMPTY_ENTITIES
   }
 
-  abstract override fun update(deltaTime: Float)
+  final override fun update(deltaTime: Float) {
+    if (entities.size() == 0) return
+    processEntities(entities)
+  }
+
+  abstract fun processEntities(entities: ImmutableArray<Entity>)
 
   companion object {
     private val EMPTY_ENTITIES = ImmutableArray<Entity>(Array.with())
