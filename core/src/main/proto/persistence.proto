@@ -80,6 +80,7 @@ message Entity {
     optional bool followedByCamera = 2;
     optional bool gravityAffected = 3;
     optional bool ignorePlaceableCheck = 4;
+    optional bool leafDecay = 5;
   }
 
   message Killable {

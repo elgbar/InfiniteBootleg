@@ -75,9 +75,9 @@ import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
-import no.elg.infiniteBootleg.world.ecs.system.block.DespawnLeavesSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
+import no.elg.infiniteBootleg.world.ecs.system.block.LeavesDecaySystem
 import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
@@ -214,7 +214,7 @@ abstract class World(
     engine.addSystem(OutOfBoundsSystem)
     engine.addSystem(FallingBlockSystem)
     engine.addSystem(ExplosiveBlockSystem)
-    engine.addSystem(DespawnLeavesSystem)
+    engine.addSystem(LeavesDecaySystem)
     if (Main.isClient) {
       engine.addSystem(FollowEntitySystem)
     }

@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
-import no.elg.infiniteBootleg.world.ecs.components.tags.LeafTag.Companion.leaf
+import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecay
 import no.elg.infiniteBootleg.world.ecs.components.transients.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -107,5 +107,5 @@ fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: 
 
 fun Engine.createLeafEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
-    this.entity.leaf = true
+    this.entity.leafDecay = true
   }

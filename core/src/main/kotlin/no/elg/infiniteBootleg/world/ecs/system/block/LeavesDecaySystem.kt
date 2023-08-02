@@ -17,9 +17,9 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Com
 import no.elg.infiniteBootleg.world.ecs.leafBlockFamily
 import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
 
-object DespawnLeavesSystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT) {
+object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT) {
 
-  const val DESPAWN_LEAVES_RADIUS = 5f
+  private const val DESPAWN_LEAVES_RADIUS = 5f
 
   override fun processEntities(entities: ImmutableArray<Entity>) {
     val entity: Entity = entities.random()
