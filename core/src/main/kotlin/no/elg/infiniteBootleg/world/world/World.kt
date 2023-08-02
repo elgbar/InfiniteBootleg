@@ -3,8 +3,7 @@ package no.elg.infiniteBootleg.world.world
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.math.MathUtils.floorPositive
-import com.badlogic.gdx.math.MathUtils.random
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.utils.Array
@@ -100,8 +99,6 @@ import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.floor
 
 /**
  * Different kind of views
@@ -177,7 +174,7 @@ abstract class World(
   constructor(protoWorld: ProtoWorld.World) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name)
 
   init {
-    random.setSeed(seed)
+    MathUtils.random.setSeed(seed)
     uuid = generateUUIDFromLong(seed).toString()
     name = worldName
     worldTicker = WorldTicker(this, false)
@@ -642,15 +639,15 @@ abstract class World(
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
       if (Util.isBetween(
-          floor((x - size.halfBox2dWidth)).toFloat(),
+          MathUtils.floor((x - size.halfBox2dWidth)).toFloat(),
           worldX,
-          ceil((x + size.halfBox2dWidth)).toFloat()
+          MathUtils.ceil((x + size.halfBox2dWidth)).toFloat()
         ) &&
         //
         Util.isBetween(
-          floor((y - size.halfBox2dHeight)).toFloat(),
+          MathUtils.floor((y - size.halfBox2dHeight)).toFloat(),
           worldY,
-          ceil((y + size.halfBox2dHeight)).toFloat()
+          MathUtils.ceil((y + size.halfBox2dHeight)).toFloat()
         )
       ) {
         foundEntities.add(entity)
@@ -977,11 +974,16 @@ abstract class World(
     }
     Preconditions.checkArgument(offsetX >= 0, "offsetX must be >= 0, was $offsetX")
     Preconditions.checkArgument(offsetY >= 0, "offsetY must be >= 0, was $offsetY")
-    val capacity = floor(abs(offsetX * offsetY)).toInt()
-    val blocks = GdxArray<Block>(true, capacity)
+    val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
+    val blocks = Array<Block>(true, capacity)
+    var x = MathUtils.floor(worldX)
+    val startY = MathUtils.floor(worldY)
+    val maxX = worldX + offsetX
+    val maxY = worldY + offsetY
     val chunks = LongMap<Chunk>()
-    for (x in floor(worldX).toInt() until ceil(worldX + offsetX).toInt()) {
-      for (y in floor(worldY).toInt() until ceil(worldY + offsetY).toInt()) {
+    while (x <= maxX) {
+      var y = startY
+      while (y <= maxY) {
         if (cancel.invoke()) {
           return blocks
         }
@@ -990,17 +992,24 @@ abstract class World(
         if (chunk == null || chunk.isInvalid) {
           chunk = getChunk(chunkPos, loadChunk)
           if (chunk == null) {
+            y++
             continue
           }
           chunks.put(chunkPos, chunk)
         }
         val localX = x.chunkOffset()
         val localY = y.chunkOffset()
-        val b = (if (effectiveRaw) chunk.getRawBlock(localX, localY) else chunk.getBlock(localX, localY)) ?: continue
+        val b = if (effectiveRaw) chunk.getRawBlock(localX, localY) else chunk.getBlock(localX, localY)
+        if (b == null) {
+          y++
+          continue
+        }
         if ((includeAir || b.isMarkerBlock() || b.isNotAir()) && filter.invoke(b)) {
           blocks.add(b)
         }
+        y++
       }
+      x++
     }
     return blocks
   }
@@ -1075,12 +1084,18 @@ abstract class World(
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100L
 
     fun getLocationsAABB(worldX: Float, worldY: Float, offsetX: Float, offsetY: Float): LongArray {
-      val capacity = floorPositive(abs(offsetX)) * floorPositive(abs(offsetY))
+      val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
       val blocks = GdxLongArray(true, capacity)
-      for (x in floor(worldX - offsetX).toInt() until ceil(worldX + offsetX).toInt()) {
-        for (y in floor(worldY - offsetY).toInt() until ceil(worldY + offsetY).toInt()) {
+      var x = MathUtils.floor(worldX - offsetX)
+      val maxX = worldX + offsetX
+      val maxY = worldY + offsetY
+      while (x <= maxX) {
+        var y = MathUtils.floor(worldY - offsetY)
+        while (y <= maxY) {
           blocks.add(compactLoc(x, y))
+          y++
         }
+        x++
       }
       return blocks.toArray()
     }
