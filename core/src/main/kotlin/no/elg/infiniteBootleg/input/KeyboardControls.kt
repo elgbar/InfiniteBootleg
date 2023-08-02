@@ -8,13 +8,14 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.util.breakableBlock
+import no.elg.infiniteBootleg.util.breakableBlocks
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.dstd
-import no.elg.infiniteBootleg.util.placeableBlock
+import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryOrNull
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -22,13 +23,11 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent.Companion.grounded
 import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent.Companion.selectedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
-import kotlin.math.sign
 
 /**
  * Control scheme where the user moves the player around with a keyboard
@@ -50,9 +49,8 @@ class KeyboardControls(val world: ClientWorld) {
   private fun breakBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
     if (canNotInteract(blockX, blockY)) return false
     val world = entity.world
-    val breakableBlocks = entity.breakableBlock(world, blockX, blockY, brushSize, interactRadius)
-    if (breakableBlocks.isEmpty()) return false
-    world.removeBlocks(world.getBlocks(breakableBlocks), true)
+    val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, brushSize, interactRadius).asIterable()
+    world.removeBlocks(world.getBlocks(breakableBlocks))
     return true
   }
 
@@ -61,8 +59,7 @@ class KeyboardControls(val world: ClientWorld) {
     val world = entity.world
     val material = (entity.selectedOrNull ?: return false).material
     val inventory = entity.inventoryOrNull ?: return false
-    val placeableBlock = entity.placeableBlock(world, blockX, blockY, brushSize, interactRadius)
-    if (placeableBlock.isEmpty()) return false
+    val placeableBlock = entity.placeableBlocks(world, blockX, blockY, brushSize, interactRadius).toSet()
     if (inventory.use(material, placeableBlock.size.toUInt())) {
       material.createBlocks(world, placeableBlock)
     }
@@ -156,12 +153,7 @@ class KeyboardControls(val world: ClientWorld) {
     val body = box2dBody
     val vel = body.linearVelocity
     val (nx, ny) = modify(vel.x, vel.y)
-    val cap = { z: Float, max: Float -> sign(z) * min(max, abs(z)) }
-
-    val velocityComponent = this.velocity
-    velocityComponent.dx = cap(nx, MAX_X_VEL)
-    velocityComponent.dy = cap(ny, MAX_Y_VEL)
-    this.updateBox2DVelocity = true
+    this.setVelocity(nx, ny)
   }
 
   fun touchDown(entity: Entity, button: Int) {

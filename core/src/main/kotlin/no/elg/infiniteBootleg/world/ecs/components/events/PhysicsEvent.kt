@@ -16,7 +16,7 @@ class PhysicsEventQueue : ECSEventQueue<PhysicsEvent>, Pool.Poolable {
 
   companion object : Mapper<PhysicsEventQueue>() {
     var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
-    inline fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = { true }) {
+    fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = { true }) {
       queueEvent(PhysicsEventQueue.mapper, event, filter)
     }
   }

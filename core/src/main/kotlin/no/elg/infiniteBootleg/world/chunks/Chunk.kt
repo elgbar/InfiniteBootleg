@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.Material
@@ -148,8 +147,13 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    */
   fun updateIfDirty()
 
+  /**
+   * Block light was updated in this chunk at the given local coordinates
+   */
+  fun blockLightUpdatedAt(localX: Int, localY: Int)
+
   /** Update the light of the chunk  */
-  fun updateBlockLights(localX: Int = ChunkLightUpdatedEvent.CHUNK_CENTER, localY: Int = ChunkLightUpdatedEvent.CHUNK_CENTER, dispatchEvent: Boolean = true)
+  fun updateAllBlockLights()
 
   /** Mark this chunk as viewed during the current tick  */
   fun view()

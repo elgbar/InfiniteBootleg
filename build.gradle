@@ -4,7 +4,7 @@ plugins {
   id "java"
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.15.0" apply false
+  id "com.diffplug.spotless" version "6.20.0" apply false
   id "com.github.ben-manes.versions" version "0.47.0" apply false
   id "com.google.protobuf" version "0.9.4" apply false
 }
@@ -58,7 +58,6 @@ allprojects {
       targetExclude fileTree(projectDir) { include '**/generated/**' }
 
       ktlint()
-        .setUseExperimental(true)
         .setEditorConfigPath("$rootDir/.editorconfig")
     }
   }
@@ -73,7 +72,7 @@ subprojects {
 
   java {
     toolchain {
-      languageVersion = JavaLanguageVersion.of(17)
+      languageVersion = JavaLanguageVersion.of(20)
     }
   }
 
@@ -132,7 +131,7 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.94.Final"
+    implementation "io.netty:netty-all:4.1.95.Final"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "org.jetbrains:annotations:24.0.1"

@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.generator.chunk
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
+import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl
@@ -32,6 +33,22 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     it.SetFrequency(0.01f)
     it.SetFractalType(FractalType.Ridged)
     it.SetFractalOctaves(1)
+    it.SetFractalLacunarity(1.0f)
+    it.SetFractalGain(0.5f)
+  }
+
+  private val noiseCheeseCave: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
+    it.SetNoiseType(NoiseType.OpenSimplex2)
+    it.SetFrequency(0.05f)
+    it.SetFractalOctaves(2)
+    it.SetFractalLacunarity(1.0f)
+    it.SetFractalGain(0.5f)
+  }
+
+  private val noiseGreatHall: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
+    it.SetNoiseType(NoiseType.OpenSimplex2)
+    it.SetFrequency(0.004f)
+    it.SetFractalOctaves(2)
     it.SetFractalLacunarity(1.0f)
     it.SetFractalGain(0.5f)
   }
@@ -68,20 +85,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
 
       // generate caves (where there is something to generate them in
       if (chunkY <= genChunkY) {
-        val blocks = chunk.blocks
-        val worldChunkY = chunkY.chunkToWorld()
-        for (localY in 0 until Chunk.CHUNK_SIZE) {
-          val worldY = worldChunkY + localY
-
-          // calculate the size of the worm
-          val wormSize = 1 + abs(noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY))
-          val caveNoise = noise2.GetNoise(worldX.toDouble(), worldY.toDouble()) / wormSize
-          val diffToSurface = (genHeight - worldY).toDouble()
-          val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
-          if (caveNoise > CAVE_CREATION_THRESHOLD / depthModifier) {
-            blocks[localX][localY] = null
-          }
-        }
+        generateCaves(chunk, chunkY, genHeight, worldX)
       }
     }
     chunk.finishLoading()
@@ -105,9 +109,34 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     }
   }
 
+  private fun generateCaves(chunk: Chunk, chunkY: Int, genHeight: Int, worldX: Int) {
+    val blocks = chunk.blocks
+    val worldChunkY = chunkY.chunkToWorld()
+    val localX = worldX.chunkOffset()
+    for (localY in 0 until Chunk.CHUNK_SIZE) {
+      val worldY = worldChunkY + localY
+
+      // calculate the size of the worm
+      val wormSize = 1 + abs(noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY))
+      val caveNoise = noise2.GetNoise(worldX.toDouble(), worldY.toDouble()) / wormSize
+      val diffToSurface = (genHeight - worldY).toDouble()
+      val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
+
+      val cheese = noiseCheeseCave.getNoise(worldX.toDouble(), worldY.toDouble(), wormSize)
+      val greatHall = noiseGreatHall.getNoise(worldX.toDouble(), worldY.toDouble(), wormSize)
+      if (caveNoise > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier ||
+        cheese > CHEESE_CAVE_CREATION_THRESHOLD / depthModifier ||
+        greatHall > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier
+      ) {
+        blocks[localX][localY] = null
+      }
+    }
+  }
+
   companion object {
     /** Noise values above this value will be cave (i.e., air).  */
-    private const val CAVE_CREATION_THRESHOLD = 0.92
+    private const val SNAKE_CAVE_CREATION_THRESHOLD = 0.92
+    private const val CHEESE_CAVE_CREATION_THRESHOLD = 0.8
 
     /** How much the size of the caves (worms) changes  */
     private const val WORM_SIZE_AMPLITUDE = 0.15

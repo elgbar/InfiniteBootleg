@@ -20,10 +20,10 @@ fun main(args: Array<String>) {
     val config = Lwjgl3ApplicationConfiguration()
     config.disableAudio(true)
     config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
-    config.useVsync(true)
+    config.useVsync(Settings.vsync)
     config.setTitle("Infinite Terraria")
     config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 16)
-    config.setForegroundFPS(361) // Max hz reasonably to expect
+    config.setForegroundFPS(Settings.foregroundFPS)
     Lwjgl3Application(main, config)
   } else {
     val config = HeadlessApplicationConfiguration()

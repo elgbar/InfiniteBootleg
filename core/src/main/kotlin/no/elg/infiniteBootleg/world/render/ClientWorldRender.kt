@@ -103,15 +103,15 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
         renderer.render()
       }
     }
-    if (Settings.debug) {
+    if (Settings.renderChunkUpdates || Settings.renderChunkBounds) {
       chunkDebugRenderer.render()
     }
-    if (Settings.renderBox2dDebug && Settings.debug) {
+    if (Settings.renderBox2dDebug) {
       synchronized(BOX2D_LOCK) {
         box2DDebugRenderer.render(worldBody.box2dWorld, m4)
       }
     }
-    if (Settings.renderLight && Settings.debug) {
+    if (Settings.renderLight) {
       blockLightDebugRenderer.render()
     }
   }

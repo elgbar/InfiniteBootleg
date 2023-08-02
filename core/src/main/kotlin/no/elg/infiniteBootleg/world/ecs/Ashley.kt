@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.LeafTag
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.transients.ChunkComponent
@@ -72,6 +73,7 @@ val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).
 
 val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).get()
 val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).get()
+val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafTag::class).get()
 
 val fallingStandaloneBlockFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, VelocityComponent::class, OccupyingBlocksComponent::class).get()
 val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class).get()

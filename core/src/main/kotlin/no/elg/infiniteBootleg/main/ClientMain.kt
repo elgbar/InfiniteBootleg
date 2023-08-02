@@ -11,9 +11,9 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.input.GlobalInputListener
 import no.elg.infiniteBootleg.input.MouseLocator
+import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.main.Main.Companion.isClient
 import no.elg.infiniteBootleg.main.Main.Companion.isServer
-import no.elg.infiniteBootleg.main.Main.Companion.isSingleplayer
 import no.elg.infiniteBootleg.main.Main.Companion.logger
 import no.elg.infiniteBootleg.screens.AbstractScreen
 import no.elg.infiniteBootleg.screens.MainMenuScreen
@@ -104,7 +104,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     Runtime.getRuntime().addShutdownHook(
       Thread {
         scheduler.shutdown()
-        if (isSingleplayer) {
+        if (isAuthoritative) {
           world?.save()
           world?.dispose()
         } else if (isClient) {

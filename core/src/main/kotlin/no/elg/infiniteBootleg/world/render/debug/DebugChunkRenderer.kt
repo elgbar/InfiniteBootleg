@@ -29,10 +29,6 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
   }
 
   override fun render() {
-    if (!Settings.renderChunkUpdates && !Settings.renderChunkBounds) {
-      return
-    }
-
     val chunksInView = worldRender.chunksInView
     val yEnd = chunksInView.verticalEnd
     val xEnd = chunksInView.horizontalEnd

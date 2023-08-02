@@ -24,16 +24,16 @@ class ForestGenerator(override val seed: Long, private val cutoff: Float) : Feat
   private fun createTree(world: World, worldX: Int, worldY: Int) {
     val treeHeight = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 1) * 16)
     val locs = World.getLocationsAABB(worldX.toFloat(), worldY.toFloat(), 0f, treeHeight)
-    Material.BIRCH_TRUNK.createBlocks(world, locs.toSet(), false)
+    Material.BIRCH_TRUNK.createBlocks(world, locs, false)
 
     val leavesRadius = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 2) * 5).coerceAtLeast(3f)
     val leaves = getLocationsWithin(worldX, worldY + treeHeight.toInt(), leavesRadius)
-    Material.BIRCH_LEAVES.createBlocks(world, leaves.toSet(), false)
+    Material.BIRCH_LEAVES.createBlocks(world, leaves, false)
 
     if (treeHeight >= 6) {
       val leavesRadius2 = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 3) * 4).coerceIn(1f, leavesRadius - 0.5f)
       val leaves2 = getLocationsWithin(worldX, worldY + (treeHeight - leavesRadius).toInt(), leavesRadius2)
-      Material.BIRCH_LEAVES.createBlocks(world, leaves2.toSet(), false)
+      Material.BIRCH_LEAVES.createBlocks(world, leaves2, false)
     }
   }
 }

@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.util.breakableBlock
+import no.elg.infiniteBootleg.util.breakableBlocks
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
-import no.elg.infiniteBootleg.util.placeableBlock
+import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledOrNull
@@ -27,13 +27,13 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
       val keyboardControls = entity.locallyControlledOrNull?.keyboardControls ?: continue
 
-      entity.breakableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
+      entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
         .forEach { (blockWorldX, blockWorldY) ->
           renderPlaceableBlock(world, KAssets.breakingBlockTexture.textureRegion, blockWorldX, blockWorldY)
         }
 
       val texture = entity.selected.material.textureRegion?.textureRegion ?: continue
-      entity.placeableBlock(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
+      entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
         .forEach { (blockWorldX, blockWorldY) ->
           renderPlaceableBlock(world, texture, blockWorldX, blockWorldY)
         }

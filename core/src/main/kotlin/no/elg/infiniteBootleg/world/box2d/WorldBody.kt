@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.OrderedSet
-import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.CheckableDisposable
@@ -45,8 +44,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   @field:Volatile
   private var disposed = false
-
-  private val bodies = GdxArray<Body>()
 
   private val chunksToUpdate = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
   private val updatingChunks = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }

@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.entity
 import no.elg.infiniteBootleg.protobuf.tagsOrNull
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.EntityTypeComponent.Companion.entityTypeComponentOrNull

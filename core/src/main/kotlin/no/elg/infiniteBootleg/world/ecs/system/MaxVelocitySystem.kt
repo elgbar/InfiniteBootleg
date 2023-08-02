@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 import no.elg.infiniteBootleg.world.ecs.toFamily
 import kotlin.math.abs
 
@@ -20,9 +20,7 @@ object MaxVelocitySystem : IteratingSystem(VelocityComponent::class.toFamily(), 
     val tooFastY: Boolean = abs(velocity.dy) > velocity.maxDy
 
     if (tooFastX || tooFastY) {
-      entity.updateBox2DVelocity = true
-      entity.velocity.dx = velocity.dx.coerceIn(-velocity.maxDx, velocity.maxDx)
-      entity.velocity.dy = velocity.dy.coerceIn(-velocity.maxDy, velocity.maxDy)
+      entity.setVelocity(velocity.dx, velocity.dy)
     }
   }
 }

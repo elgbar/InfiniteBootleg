@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
+import java.lang.Short.SIZE
 import kotlin.math.abs
 import kotlin.math.floor
 
@@ -131,7 +132,7 @@ inline fun Long.worldCompactToChunk(): Long = compactLoc(decompactLocX().worldTo
 
 inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
 
-inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl java.lang.Short.SIZE or (b.toInt() and 0xffff)
+inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl SIZE or (b.toInt() and 0xffff)
 
 inline fun compactChunkToWorld(chunk: Chunk, localX: Int, localY: Int): Long = compactLoc(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
 
@@ -140,7 +141,7 @@ inline fun compactChunkToWorld(chunk: Chunk, localX: Int, localY: Int): Long = c
  * @return The x coordinate of the compacted location
  */
 
-inline fun Int.decompactShortA(): Short = (this shr java.lang.Short.SIZE).toShort()
+inline fun Int.decompactShortA(): Short = (this shr SIZE).toShort()
 
 /**
  * @param this@decompactShortB A long created by [.compactLoc]

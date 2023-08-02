@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.ecs.system.client
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import no.elg.infiniteBootleg.Settings
@@ -21,7 +22,7 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
   private const val CAMERA_LERP = 2.5f
   private const val LERP_CUTOFF = 5f
 
-  override fun update(deltaTime: Float) {
+  override fun processEntities(entities: ImmutableArray<Entity>) {
     val entity = entities.firstOrNull() ?: return
     processEntity(entity)
     if (entities.size() > 1) {

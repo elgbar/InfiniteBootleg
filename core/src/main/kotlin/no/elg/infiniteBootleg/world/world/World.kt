@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils.floorPositive
 import com.badlogic.gdx.math.MathUtils.random
@@ -76,6 +75,7 @@ import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
+import no.elg.infiniteBootleg.world.ecs.system.block.DespawnLeavesSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
@@ -182,7 +182,7 @@ abstract class World(
     name = worldName
     worldTicker = WorldTicker(this, false)
     worldTime = WorldTime(this)
-    spawn = Location(0, 0)
+    spawn = Location(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
     worldBody = WorldBody(this)
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
@@ -203,7 +203,7 @@ abstract class World(
   }
 
   protected open fun initializeEngine(): Engine {
-    val engine = PooledEngine()
+    val engine = Engine()
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(ReadBox2DStateSystem)
     engine.addSystem(WriteBox2DStateSystem)
@@ -214,6 +214,7 @@ abstract class World(
     engine.addSystem(OutOfBoundsSystem)
     engine.addSystem(FallingBlockSystem)
     engine.addSystem(ExplosiveBlockSystem)
+    engine.addSystem(DespawnLeavesSystem)
     if (Main.isClient) {
       engine.addSystem(FollowEntitySystem)
     }
@@ -1009,8 +1010,8 @@ abstract class World(
    * @param worldY The y coordinate in world view
    * @return The material at the given location
    */
-  fun getMaterial(worldX: Int, worldY: Int): Material = getRawBlock(worldX, worldY, true).materialOrAir()
-  fun getMaterial(compactLoc: Long): Material = getRawBlock(compactLoc, true).materialOrAir()
+  fun getMaterial(worldX: Int, worldY: Int, load: Boolean = true): Material = getRawBlock(worldX, worldY, load).materialOrAir()
+  fun getMaterial(compactLoc: Long, load: Boolean = true): Material = getRawBlock(compactLoc, load).materialOrAir()
 
   /**
    * Alias to `WorldBody#postBox2dRunnable`
