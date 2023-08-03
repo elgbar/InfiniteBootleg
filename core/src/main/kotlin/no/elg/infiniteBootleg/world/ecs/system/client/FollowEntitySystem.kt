@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -24,9 +25,11 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
 
   override fun processEntities(entities: ImmutableArray<Entity>) {
     val entity = entities.firstOrNull() ?: return
-    processEntity(entity)
-    if (entities.size() > 1) {
+    if (entities.size() == 1) {
+      processEntity(entity)
+    } else if (entities.size() > 1) {
       Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: $entities")
+      entities.drop(1).forEach { it.followedByCamera = false }
     }
   }
 
