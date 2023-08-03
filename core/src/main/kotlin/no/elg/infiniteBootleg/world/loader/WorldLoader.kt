@@ -59,7 +59,7 @@ object WorldLoader {
     return future
   }
 
-  fun saveServerPlayer(player: Entity) {
+  private fun saveServerPlayer(player: Entity) {
     val fileHandle = getServerPlayerFile(player.world, player.id)
     if (fileHandle != null) {
       try {
@@ -75,7 +75,7 @@ object WorldLoader {
     return Gdx.files.external(Main.WORLD_FOLDER + uuid)
   }
 
-  fun getWorldLockFile(uuid: String): FileHandle {
+  private fun getWorldLockFile(uuid: String): FileHandle {
     return getWorldFolder(uuid).child(LOCK_FILE_NAME)
   }
 
@@ -89,7 +89,6 @@ object WorldLoader {
       if (worldLockFile.isDirectory) {
         // Invalid format, allow writing
         Main.logger().warn("World lock file for $uuid was a directory")
-        worldLockFile.deleteDirectory()
         return true
       }
       if (!worldLockFile.exists()) {
