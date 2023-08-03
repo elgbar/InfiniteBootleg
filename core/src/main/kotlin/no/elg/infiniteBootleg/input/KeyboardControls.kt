@@ -14,15 +14,15 @@ import no.elg.infiniteBootleg.util.dstd
 import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryOrNull
+import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2dBody
-import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent.Companion.grounded
-import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent.Companion.selectedOrNull
-import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
@@ -57,8 +57,8 @@ class KeyboardControls(val world: ClientWorld) {
   private fun placeBlocks(entity: Entity, blockX: Int, blockY: Int): Boolean {
     if (canNotInteract(blockX, blockY)) return false
     val world = entity.world
-    val material = (entity.selectedOrNull ?: return false).material
-    val inventory = entity.inventoryOrNull ?: return false
+    val material = (entity.selectedInventoryItemComponentOrNull ?: return false).material
+    val inventory = entity.inventoryComponentOrNull ?: return false
     val placeableBlock = entity.placeableBlocks(world, blockX, blockY, brushSize, interactRadius).toSet()
     if (inventory.use(material, placeableBlock.size.toUInt())) {
       material.createBlocks(world, placeableBlock)
@@ -94,18 +94,18 @@ class KeyboardControls(val world: ClientWorld) {
     fun moveHorz(dir: Float) {
       val world = world
       world.postBox2dRunnable {
-        if (grounded.canMove(dir)) {
+        if (groundedComponent.canMove(dir)) {
           val body = box2dBody
 
           val currSpeed = body.linearVelocity.x
-          val wantedSpeed = dir * if (grounded.onGround) {
+          val wantedSpeed = dir * if (groundedComponent.onGround) {
             MAX_X_VEL
           } else {
             MAX_X_VEL * (2f / 3f)
           }
           val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
 
-          tmpVec.set(impulse, velocity.dy)
+          tmpVec.set(impulse, velocityComponent.dy)
 
           body.applyLinearImpulse(tmpVec, body.worldCenter, true)
         }
@@ -121,7 +121,7 @@ class KeyboardControls(val world: ClientWorld) {
   }
 
   private fun Entity.jump() {
-    if (this.grounded.onGround && Gdx.input.isKeyPressed(Keys.W)) {
+    if (this.groundedComponent.onGround && Gdx.input.isKeyPressed(Keys.W)) {
       setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
     }
   }
@@ -175,7 +175,7 @@ class KeyboardControls(val world: ClientWorld) {
       Keys.Q -> entity.interpolate(true, this::placeBlocks)
     }
 
-    val selectedMaterial = entity.selectedOrNull ?: return true
+    val selectedMaterial = entity.selectedInventoryItemComponentOrNull ?: return true
 
     val extra = if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Keys.SHIFT_RIGHT)) 10 else 0
     try {

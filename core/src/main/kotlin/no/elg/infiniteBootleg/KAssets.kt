@@ -34,6 +34,7 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.findRotationAwareRegion
 import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
 import java.io.File
 
@@ -72,11 +73,11 @@ object KAssets {
   fun loadAssets() {
     textureAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
 
-    breakingBlockTexture = textureAtlas.findRegion("breaking_block").disallowedRotation()
-    handTexture = textureAtlas.findRegion("hand").disallowedRotation()
-    playerTexture = textureAtlas.findRegion("player").disallowedRotation()
-    doorOpenTexture = textureAtlas.findRegion("door_open").disallowedRotation()
-    doorClosedTexture = textureAtlas.findRegion("door_closed").disallowedRotation()
+    breakingBlockTexture = textureAtlas.findRotationAwareRegion("breaking_block", false)
+    handTexture = textureAtlas.findRotationAwareRegion("hand", false)
+    playerTexture = textureAtlas.findRotationAwareRegion("player", false)
+    doorOpenTexture = textureAtlas.findRotationAwareRegion("door_open", false)
+    doorClosedTexture = textureAtlas.findRotationAwareRegion("door_closed", false)
 
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font
@@ -143,6 +144,6 @@ object KAssets {
     Pixmap(Block.BLOCK_SIZE, Block.BLOCK_SIZE, Pixmap.Format.RGBA4444).useDispose {
       it.setColor(r, g, b, a)
       it.fill()
-      TextureRegion(Texture(it)).disallowedRotation()
+      TextureRegion(Texture(it)).disallowedRotation("GENERATED FROM $r, $g, $b, $a")
     }
 }

@@ -7,31 +7,31 @@ import ktx.ashley.allOf
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.world.ecs.components.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
-import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
-import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.NameComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
+import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.transients.ChunkComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.DoorComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent
 import kotlin.reflect.KClass
 
 /**
@@ -81,7 +81,7 @@ val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY
 val PLAYERS_ENTITY_ARRAY = arrayOf(
   *DYNAMIC_STANDALONE_ENTITY,
   GroundedComponent::class,
-  NamedComponent::class,
+  NameComponent::class,
   KillableComponent::class,
   InventoryComponent::class
 )

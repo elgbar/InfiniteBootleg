@@ -26,18 +26,18 @@ import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
-import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
-import no.elg.infiniteBootleg.world.ecs.components.NamedComponent
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
+import no.elg.infiniteBootleg.world.ecs.components.NameComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
+import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.LookDirectionComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -148,7 +148,7 @@ private fun EngineEntity.addCommonPlayerComponents(
   with<GroundedComponent>()
 
   // player family
-  with(NamedComponent(name))
+  with(NameComponent(name))
 
   with(killableComponent ?: KillableComponent())
   with(

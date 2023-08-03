@@ -6,10 +6,10 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2dBody
-import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 
@@ -29,7 +29,7 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
   private fun updateVelocity(entity: Entity, body: Body) {
     if (entity.updateBox2DVelocity) {
       entity.updateBox2DVelocity = false
-      body.setLinearVelocity(entity.velocity.dx, entity.velocity.dy)
+      body.setLinearVelocity(entity.velocityComponent.dx, entity.velocityComponent.dy)
     }
   }
 
@@ -37,7 +37,7 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
     if (entity.updateBox2DPosition) {
       entity.updateBox2DPosition = false
 
-      entity.groundedOrNull?.clearContacts()
+      entity.groundedComponentOrNull?.clearContacts()
 
       tmp.x = entity.positionComponent.x
       tmp.y = entity.positionComponent.y

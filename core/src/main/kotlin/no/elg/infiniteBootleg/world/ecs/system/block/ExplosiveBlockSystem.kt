@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent.Companion.explosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.abs

@@ -320,7 +320,7 @@ abstract class World(
     if (Main.isSingleplayer) {
       val entities = engine.getEntitiesFor(playerFamily)
       if (entities != null && entities.size() > 0) {
-        builder.player = entities.first().save(true)
+        builder.player = entities.first().save()
       }
     }
     return builder.build()

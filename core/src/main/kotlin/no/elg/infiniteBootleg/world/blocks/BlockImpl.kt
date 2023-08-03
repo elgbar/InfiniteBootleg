@@ -28,7 +28,7 @@ class BlockImpl(
   override val localX: Int,
   override val localY: Int,
   override val material: Material,
-  override val entity: Entity? = null
+  override var entity: Entity? = null
 ) : Block {
 
   override var isDisposed: Boolean = false

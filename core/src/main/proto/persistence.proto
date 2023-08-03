@@ -57,9 +57,10 @@ message ChunkColumn {
 message Entity {
   EntityType type = 1;
   Vector2f position = 2;
-  optional Tags tags = 3;
-  string uuid = 4;
-  optional string name = 5;
+  string uuid = 3;
+  optional string name = 4;
+  optional Tags tags = 5;
+  optional AdditionalComponents additionalComponents = 6;
 
   optional Killable killable = 16;
   optional Material material = 17;
@@ -67,6 +68,9 @@ message Entity {
   optional Vector2f velocity = 19;
   optional Explosive explosive = 20;
   optional Inventory inventory = 21;
+  optional Texture texture = 22;
+  optional LookDirection lookDirection = 23;
+  optional SelectedItem selectedItem = 24;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -83,6 +87,14 @@ message Entity {
     optional bool leafDecay = 5;
   }
 
+  message AdditionalComponents {
+    optional bool chunk = 1;
+    optional bool locallyControlled = 2;
+    optional bool occupyingBlocks = 3;
+    optional bool grounded = 4;
+    optional bool door = 5;
+  }
+
   message Killable {
     int32 health = 1;
     int32 max_health = 2;
@@ -90,7 +102,6 @@ message Entity {
 
   message Player {
     float torch_angle_deg = 1;
-    bool controlled = 2;
   }
 
   message Explosive {
@@ -107,5 +118,17 @@ message Entity {
       uint32 stock = 2;
       uint32 maxStock = 3;
     }
+  }
+
+  message Texture {
+    string texture = 1;
+  }
+
+  message LookDirection {
+    Vector2i direction = 1;
+  }
+
+  message SelectedItem {
+    Material material = 1;
   }
 }

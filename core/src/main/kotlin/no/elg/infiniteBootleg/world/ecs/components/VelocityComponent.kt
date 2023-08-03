@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
 
@@ -38,12 +38,12 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     velocity = toVector2f()
   }
 
-  companion object : EntityParentLoadableMapper<VelocityComponent>() {
-    var Entity.velocity by propertyFor(mapper)
-    var Entity.velocityOrNull by optionalPropertyFor(mapper)
+  companion object : EntityLoadableMapper<VelocityComponent>() {
+    var Entity.velocityComponent by propertyFor(mapper)
+    var Entity.velocityComponentOrNull by optionalPropertyFor(mapper)
 
     fun Entity.setVelocity(dx: Float, dy: Float) {
-      velocityOrNull?.also {
+      velocityComponentOrNull?.also {
         it.dx = dx.coerceIn(-it.maxDx, it.maxDx)
         it.dy = dy.coerceIn(-it.maxDy, it.maxDy)
         this.updateBox2DVelocity = true

@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.explosive
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
 class ExplosiveComponent(var fuse: Float = FUSE_DURATION_SECONDS, val strength: Float = EXPLOSION_STRENGTH.toFloat()) : EntitySavableComponent {
@@ -20,7 +20,7 @@ class ExplosiveComponent(var fuse: Float = FUSE_DURATION_SECONDS, val strength: 
     }
   }
 
-  companion object : EntityParentLoadableMapper<ExplosiveComponent>() {
+  companion object : EntityLoadableMapper<ExplosiveComponent>() {
     val Entity.explosiveComponent by propertyFor(ExplosiveComponent.mapper)
     var Entity.explosiveComponentOrNull by optionalPropertyFor(ExplosiveComponent.mapper)
 

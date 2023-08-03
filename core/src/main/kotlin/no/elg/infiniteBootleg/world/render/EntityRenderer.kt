@@ -8,10 +8,10 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2dBody
-import no.elg.infiniteBootleg.world.ecs.components.transients.LookDirectionComponent.Companion.lookDirectionOrNull
-import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent.Companion.textureRegion
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.roundToInt
@@ -25,7 +25,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val worldOffsetX = worldBody.worldOffsetX
     val worldOffsetY = worldBody.worldOffsetY
     for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
-      val textureRegion = entity.textureRegion.texture
+      val textureRegion = entity.textureRegionComponent.texture
       val box2d = entity.box2d
       val centerPos = entity.box2dBody.position
       val worldX = centerPos.x - box2d.halfBox2dWidth
@@ -59,7 +59,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val screenX = worldToScreen(worldX, worldOffsetX)
       val screenY = worldToScreen(worldY, worldOffsetY)
 
-      val lookDirectionOrNull = entity.lookDirectionOrNull
+      val lookDirectionOrNull = entity.lookDirectionComponentOrNull
       val texture = textureRegion.textureRegion
       val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
 

@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.box2d.LongContactTracker
+import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
-import no.elg.infiniteBootleg.world.ecs.components.transients.GroundedComponent.Companion.groundedOrNull
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
 
 object OnGroundService {
@@ -16,7 +16,7 @@ object OnGroundService {
   }
 
   private fun handleBodyEvents(entity: Entity, event: PhysicsEvent, handle: LongContactTracker.(loc: Long) -> Unit) {
-    val grounded = entity.groundedOrNull ?: return
+    val grounded = entity.groundedComponentOrNull ?: return
     handleTouchEvent(entity, event, grounded.feetContacts, handle)
     handleTouchEvent(entity, event, grounded.leftArmContacts, handle)
     handleTouchEvent(entity, event, grounded.rightArmContacts, handle)
@@ -31,7 +31,7 @@ object OnGroundService {
   }
 
   fun handleOnGroundBlockRemovedEvent(entity: Entity, event: PhysicsEvent.BlockRemovedEvent) {
-    val grounded = entity.groundedOrNull ?: return
+    val grounded = entity.groundedComponentOrNull ?: return
     val blockWorldLoc = event.compactLocation
     grounded.feetContacts.removeAll(blockWorldLoc)
     grounded.leftArmContacts.removeAll(blockWorldLoc)

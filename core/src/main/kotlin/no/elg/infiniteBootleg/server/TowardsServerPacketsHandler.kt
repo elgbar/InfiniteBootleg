@@ -33,9 +33,9 @@ import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.name
-import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameComponent
-import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
+import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
+import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.loader.WorldLoader

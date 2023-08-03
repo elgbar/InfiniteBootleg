@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
 import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.asProto
 
@@ -66,9 +66,9 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
     return true
   }
 
-  companion object : EntityParentLoadableMapper<InventoryComponent>() {
-    var Entity.inventory by propertyFor(InventoryComponent.mapper)
-    var Entity.inventoryOrNull by optionalPropertyFor(InventoryComponent.mapper)
+  companion object : EntityLoadableMapper<InventoryComponent>() {
+    var Entity.inventoryComponent by propertyFor(InventoryComponent.mapper)
+    var Entity.inventoryComponentOrNull by optionalPropertyFor(InventoryComponent.mapper)
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       InventoryComponent(protoEntity.inventory.maxSize).apply {

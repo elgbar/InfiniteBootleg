@@ -1,14 +1,13 @@
-package no.elg.infiniteBootleg.world.ecs.components
+package no.elg.infiniteBootleg.world.ecs.components.required
 
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
-import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
 data class EntityTypeComponent(val entityType: EntityType) : EntitySavableComponent {
@@ -17,9 +16,8 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
     type = entityType
   }
 
-  companion object : EntityParentLoadableMapper<EntityTypeComponent>() {
-    var Entity.entityTypeComponent by propertyFor(mapper)
-    var Entity.entityTypeComponentOrNull by optionalPropertyFor(mapper)
+  companion object : EntityLoadableMapper<EntityTypeComponent>() {
+    val Entity.entityTypeComponent by propertyFor(mapper)
 
     private val PLAYER_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.PLAYER)
     private val BLOCK_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.BLOCK)

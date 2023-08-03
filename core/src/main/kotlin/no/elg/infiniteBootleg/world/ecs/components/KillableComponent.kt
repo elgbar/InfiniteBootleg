@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.killable
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
 data class KillableComponent(val maxHealth: Int = 10, val health: Int = maxHealth) : EntitySavableComponent {
@@ -23,9 +23,9 @@ data class KillableComponent(val maxHealth: Int = 10, val health: Int = maxHealt
     }
   }
 
-  companion object : EntityParentLoadableMapper<KillableComponent>() {
-    var Entity.killable by propertyFor(mapper)
-    var Entity.killableOrNull by optionalPropertyFor(mapper)
+  companion object : EntityLoadableMapper<KillableComponent>() {
+    var Entity.killableComponent by propertyFor(mapper)
+    var Entity.killableComponentOrNull by optionalPropertyFor(mapper)
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       with(KillableComponent(protoEntity.killable.health, protoEntity.killable.maxHealth))

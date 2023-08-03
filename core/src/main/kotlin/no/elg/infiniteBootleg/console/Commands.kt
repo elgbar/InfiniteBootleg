@@ -26,8 +26,8 @@ import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.WorldTime
-import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlled
-import no.elg.infiniteBootleg.world.ecs.components.NamedComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -355,7 +355,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       logger.log("There is no local, controlled player in this world")
     }
     for (entity in entities) {
-      val controls: KeyboardControls = entity.locallyControlled.keyboardControls
+      val controls: KeyboardControls = entity.locallyControlledComponent.keyboardControls
       logger.success("Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${controls.brushSize}")
     }
   }
@@ -374,7 +374,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
     for (entity in entities) {
-      val controls: KeyboardControls = entity.locallyControlled.keyboardControls
+      val controls: KeyboardControls = entity.locallyControlledComponent.keyboardControls
       controls.brushSize = size
       logger.success("New brush size is now $size")
     }
@@ -394,7 +394,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
     for (entity in entities) {
-      val controls: KeyboardControls = entity.locallyControlled.keyboardControls
+      val controls: KeyboardControls = entity.locallyControlledComponent.keyboardControls
       controls.interactRadius = interactRadius
       logger.success("New interact radius is now $interactRadius")
     }

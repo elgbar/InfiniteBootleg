@@ -6,7 +6,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import java.util.UUID
 
@@ -16,7 +16,7 @@ data class IdComponent(val id: String = UUID.randomUUID().toString()) : EntitySa
     uuid = this@IdComponent.id
   }
 
-  companion object : EntityParentLoadableMapper<IdComponent>() {
+  companion object : EntityLoadableMapper<IdComponent>() {
 
     fun createRandomId(): IdComponent = IdComponent(UUID.randomUUID().toString())
 

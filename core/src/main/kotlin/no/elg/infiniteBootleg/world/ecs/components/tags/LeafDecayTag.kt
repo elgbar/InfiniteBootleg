@@ -7,12 +7,12 @@ import ktx.ashley.tagFor
 import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.ecs.api.TagParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.TagLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.TagSavableComponent
 
 class LeafDecayTag : TagSavableComponent {
 
-  companion object : TagParentLoadableMapper<LeafDecayTag>() {
+  companion object : TagLoadableMapper<LeafDecayTag>() {
     var Entity.leafDecay by tagFor<LeafDecayTag>()
     var Entity.leafDecayComponentOrNull by optionalPropertyFor(LeafDecayTag.mapper)
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.Tags): LeafDecayTag = with<LeafDecayTag>()

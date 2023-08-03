@@ -7,12 +7,12 @@ import ktx.ashley.tagFor
 import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.world.ecs.api.TagParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.TagLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.TagSavableComponent
 
 class FollowedByCameraTag : TagSavableComponent {
 
-  companion object : TagParentLoadableMapper<FollowedByCameraTag>() {
+  companion object : TagLoadableMapper<FollowedByCameraTag>() {
     var Entity.followedByCamera by tagFor<FollowedByCameraTag>()
     var Entity.followedByCameraComponentOrNull by optionalPropertyFor(FollowedByCameraTag.mapper)
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.Tags) = with<FollowedByCameraTag>()

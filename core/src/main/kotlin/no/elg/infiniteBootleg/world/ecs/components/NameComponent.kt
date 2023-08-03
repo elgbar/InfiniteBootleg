@@ -7,22 +7,22 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.ecs.api.EntityParentLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
-data class NamedComponent(val name: String) : EntitySavableComponent {
+data class NameComponent(val name: String) : EntitySavableComponent {
 
   override fun EntityKt.Dsl.save() {
-    name = this@NamedComponent.name
+    name = this@NameComponent.name
   }
 
-  companion object : EntityParentLoadableMapper<NamedComponent>() {
+  companion object : EntityLoadableMapper<NameComponent>() {
     val Entity.name get() = nameComponent.name
     val Entity.nameOrNull get() = nameComponentOrNull?.name
     var Entity.nameComponent by propertyFor(mapper)
     var Entity.nameComponentOrNull by optionalPropertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(NamedComponent(protoEntity.name))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(NameComponent(protoEntity.name))
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasName()
   }

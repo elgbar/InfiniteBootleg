@@ -18,13 +18,13 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.ChunkComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.WorldComponent
 import no.elg.infiniteBootleg.world.world.World
 
 const val ESSENTIALLY_ZERO = 0.001f

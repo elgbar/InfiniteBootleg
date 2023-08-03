@@ -39,5 +39,7 @@ enum class Direction(val dx: Int, val dy: Int) {
       val diffY = sign((toY - fromY).toFloat()).toInt()
       return directionMap[compactLoc(diffX, diffY)]
     }
+
+    fun valueOf(dx: Int, dy: Int): Direction = directionMap[compactLoc(dx, dy)] ?: throw IllegalArgumentException("No direction with dx=$dx and dy=$dy")
   }
 }

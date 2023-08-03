@@ -26,7 +26,7 @@ object TextureNeighbor {
       }
 
       val neighborTextureSet = textureNeighbors.computeIfAbsent(centerMaterial) { mutableListOf() }
-      neighborTextureSet += NeighborTexture(region.disallowedRotation(), wantedNeighbors)
+      neighborTextureSet += NeighborTexture(region.disallowedRotation(region.name), wantedNeighbors)
     }
     // We want the texture neighbors with the most directions to be first
     for (textureNeighbor in textureNeighbors.values) {

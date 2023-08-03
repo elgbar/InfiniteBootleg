@@ -35,7 +35,7 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
-import no.elg.infiniteBootleg.world.ecs.components.EntityTypeComponent.Companion.entityTypeComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.ClientWorldRender

@@ -5,7 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocity
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.toFamily
 import kotlin.math.abs
 
@@ -15,7 +15,7 @@ import kotlin.math.abs
 object MaxVelocitySystem : IteratingSystem(VelocityComponent::class.toFamily(), UPDATE_PRIORITY_DEFAULT) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val velocity = entity.velocity
+    val velocity = entity.velocityComponent
     val tooFastX: Boolean = abs(velocity.dx) > velocity.maxDx
     val tooFastY: Boolean = abs(velocity.dy) > velocity.maxDy
 

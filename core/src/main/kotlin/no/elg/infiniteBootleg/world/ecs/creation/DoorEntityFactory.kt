@@ -13,10 +13,10 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.transients.DoorComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.doorEntityFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily

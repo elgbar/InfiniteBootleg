@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.events.api.ThreadType
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.component1
@@ -130,7 +131,8 @@ enum class Material(
   init {
     if (Settings.client && itemType != ItemType.AIR) {
       val textureName = textureName ?: name.lowercase(Locale.getDefault())
-      textureRegion = textureAtlas.findRegion("${textureName}_rotatable")?.allowedRotation() ?: textureAtlas.findRegion(textureName).disallowedRotation()
+      val name = "${textureName}_rotatable"
+      textureRegion = textureAtlas.findRegion(name)?.allowedRotation(name) ?: textureAtlas.findRegion(textureName).disallowedRotation(name)
       if (textureRegion == null) {
         throw NullPointerException("Failed to find a texture for $name")
       }
@@ -148,9 +150,24 @@ enum class Material(
    */
   fun createBlock(world: World, chunk: Chunk, localX: Int, localY: Int, protoEntity: ProtoWorld.Entity? = null): Block {
     Preconditions.checkArgument(isBlock)
-    val entity = protoEntity?.let { world.engine.load(it, world, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
-    return BlockImpl(world, chunk, localX, localY, this, entity)
+    if (willNotCreateEntity(protoEntity)) {
+      return BlockImpl(world, chunk, localX, localY, this, null)
+    }
+    fun createEntity() = protoEntity?.let { world.engine.load(it, world, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
+    return if (ThreadType.currentThreadType() == ThreadType.PHYSICS) {
+      BlockImpl(world, chunk, localX, localY, this, createEntity())
+    } else {
+      BlockImpl(world, chunk, localX, localY, this, null).also {
+        world.postBox2dRunnable {
+          if (!it.isDisposed) {
+            it.entity = createEntity()
+          }
+        }
+      }
+    }
   }
+
+  fun willNotCreateEntity(protoEntity: ProtoWorld.Entity?): Boolean = protoEntity == null && createNew == null
 
   fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true) {
     createBlocks(world, locs.asIterable(), prioritize)
@@ -160,8 +177,7 @@ enum class Material(
     check(isBlock) { "This material ($name) is not a block" }
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
-      val currentMaterial = world.getMaterial(worldX, worldY)
-      if (currentMaterial == AIR) {
+      if (world.isAirBlock(worldX, worldY, markerIsAir = false)) {
         val block = world.setBlock(worldX, worldY, this, false, prioritize)
         chunks += block?.chunk ?: continue
       }
