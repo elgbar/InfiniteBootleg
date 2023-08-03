@@ -1,0 +1,96 @@
+package no.elg.infiniteBootleg.world.ecs.components
+
+import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.physics.box2d.Body
+import ktx.ashley.EngineEntity
+import ktx.ashley.optionalPropertyFor
+import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.DOOR
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.FALLING_BLOCK
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.PLAYER
+import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.world.Constants
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.creation.CONTROLLED_CLIENT_PLAYER_FAMILIES
+import no.elg.infiniteBootleg.world.ecs.creation.createDoorBodyComponent
+import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockBodyComponent
+import no.elg.infiniteBootleg.world.ecs.creation.createPlayerBodyComponent
+
+/**
+ *
+ * @param box2dWidth  The height of this entity in box2d view
+ * @param box2dHeight The width of this entity in box2d view
+ */
+class Box2DBodyComponent(
+  body: Body,
+  private val type: ProtoWorld.Entity.Box2D.BodyType,
+  private val box2dWidth: Float,
+  private val box2dHeight: Float
+) : EntitySavableComponent, CheckableDisposable {
+
+  private var internalBody: Body? = body
+  private var disposed = false
+
+  val halfBox2dWidth: Float get() = box2dWidth / 2f
+  val halfBox2dHeight: Float get() = box2dHeight / 2f
+
+  val worldWidth: Float get() = box2dWidth * Block.BLOCK_SIZE
+  val worldHeight: Float get() = box2dHeight * Block.BLOCK_SIZE
+
+  override val isDisposed get() = disposed
+
+  val body: Body = (if (disposed) null else internalBody) ?: error("Tried to access a disposed body!")
+
+  fun disableGravity() {
+    body.gravityScale = 0f
+  }
+
+  fun enableGravity() {
+    body.gravityScale = Constants.DEFAULT_GRAVITY_SCALE
+  }
+
+  override fun dispose() {
+    if (!isDisposed) {
+      disposed = true
+      val currentBody = internalBody ?: return
+      this.internalBody = null
+      val entity = currentBody.userData as Entity
+      entity.world.worldBody.destroyBody(currentBody)
+    }
+  }
+
+  companion object : EntityLoadableMapper<Box2DBodyComponent>() {
+    val Entity.box2dBody get() = box2d.body
+    val Entity.box2d by propertyFor(mapper)
+    val Entity.box2dOrNull by optionalPropertyFor(mapper)
+
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): Box2DBodyComponent? {
+      val world = entity.world
+      val pos = entity.position
+      val vel = entity.velocityOrZero
+      when (protoEntity.box2D.type) {
+        PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, CONTROLLED_CLIENT_PLAYER_FAMILIES)
+        FALLING_BLOCK -> createFallingBlockBodyComponent(world, pos.x, pos.y, vel.x, vel.y)
+        DOOR -> createDoorBodyComponent(world, pos.x.toInt(), pos.y.toInt())
+        else -> error("Unknown body type ${protoEntity.box2D.type}")
+      }
+      return null
+    }
+
+    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasBox2D()
+  }
+
+  override fun EntityKt.Dsl.save() {
+    box2D = box2D {
+      type = this@Box2DBodyComponent.type
+    }
+  }
+}

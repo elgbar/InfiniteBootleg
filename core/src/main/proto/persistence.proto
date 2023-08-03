@@ -71,6 +71,7 @@ message Entity {
   optional Texture texture = 22;
   optional LookDirection lookDirection = 23;
   optional SelectedItem selectedItem = 24;
+  optional Box2D box2d = 25;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -130,5 +131,15 @@ message Entity {
 
   message SelectedItem {
     Material material = 1;
+  }
+
+  message Box2D {
+    BodyType type = 1;
+
+    enum BodyType {
+      PLAYER = 0;
+      DOOR = 1;
+      FALLING_BLOCK = 2;
+    }
   }
 }

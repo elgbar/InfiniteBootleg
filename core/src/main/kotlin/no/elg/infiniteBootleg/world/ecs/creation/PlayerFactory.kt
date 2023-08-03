@@ -3,11 +3,6 @@ package no.elg.infiniteBootleg.world.ecs.creation
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.physics.box2d.Fixture
-import com.badlogic.gdx.physics.box2d.FixtureDef
-import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.ashley.EngineEntity
 import ktx.ashley.entity
 import ktx.ashley.with
@@ -20,10 +15,9 @@ import no.elg.infiniteBootleg.protobuf.killableOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
@@ -36,7 +30,6 @@ import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledC
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
-import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
@@ -78,57 +71,6 @@ val CONTROLLED_CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   controlledEntityWithInputEventFamily to "controlledEntityWithInputEventFamily"
 )
 
-private fun createPlayerFixture(body: Body) {
-  val shape = PolygonShape()
-
-  val halfWidth = PLAYER_WIDTH / 2f
-  val halfHeight = PLAYER_HEIGHT / 2f
-  val nearZW = halfWidth - 0.1f
-  val nearZH = halfHeight - 0.1f
-
-  val vertices = Array(8) { Vector2() }
-  vertices[0].set(-nearZW, halfHeight)
-  vertices[1].set(nearZW, halfHeight)
-  vertices[2].set(-halfWidth, -(halfHeight / 2f))
-  vertices[3].set(-halfWidth, nearZH)
-  vertices[4].set(-(halfWidth / 2f), -halfHeight)
-  vertices[5].set((halfWidth / 2f), -halfHeight)
-  vertices[6].set(halfWidth, -(halfHeight / 2f))
-  vertices[7].set(halfWidth, nearZH)
-  shape.set(vertices)
-
-  val def = FixtureDef()
-  def.shape = shape
-  def.density = Constants.DEFAULT_FIXTURE_DENSITY
-  def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-  def.restitution = Constants.DEFAULT_FIXTURE_RESTITUTION // a bit bouncy!
-
-  val fix: Fixture = body.createFixture(def)
-  fix.filterData = Filters.GR_EN_ENTITY_FILTER
-  fix.userData = body.userData
-
-  shape.dispose()
-}
-
-private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float, height: Float, rx: Float = 0f, ry: Float = 0f) {
-  val shape = PolygonShape()
-  shape.setAsBox(width.coerceAtLeast(ESSENTIALLY_ZERO), height.coerceAtLeast(ESSENTIALLY_ZERO), Vector2(rx, ry), 0f)
-
-  val def = FixtureDef().apply {
-    this.shape = shape
-    isSensor = true
-    filter.set(Filters.GR__ENTITY_FILTER)
-  }
-  body.createFixture(def).apply {
-    this.userData = userData
-  }
-  shape.dispose()
-}
-
-private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
-  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 2f, rx = PLAYER_WIDTH * side / 1.5f)
-}
-
 private fun EngineEntity.addCommonPlayerComponents(
   world: World,
   worldX: Float,
@@ -158,13 +100,7 @@ private fun EngineEntity.addCommonPlayerComponents(
       }
     }
   )
-
-  createBody2DBodyComponent(entity, world, worldX, worldY, dx, dy, PLAYER_WIDTH, PLAYER_HEIGHT, wantedFamilies, afterBodyCreated = whenReady) {
-    createPlayerFixture(it)
-    createSecondaryPlayerFixture(it, PLAYERS_FOOT_USER_DATA, width = PLAYER_WIDTH / 3f, height = ESSENTIALLY_ZERO, ry = -(PLAYER_HEIGHT / 2f))
-    createPlayerTouchAreaFixture(it, PLAYERS_LEFT_ARM_USER_DATA, -1)
-    createPlayerTouchAreaFixture(it, PLAYERS_RIGHT_ARM_USER_DATA, 1)
-  }
+  createPlayerBodyComponent(world, worldX, worldY, dx, dy, wantedFamilies, whenReady)
 }
 
 fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, controlled: Boolean) {

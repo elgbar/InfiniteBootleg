@@ -10,6 +10,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.entity
 import no.elg.infiniteBootleg.protobuf.tagsOrNull
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent.Companion.explosiveComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
@@ -66,6 +68,7 @@ fun Entity.save(): ProtoWorld.Entity {
     this@save.positionComponent.apply { save() }
     this@save.worldComponent.apply { save() }
 
+    this@save.box2dOrNull?.apply { save() }
     this@save.explosiveComponentOrNull?.apply { save() }
     this@save.inventoryComponentOrNull?.apply { save() }
     this@save.killableComponentOrNull?.apply { save() }
@@ -129,4 +132,7 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
     }
     OccupyingBlocksComponent.load(this, it)
   }
+
+  // Load box2d body last, as it depends on other components
+  Box2DBodyComponent.load(this, protoEntity)
 }

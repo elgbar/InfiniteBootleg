@@ -60,14 +60,15 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
+import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
@@ -223,9 +224,7 @@ abstract class World(
   fun initialize() {
     if (Settings.loadWorldFromDisk) {
       val worldFolder = worldFolder
-      if (!transientWorld && worldFolder != null && worldFolder.isDirectory &&
-        !canWriteToWorld(uuid)
-      ) {
+      if (!transientWorld && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
         if (!Settings.ignoreWorldLock) {
           transientWorld = true
           Main.logger().warn("World", "World found is already in use. Initializing world as a transient.")
@@ -267,6 +266,9 @@ abstract class World(
     spawn = fromVector2i(protoWorld.spawn)
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
+    if (protoWorld.hasPlayer()) {
+      engine.load(protoWorld.player, this)
+    }
     synchronized(chunkColumns) {
       for (protoCC in protoWorld.chunkColumnsList) {
         val chunkColumn = fromProtobuf(this, protoCC)

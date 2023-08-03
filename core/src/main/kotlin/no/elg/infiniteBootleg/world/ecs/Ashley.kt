@@ -7,6 +7,8 @@ import ktx.ashley.allOf
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
@@ -30,8 +32,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
-import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import kotlin.reflect.KClass
 
 /**

@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.server
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.events.api.EventManager.javaOneShotListener
+import no.elg.infiniteBootleg.events.api.EventManager.oneShotListener
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -38,9 +38,9 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
-import no.elg.infiniteBootleg.world.ecs.components.transients.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createMPClientPlayerEntity
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -274,7 +274,7 @@ private fun ServerClient.handleLoginSuccess() {
   }
 
   val worldFuture: CompletableFuture<ClientWorld> = CompletableFuture<ClientWorld>().orTimeout(10, TimeUnit.SECONDS)
-  javaOneShotListener(WorldLoadedEvent::class.java) {
+  oneShotListener<WorldLoadedEvent> {
     Main.logger().debug("ClientWorld") { "Completing World loaded future" }
     worldFuture.complete(it.world as ClientWorld)
   }

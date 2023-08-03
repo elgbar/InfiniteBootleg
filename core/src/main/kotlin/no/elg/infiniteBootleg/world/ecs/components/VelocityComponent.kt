@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
@@ -38,7 +39,13 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     velocity = toVector2f()
   }
 
+  fun toVector2(): Vector2 = Vector2(dx, dy)
+
   companion object : EntityLoadableMapper<VelocityComponent>() {
+
+    val Entity.velocityOrNull: Vector2? get() = velocityComponentOrNull?.toVector2()
+    val Entity.velocityOrZero: Vector2 get() = velocityComponentOrNull?.toVector2() ?: Vector2.Zero
+
     var Entity.velocityComponent by propertyFor(mapper)
     var Entity.velocityComponentOrNull by optionalPropertyFor(mapper)
 

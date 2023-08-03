@@ -14,7 +14,7 @@ abstract class LoadableMapper<C : Component, P : Message, S> : Mapper<C>() {
     return null
   }
 
-  protected abstract fun EngineEntity.loadInternal(protoEntity: P, state: S): C
+  protected abstract fun EngineEntity.loadInternal(protoEntity: P, state: S): C?
 
   protected abstract fun P.checkShouldLoad(): Boolean
 }
@@ -24,9 +24,9 @@ abstract class StatelessLoadableMapper<C : Component, P : Message> : LoadableMap
   fun load(engineEntity: EngineEntity, protoEntity: P): C? = load(engineEntity, protoEntity) { }
 
   @Deprecated("Do not use stateful loading in this class", ReplaceWith("loadInternal(protoEntity)"))
-  final override fun EngineEntity.loadInternal(protoEntity: P, state: Unit): C = loadInternal(protoEntity)
+  final override fun EngineEntity.loadInternal(protoEntity: P, state: Unit): C? = loadInternal(protoEntity)
 
-  protected abstract fun EngineEntity.loadInternal(protoEntity: P): C
+  protected abstract fun EngineEntity.loadInternal(protoEntity: P): C?
 }
 
 abstract class EntityLoadableMapper<T : Component> : StatelessLoadableMapper<T, ProtoWorld.Entity>()
