@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
 import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -71,11 +72,13 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
     var Entity.inventoryComponentOrNull by optionalPropertyFor(InventoryComponent.mapper)
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
-      InventoryComponent(protoEntity.inventory.maxSize).apply {
-        protoEntity.inventory.itemsList.forEach {
-          this += Item(Material.fromOrdinal(it.material.ordinal), it.stock.toUInt(), it.maxStock.toUInt())
+      with(
+        InventoryComponent(protoEntity.inventory.maxSize).apply {
+          protoEntity.inventory.itemsList.forEach {
+            this += Item(Material.fromOrdinal(it.material.ordinal), it.stock.toUInt(), it.maxStock.toUInt())
+          }
         }
-      }
+      )
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasInventory()
   }

@@ -94,6 +94,8 @@ message Entity {
     optional bool occupyingBlocks = 3;
     optional bool grounded = 4;
     optional bool door = 5;
+    optional bool inputEvent = 6;
+    optional bool physicsEvent = 7;
   }
 
   message Killable {

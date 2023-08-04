@@ -2,19 +2,30 @@ package no.elg.infiniteBootleg.world.ecs.components.events
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.Mapper
+import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
+import ktx.ashley.with
+import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.world.ecs.api.StatelessAdditionalComponentsLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue.Companion.queueEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class InputEventQueue : ECSEventQueue<InputEvent> {
   override val events = ConcurrentLinkedQueue<InputEvent>()
 
-  companion object : Mapper<InputEventQueue>() {
+  override fun EntityKt.AdditionalComponentsKt.Dsl.save() {
+    inputEvent = true
+  }
+
+  companion object : StatelessAdditionalComponentsLoadableMapper<InputEventQueue>() {
     var Entity.inputEventQueueOrNull by optionalPropertyFor(InputEventQueue.mapper)
     fun Engine.queueInputEvent(event: InputEvent, filter: (Entity) -> Boolean = { true }) {
       queueEvent(InputEventQueue.mapper, event, filter)
     }
+
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.AdditionalComponents): InputEventQueue = with<InputEventQueue>()
+    override fun ProtoWorld.Entity.AdditionalComponents.checkShouldLoad(): Boolean = hasInputEvent()
   }
 }
 

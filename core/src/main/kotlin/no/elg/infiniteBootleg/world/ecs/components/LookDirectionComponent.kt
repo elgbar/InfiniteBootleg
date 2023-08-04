@@ -26,7 +26,7 @@ data class LookDirectionComponent(var direction: Direction = Direction.WEST) : E
   }
 
   override fun EntityKt.Dsl.save() {
-    lookDirection {
+    lookDirection = lookDirection {
       direction = vector2i {
         this.x = this@LookDirectionComponent.direction.dx
         this.y = this@LookDirectionComponent.direction.dy

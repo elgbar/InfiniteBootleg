@@ -40,6 +40,10 @@ import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledC
 import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue.Companion.inputEventQueueOrNull
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -93,6 +97,8 @@ fun Entity.save(): ProtoWorld.Entity {
       this@save.groundedComponentOrNull?.apply { save() }
       this@save.locallyControlledComponentOrNull?.apply { save() }
       this@save.occupyingBlocksComponentOrNull?.apply { save() }
+      this@save.inputEventQueueOrNull?.apply { save() }
+      this@save.physicsEventQueueOrNull?.apply { save() }
     }
   }
 }
@@ -131,6 +137,8 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
       KeyboardControls(clientWorld)
     }
     OccupyingBlocksComponent.load(this, it)
+    PhysicsEventQueue.load(this, it)
+    InputEventQueue.load(this, it)
   }
 
   // Load box2d body last, as it depends on other components
