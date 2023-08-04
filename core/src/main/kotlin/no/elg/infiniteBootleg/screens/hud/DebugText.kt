@@ -27,7 +27,6 @@ object DebugText {
 
   val dotFourFormat = DecimalFormat("0.0000")
 
-  @JvmStatic
   inline fun fpsString(sb: StringBuilder, world: ClientWorld?) {
     val worldTps = world?.worldTicker?.realTPS ?: -1
     val physicsTps = world?.worldTicker?.box2DTicker?.ticker?.realTPS ?: -1
@@ -38,7 +37,6 @@ object DebugText {
       .append(" | ptps: ").fastIntFormat(physicsTps.toInt(), 2)
   }
 
-  @JvmStatic
   fun lights(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val localX = mouseBlockX.chunkOffset()
     val localY = mouseBlockY.chunkOffset()
@@ -64,7 +62,6 @@ object DebugText {
     sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, sub))
   }
 
-  @JvmStatic
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val localX = mouseBlockX.chunkOffset()
     val localY = mouseBlockY.chunkOffset()
@@ -80,7 +77,6 @@ object DebugText {
     sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug))
   }
 
-  @JvmStatic
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val chunkX = mouseBlockX.worldToChunk()
     val chunkY = mouseBlockY.worldToChunk()
@@ -104,7 +100,6 @@ object DebugText {
     }
   }
 
-  @JvmStatic
   fun time(sb: StringBuilder, world: ClientWorld) {
     val worldTime = world.worldTime
     val format = "time: %.2f (%.2f) scale: %.2f sky brightness: %.2f TOD: %s"
@@ -120,7 +115,6 @@ object DebugText {
     )
   }
 
-  @JvmStatic
   fun viewChunk(sb: StringBuilder, world: ClientWorld) {
     val viewingChunks = world.render.chunksInView
     val chunksHor = viewingChunks.horizontalLength
@@ -134,7 +128,6 @@ object DebugText {
     sb.append(String.format(format, chunksInView, blocks, blocksHor, blocksVer, zoom))
   }
 
-  @JvmStatic
   fun pos(sb: StringBuilder, players: ImmutableArray<Entity>) {
     if (players.size() == 0) {
       sb.append("No player")
@@ -143,7 +136,6 @@ object DebugText {
     val player = players.first()
     val velocity = player.velocityComponent
     val position = player.positionComponent
-//    val physicsPosition = player.physicsPosition
     val grounded = player.groundedComponentOrNull
     val onGround = grounded?.onGround ?: false
     val canMoveLeft = grounded?.canMoveLeft ?: false
@@ -161,8 +153,6 @@ object DebugText {
         velocity.dx,
         velocity.dy,
         0f, 0f,
-//        physicsPosition.x,
-//        physicsPosition.y,
         onGround,
         canMoveLeft,
         canMoveRight,
@@ -174,12 +164,10 @@ object DebugText {
     )
   }
 
-  @JvmStatic
-  fun ents(sb: StringBuilder, world: ClientWorld) {
-//    val nl = "\n    "
-//    sb.append("E = ")
-//    for (entity in world.getEntities(ClientMain.inst().mouseWorldX, ClientMain.inst().mouseWorldY)) {
-//      sb.append(entity.simpleName()).append("[").append(entity.hudDebug()).append("]").append(nl)
-//    }
+  fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: Float, mouseWorldY: Float) {
+    sb.append("E = \n")
+    for (entity in world.getEntities(mouseWorldX, mouseWorldY)) {
+      sb.append("${entity.id}: ${entity.components.map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}").appendLine()
+    }
   }
 }
