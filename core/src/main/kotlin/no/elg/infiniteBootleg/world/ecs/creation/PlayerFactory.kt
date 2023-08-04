@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -88,6 +89,7 @@ private fun EngineEntity.addCommonPlayerComponents(
   // BASIC_DYNAMIC_ENTITY_ARRAY
   with(VelocityComponent(dx, dy))
   with<GroundedComponent>()
+  with<TransientTag>()
 
   // player family
   with(NameComponent(name))

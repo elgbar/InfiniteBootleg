@@ -35,7 +35,7 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
-import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -575,7 +575,7 @@ class ChunkImpl(
       }
       blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
       queryEntities { entities ->
-        this.entities += entities.filterNot { it.entityTypeComponent.entityType == ProtoWorld.Entity.EntityType.BLOCK }.map { it.save() }
+        this.entities += entities.filterNot { it.transient }.map { it.save() }
         future.complete(this._build())
       }
     }
