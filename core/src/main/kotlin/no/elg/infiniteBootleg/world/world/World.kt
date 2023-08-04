@@ -69,6 +69,7 @@ import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.world.ecs.load
+import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
@@ -187,12 +188,14 @@ abstract class World(
       Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!" }
       check(!worldTicker.isStarted) { "World has already been started" }
       worldTicker.start()
-      if (this is SinglePlayerWorld) {
-        if (engine.getEntitiesFor(playerFamily).size() == 0) {
-          Main.logger().debug("World", "Spawning new singleplayer player")
-          engine.createSPPlayerEntity(this, spawn.x.toFloat(), spawn.y.toFloat(), 0f, 0f, "Player", null)
-        } else {
-          Main.logger().debug("World") { "Will not spawn a new player in as the world contains a singleplayer entity" }
+      Main.inst().scheduler.scheduleSync(250L) {
+        if (this is SinglePlayerWorld) {
+          if (engine.getEntitiesFor(localPlayerFamily).size() == 0) {
+            Main.logger().debug("World", "Spawning new singleplayer player")
+            engine.createSPPlayerEntity(this, spawn.x.toFloat(), spawn.y.toFloat(), 0f, 0f, "Player", null)
+          } else {
+            Main.logger().debug("World") { "Will not spawn a new player in as the world contains a singleplayer entity" }
+          }
         }
       }
       Main.logger().debug("World") { "World ticker started, sending WorldLoadedEvent" }

@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
@@ -28,7 +29,7 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
     if (entities.size() == 1) {
       processEntity(entity)
     } else if (entities.size() > 1) {
-      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: $entities")
+      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: ${entities.map { it.id }}")
       entities.drop(1).forEach { it.followedByCamera = false }
     }
   }
