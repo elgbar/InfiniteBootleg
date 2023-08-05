@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.doorEntityFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
@@ -58,7 +59,7 @@ fun EngineEntity.createPlayerBodyComponent(
   }
 }
 
-fun EngineEntity.createDoorBodyComponent(world: World, worldX: Int, worldY: Int) {
+fun EngineEntity.createDoorBodyComponent(world: World, worldX: Int, worldY: Int, whenReady: (Entity) -> Unit = {}) {
   createBody2DBodyComponent(
     ProtoWorld.Entity.Box2D.BodyType.DOOR,
     entity,
@@ -76,7 +77,8 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: Int, worldY: Int)
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
       standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
     ),
-    BodyDef.BodyType.StaticBody
+    BodyDef.BodyType.StaticBody,
+    whenReady
   ) {
     val shape = PolygonShape()
     shape.setAsBox(DOOR_WIDTH / 2f, DOOR_HEIGHT / 2f)
@@ -165,6 +167,12 @@ internal fun createBody2DBodyComponent(
   bodyDef.fixedRotation = true
 
   world.worldBody.createBody(bodyDef) {
+    if (entity.isRemoving || entity.isScheduledForRemoval) {
+      // If the entity was removed before the body was created, destroy the body
+      entity.world.worldBody.destroyBody(it)
+      return@createBody
+    }
+
     it.gravityScale = Constants.DEFAULT_GRAVITY_SCALE
     it.userData = entity
 

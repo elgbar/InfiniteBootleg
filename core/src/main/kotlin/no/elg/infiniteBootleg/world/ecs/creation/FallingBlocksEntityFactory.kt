@@ -2,9 +2,9 @@ package no.elg.infiniteBootleg.world.ecs.creation
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.entity
 import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -42,7 +42,7 @@ fun Engine.createFallingBlockStandaloneEntity(
   id: String? = null,
   onReady: (Entity) -> Unit = {}
 ) {
-  entity {
+  futureEntity { future ->
     withRequiredComponents(ProtoWorld.Entity.EntityType.FALLING_BLOCK, world, worldX, worldY, id)
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
@@ -54,7 +54,10 @@ fun Engine.createFallingBlockStandaloneEntity(
     with<PhysicsEventQueue>()
     with(MaterialComponent(material))
     with<OccupyingBlocksComponent>()
-    createFallingBlockBodyComponent(world, worldX, worldY, dx, dy, onReady)
+    createFallingBlockBodyComponent(world, worldX, worldY, dx, dy) {
+      onReady(it)
+      future.complete(Unit)
+    }
   }
 }
 

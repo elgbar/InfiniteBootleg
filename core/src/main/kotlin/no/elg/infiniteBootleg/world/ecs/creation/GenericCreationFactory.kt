@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import ktx.ashley.EngineEntity
-import ktx.ashley.entity
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -49,10 +49,13 @@ fun Engine.createBlockEntity(
   material: Material,
   wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
   additionalConfiguration: EngineEntity.() -> Unit = {}
-) = entity {
+) = futureEntity { future ->
   withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
   with(ChunkComponent(chunk))
   with(MaterialComponent(material))
   additionalConfiguration()
   checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
+
+  // OK to complete now, as this entity does not contain a box2d component
+  future.complete(Unit)
 }

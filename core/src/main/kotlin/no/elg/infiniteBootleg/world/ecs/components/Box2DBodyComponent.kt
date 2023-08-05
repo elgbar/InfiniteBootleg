@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.PLAYER
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.blocks.Block
-import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
@@ -67,19 +67,19 @@ class Box2DBodyComponent(
     }
   }
 
-  companion object : EntityLoadableMapper<Box2DBodyComponent>() {
+  companion object : LoadableMapper<Box2DBodyComponent, ProtoWorld.Entity, (Entity) -> Unit>() {
     val Entity.box2dBody get() = box2d.body
     val Entity.box2d by propertyFor(mapper)
     val Entity.box2dOrNull by optionalPropertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): Box2DBodyComponent? {
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: (Entity) -> Unit): Box2DBodyComponent? {
       val world = entity.world
       val pos = entity.position
       val vel = entity.velocityOrZero
       when (protoEntity.box2D.type) {
-        PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, CONTROLLED_CLIENT_PLAYER_FAMILIES)
-        FALLING_BLOCK -> createFallingBlockBodyComponent(world, pos.x, pos.y, vel.x, vel.y)
-        DOOR -> createDoorBodyComponent(world, pos.x.toInt(), pos.y.toInt())
+        PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, CONTROLLED_CLIENT_PLAYER_FAMILIES, state)
+        FALLING_BLOCK -> createFallingBlockBodyComponent(world, pos.x, pos.y, vel.x, vel.y, state)
+        DOOR -> createDoorBodyComponent(world, pos.x.toInt(), pos.y.toInt(), state)
         else -> error("Unknown body type ${protoEntity.box2D.type}")
       }
       return null

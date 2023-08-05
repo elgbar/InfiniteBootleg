@@ -67,6 +67,8 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecayComponentOrNull
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
+import java.util.concurrent.CompletableFuture
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.checkShouldLoad as box2DBodyComponentCheckShouldLoad
 
 fun Entity.save(): ProtoWorld.Entity {
   return entity {
@@ -106,44 +108,53 @@ fun Entity.save(): ProtoWorld.Entity {
   }
 }
 
-fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = null): Entity = entity {
+fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = null): CompletableFuture<Entity> {
   if (Settings.debug) {
     Main.logger().debug("PB Entity", TextFormat.printer().shortDebugString(protoEntity))
   }
-  PositionComponent.load(this, protoEntity)
-  WorldComponent.load(this, protoEntity) { world }
+  return futureEntity { future ->
+    // Required components
+    EntityTypeComponent.load(this, protoEntity)
+    IdComponent.load(this, protoEntity)
+    PositionComponent.load(this, protoEntity)
+    WorldComponent.load(this, protoEntity) { world }
 
-  ExplosiveComponent.load(this, protoEntity)
-  InventoryComponent.load(this, protoEntity)
-  KillableComponent.load(this, protoEntity)
-  LookDirectionComponent.load(this, protoEntity)
-  MaterialComponent.load(this, protoEntity)
-  NameComponent.load(this, protoEntity)
-  SelectedInventoryItemComponent.load(this, protoEntity)
-  TextureRegionComponent.load(this, protoEntity)
-  VelocityComponent.load(this, protoEntity)
+    ExplosiveComponent.load(this, protoEntity)
+    InventoryComponent.load(this, protoEntity)
+    KillableComponent.load(this, protoEntity)
+    LookDirectionComponent.load(this, protoEntity)
+    MaterialComponent.load(this, protoEntity)
+    NameComponent.load(this, protoEntity)
+    SelectedInventoryItemComponent.load(this, protoEntity)
+    TextureRegionComponent.load(this, protoEntity)
+    VelocityComponent.load(this, protoEntity)
 
-  protoEntity.tagsOrNull?.let {
-    FlyingTag.load(this, it)
-    FollowedByCameraTag.load(this, it)
-    GravityAffectedTag.load(this, it)
-    IgnorePlaceableCheckTag.load(this, it)
-    LeafDecayTag.load(this, it)
-  }
-
-  protoEntity.additionalComponents?.let {
-    ChunkComponent.load(this, it) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
-    DoorComponent.load(this, it)
-    GroundedComponent.load(this, it)
-    LocallyControlledComponent.load(this, it) {
-      val clientWorld = world as ClientWorld? ?: error("Not client world")
-      KeyboardControls(clientWorld)
+    protoEntity.tagsOrNull?.let {
+      FlyingTag.load(this, it)
+      FollowedByCameraTag.load(this, it)
+      GravityAffectedTag.load(this, it)
+      IgnorePlaceableCheckTag.load(this, it)
+      LeafDecayTag.load(this, it)
     }
-    OccupyingBlocksComponent.load(this, it)
-    PhysicsEventQueue.load(this, it)
-    InputEventQueue.load(this, it)
-  }
 
-  // Load box2d body last, as it depends on other components
-  Box2DBodyComponent.load(this, protoEntity)
+    protoEntity.additionalComponents?.let {
+      ChunkComponent.load(this, it) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
+      DoorComponent.load(this, it)
+      GroundedComponent.load(this, it)
+      LocallyControlledComponent.load(this, it) {
+        val clientWorld = world as ClientWorld? ?: error("Not client world")
+        KeyboardControls(clientWorld)
+      }
+      OccupyingBlocksComponent.load(this, it)
+      PhysicsEventQueue.load(this, it)
+      InputEventQueue.load(this, it)
+    }
+
+    // Load box2d body last, as it depends on other components
+    if (protoEntity.box2DBodyComponentCheckShouldLoad()) {
+      Box2DBodyComponent.load(this, protoEntity) { { future.complete(Unit) } }
+    } else {
+      future.complete(Unit)
+    }
+  }
 }

@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.events.api.ThreadType
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.component1
@@ -25,6 +24,7 @@ import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Compan
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 import no.elg.infiniteBootleg.world.world.World
 import java.util.Locale
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author Elg
@@ -58,7 +58,7 @@ enum class Material(
    * @return If this material can be rotated, but the entity can handle the rendering
    */
   val invisibleBlock: Boolean = false,
-  val createNew: ((world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) -> Entity)? = null
+  val createNew: ((world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) -> CompletableFuture<Entity>)? = null
 ) {
   AIR(
     itemType = ItemType.AIR,
@@ -150,24 +150,19 @@ enum class Material(
    */
   fun createBlock(world: World, chunk: Chunk, localX: Int, localY: Int, protoEntity: ProtoWorld.Entity? = null): Block {
     Preconditions.checkArgument(isBlock)
-    if (willNotCreateEntity(protoEntity)) {
-      return BlockImpl(world, chunk, localX, localY, this, null)
-    }
-    fun createEntity() = protoEntity?.let { world.engine.load(it, world, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
-    return if (ThreadType.currentThreadType() == ThreadType.PHYSICS) {
-      BlockImpl(world, chunk, localX, localY, this, createEntity())
-    } else {
-      BlockImpl(world, chunk, localX, localY, this, null).also {
-        world.postBox2dRunnable {
-          if (!it.isDisposed) {
-            it.entity = createEntity()
+    return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
+      protoEntity?.let { world.engine.load(it, world, chunk) }
+        ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
+          futureEntity.thenApply {
+            if (block.isDisposed) {
+              world.engine.removeEntity(it)
+            } else {
+              block.entity = it
+            }
           }
         }
-      }
     }
   }
-
-  fun willNotCreateEntity(protoEntity: ProtoWorld.Entity?): Boolean = protoEntity == null && createNew == null
 
   fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true) {
     createBlocks(world, locs.asIterable(), prioritize)

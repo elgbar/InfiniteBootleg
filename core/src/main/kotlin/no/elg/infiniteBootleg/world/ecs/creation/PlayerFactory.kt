@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import ktx.ashley.EngineEntity
-import ktx.ashley.entity
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.input.KeyboardControls
@@ -14,6 +13,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.killableOrNull
 import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
@@ -82,7 +82,8 @@ private fun EngineEntity.addCommonPlayerComponents(
   id: String,
   killableComponent: KillableComponent?,
   wantedFamilies: Array<Pair<Family, String>>,
-  whenReady: (Entity) -> Unit
+  future: CompletableFuture<Unit>,
+  whenReady: (Entity) -> Unit = {}
 ) {
   withRequiredComponents(ProtoWorld.Entity.EntityType.PLAYER, world, worldX, worldY, id)
 
@@ -102,7 +103,10 @@ private fun EngineEntity.addCommonPlayerComponents(
       }
     }
   )
-  createPlayerBodyComponent(world, worldX, worldY, dx, dy, wantedFamilies, whenReady)
+  createPlayerBodyComponent(world, worldX, worldY, dx, dy, wantedFamilies) {
+    whenReady(it)
+    future.complete(Unit)
+  }
 }
 
 fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, controlled: Boolean) {
@@ -162,18 +166,14 @@ fun Engine.createMPServerPlayerEntity(
   sharedInformation: SharedInformation,
   killableComponent: KillableComponent?
 ): CompletableFuture<Entity> {
-  val completableFuture = CompletableFuture<Entity>()
-  if (Main.isServer) {
-    entity {
+  return if (Main.isServer) {
+    futureEntity {
       with(SharedInformationComponent(sharedInformation))
-      addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES) {
-        completableFuture.complete(it)
-      }
+      addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES, it)
     }
   } else {
-    completableFuture.completeExceptionally(IllegalStateException("Cannot create a server player when this is not a server instance"))
+    CompletableFuture.failedFuture(IllegalStateException("Cannot create a server player when this is not a server instance"))
   }
-  return completableFuture
 }
 
 fun Engine.createMPClientPlayerEntity(
@@ -186,21 +186,13 @@ fun Engine.createMPClientPlayerEntity(
   id: String,
   controlled: Boolean,
   killableComponent: KillableComponent?
-): CompletableFuture<Entity> {
-  val completableFuture = CompletableFuture<Entity>()
-//  if (Main.isServerClient) {
-  entity {
+): CompletableFuture<Entity> =
+  futureEntity {
     addCommonClientPlayerComponents(world, controlled)
-    addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES) {
+    addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES, it) {
       it.box2d.disableGravity()
-      completableFuture.complete(it)
     }
   }
-//  } else {
-//    completableFuture.completeExceptionally(IllegalStateException("Cannot create a server-client player when this is not a server-client instance"))
-//  }
-  return completableFuture
-}
 
 fun Engine.createSPPlayerEntity(
   world: SinglePlayerWorld,
@@ -210,17 +202,12 @@ fun Engine.createSPPlayerEntity(
   dy: Float,
   name: String = "Player",
   id: String? = null
-): CompletableFuture<Entity> {
-  val completableFuture = CompletableFuture<Entity>()
+): CompletableFuture<Entity> =
   if (Main.isSingleplayer) {
-    entity {
+    futureEntity {
       addCommonClientPlayerComponents(world, true)
-      addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES) {
-        completableFuture.complete(it)
-      }
+      addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES, it)
     }
   } else {
-    completableFuture.completeExceptionally(IllegalStateException("Cannot create a singleplayer player when this is not a singleplayer instance"))
+    CompletableFuture.failedFuture(IllegalStateException("Cannot create a singleplayer player when this is not a singleplayer instance"))
   }
-  return completableFuture
-}
