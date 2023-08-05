@@ -19,7 +19,7 @@ object OutOfBoundsSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_P
       if (Settings.debug) {
         Main.logger().log("OutOfBoundsSystem", "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)}")
       }
-      world.engine.removeEntity(entity)
+      world.removeEntity(entity)
     }
   }
 }

@@ -155,7 +155,7 @@ enum class Material(
         ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
           futureEntity.thenApply {
             if (block.isDisposed) {
-              world.engine.removeEntity(it)
+              world.removeEntity(it)
             } else {
               block.entity = it
             }

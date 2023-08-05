@@ -54,9 +54,7 @@ class BlockImpl(
     }
     isDisposed = true
     entity?.also {
-      if (!it.isScheduledForRemoval) {
-        world.engine.removeEntity(it)
-      }
+      world.removeEntity(it)
     }
   }
 

@@ -40,6 +40,7 @@ import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNotAir
+import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
@@ -142,6 +143,12 @@ abstract class World(
 
   val worldBody: WorldBody
   val worldTime: WorldTime
+
+  /**
+   * The entity engine of this world
+   *
+   * Adding and removing entities to the engine must be used on [ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
+   */
   val engine: Engine
 
   /**
@@ -886,7 +893,7 @@ abstract class World(
     reason: DespawnReason = DespawnReason.UNKNOWN_REASON
   ) {
     despawnEntity(entity, reason)
-    engine.removeEntity(entity)
+    engine.removeEntityAsync(entity)
   }
 
   fun getPlayer(uuid: String): Entity? {

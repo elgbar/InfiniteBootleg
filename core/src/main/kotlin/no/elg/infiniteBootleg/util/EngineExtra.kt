@@ -51,3 +51,5 @@ inline fun Engine.futureEntity(configure: EngineEntity.(whenReady: CompletableFu
   }
   return addedToEngineFuture
 }
+
+fun Engine.removeEntityAsync(entity: Entity) = entity.world.postBox2dRunnable { this.removeEntity(entity) }

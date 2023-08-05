@@ -24,7 +24,7 @@ object DisposedChunkCheckSystem : IteratingSystem(blockEntityFamily, UPDATE_PRIO
         if (Settings.debug) {
           Main.logger().debug("DisposedChunkCheckSystem", "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)}")
         }
-        world.engine.removeEntity(entity)
+        world.removeEntity(entity)
       } else {
         // Replace chunk with a loaded chunk
         entity.chunkComponent.chunk = loadedChunk

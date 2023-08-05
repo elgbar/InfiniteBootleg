@@ -24,7 +24,7 @@ object FallingBlockContactService {
         if (entity.isScheduledForRemoval || entity.isRemoving) {
           return
         }
-        world.engine.removeEntity(entity)
+        world.removeEntity(entity)
 
         var deltaY = 0
         var blockUp: Block?
