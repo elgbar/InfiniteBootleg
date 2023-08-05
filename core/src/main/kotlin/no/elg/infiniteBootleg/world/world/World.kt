@@ -74,6 +74,7 @@ import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
+import no.elg.infiniteBootleg.world.ecs.system.DisposedChunkCheckSystem
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
@@ -218,6 +219,7 @@ abstract class World(
     engine.addSystem(FallingBlockSystem)
     engine.addSystem(ExplosiveBlockSystem)
     engine.addSystem(LeavesDecaySystem)
+    engine.addSystem(DisposedChunkCheckSystem)
     if (Main.isClient) {
       engine.addSystem(FollowEntitySystem)
     }
@@ -737,17 +739,6 @@ abstract class World(
     return isChunkLoaded(compactLoc(chunkX, chunkY))
   }
 
-  fun isChunkLoaded(compactedChunkLoc: Long): Boolean {
-    val chunk: Chunk?
-    chunksLock.readLock().lock()
-    chunk = try {
-      chunks[compactedChunkLoc]
-    } finally {
-      chunksLock.readLock().unlock()
-    }
-    return chunk != null && chunk.isNotDisposed
-  }
-
   /**
    * Unload and save all chunks in this world.
    *
@@ -816,6 +807,11 @@ abstract class World(
       }
     }
 
+  fun isChunkLoaded(compactedChunkLoc: Long): Boolean {
+    val chunk: Chunk? = getLoadedChunk(compactedChunkLoc)
+    return chunk != null && chunk.isNotDisposed
+  }
+
   fun getLoadedChunk(compactChunkLoc: Long): Chunk? {
     chunksLock.readLock().lock()
     return try {
@@ -845,10 +841,6 @@ abstract class World(
         if (save && loader is FullChunkLoader) {
           loader.save(chunk)
         }
-
-        //                for (Entity entity : chunk.getEntities()) {
-        //                  removeEntity(entity, CHUNK_UNLOADED);
-        //                }
         chunks.remove(chunk.compactLocation)
       } finally {
         chunksLock.writeLock().unlock()

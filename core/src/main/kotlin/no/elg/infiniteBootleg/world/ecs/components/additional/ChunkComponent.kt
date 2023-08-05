@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.world.ecs.api.AdditionalComponentsLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.AdditionalComponentsSavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 
-class ChunkComponent(val chunk: Chunk) : AdditionalComponentsSavableComponent {
+class ChunkComponent(var chunk: Chunk) : AdditionalComponentsSavableComponent {
 
   companion object : AdditionalComponentsLoadableMapper<ChunkComponent, Chunk>() {
     val Entity.chunk get() = chunkComponent.chunk
