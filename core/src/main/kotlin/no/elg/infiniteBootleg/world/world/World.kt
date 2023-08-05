@@ -197,9 +197,9 @@ abstract class World(
             Main.logger().debug("World") { "Will not spawn a new player in as the world contains a singleplayer entity" }
           }
         }
+        dispatchEvent(WorldLoadedEvent(this))
       }
       Main.logger().debug("World") { "World ticker started, sending WorldLoadedEvent" }
-      dispatchEvent(WorldLoadedEvent(this))
     }
   }
 
