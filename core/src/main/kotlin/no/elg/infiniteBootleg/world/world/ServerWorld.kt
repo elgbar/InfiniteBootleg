@@ -37,8 +37,8 @@ class ServerWorld : World {
     }
   }
 
-  override fun initializeEngine(): Engine = super.initializeEngine().also {
-    it.addEntityListener(
+  override fun initializeEngine(engine: Engine) {
+    engine.addEntityListener(
       playerFamily,
       object : EntityListener {
         override fun entityAdded(entity: Entity): Unit = onEntityAdd(entity)

@@ -65,6 +65,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
 import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
@@ -203,7 +204,7 @@ abstract class World(
     }
   }
 
-  protected open fun initializeEngine(): Engine {
+  private fun initializeEngine(): Engine {
     val engine = Engine()
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(ReadBox2DStateSystem)
@@ -221,8 +222,11 @@ abstract class World(
     }
     ensureUniquenessListener(engine)
     disposeEntitiesOnRemoval(engine)
+    initializeEngine(engine)
     return engine
   }
+
+  protected open fun initializeEngine(engine: Engine) {}
 
   fun initialize() {
     if (Settings.loadWorldFromDisk) {
@@ -269,7 +273,7 @@ abstract class World(
     spawn = fromVector2i(protoWorld.spawn)
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
-    if (protoWorld.hasPlayer()) {
+    if (Main.isSingleplayer && protoWorld.hasPlayer()) {
       engine.load(protoWorld.player, this).also {
         it.transient = true
       }
