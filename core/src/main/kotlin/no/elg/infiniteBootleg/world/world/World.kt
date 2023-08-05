@@ -279,16 +279,18 @@ abstract class World(
     spawn = fromVector2i(protoWorld.spawn)
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
-    if (Main.isSingleplayer && protoWorld.hasPlayer()) {
-      engine.load(protoWorld.player, this).also {
-        it.transient = true
-      }
-    }
     synchronized(chunkColumns) {
       for (protoCC in protoWorld.chunkColumnsList) {
         val chunkColumn = fromProtobuf(this, protoCC)
         val chunkX = protoCC.chunkX
         chunkColumns.put(chunkX, chunkColumn)
+      }
+    }
+
+    if (Main.isSingleplayer && protoWorld.hasPlayer()) {
+      engine.load(protoWorld.player, this).thenApply {
+        it.transient = true
+        loadChunk(it.compactChunkLoc, returnIfLoaded = true)
       }
     }
   }
