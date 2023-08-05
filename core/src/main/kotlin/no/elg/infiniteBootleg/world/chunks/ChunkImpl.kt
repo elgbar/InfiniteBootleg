@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
+import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventListener
@@ -596,6 +597,10 @@ class ChunkImpl(
       initializing,
       "Cannot load from proto chunk after chunk has been initialized"
     )
+
+    if (Settings.debug) {
+      Main.logger().debug("PB Chunk", TextFormat.printer().shortDebugString(protoChunk))
+    }
     val chunkPosition = protoChunk.position
     val posErrorMsg = "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})"
     Preconditions.checkArgument(chunkPosition.x == chunkX, posErrorMsg)

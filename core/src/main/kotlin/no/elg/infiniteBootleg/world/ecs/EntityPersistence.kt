@@ -2,13 +2,16 @@ package no.elg.infiniteBootleg.world.ecs
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.entity
+import com.google.protobuf.TextFormat
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.KeyboardControls
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt.additionalComponents
 import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.entity
 import no.elg.infiniteBootleg.protobuf.tagsOrNull
+import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
@@ -104,9 +107,9 @@ fun Entity.save(): ProtoWorld.Entity {
 }
 
 fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = null): Entity = entity {
-  // Required components
-  EntityTypeComponent.load(this, protoEntity)
-  IdComponent.load(this, protoEntity)
+  if (Settings.debug) {
+    Main.logger().debug("PB Entity", TextFormat.printer().shortDebugString(protoEntity))
+  }
   PositionComponent.load(this, protoEntity)
   WorldComponent.load(this, protoEntity) { world }
 

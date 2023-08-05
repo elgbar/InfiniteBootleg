@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
+import com.google.protobuf.TextFormat
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.Settings
@@ -26,7 +27,6 @@ import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.ProtoWorld.WorldOrBuilder
 import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.chunkOffset
@@ -64,6 +64,7 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
 import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
@@ -269,7 +270,10 @@ abstract class World(
     }
   }
 
-  fun loadFromProtoWorld(protoWorld: WorldOrBuilder) {
+  fun loadFromProtoWorld(protoWorld: ProtoWorld.World) {
+    if (Settings.debug) {
+      Main.logger().debug("PB World", TextFormat.printer().shortDebugString(protoWorld))
+    }
     spawn = fromVector2i(protoWorld.spawn)
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
