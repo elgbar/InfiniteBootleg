@@ -25,7 +25,9 @@ import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.WorldTime
+import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
@@ -300,12 +302,16 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
     val entities = clientWorld.engine.getEntitiesFor(localPlayerFamily)
-    if (entities.size() == 0) {
-      logger.log("There is no local, controlled player in this world")
-    }
-    entities.forEach { it.teleport(worldX, worldY) }
 
+    clientWorld.render.camera.position.set(worldX * Block.BLOCK_SIZE, worldY * Block.BLOCK_SIZE, 0f)
+    clientWorld.render.update()
     logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
+
+    if (entities.size() > 0) {
+      logger.logf(LogLevel.SUCCESS, "Teleported entity to (% .2f,% .2f)", worldX, worldY)
+      world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
+      entities.forEach { it.teleport(worldX, worldY) }
+    }
   }
 
   @CmdArgNames("mode")
