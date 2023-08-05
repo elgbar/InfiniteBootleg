@@ -26,9 +26,9 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
       //noinspection ConstantConditions
       world.render.render()
       hud.render()
-      Main.inst().console.draw()
       super.render(delta)
     }
+    Main.inst().console.draw()
   }
 
   override fun resize(width: Int, height: Int) {
