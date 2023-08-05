@@ -164,14 +164,14 @@ class TickerImpl(
 
   override fun start() {
     check(!isStarted) { "Ticker thread has already been started" }
+    isStarted = true
     val threadType = currentThreadType()
     if (threadType !== ThreadType.RENDER) {
       throw CalledFromWrongThreadTypeException(
         "Tickers can only be started from the render thread, it was called from $threadType"
       )
     }
-    isStarted = true
-    Main.inst().scheduler.executeAsync { tickerThread.start() }
+    tickerThread.start()
   }
 
   /** Stop this ticker, the tickers thread will not be called anymore  */
