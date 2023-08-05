@@ -45,8 +45,8 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
       val diffY = y - camera.position.y
       val teleportCam = !Settings.enableCameraFollowLerp || abs(diffX) > Gdx.graphics.width || abs(diffY) > Gdx.graphics.height
       if (teleportCam) {
-        camera.position.x = x * Block.BLOCK_SIZE
-        camera.position.y = y * Block.BLOCK_SIZE
+        camera.position.x = x
+        camera.position.y = y
       } else {
         val dx = diffX * CAMERA_LERP * Block.BLOCK_SIZE
         val dy = diffY * CAMERA_LERP * Block.BLOCK_SIZE
