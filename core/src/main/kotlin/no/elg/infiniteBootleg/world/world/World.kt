@@ -270,7 +270,9 @@ abstract class World(
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
     if (protoWorld.hasPlayer()) {
-      engine.load(protoWorld.player, this)
+      engine.load(protoWorld.player, this).also {
+        it.transient = true
+      }
     }
     synchronized(chunkColumns) {
       for (protoCC in protoWorld.chunkColumnsList) {
