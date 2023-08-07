@@ -27,25 +27,31 @@ import no.elg.infiniteBootleg.screens.hide
 import no.elg.infiniteBootleg.screens.toggleShown
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
+import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
+import java.math.BigDecimal
 
 class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow) {
 
   val isDebugMenuVisible: Boolean get() = debugMenu.isVisible || debugMenu.isShown()
 
   fun toggleDebugMenu() {
+    if (!isDebugMenuVisible) {
+      updateAllValues()
+    }
     debugMenu.toggleShown(stage, true)
   }
 }
 
-private val onAnyButtonClicked = mutableListOf<() -> Unit>()
+private val onAnyElementChanged = mutableListOf<() -> Unit>()
 
-private fun updateAllButtons() {
-  for (onClick in onAnyButtonClicked) {
-    onClick()
+private fun updateAllValues() {
+  for (onChange in onAnyElementChanged) {
+    onChange()
   }
 }
 
@@ -66,37 +72,47 @@ private fun KVisWindow.toggleableDebugButton(
 
   onClick {
     onToggle()
-    updateAllButtons()
+    updateAllValues()
   }
   it.fillX()
-  onAnyButtonClicked += {
+  onAnyElementChanged += {
     isDisabled = booleanGetter()
     tooltipLabel.setText(tooltipText())
   }
 }
 
 @Scene2dDsl
-private fun KVisWindow.floatSpinner(name: String, initialValue: Number, min: Number, max: Number, step: Number, onChange: (Float) -> Unit) {
-  val model = FloatSpinnerModel(initialValue.toString(), min.toString(), max.toString(), step.toString())
+private fun KVisWindow.floatSpinner(name: String, srcValueGetter: () -> Number, min: Number, max: Number, step: Number, onChange: (Float) -> Unit) {
+  val model = FloatSpinnerModel(srcValueGetter().toString(), min.toString(), max.toString(), step.toString())
   spinner(name, model) {
     it.fillX()
+
     onChange {
       onChange(model.value.toFloat())
+      updateAllValues()
+    }
+    onAnyElementChanged += {
+      model.setValue(BigDecimal.valueOf(srcValueGetter().toDouble()), false)
     }
   }
 }
 
 @Scene2dDsl
-private fun KVisWindow.floatSlider(name: String, initialValue: Float, min: Float, max: Float, step: Float, onChange: (Float) -> Unit) {
+private fun KVisWindow.floatSlider(name: String, srcValueGetter: () -> Float, min: Float, max: Float, step: Float, onChange: (Float) -> Unit) {
   horizontalGroup {
     it.fillX()
     space(5f)
     visLabel(name)
     visSlider(min, max, step) {
       this.name = name
-      setValue(initialValue)
+      setValue(srcValueGetter())
+
+      onAnyElementChanged += {
+        setValue(srcValueGetter())
+      }
       onChange {
         onChange(this.value)
+        updateAllValues()
       }
     }
   }
@@ -124,14 +140,27 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
       }
       aRow {
-        toggleableDebugButton("Ignore place check", { world.engine.getEntitiesFor(localPlayerFamily).any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
+        val placeCheckGetter = { world.engine.getEntitiesFor(localPlayerFamily).any { it.ignorePlaceableCheck } }
+        toggleableDebugButton("Ignore place check", placeCheckGetter, Main.inst().console.exec::placeCheck)
         toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
         toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
       }
       aRow {
-        floatSpinner("Brush size", KeyboardControls.INITIAL_BRUSH_SIZE, 1f, 64f, 0.25f, Main.inst().console.exec::brush)
-        floatSpinner("Reach radius", KeyboardControls.INITIAL_INTERACT_RADIUS, 1f, 512f, 1f, Main.inst().console.exec::interactRadius)
-        floatSlider("Zoom", 1f, 0.1f, MAX_ZOOM * 5, 0.1f) {
+        val brushSizeGetter: () -> Number = {
+          world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
+            .map { it.locallyControlledComponentOrNull }
+            .firstOrNull()?.keyboardControls?.brushSize ?: KeyboardControls.INITIAL_BRUSH_SIZE
+        }
+        floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, Main.inst().console.exec::brush)
+
+        val reachRadiusGetter: () -> Number = {
+          world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
+            .map { it.locallyControlledComponentOrNull }
+            .firstOrNull()?.keyboardControls?.interactRadius ?: KeyboardControls.INITIAL_INTERACT_RADIUS
+        }
+        floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, Main.inst().console.exec::interactRadius)
+        val zoomValueGetter: () -> Float = { ClientMain.inst().world?.let { it.render.camera.zoom } ?: 1f }
+        floatSlider("Zoom", zoomValueGetter, 0.1f, MAX_ZOOM * 5, 0.1f) {
           val clientWorld = ClientMain.inst().world ?: return@floatSlider
           clientWorld.render.camera.zoom = it
         }
@@ -160,7 +189,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       }
       aRow {
         toggleableDebugButton("Vsync", Settings::vsync) { Settings.vsync = !Settings.vsync }
-        floatSpinner("Max FPS", Settings.foregroundFPS, 0, 512, 1) { Settings.foregroundFPS = it.toInt() }
+        floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1) { Settings.foregroundFPS = it.toInt() }
       }
       pack()
     }
