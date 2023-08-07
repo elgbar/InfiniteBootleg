@@ -75,7 +75,7 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
       with(
         InventoryComponent(protoEntity.inventory.maxSize).apply {
           protoEntity.inventory.itemsList.forEach {
-            this += Item(Material.fromOrdinal(it.material.ordinal), it.stock.toUInt(), it.maxStock.toUInt())
+            this += Item(material = Material.fromOrdinal(it.material.ordinal), maxStock = it.maxStock.toUInt(), stock = it.stock.toUInt())
           }
         }
       )
