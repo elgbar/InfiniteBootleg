@@ -25,7 +25,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
-      val keyboardControls = entity.locallyControlledComponentOrNull?.keyboardControls ?: continue
+      val keyboardControls = entity.locallyControlledComponentOrNull ?: continue
 
       entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
         .forEach { (blockWorldX, blockWorldY) ->

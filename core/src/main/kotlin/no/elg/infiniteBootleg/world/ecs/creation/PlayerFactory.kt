@@ -6,12 +6,10 @@ import com.badlogic.ashley.core.Family
 import ktx.ashley.EngineEntity
 import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
-import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.killableOrNull
-import no.elg.infiniteBootleg.protobuf.playerOrNull
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.with
@@ -109,10 +107,10 @@ private fun EngineEntity.addCommonPlayerComponents(
   }
 }
 
-fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, controlled: Boolean) {
+fun EngineEntity.addCommonClientPlayerComponents(controlled: Boolean) {
   if (controlled) {
     // This entity will handle input events
-    with(LocallyControlledComponent(KeyboardControls(world)))
+    with(LocallyControlledComponent())
     with<FollowedByCameraTag>()
     with<InputEventQueue>()
     with<SelectedInventoryItemComponent>()
@@ -124,7 +122,7 @@ fun EngineEntity.addCommonClientPlayerComponents(world: ClientWorld, controlled:
 }
 
 fun Engine.createMPServerPlayerEntity(world: ServerWorld, protoEntity: ProtoWorld.Entity, sharedInformation: SharedInformation): CompletableFuture<Entity> {
-  val protoPlayer = protoEntity.playerOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
+  if (!protoEntity.hasPlayer()) return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
   val living = protoEntity.killableOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
   return createMPServerPlayerEntity(
     world,
@@ -140,7 +138,7 @@ fun Engine.createMPServerPlayerEntity(world: ServerWorld, protoEntity: ProtoWorl
 }
 
 fun Engine.createMPClientPlayerEntity(world: ServerClientWorld, protoEntity: ProtoWorld.Entity, controlled: Boolean): CompletableFuture<Entity> {
-  val protoPlayer = protoEntity.playerOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
+  if (!protoEntity.hasPlayer()) return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
   val living = protoEntity.killableOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
   return createMPClientPlayerEntity(
     world,
@@ -188,7 +186,7 @@ fun Engine.createMPClientPlayerEntity(
   killableComponent: KillableComponent?
 ): CompletableFuture<Entity> =
   futureEntity {
-    addCommonClientPlayerComponents(world, controlled)
+    addCommonClientPlayerComponents(controlled)
     addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES, it) {
       it.box2d.disableGravity()
     }
@@ -205,7 +203,7 @@ fun Engine.createSPPlayerEntity(
 ): CompletableFuture<Entity> =
   if (Main.isSingleplayer) {
     futureEntity {
-      addCommonClientPlayerComponents(world, true)
+      addCommonClientPlayerComponents(true)
       addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES, it)
     }
   } else {

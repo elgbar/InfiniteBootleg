@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt.additionalComponents
 import no.elg.infiniteBootleg.protobuf.EntityKt.tags
@@ -65,7 +64,6 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheckComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecayComponentOrNull
-import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.checkShouldLoad as box2DBodyComponentCheckShouldLoad
@@ -128,10 +126,7 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
     SelectedInventoryItemComponent.load(this, protoEntity)
     TextureRegionComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)
-    LocallyControlledComponent.load(this, protoEntity) {
-      val clientWorld = world as ClientWorld? ?: error("Not client world")
-      KeyboardControls(clientWorld)
-    }
+    LocallyControlledComponent.load(this, protoEntity)
 
     protoEntity.tagsOrNull?.let {
       FlyingTag.load(this, it)

@@ -12,7 +12,6 @@ import com.strongjoshua.console.annotation.HiddenCommand
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
-import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
@@ -361,8 +360,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       logger.log("There is no local, controlled player in this world")
     }
     for (entity in entities) {
-      val controls: KeyboardControls = entity.locallyControlledComponent.keyboardControls
-      logger.success("Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${controls.brushSize}")
+      logger.success("Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${entity.locallyControlledComponent.brushSize}")
     }
   }
 
@@ -380,8 +378,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
     for (entity in entities) {
-      val controls: KeyboardControls = entity.locallyControlledComponent.keyboardControls
-      controls.brushSize = size
+      entity.locallyControlledComponent.brushSize = size
       logger.success("New brush size is now $size")
     }
   }
@@ -400,8 +397,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
     for (entity in entities) {
-      val controls: KeyboardControls = entity.locallyControlledComponent.keyboardControls
-      controls.interactRadius = interactRadius
+      entity.locallyControlledComponent.interactRadius = interactRadius
       logger.success("New interact radius is now $interactRadius")
     }
   }

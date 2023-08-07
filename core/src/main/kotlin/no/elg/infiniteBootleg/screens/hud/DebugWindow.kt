@@ -20,11 +20,12 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.input.KeyboardControls
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
 import no.elg.infiniteBootleg.screens.toggleShown
+import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
+import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
@@ -149,14 +150,14 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         val brushSizeGetter: () -> Number = {
           world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
             .map { it.locallyControlledComponentOrNull }
-            .firstOrNull()?.keyboardControls?.brushSize ?: KeyboardControls.INITIAL_BRUSH_SIZE
+            .firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
         }
         floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, Main.inst().console.exec::brush)
 
         val reachRadiusGetter: () -> Number = {
           world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
             .map { it.locallyControlledComponentOrNull }
-            .firstOrNull()?.keyboardControls?.interactRadius ?: KeyboardControls.INITIAL_INTERACT_RADIUS
+            .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
         floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, Main.inst().console.exec::interactRadius)
         val zoomValueGetter: () -> Float = { ClientMain.inst().world?.let { it.render.camera.zoom } ?: 1f }

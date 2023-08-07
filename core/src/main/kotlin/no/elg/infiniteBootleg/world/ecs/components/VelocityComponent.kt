@@ -5,11 +5,11 @@ import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_X_VEL
-import no.elg.infiniteBootleg.input.KeyboardControls.Companion.MAX_Y_VEL
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
+import no.elg.infiniteBootleg.util.MAX_X_VEL
+import no.elg.infiniteBootleg.util.MAX_Y_VEL
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent

@@ -1,18 +1,28 @@
 package no.elg.infiniteBootleg.world.ecs.system.event
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponent
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import no.elg.infiniteBootleg.util.WorldEntity
+import no.elg.infiniteBootleg.util.breakBlocks
+import no.elg.infiniteBootleg.util.inputMouseLocator
+import no.elg.infiniteBootleg.util.interpolate
+import no.elg.infiniteBootleg.util.placeBlocks
+import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 
 object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueue.mapper) {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
-    val controls = entity.locallyControlledComponent.keyboardControls
+    val worldEntity = WorldEntity(entity.world, entity)
     when (event) {
-      is InputEvent.KeyDownEvent -> controls.keyDown(entity, event.keycode)
-      is InputEvent.TouchDownEvent -> controls.touchDown(entity, event.button)
+      is InputEvent.KeyDownEvent -> worldEntity.keyDown(entity, event.keycode)
+      is InputEvent.TouchDownEvent -> worldEntity.touchDown(event.button)
       is InputEvent.KeyTypedEvent -> Unit
       is InputEvent.KeyUpEvent -> Unit
       is InputEvent.MouseMovedEvent -> Unit
@@ -20,5 +30,49 @@ object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWi
       is InputEvent.TouchDraggedEvent -> Unit
       is InputEvent.TouchUpEvent -> Unit
     }
+  }
+
+  private fun WorldEntity.touchDown(button: Int) {
+    val update =
+      when (button) {
+        Input.Buttons.LEFT -> interpolate(true, ::breakBlocks)
+        Input.Buttons.RIGHT -> interpolate(true, ::placeBlocks)
+        else -> false
+      }
+
+    if (update) {
+      world.render.update()
+    }
+  }
+
+  private fun WorldEntity.keyDown(entity: Entity, keycode: Int): Boolean {
+    when (keycode) {
+      Input.Keys.T -> entity.teleport(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY)
+      Input.Keys.Q -> interpolate(true, ::placeBlocks)
+    }
+
+    val selectedMaterial = entity.selectedInventoryItemComponentOrNull ?: return true
+
+    val extra = if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) 10 else 0
+    try {
+      when (keycode) {
+        Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> Material.entries[0 + extra]
+        Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> Material.entries[1 + extra]
+        Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> Material.entries[2 + extra]
+        Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> Material.entries[3 + extra]
+        Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> Material.entries[4 + extra]
+        Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> Material.entries[5 + extra]
+        Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> Material.entries[6 + extra]
+        Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> Material.entries[7 + extra]
+        Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> Material.entries[8 + extra]
+        Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> Material.entries[9 + extra]
+        else -> null
+      }?.let {
+        selectedMaterial.material = it
+      }
+    } catch (_: IndexOutOfBoundsException) {
+      // Ignore out of bounds, for materials that don't exist
+    }
+    return true
   }
 }

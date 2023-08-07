@@ -113,7 +113,7 @@ fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 // ////////////////////////////////////
 
 const val UPDATE_PRIORITY_ID_CHECK = Int.MIN_VALUE
-const val UPDATE_PRIORITY_FIRST = -2_000
+const val UPDATE_PRIORITY_BEFORE_EVENTS = -2_000
 const val UPDATE_PRIORITY_EVENT_HANDLING = -1_500
 const val UPDATE_PRIORITY_EARLY = -1_000
 const val UPDATE_PRIORITY_DEFAULT = 0
