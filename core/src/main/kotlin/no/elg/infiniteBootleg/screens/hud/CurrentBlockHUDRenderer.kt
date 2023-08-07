@@ -30,7 +30,7 @@ object CurrentBlockHUDRenderer {
     try {
       val entity = world?.engine?.getEntitiesFor(selectedMaterialComponentFamily)?.firstOrNull() ?: return
       val item = entity.selectedItem ?: airItem
-      val texture = item.material.textureRegion ?: KAssets.breakingBlockTexture
+      val texture = item.material.textureRegion ?: KAssets.breakableBlockTexture
       with(screenRenderer) {
         batch.draw(texture.textureRegion, Gdx.graphics.width - x4Block, Gdx.graphics.height - x3Block, x2Block, x2Block)
         layout.setText(font, "${item.stock} / ${item.maxStock}", Color.WHITE, x10Block, Align.right, true)

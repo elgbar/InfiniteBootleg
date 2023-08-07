@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -22,10 +23,10 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
   private val lr: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 
-  private val newlyUpdatedChunks = LongMap<VisualizeUpdate>()
+  private val newlyUpdatedChunks = LongMap<ProgressHandler>()
 
   private val listener = EventManager.registerListener { e: ChunkTextureChangedEvent ->
-    newlyUpdatedChunks.put(e.chunk.compactLocation, VisualizeUpdate(0.25f))
+    newlyUpdatedChunks.put(e.chunk.compactLocation, ProgressHandler(0.25f))
   }
 
   override fun render() {
@@ -45,7 +46,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
           for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
             val compactLoc = compactLoc(x, y)
             val updatedChunk = newlyUpdatedChunks.get(compactLoc) ?: continue
-            lr.color.a = updatedChunk.calculateAlpha(Gdx.graphics.deltaTime)
+            lr.color.a = updatedChunk.calculateProgress(Gdx.graphics.deltaTime)
             if (updatedChunk.isDone()) {
               newlyUpdatedChunks.remove(compactLoc)
               continue

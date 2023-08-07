@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.LongMapUtil.component1
 import no.elg.infiniteBootleg.util.LongMapUtil.component2
+import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
@@ -33,9 +34,9 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     it.color = BLOCK_LIGHT_UPDATE_COLOR
   }
 
-  private val newlyUpdatedChunks = LongMap<VisualizeUpdate>()
+  private val newlyUpdatedChunks = LongMap<ProgressHandler>()
   private val listener = EventManager.registerListener { e: BlockLightChangedEvent ->
-    newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), VisualizeUpdate(1f))
+    newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), ProgressHandler(1f))
   }
 
   override fun render() {
@@ -49,12 +50,12 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
   private fun renderLightUpdates() {
     val textureSize = BLOCK_SIZE.toFloat()
-    newlyUpdatedChunks.removeAll { (_, it: VisualizeUpdate?) -> it == null || it.isDone() }
+    newlyUpdatedChunks.removeAll { (_, it: ProgressHandler?) -> it == null || it.isDone() }
     Gdx.gl.glEnable(GL30.GL_BLEND)
     lr.use(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
-      for ((compactLoc, visualizeUpdate: VisualizeUpdate?) in newlyUpdatedChunks.entries()) {
+      for ((compactLoc, visualizeUpdate: ProgressHandler?) in newlyUpdatedChunks.entries()) {
         val (worldX, worldY) = compactLoc
-        lr.color.a = visualizeUpdate?.calculateAlpha(Gdx.graphics.deltaTime) ?: continue
+        lr.color.a = visualizeUpdate?.calculateProgress(Gdx.graphics.deltaTime) ?: continue
         lr.rect(worldX * textureSize + textureSize / 2f, worldY * textureSize + textureSize / 2f, textureSize / 4f, textureSize / 4f)
       }
     }

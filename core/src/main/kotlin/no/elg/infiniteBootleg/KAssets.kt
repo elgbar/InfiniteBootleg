@@ -49,7 +49,7 @@ object KAssets {
 
   lateinit var textureAtlas: TextureAtlas
 
-  lateinit var breakingBlockTexture: RotatableTextureRegion
+  lateinit var breakableBlockTexture: RotatableTextureRegion
   lateinit var handTexture: RotatableTextureRegion
   lateinit var playerTexture: RotatableTextureRegion
   lateinit var doorOpenTexture: RotatableTextureRegion
@@ -60,6 +60,8 @@ object KAssets {
   lateinit var whiteTexture: RotatableTextureRegion
   lateinit var skylightDebugTexture: RotatableTextureRegion
   lateinit var luminanceDebugTexture: RotatableTextureRegion
+
+  lateinit var breakingBlockTexture: Array<RotatableTextureRegion>
 
   val font: BitmapFont by lazy {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
@@ -73,11 +75,15 @@ object KAssets {
   fun loadAssets() {
     textureAtlas = TextureAtlas(TEXTURES_BLOCK_FILE)
 
-    breakingBlockTexture = textureAtlas.findRotationAwareRegion("breaking_block", false)
+    breakableBlockTexture = textureAtlas.findRotationAwareRegion("breaking_block", false)
     handTexture = textureAtlas.findRotationAwareRegion("hand", false)
     playerTexture = textureAtlas.findRotationAwareRegion("player", false)
     doorOpenTexture = textureAtlas.findRotationAwareRegion("door_open", false)
     doorClosedTexture = textureAtlas.findRotationAwareRegion("door_closed", false)
+
+    breakingBlockTexture = (1..9).map {
+      textureAtlas.findRotationAwareRegion("break", false, it)
+    }.toTypedArray()
 
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font

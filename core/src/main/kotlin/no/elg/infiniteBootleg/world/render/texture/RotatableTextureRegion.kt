@@ -9,10 +9,12 @@ data class RotatableTextureRegion(val textureRegion: TextureRegion, val rotation
     fun TextureRegion.allowedRotation(name: String) = RotatableTextureRegion(this, true, name)
     fun TextureRegion.disallowedRotation(name: String) = RotatableTextureRegion(this, false, name)
 
-    fun TextureAtlas.findRotationAwareRegionOrNull(name: String, rotationAllowed: Boolean): RotatableTextureRegion? =
-      this.findRegion(name)?.let { RotatableTextureRegion(it, rotationAllowed, name) }
+    fun TextureAtlas.findRotationAwareRegionOrNull(name: String, rotationAllowed: Boolean, index: Int? = null): RotatableTextureRegion? {
+      val region = index?.let { findRegion(name, it) } ?: findRegion(name)
+      return region?.let { texture -> RotatableTextureRegion(texture, rotationAllowed, name) }
+    }
 
-    fun TextureAtlas.findRotationAwareRegion(name: String, rotationAllowed: Boolean): RotatableTextureRegion =
-      this.findRotationAwareRegionOrNull(name, rotationAllowed) ?: error { "Could not find region $name in texture atlas" }
+    fun TextureAtlas.findRotationAwareRegion(name: String, rotationAllowed: Boolean, index: Int? = null): RotatableTextureRegion =
+      this.findRotationAwareRegionOrNull(name, rotationAllowed, index) ?: error("Could not find region $name in texture atlas")
   }
 }
