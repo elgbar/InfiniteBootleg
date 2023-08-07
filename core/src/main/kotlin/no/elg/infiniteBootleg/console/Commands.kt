@@ -402,6 +402,22 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
+  @CmdArgNames("instantBreak")
+  @ClientsideOnly
+  @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New instant break"])
+  fun instantBreak() {
+    val world = clientWorld ?: return
+    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    if (entities.size() == 0) {
+      logger.error("There is no local, controlled player in this world")
+    }
+    for (entity in entities) {
+      val locallyControlledComponent = entity.locallyControlledComponent
+      locallyControlledComponent.instantBreak = !locallyControlledComponent.instantBreak
+      logger.success("Instant break for ${entity.nameOrNull} is now ${(!locallyControlledComponent.instantBreak).toAbled()}")
+    }
+  }
+
   @ClientsideOnly
   @ConsoleDoc(description = "Toggle whether a player can place blocks disconnected from other blocks")
   fun placeCheck() {

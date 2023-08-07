@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
 import no.elg.infiniteBootleg.screens.toggleShown
 import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
+import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
@@ -160,6 +161,16 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
             .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
         floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, Main.inst().console.exec::interactRadius)
+
+        val instantBreakGetter: () -> Boolean = {
+          world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
+            .map { it.locallyControlledComponentOrNull }
+            .firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
+        }
+        toggleableDebugButton("Instant break", instantBreakGetter, Main.inst().console.exec::instantBreak)
+      }
+
+      aRow {
         val zoomValueGetter: () -> Float = { ClientMain.inst().world?.let { it.render.camera.zoom } ?: 1f }
         floatSlider("Zoom", zoomValueGetter, 0.1f, MAX_ZOOM * 5, 0.1f) {
           val clientWorld = ClientMain.inst().world ?: return@floatSlider

@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
+import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
@@ -16,7 +17,7 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 data class LocallyControlledComponent(
   var brushSize: Float = INITIAL_BRUSH_SIZE,
   var interactRadius: Float = INITIAL_INTERACT_RADIUS,
-  var instantBreak: Boolean = false
+  var instantBreak: Boolean = INITIAL_INSTANT_BREAK
 ) : EntitySavableComponent {
 
   companion object : EntityLoadableMapper<LocallyControlledComponent>() {

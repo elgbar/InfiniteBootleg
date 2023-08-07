@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponen
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker
 import no.elg.infiniteBootleg.world.world.World
@@ -30,6 +31,7 @@ const val MAX_Y_VEL = 20f
 
 const val INITIAL_BRUSH_SIZE = 1f
 const val INITIAL_INTERACT_RADIUS = 32f
+const val INITIAL_INSTANT_BREAK = false
 
 private val tmpVec = Vector2()
 private val tmpVec2 = Vector2()
@@ -39,7 +41,7 @@ private var lastCreateBlockLoc: Long = 0
 private var lastCreateBlockTick: Long = 0
 
 fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = with(worldEntity) {
-  if (canNotInteract(worldEntity, blockX, blockY)) return false
+  if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
   val locallyControlledComponent = entity.locallyControlledComponent
   val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
   world.removeBlocks(world.getBlocks(breakableBlocks))
