@@ -165,9 +165,9 @@ fun Engine.createMPServerPlayerEntity(
   killableComponent: KillableComponent?
 ): CompletableFuture<Entity> {
   return if (Main.isServer) {
-    futureEntity {
+    futureEntity { future ->
       with(SharedInformationComponent(sharedInformation))
-      addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES, it)
+      addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES, future)
     }
   } else {
     CompletableFuture.failedFuture(IllegalStateException("Cannot create a server player when this is not a server instance"))
@@ -185,9 +185,9 @@ fun Engine.createMPClientPlayerEntity(
   controlled: Boolean,
   killableComponent: KillableComponent?
 ): CompletableFuture<Entity> =
-  futureEntity {
+  futureEntity { future ->
     addCommonClientPlayerComponents(controlled)
-    addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES, it) {
+    addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES, future) {
       it.box2d.disableGravity()
     }
   }
@@ -202,9 +202,9 @@ fun Engine.createSPPlayerEntity(
   id: String? = null
 ): CompletableFuture<Entity> =
   if (Main.isSingleplayer) {
-    futureEntity {
+    futureEntity { future ->
       addCommonClientPlayerComponents(true)
-      addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES, it)
+      addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES, future)
     }
   } else {
     CompletableFuture.failedFuture(IllegalStateException("Cannot create a singleplayer player when this is not a singleplayer instance"))
