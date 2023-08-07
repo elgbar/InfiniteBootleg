@@ -87,6 +87,7 @@ fun Entity.save(): ProtoWorld.Entity {
     this@save.selectedInventoryItemComponentOrNull?.apply { save() }
     this@save.textureRegionComponentOrNull?.apply { save() }
     this@save.velocityComponentOrNull?.apply { save() }
+    this@save.locallyControlledComponentOrNull?.apply { save() }
 
     tags = tags {
       this@save.flyingComponentOrNull?.apply { save() }
@@ -100,7 +101,6 @@ fun Entity.save(): ProtoWorld.Entity {
       this@save.chunkComponentOrNull?.apply { save() }
       this@save.doorComponentOrNull?.apply { save() }
       this@save.groundedComponentOrNull?.apply { save() }
-      this@save.locallyControlledComponentOrNull?.apply { save() }
       this@save.occupyingBlocksComponentOrNull?.apply { save() }
       this@save.inputEventQueueOrNull?.apply { save() }
       this@save.physicsEventQueueOrNull?.apply { save() }
@@ -128,6 +128,10 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
     SelectedInventoryItemComponent.load(this, protoEntity)
     TextureRegionComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)
+    LocallyControlledComponent.load(this, protoEntity) {
+      val clientWorld = world as ClientWorld? ?: error("Not client world")
+      KeyboardControls(clientWorld)
+    }
 
     protoEntity.tagsOrNull?.let {
       FlyingTag.load(this, it)
@@ -141,10 +145,6 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
       ChunkComponent.load(this, it) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
       DoorComponent.load(this, it)
       GroundedComponent.load(this, it)
-      LocallyControlledComponent.load(this, it) {
-        val clientWorld = world as ClientWorld? ?: error("Not client world")
-        KeyboardControls(clientWorld)
-      }
       OccupyingBlocksComponent.load(this, it)
       PhysicsEventQueue.load(this, it)
       InputEventQueue.load(this, it)

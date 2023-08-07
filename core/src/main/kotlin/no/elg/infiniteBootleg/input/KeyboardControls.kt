@@ -38,6 +38,7 @@ class KeyboardControls(val world: ClientWorld) {
 
   var brushSize = INITIAL_BRUSH_SIZE
   var interactRadius = INITIAL_INTERACT_RADIUS
+  var instantBreak = false
 
   private val tmpVec = Vector2()
   private val tmpVec2 = Vector2()

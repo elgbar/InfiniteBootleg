@@ -72,6 +72,7 @@ message Entity {
   optional LookDirection lookDirection = 23;
   optional SelectedItem selectedItem = 24;
   optional Box2D box2d = 25;
+  optional LocallyControlled locallyControlled = 26;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -90,7 +91,6 @@ message Entity {
 
   message AdditionalComponents {
     optional bool chunk = 1;
-    optional bool locallyControlled = 2;
     optional bool occupyingBlocks = 3;
     optional bool grounded = 4;
     optional bool door = 5;
@@ -144,4 +144,12 @@ message Entity {
       FALLING_BLOCK = 2;
     }
   }
+
+  message LocallyControlled {
+    bool instantBreak = 1;
+    float brushRadius = 2;
+    float interactRadius = 3;
+  }
+
+  message Chunk {}
 }
