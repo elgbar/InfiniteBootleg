@@ -23,7 +23,7 @@ import kotlin.math.min
 
 class WorldEntity(val world: World, val entity: Entity)
 
-const val JUMP_VERTICAL_VEL = 9f
+const val JUMP_VERTICAL_VEL = 10f
 const val FLY_VEL = 1f
 
 const val MAX_X_VEL = 7.5f // ie target velocity
