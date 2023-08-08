@@ -22,7 +22,8 @@ import java.lang.Math.floorMod
 
 class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
-  private val visualizeUpdate = ProgressHandler(2f, Interpolation.linear, 0f, 1f)
+  private val visualizeUpdate = ProgressHandler(1f, Interpolation.linear, 0f, 1f)
+  private var target: Long? = null
 
   override fun render() {
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
@@ -31,7 +32,8 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
 
-    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) || target != mouseLocator.mouseBlockCompactLoc) {
+      target = mouseLocator.mouseBlockCompactLoc
       visualizeUpdate.reset()
     }
 
