@@ -65,10 +65,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
   }
 
   override fun dispose() {
+    world.save()
     super.dispose()
-    if (Main.isAuthoritative) {
-      world.save()
-    }
     ClientMain.inst().updateStatus(null)
     world.disposeSafely()
   }

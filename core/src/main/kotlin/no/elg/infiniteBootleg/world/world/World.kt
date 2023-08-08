@@ -303,7 +303,7 @@ abstract class World(
   }
 
   fun save() {
-    if (transientWorld) {
+    if (transientWorld || Main.isNotAuthoritative) {
       return
     }
     val worldFolder = worldFolder ?: return
@@ -316,9 +316,6 @@ abstract class World(
         }
       }
 
-      //      for (Player player : players.values()) {
-      //        saveServerPlayer(player);
-      //      }
       val builder = toProtobuf()
       val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
       if (worldInfoFile.exists()) {

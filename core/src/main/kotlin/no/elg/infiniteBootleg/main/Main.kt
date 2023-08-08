@@ -65,6 +65,11 @@ interface Main : ApplicationListener {
        * @return If this instance is authoritative (i.e., have the final say)
        */
       get() = isServer || isSingleplayer
+    val isNotAuthoritative: Boolean
+      /**
+       * @return If this instance is not authoritative (i.e., does not have the final say)
+       */
+      get() = isServerClient
     private val EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar
     val WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar
     const val VERSION_FILE = "version"
