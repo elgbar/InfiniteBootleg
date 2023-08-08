@@ -19,6 +19,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 class ChunkComponent(var chunk: Chunk) : AdditionalComponentsSavableComponent {
 
   companion object : AdditionalComponentsLoadableMapper<ChunkComponent, Chunk>() {
+    /**
+     * Chunk might be disposed, make sure to check it when calling this
+     */
     val Entity.chunk get() = chunkComponent.chunk
     val Entity.chunkOrNull get() = chunkComponentOrNull?.chunk
     val Entity.chunkComponent by propertyFor(ChunkComponent.mapper)

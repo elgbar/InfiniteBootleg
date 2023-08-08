@@ -2,11 +2,12 @@ package no.elg.infiniteBootleg.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import ktx.ashley.allOf
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
-import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EARLY
-import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
+import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
+import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent.Companion.chunk
 import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent.Companion.chunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -14,7 +15,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 
-object DisposedChunkCheckSystem : IteratingSystem(blockEntityFamily, UPDATE_PRIORITY_EARLY) {
+object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).get(), UPDATE_PRIORITY_BEFORE_EVENTS) {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val entityChunk = entity.chunk
