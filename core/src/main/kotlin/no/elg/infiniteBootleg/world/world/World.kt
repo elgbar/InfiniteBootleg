@@ -43,6 +43,7 @@ import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Location
@@ -405,8 +406,7 @@ abstract class World(
   fun updateChunk(chunk: Chunk) {
     Preconditions.checkState(chunk.isValid)
     chunksLock.writeLock().lock()
-    val old: Chunk?
-    old = try {
+    val old: Chunk? = try {
       chunks.put(chunk.compactLocation, chunk)
     } finally {
       chunksLock.writeLock().unlock()
@@ -641,6 +641,20 @@ abstract class World(
     return action(localX, localY, chunk)
   }
 
+  private inline fun actionOnBlocks(
+    locations: Iterable<Long>,
+    loadChunk: Boolean = true,
+    action: (localX: Int, localY: Int, chunk: Chunk?) -> Unit
+  ): Iterable<Chunk> {
+    val chunks = LongMap<Chunk>()
+    for ((worldX, worldY) in locations) {
+      val chunkLoc = worldXYtoChunkCompactLoc(worldX, worldY)
+      val chunk: Chunk? = chunks.get(chunkLoc) ?: getChunk(chunkLoc, loadChunk)?.also { chunks.put(chunkLoc, it) }
+      action(worldX.chunkOffset(), worldY.chunkOffset(), chunk)
+    }
+    return chunks.values()
+  }
+
   fun getBlocks(locs: GdxLongArray, loadChunk: Boolean = true): Iterable<Block> = getBlocks(locs.toArray(), loadChunk)
   fun getBlocks(locs: LongArray, loadChunk: Boolean = true): Iterable<Block> = locs.map { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }.filterNotNullTo(mutableSetOf())
   fun getBlocks(locs: Iterable<Long>, loadChunk: Boolean = true): Iterable<Block> = locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
@@ -650,6 +664,17 @@ abstract class World(
     for (block in blocks) {
       block.remove(updateTexture = false)
       blockChunks.add(block.chunk)
+    }
+    for (chunk in blockChunks) {
+      chunk.updateTexture(prioritize)
+    }
+  }
+
+  @JvmName("removeLocs")
+  fun removeBlocks(blocks: Iterable<Long>, prioritize: Boolean = false) {
+    val blockChunks = actionOnBlocks(blocks) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return@actionOnBlocks
+      chunk.removeBlock(localX, localY, updateTexture = false)
     }
     for (chunk in blockChunks) {
       chunk.updateTexture(prioritize)
@@ -1066,11 +1091,7 @@ abstract class World(
     clear()
     worldTicker.dispose()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
-    //    for (Entity entity : entities.values()) {
-    //      entity.dispose();
-    //    }
-    //    entities.clear();
-    //    players.clear();
+
     chunksLock.writeLock().lock()
     try {
       for (chunk in chunks.values()) {
