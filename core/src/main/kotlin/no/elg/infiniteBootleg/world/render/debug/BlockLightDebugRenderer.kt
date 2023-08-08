@@ -55,7 +55,7 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     lr.use(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
       for ((compactLoc, visualizeUpdate: ProgressHandler?) in newlyUpdatedChunks.entries()) {
         val (worldX, worldY) = compactLoc
-        lr.color.a = visualizeUpdate?.calculateProgress(Gdx.graphics.deltaTime) ?: continue
+        lr.color.a = visualizeUpdate?.updateAndGetProgress(Gdx.graphics.deltaTime) ?: continue
         lr.rect(worldX * textureSize + textureSize / 2f, worldY * textureSize + textureSize / 2f, textureSize / 4f, textureSize / 4f)
       }
     }

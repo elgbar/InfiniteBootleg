@@ -31,6 +31,11 @@ class MouseLocator {
 
   val mouseBlockCompactLoc: Long get() = compactLoc(mouseBlockX, mouseBlockY)
 
+  /**
+   * If the block the mouse is over has changed since the last update
+   */
+  val isOverNewBlock: Boolean get() = mouseBlockX != previousMouseBlockX || mouseBlockY != previousMouseBlockY
+
   fun update(world: ClientWorld) {
     screenInputVec.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
     world.render.camera.unproject(screenInputVec)

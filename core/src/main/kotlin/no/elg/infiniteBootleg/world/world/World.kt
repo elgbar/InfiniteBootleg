@@ -78,6 +78,7 @@ import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.DisposedChunkCheckSystem
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
+import no.elg.infiniteBootleg.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
@@ -228,6 +229,7 @@ abstract class World(
     engine.addSystem(ExplosiveBlockSystem)
     engine.addSystem(LeavesDecaySystem)
     engine.addSystem(DisposedChunkCheckSystem)
+    engine.addSystem(MineBlockSystem)
     if (Main.isClient) {
       engine.addSystem(FollowEntitySystem)
     }

@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -35,7 +36,11 @@ object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWi
   private fun WorldEntity.touchDown(button: Int) {
     val update =
       when (button) {
-        Input.Buttons.LEFT -> interpolate(true, ::breakBlocks)
+        Input.Buttons.LEFT -> {
+          entity.locallyControlledComponentOrNull?.breakingProgress?.reset()
+          interpolate(true, ::breakBlocks)
+        }
+
         Input.Buttons.RIGHT -> interpolate(true, ::placeBlocks)
         else -> false
       }

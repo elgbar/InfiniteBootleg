@@ -11,14 +11,28 @@ data class ProgressHandler(
 
   private var timeToTarget = durationSeconds
 
-  /**
-   * @return Alpha between 1f and 0f
-   */
-  fun calculateProgress(delta: Float): Float {
-    timeToTarget -= delta
-    val progress: Float = if (timeToTarget <= 0) 1f else 1f - (timeToTarget / durationSeconds)
-    return interpolation.apply(start, end, progress)
+  fun updateAndGetProgress(delta: Float): Float {
+    update(delta)
+    return progress
   }
+
+  /**
+   * @return True if the progress is just done
+   */
+  fun update(delta: Float): Boolean {
+    val wasDone = isDone()
+    timeToTarget -= delta
+    return !wasDone && isDone()
+  }
+
+  /**
+   * @return Progress between [start] and [end] using [interpolation]
+   */
+  val progress: Float
+    get() {
+      val progress: Float = if (timeToTarget <= 0) 1f else 1f - (timeToTarget / durationSeconds)
+      return interpolation.apply(start, end, progress)
+    }
 
   fun reset() {
     timeToTarget = durationSeconds

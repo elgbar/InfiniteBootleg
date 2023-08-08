@@ -46,7 +46,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
           for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
             val compactLoc = compactLoc(x, y)
             val updatedChunk = newlyUpdatedChunks.get(compactLoc) ?: continue
-            lr.color.a = updatedChunk.calculateProgress(Gdx.graphics.deltaTime)
+            lr.color.a = updatedChunk.updateAndGetProgress(Gdx.graphics.deltaTime)
             if (updatedChunk.isDone()) {
               newlyUpdatedChunks.remove(compactLoc)
               continue

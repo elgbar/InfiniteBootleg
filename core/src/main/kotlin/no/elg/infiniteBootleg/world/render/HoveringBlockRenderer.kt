@@ -1,13 +1,9 @@
 package no.elg.infiniteBootleg.world.render
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Interpolation
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.breakableBlocks
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
@@ -19,11 +15,9 @@ import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledC
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 import java.lang.Math.floorMod
+import kotlin.math.roundToInt
 
 class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
-
-  private val visualizeUpdate = ProgressHandler(1f, Interpolation.linear, 0f, 1f)
-  private var target: Long? = null
 
   override fun render() {
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
@@ -32,34 +26,18 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
 
-    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) || target != mouseLocator.mouseBlockCompactLoc) {
-      target = mouseLocator.mouseBlockCompactLoc
-      visualizeUpdate.reset()
-    }
-
     for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
-      val keyboardControls = entity.locallyControlledComponentOrNull ?: continue
-      val isBreaking = !keyboardControls.instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT)
+      val controls = entity.locallyControlledComponentOrNull ?: continue
+      val isBreaking = controls.isBreaking
+      val progress = if (isBreaking) controls.breakingProgress.progress else 1f
 
-      val progress = if (isBreaking) {
-        visualizeUpdate.calculateProgress(Gdx.graphics.deltaTime)
-      } else {
-        0f
-      }
-
-      val breakableBlocks = entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
+      val breakableBlocks = entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
       breakableBlocks
         .forEach { (blockWorldX, blockWorldY) ->
           if (isBreaking) {
-            val textures = KAssets.breakingBlockTexture.size
-            val index = (progress * textures).toInt().coerceIn(0, textures - 1)
+            val textures = KAssets.breakingBlockTexture.size - 1f
+            val index = (textures * progress).roundToInt()
             renderPlaceableBlock(world, KAssets.breakingBlockTexture[index].textureRegion, blockWorldX, blockWorldY, 1f)
-            if (visualizeUpdate.isDone()) {
-              visualizeUpdate.reset()
-              world.postBox2dRunnable {
-                world.removeBlocks(world.getBlocks(breakableBlocks.toList(), loadChunk = false), prioritize = true)
-              }
-            }
           } else {
             renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldX, blockWorldY)
           }
@@ -67,7 +45,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
       if (!isBreaking) {
         val texture = entity.selectedInventoryItemComponent.material.textureRegion?.textureRegion ?: continue
-        entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, keyboardControls.brushSize, keyboardControls.interactRadius)
+        entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
           .forEach { (blockWorldX, blockWorldY) ->
             renderPlaceableBlock(world, texture, blockWorldX, blockWorldY)
           }
