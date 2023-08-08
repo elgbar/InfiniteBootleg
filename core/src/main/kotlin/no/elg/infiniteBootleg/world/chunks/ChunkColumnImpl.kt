@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.chunks
 
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
@@ -10,6 +9,7 @@ import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.isValid
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
 import no.elg.infiniteBootleg.world.world.World
@@ -19,22 +19,22 @@ import kotlin.math.min
 
 class ChunkColumnImpl(override val world: World, override val chunkX: Int, initialTopSolid: IntArray? = null, initialTopLight: IntArray? = null) : ChunkColumn {
 
-  private val topSolid = IntArray(CHUNK_SIZE)
-  private val topLight = IntArray(CHUNK_SIZE)
+  private val topWorldYSolid = IntArray(CHUNK_SIZE)
+  private val topWorldYLight = IntArray(CHUNK_SIZE)
   private val syncLocks = Array(CHUNK_SIZE) { Any() }
 
   init {
     if (initialTopSolid != null && initialTopLight != null) {
       require(initialTopSolid.size == CHUNK_SIZE) { "Chunk column was given initial top solid blocks with wrong size! Expected $CHUNK_SIZE, got ${initialTopSolid.size}" }
       require(initialTopLight.size == CHUNK_SIZE) { "Chunk column was given initial top light blocks with wrong size! Expected $CHUNK_SIZE, got ${initialTopLight.size}" }
-      System.arraycopy(initialTopSolid, 0, topSolid, 0, CHUNK_SIZE)
-      System.arraycopy(initialTopLight, 0, topLight, 0, CHUNK_SIZE)
+      System.arraycopy(initialTopSolid, 0, topWorldYSolid, 0, CHUNK_SIZE)
+      System.arraycopy(initialTopLight, 0, topWorldYLight, 0, CHUNK_SIZE)
     } else {
       for (localX in 0 until CHUNK_SIZE) {
         val worldX = getWorldX(localX)
         val height = world.chunkLoader.generator.getHeight(worldX)
-        topSolid[localX] = height
-        topLight[localX] = height
+        topWorldYSolid[localX] = height
+        topWorldYLight[localX] = height
       }
     }
   }
@@ -42,8 +42,8 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   override fun topBlockHeight(localX: Int, features: Int): Int {
     require(localX in 0 until CHUNK_SIZE) { "Local x is out of bounds. localX: $localX" }
     synchronized(syncLocks[localX]) {
-      val solid = if (features and SOLID_FLAG != 0) topSolid[localX] else Int.MIN_VALUE
-      val light = if (features and BLOCKS_LIGHT_FLAG != 0) topLight[localX] else Int.MIN_VALUE
+      val solid = if (features and SOLID_FLAG != 0) topWorldYSolid[localX] else Int.MIN_VALUE
+      val light = if (features and BLOCKS_LIGHT_FLAG != 0) topWorldYLight[localX] else Int.MIN_VALUE
       val max = max(light, solid)
       require(max != Int.MIN_VALUE) { "Failed to find to block at local x $localX, with the given features $features in the chunk $chunkX column" }
       return max
@@ -52,7 +52,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
   private fun topSkylight(localX: Int): Int {
     synchronized(syncLocks[localX]) {
-      return topLight[localX]
+      return topWorldYLight[localX]
     }
   }
 
@@ -126,11 +126,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   }
 
   override fun updateTopBlock(localX: Int, worldYHint: Int) {
-    updateTopBlock(topSolid, localX, worldYHint) {
+    updateTopBlock(topWorldYSolid, localX, worldYHint) {
       it.material.isCollidable
     }
 
-    updateTopBlock(topLight, localX, worldYHint) {
+    updateTopBlock(topWorldYLight, localX, worldYHint) {
       it.material.blocksLight
     }
   }
@@ -143,36 +143,29 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
   private fun updateTopBlock(top: IntArray, localX: Int, worldYHint: Int, rule: (block: Block) -> Boolean) {
     synchronized(syncLocks[localX]) {
-      val currTopHeight = top[localX]
-      val currTopBlock = getWorldBlock(localX, top[localX])
-      if (currTopBlock == null) {
-        Main.logger().error("Failed to get the current block at $chunkX, $localX, $currTopHeight. Trying again")
-        // failed to get the current block
-        Main.inst().scheduler.scheduleAsync(100) {
-          updateTopBlock(top, localX, worldYHint, rule)
-        }
-        return
-      }
+      val currTopWorldY = top[localX]
 
-      val localY = worldYHint.chunkOffset()
-
-      if (worldYHint > currTopHeight) {
+      if (worldYHint > currTopWorldY) {
+        // The hint is above the current top block. Check if it is valid
         val hintChunk = getLoadedChunk(worldYHint)
-        if (hintChunk != null && hintChunk.isValid) {
+        if (hintChunk.isValid()) {
           // its loaded at least
-          val hintBlock = hintChunk.getRawBlock(localX, localY)
+          val localYHint = worldYHint.chunkOffset()
+          val hintBlock = hintChunk.getRawBlock(localX, localYHint)
           if (isValidTopBlock(hintBlock, rule)) {
             // Assume the hint was correct. This is now the top y!
             setTopBlock(top, localX, worldYHint)
             return
           }
         }
-        // The hint was wrong!
-//        Main.logger().warn("ChunkCol", "WRONG gr top block hint! chunkx: $chunkX, localx: $localX, hint: $worldYHint valid chunk? ${hintChunk?.isValid ?: false}")
       }
-      if (worldYHint < currTopHeight && currTopBlock.isNotAir()) {
-        // Top block did not change
-//        Main.logger().warn("ChunkCol", "WRONG lw top block hint! chunkx: $chunkX, localx:$localX, hint: $worldYHint")
+
+      val currTopLocalY = currTopWorldY.chunkOffset()
+      val currTopChunk = getLoadedChunk(currTopWorldY)
+      val currTopBlock: Block? = currTopChunk?.getRawBlock(localX, currTopLocalY)
+      if (worldYHint < currTopWorldY && (currTopChunk == null || currTopBlock.isNotAir())) {
+        // World y hint is below the current top block.
+        // But the current top block is not air or the chunk is not loaded, so the top block (should) not have changed
         return
       }
 
@@ -189,7 +182,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
         return false
       }
 
-      val currentTopChunkY = currTopHeight.worldToChunk()
+      val currentTopChunkY = currTopWorldY.worldToChunk()
 
       for (nextChunkY in MAX_CHUNKS_TO_LOOK_UPWARDS downTo 0) {
         val nextChunk = getLoadedChunk(nextChunkY + currentTopChunkY)
@@ -210,8 +203,8 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
   override fun toProtobuf(): ProtoWorld.ChunkColumn {
     val builder = ProtoWorld.ChunkColumn.newBuilder()
     builder.chunkX = chunkX
-    builder.addAllTopSolidBlocks(topSolid.toList())
-    builder.addAllTopTransparentBlocks(topLight.toList())
+    builder.addAllTopSolidBlocks(topWorldYSolid.toList())
+    builder.addAllTopTransparentBlocks(topWorldYLight.toList())
     return builder.build()
   }
 

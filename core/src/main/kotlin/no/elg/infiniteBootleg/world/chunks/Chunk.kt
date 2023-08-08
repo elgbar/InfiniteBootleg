@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
+import kotlin.contracts.contract
 import kotlin.math.ln
 
 /**
@@ -198,5 +199,10 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
     const val CHUNK_SIZE = 16
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.BLOCK_SIZE
     val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
+
+    fun Chunk?.isValid(): Boolean {
+      contract { returns(true) implies (this@isValid != null) }
+      return this != null && this.isValid
+    }
   }
 }
