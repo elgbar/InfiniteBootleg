@@ -502,11 +502,7 @@ class ChunkImpl(
    */
   override fun getBlock(localX: Int, localY: Int): Block {
     if (!isValid) {
-      Main.logger()
-        .warn(
-          "Fetched block from invalid chunk " +
-            stringifyChunkToWorld(this, localX, localY)
-        )
+      Main.logger().warn("Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}")
     }
     Preconditions.checkArgument(
       isInsideChunk(localX, localY),

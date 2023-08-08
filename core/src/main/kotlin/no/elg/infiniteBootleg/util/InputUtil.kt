@@ -44,7 +44,7 @@ fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = w
   if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
   val locallyControlledComponent = entity.locallyControlledComponent
   val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
-  world.removeBlocks(world.getBlocks(breakableBlocks))
+  world.removeBlocks(breakableBlocks)
   return true
 }
 

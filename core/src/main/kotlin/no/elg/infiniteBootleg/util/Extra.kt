@@ -113,10 +113,10 @@ fun Entity.interactableBlocks(
 ): Sequence<Long> {
   val pos = this.position
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
-    .filter {
+    .filter { (worldX, worldY) ->
       ignorePlaceableCheck || (
-        isBlockInsideRadius(pos.x, pos.y, it.decompactLocX(), it.decompactLocY(), interactionRadius) &&
-          (!Settings.renderLight || world.getBlockLight(it.decompactLocX(), it.decompactLocY())?.isLit ?: true)
+        isBlockInsideRadius(pos.x, pos.y, worldX, worldY, interactionRadius) &&
+          (!Settings.renderLight || world.getBlockLight(worldX, worldY)?.isLit ?: true)
         )
     }
 }
