@@ -27,7 +27,7 @@ class MouseLocator {
     private set
 
   private val mouseWorldInput = Vector2()
-  val screenInputVec = Vector3()
+  private val screenInputVec = Vector3()
 
   val mouseBlockCompactLoc: Long get() = compactLoc(mouseBlockX, mouseBlockY)
 

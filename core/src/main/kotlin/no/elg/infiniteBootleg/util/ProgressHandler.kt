@@ -16,7 +16,7 @@ data class ProgressHandler(
    */
   fun calculateProgress(delta: Float): Float {
     timeToTarget -= delta
-    val progress: Float = if (timeToTarget < 0) 1f else 1f - timeToTarget / durationSeconds
+    val progress: Float = if (timeToTarget <= 0) 1f else 1f - (timeToTarget / durationSeconds)
     return interpolation.apply(start, end, progress)
   }
 
