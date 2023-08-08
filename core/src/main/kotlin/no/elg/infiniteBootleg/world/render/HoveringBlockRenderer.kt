@@ -53,7 +53,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
           if (isBreaking) {
             val textures = KAssets.breakingBlockTexture.size
             val index = (progress * textures).toInt().coerceIn(0, textures - 1)
-            renderPlaceableBlock(world, KAssets.breakingBlockTexture[index].textureRegion, blockWorldX, blockWorldY)
+            renderPlaceableBlock(world, KAssets.breakingBlockTexture[index].textureRegion, blockWorldX, blockWorldY, 1f)
             if (visualizeUpdate.isDone()) {
               visualizeUpdate.reset()
               world.postBox2dRunnable {
@@ -75,13 +75,13 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     }
   }
 
-  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldX: Int, blockWorldY: Int) {
+  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldX: Int, blockWorldY: Int, overrideAlpha: Float? = null) {
     val averageBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: 1f
     if (averageBrightness == 0f) {
       // no need to render a black block
       return
     }
-    val a = (1f - averageBrightness).coerceAtLeast(0.33f)
+    val a = overrideAlpha ?: (1f - averageBrightness).coerceAtLeast(0.33f)
     worldRender.batch.withColor(averageBrightness, averageBrightness, averageBrightness, a) {
       val mouseScreenX = blockWorldX * Block.BLOCK_SIZE
       val mouseScreenY = blockWorldY * Block.BLOCK_SIZE
