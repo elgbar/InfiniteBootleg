@@ -1,91 +1,93 @@
 textures.png
-	size: 364, 72
+	size: 224, 142
 	format: RGBA4444
 	repeat: xy
 birch_leaves-air-north-air-east-birch_leaves-south-birch_leaves-west
-	bounds: 135, 5, 32, 32
+	bounds: 135, 109, 32, 32
 birch_leaves-air-north-air-west-birch_leaves-south-birch_leaves-east
-	bounds: 67, 39, 32, 32
+	bounds: 67, 109, 32, 32
 birch_leaves-air-south-air-east-birch_leaves-north-birch_leaves-west
-	bounds: 169, 5, 32, 32
+	bounds: 135, 75, 32, 32
 birch_leaves-air-south-air-west-birch_leaves-north-birch_leaves-east
-	bounds: 169, 39, 32, 32
+	bounds: 101, 41, 32, 32
 birch_leaves_rotatable
-	bounds: 203, 39, 32, 32
+	bounds: 169, 109, 32, 32
 birch_trunk
-	bounds: 257, 37, 16, 16
+	bounds: 103, 23, 16, 16
 birch_trunk-birch_leaves-east
-	bounds: 101, 5, 32, 32
+	bounds: 67, 41, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west
-	bounds: 67, 5, 32, 32
+	bounds: 67, 75, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west-birch_leaves-north
-	bounds: 101, 39, 32, 32
+	bounds: 101, 109, 32, 32
 birch_trunk-birch_leaves-west
-	bounds: 135, 39, 32, 32
+	bounds: 101, 75, 32, 32
 break
 	index: 9
-	bounds: 239, 5, 16, 16
+	bounds: 189, 91, 16, 16
 break
 	index: 1
-	bounds: 257, 55, 16, 16
+	bounds: 85, 23, 16, 16
 break
 	index: 6
-	bounds: 275, 37, 16, 16
+	bounds: 171, 59, 16, 16
 break
 	index: 3
-	bounds: 293, 55, 16, 16
+	bounds: 189, 55, 16, 16
 break
 	index: 8
-	bounds: 311, 55, 16, 16
+	bounds: 207, 91, 16, 16
 break
 	index: 5
-	bounds: 293, 1, 16, 16
+	bounds: 67, 5, 16, 16
 break
 	index: 2
-	bounds: 347, 37, 16, 16
+	bounds: 121, 5, 16, 16
 break
 	index: 7
-	bounds: 347, 19, 16, 16
+	bounds: 139, 1, 16, 16
 break
 	index: 4
-	bounds: 347, 1, 16, 16
+	bounds: 175, 1, 16, 16
 breaking_block
-	bounds: 329, 1, 16, 16
+	bounds: 157, 1, 16, 16
 brick
-	bounds: 293, 37, 16, 16
+	bounds: 189, 37, 16, 16
 dirt_rotatable
-	bounds: 239, 23, 16, 16
+	bounds: 67, 23, 16, 16
 door
-	bounds: 329, 55, 16, 16
+	bounds: 207, 73, 16, 16
 door_closed
-	bounds: 221, 5, 16, 32
+	bounds: 203, 109, 16, 32
 door_open
-	bounds: 203, 5, 16, 32
+	bounds: 135, 41, 16, 32
 glass
-	bounds: 275, 1, 16, 16
+	bounds: 171, 41, 16, 16
 grass-dirt-east
-	bounds: 311, 19, 16, 16
+	bounds: 171, 23, 16, 16
 grass-dirt-south
-	bounds: 311, 37, 16, 16
+	bounds: 85, 5, 16, 16
 grass-dirt-south-dirt-east
-	bounds: 329, 37, 16, 16
+	bounds: 103, 5, 16, 16
 grass-dirt-south-dirt-west
-	bounds: 311, 1, 16, 16
+	bounds: 189, 19, 16, 16
 grass-dirt-south-dirt-west-dirt-east
-	bounds: 275, 55, 16, 16
+	bounds: 153, 39, 16, 16
 grass-dirt-west
-	bounds: 329, 19, 16, 16
+	bounds: 207, 19, 16, 16
 grass_rotatable
-	bounds: 347, 55, 16, 16
+	bounds: 207, 55, 16, 16
 hand
-	bounds: 1, 7, 64, 64
+	bounds: 1, 77, 64, 64
+pickaxe
+	bounds: 1, 11, 64, 64
 player
-	bounds: 237, 41, 18, 30
+	bounds: 169, 77, 18, 30
 sand_rotatable
-	bounds: 293, 19, 16, 16
+	bounds: 207, 37, 16, 16
 stone_rotatable
-	bounds: 275, 19, 16, 16
+	bounds: 189, 73, 16, 16
 tnt
-	bounds: 257, 19, 16, 16
+	bounds: 121, 23, 16, 16
 torch
-	bounds: 257, 1, 16, 16
+	bounds: 153, 57, 16, 16

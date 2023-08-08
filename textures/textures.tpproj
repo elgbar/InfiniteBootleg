@@ -34,7 +34,7 @@ prettyPrint=true
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:blocks,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:entities,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
+inputFiles=[{path:blocks,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:entities,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false},{path:items,type:Input,dirFilePrefix:null,recursive:false,flattenPaths:false}]
 keepInputFileExtensions=false
 
 
