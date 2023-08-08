@@ -487,7 +487,7 @@ abstract class World(
     chunksLock.writeLock().lock()
     return try {
       if (returnIfLoaded) {
-        val current = chunks[chunkLoc]
+        val current: Chunk? = chunks[chunkLoc]
         if (current != null) {
           if (current.isValid) {
             return current
@@ -709,26 +709,20 @@ abstract class World(
    * @param load            Load the chunk at the coordinates
    * @return The block at the given x and y
    */
-  fun getRawBlock(compactWorldLoc: Long, load: Boolean): Block? {
-    val worldY = compactWorldLoc.decompactLocY()
-    val worldX = compactWorldLoc.decompactLocX()
-    return getRawBlock(worldX, worldY, load)
-  }
+  fun getRawBlock(compactWorldLoc: Long, load: Boolean): Block? =
+    getRawBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), load)
 
   /**
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
-   * @param load   Load the chunk at the coordinates
+   * @param loadChunk   Load the chunk at the coordinates
    * @return The block at the given x and y (or null if air block)
    */
-  fun getRawBlock(worldX: Int, worldY: Int, load: Boolean): Block? {
-    val chunkX = worldX.worldToChunk()
-    val chunkY = worldY.worldToChunk()
-    val localX = worldX - chunkX * Chunk.CHUNK_SIZE
-    val localY = worldY - chunkY * Chunk.CHUNK_SIZE
-    val chunk = getChunk(chunkX, chunkY, load) ?: return null
-    return chunk.getRawBlock(localX, localY)
-  }
+  fun getRawBlock(worldX: Int, worldY: Int, loadChunk: Boolean): Block? =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return null
+      return chunk.getRawBlock(localX, localY)
+    }
 
   fun getBlockLight(worldX: Int, worldY: Int, loadChunk: Boolean = true): BlockLight? {
     val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
@@ -744,14 +738,11 @@ abstract class World(
    * @param loadChunk
    * @return The block at the given x and y
    */
-  fun getBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Block? {
-    val chunkX = worldX.worldToChunk()
-    val chunkY = worldY.worldToChunk()
-    val localX = worldX - chunkX * Chunk.CHUNK_SIZE
-    val localY = worldY - chunkY * Chunk.CHUNK_SIZE
-    val chunk = getChunk(chunkX, chunkY, loadChunk) ?: return null
-    return chunk.getBlock(localX, localY)
-  }
+  fun getBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Block? =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return null
+      return chunk.getBlock(localX, localY)
+    }
 
   /**
    * Use [isChunkLoaded] or [isChunkLoaded] if possible
