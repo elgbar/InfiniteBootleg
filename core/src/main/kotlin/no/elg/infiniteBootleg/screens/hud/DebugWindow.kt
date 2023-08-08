@@ -132,13 +132,11 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         row()
       }
 
-      
       aRow {
         toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
         toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
         toggleableDebugButton("Debug chunk updates", Settings::renderChunkUpdates, Main.inst().console.exec::debChuUpd)
       }
-
 
       aRow {
         toggleableDebugButton("Debug block lighting", Settings::debugBlockLight, Main.inst().console.exec::debBlkLit)
@@ -146,14 +144,12 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
       }
 
-
       aRow {
         val placeCheckGetter = { world.engine.getEntitiesFor(localPlayerFamily).any { it.ignorePlaceableCheck } }
         toggleableDebugButton("Ignore place check", placeCheckGetter, Main.inst().console.exec::placeCheck)
         toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
         toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
       }
-
 
       aRow {
         val instantBreakGetter: () -> Boolean = {
@@ -163,7 +159,6 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         }
         toggleableDebugButton("Instant break", instantBreakGetter, Main.inst().console.exec::instantBreak)
       }
-
 
       aRow {
         val brushSizeGetter: () -> Number = {
