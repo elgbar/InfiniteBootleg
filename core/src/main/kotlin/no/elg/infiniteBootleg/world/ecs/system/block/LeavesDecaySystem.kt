@@ -23,7 +23,10 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
 
   override fun processEntities(entities: ImmutableArray<Entity>) {
     val entity: Entity = entities.random()
-
+    val chunk = entity.chunk
+    if (chunk.isDisposed) {
+      return
+    }
     val srcLoc = entity.compactBlockLoc
 
     val stack = GdxLongArray(false, 16)
