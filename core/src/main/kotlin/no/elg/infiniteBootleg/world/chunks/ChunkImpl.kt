@@ -129,8 +129,8 @@ class ChunkImpl(
   private val updateChunkLightEventListener = EventListener { (chunk, originLocalX, originLocalY): ChunkLightUpdatedEvent ->
     if (this.isNeighbor(chunk)) {
       val dir = chunk.directionTo(this)
-      val localX = (originLocalX + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
-      val localY = (originLocalY + dir.dy * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
+      val localX = (originLocalX + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()
+      val localY = (originLocalY + dir.dy * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()
       val xCheck = when (dir.dx) {
         -1 -> localX < 0
         0 -> true
@@ -364,7 +364,7 @@ class ChunkImpl(
               originWorldY.toFloat(),
               getWorldX(localX).toFloat(),
               getWorldY(localY).toFloat()
-            ) > World.LIGHT_SOURCE_LOOK_BLOCKS * World.LIGHT_SOURCE_LOOK_BLOCKS
+            ) > World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
           ) {
             continue
           }

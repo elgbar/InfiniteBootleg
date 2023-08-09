@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLO
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
+import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -90,8 +91,8 @@ class BlockLight(
     }
 
     val chunkColumn = chunk.chunkColumn
-    val worldX: WorldCoord = chunkToWorld(chunk.chunkX, localX)
-    val worldY: WorldCoord = chunkToWorld(chunk.chunkY, localY)
+    val worldX = chunkToWorld(chunk.chunkX, localX)
+    val worldY = chunkToWorld(chunk.chunkY, localY)
 
     if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
       // This block is a skylight, its always lit fully
@@ -109,8 +110,6 @@ class BlockLight(
       isLitNext = true
       for (dx in 0 until LIGHT_RESOLUTION) {
         for (dy in 0 until LIGHT_RESOLUTION) {
-          fun centerOfSubcell(subcellCoordinate: Int): Double = ((1.0 / LIGHT_RESOLUTION) + subcellCoordinate.toDouble()) / LIGHT_RESOLUTION
-
           // Calculate distance for each light cell
           val cellX = worldX + centerOfSubcell(dx)
           val cellY = worldY + centerOfSubcell(dy)
@@ -182,8 +181,8 @@ class BlockLight(
       .getBlocksAABBFromCenter(
         worldX + 0.5f,
         worldY + 0.5f,
-        LIGHT_SOURCE_LOOK_BLOCKS,
-        LIGHT_SOURCE_LOOK_BLOCKS,
+        LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA,
+        LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA,
         raw = true,
         loadChunk = false,
         includeAir = false,
@@ -197,7 +196,7 @@ class BlockLight(
       return skyblocks
     }
     // Since we're not creating air blocks above, we will instead just load
-    for (offsetWorldX: LocalCoord in -floor(LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
+    for (offsetWorldX: LocalCoord in -floor(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()) {
       val topWorldX: WorldCoord = worldX + offsetWorldX
       val topWorldY: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
 
@@ -246,15 +245,15 @@ class BlockLight(
     return !block.material.blocksLight &&
       !block.material.emitsLight &&
       block.chunk.chunkColumn.isBlockAboveTopBlock(block.localX, block.worldY, BLOCKS_LIGHT_FLAG) &&
-      Vector2.dst2(worldX, worldY, block.worldX.toFloat(), block.worldY.toFloat()) <= LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS
+      Vector2.dst2(worldX, worldY, block.worldX.toFloat(), block.worldY.toFloat()) <= LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
   }
 
   /**
    * Given two y-coordinates ([worldYA] and [worldYB]) get a column of blocks between the two
    */
   private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: () -> Boolean = { false }): GdxArray<Block>? {
-    val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS)
-    val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS)
+    val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
+    val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val columnHeight = worldYTop - worldYBtm
     if (columnHeight <= 0) {
       // The bottom world y-coordinate is below (or at) the top world y-coordinate!
@@ -289,5 +288,7 @@ class BlockLight(
     val NO_LIGHTS_LIGHT_MAP: Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) { 0f } }
 
     const val MIN_Y_OFFSET = 1
+
+    inline fun centerOfSubcell(subcellCoordinate: Int): Double = ((1.0 / LIGHT_RESOLUTION) + subcellCoordinate.toDouble()) / LIGHT_RESOLUTION
   }
 }
