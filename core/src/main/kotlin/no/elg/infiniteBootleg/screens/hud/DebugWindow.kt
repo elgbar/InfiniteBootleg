@@ -84,8 +84,8 @@ private fun KVisWindow.toggleableDebugButton(
 }
 
 @Scene2dDsl
-private fun KVisWindow.floatSpinner(name: String, srcValueGetter: () -> Number, min: Number, max: Number, step: Number, onChange: (Float) -> Unit) {
-  val model = FloatSpinnerModel(srcValueGetter().toString(), min.toString(), max.toString(), step.toString())
+private fun KVisWindow.floatSpinner(name: String, srcValueGetter: () -> Number, min: Number, max: Number, step: Number, decimals: Int, onChange: (Float) -> Unit) {
+  val model = FloatSpinnerModel(srcValueGetter().toString(), min.toString(), max.toString(), step.toString(), decimals)
   spinner(name, model) {
     it.fillX()
 
@@ -166,16 +166,16 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
         }
-        floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, Main.inst().console.exec::brush)
+        floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, 2, Main.inst().console.exec::brush)
 
         val reachRadiusGetter: () -> Number = {
           world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
-        floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, Main.inst().console.exec::interactRadius)
+        floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, 0, Main.inst().console.exec::interactRadius)
 
-        val zoomValueGetter: () -> Float = { ClientMain.inst().world?.let { it.render.camera.zoom } ?: 1f }
+        val zoomValueGetter: () -> Float = { ClientMain.inst().world?.render?.camera?.zoom ?: 1f }
         floatSlider("Zoom", zoomValueGetter, 0.1f, MAX_ZOOM * 5, 0.1f) {
           val clientWorld = ClientMain.inst().world ?: return@floatSlider
           clientWorld.render.camera.zoom = it
@@ -205,7 +205,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       }
       aRow {
         toggleableDebugButton("Vsync", Settings::vsync) { Settings.vsync = !Settings.vsync }
-        floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1) { Settings.foregroundFPS = it.toInt() }
+        floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1, 0) { Settings.foregroundFPS = it.toInt() }
       }
       pack()
     }
