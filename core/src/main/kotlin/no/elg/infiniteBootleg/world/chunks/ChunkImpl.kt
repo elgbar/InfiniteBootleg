@@ -24,6 +24,9 @@ import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.directionTo
@@ -50,8 +53,8 @@ import javax.annotation.concurrent.GuardedBy
 
 class ChunkImpl(
   override val world: World,
-  override val chunkX: Int,
-  override val chunkY: Int
+  override val chunkX: ChunkCoord,
+  override val chunkY: ChunkCoord
 ) : Chunk {
 
   val currentUpdateId = AtomicInteger()
@@ -148,8 +151,8 @@ class ChunkImpl(
 
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   override fun setBlock(
-    localX: Int,
-    localY: Int,
+    localX: LocalCoord,
+    localY: LocalCoord,
     material: Material?,
     updateTexture: Boolean,
     prioritize: Boolean,
@@ -166,7 +169,7 @@ class ChunkImpl(
     )
   }
 
-  override fun removeBlock(localX: Int, localY: Int, updateTexture: Boolean, prioritize: Boolean, sendUpdatePacket: Boolean) {
+  override fun removeBlock(localX: LocalCoord, localY: LocalCoord, updateTexture: Boolean, prioritize: Boolean, sendUpdatePacket: Boolean) {
     setBlock(
       localX = localX,
       localY = localY,
@@ -178,8 +181,8 @@ class ChunkImpl(
   }
 
   override fun setBlock(
-    localX: Int,
-    localY: Int,
+    localX: LocalCoord,
+    localY: LocalCoord,
     block: Block?,
     updateTexture: Boolean,
     prioritize: Boolean,
@@ -249,11 +252,11 @@ class ChunkImpl(
     return block
   }
 
-  override fun getWorldX(localX: Int): Int {
+  override fun getWorldX(localX: LocalCoord): WorldCoord {
     return chunkToWorld(chunkX, localX)
   }
 
-  override fun getWorldY(localY: Int): Int {
+  override fun getWorldY(localY: LocalCoord): WorldCoord {
     return chunkToWorld(chunkY, localY)
   }
 
@@ -332,14 +335,14 @@ class ChunkImpl(
     }
   }
 
-  override fun blockLightUpdatedAt(localX: Int, localY: Int) {
+  override fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord) {
     if (Settings.renderLight) {
       dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
       doUpdateLight(getWorldX(localX), getWorldY(localY), true)
     }
   }
 
-  private fun doUpdateLight(originWorldX: Int, originWorldY: Int, checkDistance: Boolean = true) {
+  private fun doUpdateLight(originWorldX: WorldCoord, originWorldY: WorldCoord, checkDistance: Boolean = true) {
     synchronized(blockLights) {
       // If we reached this point before the light is done recalculating then we must start again
       cancelCurrentBlockLightUpdate()
@@ -349,7 +352,7 @@ class ChunkImpl(
   }
 
   /** Should only be used by [blockLightUpdatedAt]  */
-  private fun updateBlockLights(updateId: Int, originWorldX: Int, originWorldY: Int, checkDistance: Boolean) {
+  private fun updateBlockLights(updateId: Int, originWorldX: WorldCoord, originWorldY: WorldCoord, checkDistance: Boolean) {
     synchronized(tasks) {
       outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
         for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
@@ -404,11 +407,11 @@ class ChunkImpl(
       }
     }
 
-  override fun getBlockLight(localX: Int, localY: Int): BlockLight {
+  override fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight {
     return blockLights[localX][localY]
   }
 
-  override fun getRawBlock(localX: Int, localY: Int): Block? {
+  override fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block? {
     return blocks[localX][localY]
   }
 
@@ -452,12 +455,12 @@ class ChunkImpl(
   @get:Contract(pure = true)
   override val compactLocation: Long
     get() = compactLoc(chunkX, chunkY)
-  override val worldX: Int
+  override val worldX: WorldCoord
     /**
      * @return Location of this chunk in world coordinates
      */
     get() = chunkX.chunkToWorld()
-  override val worldY: Int
+  override val worldY: WorldCoord
     /**
      * This is the same as doing `CoordUtil.chunkToWorld(getLocation())`
      *
@@ -500,7 +503,7 @@ class ChunkImpl(
    * @param localY The local y ie a value between 0 and [CHUNK_SIZE]
    * @return The block instance of the given coordinates, a new air block will be created if there is no existing block
    */
-  override fun getBlock(localX: Int, localY: Int): Block {
+  override fun getBlock(localX: LocalCoord, localY: LocalCoord): Block {
     if (!isValid) {
       Main.logger().warn("Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}")
     }

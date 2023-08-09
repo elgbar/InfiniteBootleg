@@ -7,6 +7,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.util.worldToBlock
@@ -19,8 +20,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
 data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponent {
 
-  val blockX: Int get() = worldToBlock(x)
-  val blockY: Int get() = worldToBlock(y)
+  val blockX: WorldCoord get() = worldToBlock(x)
+  val blockY: WorldCoord get() = worldToBlock(y)
 
   fun setPosition(vector2: Vector2) {
     x = vector2.x

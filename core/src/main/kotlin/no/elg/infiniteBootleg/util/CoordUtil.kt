@@ -27,14 +27,14 @@ inline fun Vector2.worldToChunk(): Location = Location(x.toInt().worldToChunk(),
  */
 
 @Contract(pure = true)
-inline fun Int.worldToChunk(): Int = this shr Chunk.CHUNK_SIZE_SHIFT
+inline fun WorldCoord.worldToChunk(): ChunkCoord = this shr Chunk.CHUNK_SIZE_SHIFT
 
 /**
  * @param this@worldToChunk The world coordinate to convert
  * @return The chunk coordinate the given coordinate is in
  */
 @Contract(pure = true)
-inline fun Float.worldToChunk(): Int = toInt().worldToChunk()
+inline fun Number.worldToChunk(): ChunkCoord = toInt().worldToChunk()
 
 /**
  * Convert a chunk coordinate to world coordinate
@@ -44,7 +44,7 @@ inline fun Float.worldToChunk(): Int = toInt().worldToChunk()
  */
 
 @Contract(pure = true)
-inline fun Int.chunkToWorld(): Int = this shl Chunk.CHUNK_SIZE_SHIFT
+inline fun ChunkCoord.chunkToWorld(): WorldCoord = this shl Chunk.CHUNK_SIZE_SHIFT
 
 /**
  * Convert a chunk coordinate to world coordinate
@@ -53,7 +53,7 @@ inline fun Int.chunkToWorld(): Int = this shl Chunk.CHUNK_SIZE_SHIFT
  * @return The chunk coordinate in world view
  */
 @Contract(pure = true)
-inline fun Float.chunkToWorld(): Int = toInt().chunkToWorld()
+inline fun Number.chunkToWorld(): WorldCoord = toInt().chunkToWorld()
 
 /**
  * Convert a chunk coordinate to world coordinate with an offset within the chunk
@@ -65,7 +65,7 @@ inline fun Float.chunkToWorld(): Int = toInt().chunkToWorld()
  */
 
 @Contract(pure = true)
-inline fun chunkToWorld(chunkCoord: Int, offset: Int): Int = chunkCoord.chunkToWorld() + offset
+inline fun chunkToWorld(chunkCoord: ChunkCoord, offset: LocalCoord): WorldCoord = chunkCoord.chunkToWorld() + offset
 
 /**
  * Calculate the offset the given world coordinate have in its chunk
@@ -75,7 +75,7 @@ inline fun chunkToWorld(chunkCoord: Int, offset: Int): Int = chunkCoord.chunkToW
  */
 
 @Contract(pure = true)
-inline fun Int.chunkOffset(): Int = this - worldToChunk().chunkToWorld()
+inline fun WorldCoord.chunkOffset(): LocalCoord = this - worldToChunk().chunkToWorld()
 
 /**
  * @param localX The chunk local x coordinate
@@ -83,9 +83,8 @@ inline fun Int.chunkOffset(): Int = this - worldToChunk().chunkToWorld()
  * @return If given x and y are both between 0 (inclusive) and [Chunk.CHUNK_SIZE]
  * (exclusive)
  */
-
 @Contract(pure = true)
-inline fun isInsideChunk(localX: Int, localY: Int): Boolean = localX >= 0 && localX < Chunk.CHUNK_SIZE && localY >= 0 && localY < Chunk.CHUNK_SIZE
+inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX >= 0 && localX < Chunk.CHUNK_SIZE && localY >= 0 && localY < Chunk.CHUNK_SIZE
 
 /**
  * @param localX The chunk local x coordinate
@@ -93,7 +92,7 @@ inline fun isInsideChunk(localX: Int, localY: Int): Boolean = localX >= 0 && loc
  * @return If given x and y are on the edge of a chunk, while still inside the chunk
  */
 @Contract(pure = true)
-inline fun isInnerEdgeOfChunk(localX: Int, localY: Int): Boolean = localX == 0 || localX == Chunk.CHUNK_SIZE - 1 || localY == 0 || localY == Chunk.CHUNK_SIZE - 1
+inline fun isInnerEdgeOfChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX == 0 || localX == Chunk.CHUNK_SIZE - 1 || localY == 0 || localY == Chunk.CHUNK_SIZE - 1
 
 /**
  * @param worldX The world x coordinate
@@ -101,7 +100,7 @@ inline fun isInnerEdgeOfChunk(localX: Int, localY: Int): Boolean = localX == 0 |
  * @return The chunk location for the given world coordinates
  */
 @Contract(pure = true)
-inline fun worldXYtoChunkCompactLoc(worldX: Int, worldY: Int): Long = compactLoc(worldX.worldToChunk(), worldY.worldToChunk())
+inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): ChunkCompactLoc = compactLoc(worldX.worldToChunk(), worldY.worldToChunk())
 
 /**
  * Store two integers inside a single long
@@ -134,7 +133,8 @@ inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactL
 
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl SIZE or (b.toInt() and 0xffff)
 
-inline fun compactChunkToWorld(chunk: Chunk, localX: Int, localY: Int): Long = compactLoc(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
+inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
+  compactLoc(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
 
 /**
  * @param this@decompactShortA A long created by [.compactLoc]
@@ -159,13 +159,13 @@ inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block
 
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 
-inline fun stringifyChunkToWorld(chunk: Chunk, localX: Int, localY: Int): String = "(${chunkToWorld(chunk.chunkX, localX)},${chunkToWorld(chunk.chunkY, localY)})"
+inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunkToWorld(chunk.chunkX, localX)},${chunkToWorld(chunk.chunkY, localY)})"
 
 /**
  * @param worldCoord A part of a coordinate in the world
  * @return Which coordinate a block at the given world coordinate will have
  */
-inline fun worldToBlock(worldCoord: Float): Int = floor(worldCoord.toDouble()).toInt()
+inline fun worldToBlock(worldCoord: Number): Int = floor(worldCoord.toDouble()).toInt()
 
 /**
  * @param worldOffset Given by [WorldBody.getWorldOffsetX] and [WorldBody.getWorldOffsetY]
@@ -177,5 +177,17 @@ inline fun worldToScreen(worldCoord: Float, worldOffset: Float): Float = (worldC
 operator fun Long.component1(): Int = this.decompactLocX()
 operator fun Long.component2(): Int = this.decompactLocY()
 
-inline fun isBlockInsideRadius(worldX: Float, worldY: Float, blockBlockX: Int, targetBlockY: Int, radius: Float): Boolean =
+inline fun isBlockInsideRadius(worldX: Float, worldY: Float, blockBlockX: WorldCoord, targetBlockY: WorldCoord, radius: Float): Boolean =
   abs(Vector2.dst2(worldX, worldY, blockBlockX + World.HALF_BLOCK_SIZE, targetBlockY + World.HALF_BLOCK_SIZE)) < radius * radius
+
+typealias LocalCompactLoc = Long
+typealias WorldCompactLoc = Long
+typealias ChunkCompactLoc = Long
+
+typealias LocalCoord = Int
+typealias WorldCoord = Int
+typealias ChunkCoord = Int
+
+typealias LocalCoordArray = IntArray
+typealias WorldCoordArray = IntArray
+typealias ChunkCoordArray = IntArray

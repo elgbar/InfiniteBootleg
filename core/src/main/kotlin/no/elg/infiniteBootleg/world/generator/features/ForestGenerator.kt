@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.generator.features
 
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -14,14 +15,14 @@ class ForestGenerator(override val seed: Long, private val cutoff: Float) : Feat
     it.SetFrequency(0.55f)
   }
 
-  override fun generateFeature(chunk: Chunk, worldX: Int, worldY: Int) {
+  override fun generateFeature(chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord) {
     val warmth = shouldGenerateTreeNoise.getNoise(worldX, worldY)
     if (warmth > cutoff) {
       createTree(chunk.world, worldX, worldY)
     }
   }
 
-  private fun createTree(world: World, worldX: Int, worldY: Int) {
+  private fun createTree(world: World, worldX: WorldCoord, worldY: WorldCoord) {
     val treeHeight = (shouldGenerateTreeNoise.getNoise(worldX, worldY, 1) * 16)
     val locs = World.getLocationsAABB(worldX.toFloat(), worldY.toFloat(), 0f, treeHeight)
     Material.BIRCH_TRUNK.createBlocks(world, locs, false)

@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockLight
@@ -59,15 +62,15 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   val chunkColumn: ChunkColumn
 
-  val chunkX: Int
+  val chunkX: ChunkCoord
 
-  val chunkY: Int
+  val chunkY: ChunkCoord
 
   val compactLocation: Long
 
-  val worldX: Int
+  val worldX: WorldCoord
 
-  val worldY: Int
+  val worldY: WorldCoord
 
   val lastViewedTick: Long
 
@@ -101,7 +104,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @return The new block, only `null` if `material` parameter is `null`
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
-  fun setBlock(localX: Int, localY: Int, material: Material?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
+  fun setBlock(localX: LocalCoord, localY: LocalCoord, material: Material?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
 
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
@@ -113,7 +116,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @return The new block, equal to the `block` parameter (but not necessarily the same object)
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
-  fun setBlock(localX: Int, localY: Int, block: Block?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
+  fun setBlock(localX: LocalCoord, localY: LocalCoord, block: Block?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
 
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
@@ -123,7 +126,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @param sendUpdatePacket If an update should be sent when in multiplayer
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
-  fun removeBlock(localX: Int, localY: Int, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true)
+  fun removeBlock(localX: LocalCoord, localY: LocalCoord, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true)
 
   /**
    * Force update of this chunk's texture and invariants
@@ -151,7 +154,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   /**
    * Block light was updated in this chunk at the given local coordinates
    */
-  fun blockLightUpdatedAt(localX: Int, localY: Int)
+  fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord)
 
   /** Update the light of the chunk  */
   fun updateAllBlockLights()
@@ -163,19 +166,19 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @param localX The local chunk x coordinate
    * @return The world coordinate from the local position as offset
    */
-  fun getWorldX(localX: Int): Int
+  fun getWorldX(localX: LocalCoord): Int
 
   /**
    * @param localY The local chunk y coordinate
    * @return The world coordinate from the local position as offset
    */
-  fun getWorldY(localY: Int): Int
+  fun getWorldY(localY: LocalCoord): Int
 
-  fun getBlockLight(localX: Int, localY: Int): BlockLight
+  fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight
 
-  fun getRawBlock(localX: Int, localY: Int): Block?
+  fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block?
 
-  fun getBlock(localX: Int, localY: Int): Block
+  fun getBlock(localX: LocalCoord, localY: LocalCoord): Block
 
   /**
    * If `isAllowingUnloading` is `false` this chunk cannot be unloaded

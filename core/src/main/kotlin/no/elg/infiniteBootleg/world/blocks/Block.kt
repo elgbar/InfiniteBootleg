@@ -9,6 +9,8 @@ import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
 import no.elg.infiniteBootleg.protobuf.material
 import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.world.Direction
@@ -32,12 +34,12 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
   /**
    * @return The offset/local position of this block within its chunk
    */
-  val localX: Int
+  val localX: LocalCoord
 
   /**
    * @return The offset/local position of this block within its chunk
    */
-  val localY: Int
+  val localY: LocalCoord
 
   /**
    * Connected blocks to ashley engine
@@ -51,8 +53,8 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
   companion object {
 
     val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
-    val Block.worldX: Int get() = chunk.getWorldX(localX)
-    val Block.worldY: Int get() = chunk.getWorldY(localY)
+    val Block.worldX: WorldCoord get() = chunk.getWorldX(localX)
+    val Block.worldY: WorldCoord get() = chunk.getWorldY(localY)
 
     /**
      * Remove this block by setting it to air
@@ -79,15 +81,15 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       return if (isInsideChunk(newLocalX, newLocalY)) {
         chunk.getRawBlock(newLocalX, newLocalY)
       } else {
-        val newWorldX: Int = worldX + dir.dx
-        val newWorldY: Int = worldY + dir.dy
+        val newWorldX: WorldCoord = worldX + dir.dx
+        val newWorldY: WorldCoord = worldY + dir.dy
         world.getRawBlock(newWorldX, newWorldY, load)
       }
     }
 
     fun Block?.materialOrAir(): Material = this?.material ?: Material.AIR
 
-    fun fromProto(world: World, chunk: Chunk, localX: Int, localY: Int, protoBlock: ProtoWorld.Block?): Block? {
+    fun fromProto(world: World, chunk: Chunk, localX: LocalCoord, localY: LocalCoord, protoBlock: ProtoWorld.Block?): Block? {
       if (protoBlock == null) {
         return null
       }

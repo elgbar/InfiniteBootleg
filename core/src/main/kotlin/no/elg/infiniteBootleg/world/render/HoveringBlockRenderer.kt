@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.breakableBlocks
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
@@ -53,7 +54,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     }
   }
 
-  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldX: Int, blockWorldY: Int, overrideAlpha: Float? = null) {
+  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldX: WorldCoord, blockWorldY: WorldCoord, overrideAlpha: Float? = null) {
     val averageBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: 1f
     if (averageBrightness == 0f) {
       // no need to render a black block

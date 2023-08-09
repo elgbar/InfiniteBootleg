@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.world.generator.biome
 
 import ktx.collections.GdxArray
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
@@ -38,7 +40,7 @@ enum class Biome @SafeVarargs constructor(
     this.topBlocks = mats.toArray()
   }
 
-  fun heightAt(pcg: PerlinChunkGenerator, worldX: Int): Int {
+  fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {
     var y = 0
     for (dx in -INTERPOLATION_RADIUS..INTERPOLATION_RADIUS) {
       y = if (dx != 0) {
@@ -53,15 +55,15 @@ enum class Biome @SafeVarargs constructor(
     return y / (INTERPOLATION_RADIUS * 2 + 1)
   }
 
-  private fun rawHeightAt(noise: PerlinNoise, worldX: Int): Double {
+  private fun rawHeightAt(noise: PerlinNoise, worldX: WorldCoord): Double {
     return rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset)
   }
 
   fun fillUpTo(
     noise: PerlinNoise,
     chunk: Chunk,
-    localX: Int,
-    localY: Int,
+    localX: LocalCoord,
+    localY: LocalCoord,
     height: Int
   ) {
     val blocks = chunk.blocks[localX]
@@ -71,7 +73,7 @@ enum class Biome @SafeVarargs constructor(
     }
   }
 
-  private fun materialAt(noise: PerlinNoise, height: Int, worldX: Int, worldY: Int): Material {
+  private fun materialAt(noise: PerlinNoise, height: Int, worldX: WorldCoord, worldY: WorldCoord): Material {
     var delta = height - worldY
     if (delta == 0) {
       return topmostBlock
@@ -88,7 +90,7 @@ enum class Biome @SafeVarargs constructor(
     const val INTERPOLATION_RADIUS = 25
     fun rawHeightAt(
       noise: PerlinNoise,
-      worldX: Int,
+      worldX: WorldCoord,
       y: Double,
       z: Double,
       amplitude: Double,

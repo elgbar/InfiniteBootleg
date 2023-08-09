@@ -6,6 +6,8 @@ import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.with
@@ -58,7 +60,7 @@ enum class Material(
    * @return If this material can be rotated, but the entity can handle the rendering
    */
   val invisibleBlock: Boolean = false,
-  val createNew: ((world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) -> CompletableFuture<Entity>)? = null
+  val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
 ) {
   AIR(
     itemType = ItemType.AIR,
@@ -74,14 +76,19 @@ enum class Material(
   BRICK(hardness = 2f, hasTransparentTexture = false),
   DIRT(hardness = 1f, hasTransparentTexture = false),
   GRASS(hardness = 0.8f, hasTransparentTexture = false),
-  TNT(hardness = 0.5f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
+  TNT(hardness = 0.5f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
     world.engine.createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
       with(ExplosiveComponent())
     }
   }),
-  SAND(hardness = 1f, hasTransparentTexture = false, isGravityAffected = true, createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
-    world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
-  }),
+  SAND(
+    hardness = 1f,
+    hasTransparentTexture = false,
+    isGravityAffected = true,
+    createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
+    }
+  ),
   TORCH(
     hardness = 0.1f,
     hasTransparentTexture = true,
@@ -90,7 +97,7 @@ enum class Material(
     emitsLight = true,
     adjacentPlaceable = false,
     isGravityAffected = true,
-    createNew = { world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material ->
+    createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
     }
   ),
@@ -101,7 +108,7 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     invisibleBlock = true,
-    createNew = { world: World, chunk, worldX: Int, worldY: Int, material: Material ->
+    createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createDoorBlockEntity(world, chunk, worldX, worldY, material)
     }
   ),
@@ -112,7 +119,7 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     adjacentPlaceable = false,
-    createNew = { world: World, chunk, worldX: Int, worldY: Int, material: Material ->
+    createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, chunk, worldX, worldY, material)
     }
   );
@@ -148,7 +155,7 @@ enum class Material(
    * @param localY Relative y in the chunk
    * @return A block of this type
    */
-  fun createBlock(world: World, chunk: Chunk, localX: Int, localY: Int, protoEntity: ProtoWorld.Entity? = null): Block {
+  fun createBlock(world: World, chunk: Chunk, localX: LocalCoord, localY: LocalCoord, protoEntity: ProtoWorld.Entity? = null): Block {
     Preconditions.checkArgument(isBlock)
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
       protoEntity?.let { world.engine.load(it, world, chunk) }

@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.render
 
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.util.ChunkCoord
 
 class ServerClientChunksInView(private var centerX: Int, private var centerY: Int) : ChunksInView {
 
@@ -28,7 +29,7 @@ class ServerClientChunksInView(private var centerX: Int, private var centerY: In
       centerY = value - Settings.viewDistance
     }
 
-  fun setCenter(chunkX: Int, chunkY: Int) {
+  fun setCenter(chunkX: ChunkCoord, chunkY: ChunkCoord) {
     centerX = chunkX
     centerY = chunkY
   }

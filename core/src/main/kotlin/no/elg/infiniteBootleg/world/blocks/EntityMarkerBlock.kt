@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Settings.debugEntityMarkerBlocks
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.EntityRemoveListener
+import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -19,8 +20,8 @@ import no.elg.infiniteBootleg.world.world.World
 class EntityMarkerBlock(
   override val chunk: Chunk,
   override val world: World,
-  override val localX: Int,
-  override val localY: Int,
+  override val localX: LocalCoord,
+  override val localY: LocalCoord,
   override val entity: Entity
 ) : Block {
 

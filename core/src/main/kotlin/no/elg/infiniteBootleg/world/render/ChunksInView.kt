@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.utils.OrderedSet
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
@@ -22,11 +23,11 @@ interface ChunksInView {
   val size: Int
     get() = horizontalLength * verticalLength
 
-  fun isOutOfView(chunkX: Int, chunkY: Int): Boolean {
+  fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
     return chunkX < horizontalStart || chunkX >= horizontalEnd || chunkY < verticalStart || chunkY >= verticalEnd
   }
 
-  fun isInView(chunkX: Int, chunkY: Int): Boolean {
+  fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
     return (chunkX in horizontalStart until horizontalEnd) && (chunkY in verticalStart until verticalEnd)
   }
 

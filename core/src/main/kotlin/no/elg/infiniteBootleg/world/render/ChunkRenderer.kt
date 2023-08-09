@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_B
 import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_G
 import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_R
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.isAir
@@ -187,7 +188,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     }
   }
 
-  private fun calculateRotation(chunk: Chunk, localX: Int, localY: Int): Int {
+  private fun calculateRotation(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): Int {
     val noise = rotationNoise.getNoise(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
     val cardinalDirections = 4
     val cardinalDirectionDegrees = 90

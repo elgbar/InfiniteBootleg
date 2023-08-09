@@ -13,6 +13,7 @@ import ktx.ashley.plusAssign
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
@@ -59,7 +60,7 @@ fun EngineEntity.createPlayerBodyComponent(
   }
 }
 
-fun EngineEntity.createDoorBodyComponent(world: World, worldX: Int, worldY: Int, whenReady: (Entity) -> Unit = {}) {
+fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, worldY: WorldCoord, whenReady: (Entity) -> Unit = {}) {
   createBody2DBodyComponent(
     ProtoWorld.Entity.Box2D.BodyType.DOOR,
     entity,

@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import ktx.ashley.EngineEntity
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
@@ -44,8 +45,8 @@ fun EngineEntity.withRequiredComponents(entityType: ProtoWorld.Entity.EntityType
 fun Engine.createBlockEntity(
   world: World,
   chunk: Chunk,
-  worldX: Int,
-  worldY: Int,
+  worldX: WorldCoord,
+  worldY: WorldCoord,
   material: Material,
   wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
   additionalConfiguration: EngineEntity.() -> Unit = {}

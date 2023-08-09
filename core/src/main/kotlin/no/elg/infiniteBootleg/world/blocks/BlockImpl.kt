@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.blocks
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.getRawRelative
@@ -25,8 +26,8 @@ import java.util.EnumMap
 class BlockImpl(
   override val world: World,
   override val chunk: Chunk,
-  override val localX: Int,
-  override val localY: Int,
+  override val localX: LocalCoord,
+  override val localY: LocalCoord,
   override val material: Material,
   override var entity: Entity? = null
 ) : Block {

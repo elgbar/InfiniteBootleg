@@ -5,6 +5,8 @@ import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -21,8 +23,8 @@ import kotlin.math.min
 
 class BlockLight(
   val chunk: Chunk,
-  val localX: Int,
-  val localY: Int
+  val localX: LocalCoord,
+  val localY: LocalCoord
 ) {
 
   /**
@@ -88,8 +90,8 @@ class BlockLight(
     }
 
     val chunkColumn = chunk.chunkColumn
-    val worldX: Int = chunkToWorld(chunk.chunkX, localX)
-    val worldY: Int = chunkToWorld(chunk.chunkY, localY)
+    val worldX: WorldCoord = chunkToWorld(chunk.chunkX, localX)
+    val worldY: WorldCoord = chunkToWorld(chunk.chunkY, localY)
 
     if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
       // This block is a skylight, its always lit fully
@@ -174,7 +176,7 @@ class BlockLight(
     return updateId != NEVER_CANCEL_UPDATE_ID && diff
   }
 
-  fun findLuminescentBlocks(worldX: Int, worldY: Int, cancelled: () -> Boolean = { false }): GdxArray<Block> {
+  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = { false }): GdxArray<Block> {
     return chunk
       .world
       .getBlocksAABBFromCenter(
@@ -189,24 +191,24 @@ class BlockLight(
       ) { it.material.emitsLight }
   }
 
-  fun findSkylightBlocks(worldX: Int, worldY: Int, cancelled: () -> Boolean = { false }): GdxArray<Block> {
+  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = { false }): GdxArray<Block> {
     val skyblocks = GdxArray<Block>()
     if (cancelled()) {
       return skyblocks
     }
     // Since we're not creating air blocks above, we will instead just load
-    for (offsetWorldX in -floor(LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
-      val topWorldX: Int = worldX + offsetWorldX
-      val topWorldY = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
+    for (offsetWorldX: LocalCoord in -floor(LIGHT_SOURCE_LOOK_BLOCKS).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS).toInt()) {
+      val topWorldX: WorldCoord = worldX + offsetWorldX
+      val topWorldY: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
 
-      val topWorldYR = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG) + 1
-      val offsetYR = topWorldYR - topWorldY
+      val topWorldYR: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX + 1, BLOCKS_LIGHT_FLAG) + 1
+      val offsetYR: LocalCoord = topWorldYR - topWorldY
 
-      val topWorldYL = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG) + 1
-      val offsetYL = topWorldYL - topWorldY
+      val topWorldYL: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX - 1, BLOCKS_LIGHT_FLAG) + 1
+      val offsetYL: LocalCoord = topWorldYL - topWorldY
 
-      val offsetY: Int
-      val topWorldYLR: Int
+      val offsetY: LocalCoord
+      val topWorldYLR: WorldCoord
       if (offsetYL > offsetYR) {
         offsetY = offsetYL
         topWorldYLR = topWorldYL

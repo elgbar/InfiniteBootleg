@@ -7,6 +7,7 @@ import ktx.ashley.hasNot
 import ktx.ashley.remove
 import ktx.collections.gdxSetOf
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -38,7 +39,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
     }
   }
 
-  private fun ExplosiveComponent.explode(world: World, worldX: Int, worldY: Int) {
+  private fun ExplosiveComponent.explode(world: World, worldX: WorldCoord, worldY: WorldCoord) {
     val destroyed = gdxSetOf<Block>()
     var x = MathUtils.floor(worldX - strength)
     while (x < worldX + strength) {

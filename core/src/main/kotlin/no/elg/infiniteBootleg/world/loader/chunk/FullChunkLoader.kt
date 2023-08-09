@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.loader.chunk
 
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
@@ -26,7 +27,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     return LoadedChunk(loadChunkFromFile ?: generateChunk(chunkX, chunkY), loadChunkFromFile == null)
   }
 
-  private fun generateChunk(chunkX: Int, chunkY: Int): Chunk? {
+  private fun generateChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
     val generated = generator.generate(world, chunkX, chunkY)
     if (generated.isValid) {
       return generated
@@ -51,7 +52,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
    * @param chunkY The x coordinate of the chunk (in chunk view)
    * @return If a chunk at the given location exists
    */
-  private fun existsOnDisk(chunkX: Int, chunkY: Int): Boolean {
+  private fun existsOnDisk(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
     if (!Settings.loadWorldFromDisk) {
       return false
     }

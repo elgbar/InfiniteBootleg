@@ -1,6 +1,11 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.WorldCoordArray
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
@@ -17,7 +22,8 @@ import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min
 
-class ChunkColumnImpl(override val world: World, override val chunkX: Int, initialTopSolid: IntArray? = null, initialTopLight: IntArray? = null) : ChunkColumn {
+class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord, initialTopSolid: WorldCoordArray? = null, initialTopLight: WorldCoordArray? = null) :
+  ChunkColumn {
 
   private val topWorldYSolid = IntArray(CHUNK_SIZE)
   private val topWorldYLight = IntArray(CHUNK_SIZE)
@@ -39,7 +45,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     }
   }
 
-  override fun topBlockHeight(localX: Int, features: Int): Int {
+  override fun topBlockHeight(localX: LocalCoord, features: ChunkColumnFeatureFlag): WorldCoord {
     require(localX in 0 until CHUNK_SIZE) { "Local x is out of bounds. localX: $localX" }
     synchronized(syncLocks[localX]) {
       val solid = if (features and SOLID_FLAG != 0) topWorldYSolid[localX] else Int.MIN_VALUE
@@ -50,17 +56,17 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     }
   }
 
-  private fun topSkylight(localX: Int): Int {
+  private fun topSkylight(localX: LocalCoord): WorldCoord {
     synchronized(syncLocks[localX]) {
       return topWorldYLight[localX]
     }
   }
 
-  override fun topBlock(localX: Int, features: Int): Block? {
+  override fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag): Block? {
     return getWorldBlock(localX, topBlockHeight(localX, features))
   }
 
-  override fun isChunkAboveTopBlock(chunkY: Int, features: Int): Boolean {
+  override fun isChunkAboveTopBlock(chunkY: ChunkCoord, features: ChunkColumnFeatureFlag): Boolean {
     val maxWorldY = chunkToWorld(chunkY, CHUNK_SIZE - 1)
     for (localX in 0 until CHUNK_SIZE) {
       if (!isBlockAboveTopBlock(localX, maxWorldY, features)) {
@@ -70,31 +76,31 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     return true
   }
 
-  override fun isBlockAboveTopBlock(localX: Int, worldY: Int, features: Int): Boolean {
+  override fun isBlockAboveTopBlock(localX: LocalCoord, worldY: WorldCoord, features: ChunkColumnFeatureFlag): Boolean {
     return topBlockHeight(localX, features) < worldY
   }
 
-  private fun getWorldX(localX: Int): Int {
+  private fun getWorldX(localX: LocalCoord): WorldCoord {
     return chunkToWorld(chunkX, localX)
   }
 
-  private fun getWorldBlock(localX: Int, worldY: Int): Block? {
+  private fun getWorldBlock(localX: LocalCoord, worldY: WorldCoord): Block? {
     return world.getBlock(getWorldX(localX), worldY)
   }
 
-  private fun getLoadedChunk(chunkY: Int, chunkX: Int = this.chunkX): Chunk? {
+  private fun getLoadedChunk(chunkY: ChunkCoord, chunkX: ChunkCoord = this.chunkX): Chunk? {
     val compactLoc = compactLoc(chunkX, chunkY)
     return world.getLoadedChunk(compactLoc)
   }
 
-  private fun getLoadedChunkFromWorldY(worldY: Int, chunkX: Int = this.chunkX): Chunk? = getLoadedChunk(worldY.worldToChunk(), chunkX)
+  private fun getLoadedChunkFromWorldY(worldY: WorldCoord, chunkX: ChunkCoord = this.chunkX): Chunk? = getLoadedChunk(worldY.worldToChunk(), chunkX)
 
-  private fun getChunk(chunkY: Int): Chunk? {
+  private fun getChunk(chunkY: ChunkCoord): Chunk? {
     return world.getChunk(chunkX, chunkY, true)
   }
 
-  private fun setTopBlock(currentTops: IntArray, localX: Int, worldY: Int) {
-    val oldTop: Int
+  private fun setTopBlock(currentTops: WorldCoordArray, localX: LocalCoord, worldY: WorldCoord) {
+    val oldTop: WorldCoord
     synchronized(syncLocks[localX]) {
       oldTop = currentTops[localX]
       currentTops[localX] = worldY
@@ -121,11 +127,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     }
   }
 
-  override fun updateTopBlock(localX: Int) {
+  override fun updateTopBlock(localX: LocalCoord) {
     updateTopBlock(localX, topBlockHeight(localX))
   }
 
-  override fun updateTopBlock(localX: Int, worldYHint: Int) {
+  override fun updateTopBlock(localX: LocalCoord, worldYHint: WorldCoord) {
     updateTopBlock(topWorldYSolid, localX, worldYHint) {
       it.material.isCollidable
     }
@@ -141,7 +147,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     return block.isNotAir() && specialRule(block)
   }
 
-  private fun updateTopBlock(top: IntArray, localX: Int, worldYHint: Int, rule: (block: Block) -> Boolean) {
+  private fun updateTopBlock(top: WorldCoordArray, localX: LocalCoord, worldYHint: WorldCoord, rule: (block: Block) -> Boolean) {
     synchronized(syncLocks[localX]) {
       val currTopWorldY = top[localX]
 

@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
 import com.badlogic.gdx.utils.Disposable
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
@@ -53,10 +55,10 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     it.SetFractalGain(0.5f)
   }
 
-  fun getBiomeHeight(worldX: Int): Double =
+  fun getBiomeHeight(worldX: WorldCoord): Double =
     (noise.noise(worldX.toDouble(), 0.5, 0.5, BIOME_HEIGHT_AMPLITUDE, 0.001) + BIOME_HEIGHT_AMPLITUDE) / (BIOME_HEIGHT_AMPLITUDE * 2)
 
-  override fun getBiome(worldX: Int): Biome {
+  override fun getBiome(worldX: WorldCoord): Biome {
     val height = getBiomeHeight(worldX)
     return when {
       height > 0.65 -> Biome.MOUNTAINS
@@ -66,11 +68,11 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     }
   }
 
-  override fun getHeight(worldX: Int): Int {
+  override fun getHeight(worldX: WorldCoord): Int {
     return getBiome(worldX).heightAt(this, worldX)
   }
 
-  override fun generate(world: World, chunkX: Int, chunkY: Int): Chunk {
+  override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk {
     val chunk = ChunkImpl(world, chunkX, chunkY)
     for (localX in 0 until Chunk.CHUNK_SIZE) {
       val worldX = chunkToWorld(chunkX, localX)
@@ -109,7 +111,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     }
   }
 
-  private fun generateCaves(chunk: Chunk, chunkY: Int, genHeight: Int, worldX: Int) {
+  private fun generateCaves(chunk: Chunk, chunkY: ChunkCoord, genHeight: Int, worldX: WorldCoord) {
     val blocks = chunk.blocks
     val worldChunkY = chunkY.chunkToWorld()
     val localX = worldX.chunkOffset()

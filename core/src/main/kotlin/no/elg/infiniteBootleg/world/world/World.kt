@@ -28,7 +28,11 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.despawnEntity
+import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.component1
@@ -366,7 +370,7 @@ abstract class World(
       return worldFile
     }
 
-  fun getChunkColumn(chunkX: Int): ChunkColumn {
+  fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn {
     synchronized(chunkColumns) {
       val column = chunkColumns[chunkX]
       if (column == null) {
@@ -383,7 +387,7 @@ abstract class World(
    * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
-  fun getTopBlock(worldX: Int, features: Int): Block? {
+  fun getTopBlock(worldX: WorldCoord, features: ChunkColumnFeatureFlag): Block? {
     return getChunkColumn(worldX.worldToChunk())
       .topBlock(worldX.chunkOffset(), features)
   }
@@ -394,12 +398,12 @@ abstract class World(
    * @return The worldY coordinate of the top block of the given worldX
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
-  fun getTopBlockWorldY(worldX: Int, features: Int): Int {
+  fun getTopBlockWorldY(worldX: WorldCoord, features: ChunkColumnFeatureFlag): WorldCoord {
     return getChunkColumn(worldX.worldToChunk())
       .topBlockHeight(worldX.chunkOffset(), features)
   }
 
-  fun getChunkFromWorld(worldX: Int, worldY: Int, load: Boolean): Chunk? {
+  fun getChunkFromWorld(worldX: WorldCoord, worldY: WorldCoord, load: Boolean): Chunk? {
     val chunkX = worldX.worldToChunk()
     val chunkY = worldY.worldToChunk()
     return getChunk(chunkX, chunkY, load)
@@ -420,7 +424,7 @@ abstract class World(
     return getChunk(chunkLoc.toCompactLocation(), true)
   }
 
-  fun getChunk(chunkX: Int, chunkY: Int, load: Boolean): Chunk? {
+  fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? {
     return getChunk(compactLoc(chunkX, chunkY), load)
   }
 
@@ -468,7 +472,7 @@ abstract class World(
    * @param chunkY The y-coordinate of the chunk to load (in Chunk coordinate-view)
    * @return The loaded chunk
    */
-  fun loadChunk(chunkX: Int, chunkY: Int): Chunk? {
+  fun loadChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
     return loadChunk(compactLoc(chunkX, chunkY), true)
   }
 
@@ -533,7 +537,7 @@ abstract class World(
    * @param updateTexture If the texture of the corresponding chunk should be updated
    * @see Chunk.setBlock
    */
-  fun setBlock(worldX: Int, worldY: Int, material: Material, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
+  fun setBlock(worldX: WorldCoord, worldY: WorldCoord, material: Material, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
       chunk.setBlock(localX, localY, material, updateTexture, prioritize)
@@ -551,7 +555,14 @@ abstract class World(
       chunk.setBlock(localX, localY, block, updateTexture, prioritize)
     }
 
-  fun setBlock(worldX: Int, worldY: Int, protoBlock: ProtoWorld.Block?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block? =
+  fun setBlock(
+    worldX: WorldCoord,
+    worldY: WorldCoord,
+    protoBlock: ProtoWorld.Block?,
+    updateTexture: Boolean = true,
+    prioritize: Boolean = false,
+    sendUpdatePacket: Boolean = true
+  ): Block? =
     actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
       val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
@@ -565,7 +576,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @param updateTexture If the texture of the corresponding chunk should be updated
    */
-  fun removeBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) =
+  fun removeBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk -> chunk?.removeBlock(localX, localY, updateTexture, prioritize, sendUpdatePacket) }
 
   /**
@@ -597,7 +608,7 @@ abstract class World(
    * @param worldY The y coordinate from world view
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+  fun isAirBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       chunk.getRawBlock(localX, localY).isAir(markerIsAir)
@@ -606,7 +617,7 @@ abstract class World(
   /**
    * Check whether a block can be placed at the given location
    */
-  fun canEntityPlaceBlock(blockX: Int, blockY: Int, entity: Entity): Boolean {
+  fun canEntityPlaceBlock(blockX: WorldCoord, blockY: WorldCoord, entity: Entity): Boolean {
     if (entity.ignorePlaceableCheck) {
       return true
     }
@@ -621,7 +632,7 @@ abstract class World(
     return false
   }
 
-  private fun canPlaceBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Boolean =
+  private fun canPlaceBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Boolean =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       val material = chunk.getRawBlock(localX, localY).materialOrAir()
@@ -629,24 +640,24 @@ abstract class World(
     }
 
   private inline fun <R> actionOnBlock(
-    worldX: Int,
-    worldY: Int,
+    worldX: WorldCoord,
+    worldY: WorldCoord,
     loadChunk: Boolean = true,
-    action: (localX: Int, localY: Int, chunk: Chunk?) -> R
+    action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R
   ): R {
-    val chunkX: Int = worldX.worldToChunk()
-    val chunkY: Int = worldY.worldToChunk()
+    val chunkX: ChunkCoord = worldX.worldToChunk()
+    val chunkY: ChunkCoord = worldY.worldToChunk()
     val chunk: Chunk? = getChunk(chunkX, chunkY, loadChunk)
 
-    val localX: Int = worldX.chunkOffset()
-    val localY: Int = worldY.chunkOffset()
+    val localX: LocalCoord = worldX.chunkOffset()
+    val localY: LocalCoord = worldY.chunkOffset()
     return action(localX, localY, chunk)
   }
 
   private inline fun actionOnBlocks(
     locations: Iterable<Long>,
     loadChunk: Boolean = true,
-    action: (localX: Int, localY: Int, chunk: Chunk?) -> Unit
+    action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> Unit
   ): Iterable<Chunk> {
     val chunks = LongMap<Chunk>()
     for ((worldX, worldY) in locations) {
@@ -720,13 +731,13 @@ abstract class World(
    * @param loadChunk   Load the chunk at the coordinates
    * @return The block at the given x and y (or null if air block)
    */
-  fun getRawBlock(worldX: Int, worldY: Int, loadChunk: Boolean): Block? =
+  fun getRawBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return null
       return chunk.getRawBlock(localX, localY)
     }
 
-  fun getBlockLight(worldX: Int, worldY: Int, loadChunk: Boolean = true): BlockLight? {
+  fun getBlockLight(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): BlockLight? {
     val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
     return chunk.getBlockLight(worldX.chunkOffset(), worldY.chunkOffset())
   }
@@ -740,7 +751,7 @@ abstract class World(
    * @param loadChunk
    * @return The block at the given x and y
    */
-  fun getBlock(worldX: Int, worldY: Int, loadChunk: Boolean = true): Block? =
+  fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block? =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return null
       return chunk.getBlock(localX, localY)
@@ -759,7 +770,7 @@ abstract class World(
   /**
    * @return If the given chunk is loaded in memory
    */
-  fun isChunkLoaded(chunkX: Int, chunkY: Int): Boolean {
+  fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
     return isChunkLoaded(compactLoc(chunkX, chunkY))
   }
 
@@ -930,7 +941,7 @@ abstract class World(
    * @param radius Radius to be equal or less from center
    * @return Set of blocks within the given radius
    */
-  fun getBlocksWithin(worldX: Int, worldY: Int, radius: Float): ObjectSet<Block> = getBlocksWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+  fun getBlocksWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): ObjectSet<Block> = getBlocksWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
   fun getBlocksWithin(worldX: Float, worldY: Float, radius: Float): ObjectSet<Block> {
     Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
     val blocks = ObjectSet<Block>()
@@ -1050,7 +1061,7 @@ abstract class World(
    * @param worldY The y coordinate in world view
    * @return The material at the given location
    */
-  fun getMaterial(worldX: Int, worldY: Int, load: Boolean = true): Material = getRawBlock(worldX, worldY, load).materialOrAir()
+  fun getMaterial(worldX: WorldCoord, worldY: WorldCoord, load: Boolean = true): Material = getRawBlock(worldX, worldY, load).materialOrAir()
   fun getMaterial(compactLoc: Long, load: Boolean = true): Material = getRawBlock(compactLoc, load).materialOrAir()
 
   /**
@@ -1133,7 +1144,7 @@ abstract class World(
      * @param radius Radius to be equal or less from center
      * @return Set of blocks within the given radius
      */
-    fun getLocationsWithin(worldX: Int, worldY: Int, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+    fun getLocationsWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
     fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
       Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
       val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)

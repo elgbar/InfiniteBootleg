@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
@@ -61,12 +62,12 @@ fun Engine.createFallingBlockStandaloneEntity(
   }
 }
 
-fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
+fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
     this.entity.gravityAffected = true
   }
 
-fun Engine.createLeafEntity(world: World, chunk: Chunk, worldX: Int, worldY: Int, material: Material) =
+fun Engine.createLeafEntity(world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
   createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
     this.entity.leafDecay = true
   }

@@ -1,6 +1,10 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
@@ -14,7 +18,7 @@ interface ChunkColumn {
   /**
    * The x-coordinate of the chunks represented by this column
    */
-  val chunkX: Int
+  val chunkX: ChunkCoord
 
   /**
    * The world this column belong
@@ -28,7 +32,7 @@ interface ChunkColumn {
    *
    * @see FeatureFlag
    */
-  fun topBlockHeight(localX: Int, features: Int = TOP_MOST_FLAG): Int
+  fun topBlockHeight(localX: LocalCoord, features: ChunkColumnFeatureFlag = TOP_MOST_FLAG): Int
 
   /**
    * @param features What kind of top block to return
@@ -36,20 +40,20 @@ interface ChunkColumn {
    *
    * @see FeatureFlag
    */
-  fun topBlock(localX: Int, features: Int = TOP_MOST_FLAG): Block?
+  fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag = TOP_MOST_FLAG): Block?
 
   /**
    * @param localX The x-coordinate of the block column to recalculate. Must be in `0..`[CHUNK_SIZE]
    * Recalculate the top block of a given local x
    */
-  fun updateTopBlock(localX: Int)
+  fun updateTopBlock(localX: LocalCoord)
 
   /**
    * @param localX The x-coordinate of the block column to recalculate. Must be in `0..`[CHUNK_SIZE]
    * @param worldYHint Hint what could be the next topmost block
    * Recalculate the top block of a given local x
    */
-  fun updateTopBlock(localX: Int, worldYHint: Int)
+  fun updateTopBlock(localX: LocalCoord, worldYHint: Int)
 
   /**
    * @param features What kind of top block to return
@@ -57,7 +61,7 @@ interface ChunkColumn {
    *
    * @see FeatureFlag
    */
-  fun isChunkAboveTopBlock(chunkY: Int, features: Int = TOP_MOST_FLAG): Boolean
+  fun isChunkAboveTopBlock(chunkY: ChunkCoord, features: ChunkColumnFeatureFlag = TOP_MOST_FLAG): Boolean
 
   /**
    * @param features What kind of top block to return
@@ -65,7 +69,7 @@ interface ChunkColumn {
    *
    * @see FeatureFlag
    */
-  fun isBlockAboveTopBlock(localX: Int, worldY: Int, features: Int = TOP_MOST_FLAG): Boolean
+  fun isBlockAboveTopBlock(localX: LocalCoord, worldY: WorldCoord, features: ChunkColumnFeatureFlag = TOP_MOST_FLAG): Boolean
 
   /**
    * @return a copy of this column as a protobuf instance
@@ -78,17 +82,17 @@ interface ChunkColumn {
       /**
        * Indicate that the returned top block must block light
        */
-      const val BLOCKS_LIGHT_FLAG: Int = 1 shl 0
+      const val BLOCKS_LIGHT_FLAG: ChunkColumnFeatureFlag = 1 shl 0
 
       /**
        * Indicate that the returned top block must be solid
        */
-      const val SOLID_FLAG: Int = 1 shl 1
+      const val SOLID_FLAG: ChunkColumnFeatureFlag = 1 shl 1
 
       /**
        * The absolute top-most block, contains all flags
        */
-      const val TOP_MOST_FLAG: Int = BLOCKS_LIGHT_FLAG or SOLID_FLAG
+      const val TOP_MOST_FLAG: ChunkColumnFeatureFlag = BLOCKS_LIGHT_FLAG or SOLID_FLAG
     }
   }
 }

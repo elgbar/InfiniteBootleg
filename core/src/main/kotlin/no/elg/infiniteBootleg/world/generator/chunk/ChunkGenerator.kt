@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.biome.Biome
 import no.elg.infiniteBootleg.world.world.World
@@ -18,13 +20,13 @@ interface ChunkGenerator {
    * @param worldX World location
    * @return The biome at the calculated location
    */
-  fun getBiome(worldX: Int): Biome
+  fun getBiome(worldX: WorldCoord): Biome
 
   /**
    * @param worldX World location
    * @return The world height at this location
    */
-  fun getHeight(worldX: Int): Int
+  fun getHeight(worldX: WorldCoord): Int
 
   /**
    * @param world The world to generate the chunk in
@@ -32,7 +34,7 @@ interface ChunkGenerator {
    * @param chunkY Y coordinate of chunk in world to generate
    * @return A valid chunk at the given offset in the given world
    */
-  fun generate(world: World, chunkX: Int, chunkY: Int): Chunk
+  fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk
 
   fun generateFeatures(chunk: Chunk) {}
 

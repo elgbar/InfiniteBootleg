@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.google.protobuf.InvalidProtocolBufferException
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl
@@ -33,7 +34,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
     return null
   }
 
-  protected fun loadChunkFromFile(chunkX: Int, chunkY: Int): Chunk? {
+  protected fun loadChunkFromFile(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
     val protoChunk = readChunkFile(chunkX, chunkY)
     return if (protoChunk != null) {
       loadChunkFromProto(protoChunk)
@@ -51,7 +52,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
     return false
   }
 
-  private fun readChunkFile(chunkX: Int, chunkY: Int): ProtoWorld.Chunk? {
+  private fun readChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord): ProtoWorld.Chunk? {
     val chunkFile = getChunkFile(world, chunkX, chunkY)?.file()
     if (chunkFile != null && chunkFile.isFile && chunkFile.canRead()) {
       val bytes = chunkFile.readBytes()
@@ -67,7 +68,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
 
   companion object {
     @JvmStatic
-    fun getChunkFile(world: World, chunkX: Int, chunkY: Int): FileHandle? {
+    fun getChunkFile(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): FileHandle? {
       val worldFile = world.worldFolder ?: return null
       return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY)
     }

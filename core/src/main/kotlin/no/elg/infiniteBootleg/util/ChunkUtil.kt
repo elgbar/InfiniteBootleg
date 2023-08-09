@@ -6,7 +6,7 @@ import kotlin.math.abs
 
 fun Chunk.isNeighbor(other: Chunk): Boolean = isNeighbor(other.chunkX, other.chunkY)
 
-fun Chunk.isNeighbor(chunkX: Int, chunkY: Int): Boolean {
+fun Chunk.isNeighbor(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
   return if (chunkX == this.chunkX && chunkY == this.chunkY) {
     false
   } else {
@@ -16,6 +16,6 @@ fun Chunk.isNeighbor(chunkX: Int, chunkY: Int): Boolean {
 
 fun Chunk.directionTo(other: Chunk): Direction = directionTo(other.chunkX, other.chunkY)
 
-fun Chunk.directionTo(chunkX: Int, chunkY: Int): Direction {
+fun Chunk.directionTo(chunkX: ChunkCoord, chunkY: ChunkCoord): Direction {
   return Direction.direction(this.chunkX, this.chunkY, chunkX, chunkY)
 }

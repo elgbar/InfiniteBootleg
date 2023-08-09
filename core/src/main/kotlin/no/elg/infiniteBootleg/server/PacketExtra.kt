@@ -42,6 +42,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
@@ -95,7 +96,7 @@ fun broadcast(packet: Packet, filter: ((Channel, SharedInformation) -> Boolean)?
  *
  * Can only be used by a server instance
  */
-fun broadcastToInView(packet: Packet, worldX: Int, worldY: Int, filter: ((Channel, SharedInformation) -> Boolean)? = null) {
+fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ((Channel, SharedInformation) -> Boolean)? = null) {
   require(Main.isServer) { "This broadcasting methods can only be used by servers" }
   val world = ServerMain.inst().serverWorld
   val renderer = world.render
@@ -139,7 +140,7 @@ fun serverBoundLoginPacket(name: String, uuid: UUID): Packet {
     ).build()
 }
 
-fun ServerClient.serverBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packet {
+fun ServerClient.serverBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?): Packet {
   return serverBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
@@ -207,7 +208,7 @@ fun ServerClient.serverBoundHeartbeat(): Packet {
 
 private val PROTO_AIR_BLOCK = Block.save(AIR).build()
 
-fun clientBoundBlockUpdate(worldX: Int, worldY: Int, block: Block?): Packet {
+fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?): Packet {
   return clientBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)

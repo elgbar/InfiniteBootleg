@@ -28,7 +28,9 @@ import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.toLocation
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Location
@@ -342,10 +344,10 @@ private fun chunksInView(ctx: ChannelHandlerContext): ChunksInView? {
   return chunksInView
 }
 
-private fun isChunkInView(ctx: ChannelHandlerContext, chunkX: Int, chunkY: Int): Boolean {
+private fun isChunkInView(ctx: ChannelHandlerContext, chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
   return chunksInView(ctx)?.isInView(chunkX, chunkY) ?: false
 }
 
-private fun isLocInView(ctx: ChannelHandlerContext, worldX: Int, worldY: Int): Boolean {
+private fun isLocInView(ctx: ChannelHandlerContext, worldX: WorldCoord, worldY: WorldCoord): Boolean {
   return chunksInView(ctx)?.isInView(worldX.worldToChunk(), worldY.worldToChunk()) ?: false
 }

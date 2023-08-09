@@ -106,8 +106,8 @@ inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.
 
 fun Entity.interactableBlocks(
   world: World,
-  centerBlockX: Int,
-  centerBlockY: Int,
+  centerBlockX: WorldCoord,
+  centerBlockY: WorldCoord,
   radius: Float,
   interactionRadius: Float
 ): Sequence<Long> {
@@ -123,8 +123,8 @@ fun Entity.interactableBlocks(
 
 fun Entity.breakableBlocks(
   world: World,
-  centerBlockX: Int,
-  centerBlockY: Int,
+  centerBlockX: WorldCoord,
+  centerBlockY: WorldCoord,
   radius: Float,
   interactionRadius: Float
 ): Sequence<Long> {
@@ -133,8 +133,8 @@ fun Entity.breakableBlocks(
 
 fun Entity.placeableBlocks(
   world: World,
-  centerBlockX: Int,
-  centerBlockY: Int,
+  centerBlockX: WorldCoord,
+  centerBlockY: WorldCoord,
   radius: Float,
   interactionRadius: Float
 ): Sequence<Long> {
@@ -148,3 +148,4 @@ fun Entity.placeableBlocks(
       }
     }
 }
+typealias ChunkColumnFeatureFlag = Int
