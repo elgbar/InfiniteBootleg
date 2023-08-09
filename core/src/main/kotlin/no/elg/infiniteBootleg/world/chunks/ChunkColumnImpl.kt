@@ -82,13 +82,14 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     return world.getBlock(getWorldX(localX), worldY)
   }
 
-  private fun getLoadedChunk(worldY: Int, chunkX: Int = this.chunkX): Chunk? {
-    val compactLoc = compactLoc(chunkX, worldY.worldToChunk())
+  private fun getLoadedChunk(chunkY: Int, chunkX: Int = this.chunkX): Chunk? {
+    val compactLoc = compactLoc(chunkX, chunkY)
     return world.getLoadedChunk(compactLoc)
   }
 
-  private fun getChunk(worldY: Int): Chunk? {
-    val chunkY = worldY.worldToChunk()
+  private fun getLoadedChunkFromWorldY(worldY: Int, chunkX: Int = this.chunkX): Chunk? = getLoadedChunk(worldY.worldToChunk(), chunkX)
+
+  private fun getChunk(chunkY: Int): Chunk? {
     return world.getChunk(chunkX, chunkY, true)
   }
 
@@ -105,18 +106,17 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
     val max = max(oldChunk, newChunk)
     val worldX = chunkToWorld(chunkX, localX)
     for (chunkY in min..max) {
-      val newWorldY = chunkY.chunkToWorld()
-      getLoadedChunk(newWorldY)?.updateAllBlockLights()
+      getLoadedChunk(chunkY)?.updateAllBlockLights()
 
       // Update chunks to the sides, if the light reaches that far
       val leftChunkX = (worldX - World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (leftChunkX != chunkX) {
-        getLoadedChunk(newWorldY, leftChunkX)?.updateAllBlockLights()
+        getLoadedChunk(chunkY, leftChunkX)?.updateAllBlockLights()
       }
 
       val rightChunkX = (worldX + World.LIGHT_SOURCE_LOOK_BLOCKS).toInt().worldToChunk()
       if (rightChunkX != chunkX) {
-        getLoadedChunk(newWorldY, rightChunkX)?.updateAllBlockLights()
+        getLoadedChunk(chunkY, rightChunkX)?.updateAllBlockLights()
       }
     }
   }
@@ -147,7 +147,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
 
       if (worldYHint > currTopWorldY) {
         // The hint is above the current top block. Check if it is valid
-        val hintChunk = getLoadedChunk(worldYHint)
+        val hintChunk = getLoadedChunkFromWorldY(worldYHint)
         if (hintChunk.isValid()) {
           // its loaded at least
           val localYHint = worldYHint.chunkOffset()
@@ -161,7 +161,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: Int, initi
       }
 
       val currTopLocalY = currTopWorldY.chunkOffset()
-      val currTopChunk = getLoadedChunk(currTopWorldY)
+      val currTopChunk = getLoadedChunkFromWorldY(currTopWorldY)
       val currTopBlock: Block? = currTopChunk?.getRawBlock(localX, currTopLocalY)
       if (worldYHint < currTopWorldY && (currTopChunk == null || currTopBlock.isNotAir())) {
         // World y hint is below the current top block.
