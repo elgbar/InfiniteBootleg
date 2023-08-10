@@ -46,6 +46,7 @@ import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
+import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK

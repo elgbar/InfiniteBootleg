@@ -2,9 +2,9 @@ package no.elg.infiniteBootleg.world.loader.chunk
 
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.serverBoundChunkRequestPacket
-import no.elg.infiniteBootleg.util.compact
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
+import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
@@ -29,7 +29,7 @@ class ServerClientChunkLoader(override val world: ServerClientWorld, generator: 
   }
 
   override fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
-    toBeLoadedChunks -= protoChunk.position.compact()
+    toBeLoadedChunks -= protoChunk.position.toCompact()
     return super.loadChunkFromProto(protoChunk)
   }
 }
