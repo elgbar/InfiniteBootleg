@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
@@ -105,6 +106,7 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader.writeLockFile
 import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.FullChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.ServerClientChunkLoader
+import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 import java.util.concurrent.TimeUnit
@@ -279,10 +281,7 @@ abstract class World(
     }
     render.update()
     Main.inst().scheduler.executeAsync {
-      loadChunk(spawn.x.worldToChunk(), spawn.y.worldToChunk())
-      for (location in render.chunkLocationsInView) {
-        loadChunk(location.x, location.y)
-      }
+      render.chunkLocationsInView.forEach(::loadChunk)
       Main.inst().scheduler.executeSync { dispatchEvent(InitialChunksOfWorldLoadedEvent(this)) }
     }
   }
@@ -485,7 +484,7 @@ abstract class World(
    * `chunkLocation` and thus not reload the chunk
    * @return The loaded chunk
    */
-  fun loadChunk(chunkLoc: Long, returnIfLoaded: Boolean): Chunk? {
+  fun loadChunk(chunkLoc: Long, returnIfLoaded: Boolean = true): Chunk? {
     if (worldTicker.isPaused) {
       Main.logger().debug("World", "Ticker paused will not load chunk")
       return null
@@ -507,8 +506,6 @@ abstract class World(
         }
       }
 
-      //      Main.logger().log("Loading world chunk at " + CoordUtil.stringifyCompactLoc(chunkLoc)
-      // + "\n" + DebugUtilsKt.stacktrace());
       val loadedChunk = chunkLoader.fetchChunk(chunkLoc)
       val chunk = loadedChunk.chunk
       if (chunk == null) {
@@ -519,8 +516,7 @@ abstract class World(
       } else {
         Preconditions.checkState(chunk.isValid)
         old = chunks.put(chunkLoc, chunk)
-        val event = ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated)
-        dispatchEvent(event)
+        dispatchEvent(ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated))
         chunk
       }
     } finally {
@@ -571,8 +567,6 @@ abstract class World(
     }
 
   /**
-   * Remove anything that is at the given location be it a [Block] or [MaterialEntity]
-   *
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
    * @param updateTexture If the texture of the corresponding chunk should be updated

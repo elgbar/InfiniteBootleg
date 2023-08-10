@@ -8,17 +8,16 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.utils.OrderedMap
-import com.badlogic.gdx.utils.OrderedSet
 import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
-import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.toSet
+import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -52,6 +51,11 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   }
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
   val box2DDebugRenderer: Box2DDebugRenderer = Box2DDebugRenderer(true, true, true, true, true, true)
+
+  fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
+    camera.position.set(worldX.toFloat(), worldY.toFloat(), 0f)
+    update()
+  }
 
   override fun render() {
     batch.projectionMatrix = camera.combined
@@ -156,5 +160,5 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   override fun isOutOfView(chunk: Chunk): Boolean = chunksInView.isOutOfView(chunk.chunkX, chunk.chunkY)
 
-  override val chunkLocationsInView: OrderedSet<Location> get() = chunksInView.toSet()
+  override val chunkLocationsInView get() = chunksInView.iterator()
 }

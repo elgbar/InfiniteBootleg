@@ -23,10 +23,10 @@ import no.elg.infiniteBootleg.server.sendDuplexPacket
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
+import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.WorldTime
-import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
@@ -298,12 +298,11 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @CmdArgNames("x", "y")
   @ClientsideOnly
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
-  fun tp(worldX: Float, worldY: Float) {
+  fun tp(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
     val clientWorld = clientWorld ?: return
     val entities = clientWorld.engine.getEntitiesFor(localPlayerFamily)
 
-    clientWorld.render.camera.position.set(worldX * Block.BLOCK_SIZE, worldY * Block.BLOCK_SIZE, 0f)
-    clientWorld.render.update()
+    clientWorld.render.lookAt(worldX, worldY)
     logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
 
     if (entities.size() > 0) {

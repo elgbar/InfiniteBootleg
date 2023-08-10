@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.util.worldToBlock
@@ -48,10 +49,10 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
     val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(x.worldToChunk(), y.worldToChunk()) }
     val Entity.positionComponent by propertyFor(mapper)
 
-    fun Entity.teleport(worldX: Float, worldY: Float) {
+    fun Entity.teleport(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
       val position = positionComponent
-      position.x = worldX
-      position.y = worldY
+      position.x = worldX.toFloat()
+      position.y = worldY.toFloat()
       updateBox2DPosition = true
       setVelocity(0f, 0f)
     }

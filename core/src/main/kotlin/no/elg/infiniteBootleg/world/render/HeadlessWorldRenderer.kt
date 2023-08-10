@@ -2,14 +2,12 @@ package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.OrderedMap
-import com.badlogic.gdx.utils.OrderedSet
 import no.elg.infiniteBootleg.util.worldToChunk
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.playerFamily
-import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.toSet
+import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -65,15 +63,8 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     }
   }
 
-  override val chunkLocationsInView: OrderedSet<Location>
-    get() {
-      val locs = OrderedSet<Location>(viewingChunks.size)
-      locs.orderedItems().ordered = false
-      for (inView in viewingChunks.values()) {
-        locs.addAll(inView.toSet())
-      }
-      return locs
-    }
+  override val chunkLocationsInView: Iterator<Long>
+    get() = viewingChunks.values().flatMap { it.iterator().asSequence() }.iterator()
 
   fun addClient(uuid: String, civ: ServerClientChunksInView) {
     writeLock.lock()

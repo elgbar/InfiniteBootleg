@@ -1,11 +1,9 @@
 package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.OrderedSet
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.api.Updatable
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 
@@ -19,8 +17,7 @@ interface WorldRender : Updatable, Renderer, Disposable, Resizable {
    */
   fun isOutOfView(chunk: Chunk): Boolean
   val world: World
-
-  val chunkLocationsInView: OrderedSet<Location>
+  val chunkLocationsInView: Iterator<Long>
 
   companion object {
     const val MIN_ZOOM = 0.25f

@@ -3,6 +3,7 @@
 package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.math.Vector2
+import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -188,6 +189,18 @@ typealias LocalCoord = Int
 typealias WorldCoord = Int
 typealias ChunkCoord = Int
 
+typealias LocalCoordNumber = Number
+typealias WorldCoordNumber = Number
+typealias ChunkCoordNumber = Number
+
 typealias LocalCoordArray = IntArray
 typealias WorldCoordArray = IntArray
 typealias ChunkCoordArray = IntArray
+
+typealias LocalCompactLocArray = LongArray
+typealias WorldCompactLocArray = LongArray
+typealias ChunkCompactLocArray = LongArray
+
+typealias LocalCompactLocGdxArray = GdxLongArray
+typealias WorldCompactLocGdxArray = GdxLongArray
+typealias ChunkCompactLocGdxArray = GdxLongArray

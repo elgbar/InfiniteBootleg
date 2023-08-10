@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.render
 
-import com.badlogic.gdx.utils.OrderedSet
+import no.elg.infiniteBootleg.util.ChunkCompactLocGdxArray
 import no.elg.infiniteBootleg.util.ChunkCoord
-import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 
@@ -45,15 +45,14 @@ interface ChunksInView {
       }
     }
 
-    fun ChunksInView.toSet(): OrderedSet<Location> {
-      val locs = OrderedSet<Location>(size)
-      locs.orderedItems().ordered = false
+    fun ChunksInView.iterator(): LongIterator {
+      val locs = ChunkCompactLocGdxArray(size)
       for (y in verticalStart until verticalEnd) {
         for (x in horizontalStart until horizontalEnd) {
-          locs.add(Location(x, y))
+          locs.add(compactLoc(x, y))
         }
       }
-      return locs
+      return locs.toArray().iterator()
     }
   }
 }
