@@ -43,6 +43,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
@@ -194,7 +195,7 @@ fun ServerClient.serverBoundEntityRequest(uuid: String): Packet {
   ).build()
 }
 
-fun ServerClient.serverBoundWorldSettings(spawn: Location?, time: Float?, timeScale: Float?): Packet {
+fun ServerClient.serverBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet {
   return worldSettingsPacketBuilder(serverBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
 }
 
@@ -275,7 +276,7 @@ fun clientBoundSecretExchange(sharedInformation: SharedInformation): Packet {
   ).build()
 }
 
-fun clientBoundWorldSettings(spawn: Location?, time: Float?, timeScale: Float?): Packet {
+fun clientBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet {
   return worldSettingsPacketBuilder(clientBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
 }
 
@@ -306,7 +307,7 @@ fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Pa
 //   DUAL Builders   //
 // /////////////////////
 
-private fun worldSettingsPacketBuilder(packet: Packet.Builder, spawn: Location?, time: Float?, timeScale: Float?): Packet {
+private fun worldSettingsPacketBuilder(packet: Packet.Builder, spawn: Long?, time: Float?, timeScale: Float?): Packet {
   return packet.setWorldSettings(
     WorldSettings.newBuilder()?.also {
       if (spawn != null) {

@@ -31,9 +31,8 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
-import no.elg.infiniteBootleg.util.toLocation
+import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.worldToChunk
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
@@ -121,12 +120,12 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
 private fun handleWorldSettings(ctx: ChannelHandlerContext, worldSettings: WorldSettings) {
   Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
   val world = ServerMain.inst().serverWorld
-  var spawn: Location? = null
+  var spawn: Long? = null
   var time: Float? = null
   var timeScale: Float? = null
 
   if (worldSettings.hasSpawn()) {
-    world.spawn = worldSettings.spawn.toLocation()
+    world.spawn = worldSettings.spawn.toCompact()
     spawn = world.spawn
   }
   if (worldSettings.hasTime()) {

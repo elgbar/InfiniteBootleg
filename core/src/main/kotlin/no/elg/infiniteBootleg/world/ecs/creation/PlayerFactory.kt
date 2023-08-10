@@ -155,8 +155,8 @@ fun Engine.createMPClientPlayerEntity(world: ServerClientWorld, protoEntity: Pro
 
 fun Engine.createMPServerPlayerEntity(
   world: ServerWorld,
-  worldX: Float,
-  worldY: Float,
+  worldX: Number,
+  worldY: Number,
   dx: Float,
   dy: Float,
   name: String,
@@ -167,7 +167,7 @@ fun Engine.createMPServerPlayerEntity(
   return if (Main.isServer) {
     futureEntity { future ->
       with(SharedInformationComponent(sharedInformation))
-      addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES, future)
+      addCommonPlayerComponents(world, worldX.toFloat(), worldY.toFloat(), dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES, future)
     }
   } else {
     CompletableFuture.failedFuture(IllegalStateException("Cannot create a server player when this is not a server instance"))
@@ -194,17 +194,28 @@ fun Engine.createMPClientPlayerEntity(
 
 fun Engine.createSPPlayerEntity(
   world: SinglePlayerWorld,
-  worldX: Float,
-  worldY: Float,
-  dx: Float,
-  dy: Float,
+  worldX: Number,
+  worldY: Number,
+  dx: Float = 0f,
+  dy: Float = 0f,
   name: String = "Player",
   id: String? = null
 ): CompletableFuture<Entity> =
   if (Main.isSingleplayer) {
     futureEntity { future ->
       addCommonClientPlayerComponents(true)
-      addCommonPlayerComponents(world, worldX, worldY + PLAYER_HEIGHT, dx, dy, name, id ?: UUID.randomUUID().toString(), null, CONTROLLED_CLIENT_PLAYER_FAMILIES, future)
+      addCommonPlayerComponents(
+        world,
+        worldX.toFloat(),
+        worldY.toFloat() + PLAYER_HEIGHT,
+        dx,
+        dy,
+        name,
+        id ?: UUID.randomUUID().toString(),
+        null,
+        CONTROLLED_CLIENT_PLAYER_FAMILIES,
+        future
+      )
     }
   } else {
     CompletableFuture.failedFuture(IllegalStateException("Cannot create a singleplayer player when this is not a singleplayer instance"))

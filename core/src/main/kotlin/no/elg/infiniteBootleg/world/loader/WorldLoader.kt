@@ -7,6 +7,8 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.util.decompactLocX
+import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.creation.createMPServerPlayerEntity
@@ -51,7 +53,7 @@ object WorldLoader {
     }
     Main.logger().debug("SERVER", "Creating fresh player profile for $uuid")
     val spawn = world.spawn
-    val future = world.engine.createMPServerPlayerEntity(world, spawn.x.toFloat(), spawn.y.toFloat(), 0f, 0f, username, uuid, sharedInformation, null)
+    val future = world.engine.createMPServerPlayerEntity(world, spawn.decompactLocX(), spawn.decompactLocY(), 0f, 0f, username, uuid, sharedInformation, null)
     future.thenAccept {
       saveServerPlayer(it)
       Main.logger().debug("SERVER", "Created persisted player profile for $uuid")

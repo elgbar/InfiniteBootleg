@@ -35,7 +35,7 @@ import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ClientBoundHandler.Companion.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
-import no.elg.infiniteBootleg.util.toLocation
+import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -128,7 +128,7 @@ private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
   }
   Main.logger().debug("handleWorldSettings", "spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
   if (worldSettings.hasSpawn()) {
-    world.spawn = worldSettings.spawn.toLocation()
+    world.spawn = worldSettings.spawn.toCompact()
   }
   if (worldSettings.hasTime()) {
     world.worldTime.time = worldSettings.time

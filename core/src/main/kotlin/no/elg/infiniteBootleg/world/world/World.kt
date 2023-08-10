@@ -48,12 +48,11 @@ import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
+import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Direction
-import no.elg.infiniteBootleg.world.Location
-import no.elg.infiniteBootleg.world.Location.Companion.fromVector2i
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -183,7 +182,7 @@ abstract class World(
   /**
    * Spawn in world coordinates
    */
-  var spawn: Location
+  var spawn: Long
 
   @JvmField
   val chunksLock: ReadWriteLock = ReentrantReadWriteLock()
@@ -200,7 +199,7 @@ abstract class World(
     name = worldName
     worldTicker = WorldTicker(this, false)
     worldTime = WorldTime(this)
-    spawn = Location(0, chunkLoader.generator.getHeight(0))
+    spawn = compactLoc(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
     worldBody = WorldBody(this)
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
@@ -211,7 +210,7 @@ abstract class World(
         if (this is SinglePlayerWorld) {
           if (engine.getEntitiesFor(localPlayerFamily).size() == 0) {
             Main.logger().debug("World", "Spawning new singleplayer player")
-            engine.createSPPlayerEntity(this, spawn.x.toFloat(), spawn.y.toFloat(), 0f, 0f, "Player", null)
+            engine.createSPPlayerEntity(this, spawn.decompactLocX(), spawn.decompactLocY())
           } else {
             Main.logger().debug("World") { "Will not spawn a new player in as the world contains a singleplayer entity" }
           }
