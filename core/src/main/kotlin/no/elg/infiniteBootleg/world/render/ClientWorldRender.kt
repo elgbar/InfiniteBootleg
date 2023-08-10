@@ -60,7 +60,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   override fun render() {
     batch.projectionMatrix = camera.combined
     chunkRenderer.renderMultiple()
-    draw.clear()
+    draw.clear(chunksInView.size)
     draw.ensureCapacity(chunksInView.size)
     val worldBody = world.worldBody
     val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
