@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
     config.setTitle("Infinite Terraria")
     config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 16)
     config.setForegroundFPS(Settings.foregroundFPS)
+    config.setWindowIcon("textures/icon_64.png")
     Lwjgl3Application(main, config)
   } else {
     val config = HeadlessApplicationConfiguration()
