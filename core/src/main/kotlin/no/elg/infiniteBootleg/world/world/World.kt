@@ -32,7 +32,6 @@ import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.Util
-import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
@@ -71,7 +70,7 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
 import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
@@ -294,7 +293,7 @@ abstract class World(
     if (Settings.debug) {
       Main.logger().debug("PB World", TextFormat.printer().shortDebugString(protoWorld))
     }
-    spawn = fromVector2i(protoWorld.spawn)
+    spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
     synchronized(chunkColumns) {
@@ -361,7 +360,7 @@ abstract class World(
       }
     }
     if (Main.isSingleplayer) {
-      val entities = engine.getEntitiesFor(playerFamily)
+      val entities = engine.getEntitiesFor(localPlayerFamily)
       if (entities != null && entities.size() > 0) {
         builder.player = entities.first().save()
       }
@@ -401,8 +400,7 @@ abstract class World(
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
   fun getTopBlock(worldX: WorldCoord, features: ChunkColumnFeatureFlag): Block? {
-    return getChunkColumn(worldX.worldToChunk())
-      .topBlock(worldX.chunkOffset(), features)
+    return getChunkColumn(worldX.worldToChunk()).topBlock(worldX.chunkOffset(), features)
   }
 
   /**
@@ -412,8 +410,7 @@ abstract class World(
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
   fun getTopBlockWorldY(worldX: WorldCoord, features: ChunkColumnFeatureFlag): WorldCoord {
-    return getChunkColumn(worldX.worldToChunk())
-      .topBlockHeight(worldX.chunkOffset(), features)
+    return getChunkColumn(worldX.worldToChunk()).topBlockHeight(worldX.chunkOffset(), features)
   }
 
   fun getChunkFromWorld(worldX: WorldCoord, worldY: WorldCoord, load: Boolean): Chunk? {
@@ -431,10 +428,6 @@ abstract class World(
       chunksLock.writeLock().unlock()
     }
     old?.dispose()
-  }
-
-  fun getChunk(chunkLoc: Location): Chunk? {
-    return getChunk(chunkLoc.toCompactLocation(), true)
   }
 
   fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? {
@@ -572,12 +565,11 @@ abstract class World(
     updateTexture: Boolean = true,
     prioritize: Boolean = false,
     sendUpdatePacket: Boolean = true
-  ): Block? =
-    actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
-      val chunk = nullableChunk ?: return@actionOnBlock null
-      val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
-      chunk.setBlock(localX, localY, block, updateTexture, prioritize, sendUpdatePacket)
-    }
+  ): Block? = actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
+    val chunk = nullableChunk ?: return@actionOnBlock null
+    val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
+    chunk.setBlock(localX, localY, block, updateTexture, prioritize, sendUpdatePacket)
+  }
 
   /**
    * @param worldX The x coordinate from world view
@@ -708,15 +700,11 @@ abstract class World(
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
       if (Util.isBetween(
-          MathUtils.floor((x - size.halfBox2dWidth)).toFloat(),
-          worldX,
-          MathUtils.ceil((x + size.halfBox2dWidth)).toFloat()
+          MathUtils.floor((x - size.halfBox2dWidth)).toFloat(), worldX, MathUtils.ceil((x + size.halfBox2dWidth)).toFloat()
         ) &&
         //
         Util.isBetween(
-          MathUtils.floor((y - size.halfBox2dHeight)).toFloat(),
-          worldY,
-          MathUtils.ceil((y + size.halfBox2dHeight)).toFloat()
+          MathUtils.floor((y - size.halfBox2dHeight)).toFloat(), worldY, MathUtils.ceil((y + size.halfBox2dHeight)).toFloat()
         )
       ) {
         foundEntities.add(entity)
@@ -730,8 +718,7 @@ abstract class World(
    * @param load            Load the chunk at the coordinates
    * @return The block at the given x and y
    */
-  fun getRawBlock(compactWorldLoc: Long, load: Boolean): Block? =
-    getRawBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), load)
+  fun getRawBlock(compactWorldLoc: Long, load: Boolean): Block? = getRawBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), load)
 
   /**
    * @param worldX The x coordinate from world view
@@ -739,11 +726,10 @@ abstract class World(
    * @param loadChunk   Load the chunk at the coordinates
    * @return The block at the given x and y (or null if air block)
    */
-  fun getRawBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
-      val chunk = nullableChunk ?: return null
-      return chunk.getRawBlock(localX, localY)
-    }
+  fun getRawBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+    val chunk = nullableChunk ?: return null
+    return chunk.getRawBlock(localX, localY)
+  }
 
   fun getBlockLight(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): BlockLight? {
     val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
@@ -759,28 +745,15 @@ abstract class World(
    * @param loadChunk
    * @return The block at the given x and y
    */
-  fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block? =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
-      val chunk = nullableChunk ?: return null
-      return chunk.getBlock(localX, localY)
-    }
-
-  /**
-   * Use [isChunkLoaded] or [isChunkLoaded] if possible
-   *
-   * @param chunkLoc Chunk location in chunk coordinates
-   * @return If the given chunk is loaded in memory
-   */
-  fun isChunkLoaded(chunkLoc: Location): Boolean {
-    return isChunkLoaded(chunkLoc.toCompactLocation())
+  fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block? = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+    val chunk = nullableChunk ?: return null
+    return chunk.getBlock(localX, localY)
   }
 
   /**
    * @return If the given chunk is loaded in memory
    */
-  fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
-    return isChunkLoaded(compactLoc(chunkX, chunkY))
-  }
+  fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = isChunkLoaded(compactLoc(chunkX, chunkY))
 
   /**
    * Unload and save all chunks in this world.

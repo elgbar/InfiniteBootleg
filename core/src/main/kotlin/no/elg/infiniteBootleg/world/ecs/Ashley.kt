@@ -125,7 +125,7 @@ fun ensureUniquenessListener(engine: Engine) {
   engine.onEntityAdded(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
     val duplicateEntities = engine.getEntitiesFor(family)
     if (duplicateEntities.filter { it.id == entity.id }.size > 1) {
-      Main.logger().warn("Duplicate entity with id '${entity.id}' removed")
+      Main.logger().warn("Duplicate entity with id '${entity.id}' removed: Components ${entity.components.map { it::class.simpleName }}")
       engine.removeEntity(entity)
     }
   }

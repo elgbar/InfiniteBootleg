@@ -146,7 +146,6 @@ subprojects {
     testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 
-
   tasks.named("dependencyUpdates").configure {
     rejectVersionIf {
       isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
