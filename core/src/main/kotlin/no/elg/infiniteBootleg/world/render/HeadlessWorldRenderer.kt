@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.OrderedMap
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -49,11 +50,13 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     }
   }
 
-  override fun isOutOfView(chunk: Chunk): Boolean {
+  override fun isOutOfView(chunk: Chunk): Boolean = isOutOfView(chunk.chunkX, chunk.chunkY)
+
+  override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
     readLock.lock()
     return try {
       for (inView in viewingChunks.values()) {
-        if (inView.isInView(chunk.chunkX, chunk.chunkY)) {
+        if (inView.isInView(chunkX, chunkY)) {
           return false
         }
       }
@@ -62,6 +65,8 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
       readLock.unlock()
     }
   }
+
+  override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = !isOutOfView(chunkX, chunkY)
 
   override val chunkLocationsInView: Iterator<Long>
     get() = viewingChunks.values().flatMap { it.iterator().asSequence() }.iterator()

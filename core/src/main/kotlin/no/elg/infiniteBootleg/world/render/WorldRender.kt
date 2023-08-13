@@ -4,6 +4,10 @@ import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.api.Updatable
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
+import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.decompactLocX
+import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 
@@ -16,6 +20,13 @@ interface WorldRender : Updatable, Renderer, Disposable, Resizable {
    * @return `true` if the given chunk is outside the view of the camera
    */
   fun isOutOfView(chunk: Chunk): Boolean
+
+  fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean
+  fun isOutOfView(chunkLoc: ChunkCompactLoc): Boolean = isOutOfView(chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
+
+  fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean
+  fun isInView(chunkLoc: ChunkCompactLoc): Boolean = isInView(chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
+
   val world: World
   val chunkLocationsInView: Iterator<Long>
 

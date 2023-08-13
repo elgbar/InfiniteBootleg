@@ -12,6 +12,7 @@ import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -159,6 +160,8 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   }
 
   override fun isOutOfView(chunk: Chunk): Boolean = chunksInView.isOutOfView(chunk.chunkX, chunk.chunkY)
+  override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isOutOfView(chunkX, chunkY)
+  override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isInView(chunkX, chunkY)
 
   override val chunkLocationsInView get() = chunksInView.iterator()
 }
