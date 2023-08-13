@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag
@@ -89,6 +90,7 @@ private fun EngineEntity.addCommonPlayerComponents(
   with(VelocityComponent(dx, dy))
   with<GroundedComponent>()
   with<TransientTag>()
+  with<CanBeOutOfBoundsTag>()
 
   // player family
   with(NameComponent(name))

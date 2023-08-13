@@ -54,6 +54,8 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.worldComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag.Companion.canBeOutOfBoundsComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flyingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
@@ -93,6 +95,7 @@ fun Entity.save(): ProtoWorld.Entity {
       this@save.gravityAffectedComponentOrNull?.apply { save() }
       this@save.ignorePlaceableCheckComponentOrNull?.apply { save() }
       this@save.leafDecayComponentOrNull?.apply { save() }
+      this@save.canBeOutOfBoundsComponentOrNull?.apply { save() }
     }
 
     additionalComponents = additionalComponents {
@@ -134,6 +137,7 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
       GravityAffectedTag.load(this, it)
       IgnorePlaceableCheckTag.load(this, it)
       LeafDecayTag.load(this, it)
+      CanBeOutOfBoundsTag.load(this, it)
     }
 
     protoEntity.additionalComponents?.let {
