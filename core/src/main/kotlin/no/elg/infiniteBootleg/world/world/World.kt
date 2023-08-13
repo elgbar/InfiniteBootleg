@@ -202,27 +202,25 @@ abstract class World(
     spawn = compactLoc(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
     worldBody = WorldBody(this)
+
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
       Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!" }
-      check(!worldTicker.isStarted) { "World has already been started" }
-      worldTicker.start()
-      Main.inst().scheduler.scheduleSync(250L) {
-        if (this is SinglePlayerWorld) {
-          if (engine.getEntitiesFor(localPlayerFamily).size() == 0) {
-            Main.logger().debug("World", "Spawning new singleplayer player")
-            engine.createSPPlayerEntity(this, spawn.decompactLocX(), spawn.decompactLocY())
-          } else {
-            Main.logger().debug("World") { "Will not spawn a new player in as the world contains a singleplayer entity" }
-          }
-        }
+      Main.inst().scheduler.executeSync {
+        addSystems()
         dispatchEvent(WorldLoadedEvent(this))
       }
-      Main.logger().debug("World") { "World ticker started, sending WorldLoadedEvent" }
     }
   }
 
   private fun initializeEngine(): Engine {
     val engine = Engine()
+    ensureUniquenessListener(engine)
+    disposeEntitiesOnRemoval(engine)
+    addEntityListeners(engine)
+    return engine
+  }
+
+  private fun addSystems() {
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(ReadBox2DStateSystem)
     engine.addSystem(WriteBox2DStateSystem)
@@ -239,15 +237,14 @@ abstract class World(
     if (Main.isClient) {
       engine.addSystem(FollowEntitySystem)
     }
-    ensureUniquenessListener(engine)
-    disposeEntitiesOnRemoval(engine)
-    initializeEngine(engine)
-    return engine
+    addSystems(engine)
   }
 
-  protected open fun initializeEngine(engine: Engine) {}
+  protected open fun addEntityListeners(engine: Engine) {}
+  protected open fun addSystems(engine: Engine) {}
 
   fun initialize() {
+    var willDispatchChunksLoadedEvent = false
     if (Settings.loadWorldFromDisk) {
       val worldFolder = worldFolder
       if (!transientWorld && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
@@ -267,7 +264,7 @@ abstract class World(
           if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
             try {
               val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
-              loadFromProtoWorld(protoWorld)
+              willDispatchChunksLoadedEvent = loadFromProtoWorld(protoWorld)
             } catch (e: InvalidProtocolBufferException) {
               e.printStackTrace()
             }
@@ -278,14 +275,22 @@ abstract class World(
         }
       }
     }
-    render.update()
-    Main.inst().scheduler.executeAsync {
-      render.chunkLocationsInView.forEach(::loadChunk)
-      Main.inst().scheduler.executeSync { dispatchEvent(InitialChunksOfWorldLoadedEvent(this)) }
+    check(!worldTicker.isStarted) { "World has already been started" }
+    worldTicker.start()
+
+    if (!willDispatchChunksLoadedEvent) {
+      render.update()
+      Main.inst().scheduler.executeAsync {
+        render.chunkLocationsInView.forEach(::loadChunk)
+        dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
+      }
     }
   }
 
-  fun loadFromProtoWorld(protoWorld: ProtoWorld.World) {
+  /**
+   * @return Will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
+   */
+  fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
     if (Settings.debug) {
       Main.logger().debug("PB World", TextFormat.printer().shortDebugString(protoWorld))
     }
@@ -300,11 +305,20 @@ abstract class World(
       }
     }
 
-    if (Main.isSingleplayer && protoWorld.hasPlayer()) {
+    return if (this is SinglePlayerWorld && protoWorld.hasPlayer()) {
       engine.load(protoWorld.player, this).thenApply {
         it.transient = true
-        loadChunk(it.compactChunkLoc, returnIfLoaded = true)
+        (render as? ClientWorldRender)?.lookAt(it.position.x, it.position.y)
+        render.chunkLocationsInView.forEach(::loadChunk)
+        dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
       }
+      true
+    } else {
+      if (this is SinglePlayerWorld) {
+        engine.createSPPlayerEntity(this, spawn.decompactLocX(), spawn.decompactLocY())
+        Main.logger().debug("World", "Spawning new singleplayer player")
+      }
+      false
     }
   }
 

@@ -126,22 +126,20 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     m4.set(camera.combined).scl(Block.BLOCK_SIZE.toFloat())
     val width = camera.viewportWidth * camera.zoom
     val height = camera.viewportHeight * camera.zoom
-    if (!world.worldTicker.isPaused) {
-      val worldBody = world.worldBody
-      val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
-      val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
-      val w = width * abs(camera.up.y) + height * abs(camera.up.x)
-      val h = height * abs(camera.up.y) + width * abs(camera.up.x)
-      viewBound[camera.position.x - worldOffsetX - w / 2, camera.position.y - worldOffsetY - h / 2, w] = h
-      chunksInView.horizontalStart = MathUtils.floor(viewBound.x / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS
-      chunksInView.horizontalEnd =
-        (MathUtils.floor((viewBound.x + viewBound.width + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS)
-      chunksInView.verticalStart = MathUtils.floor(viewBound.y / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER
-      chunksInView.verticalEnd =
-        (MathUtils.floor((viewBound.y + viewBound.height + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER)
-      if (abs(lastZoom - camera.zoom) > WorldRender.SKYLIGHT_ZOOM_THRESHOLD) {
-        lastZoom = camera.zoom
-      }
+    val worldBody = world.worldBody
+    val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
+    val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
+    val w = width * abs(camera.up.y) + height * abs(camera.up.x)
+    val h = height * abs(camera.up.y) + width * abs(camera.up.x)
+    viewBound[camera.position.x - worldOffsetX - w / 2, camera.position.y - worldOffsetY - h / 2, w] = h
+    chunksInView.horizontalStart = MathUtils.floor(viewBound.x / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS
+    chunksInView.horizontalEnd =
+      (MathUtils.floor((viewBound.x + viewBound.width + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS)
+    chunksInView.verticalStart = MathUtils.floor(viewBound.y / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER
+    chunksInView.verticalEnd =
+      (MathUtils.floor((viewBound.y + viewBound.height + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_PADDING_RENDER)
+    if (abs(lastZoom - camera.zoom) > WorldRender.SKYLIGHT_ZOOM_THRESHOLD) {
+      lastZoom = camera.zoom
     }
   }
 

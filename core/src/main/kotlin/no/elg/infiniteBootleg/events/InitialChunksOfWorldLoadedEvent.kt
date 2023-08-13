@@ -7,4 +7,4 @@ import no.elg.infiniteBootleg.world.world.World
 /**
  * Event fired when all the initial chunks of the world is loaded.
  */
-data class InitialChunksOfWorldLoadedEvent(val world: World) : AsyncEvent(ThreadType.RENDER)
+data class InitialChunksOfWorldLoadedEvent(val world: World) : AsyncEvent(ThreadType.ASYNC, ThreadType.PHYSICS)

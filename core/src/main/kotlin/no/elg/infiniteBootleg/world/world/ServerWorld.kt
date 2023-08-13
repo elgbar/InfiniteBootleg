@@ -37,7 +37,7 @@ class ServerWorld : World {
     }
   }
 
-  override fun initializeEngine(engine: Engine) {
+  override fun addEntityListeners(engine: Engine) {
     engine.addEntityListener(
       playerFamily,
       object : EntityListener {
