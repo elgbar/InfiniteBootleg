@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
-import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.util.distCubed
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -115,7 +115,7 @@ class BlockLight(
           val cellY = worldY + centerOfSubcell(dy)
           val nx = neighbor.worldX + 0.5
           val ny = neighbor.worldY + 0.5
-          val distCubed = Location.distCubed(cellX, cellY, nx, ny) / (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS)
+          val distCubed = distCubed(cellX, cellY, nx, ny) / (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS)
           val intensity = if (distCubed > 0) 1 - distCubed.toFloat() else 1 + distCubed.toFloat()
 
           val old: Float = tmpLightMap[dx][dy]

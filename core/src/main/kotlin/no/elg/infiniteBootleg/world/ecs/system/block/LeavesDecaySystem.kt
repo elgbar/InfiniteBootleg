@@ -7,8 +7,8 @@ import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.isWithin
+import no.elg.infiniteBootleg.util.relativeCompact
 import no.elg.infiniteBootleg.world.Direction
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent.Companion.chunk
@@ -38,7 +38,7 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
       val loc = stack.removeIndex(0)
       seen.add(loc)
       for (dir in Direction.CARDINAL) {
-        val nextLoc = Location.relativeCompact(loc.decompactLocX(), loc.decompactLocY(), dir)
+        val nextLoc = relativeCompact(loc.decompactLocX(), loc.decompactLocY(), dir)
         if (!isWithin(srcLoc, nextLoc, DESPAWN_LEAVES_RADIUS)) {
           // Block is too far away to be connected
           continue

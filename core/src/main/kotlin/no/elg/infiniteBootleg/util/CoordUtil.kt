@@ -5,7 +5,7 @@ package no.elg.infiniteBootleg.util
 import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
-import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -14,13 +14,6 @@ import org.jetbrains.annotations.Contract
 import java.lang.Short.SIZE
 import kotlin.math.abs
 import kotlin.math.floor
-
-/**
- * @param this@worldToChunk A location in world view
- * @return The location in chunk view
- */
-@Contract("_ -> new")
-inline fun Vector2.worldToChunk(): Location = Location(x.toInt().worldToChunk(), y.toInt().worldToChunk())
 
 /**
  * @param this@worldToChunk The world coordinate to convert
@@ -204,3 +197,9 @@ typealias ChunkCompactLocArray = LongArray
 typealias LocalCompactLocGdxArray = GdxLongArray
 typealias WorldCompactLocGdxArray = GdxLongArray
 typealias ChunkCompactLocGdxArray = GdxLongArray
+
+fun relativeCompact(x: Int, y: Int, dir: Direction): Long = compactLoc(x + dir.dx, y + dir.dy)
+
+fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
+
+fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)

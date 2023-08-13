@@ -45,7 +45,6 @@ import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.Material.AIR
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -159,10 +158,6 @@ fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInform
 
 fun ServerClient.serverBoundChunkRequestPacket(x: Int, y: Int): Packet {
   return serverBoundChunkRequestPacket(Vector2i.newBuilder().setX(x).setY(y).build())
-}
-
-fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Location): Packet {
-  return serverBoundChunkRequestPacket(chunkLocation.toVector2i())
 }
 
 fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Vector2i): Packet {

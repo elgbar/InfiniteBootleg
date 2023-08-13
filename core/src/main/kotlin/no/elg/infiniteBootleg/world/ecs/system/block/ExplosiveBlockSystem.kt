@@ -8,7 +8,7 @@ import ktx.ashley.remove
 import ktx.collections.gdxSetOf
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.WorldCoord
-import no.elg.infiniteBootleg.world.Location
+import no.elg.infiniteBootleg.util.distCubed
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -49,7 +49,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
         val mat = block.materialOrAir()
         val hardness = mat.hardness
         if (mat != Material.AIR && hardness >= 0 && block != null) {
-          val dist = (Location.distCubed(worldX, worldY, block.worldX, block.worldY) * hardness * abs(MathUtils.random.nextGaussian() + ExplosiveComponent.RESISTANCE))
+          val dist = distCubed(worldX, worldY, block.worldX, block.worldY) * hardness * abs(MathUtils.random.nextGaussian() + ExplosiveComponent.RESISTANCE)
           val otherBlockEntity = block.entity
           if (dist < strength * strength && (otherBlockEntity == null || otherBlockEntity.hasNot(ExplosiveComponent.mapper))) {
             destroyed.add(block)

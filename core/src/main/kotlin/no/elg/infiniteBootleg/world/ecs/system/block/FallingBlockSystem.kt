@@ -2,9 +2,9 @@ package no.elg.infiniteBootleg.world.ecs.system.block
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import no.elg.infiniteBootleg.util.relativeCompact
 import no.elg.infiniteBootleg.util.worldCompactToChunk
 import no.elg.infiniteBootleg.world.Direction
-import no.elg.infiniteBootleg.world.Location
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
@@ -25,7 +25,7 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
     val material = entity.materialOrNull ?: return
     val world = entity.world
     val pos = entity.positionComponent
-    val locBelow = Location.relativeCompact(pos.blockX, pos.blockY, Direction.SOUTH)
+    val locBelow = relativeCompact(pos.blockX, pos.blockY, Direction.SOUTH)
 
     if (world.isChunkLoaded(locBelow.worldCompactToChunk()) && world.isAirBlock(locBelow)) {
       val block = world.getRawBlock(pos.blockX, pos.blockY, false) ?: return
