@@ -115,6 +115,12 @@ public class CancellableThreadScheduler {
     return executor.schedule(() -> Gdx.app.postRunnable(runnable), ms, TimeUnit.MILLISECONDS);
   }
 
+  public ScheduledFuture<?> schedulePeriodicSync(
+      long delayMs, long rateMs, @NotNull Runnable runnable) {
+    return executor.scheduleWithFixedDelay(
+        () -> Gdx.app.postRunnable(runnable), delayMs, rateMs, TimeUnit.MILLISECONDS);
+  }
+
   /** Shut down the thread */
   public void shutdown() {
     executor.shutdown();

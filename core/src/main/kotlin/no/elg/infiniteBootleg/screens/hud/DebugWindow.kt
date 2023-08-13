@@ -132,6 +132,16 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         row()
       }
 
+      @Scene2dDsl
+      fun aSeparator() {
+        aRow {
+          separator {
+            it.fillX()
+            it.colspan(4)
+          }
+        }
+      }
+
       aRow {
         toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
         toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
@@ -181,12 +191,9 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           clientWorld.render.camera.zoom = it
         }
       }
-      aRow {
-        separator {
-          it.fillX()
-          it.colspan(4)
-        }
-      }
+
+      aSeparator()
+
       val box2dDebug = world.render.box2DDebugRenderer
 
       aRow {
@@ -203,9 +210,14 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("Box2D draw velocities", box2dDebug::isDrawVelocities, Main.inst().console.exec::drawVelocities)
         toggleableDebugButton("Box2D draw contacts", box2dDebug::isDrawContacts, Main.inst().console.exec::drawContacts)
       }
+      aSeparator()
       aRow {
         toggleableDebugButton("Vsync", Settings::vsync) { Settings.vsync = !Settings.vsync }
         floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1, 0) { Settings.foregroundFPS = it.toInt() }
+        val oneDayInSeconds = 86400f
+        floatSpinner("Save every (sec)", Settings::savePeriodSeconds, 1f, oneDayInSeconds, 1f, 0) {
+          Settings.savePeriodSeconds = it.toLong()
+        }
       }
       pack()
     }

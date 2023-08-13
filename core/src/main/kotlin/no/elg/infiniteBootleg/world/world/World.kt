@@ -107,6 +107,7 @@ import no.elg.infiniteBootleg.world.loader.chunk.ServerClientChunkLoader
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
+import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -189,6 +190,8 @@ abstract class World(
   private var transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient
 
   val tick get() = worldTicker.tickId
+
+  private var saveTask: ScheduledFuture<*>? = null
 
   constructor(protoWorld: ProtoWorld.World) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name)
 
@@ -284,6 +287,13 @@ abstract class World(
         dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
       }
     }
+    updateSavePeriod()
+  }
+
+  fun updateSavePeriod() {
+    saveTask?.cancel(false)
+    val savePeriodMs = Settings.savePeriodSeconds * 1000L
+    saveTask = Main.inst().scheduler.schedulePeriodicSync(savePeriodMs, savePeriodMs, ::save)
   }
 
   /**
@@ -326,6 +336,7 @@ abstract class World(
       return
     }
     val worldFolder = worldFolder ?: return
+    Main.logger().debug("World") { "Starting to save world '$name'" }
     chunksLock.writeLock().lock()
     try {
       val chunkLoader = chunkLoader
@@ -344,6 +355,7 @@ abstract class World(
     } finally {
       chunksLock.writeLock().unlock()
     }
+    Main.logger().debug("World") { "Done saving world '$name'" }
   }
 
   fun toProtobuf(): ProtoWorld.World {
@@ -1074,6 +1086,8 @@ abstract class World(
 
   override fun dispose() {
     clear()
+    saveTask?.cancel(false)
+    saveTask = null
     worldTicker.dispose()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
 

@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg
 
 import com.badlogic.gdx.Gdx
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import java.awt.GraphicsEnvironment
 
@@ -89,9 +90,18 @@ object Settings {
   /**
    * Default value is max hz of displays reasonably to expect
    */
-  var foregroundFPS = 361
+  var foregroundFPS: Int = 361
     set(value) {
       field = value.coerceAtLeast(0)
       Gdx.graphics.setForegroundFPS(field)
+    }
+
+  /**
+   * How often the world should be saved in seconds
+   */
+  var savePeriodSeconds: Long = 15
+    set(value) {
+      field = value.coerceAtLeast(1)
+      Main.inst().world?.updateSavePeriod()
     }
 }
