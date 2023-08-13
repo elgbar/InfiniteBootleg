@@ -126,6 +126,8 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       hide()
       defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
+      val cols = 5
+
       @Scene2dDsl
       fun aRow(theRow: () -> Unit) {
         theRow()
@@ -137,7 +139,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         aRow {
           separator {
             it.fillX()
-            it.colspan(4)
+            it.colspan(cols)
           }
         }
       }
@@ -146,56 +148,47 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
         toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
         toggleableDebugButton("Debug chunk updates", Settings::renderChunkUpdates, Main.inst().console.exec::debChuUpd)
-      }
-
-      aRow {
         toggleableDebugButton("Debug block lighting", Settings::debugBlockLight, Main.inst().console.exec::debBlkLit)
+      }
+      aRow {
         toggleableDebugButton("Debug entity lighting", Settings::debugEntityLight, Main.inst().console.exec::debEntLit)
         toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
-      }
-
-      aRow {
-        val placeCheckGetter = { world.engine.getEntitiesFor(localPlayerFamily).any { it.ignorePlaceableCheck } }
-        toggleableDebugButton("Ignore place check", placeCheckGetter, Main.inst().console.exec::placeCheck)
+        toggleableDebugButton("Ignore place check", { world.engine.getEntitiesFor(localPlayerFamily).any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
         toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
-        toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
       }
-
       aRow {
         val instantBreakGetter: () -> Boolean = {
           world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
         }
-        toggleableDebugButton("Instant break", instantBreakGetter, Main.inst().console.exec::instantBreak)
-      }
 
-      aRow {
         val brushSizeGetter: () -> Number = {
           world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
         }
-        floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, 2, Main.inst().console.exec::brush)
-
         val reachRadiusGetter: () -> Number = {
           world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
+        toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
+        toggleableDebugButton("Instant break", instantBreakGetter, Main.inst().console.exec::instantBreak)
+        floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, 2, Main.inst().console.exec::brush)
         floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, 0, Main.inst().console.exec::interactRadius)
+      }
 
+      aRow {
         val zoomValueGetter: () -> Float = { ClientMain.inst().world?.render?.camera?.zoom ?: 1f }
         floatSlider("Zoom", zoomValueGetter, 0.1f, MAX_ZOOM * 5, 0.1f) {
           val clientWorld = ClientMain.inst().world ?: return@floatSlider
           clientWorld.render.camera.zoom = it
         }
       }
-
       aSeparator()
 
       val box2dDebug = world.render.box2DDebugRenderer
-
       aRow {
         toggleableDebugButton("Debug Box2D", Settings::renderBox2dDebug, Main.inst().console.exec::debBox)
       }
@@ -203,10 +196,9 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("Box2D draw bodies", box2dDebug::isDrawBodies, Main.inst().console.exec::drawBodies)
         toggleableDebugButton("Box2D draw joints", box2dDebug::isDrawJoints, Main.inst().console.exec::drawJoints)
         toggleableDebugButton("Box2D draw AABBs", box2dDebug::isDrawAABBs, Main.inst().console.exec::drawAABBs)
-      }
-
-      aRow {
         toggleableDebugButton("Box2D draw inactiveBodies", box2dDebug::isDrawInactiveBodies, Main.inst().console.exec::drawInactiveBodies)
+      }
+      aRow {
         toggleableDebugButton("Box2D draw velocities", box2dDebug::isDrawVelocities, Main.inst().console.exec::drawVelocities)
         toggleableDebugButton("Box2D draw contacts", box2dDebug::isDrawContacts, Main.inst().console.exec::drawContacts)
       }
