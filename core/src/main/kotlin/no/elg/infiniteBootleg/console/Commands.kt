@@ -23,7 +23,6 @@ import no.elg.infiniteBootleg.server.sendDuplexPacket
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ReflectionUtil
-import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.WorldTime
@@ -298,7 +297,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @CmdArgNames("x", "y")
   @ClientsideOnly
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
-  fun tp(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
+  fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
     val entities = clientWorld.engine.getEntitiesFor(localPlayerFamily)
 
