@@ -24,7 +24,7 @@ data class LocallyControlledComponent(
   var instantBreak: Boolean = INITIAL_INSTANT_BREAK
 ) : EntitySavableComponent {
 
-  val breakingProgress = ProgressHandler(1f, Interpolation.linear, 0f, 1f)
+  val breakingProgress = ProgressHandler(0.5f, Interpolation.linear, 0f, 1f)
 
   val isBreaking get() = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT)
 
