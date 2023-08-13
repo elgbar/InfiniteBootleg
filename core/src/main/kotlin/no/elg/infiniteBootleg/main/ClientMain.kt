@@ -103,7 +103,6 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
 
     Runtime.getRuntime().addShutdownHook(
       Thread {
-        scheduler.shutdown()
         if (isAuthoritative) {
           world?.save()
           world?.dispose()
@@ -112,6 +111,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
             ctx.writeAndFlush(serverBoundClientDisconnectPacket("Client shutdown"))
           }
         }
+        scheduler.shutdown()
       }
     )
   }
@@ -140,9 +140,9 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   override fun dispose() {
     super.dispose()
     if (Settings.client) {
+      screen.dispose()
       screenRenderer.dispose()
       VisUI.dispose()
-      screen.dispose()
     }
   }
 
@@ -168,7 +168,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     const val CLEAR_COLOR_B = 1f
     const val CLEAR_COLOR_A = 1f
 
-    protected lateinit var instField: ClientMain
+    private lateinit var instField: ClientMain
     fun inst(): ClientMain {
       if (Settings.client) {
         return instField
