@@ -168,9 +168,9 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return
   }
-  Main.logger().debug("handleSpawnEntity") { "Spawning a ${spawnEntity.entity.type}" }
+  Main.logger().debug("handleSpawnEntity") { "Spawning a ${spawnEntity.entity.entityType}" }
 
-  when (spawnEntity.entity.type) {
+  when (spawnEntity.entity.entityType) {
     PLAYER -> {
       val controlled = uuid == spawnEntity.uuid
       val future = world.engine.createMPClientPlayerEntity(world, spawnEntity.entity, controlled)
@@ -181,7 +181,7 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
 
     FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, spawnEntity.entity)
 
-    else -> Main.logger().error("Cannot spawn a ${spawnEntity.entity.type} yet")
+    else -> Main.logger().error("Cannot spawn a ${spawnEntity.entity.entityType} yet")
   }
 }
 
@@ -218,8 +218,8 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
     loadFromProtoWorld(protoWorld)
   }
 
-  if (startGame.controlling.type != PLAYER) {
-    ctx.fatal("Can only control a player, got ${startGame.controlling.type}")
+  if (startGame.controlling.entityType != PLAYER) {
+    ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
   } else {
     this.controllingEntity = startGame.controlling
     Main.logger().debug("LOGIN", "World loaded, player loaded, waiting for chunks")

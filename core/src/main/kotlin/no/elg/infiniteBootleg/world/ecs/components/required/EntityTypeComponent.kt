@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 data class EntityTypeComponent(val entityType: EntityType) : EntitySavableComponent {
 
   override fun EntityKt.Dsl.save() {
-    type = entityType
+    entityType = this@EntityTypeComponent.entityType
   }
 
   companion object : EntityLoadableMapper<EntityTypeComponent>() {
@@ -33,7 +33,7 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
       }
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): EntityTypeComponent = with(EntityTypeComponent(protoEntity.type))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): EntityTypeComponent = with(EntityTypeComponent(protoEntity.entityType))
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = true
   }

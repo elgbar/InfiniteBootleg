@@ -55,7 +55,7 @@ message ChunkColumn {
 }
 
 message Entity {
-  EntityType type = 1;
+  EntityType entityType = 1;
   Vector2f position = 2;
   string uuid = 3;
   string worldUUID = 4;
@@ -135,7 +135,7 @@ message Entity {
   }
 
   message Box2D {
-    BodyType type = 1;
+    BodyType bodyType = 1;
 
     enum BodyType {
       PLAYER = 0;

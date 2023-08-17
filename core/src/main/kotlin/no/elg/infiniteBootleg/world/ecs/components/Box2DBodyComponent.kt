@@ -76,11 +76,11 @@ class Box2DBodyComponent(
       val world = entity.world
       val pos = entity.position
       val vel = entity.velocityOrZero
-      when (protoEntity.box2D.type) {
+      when (protoEntity.box2D.bodyType) {
         PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, CONTROLLED_CLIENT_PLAYER_FAMILIES, state)
         FALLING_BLOCK -> createFallingBlockBodyComponent(world, pos.x, pos.y, vel.x, vel.y, state)
         DOOR -> createDoorBodyComponent(world, pos.x.toInt(), pos.y.toInt(), state)
-        else -> error("Unknown body type ${protoEntity.box2D.type}")
+        else -> error("Unknown body type ${protoEntity.box2D.bodyType}")
       }
       return null
     }
@@ -90,7 +90,7 @@ class Box2DBodyComponent(
 
   override fun EntityKt.Dsl.save() {
     box2D = box2D {
-      type = this@Box2DBodyComponent.type
+      bodyType = this@Box2DBodyComponent.type
     }
   }
 }
