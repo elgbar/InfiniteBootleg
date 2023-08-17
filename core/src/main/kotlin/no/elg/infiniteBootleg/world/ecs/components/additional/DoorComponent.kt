@@ -5,26 +5,28 @@ import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.EntityKt.door
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker
-import no.elg.infiniteBootleg.world.ecs.api.AdditionalComponentsSavableComponent
-import no.elg.infiniteBootleg.world.ecs.api.StatelessAdditionalComponentsLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
-class DoorComponent : AdditionalComponentsSavableComponent {
+class DoorComponent : EntitySavableComponent {
 
   val contacts = ObjectContactTracker<Entity>()
   val closed: Boolean get() = contacts.isEmpty
 
-  companion object : StatelessAdditionalComponentsLoadableMapper<DoorComponent>() {
+  companion object : EntityLoadableMapper<DoorComponent>() {
     var Entity.doorComponent by propertyFor(mapper)
     var Entity.doorComponentOrNull by optionalPropertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.AdditionalComponents): DoorComponent = with(DoorComponent())
-    override fun ProtoWorld.Entity.AdditionalComponents.checkShouldLoad(): Boolean = hasDoor()
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): DoorComponent = with(DoorComponent())
+    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasDoor()
+    val PROTO_DOOR = ProtoWorld.Entity.Door.getDefaultInstance()
   }
 
-  override fun EntityKt.AdditionalComponentsKt.Dsl.save() {
-    door = true
+  override fun EntityKt.Dsl.save() {
+    door = PROTO_DOOR
   }
 }

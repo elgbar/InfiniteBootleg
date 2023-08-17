@@ -85,7 +85,7 @@ class Box2DBodyComponent(
       return null
     }
 
-    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasBox2D()
+    override fun ProtoWorld.Entity.checkShouldLoad(state: () -> (Entity) -> Unit): Boolean = hasBox2D()
   }
 
   override fun EntityKt.Dsl.save() {

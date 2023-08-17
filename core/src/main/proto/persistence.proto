@@ -58,9 +58,9 @@ message Entity {
   EntityType type = 1;
   Vector2f position = 2;
   string uuid = 3;
-  optional string name = 4;
+  string worldUUID = 4;
   optional Tags tags = 5;
-  optional AdditionalComponents additionalComponents = 6;
+  optional string name = 6;
 
   optional Killable killable = 16;
   optional Material material = 17;
@@ -73,6 +73,12 @@ message Entity {
   optional SelectedItem selectedItem = 24;
   optional Box2D box2d = 25;
   optional LocallyControlled locallyControlled = 26;
+  optional ChunkBased chunk = 27;
+  optional OccupyingBlocks occupyingBlocks = 28;
+  optional Grounded grounded = 29;
+  optional Door door = 30;
+  optional InputEvent inputEvent = 31;
+  optional PhysicsEvent physicsEvent = 32;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -88,15 +94,7 @@ message Entity {
     optional bool ignorePlaceableCheck = 4;
     optional bool leafDecay = 5;
     optional bool canBeOutOfBounds = 6;
-  }
-
-  message AdditionalComponents {
-    optional bool chunk = 1;
-    optional bool occupyingBlocks = 3;
-    optional bool grounded = 4;
-    optional bool door = 5;
-    optional bool inputEvent = 6;
-    optional bool physicsEvent = 7;
+    optional bool transient = 7;
   }
 
   message Killable {
@@ -152,5 +150,10 @@ message Entity {
     float interactRadius = 3;
   }
 
-  message Chunk {}
+  message ChunkBased {}
+  message OccupyingBlocks {}
+  message Grounded {}
+  message Door {}
+  message InputEvent {}
+  message PhysicsEvent {}
 }

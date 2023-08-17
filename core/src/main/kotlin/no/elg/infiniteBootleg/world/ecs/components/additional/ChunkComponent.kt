@@ -12,13 +12,13 @@ import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.ecs.api.AdditionalComponentsLoadableMapper
-import no.elg.infiniteBootleg.world.ecs.api.AdditionalComponentsSavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.StatefulEntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 
-class ChunkComponent(var chunk: Chunk) : AdditionalComponentsSavableComponent {
+class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
 
-  companion object : AdditionalComponentsLoadableMapper<ChunkComponent, Chunk>() {
+  companion object : StatefulEntityLoadableMapper<ChunkComponent, Chunk>() {
     /**
      * Chunk might be disposed, make sure to check it when calling this
      */
@@ -32,11 +32,12 @@ class ChunkComponent(var chunk: Chunk) : AdditionalComponentsSavableComponent {
         return chunk.getBlock(worldX.toInt().chunkOffset(), worldY.toInt().chunkOffset())
       }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.AdditionalComponents, state: Chunk): ChunkComponent = with(ChunkComponent(state))
-    override fun ProtoWorld.Entity.AdditionalComponents.checkShouldLoad(): Boolean = hasChunk()
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: Chunk): ChunkComponent = with(ChunkComponent(state))
+    override fun ProtoWorld.Entity.checkShouldLoad(state: () -> Chunk): Boolean = hasChunk()
+    val PROTO_CHUNK_BASED = ProtoWorld.Entity.ChunkBased.getDefaultInstance()
   }
 
-  override fun EntityKt.AdditionalComponentsKt.Dsl.save() {
-    chunk = true
+  override fun EntityKt.Dsl.save() {
+    chunk = PROTO_CHUNK_BASED
   }
 }

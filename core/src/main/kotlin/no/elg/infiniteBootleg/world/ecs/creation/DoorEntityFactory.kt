@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.world.World
 
 const val DOOR_WIDTH: Int = 2
@@ -21,7 +21,7 @@ fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: WorldCoord,
     with(TextureRegionComponent(KAssets.doorClosedTexture))
     // This entity will handle input events
     with<DoorComponent>()
-    with<PhysicsEventQueue>()
+    with<PhysicsEventQueueComponent>()
     with<OccupyingBlocksComponent>()
 
     createDoorBodyComponent(world, worldX, worldY)

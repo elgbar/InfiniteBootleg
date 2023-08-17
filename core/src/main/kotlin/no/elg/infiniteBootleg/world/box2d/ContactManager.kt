@@ -6,8 +6,8 @@ import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.ContactImpulse
 import com.badlogic.gdx.physics.box2d.ContactListener
 import com.badlogic.gdx.physics.box2d.Manifold
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent.Companion.queuePhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.queuePhysicsEvent
 
 class ContactManager(val engine: Engine) : ContactListener {
 

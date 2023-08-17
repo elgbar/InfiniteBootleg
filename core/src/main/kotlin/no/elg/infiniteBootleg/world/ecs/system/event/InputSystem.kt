@@ -9,15 +9,15 @@ import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.additional.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 
-object InputSystem : EventSystem<InputEvent, InputEventQueue>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueue.mapper) {
+object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueueComponent.mapper) {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     val worldEntity = WorldEntity(entity.world, entity)

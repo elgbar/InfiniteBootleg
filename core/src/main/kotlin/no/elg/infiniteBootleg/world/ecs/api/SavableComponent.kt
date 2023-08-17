@@ -8,5 +8,4 @@ sealed interface SavableComponent<DSL> : Component {
 }
 
 interface TagSavableComponent : SavableComponent<EntityKt.TagsKt.Dsl>
-interface AdditionalComponentsSavableComponent : SavableComponent<EntityKt.AdditionalComponentsKt.Dsl>
 interface EntitySavableComponent : SavableComponent<EntityKt.Dsl>

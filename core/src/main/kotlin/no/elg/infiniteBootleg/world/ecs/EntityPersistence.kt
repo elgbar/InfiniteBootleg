@@ -1,11 +1,9 @@
 package no.elg.infiniteBootleg.world.ecs
 
-import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.protobuf.EntityKt.additionalComponents
 import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.entity
@@ -20,6 +18,8 @@ import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent.Companion.killableComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
@@ -38,14 +38,12 @@ import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent.Companion.doorComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent.Companion.groundedComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.additional.InputEventQueueComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.InputEventQueueComponent.Companion.inputEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue.Companion.inputEventQueueOrNull
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue.Companion.physicsEventQueueOrNull
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -66,16 +64,27 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheckComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecayComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.checkShouldLoad as box2DBodyComponentCheckShouldLoad
 
-fun Entity.save(): ProtoWorld.Entity {
+fun Entity.save(ignoreTransient: Boolean = false): ProtoWorld.Entity? {
+  if (!ignoreTransient && this.transient) return null
   return entity {
     this@save.entityTypeComponent.apply { save() }
     this@save.idComponent.apply { save() }
     this@save.positionComponent.apply { save() }
     this@save.worldComponent.apply { save() }
+
+    tags = tags {
+      this@save.flyingComponentOrNull?.apply { save() }
+      this@save.followedByCameraComponentOrNull?.apply { save() }
+      this@save.gravityAffectedComponentOrNull?.apply { save() }
+      this@save.ignorePlaceableCheckComponentOrNull?.apply { save() }
+      this@save.leafDecayComponentOrNull?.apply { save() }
+      this@save.canBeOutOfBoundsComponentOrNull?.apply { save() }
+    }
 
     this@save.box2dOrNull?.apply { save() }
     this@save.explosiveComponentOrNull?.apply { save() }
@@ -88,37 +97,43 @@ fun Entity.save(): ProtoWorld.Entity {
     this@save.textureRegionComponentOrNull?.apply { save() }
     this@save.velocityComponentOrNull?.apply { save() }
     this@save.locallyControlledComponentOrNull?.apply { save() }
-
-    tags = tags {
-      this@save.flyingComponentOrNull?.apply { save() }
-      this@save.followedByCameraComponentOrNull?.apply { save() }
-      this@save.gravityAffectedComponentOrNull?.apply { save() }
-      this@save.ignorePlaceableCheckComponentOrNull?.apply { save() }
-      this@save.leafDecayComponentOrNull?.apply { save() }
-      this@save.canBeOutOfBoundsComponentOrNull?.apply { save() }
-    }
-
-    additionalComponents = additionalComponents {
-      this@save.chunkComponentOrNull?.apply { save() }
-      this@save.doorComponentOrNull?.apply { save() }
-      this@save.groundedComponentOrNull?.apply { save() }
-      this@save.occupyingBlocksComponentOrNull?.apply { save() }
-      this@save.inputEventQueueOrNull?.apply { save() }
-      this@save.physicsEventQueueOrNull?.apply { save() }
-    }
+    this@save.chunkComponentOrNull?.apply { save() }
+    this@save.doorComponentOrNull?.apply { save() }
+    this@save.groundedComponentOrNull?.apply { save() }
+    this@save.occupyingBlocksComponentOrNull?.apply { save() }
+    this@save.inputEventQueueOrNull?.apply { save() }
+    this@save.physicsEventQueueOrNull?.apply { save() }
   }
 }
 
-fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = null): CompletableFuture<Entity> {
+/**
+ * Load an entity from a proto entity
+ *
+ * @param protoEntity The proto entity to load from
+ * @param chunk The chunk this entity is in, if any, will be ignored if the `protoEntity` does not have a chunk field
+ * @param configure A function to configure the entity after it has been loaded, but before it's added to the engine. Useful to add transient components
+ */
+fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: Entity.() -> Unit = {}): CompletableFuture<Entity> {
+  require(chunk == null || this === chunk.world) { "Chunk world does not match entity world" }
   if (Settings.debug) {
     Main.logger().debug("PB Entity", TextFormat.printer().shortDebugString(protoEntity))
   }
-  return futureEntity { future ->
+  val world = this
+  return engine.futureEntity { future ->
     // Required components
     EntityTypeComponent.load(this, protoEntity)
     IdComponent.load(this, protoEntity)
     PositionComponent.load(this, protoEntity)
     WorldComponent.load(this, protoEntity) { world }
+
+    protoEntity.tagsOrNull?.let {
+      FlyingTag.load(this, it)
+      FollowedByCameraTag.load(this, it)
+      GravityAffectedTag.load(this, it)
+      IgnorePlaceableCheckTag.load(this, it)
+      LeafDecayTag.load(this, it)
+      CanBeOutOfBoundsTag.load(this, it)
+    }
 
     ExplosiveComponent.load(this, protoEntity)
     InventoryComponent.load(this, protoEntity)
@@ -130,30 +145,24 @@ fun Engine.load(protoEntity: ProtoWorld.Entity, world: World, chunk: Chunk? = nu
     TextureRegionComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)
     LocallyControlledComponent.load(this, protoEntity)
-
-    protoEntity.tagsOrNull?.let {
-      FlyingTag.load(this, it)
-      FollowedByCameraTag.load(this, it)
-      GravityAffectedTag.load(this, it)
-      IgnorePlaceableCheckTag.load(this, it)
-      LeafDecayTag.load(this, it)
-      CanBeOutOfBoundsTag.load(this, it)
-    }
-
-    protoEntity.additionalComponents?.let {
-      ChunkComponent.load(this, it) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
-      DoorComponent.load(this, it)
-      GroundedComponent.load(this, it)
-      OccupyingBlocksComponent.load(this, it)
-      PhysicsEventQueue.load(this, it)
-      InputEventQueue.load(this, it)
-    }
+    ChunkComponent.load(this, protoEntity) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
+    DoorComponent.load(this, protoEntity)
+    GroundedComponent.load(this, protoEntity)
+    OccupyingBlocksComponent.load(this, protoEntity)
+    PhysicsEventQueueComponent.load(this, protoEntity)
+    InputEventQueueComponent.load(this, protoEntity)
 
     // Load box2d body last, as it depends on other components
-    if (protoEntity.box2DBodyComponentCheckShouldLoad()) {
-      Box2DBodyComponent.load(this, protoEntity) { { future.complete(Unit) } }
+    val futureCompleter: () -> (Entity) -> Unit = {
+      {
+        configure(it)
+        future.complete(Unit)
+      }
+    }
+    if (protoEntity.box2DBodyComponentCheckShouldLoad(futureCompleter)) {
+      Box2DBodyComponent.load(this, protoEntity, futureCompleter)
     } else {
-      future.complete(Unit)
+      futureCompleter()(entity)
     }
   }
 }

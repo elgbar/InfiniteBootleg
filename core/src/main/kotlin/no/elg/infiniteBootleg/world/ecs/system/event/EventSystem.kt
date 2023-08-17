@@ -6,10 +6,10 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EVENT_HANDLING
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEvent
-import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
 import kotlin.reflect.KClass
 
-abstract class EventSystem<T : ECSEvent, Q : ECSEventQueue<T>>(
+abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(
   family: Family,
   eventType: KClass<T>,
   private val queueMapper: ComponentMapper<out Q>

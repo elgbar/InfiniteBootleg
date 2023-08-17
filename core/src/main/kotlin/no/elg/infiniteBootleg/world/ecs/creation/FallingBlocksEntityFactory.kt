@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecay
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
@@ -52,7 +52,7 @@ fun Engine.createFallingBlockStandaloneEntity(
     with(TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")))
 
     // This entity will handle input events
-    with<PhysicsEventQueue>()
+    with<PhysicsEventQueueComponent>()
     with(MaterialComponent(material))
     with<OccupyingBlocksComponent>()
     createFallingBlockBodyComponent(world, worldX, worldY, dx, dy) {

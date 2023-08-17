@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
+import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
@@ -20,10 +21,9 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.additional.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -103,8 +103,8 @@ val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).get()
 val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).get()
 val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).get()
 
-val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueue::class).get()
-val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, PhysicsEventQueue::class).get()
+val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).get()
+val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, PhysicsEventQueueComponent::class).get()
 
 fun KClass<out Component>.toFamily(): Family = allOf(this).get()
 
