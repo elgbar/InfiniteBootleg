@@ -11,9 +11,9 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
-data class KillableComponent(val maxHealth: Int = 10, val health: Int = maxHealth) : EntitySavableComponent {
+data class KillableComponent(val maxHealth: Int, val health: Int) : EntitySavableComponent {
 
-  val dead: Boolean = health <= 0
+  val killed: Boolean = health <= 0
   val alive: Boolean = health > 0
 
   override fun EntityKt.Dsl.save() {
@@ -24,7 +24,10 @@ data class KillableComponent(val maxHealth: Int = 10, val health: Int = maxHealt
   }
 
   companion object : EntityLoadableMapper<KillableComponent>() {
-    var Entity.killableComponent by propertyFor(mapper)
+
+    const val DEFAULT_MAX_HEALTH = 100
+
+    val Entity.killableComponent by propertyFor(mapper)
     var Entity.killableComponentOrNull by optionalPropertyFor(mapper)
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =

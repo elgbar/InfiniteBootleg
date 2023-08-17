@@ -22,12 +22,23 @@ import kotlin.contracts.contract
  * @throws [CreateComponentException] if the engine was unable to create the component
  * @see [create]
  */
-inline fun <reified T : Component> EngineEntity.with(component: T, configure: (@AshleyDsl T).() -> Unit = {}): T {
+inline fun <reified T : Component> Entity.with(component: T, configure: (@AshleyDsl T).() -> Unit = {}): T {
   contract { callsInPlace(configure, InvocationKind.EXACTLY_ONCE) }
   component.configure()
-  entity.add(component)
+  add(component)
   return component
 }
+
+/**
+ * Get or creates an instance of the component [T] and adds it to this [entity][EngineEntity].
+ *
+ * @param T the [Component] type to get or create.
+ * @param configure inlined function with [T] as the receiver to allow additional configuration of the [Component].
+ * @return the created ƒ[Component].
+ * @throws [CreateComponentException] if the engine was unable to create the component
+ * @see [create]
+ */
+inline fun <reified T : Component> EngineEntity.with(component: T, configure: (@AshleyDsl T).() -> Unit = {}): T = entity.with(component, configure)
 
 /**
  * Create and add an [Entity] to the [Engine].

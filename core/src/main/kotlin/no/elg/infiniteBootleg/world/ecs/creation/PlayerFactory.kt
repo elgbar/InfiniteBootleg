@@ -1,47 +1,43 @@
 package no.elg.infiniteBootleg.world.ecs.creation
 
-import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import ktx.ashley.EngineEntity
-import ktx.ashley.with
 import no.elg.infiniteBootleg.KAssets
-import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
+import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
+import no.elg.infiniteBootleg.protobuf.EntityKt.killable
+import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
+import no.elg.infiniteBootleg.protobuf.EntityKt.lookDirection
+import no.elg.infiniteBootleg.protobuf.EntityKt.selectedItem
+import no.elg.infiniteBootleg.protobuf.EntityKt.tags
+import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.killableOrNull
-import no.elg.infiniteBootleg.server.SharedInformation
-import no.elg.infiniteBootleg.util.futureEntity
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
+import no.elg.infiniteBootleg.protobuf.entity
+import no.elg.infiniteBootleg.protobuf.vector2f
+import no.elg.infiniteBootleg.protobuf.vector2i
+import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
+import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
+import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
-import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
-import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent
-import no.elg.infiniteBootleg.world.ecs.components.NameComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
-import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
-import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.KillableComponent.Companion.DEFAULT_MAX_HEALTH
+import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.asProto
 import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.LocallyControlledComponent
-import no.elg.infiniteBootleg.world.ecs.components.events.InputEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEventQueue
-import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag
-import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
-import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag
+import no.elg.infiniteBootleg.world.ecs.components.additional.InputEventQueueComponent.Companion.PROTO_INPUT_EVENT
+import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent.Companion.PROTO_PHYSICS_EVENT
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.followEntityFamily
+import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
-import no.elg.infiniteBootleg.world.world.ClientWorld
-import no.elg.infiniteBootleg.world.world.ServerClientWorld
-import no.elg.infiniteBootleg.world.world.ServerWorld
-import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -71,154 +67,87 @@ val CONTROLLED_CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   controlledEntityWithInputEventFamily to "controlledEntityWithInputEventFamily"
 )
 
-private fun EngineEntity.addCommonPlayerComponents(
+private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
+  id: String,
   world: World,
   worldX: Float,
   worldY: Float,
   dx: Float,
   dy: Float,
   name: String,
-  id: String,
-  killableComponent: KillableComponent?,
-  wantedFamilies: Array<Pair<Family, String>>,
-  future: CompletableFuture<Unit>,
-  whenReady: (Entity) -> Unit = {}
+  controlled: Boolean
 ) {
-  withRequiredComponents(ProtoWorld.Entity.EntityType.PLAYER, world, worldX, worldY, id)
-
-  // BASIC_DYNAMIC_ENTITY_ARRAY
-  with(VelocityComponent(dx, dy))
-  with<GroundedComponent>()
-  with<TransientTag>()
-  with<CanBeOutOfBoundsTag>()
-
-  // player family
-  with(NameComponent(name))
-
-  with(killableComponent ?: KillableComponent())
-  with(
-    InventoryComponent(Material.entries.size).also {
-      for (material in Material.entries) {
-        it += Item(material, 1_000_000u)
+  withRequiredComponents(EntityType.PLAYER, world, worldX, worldY, id)
+  tags = tags {
+    transient = true
+    canBeOutOfBounds = true
+    followedByCamera = controlled
+  }
+  velocity = vector2f {
+    x = dx
+    y = dy
+  }
+  this.name = name
+  grounded = GroundedComponent.PROTO_GROUNDED
+  killable = killable {
+    health = DEFAULT_MAX_HEALTH
+    maxHealth = DEFAULT_MAX_HEALTH
+  }
+  inventory = inventory {
+    maxSize = Material.entries.size
+    items += Material.entries.map {
+      EntityKt.InventoryKt.item {
+        material = it.asProto()
+        stock = 1_000_000
+        maxStock = 1_000_000
       }
     }
-  )
-  createPlayerBodyComponent(world, worldX, worldY, dx, dy, wantedFamilies) {
-    whenReady(it)
-    future.complete(Unit)
+  }
+  box2D = box2D {
+    bodyType = ProtoWorld.Entity.Box2D.BodyType.PLAYER
   }
 }
 
-fun EngineEntity.addCommonClientPlayerComponents(controlled: Boolean) {
+private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolean) {
   if (controlled) {
-    // This entity will handle input events
-    with(LocallyControlledComponent())
-    with<FollowedByCameraTag>()
-    with<InputEventQueue>()
-    with<SelectedInventoryItemComponent>()
-  }
+    inputEvent = PROTO_INPUT_EVENT
+    locallyControlled = locallyControlled {
+      instantBreak = INITIAL_INSTANT_BREAK
+      brushRadius = INITIAL_BRUSH_SIZE
+      interactRadius = INITIAL_INTERACT_RADIUS
+    }
 
-  with<PhysicsEventQueue>()
-  with<LookDirectionComponent>()
-  with(TextureRegionComponent(KAssets.playerTexture))
+    selectedItem = selectedItem {
+      material = Material.AIR.asProto()
+    }
+  }
+  physicsEvent = PROTO_PHYSICS_EVENT
+  lookDirection = lookDirection {
+    direction = vector2i {
+      x = 0
+      y = 0
+    }
+  }
+  texture = texture {
+    texture = KAssets.playerTexture.name
+  }
 }
 
-fun Engine.createMPServerPlayerEntity(world: ServerWorld, protoEntity: ProtoWorld.Entity, sharedInformation: SharedInformation): CompletableFuture<Entity> {
-  if (!protoEntity.hasPlayer()) return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
-  val living = protoEntity.killableOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
-  return createMPServerPlayerEntity(
-    world,
-    protoEntity.position.x,
-    protoEntity.position.y,
-    protoEntity.velocity.x,
-    protoEntity.velocity.y,
-    protoEntity.name,
-    protoEntity.uuid,
-    sharedInformation,
-    KillableComponent(maxHealth = living.maxHealth, health = living.health)
+fun World.createNewPlayer(): CompletableFuture<Entity> = load(createNewProtoPlayer())
+
+fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, configure: EntityKt.Dsl.() -> Unit = {}): ProtoWorld.Entity = entity {
+  val world = this@createNewProtoPlayer
+  val (spawnX, spawnY) = world.spawn
+  addCommonClientPlayerComponentsProto(controlled)
+  addCommonPlayerComponentsProto(
+    id = UUID.randomUUID().toString(),
+    world = world,
+    worldX = spawnX.toFloat(),
+    worldY = spawnY.toFloat(),
+    dx = 0f,
+    dy = 0f,
+    name = "Player",
+    controlled = controlled
   )
+  configure()
 }
-
-fun Engine.createMPClientPlayerEntity(world: ServerClientWorld, protoEntity: ProtoWorld.Entity, controlled: Boolean): CompletableFuture<Entity> {
-  if (!protoEntity.hasPlayer()) return CompletableFuture.failedFuture(IllegalStateException("Failed to find player component in entity protobuf"))
-  val living = protoEntity.killableOrNull ?: return CompletableFuture.failedFuture(IllegalStateException("Failed to find living component in entity protobuf"))
-  return createMPClientPlayerEntity(
-    world,
-    protoEntity.position.x,
-    protoEntity.position.y,
-    protoEntity.velocity.x,
-    protoEntity.velocity.y,
-    protoEntity.name,
-    protoEntity.uuid,
-    controlled,
-    KillableComponent(maxHealth = living.maxHealth, health = living.health)
-  )
-}
-
-fun Engine.createMPServerPlayerEntity(
-  world: ServerWorld,
-  worldX: Number,
-  worldY: Number,
-  dx: Float,
-  dy: Float,
-  name: String,
-  id: String,
-  sharedInformation: SharedInformation,
-  killableComponent: KillableComponent?
-): CompletableFuture<Entity> {
-  return if (Main.isServer) {
-    futureEntity { future ->
-      with(SharedInformationComponent(sharedInformation))
-      addCommonPlayerComponents(world, worldX.toFloat(), worldY.toFloat(), dx, dy, name, id, killableComponent, COMMON_PLAYER_FAMILIES, future)
-    }
-  } else {
-    CompletableFuture.failedFuture(IllegalStateException("Cannot create a server player when this is not a server instance"))
-  }
-}
-
-fun Engine.createMPClientPlayerEntity(
-  world: ClientWorld,
-  worldX: Float,
-  worldY: Float,
-  dx: Float,
-  dy: Float,
-  name: String,
-  id: String,
-  controlled: Boolean,
-  killableComponent: KillableComponent?
-): CompletableFuture<Entity> =
-  futureEntity { future ->
-    addCommonClientPlayerComponents(controlled)
-    addCommonPlayerComponents(world, worldX, worldY, dx, dy, name, id, killableComponent, if (controlled) CONTROLLED_CLIENT_PLAYER_FAMILIES else CLIENT_PLAYER_FAMILIES, future) {
-      it.box2d.disableGravity()
-    }
-  }
-
-fun Engine.createSPPlayerEntity(
-  world: SinglePlayerWorld,
-  worldX: Number,
-  worldY: Number,
-  dx: Float = 0f,
-  dy: Float = 0f,
-  name: String = "Player",
-  id: String? = null
-): CompletableFuture<Entity> =
-  if (Main.isSingleplayer) {
-    futureEntity { future ->
-      addCommonClientPlayerComponents(true)
-      addCommonPlayerComponents(
-        world,
-        worldX.toFloat(),
-        worldY.toFloat() + PLAYER_HEIGHT,
-        dx,
-        dy,
-        name,
-        id ?: UUID.randomUUID().toString(),
-        null,
-        CONTROLLED_CLIENT_PLAYER_FAMILIES,
-        future
-      )
-    }
-  } else {
-    CompletableFuture.failedFuture(IllegalStateException("Cannot create a singleplayer player when this is not a singleplayer instance"))
-  }

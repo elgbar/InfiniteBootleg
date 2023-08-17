@@ -70,10 +70,9 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
-import no.elg.infiniteBootleg.world.ecs.creation.createSPPlayerEntity
+import no.elg.infiniteBootleg.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.world.ecs.load
@@ -315,16 +314,17 @@ abstract class World(
     }
 
     return if (this is SinglePlayerWorld && protoWorld.hasPlayer()) {
-      engine.load(protoWorld.player, this).thenApply {
+      val playerPosition = protoWorld.player.position
+      (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
+      this.load(protoWorld.player).thenApply {
         it.transient = true
-        (render as? ClientWorldRender)?.lookAt(it.position.x, it.position.y)
         render.chunkLocationsInView.forEach(::loadChunk)
         dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
       }
       true
     } else {
       if (this is SinglePlayerWorld) {
-        engine.createSPPlayerEntity(this, spawn.decompactLocX(), spawn.decompactLocY())
+        this.createNewPlayer()
         Main.logger().debug("World", "Spawning new singleplayer player")
       }
       false

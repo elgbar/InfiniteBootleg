@@ -574,7 +574,7 @@ class ChunkImpl(
       }
       blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
       queryEntities { entities ->
-        this.entities += entities.filterNot { it.transient }.map { it.save() }
+        this.entities += entities.filterNot { it.transient }.mapNotNull { it.save() }
         future.complete(this._build())
       }
     }
@@ -619,7 +619,7 @@ class ChunkImpl(
       }
     }
     for (protoEntity in protoChunk.entitiesList) {
-      world.engine.load(protoEntity, world)
+      world.load(protoEntity)
     }
     return true
   }

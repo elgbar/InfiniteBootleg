@@ -7,11 +7,12 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
-import no.elg.infiniteBootleg.util.decompactLocX
-import no.elg.infiniteBootleg.util.decompactLocY
+import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.creation.createMPServerPlayerEntity
+import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
+import no.elg.infiniteBootleg.world.ecs.creation.createNewProtoPlayer
+import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.generator.chunk.EmptyChunkGenerator
@@ -41,7 +42,9 @@ object WorldLoader {
       Main.logger().debug("SERVER", "Trying to load persisted player profile for $uuid")
       try {
         val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
-        val future = world.engine.createMPServerPlayerEntity(world, proto, sharedInformation)
+        val future = world.load(proto) {
+          with(SharedInformationComponent(sharedInformation))
+        }
         future.thenAccept {
           Main.logger().debug("SERVER", "Loaded persisted player profile for $uuid")
         }
@@ -52,8 +55,13 @@ object WorldLoader {
       }
     }
     Main.logger().debug("SERVER", "Creating fresh player profile for $uuid")
-    val spawn = world.spawn
-    val future = world.engine.createMPServerPlayerEntity(world, spawn.decompactLocX(), spawn.decompactLocY(), 0f, 0f, username, uuid, sharedInformation, null)
+    val newProtoPlayer = world.createNewProtoPlayer {
+      this.uuid = uuid
+      this.name = username
+    }
+    val future = world.load(newProtoPlayer) {
+      with(SharedInformationComponent(sharedInformation))
+    }
     future.thenAccept {
       saveServerPlayer(it)
       Main.logger().debug("SERVER", "Created persisted player profile for $uuid")
@@ -62,13 +70,12 @@ object WorldLoader {
   }
 
   private fun saveServerPlayer(player: Entity) {
-    val fileHandle = getServerPlayerFile(player.world, player.id)
-    if (fileHandle != null) {
-      try {
-        fileHandle.writeBytes(player.save().toByteArray(), false)
-      } catch (e: Exception) {
-        e.printStackTrace()
-      }
+    val protoPlayer = player.save() ?: return
+    val fileHandle = getServerPlayerFile(player.world, player.id) ?: return
+    try {
+      fileHandle.writeBytes(protoPlayer.toByteArray(), false)
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
   }
 

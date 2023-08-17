@@ -158,7 +158,7 @@ enum class Material(
   fun createBlock(world: World, chunk: Chunk, localX: LocalCoord, localY: LocalCoord, protoEntity: ProtoWorld.Entity? = null): Block {
     Preconditions.checkArgument(isBlock)
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
-      protoEntity?.let { world.engine.load(it, world, chunk) }
+      protoEntity?.let { world.load(it, chunk) }
         ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
           futureEntity.thenApply {
             if (block.isDisposed) {
