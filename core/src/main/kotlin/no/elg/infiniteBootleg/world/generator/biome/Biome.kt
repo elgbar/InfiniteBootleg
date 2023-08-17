@@ -45,8 +45,6 @@ enum class Biome @SafeVarargs constructor(
     for (dx in -INTERPOLATION_RADIUS..INTERPOLATION_RADIUS) {
       y = if (dx != 0) {
         val biome = pcg.getBiome(worldX + dx)
-        // NOTE it is not a bug that the worldX does not have dx added to it
-        // well it was, but it looks better (ie more random) when the dx is not here
         (y + biome.rawHeightAt(pcg.noise, worldX + dx)).toInt()
       } else {
         (y + rawHeightAt(pcg.noise, worldX)).toInt()
