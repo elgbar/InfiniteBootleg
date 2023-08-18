@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
@@ -27,6 +28,7 @@ import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.world
 import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -65,6 +67,8 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
+import no.elg.infiniteBootleg.world.ecs.ThreadSafeEngine
+import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -156,7 +160,7 @@ abstract class World(
    *
    * Adding and removing entities to the engine must be used on [ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
    */
-  val engine: Engine
+  val engine: ThreadSafeEngine
 
   /**
    * must be accessed under [chunksLock]
@@ -213,8 +217,13 @@ abstract class World(
     }
   }
 
-  private fun initializeEngine(): Engine {
-    val engine = Engine()
+  val playersEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(playerFamily) }
+  val controlledPlayerEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(localPlayerFamily) }
+  val standaloneEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicStandaloneEntityFamily) }
+  val validEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamily) }
+
+  private fun initializeEngine(): ThreadSafeEngine {
+    val engine = ThreadSafeEngine()
     ensureUniquenessListener(engine)
     disposeEntitiesOnRemoval(engine)
     addEntityListeners(engine)
@@ -708,7 +717,7 @@ abstract class World(
 
   fun getEntities(worldX: Float, worldY: Float): Array<Entity> {
     val foundEntities = Array<Entity>(false, 4)
-    for (entity in engine.getEntitiesFor(basicStandaloneEntityFamily)) {
+    for (entity in standaloneEntities) {
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
       if (Util.isBetween(
@@ -883,13 +892,10 @@ abstract class World(
     return false
   }
 
-  fun containsEntity(uuid: String): Boolean {
-    return getEntity(uuid) != null
-  }
+  fun containsEntity(uuid: String): Boolean = getEntity(uuid) != null
 
   fun getEntity(uuid: String): Entity? {
-    val entitiesFor = engine.getEntitiesFor(basicStandaloneEntityFamily)
-    for (entity in entitiesFor) {
+    for (entity in playersEntities) {
       if (entity.getComponent(IdComponent::class.java).id == uuid) {
         return entity
       }
@@ -916,7 +922,7 @@ abstract class World(
   }
 
   fun getPlayer(uuid: String): Entity? {
-    for (entity in engine.getEntitiesFor(playerFamily)) {
+    for (entity in playersEntities) {
       if (entity.id == uuid) {
         return entity
       }
@@ -1108,6 +1114,7 @@ abstract class World(
         }
       }
     }
+    engine.dispose()
   }
 
   companion object {
