@@ -81,7 +81,7 @@ object KAssets {
     doorOpenTexture = textureAtlas.findRotationAwareRegion("door_open", false)
     doorClosedTexture = textureAtlas.findRotationAwareRegion("door_closed", false)
 
-    breakingBlockTexture = (1..9).map {
+    breakingBlockTextures = (1..9).map {
       textureAtlas.findRotationAwareRegion("break", false, it)
     }.toTypedArray()
 

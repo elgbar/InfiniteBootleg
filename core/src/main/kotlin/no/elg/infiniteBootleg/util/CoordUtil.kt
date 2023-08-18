@@ -134,7 +134,6 @@ inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCo
  * @param this@decompactShortA A long created by [.compactLoc]
  * @return The x coordinate of the compacted location
  */
-
 inline fun Int.decompactShortA(): Short = (this shr SIZE).toShort()
 
 /**

@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent.Companion.occupyingLocations
+import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily

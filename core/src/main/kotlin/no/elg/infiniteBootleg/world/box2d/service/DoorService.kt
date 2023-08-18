@@ -3,10 +3,10 @@ package no.elg.infiniteBootleg.world.box2d.service
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker
+import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
+import no.elg.infiniteBootleg.world.ecs.components.DoorComponent.Companion.doorComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent.Companion.doorComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
 

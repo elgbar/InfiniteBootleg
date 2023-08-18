@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.util.relativeCompact
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
-import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent.Companion.chunk
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.leafBlockFamily

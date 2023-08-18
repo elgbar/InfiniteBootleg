@@ -40,9 +40,9 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       breakableBlocks
         .forEach { (blockWorldX, blockWorldY) ->
           if (isBreaking) {
-            val textures = KAssets.breakingBlockTexture.size - 1f
+            val textures = KAssets.breakingBlockTextures.size - 1f
             val index = (textures * progress).roundToInt()
-            renderPlaceableBlock(world, KAssets.breakingBlockTexture[index].textureRegion, blockWorldX, blockWorldY, 1f)
+            renderPlaceableBlock(world, KAssets.breakingBlockTextures[index].textureRegion, blockWorldX, blockWorldY, 1f)
           } else {
             renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldX, blockWorldY)
           }

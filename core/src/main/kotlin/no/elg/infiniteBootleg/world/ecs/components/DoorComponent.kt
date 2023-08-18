@@ -1,11 +1,10 @@
-package no.elg.infiniteBootleg.world.ecs.components.additional
+package no.elg.infiniteBootleg.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
-import no.elg.infiniteBootleg.protobuf.EntityKt.door
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker

@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent

@@ -25,11 +25,11 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
+import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.PROTO_INPUT_EVENT
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent.Companion.DEFAULT_MAX_HEALTH
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.asProto
-import no.elg.infiniteBootleg.world.ecs.components.additional.GroundedComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.InputEventQueueComponent.Companion.PROTO_INPUT_EVENT
-import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent.Companion.PROTO_PHYSICS_EVENT
+import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent.Companion.PROTO_PHYSICS_EVENT
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily

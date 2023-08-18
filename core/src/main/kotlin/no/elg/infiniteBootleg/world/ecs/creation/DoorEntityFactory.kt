@@ -7,10 +7,10 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
+import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
+import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.DoorComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.world.World
 
 const val DOOR_WIDTH: Int = 2

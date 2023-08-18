@@ -10,10 +10,10 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
+import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
+import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecay
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily

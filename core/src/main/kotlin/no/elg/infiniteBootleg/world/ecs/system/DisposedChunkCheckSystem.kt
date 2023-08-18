@@ -7,9 +7,9 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
-import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent
-import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent.Companion.chunk
-import no.elg.infiniteBootleg.world.ecs.components.additional.ChunkComponent.Companion.chunkComponent
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc

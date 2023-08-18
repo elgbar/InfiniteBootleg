@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.world.box2d.service.DoorService
 import no.elg.infiniteBootleg.world.box2d.service.FallingBlockContactService
 import no.elg.infiniteBootleg.world.box2d.service.OnGroundService
-import no.elg.infiniteBootleg.world.ecs.components.additional.PhysicsEventQueueComponent
+import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 
