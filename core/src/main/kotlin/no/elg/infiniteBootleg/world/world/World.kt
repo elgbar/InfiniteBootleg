@@ -323,18 +323,22 @@ abstract class World(
     }
 
     return if (this is SinglePlayerWorld && protoWorld.hasPlayer()) {
-      val playerPosition = protoWorld.player.position
-      (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
-      this.load(protoWorld.player).thenApply {
-        it.transient = true
+      Main.inst().scheduler.executeAsync {
+        val playerPosition = protoWorld.player.position
+        (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
         render.chunkLocationsInView.forEach(::loadChunk)
-        dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
+        this.load(protoWorld.player).thenApply {
+          it.transient = true
+          dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
+        }
       }
       true
     } else {
-      if (this is SinglePlayerWorld) {
-        this.createNewPlayer()
-        Main.logger().debug("World", "Spawning new singleplayer player")
+      Main.inst().scheduler.executeAsync {
+        if (this is SinglePlayerWorld) {
+          this.createNewPlayer()
+          Main.logger().debug("World", "Spawning new singleplayer player")
+        }
       }
       false
     }
