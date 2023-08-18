@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
@@ -33,13 +32,16 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
   }
 
   private fun readVelocity(entity: Entity, body: Body) {
-    val velocity = entity.velocityComponentOrNull ?: return
+    val newDx = body.linearVelocity.x
     if (!entity.updateBox2DVelocity) {
-      entity.setVelocity(body.linearVelocity.x, body.linearVelocity.y)
+      entity.setVelocity(newDx, body.linearVelocity.y)
+      entity.updateBox2DVelocity = false
     }
     val lookDirection = entity.lookDirectionComponentOrNull ?: return
-    if (abs(velocity.dx) > 0.2f) {
-      lookDirection.direction = if (velocity.dx < 0f) Direction.WEST else Direction.EAST
+    if (abs(newDx) > MIN_VELOCITY_TO_FLIP) {
+      lookDirection.direction = if (newDx < 0f) Direction.WEST else Direction.EAST
     }
   }
+
+  private const val MIN_VELOCITY_TO_FLIP = 0.2f
 }
