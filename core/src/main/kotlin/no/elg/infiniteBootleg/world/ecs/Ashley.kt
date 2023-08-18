@@ -65,7 +65,8 @@ val DYNAMIC_STANDALONE_ENTITY = arrayOf(
 val CONTROLLED_STANDALONE_ENTITY = arrayOf(
   *DYNAMIC_STANDALONE_ENTITY,
   GroundedComponent::class,
-  LocallyControlledComponent::class
+  LocallyControlledComponent::class,
+  InputEventQueueComponent::class
 )
 
 val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
@@ -83,7 +84,8 @@ val PLAYERS_ENTITY_ARRAY = arrayOf(
   GroundedComponent::class,
   NameComponent::class,
   KillableComponent::class,
-  InventoryComponent::class
+  InventoryComponent::class,
+  PhysicsEventQueueComponent::class
 )
 val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
 val localPlayerFamily: Family = allOf(
@@ -91,7 +93,9 @@ val localPlayerFamily: Family = allOf(
   LocallyControlledComponent::class,
   FollowedByCameraTag::class,
   SelectedInventoryItemComponent::class,
-  TextureRegionComponent::class
+  TextureRegionComponent::class,
+  InputEventQueueComponent::class,
+  PhysicsEventQueueComponent::class
 ).get()
 
 val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).get()
