@@ -142,18 +142,23 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         }
       }
 
+      //
       aRow {
         toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
         toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
-        toggleableDebugButton("Debug chunk updates", Settings::renderChunkUpdates, Main.inst().console.exec::debChuUpd)
-        toggleableDebugButton("Debug block lighting", Settings::debugBlockLight, Main.inst().console.exec::debBlkLit)
-      }
-      aRow {
-        toggleableDebugButton("Debug entity lighting", Settings::debugEntityLight, Main.inst().console.exec::debEntLit)
+        toggleableDebugButton("Render chunk updates", Settings::renderChunkUpdates, Main.inst().console.exec::debChuUpd)
         toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
-        toggleableDebugButton("Ignore place check", { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
+      }
+      // Lights
+      aRow {
+        toggleableDebugButton("Render entity lighting", Settings::debugEntityLight, Main.inst().console.exec::debEntLit)
+        toggleableDebugButton("Render block lighting", Settings::debugBlockLight, Main.inst().console.exec::debBlkLit)
+        toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
         toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
       }
+
+      aSeparator()
+      // Player related debug controls
       aRow {
         val entities = world.controlledPlayerEntities
         val instantBreakGetter: () -> Boolean = {
@@ -172,7 +177,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
-        toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
+        toggleableDebugButton("Ignore place check", { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
         toggleableDebugButton("Instant break", instantBreakGetter, Main.inst().console.exec::instantBreak)
         floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, 2, Main.inst().console.exec::brush)
         floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, 0, Main.inst().console.exec::interactRadius)
