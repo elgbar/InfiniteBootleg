@@ -84,6 +84,11 @@ interface ConsoleLogger : ApplicationLogger {
     logf(LogLevel.ERROR, "WARN [$tag] $message", *objs)
   }
 
+  fun warn(message: String, exception: Throwable) {
+    error("WARN", message)
+    exception.printStackTrace(System.err)
+  }
+
   fun error(message: String) {
     log(LogLevel.ERROR, message)
   }

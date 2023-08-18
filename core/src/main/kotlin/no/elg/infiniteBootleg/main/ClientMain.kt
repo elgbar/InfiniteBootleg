@@ -29,6 +29,8 @@ import java.awt.Toolkit
 class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progArgs) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
 
+  private var renderFailuresInARow = 0
+
   lateinit var screenRenderer: ScreenRenderer
     private set
 
@@ -134,7 +136,17 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     world?.also {
       mouseLocator.update(it)
     }
-    screen.render(Gdx.graphics.deltaTime)
+    try {
+      screen.render(Gdx.graphics.deltaTime)
+      renderFailuresInARow = 0
+    } catch (e: Exception) {
+      renderFailuresInARow++
+      if (renderFailuresInARow >= MAX_RENDER_FAILURES_IN_A_ROW) {
+        throw RuntimeException("Render failed $MAX_RENDER_FAILURES_IN_A_ROW times in a row", e)
+      } else {
+        logger().warn("Render failed (failed render attempt $renderFailuresInARow)", e)
+      }
+    }
   }
 
   override fun dispose() {
@@ -167,6 +179,8 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     const val CLEAR_COLOR_G = (68.0 / 255.0).toFloat()
     const val CLEAR_COLOR_B = 1f
     const val CLEAR_COLOR_A = 1f
+
+    private const val MAX_RENDER_FAILURES_IN_A_ROW = 5
 
     private lateinit var instField: ClientMain
     fun inst(): ClientMain {
