@@ -192,9 +192,6 @@ enum class Material(
   val isBlock: Boolean
     get() = itemType == ItemType.BLOCK || itemType == ItemType.AIR
 
-  val isEntity: Boolean
-    get() = itemType == ItemType.ENTITY
-
   companion object {
 
     fun fromOrdinal(ordinal: Int): Material {

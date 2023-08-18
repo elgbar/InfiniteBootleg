@@ -94,7 +94,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
         return null
       }
       val mat = fromOrdinal(protoBlock.material.ordinal)
-      if (mat === Material.AIR || mat.isEntity) {
+      if (mat === Material.AIR) {
         return null
       }
       return mat.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
