@@ -16,7 +16,6 @@ import no.elg.infiniteBootleg.screens.hud.DebugText.pointing
 import no.elg.infiniteBootleg.screens.hud.DebugText.pos
 import no.elg.infiniteBootleg.screens.hud.DebugText.time
 import no.elg.infiniteBootleg.screens.hud.DebugText.viewChunk
-import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 
 /**
  * @author Elg
@@ -44,7 +43,7 @@ class HUDRenderer : Renderer, Resizable {
       if (hasMode(DISPLAY_DEBUG) && world != null) {
         val mouseBlockX = main.mouseLocator.mouseBlockX
         val mouseBlockY = main.mouseLocator.mouseBlockY
-        val controlled = world.engine.getEntitiesFor(localPlayerFamily)
+        val controlled = world.controlledPlayerEntities
         nl()
         pointing(builder, world, mouseBlockX, mouseBlockY)
         nl()
@@ -63,7 +62,7 @@ class HUDRenderer : Renderer, Resizable {
       if (builder.isNotEmpty()) {
         sr.drawTop(builder.toString(), 1f)
       }
-      if (hasMode(DISPLAY_CURRENT_BLOCK)) {
+      if (hasMode(DISPLAY_CURRENT_BLOCK) && world != null) {
         CurrentBlockHUDRenderer.render(sr, world)
       }
       if (hasMode(DISPLAY_GRAPH_FPS)) {

@@ -34,7 +34,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MIN_ZOOM
 import no.elg.infiniteBootleg.world.ticker.Ticker
@@ -119,7 +118,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggle flight for player")
   fun fly() {
     val world = clientWorld ?: return
-    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
       logger.log("There is no local, controlled player in this world")
     }
@@ -299,7 +298,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    val entities = clientWorld.engine.getEntitiesFor(localPlayerFamily)
+    val entities = clientWorld.controlledPlayerEntities
 
     clientWorld.render.lookAt(worldX, worldY)
     logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
@@ -353,7 +352,8 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Get the brush sizes")
   fun brush() {
     val world = clientWorld ?: return
-    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    val localPlayers = world.controlledPlayerEntities
+    val entities = localPlayers
     if (entities.size() == 0) {
       logger.log("There is no local, controlled player in this world")
     }
@@ -367,7 +367,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Set the brush size of the mouse", paramDescriptions = ["New brush size, positive integer"])
   fun brush(size: Float) {
     val world = clientWorld ?: return
-    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world")
     }
@@ -386,7 +386,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New interact radius, positive integer"])
   fun interactRadius(interactRadius: Float) {
     val world = clientWorld ?: return
-    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world")
     }
@@ -405,7 +405,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New instant break"])
   fun instantBreak() {
     val world = clientWorld ?: return
-    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world")
     }
@@ -420,7 +420,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggle whether a player can place blocks disconnected from other blocks")
   fun placeCheck() {
     val world = clientWorld ?: return
-    val entities = world.engine.getEntitiesFor(localPlayerFamily)
+    val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
       logger.error("There is no local, controlled player in this world")
     }

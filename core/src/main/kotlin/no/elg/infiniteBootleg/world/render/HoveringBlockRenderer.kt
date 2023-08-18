@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.render
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
@@ -20,6 +22,8 @@ import kotlin.math.roundToInt
 
 class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
+  private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(selectedMaterialComponentFamily)
+
   override fun render() {
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
       return
@@ -27,7 +31,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     val mouseLocator = ClientMain.inst().mouseLocator
     val world = worldRender.world
 
-    for (entity in world.engine.getEntitiesFor(selectedMaterialComponentFamily)) {
+    for (entity in entities) {
       val controls = entity.locallyControlledComponentOrNull ?: continue
       val isBreaking = controls.isBreaking
       val progress = if (isBreaking) controls.breakingProgress.progress else 1f

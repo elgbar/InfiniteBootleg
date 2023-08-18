@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.render
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import no.elg.infiniteBootleg.KAssets.whiteTexture
@@ -18,13 +20,15 @@ import kotlin.math.roundToInt
 
 class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
+  private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(drawableEntitiesFamily)
+
   override fun render() {
     val batch: Batch = worldRender.batch
     val world: ClientWorld = worldRender.world
     val worldBody = world.worldBody
     val worldOffsetX = worldBody.worldOffsetX
     val worldOffsetY = worldBody.worldOffsetY
-    for (entity in world.engine.getEntitiesFor(drawableEntitiesFamily)) {
+    for (entity in entities) {
       val textureRegion = entity.textureRegionComponent.texture
       val box2d = entity.box2d
       val centerPos = entity.box2dBody.position

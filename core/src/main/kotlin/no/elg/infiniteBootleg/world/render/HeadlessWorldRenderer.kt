@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.render
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.OrderedMap
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -21,6 +23,7 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   private val lock = ReentrantReadWriteLock()
   private val readLock: Lock = lock.readLock()
   private val writeLock: Lock = lock.writeLock()
+  private val entities: ImmutableArray<Entity> = world.engine.getEntitiesFor(playerFamily)
 
   @Synchronized
   override fun render() {
@@ -38,7 +41,7 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   override fun update() {
     readLock.lock()
     try {
-      for (entity in world.engine.getEntitiesFor(playerFamily)) {
+      for (entity in entities) {
         val chunksInView = viewingChunks.get(entity.id)
         if (chunksInView != null) {
           val (x, y) = entity.positionComponent

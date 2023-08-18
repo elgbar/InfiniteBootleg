@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedItem
-import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 
 object CurrentBlockHUDRenderer {
@@ -26,9 +25,9 @@ object CurrentBlockHUDRenderer {
   private val layout = GlyphLayout()
   private val airItem = Item(Material.AIR, 0u, 0u)
 
-  fun render(screenRenderer: ScreenRenderer, world: World?) {
+  fun render(screenRenderer: ScreenRenderer, world: World) {
     try {
-      val entity = world?.engine?.getEntitiesFor(selectedMaterialComponentFamily)?.firstOrNull() ?: return
+      val entity = world.controlledPlayerEntities.firstOrNull() ?: return
       val item = entity.selectedItem ?: airItem
       val texture = item.material.textureRegion ?: KAssets.breakableBlockTexture
       with(screenRenderer) {

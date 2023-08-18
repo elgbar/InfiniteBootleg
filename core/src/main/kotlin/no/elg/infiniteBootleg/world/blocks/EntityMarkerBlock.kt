@@ -25,10 +25,12 @@ class EntityMarkerBlock(
   override val entity: Entity
 ) : Block {
 
-  private var removeEntityListener: EntityListener? = EntityRemoveListener { if (it === entity) removeEntityMarker() }
+  private var removeEntityListener: EntityListener?
 
   init {
-    world.engine.addEntityListener(removeEntityListener)
+    removeEntityListener = EntityRemoveListener { if (it === entity) removeEntityMarker() }.also {
+      world.engine.addEntityListener(it)
+    }
   }
 
   fun removeEntityMarker() {
@@ -43,10 +45,12 @@ class EntityMarkerBlock(
   override fun dispose() {
     isDisposed = true
 
-    world.postBox2dRunnable {
-      world.engine.removeEntityListener(removeEntityListener)
+    removeEntityListener?.also {
+      world.postBox2dRunnable {
+        world.engine.removeEntityListener(it)
+      }
+      removeEntityListener = null
     }
-    removeEntityListener = null
   }
 
   override fun save(): ProtoWorld.Block.Builder = AIR_BLOCK_PROTO_BUILDER

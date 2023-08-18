@@ -31,8 +31,6 @@ import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
-import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import java.math.BigDecimal
@@ -153,23 +151,24 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       aRow {
         toggleableDebugButton("Debug entity lighting", Settings::debugEntityLight, Main.inst().console.exec::debEntLit)
         toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
-        toggleableDebugButton("Ignore place check", { world.engine.getEntitiesFor(localPlayerFamily).any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
+        toggleableDebugButton("Ignore place check", { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
         toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
       }
       aRow {
+        val entities = world.controlledPlayerEntities
         val instantBreakGetter: () -> Boolean = {
-          world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
+          entities
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
         }
 
         val brushSizeGetter: () -> Number = {
-          world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
+          entities
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
         }
         val reachRadiusGetter: () -> Number = {
-          world.engine.getEntitiesFor(controlledEntityWithInputEventFamily)
+          entities
             .map { it.locallyControlledComponentOrNull }
             .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
