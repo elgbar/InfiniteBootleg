@@ -523,6 +523,7 @@ class ChunkImpl(
     }
     disposed = true
     allowUnload = false
+    chunkBody.dispose()
     synchronized(fboLock) {
       fbo?.also {
         Main.inst().scheduler.executeSync { it.dispose() }
@@ -530,7 +531,6 @@ class ChunkImpl(
       }
       fboRegion = null
     }
-    chunkBody.dispose()
     for (blockArr in blocks) {
       for (block in blockArr) {
         if (block != null && !block.isDisposed) {

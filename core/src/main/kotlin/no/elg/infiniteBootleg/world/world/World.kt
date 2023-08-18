@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.world
 import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.Util
@@ -509,7 +510,7 @@ abstract class World(
    * `chunkLocation` and thus not reload the chunk
    * @return The loaded chunk
    */
-  fun loadChunk(chunkLoc: Long, returnIfLoaded: Boolean = true): Chunk? {
+  private fun loadChunk(chunkLoc: Long, returnIfLoaded: Boolean = true): Chunk? {
     if (worldTicker.isPaused) {
       Main.logger().debug("World", "Ticker paused will not load chunk")
       return null
@@ -609,8 +610,8 @@ abstract class World(
    * @param worldLoc The world location to check
    * @return If the block at the given location is air.
    */
-  fun isAirBlock(compactWorldLoc: Long, markerIsAir: Boolean = true): Boolean =
-    isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), markerIsAir = markerIsAir)
+  fun isAirBlock(compactWorldLoc: Long, loadChunk: Boolean = true, markerIsAir: Boolean = true): Boolean =
+    isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), loadChunk, markerIsAir)
 
   /**
    * Check if a given location in the world is [Material.AIR] (or internally, does not exist)
@@ -842,12 +843,12 @@ abstract class World(
       }
     }
 
-  fun isChunkLoaded(compactedChunkLoc: Long): Boolean {
+  fun isChunkLoaded(compactedChunkLoc: ChunkCompactLoc): Boolean {
     val chunk: Chunk? = getLoadedChunk(compactedChunkLoc)
     return chunk != null && chunk.isNotDisposed
   }
 
-  fun getLoadedChunk(compactChunkLoc: Long): Chunk? {
+  fun getLoadedChunk(compactChunkLoc: ChunkCompactLoc): Chunk? {
     chunksLock.readLock().lock()
     return try {
       chunks[compactChunkLoc]

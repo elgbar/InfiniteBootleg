@@ -69,7 +69,7 @@ interface ConsoleLogger : ApplicationLogger {
   }
 
   fun warn(tag: String, message: () -> String) {
-    error("WARN", message.invoke())
+    error("WARN $tag", message.invoke())
   }
 
   fun warn(message: String, vararg objs: Any?) {

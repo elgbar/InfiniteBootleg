@@ -30,6 +30,8 @@ inline fun WorldCoord.worldToChunk(): ChunkCoord = this shr Chunk.CHUNK_SIZE_SHI
 @Contract(pure = true)
 inline fun Number.worldToChunk(): ChunkCoord = toInt().worldToChunk()
 
+inline fun WorldCompactLoc.worldToChunk(): ChunkCompactLoc = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
+
 /**
  * Convert a chunk coordinate to world coordinate
  *
@@ -120,8 +122,6 @@ inline fun Long.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
  */
 
 inline fun Long.decompactLocY(): Int = toInt()
-
-inline fun Long.worldCompactToChunk(): Long = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
 
 inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
 
