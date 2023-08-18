@@ -256,42 +256,46 @@ abstract class World(
 
   fun initialize() {
     var willDispatchChunksLoadedEvent = false
-    if (Settings.loadWorldFromDisk) {
-      val worldFolder = worldFolder
-      if (!transientWorld && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
-        if (!Settings.ignoreWorldLock) {
-          transientWorld = true
-          Main.logger().warn("World", "World found is already in use. Initializing world as a transient.")
-        } else {
-          Main.logger().warn("World", "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!")
-        }
-      }
-      if (transientWorld || worldFolder == null) {
-        Main.logger().log("No world save found")
+    val worldFolder = worldFolder
+    if (!transientWorld && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
+      if (!Settings.ignoreWorldLock) {
+        transientWorld = true
+        Main.logger().warn("World", "World found is already in use. Initializing world as a transient.")
       } else {
-        Main.logger().log("Loading world from '${worldFolder.file().absolutePath}'")
-        if (writeLockFile(uuid)) {
-          val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
-          if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
-            try {
-              val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
-              willDispatchChunksLoadedEvent = loadFromProtoWorld(protoWorld)
-            } catch (e: InvalidProtocolBufferException) {
-              e.printStackTrace()
-            }
-          }
-        } else {
-          Main.logger().error("Failed to write world lock file! Setting world to transient to be safe")
-          transientWorld = true
-        }
+        Main.logger().warn("World", "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!")
       }
     }
+    if (transientWorld || worldFolder == null) {
+      Main.logger().log("No world save found")
+    } else {
+      Main.logger().log("Loading world from '${worldFolder.file().absolutePath}'")
+      if (writeLockFile(uuid)) {
+        val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
+        if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
+          try {
+            val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
+            willDispatchChunksLoadedEvent = loadFromProtoWorld(protoWorld)
+          } catch (e: InvalidProtocolBufferException) {
+            e.printStackTrace()
+          }
+        }
+      } else {
+        Main.logger().error("Failed to write world lock file! Setting world to transient to be safe")
+        transientWorld = true
+      }
+    }
+
     check(!worldTicker.isStarted) { "World has already been started" }
     worldTicker.start()
 
     if (!willDispatchChunksLoadedEvent) {
       render.update()
+
       Main.inst().scheduler.executeAsync {
+        if (Main.isSingleplayer) {
+          this.createNewPlayer()
+          Main.logger().debug("World", "Spawning new singleplayer player")
+        }
         render.chunkLocationsInView.forEach(::loadChunk)
         dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
       }
@@ -323,7 +327,7 @@ abstract class World(
       }
     }
 
-    return if (this is SinglePlayerWorld && protoWorld.hasPlayer()) {
+    return if (Main.isClient && protoWorld.hasPlayer()) {
       Main.inst().scheduler.executeAsync {
         val playerPosition = protoWorld.player.position
         (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
@@ -335,12 +339,6 @@ abstract class World(
       }
       true
     } else {
-      Main.inst().scheduler.executeAsync {
-        if (this is SinglePlayerWorld) {
-          this.createNewPlayer()
-          Main.logger().debug("World", "Spawning new singleplayer player")
-        }
-      }
       false
     }
   }
@@ -372,21 +370,20 @@ abstract class World(
     Main.logger().debug("World") { "Done saving world '$name'" }
   }
 
-  fun toProtobuf(): ProtoWorld.World =
-    world {
-      name = this@World.name
-      seed = this@World.seed
-      time = this@World.worldTime.time
-      timeScale = this@World.worldTime.timeScale
-      spawn = this@World.spawn.toVector2i()
-      generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
-      chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
-      if (Main.isSingleplayer) {
-        controlledPlayerEntities?.firstOrNull()?.save(true)?.also {
-          player = it
-        }
+  fun toProtobuf(): ProtoWorld.World = world {
+    name = this@World.name
+    seed = this@World.seed
+    time = this@World.worldTime.time
+    timeScale = this@World.worldTime.timeScale
+    spawn = this@World.spawn.toVector2i()
+    generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
+    chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
+    if (Main.isSingleplayer) {
+      controlledPlayerEntities.firstOrNull()?.save(true)?.also {
+        player = it
       }
     }
+  }
 
   val worldFolder: FileHandle?
     /**
