@@ -367,27 +367,21 @@ abstract class World(
     Main.logger().debug("World") { "Done saving world '$name'" }
   }
 
-  fun toProtobuf(): ProtoWorld.World {
-    val builder = ProtoWorld.World.newBuilder()
-    builder.name = name
-    builder.seed = seed
-    builder.time = worldTime.time
-    builder.timeScale = worldTime.timeScale
-    builder.spawn = spawn.toVector2i()
-    builder.generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
-    synchronized(chunkColumns) {
-      for (chunkColumn in chunkColumns.values()) {
-        builder.addChunkColumns(chunkColumn.toProtobuf())
+  fun toProtobuf(): ProtoWorld.World =
+    world {
+      name = this@World.name
+      seed = this@World.seed
+      time = this@World.worldTime.time
+      timeScale = this@World.worldTime.timeScale
+      spawn = this@World.spawn.toVector2i()
+      generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
+      chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
+      if (Main.isSingleplayer) {
+        controlledPlayerEntities?.firstOrNull()?.save(true)?.also {
+          player = it
+        }
       }
     }
-    if (Main.isSingleplayer) {
-      val entities = engine.getEntitiesFor(localPlayerFamily)
-      if (entities != null && entities.size() > 0) {
-        builder.player = entities.first().save()
-      }
-    }
-    return builder.build()
-  }
 
   val worldFolder: FileHandle?
     /**
