@@ -23,7 +23,10 @@ object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).g
     if (entityChunk.isDisposed) {
       if (loadedChunk == null || loadedChunk.isDisposed) {
         if (Settings.debug) {
-          Main.logger().debug("DisposedChunkCheckSystem", "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)}")
+          Main.logger().debug(
+            "DisposedChunkCheckSystem",
+            "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)} (components: ${entity.components.joinToString()})"
+          )
         }
         world.removeEntity(entity)
       } else {
