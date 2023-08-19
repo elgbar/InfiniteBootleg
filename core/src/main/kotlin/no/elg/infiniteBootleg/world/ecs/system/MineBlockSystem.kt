@@ -15,11 +15,7 @@ object MineBlockSystem : IteratingSystem(allOf(WorldComponent::class, LocallyCon
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val controls = entity.locallyControlledComponent
-    if (!controls.isBreaking) {
-      return
-    }
-
-    if (inputMouseLocator.isOverNewBlock) {
+    if (!controls.isBreaking(entity) || inputMouseLocator.isOverNewBlock) {
       controls.breakingProgress.reset()
       return
     }

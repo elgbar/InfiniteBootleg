@@ -5,6 +5,7 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.breakableBlocks
@@ -14,7 +15,7 @@ import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 import java.lang.Math.floorMod
@@ -33,23 +34,24 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
     for (entity in entities) {
       val controls = entity.locallyControlledComponentOrNull ?: continue
-      val isBreaking = controls.isBreaking
+      val element = entity.selectedInventoryItemComponentOrNull?.element ?: continue
+      val isBreaking = controls.isBreaking(entity)
       val progress = if (isBreaking) controls.breakingProgress.progress else 1f
 
-      val breakableBlocks = entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
-      breakableBlocks
-        .forEach { (blockWorldX, blockWorldY) ->
-          if (isBreaking) {
-            val textures = KAssets.breakingBlockTextures.size - 1f
-            val index = (textures * progress).roundToInt()
-            renderPlaceableBlock(world, KAssets.breakingBlockTextures[index].textureRegion, blockWorldX, blockWorldY, 1f)
-          } else {
-            renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldX, blockWorldY)
+      if (element.itemType == ItemType.TOOL) {
+        val breakableBlocks = entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
+        breakableBlocks
+          .forEach { (blockWorldX, blockWorldY) ->
+            if (isBreaking) {
+              val textures = KAssets.breakingBlockTextures.size - 1f
+              val index = (textures * progress).roundToInt()
+              renderPlaceableBlock(world, KAssets.breakingBlockTextures[index].textureRegion, blockWorldX, blockWorldY, 1f)
+            } else {
+              renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldX, blockWorldY)
+            }
           }
-        }
-
-      if (!isBreaking) {
-        val texture = entity.selectedInventoryItemComponent.element.textureRegion?.textureRegion ?: continue
+      } else if (element.itemType == ItemType.BLOCK && !isBreaking) {
+        val texture = element.textureRegion?.textureRegion ?: continue
         entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
           .forEach { (blockWorldX, blockWorldY) ->
             renderPlaceableBlock(world, texture, blockWorldX, blockWorldY)

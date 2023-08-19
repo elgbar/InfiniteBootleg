@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Interpolation
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -17,6 +18,7 @@ import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 
 data class LocallyControlledComponent(
   var brushSize: Float = INITIAL_BRUSH_SIZE,
@@ -26,7 +28,7 @@ data class LocallyControlledComponent(
 
   val breakingProgress = ProgressHandler(0.5f, Interpolation.linear, 0f, 1f)
 
-  val isBreaking get() = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT)
+  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedInventoryItemComponentOrNull?.element?.itemType == ItemType.TOOL
 
   companion object : EntityLoadableMapper<LocallyControlledComponent>() {
     var Entity.locallyControlledComponent by propertyFor(mapper)
