@@ -77,21 +77,24 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(controlle
         selectedMaterial.element = it
       }
     } catch (_: IndexOutOfBoundsException) {
-      val materialSize = Material.entries.size
-      when (keycode) {
-        Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> Tool.entries[0 + extra + materialSize]
-        Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> Tool.entries[1 + extra + materialSize]
-        Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> Tool.entries[2 + extra + materialSize]
-        Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> Tool.entries[3 + extra + materialSize]
-        Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> Tool.entries[4 + extra + materialSize]
-        Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> Tool.entries[5 + extra + materialSize]
-        Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> Tool.entries[6 + extra + materialSize]
-        Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> Tool.entries[7 + extra + materialSize]
-        Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> Tool.entries[8 + extra + materialSize]
-        Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> Tool.entries[9 + extra + materialSize]
-        else -> null
-      }?.let {
-        selectedMaterial.element = it
+      try {
+        val materialSize = Material.entries.size
+        when (keycode) {
+          Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> Tool.entries[0 + extra - materialSize]
+          Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> Tool.entries[1 + extra - materialSize]
+          Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> Tool.entries[2 + extra - materialSize]
+          Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> Tool.entries[3 + extra - materialSize]
+          Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> Tool.entries[4 + extra - materialSize]
+          Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> Tool.entries[5 + extra - materialSize]
+          Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> Tool.entries[6 + extra - materialSize]
+          Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> Tool.entries[7 + extra - materialSize]
+          Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> Tool.entries[8 + extra - materialSize]
+          Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> Tool.entries[9 + extra - materialSize]
+          else -> null
+        }?.let {
+          selectedMaterial.element = it
+        }
+      } catch (_: IndexOutOfBoundsException) {
       }
     }
     return true
