@@ -16,6 +16,6 @@ enum class Tool(textureName: String? = null) : InventoryElement {
   override val itemType: ItemType get() = ItemType.TOOL
 
   companion object {
-    fun fromOrdinal(ordinal: Int): Material = Material.entries[ordinal]
+    fun fromOrdinal(ordinal: Int): Tool = Tool.entries[ordinal]
   }
 }
