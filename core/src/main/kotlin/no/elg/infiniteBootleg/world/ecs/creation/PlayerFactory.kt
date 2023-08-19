@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.world.ecs.creation
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import no.elg.infiniteBootleg.KAssets
+import no.elg.infiniteBootleg.items.InventoryElement.Companion.asProto
+import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
@@ -24,11 +26,11 @@ import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.PROTO_INPUT_EVENT
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent.Companion.DEFAULT_MAX_HEALTH
-import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.asProto
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent.Companion.PROTO_PHYSICS_EVENT
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
@@ -94,14 +96,9 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
     maxHealth = DEFAULT_MAX_HEALTH
   }
   inventory = inventory {
-    maxSize = Material.entries.size
-    items += Material.entries.map {
-      EntityKt.InventoryKt.item {
-        material = it.asProto()
-        stock = 1_000_000
-        maxStock = 1_000_000
-      }
-    }
+    maxSize = Material.entries.size + Tool.entries.size
+    items += Material.entries.map { it.toItem().asProto() }
+    items += Tool.entries.map { it.toItem().asProto() }
   }
   box2D = box2D {
     bodyType = ProtoWorld.Entity.Box2D.BodyType.PLAYER
@@ -118,7 +115,7 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
     }
 
     selectedItem = selectedItem {
-      material = Material.AIR.asProto()
+      element = Tool.PICKAXE.asProto()
     }
   }
   physicsEvent = PROTO_PHYSICS_EVENT

@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
@@ -73,10 +74,25 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(controlle
         Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> Material.entries[9 + extra]
         else -> null
       }?.let {
-        selectedMaterial.material = it
+        selectedMaterial.element = it
       }
     } catch (_: IndexOutOfBoundsException) {
-      // Ignore out of bounds, for materials that don't exist
+      val materialSize = Material.entries.size
+      when (keycode) {
+        Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> Tool.entries[0 + extra + materialSize]
+        Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> Tool.entries[1 + extra + materialSize]
+        Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> Tool.entries[2 + extra + materialSize]
+        Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> Tool.entries[3 + extra + materialSize]
+        Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> Tool.entries[4 + extra + materialSize]
+        Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> Tool.entries[5 + extra + materialSize]
+        Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> Tool.entries[6 + extra + materialSize]
+        Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> Tool.entries[7 + extra + materialSize]
+        Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> Tool.entries[8 + extra + materialSize]
+        Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> Tool.entries[9 + extra + materialSize]
+        else -> null
+      }?.let {
+        selectedMaterial.element = it
+      }
     }
     return true
   }

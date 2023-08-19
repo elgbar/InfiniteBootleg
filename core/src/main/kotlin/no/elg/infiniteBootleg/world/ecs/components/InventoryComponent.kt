@@ -7,16 +7,16 @@ import ktx.ashley.propertyFor
 import ktx.collections.GdxSet
 import ktx.collections.minusAssign
 import ktx.collections.plusAssign
+import no.elg.infiniteBootleg.items.InventoryElement
 import no.elg.infiniteBootleg.items.Item
+import no.elg.infiniteBootleg.items.Item.Companion.asProto
+import no.elg.infiniteBootleg.items.Item.Companion.fromProto
 import no.elg.infiniteBootleg.protobuf.EntityKt
-import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
 import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
-import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
-import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.asProto
 
 class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
 
@@ -28,40 +28,30 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
   }
 
   operator fun plusAssign(item: Item) {
-    val existing = this[item]?.stock
-    val updatedItem = if (existing != null) {
-      Item(item.material, existing + item.stock)
-    } else {
-      if (items.size >= maxSize) {
-        return
-      }
-      item
-    }
+    val existing = this[item]
+    val updatedItem = existing?.merge(item) ?: item
     replace(updatedItem)
   }
 
   operator fun minusAssign(item: Item) {
-    val existing = this[item]?.stock
-    val updatedItem = if (existing != null) {
-      Item(item.material, existing - item.stock)
-    } else {
-      item
-    }
+    val existing = this[item]
+    val updatedItem = existing?.use(item.stock) ?: return
     replace(updatedItem)
   }
 
   operator fun get(item: Item): Item? = items.find { it == item }
-  operator fun get(material: Material): Item? = items.find { it.material == material }
+  operator fun get(element: InventoryElement): Item? = items.find { it.element == element }
 
-  fun getAll(material: Material): List<Item> = items.filter { it.material == material }
-  operator fun contains(material: Material): Boolean = items.any { it.material == material }
+  fun getAll(element: InventoryElement): List<Item> = items.filter { it.element == element }
+
   operator fun contains(item: Item): Boolean = items.any { it == item }
+  operator fun contains(element: InventoryElement): Boolean = items.any { it.element == element }
 
   /**
    * @return If the item was used
    */
-  fun use(material: Material, usages: UInt = 1u): Boolean {
-    val item = getAll(material).firstOrNull { it.canBeUsed(usages) } ?: return false
+  fun use(element: InventoryElement, usages: UInt = 1u): Boolean {
+    val item = getAll(element).firstOrNull { it.canBeUsed(usages) } ?: return false
     val updatedItem = item.use(usages) ?: return false
     replace(updatedItem)
     return true
@@ -74,9 +64,7 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       with(
         InventoryComponent(protoEntity.inventory.maxSize).apply {
-          protoEntity.inventory.itemsList.forEach {
-            this += Item(material = Material.fromOrdinal(it.material.ordinal), maxStock = it.maxStock.toUInt(), stock = it.stock.toUInt())
-          }
+          protoEntity.inventory.itemsList.forEach { this += it.fromProto() }
         }
       )
 
@@ -86,13 +74,7 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
   override fun EntityKt.Dsl.save() {
     inventory = inventory {
       maxSize = this@InventoryComponent.maxSize
-      items += this@InventoryComponent.items.map {
-        item {
-          material = it.material.asProto()
-          stock = it.stock.toInt()
-          maxStock = it.maxStock.toInt()
-        }
-      }
+      items += this@InventoryComponent.items.map { it.asProto() }
     }
   }
 }

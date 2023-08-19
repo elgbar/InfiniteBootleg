@@ -54,6 +54,7 @@ object KAssets {
   lateinit var playerTexture: RotatableTextureRegion
   lateinit var doorOpenTexture: RotatableTextureRegion
   lateinit var doorClosedTexture: RotatableTextureRegion
+  lateinit var pickaxeTexture: RotatableTextureRegion
 
   lateinit var skyTexture: RotatableTextureRegion
   lateinit var caveTexture: RotatableTextureRegion
@@ -61,7 +62,7 @@ object KAssets {
   lateinit var skylightDebugTexture: RotatableTextureRegion
   lateinit var luminanceDebugTexture: RotatableTextureRegion
 
-  lateinit var breakingBlockTexture: Array<RotatableTextureRegion>
+  lateinit var breakingBlockTextures: Array<RotatableTextureRegion>
 
   val font: BitmapFont by lazy {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
@@ -80,6 +81,7 @@ object KAssets {
     playerTexture = textureAtlas.findRotationAwareRegion("player", false)
     doorOpenTexture = textureAtlas.findRotationAwareRegion("door_open", false)
     doorClosedTexture = textureAtlas.findRotationAwareRegion("door_closed", false)
+    pickaxeTexture = textureAtlas.findRotationAwareRegion("pickaxe", false)
 
     breakingBlockTextures = (1..9).map {
       textureAtlas.findRotationAwareRegion("break", false, it)

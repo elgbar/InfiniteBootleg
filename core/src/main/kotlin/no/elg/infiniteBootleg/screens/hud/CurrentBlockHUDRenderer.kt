@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.KAssets
-import no.elg.infiniteBootleg.items.Item
+import no.elg.infiniteBootleg.items.MaterialItem
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ScreenRenderer
@@ -23,13 +23,13 @@ object CurrentBlockHUDRenderer {
   private val x10Block = blockScale * 10f
 
   private val layout = GlyphLayout()
-  private val airItem = Item(Material.AIR, 0u, 0u)
+  private val airItem = MaterialItem(Material.AIR, 0u, 0u)
 
   fun render(screenRenderer: ScreenRenderer, world: World) {
     try {
       val entity = world.controlledPlayerEntities.firstOrNull() ?: return
       val item = entity.selectedItem ?: airItem
-      val texture = item.material.textureRegion ?: KAssets.breakableBlockTexture
+      val texture = item.element.textureRegion ?: KAssets.breakableBlockTexture
       with(screenRenderer) {
         batch.draw(texture.textureRegion, Gdx.graphics.width - x4Block, Gdx.graphics.height - x3Block, x2Block, x2Block)
         layout.setText(font, "${item.stock} / ${item.maxStock}", Color.WHITE, x10Block, Align.right, true)

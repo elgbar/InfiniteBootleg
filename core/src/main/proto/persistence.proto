@@ -111,14 +111,28 @@ message Entity {
     float strength = 2;
   }
 
+  message Element {
+    uint32 index = 1;
+    ItemType itemType = 2;
+
+    enum ItemType {
+      MATERIAL = 0;
+      TOOL = 1;
+    }
+  }
+
+  message SelectedItem {
+    Element element = 2;
+  }
+
   message Inventory {
     int32 maxSize = 1;
     repeated Item items = 2;
 
     message Item {
-      Material material = 1;
-      uint32 stock = 2;
-      uint32 maxStock = 3;
+      uint32 stock = 1;
+      uint32 maxStock = 2;
+      Element element = 3;
     }
   }
 
@@ -128,10 +142,6 @@ message Entity {
 
   message LookDirection {
     Vector2i direction = 1;
-  }
-
-  message SelectedItem {
-    Material material = 1;
   }
 
   message Box2D {

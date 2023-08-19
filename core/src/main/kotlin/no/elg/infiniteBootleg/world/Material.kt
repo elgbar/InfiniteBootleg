@@ -1,19 +1,22 @@
 package no.elg.infiniteBootleg.world
 
 import com.badlogic.ashley.core.Entity
-import com.google.common.base.Preconditions
-import no.elg.infiniteBootleg.KAssets.textureAtlas
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.items.InventoryElement
 import no.elg.infiniteBootleg.items.ItemType
+import no.elg.infiniteBootleg.items.MaterialItem
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.material
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.util.findTextures
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
@@ -22,17 +25,13 @@ import no.elg.infiniteBootleg.world.ecs.creation.createLeafEntity
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.allowedRotation
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 import no.elg.infiniteBootleg.world.world.World
-import java.util.Locale
 import java.util.concurrent.CompletableFuture
 
 /**
  * @author Elg
  */
 enum class Material(
-  private val itemType: ItemType = ItemType.BLOCK,
   val hardness: Float,
   val textureName: String? = null,
   /**
@@ -61,9 +60,8 @@ enum class Material(
    */
   val invisibleBlock: Boolean = false,
   val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
-) {
+) : InventoryElement {
   AIR(
-    itemType = ItemType.AIR,
     hardness = 0f,
     hasTransparentTexture = true,
     isCollidable = false,
@@ -124,7 +122,7 @@ enum class Material(
     }
   );
 
-  var textureRegion: RotatableTextureRegion? = null
+  override var textureRegion: RotatableTextureRegion? = null
 
   /**
    * @param impl The implementation a block of this material must have
@@ -136,10 +134,8 @@ enum class Material(
    * @param transparent
    */
   init {
-    if (Settings.client && itemType != ItemType.AIR) {
-      val textureName = textureName ?: name.lowercase(Locale.getDefault())
-      val name = "${textureName}_rotatable"
-      textureRegion = textureAtlas.findRegion(name)?.allowedRotation(name) ?: textureAtlas.findRegion(textureName).disallowedRotation(name)
+    if (Settings.client && !invisibleBlock) {
+      textureRegion = this.findTextures(textureName)
       if (textureRegion == null) {
         throw NullPointerException("Failed to find a texture for $name")
       }
@@ -156,7 +152,6 @@ enum class Material(
    * @return A block of this type
    */
   fun createBlock(world: World, chunk: Chunk, localX: LocalCoord, localY: LocalCoord, protoEntity: ProtoWorld.Entity? = null): Block {
-    Preconditions.checkArgument(isBlock)
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
       protoEntity?.let { world.load(it, chunk) }
         ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
@@ -176,7 +171,6 @@ enum class Material(
   }
 
   fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
-    check(isBlock) { "This material ($name) is not a block" }
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
       if (world.isAirBlock(worldX, worldY, markerIsAir = false)) {
@@ -189,13 +183,20 @@ enum class Material(
     }
   }
 
-  val isBlock: Boolean
-    get() = itemType == ItemType.BLOCK || itemType == ItemType.AIR
+  override val itemType: ItemType get() = ItemType.BLOCK
 
-  companion object {
+  override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
 
-    fun fromOrdinal(ordinal: Int): Material {
-      return entries[ordinal]
+  override val index: Int get() = ordinal
+
+  companion object : ProtoConverter<Material, ProtoWorld.Material> {
+
+    override fun Material.asProto(): ProtoWorld.Material = material {
+      ordinal = this@asProto.ordinal
     }
+
+    override fun ProtoWorld.Material.fromProto(): Material = Material.entries[ordinal]
+
+    fun fromOrdinal(ordinal: Int): Material = entries[ordinal]
   }
 }

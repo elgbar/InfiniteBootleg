@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.MouseLocator
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryComponentOrNull
@@ -41,22 +43,28 @@ private var lastCreateBlockLoc: Long = 0
 private var lastCreateBlockTick: Long = 0
 
 fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = with(worldEntity) {
-  if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
-  val locallyControlledComponent = entity.locallyControlledComponent
-  val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
-  world.removeBlocks(breakableBlocks)
+  val element = (entity.selectedInventoryItemComponentOrNull ?: return false).element
+  if (element is Tool) {
+    if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
+    val locallyControlledComponent = entity.locallyControlledComponent
+    val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
+    world.removeBlocks(breakableBlocks)
+  }
   return true
 }
 
 fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = with(worldEntity) {
   if (canNotInteract(worldEntity, blockX, blockY)) return false
   val world = entity.world
-  val material = (entity.selectedInventoryItemComponentOrNull ?: return false).material
-  val inventory = entity.inventoryComponentOrNull ?: return false
-  val locallyControlledComponent = entity.locallyControlledComponent
-  val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).toSet()
-  if (inventory.use(material, placeableBlock.size.toUInt())) {
-    material.createBlocks(world, placeableBlock)
+  val element = (entity.selectedInventoryItemComponentOrNull ?: return false).element
+
+  if (element is Material) {
+    val inventory = entity.inventoryComponentOrNull ?: return false
+    val locallyControlledComponent = entity.locallyControlledComponent
+    val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).toSet()
+    if (inventory.use(element, placeableBlock.size.toUInt())) {
+      element.createBlocks(world, placeableBlock)
+    }
   }
   return true
 }
