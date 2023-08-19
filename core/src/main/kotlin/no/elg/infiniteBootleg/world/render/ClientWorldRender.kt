@@ -32,8 +32,8 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   private val viewBound: Rectangle = Rectangle()
   private val m4 = Matrix4()
   private val renderers: List<Renderer> = listOf(
-    EntityRenderer(this),
-    HoveringBlockRenderer(this)
+    HoveringBlockRenderer(this),
+    EntityRenderer(this)
   )
   private val chunkDebugRenderer: DebugChunkRenderer = DebugChunkRenderer(this)
   private val blockLightDebugRenderer: BlockLightDebugRenderer = BlockLightDebugRenderer(this)
