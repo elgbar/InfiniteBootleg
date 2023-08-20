@@ -236,5 +236,5 @@ private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Fl
 }
 
 private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
-  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 3f, rx = PLAYER_WIDTH * side / 1.5f)
+  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 2f, rx = PLAYER_WIDTH * side / 1.5f)
 }

@@ -20,7 +20,8 @@ class GroundedComponent : EntitySavableComponent {
   val leftArmContacts = LongContactTracker(PLAYERS_LEFT_ARM_USER_DATA)
   val rightArmContacts = LongContactTracker(PLAYERS_RIGHT_ARM_USER_DATA)
 
-  val onGround: Boolean get() = !feetContacts.isEmpty
+  // To fix being stuck on in a 1x1 hole, allow jumping when both arms are in contact
+  val onGround: Boolean get() = !feetContacts.isEmpty || (!leftArmContacts.isEmpty && !rightArmContacts.isEmpty)
   val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty
   val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty
 
