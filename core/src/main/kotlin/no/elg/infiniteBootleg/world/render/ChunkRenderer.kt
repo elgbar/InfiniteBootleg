@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.isAir
+import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -130,7 +131,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     // this is the main render function
     val blocks = chunk.blocks
     fbo.use {
-      batch.use {
+      batch.safeUse {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         if (aboveGround) {
           Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A)

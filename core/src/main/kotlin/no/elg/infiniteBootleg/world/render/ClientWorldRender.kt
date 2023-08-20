@@ -8,12 +8,12 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.utils.OrderedMap
-import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
+import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -98,7 +98,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
         draw.put(chunk, textureRegion)
       }
     }
-    batch.use {
+    batch.safeUse {
       for (entry in draw.entries()) {
         val dx = entry.key.chunkX * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetX
         val dy = entry.key.chunkY * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetY

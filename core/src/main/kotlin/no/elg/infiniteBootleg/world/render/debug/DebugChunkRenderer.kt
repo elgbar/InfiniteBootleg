@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -71,7 +72,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
         }
       }
       val sr = ClientMain.inst().screenRenderer
-      sr.batch.use {
+      sr.batch.safeUse {
         sr.drawBottom("Debug Chunk outline legend", 5f)
         sr.font.color = WITHIN_CAMERA_COLOR
         sr.drawBottom("  Chunks within the camera boarders", 3f)

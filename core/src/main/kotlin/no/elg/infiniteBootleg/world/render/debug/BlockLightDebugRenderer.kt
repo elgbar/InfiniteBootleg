@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -71,7 +72,7 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     val pointerWorldY = mouseLocator.mouseBlockY
 
     val light = world.getBlockLight(pointerWorldX, pointerWorldY, false) ?: return
-    batch.use {
+    batch.safeUse {
       for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
         val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
         val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)

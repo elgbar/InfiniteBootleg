@@ -1,18 +1,17 @@
 package no.elg.infiniteBootleg.util
 
-import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.fasterxml.uuid.Generators
 import ktx.assets.dispose
-import no.elg.infiniteBootleg.Settings
+import ktx.graphics.begin
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
-import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 fun fromUUIDOrNull(string: String?): UUID? {
@@ -104,48 +103,23 @@ inline fun SpriteBatch.withColor(r: Float = this.color.r, g: Float = this.color.
   this.color = oldColor
 }
 
-fun Entity.interactableBlocks(
-  world: World,
-  centerBlockX: WorldCoord,
-  centerBlockY: WorldCoord,
-  radius: Float,
-  interactionRadius: Float
-): Sequence<Long> {
-  val pos = this.position
-  return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
-    .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
-    .filter { (worldX, worldY) ->
-      ignorePlaceableCheck || (
-        isBlockInsideRadius(pos.x, pos.y, worldX, worldY, interactionRadius) &&
-          (!Settings.renderLight || world.getBlockLight(worldX, worldY, false)?.isLit ?: true)
-        )
-    }
-}
-
-fun Entity.breakableLocs(
-  world: World,
-  centerBlockX: WorldCoord,
-  centerBlockY: WorldCoord,
-  radius: Float,
-  interactionRadius: Float
-): Sequence<Long> {
-  return interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
-}
-
-fun Entity.placeableBlocks(
-  world: World,
-  centerBlockX: WorldCoord,
-  centerBlockY: WorldCoord,
-  interactionRadius: Float
-): Sequence<Long> {
-  return interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
-    .filter { world.isAirBlock(it) }
-    .let {
-      if (it.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
-        it
-      } else {
-        emptySequence()
-      }
-    }
-}
 typealias ChunkColumnFeatureFlag = Int
+
+/**
+ * Automatically calls [Batch.begin] and [Batch.end]. If the batch is already drawing, it is ended before the action.
+ * @param projectionMatrix A projection matrix to set on the batch before [Batch.begin]. If null, the batch's matrix
+ * remains unchanged.
+ * @param action inlined. Executed after [Batch.begin] and before [Batch.end].
+ */
+inline fun <B : Batch> B.safeUse(projectionMatrix: Matrix4? = null, action: (B) -> Unit) {
+  contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
+  if (projectionMatrix != null) {
+    this.projectionMatrix = projectionMatrix
+  }
+  if (isDrawing) {
+    end()
+  }
+  begin()
+  action(this)
+  end()
+}
