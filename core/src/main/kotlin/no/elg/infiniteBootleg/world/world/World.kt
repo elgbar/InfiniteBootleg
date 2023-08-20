@@ -654,7 +654,7 @@ abstract class World(
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       val material = chunk.getRawBlock(localX, localY).materialOrAir()
-      material.adjacentPlaceable
+      material.isCollidable
     }
 
   private inline fun <R> actionOnBlock(

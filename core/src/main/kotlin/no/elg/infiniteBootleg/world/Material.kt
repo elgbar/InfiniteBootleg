@@ -51,15 +51,10 @@ enum class Material(
    */
   val emitsLight: Boolean = false,
   /**
-   * @return If this material can be used to place blocks near it
-   */
-  val adjacentPlaceable: Boolean = true,
-  val isGravityAffected: Boolean = false,
-  /**
    * @return If this material can be rotated, but the entity can handle the rendering
    */
   val invisibleBlock: Boolean = false,
-  val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
+  private val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
 ) : InventoryElement {
   AIR(
     hardness = 0f,
@@ -67,7 +62,6 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     emitsLight = false,
-    adjacentPlaceable = false,
     invisibleBlock = true
   ),
   STONE(hardness = 1.5f, hasTransparentTexture = false),
@@ -82,7 +76,6 @@ enum class Material(
   SAND(
     hardness = 1f,
     hasTransparentTexture = false,
-    isGravityAffected = true,
     createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
     }
@@ -93,8 +86,6 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     emitsLight = true,
-    adjacentPlaceable = false,
-    isGravityAffected = true,
     createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
     }
@@ -116,7 +107,6 @@ enum class Material(
     hasTransparentTexture = true,
     isCollidable = false,
     blocksLight = false,
-    adjacentPlaceable = false,
     createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, chunk, worldX, worldY, material)
     }
