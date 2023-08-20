@@ -51,7 +51,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     it.position.y = 0f
   }
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
-  val box2DDebugRenderer: Box2DDebugRenderer = Box2DDebugRenderer(true, true, true, true, true, true)
+  val box2DDebugRenderer: Box2DDebugRenderer = Box2DDebugRenderer(true, false, false, false, true, false)
 
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
     camera.position.set(worldX.toFloat(), worldY.toFloat(), 0f)
