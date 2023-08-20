@@ -167,7 +167,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
   fun debBox() {
     Settings.renderBox2dDebug = !Settings.renderBox2dDebug
-    Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
       "Debug rendering for Box2D is now ${Settings.renderBox2dDebug.toAbled()}"
@@ -232,7 +231,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of chunk bounds")
   fun debChu() {
     Settings.renderChunkBounds = !Settings.renderChunkBounds
-    Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
       "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}"
@@ -243,7 +241,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of chunk updates")
   fun debChuUpd() {
     Settings.renderChunkUpdates = !Settings.renderChunkUpdates
-    Settings.debug = true
     logger.log(LogLevel.SUCCESS, "Debug rendering of chunk updates is now ${Settings.renderChunkUpdates.toAbled()}")
   }
 
@@ -251,7 +248,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of block light updates")
   fun debLitUpd() {
     Settings.renderBlockLightUpdates = !Settings.renderBlockLightUpdates
-    Settings.debug = true
     logger.log(LogLevel.SUCCESS, "Debug rendering of block light updates is now ${Settings.renderBlockLightUpdates.toAbled()}")
   }
 
@@ -259,7 +255,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of entity lighting")
   fun debEntLit() {
     Settings.debugEntityLight = !Settings.debugEntityLight
-    Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
       "Debug rendering of entity light is now ${Settings.debugEntityLight.toAbled()}"
@@ -273,7 +268,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of block lighting")
   fun debBlkLit() {
     Settings.debugBlockLight = !Settings.debugBlockLight
-    Settings.debug = true
     logger.log(
       LogLevel.SUCCESS,
       "Debug rendering of block light is now ${Settings.debugBlockLight.toAbled()}"
