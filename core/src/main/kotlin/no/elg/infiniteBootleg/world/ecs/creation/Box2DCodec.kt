@@ -55,9 +55,16 @@ fun EngineEntity.createPlayerBodyComponent(
     wantedFamilies,
     afterBodyCreated = whenReady
   ) { body: Body ->
-    createPlayerFixture(body, 0f) { set(playerVertices) }
-    createPlayerFixture(body, DEFAULT_FIXTURE_FRICTION) { setAsBox(PLAYER_WIDTH / 4f, ESSENTIALLY_ZERO, Vector2(0f, -PLAYER_HEIGHT / 2f), 0f) }
-    createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, width = PLAYER_WIDTH / 3f, height = ESSENTIALLY_ZERO, ry = -(PLAYER_HEIGHT / 2f))
+    body.isBullet = true
+    createPlayerFixture(body, body, 0f) { set(playerVertices) }
+    createPlayerFixture(body, PLAYERS_FOOT_USER_DATA, DEFAULT_FIXTURE_FRICTION) {
+      setAsBox(
+        PLAYER_WIDTH / 3.5f,
+        ESSENTIALLY_ZERO,
+        Vector2(0f, -PLAYER_HEIGHT / 2f - ESSENTIALLY_ZERO),
+        0f
+      )
+    }
     createPlayerTouchAreaFixture(body, PLAYERS_LEFT_ARM_USER_DATA, -1)
     createPlayerTouchAreaFixture(body, PLAYERS_RIGHT_ARM_USER_DATA, 1)
   }
@@ -191,20 +198,14 @@ internal fun createBody2DBodyComponent(
   }
 }
 
-private fun createPlayerFixture(body: Body, friction: Float, defineShape: PolygonShape.() -> Unit) {
-  val def = FixtureDef().apply {
-    density = Constants.DEFAULT_FIXTURE_DENSITY
-    restitution = Constants.DEFAULT_FIXTURE_RESTITUTION // a bit bouncy!
-  }
-
+private fun createPlayerFixture(body: Body, userData: Any, friction: Float, defineShape: PolygonShape.() -> Unit) {
   PolygonShape().useDispose {
     defineShape(it)
-    def.shape = it
-    def.friction = friction
+    playerFixtureDef.shape = it
+    playerFixtureDef.friction = friction
 
-    body.createFixture(def).also { fix ->
-      fix.filterData = Filters.GR_EN_ENTITY_FILTER
-      fix.userData = body.userData
+    body.createFixture(playerFixtureDef).also { fix ->
+      fix.userData = userData
     }
   }
 }
@@ -228,7 +229,13 @@ private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int
   createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 2f, rx = PLAYER_WIDTH * side / 1.5f)
 }
 
-val playerVertices = Array(8) { Vector2() }.also { vertices ->
+private val playerFixtureDef = FixtureDef().apply {
+  filter.set(Filters.GR_EN_ENTITY_FILTER)
+  density = Constants.DEFAULT_FIXTURE_DENSITY
+  restitution = 0f
+}
+
+private val playerVertices = Array(8) { Vector2() }.also { vertices ->
   val halfWidth = PLAYER_WIDTH / 2f
   val halfHeight = PLAYER_HEIGHT / 2f
   val nearZW = halfWidth - 0.1f
@@ -238,8 +245,8 @@ val playerVertices = Array(8) { Vector2() }.also { vertices ->
   vertices[1].set(nearZW, halfHeight)
   vertices[2].set(-halfWidth, -(halfHeight / 2f))
   vertices[3].set(-halfWidth, nearZH)
-  vertices[4].set(-(halfWidth / 2f), -halfHeight)
-  vertices[5].set((halfWidth / 2f), -halfHeight)
+  vertices[4].set(-(halfWidth / 2f), -halfHeight + 0.01f)
+  vertices[5].set((halfWidth / 2f), -halfHeight + 0.01f)
   vertices[6].set(halfWidth, -(halfHeight / 2f))
   vertices[7].set(halfWidth, nearZH)
 }
