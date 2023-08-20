@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.util
 import com.badlogic.gdx.math.Interpolation
 
 data class ProgressHandler(
-  val durationSeconds: Float,
+  private val durationSeconds: Float,
   private val interpolation: Interpolation = Interpolation.smooth,
   private val start: Float = 0.75f,
   private val end: Float = 0f

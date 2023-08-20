@@ -7,8 +7,8 @@ import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.util.WorldCoord
-import no.elg.infiniteBootleg.util.breakableBlocks
+import no.elg.infiniteBootleg.util.WorldCompactLoc
+import no.elg.infiniteBootleg.util.breakableLocs
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.placeableBlocks
@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
 import java.lang.Math.floorMod
@@ -36,31 +37,33 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       val controls = entity.locallyControlledComponentOrNull ?: continue
       val element = entity.selectedInventoryItemComponentOrNull?.element ?: continue
       val isBreaking = controls.isBreaking(entity)
-      val progress = if (isBreaking) controls.breakingProgress.progress else 1f
+      val breakingComponent = entity.currentlyBreakingComponentOrNull
 
       if (element.itemType == ItemType.TOOL) {
-        val breakableBlocks = entity.breakableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
+        val breakableBlocks = entity.breakableLocs(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
         breakableBlocks
-          .forEach { (blockWorldX, blockWorldY) ->
+          .forEach { blockWorldLoc ->
             if (isBreaking) {
+              val progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: 0f
               val textures = KAssets.breakingBlockTextures.size - 1f
               val index = (textures * progress).roundToInt()
-              renderPlaceableBlock(world, KAssets.breakingBlockTextures[index].textureRegion, blockWorldX, blockWorldY, 1f)
+              renderPlaceableBlock(world, KAssets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
             } else {
-              renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldX, blockWorldY)
+              renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldLoc)
             }
           }
       } else if (element.itemType == ItemType.BLOCK && !isBreaking) {
         val texture = element.textureRegion?.textureRegion ?: continue
-        entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
-          .forEach { (blockWorldX, blockWorldY) ->
-            renderPlaceableBlock(world, texture, blockWorldX, blockWorldY)
+        entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.interactRadius)
+          .forEach { blockWorldLoc ->
+            renderPlaceableBlock(world, texture, blockWorldLoc)
           }
       }
     }
   }
 
-  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldX: WorldCoord, blockWorldY: WorldCoord, overrideAlpha: Float? = null) {
+  private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldLoc: WorldCompactLoc, overrideAlpha: Float? = null) {
+    val (blockWorldX, blockWorldY) = blockWorldLoc
     val averageBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: 1f
     if (averageBrightness == 0f) {
       // no need to render a black block

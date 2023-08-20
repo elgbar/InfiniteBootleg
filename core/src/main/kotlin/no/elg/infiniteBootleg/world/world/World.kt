@@ -35,6 +35,7 @@ import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
@@ -766,6 +767,17 @@ abstract class World(
     val chunk = nullableChunk ?: return null
     return chunk.getBlock(localX, localY)
   }
+
+  /**
+   * Note an air block will be created if the chunk is loaded and there is no other block at the
+   * given location
+   *
+   * @param worldX    The x coordinate from world view
+   * @param worldY    The y coordinate from world view
+   * @param loadChunk
+   * @return The block at the given x and y
+   */
+  fun getBlock(worldX: WorldCompactLoc, loadChunk: Boolean = true): Block? = getBlock(worldX.decompactLocX(), worldX.decompactLocY(), loadChunk)
 
   /**
    * @return If the given chunk is loaded in memory

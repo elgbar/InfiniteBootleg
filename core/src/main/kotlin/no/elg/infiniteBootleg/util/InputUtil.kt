@@ -47,7 +47,7 @@ fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = w
   if (element is Tool) {
     if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
     val locallyControlledComponent = entity.locallyControlledComponent
-    val breakableBlocks = entity.breakableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
+    val breakableBlocks = entity.breakableLocs(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
     world.removeBlocks(breakableBlocks)
   }
   return true
@@ -61,7 +61,7 @@ fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = w
   if (element is Material) {
     val inventory = entity.inventoryComponentOrNull ?: return false
     val locallyControlledComponent = entity.locallyControlledComponent
-    val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).toSet()
+    val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.interactRadius).toSet()
     if (inventory.use(element, placeableBlock.size.toUInt())) {
       element.createBlocks(world, placeableBlock)
     }
