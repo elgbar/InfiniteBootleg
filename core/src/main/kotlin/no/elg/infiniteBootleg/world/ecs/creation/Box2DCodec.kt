@@ -14,7 +14,9 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Constants
+import no.elg.infiniteBootleg.world.Constants.DEFAULT_FIXTURE_FRICTION
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
@@ -52,11 +54,12 @@ fun EngineEntity.createPlayerBodyComponent(
     PLAYER_HEIGHT,
     wantedFamilies,
     afterBodyCreated = whenReady
-  ) {
-    createPlayerFixture(it)
-    createSecondaryPlayerFixture(it, PLAYERS_FOOT_USER_DATA, width = PLAYER_WIDTH / 3f, height = ESSENTIALLY_ZERO, ry = -(PLAYER_HEIGHT / 2f))
-    createPlayerTouchAreaFixture(it, PLAYERS_LEFT_ARM_USER_DATA, -1)
-    createPlayerTouchAreaFixture(it, PLAYERS_RIGHT_ARM_USER_DATA, 1)
+  ) { body: Body ->
+    createPlayerFixture(body, 0f) { set(playerVertices) }
+    createPlayerFixture(body, DEFAULT_FIXTURE_FRICTION) { setAsBox(PLAYER_WIDTH / 4f, ESSENTIALLY_ZERO, Vector2(0f, -PLAYER_HEIGHT / 2f), 0f) }
+    createSecondaryPlayerFixture(body, PLAYERS_FOOT_USER_DATA, width = PLAYER_WIDTH / 3f, height = ESSENTIALLY_ZERO, ry = -(PLAYER_HEIGHT / 2f))
+    createPlayerTouchAreaFixture(body, PLAYERS_LEFT_ARM_USER_DATA, -1)
+    createPlayerTouchAreaFixture(body, PLAYERS_RIGHT_ARM_USER_DATA, 1)
   }
 }
 
@@ -188,36 +191,22 @@ internal fun createBody2DBodyComponent(
   }
 }
 
-private fun createPlayerFixture(body: Body) {
-  val shape = PolygonShape()
+private fun createPlayerFixture(body: Body, friction: Float, defineShape: PolygonShape.() -> Unit) {
+  val def = FixtureDef().apply {
+    density = Constants.DEFAULT_FIXTURE_DENSITY
+    restitution = Constants.DEFAULT_FIXTURE_RESTITUTION // a bit bouncy!
+  }
 
-  val halfWidth = PLAYER_WIDTH / 2f
-  val halfHeight = PLAYER_HEIGHT / 2f
-  val nearZW = halfWidth - 0.1f
-  val nearZH = halfHeight - 0.1f
+  PolygonShape().useDispose {
+    defineShape(it)
+    def.shape = it
+    def.friction = friction
 
-  val vertices = Array(8) { Vector2() }
-  vertices[0].set(-nearZW, halfHeight)
-  vertices[1].set(nearZW, halfHeight)
-  vertices[2].set(-halfWidth, -(halfHeight / 2f))
-  vertices[3].set(-halfWidth, nearZH)
-  vertices[4].set(-(halfWidth / 2f), -halfHeight)
-  vertices[5].set((halfWidth / 2f), -halfHeight)
-  vertices[6].set(halfWidth, -(halfHeight / 2f))
-  vertices[7].set(halfWidth, nearZH)
-  shape.set(vertices)
-
-  val def = FixtureDef()
-  def.shape = shape
-  def.density = Constants.DEFAULT_FIXTURE_DENSITY
-  def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-  def.restitution = Constants.DEFAULT_FIXTURE_RESTITUTION // a bit bouncy!
-
-  val fix: Fixture = body.createFixture(def)
-  fix.filterData = Filters.GR_EN_ENTITY_FILTER
-  fix.userData = body.userData
-
-  shape.dispose()
+    body.createFixture(def).also { fix ->
+      fix.filterData = Filters.GR_EN_ENTITY_FILTER
+      fix.userData = body.userData
+    }
+  }
 }
 
 private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float, height: Float, rx: Float = 0f, ry: Float = 0f) {
@@ -237,4 +226,20 @@ private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Fl
 
 private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
   createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 2f, rx = PLAYER_WIDTH * side / 1.5f)
+}
+
+val playerVertices = Array(8) { Vector2() }.also { vertices ->
+  val halfWidth = PLAYER_WIDTH / 2f
+  val halfHeight = PLAYER_HEIGHT / 2f
+  val nearZW = halfWidth - 0.1f
+  val nearZH = halfHeight - 0.1f
+
+  vertices[0].set(-nearZW, halfHeight)
+  vertices[1].set(nearZW, halfHeight)
+  vertices[2].set(-halfWidth, -(halfHeight / 2f))
+  vertices[3].set(-halfWidth, nearZH)
+  vertices[4].set(-(halfWidth / 2f), -halfHeight)
+  vertices[5].set((halfWidth / 2f), -halfHeight)
+  vertices[6].set(halfWidth, -(halfHeight / 2f))
+  vertices[7].set(halfWidth, nearZH)
 }
