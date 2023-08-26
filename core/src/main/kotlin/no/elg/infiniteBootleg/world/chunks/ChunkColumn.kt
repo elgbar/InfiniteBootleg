@@ -92,7 +92,7 @@ interface ChunkColumn {
       /**
        * The absolute top-most block, contains all flags
        */
-      const val TOP_MOST_FLAG: ChunkColumnFeatureFlag = BLOCKS_LIGHT_FLAG or SOLID_FLAG
+      const val TOP_MOST_FLAG: ChunkColumnFeatureFlag = 1 shl 1 or 1 shl 0 // BLOCKS_LIGHT_FLAG or SOLID_FLAG
     }
   }
 }
