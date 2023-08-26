@@ -138,18 +138,11 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   fun updateTexture(prioritize: Boolean)
 
   /**
-   * Will not call [updateIfDirty]
+   * Will not update textures
    *
    * @return If this chunk has a texture generated
    */
   fun hasTextureRegion(): Boolean
-
-  /**
-   * Force update of texture and recalculate internal variables This is usually called when the
-   * dirty flag of the chunk is set and either [isAllAir] or [textureRegion]
-   * called.
-   */
-  fun updateIfDirty()
 
   /**
    * Block light was updated in this chunk at the given local coordinates

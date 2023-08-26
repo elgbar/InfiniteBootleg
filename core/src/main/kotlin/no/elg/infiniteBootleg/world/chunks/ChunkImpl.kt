@@ -295,6 +295,11 @@ class ChunkImpl(
     synchronized(fboLock) { return fboRegion != null }
   }
 
+  /**
+   * Force update of texture and recalculate internal variables This is usually called when the
+   * dirty flag of the chunk is set and either [isAllAir] or [textureRegion]
+   * called.
+   */
   private fun updateIfDirty() {
     if (isInvalid) {
       return
