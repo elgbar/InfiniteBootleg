@@ -96,7 +96,7 @@ object EventManager {
 
       // Remove from another thread to not cause concurrent modification
       Main.inst().scheduler.executeAsync {
-        val storedThis = oneShotStrongRefs.remove(listener) ?: throw IllegalStateException("Failed to find a strong referance to the oneshot listener")
+        val storedThis = oneShotStrongRefs.remove(listener) ?: throw IllegalStateException("Failed to find a strong reference to the oneshot listener")
         javaRemoveListener(eventClass, storedThis as EventListener<T>) // Kotlin is stuped OFC(!!) this wokrs
       }
     }

@@ -28,13 +28,9 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
       instField = this
     }
     val onShutdown = Runnable {
-      if (server != null) {
-        broadcast(clientBoundDisconnectPlayerPacket("Server closed"), null)
-      }
-      if (serverWorld != null) {
-        serverWorld?.save()
-        serverWorld?.dispose()
-      }
+      broadcast(clientBoundDisconnectPlayerPacket("Server closed"), null)
+      serverWorld.save()
+      serverWorld.dispose()
       dispose()
       scheduler.shutdown() // make sure scheduler threads are dead
     }
