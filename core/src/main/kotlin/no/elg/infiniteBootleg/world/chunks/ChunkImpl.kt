@@ -30,10 +30,13 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.directionTo
+import no.elg.infiniteBootleg.util.findWhichInnerEdgesOfChunk
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
+import no.elg.infiniteBootleg.util.isNextTo
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
+import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -145,6 +148,17 @@ class ChunkImpl(
       }
       if (xCheck && yCheck) {
         doUpdateLight(chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY), true)
+      }
+    }
+  }
+
+  private val blockChangedEventListener = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
+    val block = oldBlock ?: newBlock ?: return@EventListener
+
+    if (block.isNextTo(this)) {
+      val changeDirection = block.findWhichInnerEdgesOfChunk()
+      if (Direction.direction(block.chunk.chunkX, block.chunk.chunkY, chunkX, chunkY) in changeDirection) {
+        dirty()
       }
     }
   }
@@ -281,7 +295,7 @@ class ChunkImpl(
     synchronized(fboLock) { return fboRegion != null }
   }
 
-  override fun updateIfDirty() {
+  private fun updateIfDirty() {
     if (isInvalid) {
       return
     }
@@ -559,6 +573,7 @@ class ChunkImpl(
     chunkBody.update()
     // Register events
     registerListener(updateChunkLightEventListener)
+    registerListener(blockChangedEventListener)
     Main.inst().scheduler.executeAsync(::updateAllBlockLights)
   }
 

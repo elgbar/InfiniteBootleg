@@ -88,7 +88,37 @@ inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = loca
  * @return If given x and y are on the edge of a chunk, while still inside the chunk
  */
 @Contract(pure = true)
-inline fun isInnerEdgeOfChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX == 0 || localX == Chunk.CHUNK_SIZE - 1 || localY == 0 || localY == Chunk.CHUNK_SIZE - 1
+inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == Chunk.CHUNK_SIZE - 1
+
+inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> = mutableListOf<Direction>().also {
+  if (localX == 0) it += Direction.WEST
+  if (localX == Chunk.CHUNK_SIZE - 1) it += Direction.EAST
+  if (localY == 0) it += Direction.SOUTH
+  if (localY == Chunk.CHUNK_SIZE - 1) it += Direction.NORTH
+}
+
+/**
+ * @param localX The chunk local x coordinate
+ * @param localY The chunk local y coordinate
+ * @return If given x and y are on the edge of a chunk, while still inside the chunk
+ */
+@Contract(pure = true)
+inline fun isInnerEdgeOfChunk(localX: LocalCoord, localY: LocalCoord): Boolean = isInnerEdgeOfChunk(localX) || isInnerEdgeOfChunk(localY)
+
+inline fun isInnerEdgeOfChunk(localLoc: LocalCompactLoc): Boolean {
+  val (localX, localY) = localLoc
+  return isInnerEdgeOfChunk(localX, localY)
+}
+
+/**
+ * If this chunk is a neighbor of the given block.
+ */
+inline fun Chunk.isCardinalNeighbor(chunk: Chunk) = abs(chunk.chunkX - this.chunkX) + abs(chunk.chunkY - this.chunkY) == 1
+
+/**
+ * @return If this block is on the edge to the given chunk
+ */
+inline fun Block.isNextTo(chunk: Chunk): Boolean = this.chunk.isCardinalNeighbor(chunk) && isInnerEdgeOfChunk(localX, localY)
 
 /**
  * @param worldX The world x coordinate
