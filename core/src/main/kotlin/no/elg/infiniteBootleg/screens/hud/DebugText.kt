@@ -73,8 +73,8 @@ object DebugText {
     val exists = block != null
     val blockDebug = block?.hudDebug() ?: ""
 
-    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) exists? %-5s %s"
-    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, exists, blockDebug))
+    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s %s"
+    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug))
   }
 
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
