@@ -77,7 +77,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
@@ -334,7 +334,7 @@ abstract class World(
         (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
         render.chunkLocationsInView.forEach(::loadChunk)
         this.load(protoWorld.player).thenApply {
-          it.transient = true
+          it.isTransientEntity = true
           dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
         }
       }

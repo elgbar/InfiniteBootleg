@@ -8,8 +8,8 @@ import ktx.ashley.tagFor
 /**
  * This entity will not be saved in as a chunk entity
  */
-class TransientTag : Component {
-  companion object : Mapper<TransientTag>() {
-    var Entity.transient by tagFor<TransientTag>()
+class TransientEntityTag : Component {
+  companion object : Mapper<TransientEntityTag>() {
+    var Entity.isTransientEntity by tagFor<TransientEntityTag>()
   }
 }

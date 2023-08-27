@@ -64,13 +64,13 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheckComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecayComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientTag.Companion.transient
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.checkShouldLoad as box2DBodyComponentCheckShouldLoad
 
 fun Entity.save(ignoreTransient: Boolean = false): ProtoWorld.Entity? {
-  if (!ignoreTransient && this.transient) return null
+  if (!ignoreTransient && this.isTransientEntity) return null
   return entity {
     this@save.entityTypeComponent.apply { save() }
     this@save.idComponent.apply { save() }
