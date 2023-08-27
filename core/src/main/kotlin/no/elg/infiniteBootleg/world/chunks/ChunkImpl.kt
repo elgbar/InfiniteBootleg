@@ -639,7 +639,7 @@ class ChunkImpl(
       }
     }
     for (protoEntity in protoChunk.entitiesList) {
-      world.load(protoEntity)
+      world.load(protoEntity, this)
     }
     return true
   }
