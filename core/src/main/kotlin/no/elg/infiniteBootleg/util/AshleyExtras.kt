@@ -27,7 +27,6 @@ fun Entity.interactableBlocks(
   val pos = this.position
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
-    .filter { (worldX, worldY) -> world.getEntities(worldX + 0.5f, worldY + 0.5f).isEmpty }
     .filter { (worldX, worldY) ->
       ignorePlaceableCheck || (
         isBlockInsideRadius(pos.x, pos.y, worldX, worldY, interactionRadius) &&
