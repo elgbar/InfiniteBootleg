@@ -176,9 +176,9 @@ fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Pack
 fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   return serverBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
-      .setUuid(entity.id) //
-      .setPosition(entity.positionComponent.toProtoVector2f()) //
-      .setVelocity(entity.velocityComponent.toVector2f()) //
+      .setUuid(entity.id)
+      .setPosition(entity.positionComponent.toProtoVector2f())
+      .setVelocity(entity.velocityComponent.toVector2f())
 //      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }
@@ -215,9 +215,9 @@ fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?
 fun clientBoundMoveEntity(entity: Entity): Packet {
   return clientBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
-      .setUuid(entity.id) //
-      .setPosition(entity.positionComponent.toProtoVector2f()) //
-      .setVelocity(entity.velocityComponent.toVector2f()) //
+      .setUuid(entity.id)
+      .setPosition(entity.positionComponent.toProtoVector2f())
+      .setVelocity(entity.velocityComponent.toVector2f())
 //      .setLookAngleDeg(entity.lookDeg)
   ).build()
 }

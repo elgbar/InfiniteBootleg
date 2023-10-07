@@ -40,17 +40,17 @@ class TickerImpl(
 
   /** How low the tps must reach before displaying a "can't keep up" warning  */
   private val tpsWarnThreshold: Long
+
   /**
    * @return How many ticks have passed since start
    */
-  /** The current tick  */
   override var tickId: Long = 0
     private set
+
   /**
    * @return The current TPS might differ from [.DEFAULT_TICKS_PER_SECOND] but will never be
    * greater than it
    */
-  /** The current ticks per second  */
   override var realTPS: Long = -1
     private set
 
@@ -59,10 +59,10 @@ class TickerImpl(
 
   /** Ticks accumulated during calculating tps  */
   private var tpsTick: Long = 0
+
   /**
    * @return Nanoseconds between each tick
    */
-  /** Last diff between each tick  */
   override var tpsDelta: Long = 0
     private set
 

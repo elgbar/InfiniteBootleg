@@ -71,16 +71,14 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     Main.inst().scheduler.executeAsync {
       synchronized(QUEUE_LOCK) {
         val chunkIndex = renderQueue.indexOf(chunk)
-        val currentlyRenderingIt = chunk === curr
-
+        if (chunk === curr) {
+          return@executeAsync
+        }
         // Place the chunk at the front of the queue
-        if (prioritize && !currentlyRenderingIt && chunkIndex > 0) {
+        if (prioritize && chunkIndex > 0) {
           renderQueue.removeAt(chunkIndex)
           renderQueue.add(0, chunk)
-        }
-
-        // do not queue the chunk we're currently rendering
-        else if (!currentlyRenderingIt) {
+        } else {
           if (prioritize) {
             renderQueue.add(0, chunk)
           } else {
