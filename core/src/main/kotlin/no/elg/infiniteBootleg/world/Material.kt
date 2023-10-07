@@ -111,7 +111,7 @@ enum class Material(
       world.engine.createLeafEntity(world, chunk, worldX, worldY, material)
     }
   ),
-  SAND_STONE(
+  SANDSTONE(
     hardness = 1f,
     hasTransparentTexture = false
   );

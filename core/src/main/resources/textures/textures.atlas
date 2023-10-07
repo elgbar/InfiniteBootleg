@@ -49,47 +49,47 @@ break
 	bounds: 87, 81, 16, 16
 break
 	index: 3
-	bounds: 87, 9, 16, 16
+	bounds: 87, 27, 16, 16
 break
 	index: 8
-	bounds: 121, 149, 16, 16
+	bounds: 87, 9, 16, 16
 break
 	index: 5
-	bounds: 139, 115, 16, 16
+	bounds: 139, 133, 16, 16
 break
 	index: 2
-	bounds: 105, 59, 16, 16
+	bounds: 105, 77, 16, 16
 break
 	index: 7
-	bounds: 123, 77, 16, 16
+	bounds: 123, 95, 16, 16
 breaking_block
 	bounds: 123, 59, 16, 16
 brick
-	bounds: 139, 151, 16, 16
+	bounds: 121, 113, 16, 16
 dirt_rotatable
 	bounds: 69, 81, 16, 16
 door
-	bounds: 121, 131, 16, 16
+	bounds: 121, 149, 16, 16
 door_closed
 	bounds: 135, 235, 16, 32
 door_open
 	bounds: 135, 201, 16, 32
 glass
-	bounds: 87, 27, 16, 16
+	bounds: 87, 45, 16, 16
 grass-dirt-east
-	bounds: 105, 41, 16, 16
+	bounds: 105, 59, 16, 16
 grass-dirt-south
-	bounds: 105, 95, 16, 16
+	bounds: 139, 115, 16, 16
 grass-dirt-south-dirt-east
-	bounds: 105, 77, 16, 16
+	bounds: 105, 95, 16, 16
 grass-dirt-south-dirt-west
-	bounds: 105, 23, 16, 16
+	bounds: 105, 41, 16, 16
 grass-dirt-south-dirt-west-dirt-east
 	bounds: 69, 9, 16, 16
 grass-dirt-west
-	bounds: 123, 95, 16, 16
+	bounds: 105, 23, 16, 16
 grass_rotatable
-	bounds: 121, 113, 16, 16
+	bounds: 121, 131, 16, 16
 hand
 	bounds: 1, 203, 64, 64
 pickaxe
@@ -97,12 +97,11 @@ pickaxe
 player
 	bounds: 135, 169, 18, 30
 sand_rotatable
-	bounds: 139, 133, 16, 16
-sand_stone/sand_stone
-	index: 1
-	bounds: 87, 63, 16, 16
+	bounds: 139, 151, 16, 16
+sandstone_rotatable
+	bounds: 123, 77, 16, 16
 stone_rotatable
-	bounds: 87, 45, 16, 16
+	bounds: 87, 63, 16, 16
 tnt
 	bounds: 69, 45, 16, 16
 torch
