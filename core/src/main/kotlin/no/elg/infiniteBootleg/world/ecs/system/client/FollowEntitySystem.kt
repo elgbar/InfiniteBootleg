@@ -24,17 +24,17 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
   private const val CAMERA_LERP = 2.5f
   private const val LERP_CUTOFF = 5f
 
-  override fun processEntities(entities: ImmutableArray<Entity>) {
+  override fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float) {
     val entity = entities.firstOrNull() ?: return
     if (entities.size() == 1) {
-      processEntity(entity)
+      processEntity(entity, deltaTime)
     } else if (entities.size() > 1) {
       Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: ${entities.map { it.id }}")
       entities.drop(1).forEach { it.followedByCamera = false }
     }
   }
 
-  private fun processEntity(entity: Entity) {
+  private fun processEntity(entity: Entity, deltaTime: Float) {
     val worldRender = entity.world.render
     if (worldRender is ClientWorldRender) {
       val camera: OrthographicCamera = worldRender.camera
@@ -51,8 +51,8 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
         val dx = diffX * CAMERA_LERP * Block.BLOCK_SIZE
         val dy = diffY * CAMERA_LERP * Block.BLOCK_SIZE
         if (abs(dx) > LERP_CUTOFF || abs(dy) > LERP_CUTOFF) {
-          camera.position.x += dx * Gdx.graphics.deltaTime
-          camera.position.y += dy * Gdx.graphics.deltaTime
+          camera.position.x += dx * deltaTime
+          camera.position.y += dy * deltaTime
         }
       }
       worldRender.update()

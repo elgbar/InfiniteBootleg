@@ -21,7 +21,7 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
 
   private const val DESPAWN_LEAVES_RADIUS = 5f
 
-  override fun processEntities(entities: ImmutableArray<Entity>) {
+  override fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float) {
     val entity: Entity = entities.random()
     val chunk = entity.chunk
     if (chunk.isDisposed) {

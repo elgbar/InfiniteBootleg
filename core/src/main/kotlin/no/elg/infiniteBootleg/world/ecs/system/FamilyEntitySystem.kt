@@ -26,10 +26,10 @@ abstract class FamilyEntitySystem(private val family: Family, priority: Int) : E
 
   final override fun update(deltaTime: Float) {
     if (entities.size() == 0) return
-    processEntities(entities)
+    processEntities(entities, deltaTime)
   }
 
-  abstract fun processEntities(entities: ImmutableArray<Entity>)
+  abstract fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float)
 
   companion object {
     private val EMPTY_ENTITIES = ImmutableArray<Entity>(Array.with())
