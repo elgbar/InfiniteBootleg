@@ -77,7 +77,6 @@ class ChunkImpl(
    *
    * Use [dirty] to mark chunk as dirty
    * */
-  @get:Synchronized
   @Volatile
   override var isDirty = true
     private set
@@ -559,7 +558,6 @@ class ChunkImpl(
     }
   }
 
-  @Synchronized
   override fun dirty() {
     isDirty = true
   }
