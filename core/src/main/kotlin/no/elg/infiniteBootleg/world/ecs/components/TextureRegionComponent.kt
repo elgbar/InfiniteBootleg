@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.KAssets
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.findRotationAwareRegion
 
 data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntitySavableComponent {
   companion object : EntityLoadableMapper<TextureRegionComponent>() {
@@ -21,7 +20,7 @@ data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntityS
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasTexture()
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent {
-      val region = KAssets.textureAtlas.findRotationAwareRegion(protoEntity.texture.texture, false)
+      val region = Main.inst().assets.safeTextureAtlas.findRotationAwareRegion(protoEntity.texture.texture, false)
       return with(TextureRegionComponent(region))
     }
   }

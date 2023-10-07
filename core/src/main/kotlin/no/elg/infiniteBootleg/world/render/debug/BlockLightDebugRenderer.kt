@@ -8,13 +8,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.LongMap
 import ktx.graphics.use
-import no.elg.infiniteBootleg.KAssets.luminanceDebugTexture
-import no.elg.infiniteBootleg.KAssets.skylightDebugTexture
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.LongMapUtil.component1
 import no.elg.infiniteBootleg.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.util.ProgressHandler
@@ -76,13 +75,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
       for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
         val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
         val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
-        batch.draw(luminanceDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+        batch.draw(Main.inst().assets.luminanceDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
       }
 
       for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
         val lightX = worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
         val lightY = worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
-        batch.draw(skylightDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+        batch.draw(Main.inst().assets.skylightDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
       }
     }
   }

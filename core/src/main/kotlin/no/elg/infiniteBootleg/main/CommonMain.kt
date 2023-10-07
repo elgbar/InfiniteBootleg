@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.Collections
 import com.strongjoshua.console.LogLevel
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
+import no.elg.infiniteBootleg.assets.InfAssets
+import no.elg.infiniteBootleg.assets.InfAssetsImpl
 import no.elg.infiniteBootleg.console.ConsoleHandler
 import no.elg.infiniteBootleg.console.ConsoleLogger
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler
@@ -22,6 +24,8 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
   override lateinit var console: ConsoleHandler
     protected set
 
+  override val assets: InfAssets = InfAssetsImpl()
+
   init {
     progArgs?.dispose()
     synchronized(Main.INST_LOCK) {
@@ -35,6 +39,7 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
     Gdx.app.applicationLogger = console
     Gdx.app.logLevel = if (test || Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     console.alpha = 0.85f
+    assets.loadAssets()
     console.log(LogLevel.SUCCESS, "Version #${Util.getVersion()}")
     console.log("You can also start the program with arguments for '--help' or '-?' as arg to see all possible options")
   }

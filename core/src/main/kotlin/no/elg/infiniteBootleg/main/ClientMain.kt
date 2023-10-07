@@ -6,7 +6,6 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.GL20
 import com.kotcrab.vis.ui.VisUI
-import no.elg.infiniteBootleg.KAssets.loadAssets
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.input.GlobalInputListener
@@ -92,7 +91,6 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     super.create()
     renderThreadName = Thread.currentThread().name
     Gdx.input.inputProcessor = inputMultiplexer
-    loadAssets()
     console.log(
       """Controls:
   WASD to control the camera

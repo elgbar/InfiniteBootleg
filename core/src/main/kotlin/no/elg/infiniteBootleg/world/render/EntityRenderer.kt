@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
-import no.elg.infiniteBootleg.KAssets.whiteTexture
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
@@ -73,7 +73,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       if (Settings.debugEntityLight) {
         val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
         val offset = Block.BLOCK_SIZE / 2f - size / 2f
-        batch.draw(whiteTexture.textureRegion, lightX + offset, lightY + offset, size, size)
+        batch.draw(Main.inst().assets.whiteTexture.textureRegion, lightX + offset, lightY + offset, size, size)
       }
     }
     batch.color = Color.WHITE

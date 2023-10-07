@@ -6,14 +6,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
-import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.safeUse
 
 class ScreenRenderer : Disposable, Resizable {
   private val spacing = FONT_SIZE * ClientMain.SCALE / 2
-  val font: BitmapFont = KAssets.font
+  val font: BitmapFont = Main.inst().assets.font
   val batch: SpriteBatch = SpriteBatch().also {
     it.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
   }

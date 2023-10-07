@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.main
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.console.ConsoleHandler
 import no.elg.infiniteBootleg.console.ConsoleLogger
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler
@@ -26,6 +27,7 @@ interface Main : ApplicationListener {
    */
   val world: World?
   val renderThreadName: String
+  val assets: InfAssets
 
   companion object {
     fun logger(): ConsoleLogger = inst().consoleLogger

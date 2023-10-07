@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.render.texture
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import no.elg.infiniteBootleg.assets.SafeTextureAtlas
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
@@ -14,8 +15,8 @@ object TextureNeighbor {
   fun getTexture(center: Material, neighbors: EnumMap<Direction, Material>): RotatableTextureRegion? =
     textureNeighbors[center]?.firstOrNull { it.matches(neighbors) }?.textureRegion ?: center.textureRegion
 
-  fun generateNeighborMap(textureAtlas: TextureAtlas) {
-    for (region in textureAtlas.regions) {
+  fun generateNeighborMap(textureAtlas: SafeTextureAtlas) {
+    for (region: TextureAtlas.AtlasRegion in textureAtlas.regions) {
       val split = region.name.split('-')
       // If the size is even or only one, then it is not a neighbor texture
       if (split.size % 2 == 0 || split.size == 1) continue

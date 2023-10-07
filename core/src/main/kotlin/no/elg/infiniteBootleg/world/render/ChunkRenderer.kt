@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import ktx.graphics.use
-import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.api.EventManager
@@ -145,12 +144,12 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
             val worldY = chunkToWorld(chunk.chunkY, localY)
             if (material.invisibleBlock) {
-              texture = if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
+              texture = if (topBlockHeight > worldY) Main.inst().assets.caveTexture else Main.inst().assets.skyTexture
               secondaryTexture = null
             } else {
               texture = block?.texture ?: continue
               secondaryTexture = if (material.hasTransparentTexture) {
-                if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
+                if (topBlockHeight > worldY) Main.inst().assets.caveTexture else Main.inst().assets.skyTexture
               } else {
                 null
               }

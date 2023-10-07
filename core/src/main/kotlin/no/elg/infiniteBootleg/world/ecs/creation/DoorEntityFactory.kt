@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.ecs.creation
 
 import com.badlogic.ashley.core.Engine
 import ktx.ashley.with
-import no.elg.infiniteBootleg.KAssets
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Material
@@ -23,7 +23,7 @@ fun Engine.createDoorBlockEntity(
   worldY: WorldCoord,
   material: Material
 ) = createBlockEntity(world, chunk, worldX, worldY, material) {
-  with(TextureRegionComponent(KAssets.doorClosedTexture))
+  with(TextureRegionComponent(Main.inst().assets.doorClosedTexture))
   // This entity will handle input events
   with<DoorComponent>()
   with<PhysicsEventQueueComponent>()

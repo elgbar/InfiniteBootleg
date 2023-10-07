@@ -3,10 +3,10 @@ package no.elg.infiniteBootleg.world.render
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import no.elg.infiniteBootleg.KAssets
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.breakableLocs
 import no.elg.infiniteBootleg.util.component1
@@ -41,17 +41,16 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
       if (element.itemType == ItemType.TOOL) {
         val breakableBlocks = entity.breakableLocs(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
-        breakableBlocks
-          .forEach { blockWorldLoc ->
-            if (isBreaking) {
-              val progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: 0f
-              val textures = KAssets.breakingBlockTextures.size - 1f
-              val index = (textures * progress).roundToInt()
-              renderPlaceableBlock(world, KAssets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
-            } else {
-              renderPlaceableBlock(world, KAssets.breakableBlockTexture.textureRegion, blockWorldLoc)
-            }
+        breakableBlocks.forEach { blockWorldLoc ->
+          if (isBreaking) {
+            val progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: 0f
+            val textures = Main.inst().assets.breakingBlockTextures.size - 1f
+            val index = (textures * progress).roundToInt()
+            renderPlaceableBlock(world, Main.inst().assets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
+          } else {
+            renderPlaceableBlock(world, Main.inst().assets.breakableBlockTexture.textureRegion, blockWorldLoc)
           }
+        }
       } else if (element.itemType == ItemType.BLOCK && !isBreaking) {
         val texture = element.textureRegion?.textureRegion ?: continue
         entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.interactRadius)
