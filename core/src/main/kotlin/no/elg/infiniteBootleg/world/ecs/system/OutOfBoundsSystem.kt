@@ -16,7 +16,8 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag.Comp
 object OutOfBoundsSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
-    if (!entity.canBeOutOfBounds && world.render.isOutOfView(entity.compactChunkLoc)) {
+    val compactedChunkLoc = entity.compactChunkLoc
+    if (!entity.canBeOutOfBounds && world.render.isOutOfView(compactedChunkLoc) && !world.isChunkLoaded(compactedChunkLoc)) {
       if (Settings.debug) {
         Main.logger().log("OutOfBoundsSystem", "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)}")
       }
