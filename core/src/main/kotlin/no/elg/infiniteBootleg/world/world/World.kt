@@ -884,9 +884,8 @@ abstract class World(
       }
       chunksLock.writeLock().lock()
       val removedChunk: Chunk? = try {
-        val loader = chunkLoader
-        if (save && loader is FullChunkLoader) {
-          loader.save(chunk)
+        if (save && chunkLoader is FullChunkLoader) {
+          chunkLoader.save(chunk)
         }
         chunks.remove(chunk.compactLocation)
       } finally {

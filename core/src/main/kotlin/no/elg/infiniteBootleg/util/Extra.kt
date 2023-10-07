@@ -120,6 +120,9 @@ inline fun <B : Batch> B.safeUse(projectionMatrix: Matrix4? = null, action: (B) 
     end()
   }
   begin()
-  action(this)
-  end()
+  try {
+    action(this)
+  } finally {
+    end()
+  }
 }
