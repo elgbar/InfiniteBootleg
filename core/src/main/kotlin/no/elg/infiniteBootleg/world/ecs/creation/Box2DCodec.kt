@@ -65,6 +65,8 @@ fun EngineEntity.createPlayerBodyComponent(
         0f
       )
     }
+    val height = 0.5f
+    createSecondaryPlayerFixture(body, HOLE_DETECTOR_USER_DATA, halfWidth = ESSENTIALLY_ZERO, halfHeight = height, centerY = -(PLAYER_HEIGHT) / 2f - height)
     createPlayerTouchAreaFixture(body, PLAYERS_LEFT_ARM_USER_DATA, -1)
     createPlayerTouchAreaFixture(body, PLAYERS_RIGHT_ARM_USER_DATA, 1)
   }
@@ -210,9 +212,9 @@ private fun createPlayerFixture(body: Body, userData: Any, friction: Float, defi
   }
 }
 
-private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Float, height: Float, rx: Float = 0f, ry: Float = 0f) {
+private fun createSecondaryPlayerFixture(body: Body, userData: String, halfWidth: Float, halfHeight: Float, centerX: Float = 0f, centerY: Float = 0f) {
   val shape = PolygonShape()
-  shape.setAsBox(width.coerceAtLeast(ESSENTIALLY_ZERO), height.coerceAtLeast(ESSENTIALLY_ZERO), Vector2(rx, ry), 0f)
+  shape.setAsBox(halfWidth.coerceAtLeast(ESSENTIALLY_ZERO), halfHeight.coerceAtLeast(ESSENTIALLY_ZERO), Vector2(centerX, centerY), 0f)
 
   val def = FixtureDef().apply {
     this.shape = shape
@@ -226,7 +228,7 @@ private fun createSecondaryPlayerFixture(body: Body, userData: String, width: Fl
 }
 
 private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
-  createSecondaryPlayerFixture(body, userData, width = ESSENTIALLY_ZERO, height = PLAYER_HEIGHT / 2f, rx = PLAYER_WIDTH * side / 1.5f)
+  createSecondaryPlayerFixture(body, userData, halfWidth = ESSENTIALLY_ZERO, halfHeight = PLAYER_HEIGHT / 2.3f, centerX = PLAYER_WIDTH * side / 1.5f)
 }
 
 private val playerFixtureDef = FixtureDef().apply {

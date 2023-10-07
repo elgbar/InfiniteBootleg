@@ -12,6 +12,8 @@ class LongContactTracker(private val userData: Any) {
     get() = contactFixtures.size
   val isEmpty: Boolean
     get() = contactFixtures.isEmpty
+  val isNotEmpty: Boolean
+    get() = !contactFixtures.isEmpty
 
   fun clear() = contactFixtures.clear()
 

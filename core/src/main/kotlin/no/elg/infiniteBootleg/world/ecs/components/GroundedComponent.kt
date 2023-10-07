@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.creation.HOLE_DETECTOR_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_FOOT_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_LEFT_ARM_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_RIGHT_ARM_USER_DATA
@@ -17,11 +18,14 @@ import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_RIGHT_ARM_USER_DATA
 class GroundedComponent : EntitySavableComponent {
 
   val feetContacts = LongContactTracker(PLAYERS_FOOT_USER_DATA)
+  val holeContacts = LongContactTracker(HOLE_DETECTOR_USER_DATA)
   val leftArmContacts = LongContactTracker(PLAYERS_LEFT_ARM_USER_DATA)
   val rightArmContacts = LongContactTracker(PLAYERS_RIGHT_ARM_USER_DATA)
 
+  val contacts = listOf(feetContacts, holeContacts, leftArmContacts, rightArmContacts)
+
   // To fix being stuck on in a 1x1 hole, allow jumping when both arms are in contact
-  val onGround: Boolean get() = !feetContacts.isEmpty || (!leftArmContacts.isEmpty && !rightArmContacts.isEmpty)
+  val onGround: Boolean get() = feetContacts.isNotEmpty || (holeContacts.isNotEmpty && leftArmContacts.isNotEmpty && rightArmContacts.isNotEmpty)
   val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty
   val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty
 
@@ -32,9 +36,7 @@ class GroundedComponent : EntitySavableComponent {
   }
 
   fun clearContacts() {
-    feetContacts.clear()
-    leftArmContacts.clear()
-    rightArmContacts.clear()
+    contacts.forEach { it.clear() }
   }
 
   companion object : EntityLoadableMapper<GroundedComponent>() {

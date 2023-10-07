@@ -141,13 +141,13 @@ object DebugText {
     val canMoveLeft = grounded?.canMoveLeft ?: false
     val canMoveRight = grounded?.canMoveRight ?: false
     val feetContacts = grounded?.feetContacts?.size ?: 0
+    val holeContacts = grounded?.holeContacts?.size ?: 0
     val leftArmContacts = grounded?.leftArmContacts?.size ?: 0
     val rightArmContacts = grounded?.rightArmContacts?.size ?: 0
     val flying = player.flying
-    val format = "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b (%-5b <> %-5b) (%d + (%d + %d)) f? %-5b"
     sb.append(
       String.format(
-        format,
+        "p: (% 8.2f,% 8.2f) v: (% 8.2f,% 8.2f) php: (% 8.2f,% 8.2f) g? %-5b (%-5b <> %-5b) (g%d h%d l%d r%d)) f? %-5b",
         position.x,
         position.y,
         velocity.dx,
@@ -157,6 +157,7 @@ object DebugText {
         canMoveLeft,
         canMoveRight,
         feetContacts,
+        holeContacts,
         leftArmContacts,
         rightArmContacts,
         flying

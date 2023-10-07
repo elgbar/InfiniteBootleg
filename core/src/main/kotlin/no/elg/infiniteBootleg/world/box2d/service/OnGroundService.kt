@@ -17,9 +17,9 @@ object OnGroundService {
 
   private fun handleBodyEvents(entity: Entity, event: PhysicsEvent, handle: LongContactTracker.(loc: Long) -> Unit) {
     val grounded = entity.groundedComponentOrNull ?: return
-    handleTouchEvent(entity, event, grounded.feetContacts, handle)
-    handleTouchEvent(entity, event, grounded.leftArmContacts, handle)
-    handleTouchEvent(entity, event, grounded.rightArmContacts, handle)
+    for (contact in grounded.contacts) {
+      handleTouchEvent(entity, event, contact, handle)
+    }
   }
 
   fun handleOnGroundContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
@@ -33,8 +33,8 @@ object OnGroundService {
   fun handleOnGroundBlockRemovedEvent(entity: Entity, event: PhysicsEvent.BlockRemovedEvent) {
     val grounded = entity.groundedComponentOrNull ?: return
     val blockWorldLoc = event.compactLocation
-    grounded.feetContacts.removeAll(blockWorldLoc)
-    grounded.leftArmContacts.removeAll(blockWorldLoc)
-    grounded.rightArmContacts.removeAll(blockWorldLoc)
+    for (contact in grounded.contacts) {
+      contact.removeAll(blockWorldLoc)
+    }
   }
 }
