@@ -22,7 +22,7 @@ class EventsTracker(var log: Boolean) {
     val recordedEvent = EventListenedToEvent(event, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (log) {
-      Main.logger().debug("EVENT TRACKER") { "Event $event listened to $recordedEvent" }
+      Main.logger().info("EVENT TRACKER") { "Event $event listened to $recordedEvent" }
     }
   }
 
@@ -30,23 +30,23 @@ class EventsTracker(var log: Boolean) {
     val recordedEvent = RecordedEvent(event, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (log) {
-      Main.logger().debug("EVENT TRACKER") { "Event dispatched: $recordedEvent" }
+      Main.logger().info("EVENT TRACKER") { "Event dispatched: $recordedEvent" }
     }
   }
 
-  fun onListenerRegistered(eventClass: Class<out Event>, listener: EventListener<out Event>) {
+  fun onListenerRegistered(eventClass: KClass<out Event>, listener: EventListener<out Event>) {
     val recordedEvent = ListenerEvent("registered", eventClass, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (log) {
-      Main.logger().debug("EVENT TRACKER") { "Listener registered for ${eventClass.simpleName}: $listener" }
+      Main.logger().info("EVENT TRACKER") { "Listener registered for ${eventClass.simpleName}: $listener" }
     }
   }
 
-  fun onListenerUnregistered(eventClass: Class<out Event>, listener: EventListener<out Event>) {
+  fun onListenerUnregistered(eventClass: KClass<out Event>, listener: EventListener<out Event>) {
     val recordedEvent = ListenerEvent("unregistered", eventClass, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (log) {
-      Main.logger().debug("EVENT TRACKER") { "Listener UN-registered for ${eventClass.simpleName}: $listener" }
+      Main.logger().info("EVENT TRACKER") { "Listener UN-registered for ${eventClass.simpleName}: $listener" }
     }
   }
 }
