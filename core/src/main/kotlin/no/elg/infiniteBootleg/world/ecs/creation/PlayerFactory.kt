@@ -133,19 +133,20 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
 
 fun World.createNewPlayer(): CompletableFuture<Entity> = load(createNewProtoPlayer())
 
-fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, configure: EntityKt.Dsl.() -> Unit = {}): ProtoWorld.Entity = entity {
-  val world = this@createNewProtoPlayer
-  val (spawnX, spawnY) = world.spawn
-  addCommonClientPlayerComponentsProto(controlled)
-  addCommonPlayerComponentsProto(
-    id = UUID.randomUUID().toString(),
-    world = world,
-    worldX = spawnX.toFloat(),
-    worldY = spawnY.toFloat(),
-    dx = 0f,
-    dy = 0f,
-    name = "Player",
-    controlled = controlled
-  )
-  configure()
-}
+fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, configure: EntityKt.Dsl.() -> Unit = {}): ProtoWorld.Entity =
+  entity {
+    val world = this@createNewProtoPlayer
+    val (spawnX, spawnY) = world.spawn
+    addCommonClientPlayerComponentsProto(controlled)
+    addCommonPlayerComponentsProto(
+      id = UUID.randomUUID().toString(),
+      world = world,
+      worldX = spawnX.toFloat(),
+      worldY = spawnY.toFloat(),
+      dx = 0f,
+      dy = 0f,
+      name = "Player",
+      controlled = controlled
+    )
+    configure()
+  }

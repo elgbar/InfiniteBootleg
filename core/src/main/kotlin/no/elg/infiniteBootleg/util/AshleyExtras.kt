@@ -45,12 +45,7 @@ fun Entity.breakableLocs(
   return interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
 }
 
-fun Entity.placeableBlocks(
-  world: World,
-  centerBlockX: WorldCoord,
-  centerBlockY: WorldCoord,
-  interactionRadius: Float
-): Sequence<Long> {
+fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY: WorldCoord, interactionRadius: Float): Sequence<Long> {
   return interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
     .filter { world.isAirBlock(it) }
     .let {

@@ -29,10 +29,11 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
     y = vector2.y
   }
 
-  fun toProtoVector2f(): ProtoVector2f = vector2f {
-    x = this@PositionComponent.x
-    y = this@PositionComponent.y
-  }
+  fun toProtoVector2f(): ProtoVector2f =
+    vector2f {
+      x = this@PositionComponent.x
+      y = this@PositionComponent.y
+    }
 
   fun toVector2(): Vector2 = Vector2(x, y)
 

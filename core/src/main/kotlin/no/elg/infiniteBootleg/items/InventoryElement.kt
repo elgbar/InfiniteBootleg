@@ -27,13 +27,14 @@ interface InventoryElement {
       }
     }
 
-    override fun InventoryElement.asProto(): Entity.Element = element {
-      index = this@asProto.index
-      itemType = when (this@asProto) {
-        is Material -> Entity.Element.ItemType.MATERIAL
-        is Tool -> Entity.Element.ItemType.TOOL
-        else -> throw IllegalArgumentException("Unknown inventory element type ${this@asProto::class.simpleName}")
+    override fun InventoryElement.asProto(): Entity.Element =
+      element {
+        index = this@asProto.index
+        itemType = when (this@asProto) {
+          is Material -> Entity.Element.ItemType.MATERIAL
+          is Tool -> Entity.Element.ItemType.TOOL
+          else -> throw IllegalArgumentException("Unknown inventory element type ${this@asProto::class.simpleName}")
+        }
       }
-    }
   }
 }

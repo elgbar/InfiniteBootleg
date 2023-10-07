@@ -90,12 +90,13 @@ inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = loca
 @Contract(pure = true)
 inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == Chunk.CHUNK_SIZE - 1
 
-inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> = mutableListOf<Direction>().also {
-  if (localX == 0) it += Direction.WEST
-  if (localX == Chunk.CHUNK_SIZE - 1) it += Direction.EAST
-  if (localY == 0) it += Direction.SOUTH
-  if (localY == Chunk.CHUNK_SIZE - 1) it += Direction.NORTH
-}
+inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> =
+  mutableListOf<Direction>().also {
+    if (localX == 0) it += Direction.WEST
+    if (localX == Chunk.CHUNK_SIZE - 1) it += Direction.EAST
+    if (localY == 0) it += Direction.SOUTH
+    if (localY == Chunk.CHUNK_SIZE - 1) it += Direction.NORTH
+  }
 
 /**
  * @param localX The chunk local x coordinate
@@ -136,7 +137,8 @@ inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): Chu
  * @return A long containing both the x and y int
  */
 
-inline fun compactLoc(x: Int, y: Int): Long = // as an int have 32 bits and long 64, we can store two ints inside a long
+inline fun compactLoc(x: Int, y: Int): Long =
+  // as an int have 32 bits and long 64, we can store two ints inside a long
   x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
 
 /**
@@ -200,8 +202,13 @@ inline fun worldToScreen(worldCoord: Float, worldOffset: Float): Float = (worldC
 operator fun Long.component1(): Int = this.decompactLocX()
 operator fun Long.component2(): Int = this.decompactLocY()
 
-inline fun isBlockInsideRadius(worldX: Float, worldY: Float, blockBlockX: WorldCoord, targetBlockY: WorldCoord, radius: Float): Boolean =
-  abs(Vector2.dst2(worldX, worldY, blockBlockX + World.HALF_BLOCK_SIZE, targetBlockY + World.HALF_BLOCK_SIZE)) < radius * radius
+inline fun isBlockInsideRadius(
+  worldX: Float,
+  worldY: Float,
+  blockBlockX: WorldCoord,
+  targetBlockY: WorldCoord,
+  radius: Float
+): Boolean = abs(Vector2.dst2(worldX, worldY, blockBlockX + World.HALF_BLOCK_SIZE, targetBlockY + World.HALF_BLOCK_SIZE)) < radius * radius
 
 typealias LocalCompactLoc = Long
 typealias WorldCompactLoc = Long

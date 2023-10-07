@@ -62,12 +62,22 @@ fun Engine.createFallingBlockStandaloneEntity(
   }
 }
 
-fun Engine.createGravityAffectedBlockEntity(world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
-  createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
-    this.entity.gravityAffected = true
-  }
+fun Engine.createGravityAffectedBlockEntity(
+  world: World,
+  chunk: Chunk,
+  worldX: WorldCoord,
+  worldY: WorldCoord,
+  material: Material
+) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
+  this.entity.gravityAffected = true
+}
 
-fun Engine.createLeafEntity(world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
-  createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
-    this.entity.leafDecay = true
-  }
+fun Engine.createLeafEntity(
+  world: World,
+  chunk: Chunk,
+  worldX: WorldCoord,
+  worldY: WorldCoord,
+  material: Material
+) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
+  this.entity.leafDecay = true
+}

@@ -29,11 +29,12 @@ class GroundedComponent : EntitySavableComponent {
   val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty
   val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty
 
-  fun canMove(dir: Float): Boolean = when {
-    dir < 0 -> canMoveLeft
-    dir > 0 -> canMoveRight
-    else -> true
-  }
+  fun canMove(dir: Float): Boolean =
+    when {
+      dir < 0 -> canMoveLeft
+      dir > 0 -> canMoveRight
+      else -> true
+    }
 
   fun clearContacts() {
     contacts.forEach { it.clear() }

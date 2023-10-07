@@ -55,8 +55,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     it.SetFractalGain(0.5f)
   }
 
-  fun getBiomeHeight(worldX: WorldCoord): Double =
-    (noise.noise(worldX.toDouble(), 0.5, 0.5, BIOME_HEIGHT_AMPLITUDE, 0.001) + BIOME_HEIGHT_AMPLITUDE) / (BIOME_HEIGHT_AMPLITUDE * 2)
+  fun getBiomeHeight(worldX: WorldCoord): Double = (noise.noise(worldX.toDouble(), 0.5, 0.5, BIOME_HEIGHT_AMPLITUDE, 0.001) + BIOME_HEIGHT_AMPLITUDE) / (BIOME_HEIGHT_AMPLITUDE * 2)
 
   override fun getBiome(worldX: WorldCoord): Biome {
     val height = getBiomeHeight(worldX)

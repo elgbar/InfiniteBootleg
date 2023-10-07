@@ -145,7 +145,13 @@ enum class Material(
    * @param localY Relative y in the chunk
    * @return A block of this type
    */
-  fun createBlock(world: World, chunk: Chunk, localX: LocalCoord, localY: LocalCoord, protoEntity: ProtoWorld.Entity? = null): Block {
+  fun createBlock(
+    world: World,
+    chunk: Chunk,
+    localX: LocalCoord,
+    localY: LocalCoord,
+    protoEntity: ProtoWorld.Entity? = null
+  ): Block {
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
       protoEntity?.let { world.load(it, chunk) }
         ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
@@ -185,9 +191,10 @@ enum class Material(
 
   companion object : ProtoConverter<Material, ProtoWorld.Material> {
 
-    override fun Material.asProto(): ProtoWorld.Material = material {
-      ordinal = this@asProto.ordinal
-    }
+    override fun Material.asProto(): ProtoWorld.Material =
+      material {
+        ordinal = this@asProto.ordinal
+      }
 
     override fun ProtoWorld.Material.fromProto(): Material = Material.entries[ordinal]
 

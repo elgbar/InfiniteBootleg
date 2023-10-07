@@ -373,20 +373,21 @@ abstract class World(
     Main.logger().debug("World") { "Done saving world '$name'" }
   }
 
-  fun toProtobuf(): ProtoWorld.World = world {
-    name = this@World.name
-    seed = this@World.seed
-    time = this@World.worldTime.time
-    timeScale = this@World.worldTime.timeScale
-    spawn = this@World.spawn.toVector2i()
-    generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
-    chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
-    if (Main.isSingleplayer) {
-      controlledPlayerEntities.firstOrNull()?.save(true)?.also {
-        player = it
+  fun toProtobuf(): ProtoWorld.World =
+    world {
+      name = this@World.name
+      seed = this@World.seed
+      time = this@World.worldTime.time
+      timeScale = this@World.worldTime.timeScale
+      spawn = this@World.spawn.toVector2i()
+      generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
+      chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
+      if (Main.isSingleplayer) {
+        controlledPlayerEntities.firstOrNull()?.save(true)?.also {
+          player = it
+        }
       }
     }
-  }
 
   val worldFolder: FileHandle?
     /**
@@ -560,7 +561,14 @@ abstract class World(
    * @param updateTexture If the texture of the corresponding chunk should be updated
    * @see Chunk.setBlock
    */
-  fun setBlock(worldX: WorldCoord, worldY: WorldCoord, material: Material, updateTexture: Boolean = true, prioritize: Boolean = false, loadChunk: Boolean = true): Block? =
+  fun setBlock(
+    worldX: WorldCoord,
+    worldY: WorldCoord,
+    material: Material,
+    updateTexture: Boolean = true,
+    prioritize: Boolean = false,
+    loadChunk: Boolean = true
+  ): Block? =
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock null
       chunk.setBlock(localX, localY, material, updateTexture, prioritize)
@@ -585,19 +593,26 @@ abstract class World(
     updateTexture: Boolean = true,
     prioritize: Boolean = false,
     sendUpdatePacket: Boolean = true
-  ): Block? = actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
-    val chunk = nullableChunk ?: return@actionOnBlock null
-    val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
-    chunk.setBlock(localX, localY, block, updateTexture, prioritize, sendUpdatePacket)
-  }
+  ): Block? =
+    actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return@actionOnBlock null
+      val block = Block.fromProto(this, chunk, localX, localY, protoBlock)
+      chunk.setBlock(localX, localY, block, updateTexture, prioritize, sendUpdatePacket)
+    }
 
   /**
    * @param worldX The x coordinate from world view
    * @param worldY The y coordinate from world view
    * @param updateTexture If the texture of the corresponding chunk should be updated
    */
-  fun removeBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) =
-    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk -> chunk?.removeBlock(localX, localY, updateTexture, prioritize, sendUpdatePacket) }
+  fun removeBlock(
+    worldX: WorldCoord,
+    worldY: WorldCoord,
+    loadChunk: Boolean = true,
+    updateTexture: Boolean = true,
+    prioritize: Boolean = false,
+    sendUpdatePacket: Boolean = true
+  ) = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk -> chunk?.removeBlock(localX, localY, updateTexture, prioritize, sendUpdatePacket) }
 
   /**
    * Check if a given location in the world is [Material.AIR] (or internally, doesn't exists)
@@ -659,12 +674,7 @@ abstract class World(
       material.isCollidable && getEntities(worldX + 0.5f, worldY + 0.5f).isEmpty
     }
 
-  private inline fun <R> actionOnBlock(
-    worldX: WorldCoord,
-    worldY: WorldCoord,
-    loadChunk: Boolean = true,
-    action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R
-  ): R {
+  private inline fun <R> actionOnBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R): R {
     val chunkX: ChunkCoord = worldX.worldToChunk()
     val chunkY: ChunkCoord = worldY.worldToChunk()
     val chunk: Chunk? = getChunk(chunkX, chunkY, loadChunk)
@@ -746,10 +756,11 @@ abstract class World(
    * @param loadChunk   Load the chunk at the coordinates
    * @return The block at the given x and y (or null if air block)
    */
-  fun getRawBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
-    val chunk = nullableChunk ?: return null
-    return chunk.getRawBlock(localX, localY)
-  }
+  fun getRawBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return null
+      return chunk.getRawBlock(localX, localY)
+    }
 
   fun getBlockLight(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): BlockLight? {
     val chunk = getChunkFromWorld(worldX, worldY, loadChunk) ?: return null
@@ -765,10 +776,11 @@ abstract class World(
    * @param loadChunk
    * @return The block at the given x and y
    */
-  fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block? = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
-    val chunk = nullableChunk ?: return null
-    return chunk.getBlock(localX, localY)
-  }
+  fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block? =
+    actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
+      val chunk = nullableChunk ?: return null
+      return chunk.getBlock(localX, localY)
+    }
 
   /**
    * Note an air block will be created if the chunk is loaded and there is no other block at the
@@ -922,10 +934,7 @@ abstract class World(
    * @throws IllegalArgumentException if the given entity is not part of this world
    */
   @JvmOverloads
-  fun removeEntity(
-    entity: Entity,
-    reason: DespawnReason = DespawnReason.UNKNOWN_REASON
-  ) {
+  fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
     despawnEntity(entity, reason)
     engine.removeEntityAsync(entity)
   }

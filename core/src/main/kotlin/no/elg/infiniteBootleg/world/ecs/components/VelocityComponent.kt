@@ -25,10 +25,11 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
   val maxDx: Float = MAX_X_VEL
   val maxDy: Float = MAX_Y_VEL
 
-  fun toVector2f(): ProtoWorld.Vector2f = vector2f {
-    x = this@VelocityComponent.dx
-    y = this@VelocityComponent.dy
-  }
+  fun toVector2f(): ProtoWorld.Vector2f =
+    vector2f {
+      x = this@VelocityComponent.dx
+      y = this@VelocityComponent.dy
+    }
 
   init {
     require(maxDx > 0) { "Max dx velocity must be strictly positive" }

@@ -35,14 +35,26 @@ internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, St
   }
 }
 
-fun EngineEntity.withRequiredComponents(entityType: ProtoWorld.Entity.EntityType, world: World, worldX: Number, worldY: Number, id: String? = null) {
+fun EngineEntity.withRequiredComponents(
+  entityType: ProtoWorld.Entity.EntityType,
+  world: World,
+  worldX: Number,
+  worldY: Number,
+  id: String? = null
+) {
   with(EntityTypeComponent.getType(entityType))
   with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
   with(WorldComponent(world))
   with(PositionComponent(worldX.toFloat(), worldY.toFloat()))
 }
 
-fun EntityKt.Dsl.withRequiredComponents(entityType: ProtoWorld.Entity.EntityType, world: World, worldX: Number, worldY: Number, id: String? = null) {
+fun EntityKt.Dsl.withRequiredComponents(
+  entityType: ProtoWorld.Entity.EntityType,
+  world: World,
+  worldX: Number,
+  worldY: Number,
+  id: String? = null
+) {
   this.entityType = entityType
   uuid = id ?: UUID.randomUUID().toString()
   worldUUID = world.uuid

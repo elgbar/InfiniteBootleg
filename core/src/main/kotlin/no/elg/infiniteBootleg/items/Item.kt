@@ -65,13 +65,13 @@ sealed interface Item {
   companion object : ProtoConverter<Item, ProtoWorld.Entity.Inventory.Item> {
     const val DEFAULT_MAX_STOCK = 65_536u
 
-    override fun ProtoWorld.Entity.Inventory.Item.fromProto(): Item =
-      element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
+    override fun ProtoWorld.Entity.Inventory.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
 
-    override fun Item.asProto(): ProtoWorld.Entity.Inventory.Item = item {
-      stock = this@asProto.stock.toInt()
-      maxStock = this@asProto.maxStock.toInt()
-      element = this@asProto.element.asProto()
-    }
+    override fun Item.asProto(): ProtoWorld.Entity.Inventory.Item =
+      item {
+        stock = this@asProto.stock.toInt()
+        maxStock = this@asProto.maxStock.toInt()
+        element = this@asProto.element.asProto()
+      }
   }
 }

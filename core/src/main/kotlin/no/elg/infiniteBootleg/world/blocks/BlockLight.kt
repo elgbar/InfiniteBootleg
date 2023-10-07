@@ -251,7 +251,14 @@ class BlockLight(
   /**
    * Given two y-coordinates ([worldYA] and [worldYB]) get a column of blocks between the two
    */
-  private fun findSkylightBlockColumn(worldX: Float, worldY: Float, topWorldX: Float, worldYA: Float, worldYB: Float, cancelled: () -> Boolean = { false }): GdxArray<Block>? {
+  private fun findSkylightBlockColumn(
+    worldX: Float,
+    worldY: Float,
+    topWorldX: Float,
+    worldYA: Float,
+    worldYB: Float,
+    cancelled: () -> Boolean = { false }
+  ): GdxArray<Block>? {
     val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val columnHeight = worldYTop - worldYBtm

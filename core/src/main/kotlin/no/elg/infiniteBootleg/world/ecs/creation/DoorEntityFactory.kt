@@ -16,13 +16,18 @@ import no.elg.infiniteBootleg.world.world.World
 const val DOOR_WIDTH: Int = 2
 const val DOOR_HEIGHT: Int = 4
 
-fun Engine.createDoorBlockEntity(world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
-  createBlockEntity(world, chunk, worldX, worldY, material) {
-    with(TextureRegionComponent(KAssets.doorClosedTexture))
-    // This entity will handle input events
-    with<DoorComponent>()
-    with<PhysicsEventQueueComponent>()
-    with<OccupyingBlocksComponent>()
+fun Engine.createDoorBlockEntity(
+  world: World,
+  chunk: Chunk,
+  worldX: WorldCoord,
+  worldY: WorldCoord,
+  material: Material
+) = createBlockEntity(world, chunk, worldX, worldY, material) {
+  with(TextureRegionComponent(KAssets.doorClosedTexture))
+  // This entity will handle input events
+  with<DoorComponent>()
+  with<PhysicsEventQueueComponent>()
+  with<OccupyingBlocksComponent>()
 
-    createDoorBodyComponent(world, worldX, worldY)
-  }
+  createDoorBodyComponent(world, worldX, worldY)
+}

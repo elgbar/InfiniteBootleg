@@ -104,7 +104,14 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @return The new block, only `null` if `material` parameter is `null`
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
-  fun setBlock(localX: LocalCoord, localY: LocalCoord, material: Material?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
+  fun setBlock(
+    localX: LocalCoord,
+    localY: LocalCoord,
+    material: Material?,
+    updateTexture: Boolean = true,
+    prioritize: Boolean = false,
+    sendUpdatePacket: Boolean = true
+  ): Block?
 
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
@@ -116,7 +123,14 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @return The new block, equal to the `block` parameter (but not necessarily the same object)
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
-  fun setBlock(localX: LocalCoord, localY: LocalCoord, block: Block?, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Block?
+  fun setBlock(
+    localX: LocalCoord,
+    localY: LocalCoord,
+    block: Block?,
+    updateTexture: Boolean = true,
+    prioritize: Boolean = false,
+    sendUpdatePacket: Boolean = true
+  ): Block?
 
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
@@ -126,7 +140,13 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @param sendUpdatePacket If an update should be sent when in multiplayer
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
-  fun removeBlock(localX: LocalCoord, localY: LocalCoord, updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true)
+  fun removeBlock(
+    localX: LocalCoord,
+    localY: LocalCoord,
+    updateTexture: Boolean = true,
+    prioritize: Boolean = false,
+    sendUpdatePacket: Boolean = true
+  )
 
   /**
    * Force update of this chunk's texture and invariants

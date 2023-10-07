@@ -89,7 +89,13 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
 
     fun Block?.materialOrAir(): Material = this?.material ?: Material.AIR
 
-    fun fromProto(world: World, chunk: Chunk, localX: LocalCoord, localY: LocalCoord, protoBlock: ProtoWorld.Block?): Block? {
+    fun fromProto(
+      world: World,
+      chunk: Chunk,
+      localX: LocalCoord,
+      localY: LocalCoord,
+      protoBlock: ProtoWorld.Block?
+    ): Block? {
       if (protoBlock == null) {
         return null
       }
@@ -100,11 +106,12 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       return mat.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
     }
 
-    fun save(material: Material): ProtoWorld.Block.Builder = block {
-      this.material = material {
-        ordinal = material.ordinal
-      }
-    }.toBuilder()
+    fun save(material: Material): ProtoWorld.Block.Builder =
+      block {
+        this.material = material {
+          ordinal = material.ordinal
+        }
+      }.toBuilder()
 
     const val BLOCK_SIZE = 16
   }

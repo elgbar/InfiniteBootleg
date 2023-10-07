@@ -141,13 +141,25 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   /**
    * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
    */
-  fun queryFixtures(worldX: Number, worldY: Number, worldWidth: Number, worldHeight: Number, callback: ((Fixture) -> Boolean)) {
+  fun queryFixtures(
+    worldX: Number,
+    worldY: Number,
+    worldWidth: Number,
+    worldHeight: Number,
+    callback: ((Fixture) -> Boolean)
+  ) {
     postBox2dRunnable {
       box2dWorld.QueryAABB(callback, worldX.toFloat() + worldOffsetX, worldY.toFloat() + worldOffsetY, worldWidth.toFloat(), worldHeight.toFloat())
     }
   }
 
-  fun queryEntities(worldX: Number, worldY: Number, worldWidth: Number, worldHeight: Number, callback: ((Iterable<Entity>) -> Boolean)) {
+  fun queryEntities(
+    worldX: Number,
+    worldY: Number,
+    worldWidth: Number,
+    worldHeight: Number,
+    callback: ((Iterable<Entity>) -> Boolean)
+  ) {
     postBox2dRunnable {
       val entities = mutableSetOf<Entity>()
       val queryCallback: (Fixture) -> Boolean = {

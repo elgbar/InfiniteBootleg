@@ -182,7 +182,13 @@ class ChunkImpl(
     )
   }
 
-  override fun removeBlock(localX: LocalCoord, localY: LocalCoord, updateTexture: Boolean, prioritize: Boolean, sendUpdatePacket: Boolean) {
+  override fun removeBlock(
+    localX: LocalCoord,
+    localY: LocalCoord,
+    updateTexture: Boolean,
+    prioritize: Boolean,
+    sendUpdatePacket: Boolean
+  ) {
     setBlock(
       localX = localX,
       localY = localY,

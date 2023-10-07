@@ -56,33 +56,38 @@ private fun updateAllValues() {
 }
 
 @Scene2dDsl
-private fun KTable.toggleableDebugButton(
-  name: String,
-  booleanGetter: () -> Boolean,
-  onToggle: () -> Unit
-): VisTextButton = visTextButton(name, style = "debug-menu-button") {
-  pad(5f)
-  isDisabled = booleanGetter()
-
-  val tooltipLabel: VisLabel
-  fun tooltipText() = "$name is ${isDisabled.toAbled()}"
-  visTextTooltip(tooltipText()) {
-    tooltipLabel = this.content as VisLabel
-  }
-
-  onClick {
-    onToggle()
-    updateAllValues()
-  }
-  it.fillX()
-  onAnyElementChanged += {
+private fun KTable.toggleableDebugButton(name: String, booleanGetter: () -> Boolean, onToggle: () -> Unit): VisTextButton =
+  visTextButton(name, style = "debug-menu-button") {
+    pad(5f)
     isDisabled = booleanGetter()
-    tooltipLabel.setText(tooltipText())
+
+    val tooltipLabel: VisLabel
+    fun tooltipText() = "$name is ${isDisabled.toAbled()}"
+    visTextTooltip(tooltipText()) {
+      tooltipLabel = this.content as VisLabel
+    }
+
+    onClick {
+      onToggle()
+      updateAllValues()
+    }
+    it.fillX()
+    onAnyElementChanged += {
+      isDisabled = booleanGetter()
+      tooltipLabel.setText(tooltipText())
+    }
   }
-}
 
 @Scene2dDsl
-private fun KTable.floatSpinner(name: String, srcValueGetter: () -> Number, min: Number, max: Number, step: Number, decimals: Int, onChange: (Float) -> Unit) {
+private fun KTable.floatSpinner(
+  name: String,
+  srcValueGetter: () -> Number,
+  min: Number,
+  max: Number,
+  step: Number,
+  decimals: Int,
+  onChange: (Float) -> Unit
+) {
   val model = FloatSpinnerModel(srcValueGetter().toString(), min.toString(), max.toString(), step.toString(), decimals)
   spinner(name, model) {
     it.fillX()
@@ -98,7 +103,14 @@ private fun KTable.floatSpinner(name: String, srcValueGetter: () -> Number, min:
 }
 
 @Scene2dDsl
-private fun KTable.floatSlider(name: String, srcValueGetter: () -> Float, min: Float, max: Float, step: Float, onChange: (Float) -> Unit) {
+private fun KTable.floatSlider(
+  name: String,
+  srcValueGetter: () -> Float,
+  min: Float,
+  max: Float,
+  step: Float,
+  onChange: (Float) -> Unit
+) {
   horizontalGroup {
     it.fillX()
     space(5f)

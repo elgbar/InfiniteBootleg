@@ -212,7 +212,14 @@ private fun createPlayerFixture(body: Body, userData: Any, friction: Float, defi
   }
 }
 
-private fun createSecondaryPlayerFixture(body: Body, userData: String, halfWidth: Float, halfHeight: Float, centerX: Float = 0f, centerY: Float = 0f) {
+private fun createSecondaryPlayerFixture(
+  body: Body,
+  userData: String,
+  halfWidth: Float,
+  halfHeight: Float,
+  centerX: Float = 0f,
+  centerY: Float = 0f
+) {
   val shape = PolygonShape()
   shape.setAsBox(halfWidth.coerceAtLeast(ESSENTIALLY_ZERO), halfHeight.coerceAtLeast(ESSENTIALLY_ZERO), Vector2(centerX, centerY), 0f)
 

@@ -54,7 +54,13 @@ class WorldTime(val world: World) {
     )
   }
 
-  inline fun <T> atTime(time: Float = this.time, day: (Float) -> T, dusk: (Float) -> T, night: (Float) -> T, dawn: (Float) -> T): T {
+  inline fun <T> atTime(
+    time: Float = this.time,
+    day: (Float) -> T,
+    dusk: (Float) -> T,
+    night: (Float) -> T,
+    dawn: (Float) -> T
+  ): T {
     val dir = Util.normalizedDir(time)
     return when {
       // The sun has not set yet

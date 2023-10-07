@@ -11,7 +11,13 @@ fun Vector2.dstd(v: Vector2): Double {
 
 fun isWithin(loc1: Long, loc2: Long, radius: Number): Boolean = isWithin(loc1.decompactLocX(), loc1.decompactLocY(), loc2.decompactLocX(), loc2.decompactLocY(), radius)
 
-fun isWithin(x1: Number, y1: Number, x2: Number, y2: Number, radius: Number): Boolean {
+fun isWithin(
+  x1: Number,
+  y1: Number,
+  x2: Number,
+  y2: Number,
+  radius: Number
+): Boolean {
   val dx = x1.toDouble() - x2.toDouble()
   val dy = y1.toDouble() - y2.toDouble()
   return dx * dx + dy * dy <= radius.toDouble() * radius.toDouble()

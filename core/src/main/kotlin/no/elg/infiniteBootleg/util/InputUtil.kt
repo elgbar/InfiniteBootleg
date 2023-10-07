@@ -42,43 +42,46 @@ val inputMouseLocator = MouseLocator()
 private var lastCreateBlockLoc: Long = 0
 private var lastCreateBlockTick: Long = 0
 
-fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = with(worldEntity) {
-  val element = (entity.selectedInventoryItemComponentOrNull ?: return false).element
-  if (element is Tool) {
-    if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
-    val locallyControlledComponent = entity.locallyControlledComponent
-    val breakableBlocks = entity.breakableLocs(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
-    world.removeBlocks(breakableBlocks)
-  }
-  return true
-}
-
-fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = with(worldEntity) {
-  if (canNotInteract(worldEntity, blockX, blockY)) return false
-  val world = entity.world
-  val element = (entity.selectedInventoryItemComponentOrNull ?: return false).element
-
-  if (element is Material) {
-    val inventory = entity.inventoryComponentOrNull ?: return false
-    val locallyControlledComponent = entity.locallyControlledComponent
-    val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.interactRadius).toSet()
-    if (inventory.use(element, placeableBlock.size.toUInt())) {
-      element.createBlocks(world, placeableBlock)
+fun breakBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
+  with(worldEntity) {
+    val element = (entity.selectedInventoryItemComponentOrNull ?: return false).element
+    if (element is Tool) {
+      if (canNotInteract(worldEntity, blockX, blockY) || worldEntity.entity.locallyControlledComponentOrNull?.instantBreak == false) return false
+      val locallyControlledComponent = entity.locallyControlledComponent
+      val breakableBlocks = entity.breakableLocs(world, blockX, blockY, locallyControlledComponent.brushSize, locallyControlledComponent.interactRadius).asIterable()
+      world.removeBlocks(breakableBlocks)
     }
-  }
-  return true
-}
-
-fun canNotInteract(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean = with(worldEntity) {
-  val compactLoc = compactLoc(blockX, blockY)
-  val tick = world.tick
-  if (lastCreateBlockLoc == compactLoc && world.tick - lastCreateBlockTick < WorldBox2DTicker.BOX2D_TPS / 10f) {
     return true
   }
-  lastCreateBlockLoc = compactLoc
-  lastCreateBlockTick = tick
-  return false
-}
+
+fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
+  with(worldEntity) {
+    if (canNotInteract(worldEntity, blockX, blockY)) return false
+    val world = entity.world
+    val element = (entity.selectedInventoryItemComponentOrNull ?: return false).element
+
+    if (element is Material) {
+      val inventory = entity.inventoryComponentOrNull ?: return false
+      val locallyControlledComponent = entity.locallyControlledComponent
+      val placeableBlock = entity.placeableBlocks(world, blockX, blockY, locallyControlledComponent.interactRadius).toSet()
+      if (inventory.use(element, placeableBlock.size.toUInt())) {
+        element.createBlocks(world, placeableBlock)
+      }
+    }
+    return true
+  }
+
+fun canNotInteract(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
+  with(worldEntity) {
+    val compactLoc = compactLoc(blockX, blockY)
+    val tick = world.tick
+    if (lastCreateBlockLoc == compactLoc && world.tick - lastCreateBlockTick < WorldBox2DTicker.BOX2D_TPS / 10f) {
+      return true
+    }
+    lastCreateBlockLoc = compactLoc
+    lastCreateBlockTick = tick
+    return false
+  }
 
 fun WorldEntity.jump() {
   if (entity.groundedComponent.onGround && Gdx.input.isKeyPressed(Input.Keys.W)) {

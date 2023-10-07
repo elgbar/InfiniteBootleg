@@ -201,7 +201,13 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     }
   }
 
-  private fun drawShadedBlock(textureRegion: RotatableTextureRegion, lights: Array<FloatArray>, dx: Int, dy: Int, rotation: Int) {
+  private fun drawShadedBlock(
+    textureRegion: RotatableTextureRegion,
+    lights: Array<FloatArray>,
+    dx: Int,
+    dy: Int,
+    rotation: Int
+  ) {
     val texture = textureRegion.textureRegion
     val tileWidth = texture.regionWidth / LIGHT_RESOLUTION
     val tileHeight = texture.regionHeight / LIGHT_RESOLUTION
