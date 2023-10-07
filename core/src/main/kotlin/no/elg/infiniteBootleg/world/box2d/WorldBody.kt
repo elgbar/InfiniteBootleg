@@ -102,6 +102,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       if (!body.isActive) {
         Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
       }
+      for (it in body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>()) {
+        world.engine.removeEntity(it)
+      }
       box2dWorld.destroyBody(body)
     }
   }
