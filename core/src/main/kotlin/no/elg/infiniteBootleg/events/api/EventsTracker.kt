@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.events.api
 import no.elg.infiniteBootleg.main.Main
 import java.time.ZonedDateTime
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.reflect.KClass
 
 /**
  * Capture events
@@ -65,7 +66,7 @@ data class RecordedEvent(
 
 data class ListenerEvent(
   val action: String,
-  val eventClass: Class<out Event>,
+  val eventClass: KClass<out Event>,
   val listener: EventListener<out Event>,
   override val thread: String,
   override val tick: Long?,
