@@ -25,7 +25,7 @@ enum class Biome @SafeVarargs constructor(
 ) {
   PLAINS(0.1, 0.9, 64.0, 0.009, 0, Material.STONE, Material.GRASS, Material.GRASS to 4, Material.DIRT to 10),
   MOUNTAINS(100.0, 0.9, 356.0, 0.005, 25, Material.STONE, Material.GRASS, Material.GRASS to 2, Material.DIRT to 6),
-  DESERT(0.1, 0.9, 32.0, 0.005, 0, Material.STONE, Material.SAND, Material.SAND to 12);
+  DESERT(0.1, 0.9, 32.0, 0.005, 0, Material.SAND_STONE, Material.SAND, Material.SAND to 12);
 
   private val topBlocks: Array<Material>
 

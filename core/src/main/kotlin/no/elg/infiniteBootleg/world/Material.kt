@@ -74,7 +74,7 @@ enum class Material(
     }
   }),
   SAND(
-    hardness = 1f,
+    hardness = 0.75f,
     hasTransparentTexture = false,
     createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
@@ -110,6 +110,10 @@ enum class Material(
     createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, chunk, worldX, worldY, material)
     }
+  ),
+  SAND_STONE(
+    hardness = 1f,
+    hasTransparentTexture = false
   );
 
   override var textureRegion: RotatableTextureRegion? = null
