@@ -21,7 +21,6 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
-import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -147,11 +146,11 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
             var secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunkToWorld(chunk.chunkY, localY)
-            if (block.isAir(!Settings.debugEntityMarkerBlocks) || material.invisibleBlock) {
+            if (material.invisibleBlock) {
               texture = if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
               secondaryTexture = null
             } else {
-              texture = block.texture ?: continue
+              texture = block?.texture ?: continue
               secondaryTexture = if (material.hasTransparentTexture) {
                 if (topBlockHeight > worldY) KAssets.caveTexture else KAssets.skyTexture
               } else {
