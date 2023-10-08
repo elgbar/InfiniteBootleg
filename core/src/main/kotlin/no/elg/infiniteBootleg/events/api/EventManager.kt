@@ -18,10 +18,15 @@ object EventManager {
   val listeners: WeakHashMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
   val oneShotStrongRefs: MutableMap<EventListener<out Event>, EventListener<out Event>> = ConcurrentHashMap()
 
-  var eventsTracker: EventsTracker? = if (Settings.debug) EventsTracker(false) else null
+  val isLoggingAnyEvents: Boolean get() = eventsTracker?.logAnything ?: false
+  val isLoggingEventsDispatched get() = eventsTracker?.logEventsDispatched ?: false
+  val isLoggingEventsListenedTo get() = eventsTracker?.logEventsListenedTo ?: false
+  val isLoggingEventListenersChange get() = eventsTracker?.logEventListenersChange ?: false
+
+  var eventsTracker: EventsTracker? = if (Settings.debug) EventsTracker() else null
     private set
 
-  fun getOrCreateEventsTracker(): EventsTracker = eventsTracker ?: EventsTracker(false).also { eventsTracker = it }
+  fun getOrCreateEventsTracker(): EventsTracker = eventsTracker ?: EventsTracker().also { eventsTracker = it }
 
   /**
    * React to events [dispatchEvent]-ed by someone else.

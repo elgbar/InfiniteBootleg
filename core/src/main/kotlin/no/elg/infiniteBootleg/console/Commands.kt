@@ -12,6 +12,8 @@ import com.strongjoshua.console.annotation.HiddenCommand
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
+import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
+import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_NOTHING
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
@@ -565,8 +567,12 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggle whether to track events")
   fun trackEvents() {
     val eventTracker = getOrCreateEventsTracker()
-    eventTracker.log = !eventTracker.log
-    logger.success("Events are now ${if (eventTracker.log) "" else "not "}tracked")
+    if (eventTracker.logAnything) {
+      eventTracker.log = LOG_NOTHING
+    } else {
+      eventTracker.log = LOG_EVERYTHING
+    }
+    logger.success("Events are now ${if (eventTracker.logAnything) "" else "not "}tracked")
   }
 
   @ConsoleDoc(description = "Toggle whether to track events")

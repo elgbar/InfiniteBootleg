@@ -20,6 +20,8 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.events.api.EventsTracker
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
@@ -154,7 +156,6 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         }
       }
 
-      //
       section {
         toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
         toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
@@ -168,9 +169,22 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
         toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
       }
+      // Event tracker
+      section {
+        toggleableDebugButton("Log events", EventManager::isLoggingAnyEvents, Main.inst().console.exec::trackEvents)
+        toggleableDebugButton("Log events dispatched", EventManager::isLoggingEventsDispatched) {
+          EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_DISPATCHED }
+        }
+        toggleableDebugButton("Log listeners change", EventManager::isLoggingEventListenersChange) {
+          EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENT_LISTENERS_CHANGE }
+        }
+        toggleableDebugButton("Log events listened to", EventManager::isLoggingEventsListenedTo) {
+          EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_LISTENED_TO }
+        }
+      }
 
       aSeparator()
-      // Player related debug controlls
+      // Player related debug controls
       section {
         val entities = world.controlledPlayerEntities
         val instantBreakGetter: () -> Boolean = {
