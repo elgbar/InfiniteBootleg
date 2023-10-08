@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.google.common.base.Preconditions;
 import com.strongjoshua.console.LogLevel;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -11,10 +10,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import no.elg.infiniteBootleg.main.ClientMain;
 import no.elg.infiniteBootleg.main.Main;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -29,11 +26,14 @@ public class Util {
   public static final String VERSION_DELIMITER = "-";
   public static final String FALLBACK_VERSION =
       DEFAULT_HASH + VERSION_DELIMITER + DEFAULT_COMMIT_COUNT;
+  public static final int CIRCLE_DEG = 360;
 
   /**
-   * Based on
-   * https://gist.github.com/steen919/8a079f4dadf88d4197bb/d732449eb74321207b4b189a3bcbf47a83c5db65
-   * Converts the given hex color in 0xAARRGGBB format to a {@link Color} that can be used in a
+   * Based on <a
+   * href="https://gist.github.com/steen919/8a079f4dadf88d4197bb/d732449eb74321207b4b189a3bcbf47a83c5db65">this
+   * gist</a>
+   *
+   * <p>Converts the given hex color in 0xAARRGGBB format to a {@link Color} that can be used in a
    * LibGdx application
    */
   public static Color convert(String str) {
@@ -43,113 +43,6 @@ public class Util {
     float g = (hex & 0x0000FF00L) >> 8;
     float b = (hex & 0x000000FFL);
     return new Color(r / 255F, g / 255F, b / 255F, a / 255F);
-  }
-
-  /**
-   * @param min The minimum value to return (inclusive)
-   * @param val The value to verify is between {@code min} and {@code max}
-   * @param max The maximum value to return (inclusive)
-   * @return {@code val} if between {@code min} and {@code max}, if not return {@code min} or {@code
-   *     max} respectively
-   */
-  public static <T extends Comparable<T>> T clamp(T min, T val, T max) {
-    Preconditions.checkArgument(
-        min != null && val != null && max != null, "None of the parameters can be null");
-    Preconditions.checkArgument(
-        min.compareTo(max) <= 0,
-        "Minimum argument must be less than or equal to the maximum argument");
-    if (val.compareTo(min) < 0) {
-      return min;
-    } else if (val.compareTo(max) > 0) {
-      return max;
-    }
-    return val;
-  }
-
-  /**
-   * @param min The minimum value to check (inclusive)
-   * @param val The value to verify is between {@code min} and {@code max}
-   * @param max The maximum value to check (exclusive)
-   * @return if {@code val} is between {@code min} (inclusive) and {@code max} (exclusive)
-   */
-  public static <T extends Comparable<T>> boolean isBetween(T min, T val, T max) {
-    Preconditions.checkArgument(
-        min != null && val != null && max != null, "None of the parameters can be null");
-    Preconditions.checkArgument(
-        min.compareTo(max) <= 0,
-        "Minimum argument ("
-            + min
-            + ") must be less than or equal to the maximum argument("
-            + max
-            + ")");
-    if (val.compareTo(min) < 0) {
-      return false;
-    } else {
-      return val.compareTo(max) < 0;
-    }
-  }
-
-  /**
-   * @param min The minimum value to check (inclusive)
-   * @param val The value to verify is between {@code min} and {@code max}
-   * @param max The maximum value to check (exclusive)
-   * @return if {@code val} is between {@code min} (inclusive) and {@code max} (exclusive)
-   */
-  public static boolean isBetween(float min, float val, float max) {
-    return val >= min && val < max;
-  }
-
-  /**
-   * <a
-   * href="https://stackoverflow.com/questions/1670862/obtaining-a-powerset-of-a-set-in-java#1670871">original
-   * found here</a>
-   *
-   * @return The powerset of a set
-   */
-  public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-    Set<Set<T>> sets = new HashSet<>();
-    if (originalSet.isEmpty()) {
-      sets.add(new HashSet<>());
-      return sets;
-    }
-    List<T> list = new ArrayList<>(originalSet);
-    T head = list.get(0);
-    Set<T> rest = new HashSet<>(list.subList(1, list.size()));
-    for (Set<T> set : powerSet(rest)) {
-      Set<T> newSet = new HashSet<>();
-      newSet.add(head);
-      newSet.addAll(set);
-      sets.add(newSet);
-      sets.add(set);
-    }
-    return sets;
-  }
-
-  /**
-   * @param string The string to convert to title case
-   * @return The title case version of the given string
-   */
-  public static String toTitleCase(String string) {
-    return toTitleCase(true, string);
-  }
-
-  /**
-   * @param string The string to convert to title case
-   * @return The title case version of the given string
-   */
-  public static String toTitleCase(boolean capFirst, String string) {
-    StringBuilder sb = new StringBuilder();
-
-    final String ACTIONABLE_DELIMITERS = " '-/";
-    boolean capNext = capFirst;
-
-    for (char c : string.toCharArray()) {
-      c = (capNext) ? Character.toTitleCase(c) : Character.toLowerCase(c);
-      sb.append(c);
-      capNext = ACTIONABLE_DELIMITERS.indexOf(c) >= 0;
-    }
-
-    return sb.toString();
   }
 
   /**
@@ -283,26 +176,16 @@ public class Util {
     }
   }
 
-  public static boolean hasSuperClass(Class<?> impl, Class<?> aClass) {
-    if (impl == aClass) {
-      return true;
-    }
-    if (impl == Object.class) {
-      return false;
-    }
-    return hasSuperClass(impl.getSuperclass(), aClass);
-  }
-
   /**
    * @param orgDir The original direction
    * @return The direction normalized within 0 (inclusive) to 360 (exclusive)
    */
   public static float normalizedDir(float orgDir) {
-    if (orgDir >= 360) {
-      return orgDir % 360;
+    if (orgDir >= CIRCLE_DEG) {
+      return orgDir % CIRCLE_DEG;
     } else if (orgDir < 0) {
-      int mult = (int) (-orgDir / 360) + 1;
-      return mult * 360 + orgDir;
+      int mult = (int) (-orgDir / CIRCLE_DEG) + 1;
+      return mult * CIRCLE_DEG + orgDir;
     }
     return orgDir; // is within [0,360)
   }

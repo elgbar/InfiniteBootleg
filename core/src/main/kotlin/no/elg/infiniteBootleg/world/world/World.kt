@@ -34,7 +34,6 @@ import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
-import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
@@ -729,14 +728,9 @@ abstract class World(
     for (entity in standaloneEntities) {
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
-      if (Util.isBetween(
-          MathUtils.floor((x - size.halfBox2dWidth)).toFloat(), worldX, MathUtils.ceil((x + size.halfBox2dWidth)).toFloat()
-        ) &&
-        //
-        Util.isBetween(
-          MathUtils.floor((y - size.halfBox2dHeight)).toFloat(), worldY, MathUtils.ceil((y + size.halfBox2dHeight)).toFloat()
-        )
-      ) {
+      val xRange = MathUtils.floor((x - size.halfBox2dWidth)).toFloat().rangeUntil(MathUtils.ceil((x + size.halfBox2dWidth)).toFloat())
+      val yRange = MathUtils.floor((y - size.halfBox2dHeight)).toFloat().rangeUntil(MathUtils.ceil((y + size.halfBox2dHeight)).toFloat())
+      if (worldX in xRange && worldX in yRange) {
         foundEntities.add(entity)
       }
     }
