@@ -58,10 +58,6 @@ class EntityMarkerBlock(
   override val texture: RotatableTextureRegion? = if (debugEntityMarkerBlocks) Main.inst().assets.handTexture else null
 
   companion object {
-    fun toggleDebugEntityMarkerBlocks() {
-      debugEntityMarkerBlocks = !debugEntityMarkerBlocks
-    }
-
     /**
      * Replace a block with a [EntityMarkerBlock].
      *

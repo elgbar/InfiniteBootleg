@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
+import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -32,11 +33,13 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   private val viewBound: Rectangle = Rectangle()
   private val m4 = Matrix4()
   private val renderers: List<Renderer> = listOf(
+    AirBlockRenderer(this),
     HoveringBlockRenderer(this),
     EntityRenderer(this)
   )
   private val chunkDebugRenderer: DebugChunkRenderer = DebugChunkRenderer(this)
   private val blockLightDebugRenderer: BlockLightDebugRenderer = BlockLightDebugRenderer(this)
+
   private var lastZoom = 0f
 
   val draw: OrderedMap<Chunk, TextureRegion> = OrderedMap<Chunk, TextureRegion>().apply {

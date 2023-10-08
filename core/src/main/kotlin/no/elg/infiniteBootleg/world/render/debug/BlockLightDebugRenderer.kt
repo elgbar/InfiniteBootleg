@@ -39,6 +39,9 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), ProgressHandler(1f))
   }
 
+  private val skylightDebugTexture by lazy { Main.inst().assets.skylightDebugTexture.textureRegion }
+  private val luminanceDebugTexture by lazy { Main.inst().assets.luminanceDebugTexture.textureRegion }
+
   override fun render() {
     if (Settings.debugBlockLight) {
       renderLightSrc()
@@ -75,13 +78,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
       for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
         val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
         val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
-        batch.draw(Main.inst().assets.luminanceDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+        batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
       }
 
       for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
         val lightX = worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
         val lightY = worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
-        batch.draw(Main.inst().assets.skylightDebugTexture.textureRegion, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+        batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
       }
     }
   }

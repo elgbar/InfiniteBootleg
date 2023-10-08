@@ -28,6 +28,7 @@ interface InfAssets {
   val whiteTexture: RotatableTextureRegion
   val skylightDebugTexture: RotatableTextureRegion
   val luminanceDebugTexture: RotatableTextureRegion
+  val visibleAirTexture: RotatableTextureRegion
 
   val breakingBlockTextures: Array<RotatableTextureRegion>
 

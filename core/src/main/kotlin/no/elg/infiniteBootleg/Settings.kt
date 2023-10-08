@@ -71,6 +71,8 @@ object Settings {
 
   var renderBlockLightUpdates = false
 
+  var renderAirBlocks = false
+
   @JvmField
   var enableCameraFollowLerp = true
 

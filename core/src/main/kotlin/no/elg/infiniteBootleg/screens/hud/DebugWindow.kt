@@ -30,7 +30,6 @@ import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.toAbled
-import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
@@ -160,7 +159,10 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
         toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
         toggleableDebugButton("Render chunk updates", Settings::renderChunkUpdates, Main.inst().console.exec::debChuUpd)
-        toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks, EntityMarkerBlock::toggleDebugEntityMarkerBlocks)
+        toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks) { Settings.debugEntityMarkerBlocks = !Settings.debugEntityMarkerBlocks }
+      }
+      section {
+        toggleableDebugButton("Render existing air", Settings::renderAirBlocks) { Settings.renderAirBlocks = !Settings.renderAirBlocks }
       }
       // Lights
       section {
