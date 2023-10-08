@@ -25,6 +25,7 @@ fun main(args: Array<String>) {
     config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 16)
     config.setForegroundFPS(Settings.foregroundFPS)
     config.setWindowIcon("textures/icon_64.png")
+    config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 4, 2)
     Lwjgl3Application(main, config)
   } else {
     val config = HeadlessApplicationConfiguration()

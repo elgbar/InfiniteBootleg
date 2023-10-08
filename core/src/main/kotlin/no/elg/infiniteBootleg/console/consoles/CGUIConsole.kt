@@ -7,11 +7,11 @@ import com.kotcrab.vis.ui.widget.VisScrollPane
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.VisWindow
-import com.strongjoshua.console.GUIConsole
+import com.strongjoshua.console.ImprovedGUIConsole
 import no.elg.infiniteBootleg.console.ConsoleHandler
 import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil
 
-class CGUIConsole(private val consoleHandler: ConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) : GUIConsole(
+class CGUIConsole(private val consoleHandler: ConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) : ImprovedGUIConsole(
   skin,
   useMultiplexer,
   keyID,
