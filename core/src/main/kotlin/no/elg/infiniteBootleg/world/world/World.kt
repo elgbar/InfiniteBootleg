@@ -72,9 +72,11 @@ import no.elg.infiniteBootleg.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createNewPlayer
@@ -670,7 +672,7 @@ abstract class World(
     actionOnBlock(worldX, worldY, loadChunk) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlock false
       val material = chunk.getRawBlock(localX, localY).materialOrAir()
-      material.isCollidable && getEntities(worldX + 0.5f, worldY + 0.5f).isEmpty
+      material.isCollidable && !isAnyEntityAt(worldX, worldY)
     }
 
   private inline fun <R> actionOnBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R): R {
@@ -723,18 +725,31 @@ abstract class World(
     }
   }
 
-  fun getEntities(worldX: Float, worldY: Float): Array<Entity> {
+  fun getEntities(worldX: WorldCoord, worldY: WorldCoord): Array<Entity> {
     val foundEntities = Array<Entity>(false, 4)
     for (entity in standaloneEntities) {
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
-      val xRange = MathUtils.floor((x - size.halfBox2dWidth)).toFloat().rangeUntil(MathUtils.ceil((x + size.halfBox2dWidth)).toFloat())
-      val yRange = MathUtils.floor((y - size.halfBox2dHeight)).toFloat().rangeUntil(MathUtils.ceil((y + size.halfBox2dHeight)).toFloat())
-      if (worldX in xRange && worldX in yRange) {
+      if (worldX in MathUtils.floor(x - size.halfBox2dWidth) until MathUtils.ceil(x + size.halfBox2dWidth) &&
+        worldY in MathUtils.floor(y - size.halfBox2dHeight) until MathUtils.ceil(y + size.halfBox2dHeight)
+      ) {
         foundEntities.add(entity)
       }
     }
     return foundEntities
+  }
+
+  fun isAnyEntityAt(worldX: WorldCoord, worldY: WorldCoord): Boolean {
+    for (entity in standaloneEntities) {
+      val (x, y) = entity.positionComponent
+      val size = entity.box2d
+      if (worldX in MathUtils.floor(x - size.halfBox2dWidth) until MathUtils.ceil(x + size.halfBox2dWidth) &&
+        worldY in MathUtils.floor(y - size.halfBox2dHeight) until MathUtils.ceil(y + size.halfBox2dHeight)
+      ) {
+        return true
+      }
+    }
+    return false
   }
 
   /**
@@ -841,10 +856,10 @@ abstract class World(
     }
   }
 
+  /**
+   * @return All currently loaded chunks
+   */
   val loadedChunks: Array<Chunk>
-    /**
-     * @return All currently loaded chunks
-     */
     get() {
       chunksLock.readLock().lock()
       return try {

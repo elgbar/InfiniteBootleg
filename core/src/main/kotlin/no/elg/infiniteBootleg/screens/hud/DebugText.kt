@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.fastIntFormat
@@ -165,7 +166,7 @@ object DebugText {
     )
   }
 
-  fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: Float, mouseWorldY: Float) {
+  fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {
     sb.append("E = \n")
     for (entity in world.getEntities(mouseWorldX, mouseWorldY)) {
       sb.append("${entity.id}: ${entity.components.map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}").appendLine()

@@ -57,7 +57,7 @@ class HUDRenderer : Renderer, Resizable {
         nl()
         lights(builder, world, mouseBlockX, mouseBlockY)
         nl()
-        ents(builder, world, main.mouseLocator.mouseWorldX, main.mouseLocator.mouseWorldY)
+        ents(builder, world, main.mouseLocator.mouseBlockX, main.mouseLocator.mouseBlockY)
       }
       if (builder.isNotEmpty()) {
         sr.drawTop(builder.toString(), 1f)
