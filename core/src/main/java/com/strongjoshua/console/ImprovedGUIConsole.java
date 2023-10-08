@@ -48,7 +48,11 @@ import com.badlogic.gdx.utils.SnapshotArray;
  * application. Please see the <a href="https://github.com/StrongJoshua/libgdx-inGameConsole">GitHub
  * Repository</a> for more information.
  *
+ * <p>Improved by only refresh the console when it is visible. This must be done by setting the max
+ * log entries to a finite number, {@code 10 000} is a good number.
+ *
  * @author StrongJoshua
+ * @author Elgbar
  */
 public class ImprovedGUIConsole extends AbstractConsole {
   private int keyID;

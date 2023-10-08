@@ -23,6 +23,11 @@ class CGUIConsole(private val consoleHandler: ConsoleHandler, skin: Skin, useMul
   VisLabel::class.java,
   VisScrollPane::class.java
 ) {
+
+  init {
+    setMaxEntries(10_000)
+  }
+
   override fun printHelp(command: String) {
     HelpfulConsoleHelpUtil.printHelp(this, exec, command)
   }
