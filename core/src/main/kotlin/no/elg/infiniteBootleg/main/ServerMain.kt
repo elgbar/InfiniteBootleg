@@ -37,14 +37,6 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     Runtime.getRuntime().addShutdownHook(Thread(onShutdown))
   }
 
-//  fun getServerWorld(): ServerWorld {
-//    checkNotNull(serverWorld) { "There is no server world!" }
-//    return serverWorld
-//  }
-
-//  fun setServerWorld(serverWorld: ServerWorld) {
-//  }
-
   override fun render() {
     serverWorld.render.render()
   }

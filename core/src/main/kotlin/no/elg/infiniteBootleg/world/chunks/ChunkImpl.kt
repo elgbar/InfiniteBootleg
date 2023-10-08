@@ -383,17 +383,13 @@ class ChunkImpl(
           if (updateId != currentUpdateId.get()) {
             break@outer
           }
-          if (checkDistance && Vector2.dst2(
-              originWorldX.toFloat(),
-              originWorldY.toFloat(),
-              getWorldX(localX).toFloat(),
-              getWorldY(localY).toFloat()
-            ) > World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
-          ) {
-            continue
+          if (checkDistance) {
+            val dst2 = Vector2.dst2(originWorldX.toFloat(), originWorldY.toFloat(), getWorldX(localX).toFloat(), getWorldY(localY).toFloat())
+            if (dst2 > World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
+              continue
+            }
           }
-          val bl = blockLights[localX][localY]
-          bl.recalculateLighting(updateId)
+          blockLights[localX][localY].recalculateLighting(updateId)
         }
       }
     }

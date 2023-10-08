@@ -34,43 +34,46 @@ interface Main : ApplicationListener {
 
     fun inst(): Main = CommonMain.instField
 
+    /**
+     * @return If this is a client of a server
+     */
     val isServerClient: Boolean
-      /**
-       * @return If this is a client of a server
-       */
       get() = Settings.client && ClientMain.inst().serverClient != null
 
+    /**
+     * @return If this is a server instance (i.e., is NOT rendering)
+     */
     val isServer: Boolean
-      /**
-       * @return If this is a server instance (i.e., is NOT rendering)
-       */
       get() = !Settings.client
 
+    /**
+     * @return If this is a client instance (i.e., is rendering)
+     */
     val isClient: Boolean
-      /**
-       * @return If this is a client instance (i.e., is rendering)
-       */
       get() = Settings.client
 
+    /**
+     * @return If this is a singleplayer instance
+     */
     val isSingleplayer: Boolean
-      /**
-       * @return If this is a singleplayer instance
-       */
       get() = isClient && ClientMain.inst().isSinglePlayer
+
+    /**
+     * @return If the current instance is multiplayer (either as the server or a client of a server)
+     */
     val isMultiplayer: Boolean
-      /**
-       * @return If the current instance is multiplayer (either as the server or a client of a server)
-       */
       get() = isServer || ClientMain.inst().isMultiplayer
+
+    /**
+     * @return If this instance is authoritative (i.e., have the final say)
+     */
     val isAuthoritative: Boolean
-      /**
-       * @return If this instance is authoritative (i.e., have the final say)
-       */
       get() = isServer || isSingleplayer
+
+    /**
+     * @return If this instance is not authoritative (i.e., does not have the final say)
+     */
     val isNotAuthoritative: Boolean
-      /**
-       * @return If this instance is not authoritative (i.e., does not have the final say)
-       */
       get() = isServerClient
     private val EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar
     val WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar
