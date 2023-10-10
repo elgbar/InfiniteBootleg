@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.fastIntFormat
+import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
@@ -169,7 +170,7 @@ object DebugText {
   fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {
     sb.append("E = \n")
     for (entity in world.getEntities(mouseWorldX, mouseWorldY)) {
-      sb.append("${entity.id}: ${entity.components.map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}").appendLine()
+      sb.append("${entity.id}: ${entity.toComponentsString()}").appendLine()
     }
   }
 }

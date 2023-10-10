@@ -32,12 +32,14 @@ import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.toCompact
+import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import java.security.SecureRandom
@@ -227,8 +229,8 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
     Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
-    for (entity in world.validEntities) {
-      Main.logger().log("Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client")
+    for (entity in world.validEntitiesToSendToClient) {
+      Main.logger().debug("LOGIN") { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
       ctx.write(clientBoundSpawnEntity(entity))
     }
 
@@ -299,7 +301,7 @@ private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: Entit
     return
   }
   val entity = world.getEntity(uuid)
-  if (entity != null && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
+  if (entity != null && entity.shouldSendToClients && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))
   } else {
     ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))

@@ -95,6 +95,7 @@ message Entity {
     optional bool leafDecay = 5;
     optional bool canBeOutOfBounds = 6;
     optional bool transient = 7;
+    optional bool authoritativeOnly = 8;
   }
 
   message Killable {

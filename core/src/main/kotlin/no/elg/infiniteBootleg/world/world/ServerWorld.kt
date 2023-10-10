@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer
@@ -52,13 +53,15 @@ class ServerWorld : World {
       render.addClient(entity.id, ServerClientChunksInView(entity.positionComponent.x.worldToChunk(), entity.positionComponent.y.worldToChunk()))
     }
     render.update()
-    Main.inst().scheduler.executeSync {
-      broadcastToInView(
-        clientBoundSpawnEntity(entity),
-        entity.getComponent(PositionComponent::class.java).blockX,
-        entity.getComponent(PositionComponent::class.java).blockY,
-        null
-      )
+    if (entity.shouldSendToClients) {
+      Main.inst().scheduler.executeSync {
+        broadcastToInView(
+          clientBoundSpawnEntity(entity),
+          entity.getComponent(PositionComponent::class.java).blockX,
+          entity.getComponent(PositionComponent::class.java).blockY,
+          null
+        )
+      }
     }
   }
 

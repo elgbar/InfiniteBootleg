@@ -43,6 +43,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Material.AIR
@@ -52,6 +53,7 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.v
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.world.ecs.save
 import java.time.Instant
 import java.util.UUID
@@ -212,17 +214,10 @@ fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?
   ).build()
 }
 
-fun clientBoundMoveEntity(entity: Entity): Packet {
-  return clientBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
-    MoveEntity.newBuilder()
-      .setUuid(entity.id)
-      .setPosition(entity.positionComponent.toProtoVector2f())
-      .setVelocity(entity.velocityComponent.toVector2f())
-//      .setLookAngleDeg(entity.lookDeg)
-  ).build()
-}
-
 fun clientBoundSpawnEntity(entity: Entity): Packet {
+  if (entity.authoritativeOnly) {
+    throw IllegalStateException("Cannot send entity with the tag authoritative only to clients ${entity.toComponentsString()}")
+  }
   return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
       .setEntity(entity.save())

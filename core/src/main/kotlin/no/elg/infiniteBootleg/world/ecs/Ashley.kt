@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
 import ktx.ashley.allOf
+import ktx.ashley.exclude
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.main.Main
@@ -29,6 +30,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
@@ -99,6 +101,7 @@ val localPlayerFamily: Family = allOf(
 ).get()
 
 val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).get()
+val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).exclude(AuthoritativeOnlyTag::class).get()
 val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).get()
 val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionComponent::class).get()
 val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, SelectedInventoryItemComponent::class).get()

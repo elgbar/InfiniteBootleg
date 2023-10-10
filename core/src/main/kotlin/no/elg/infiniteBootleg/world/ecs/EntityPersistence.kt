@@ -52,6 +52,8 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.worldComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnlyOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag.Companion.canBeOutOfBoundsComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag
@@ -84,6 +86,7 @@ fun Entity.save(ignoreTransient: Boolean = false): ProtoWorld.Entity? {
       this@save.ignorePlaceableCheckComponentOrNull?.apply { save() }
       this@save.leafDecayComponentOrNull?.apply { save() }
       this@save.canBeOutOfBoundsComponentOrNull?.apply { save() }
+      this@save.authoritativeOnlyOrNull?.apply { save() }
     }
 
     this@save.box2dOrNull?.apply { save() }
@@ -133,6 +136,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
       IgnorePlaceableCheckTag.load(this, it)
       LeafDecayTag.load(this, it)
       CanBeOutOfBoundsTag.load(this, it)
+      AuthoritativeOnlyTag.load(this, it)
     }
 
     ExplosiveComponent.load(this, protoEntity)

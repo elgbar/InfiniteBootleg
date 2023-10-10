@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag.Companion.canBeOutOfBounds
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag.Companion.leafDecay
@@ -82,4 +83,5 @@ fun Engine.createLeafEntity(
 ) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
   this.entity.leafDecay = true
   this.entity.canBeOutOfBounds = true // leaves can be out of bounds, as they are removed by chunks when it is unloaded
+  this.entity.authoritativeOnly = true
 }
