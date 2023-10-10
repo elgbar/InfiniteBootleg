@@ -616,9 +616,7 @@ class ChunkImpl(
       "Cannot load from proto chunk after chunk has been initialized"
     )
 
-    if (Settings.debug) {
-      Main.logger().debug("PB Chunk", TextFormat.printer().shortDebugString(protoChunk))
-    }
+    Main.logger().debug("PB Chunk") { TextFormat.printer().shortDebugString(protoChunk) }
     val chunkPosition = protoChunk.position
     val posErrorMsg = "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})"
     Preconditions.checkArgument(chunkPosition.x == chunkX, posErrorMsg)

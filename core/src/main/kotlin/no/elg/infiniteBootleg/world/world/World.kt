@@ -70,6 +70,7 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
 import no.elg.infiniteBootleg.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
+import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamilyToSendToClient
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -225,6 +226,7 @@ abstract class World(
   val controlledPlayerEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(localPlayerFamily) }
   val standaloneEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicStandaloneEntityFamily) }
   val validEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamily) }
+  val validEntitiesToSendToClient: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient) }
 
   private fun initializeEngine(): ThreadSafeEngine {
     val engine = ThreadSafeEngine()
@@ -315,9 +317,7 @@ abstract class World(
    * @return Will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
    */
   fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
-    if (Settings.debug) {
-      Main.logger().debug("PB World", TextFormat.printer().shortDebugString(protoWorld))
-    }
+    Main.logger().debug("PB World") { TextFormat.printer().shortDebugString(protoWorld) }
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time

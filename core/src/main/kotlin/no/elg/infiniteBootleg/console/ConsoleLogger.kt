@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.console
 
 import com.badlogic.gdx.ApplicationLogger
 import com.strongjoshua.console.LogLevel
+import no.elg.infiniteBootleg.Settings
 
 /**
  * @author Elg
@@ -103,11 +104,15 @@ interface ConsoleLogger : ApplicationLogger {
   }
 
   override fun debug(tag: String, message: String) {
-    log(LogLevel.DEFAULT, "DBG [$tag] $message")
+    if (Settings.debug) {
+      log(LogLevel.DEFAULT, "DBG [$tag] $message")
+    }
   }
 
   fun debug(tag: String, message: () -> String) {
-    log(LogLevel.DEFAULT, "DBG [$tag] ${message.invoke()}")
+    if (Settings.debug) {
+      log(LogLevel.DEFAULT, "DBG [$tag] ${message.invoke()}")
+    }
   }
 
   override fun debug(tag: String, message: String, exception: Throwable?) {
