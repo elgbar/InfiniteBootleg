@@ -13,7 +13,7 @@ class Config : Metadata {
   override fun <T> get(key: String, defaultVal: T?): T? {
     val obj = config.getOrDefault(key, defaultVal)
     return try {
-      obj as T?
+      obj as? T?
     } catch (e: ClassCastException) {
       throw IllegalStateException("Failed to cast object to type T", e)
     }

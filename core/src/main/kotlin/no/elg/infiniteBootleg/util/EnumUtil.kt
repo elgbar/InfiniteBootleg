@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Compan
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 
 fun Enum<*>.findTextures(customTextureName: String? = null): RotatableTextureRegion {
-  return findTexturesOrNull(customTextureName)
+  return findTexturesOrNull(customTextureName) ?: RotatableTextureRegion(null, false, textureName(customTextureName))
     ?: error("Could not find texture for $this with texture name '${textureName(customTextureName)}' or '${rotatableTextureName(textureName(customTextureName))}'")
 }
 

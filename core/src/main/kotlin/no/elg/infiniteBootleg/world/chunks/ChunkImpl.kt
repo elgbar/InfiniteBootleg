@@ -625,7 +625,7 @@ class ChunkImpl(
     Preconditions.checkArgument(chunkPosition.y == chunkY, posErrorMsg)
     Preconditions.checkArgument(
       protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
-      "Invalid number of bytes. expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
+      "Invalid number of blocks. expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
     )
     var index = 0
     val protoBlocks = protoChunk.blocksList
