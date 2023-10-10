@@ -64,7 +64,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     serverWorld.initialize()
   }
 
-  override val world: World get() = serverWorld
+  override val world: World? get() = if (::serverWorld.isInitialized) serverWorld else null
 
   override fun dispose() {
     super.dispose()
