@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit
  * @author Elg
  */
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
-  Main.logger().debug("server->client") { TextFormat.printer().shortDebugString(packet) }
+  Main.logger().debug("client<-server") { TextFormat.printer().shortDebugString(packet) }
   when (packet.type) {
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) {
       handleHeartbeat(packet.heartbeat)
