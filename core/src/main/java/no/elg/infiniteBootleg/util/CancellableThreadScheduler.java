@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import no.elg.infiniteBootleg.events.api.ThreadType;
 import no.elg.infiniteBootleg.main.Main;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,16 +77,17 @@ public class CancellableThreadScheduler {
    * @see Application#postRunnable(Runnable)
    */
   public void executeSync(@NotNull Runnable runnable) {
-    Gdx.app.postRunnable(runnable);
+    Gdx.app.postRunnable(caughtRunnable(runnable));
   }
 
   @NotNull
-  private Runnable caughtRunnable(@NotNull Runnable runnable) {
+  private static Runnable caughtRunnable(@NotNull Runnable runnable) {
     return () -> {
       try {
         runnable.run();
       } catch (Exception e) {
-        Main.Companion.logger().log("SCHEDULER", "Exception caught on secondary thread", e);
+        Main.Companion.logger()
+            .log("SCHEDULER", "Exception caught on " + ThreadType.Companion.currentThreadType(), e);
       }
     };
   }
