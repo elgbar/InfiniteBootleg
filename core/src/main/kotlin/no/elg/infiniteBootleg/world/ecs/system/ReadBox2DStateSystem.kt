@@ -12,12 +12,13 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.s
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 import kotlin.math.abs
 
 /**
  * Read the position of the entity from the box2D entity
  */
-object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
+object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS), DuplexSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody

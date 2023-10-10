@@ -17,8 +17,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
+import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 
-object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueueComponent.mapper) {
+object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueueComponent.mapper), ClientSystem {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     val worldEntity = WorldEntity(entity.world, entity)

@@ -16,8 +16,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.leafBlockFamily
 import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
-object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT) {
+object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT), DuplexSystem {
 
   private const val DESPAWN_LEAVES_RADIUS = 5f
 

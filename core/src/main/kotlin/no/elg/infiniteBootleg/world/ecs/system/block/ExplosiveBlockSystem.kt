@@ -20,10 +20,11 @@ import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent.Companion.
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.abs
 
-object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIORITY_DEFAULT) {
+object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIORITY_DEFAULT), DuplexSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val explosiveComponent = entity.explosiveComponent

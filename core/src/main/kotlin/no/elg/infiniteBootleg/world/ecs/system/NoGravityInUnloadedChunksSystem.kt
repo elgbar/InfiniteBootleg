@@ -14,8 +14,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.InUnloadedChunkTag.Companion.isInUnloadedChunk
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
-object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
+object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY), DuplexSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val isChunkLoaded = world.isChunkLoaded(entity.compactChunkLoc)

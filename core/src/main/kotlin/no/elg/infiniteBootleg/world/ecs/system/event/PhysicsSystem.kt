@@ -7,12 +7,15 @@ import no.elg.infiniteBootleg.world.box2d.service.OnGroundService
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
-object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
-  family = entityWithPhysicsEventFamily,
-  eventType = PhysicsEvent::class,
-  queueMapper = PhysicsEventQueueComponent.mapper
-) {
+object PhysicsSystem :
+  EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
+    family = entityWithPhysicsEventFamily,
+    eventType = PhysicsEvent::class,
+    queueMapper = PhysicsEventQueueComponent.mapper
+  ),
+  DuplexSystem {
 
   inline fun <reified T : Any> PhysicsEvent.getOtherFixtureUserData(entity: Entity, filter: (userData: Any?) -> Boolean): T? {
     val userDataA: Any? = fixtureA?.userData

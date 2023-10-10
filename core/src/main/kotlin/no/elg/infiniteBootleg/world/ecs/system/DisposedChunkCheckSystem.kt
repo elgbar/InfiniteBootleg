@@ -14,8 +14,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
-object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).get(), UPDATE_PRIORITY_BEFORE_EVENTS) {
+object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).get(), UPDATE_PRIORITY_BEFORE_EVENTS), DuplexSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val entityChunk = entity.chunk

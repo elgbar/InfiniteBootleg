@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.FLY_VEL
 import no.elg.infiniteBootleg.util.MAX_X_VEL
 import no.elg.infiniteBootleg.util.WorldEntity
@@ -22,14 +23,15 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.v
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
+import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 import kotlin.math.min
 
-object ControlSystem : IteratingSystem(controlledEntityFamily, UPDATE_PRIORITY_EARLY) {
+object ControlSystem : IteratingSystem(controlledEntityFamily, UPDATE_PRIORITY_EARLY), ClientSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    if (ClientMain.inst().shouldIgnoreWorldInput()) {
+    if (Main.isServer || ClientMain.inst().shouldIgnoreWorldInput()) {
       return
     }
     val entityWorld = entity.world as? ClientWorld ?: return

@@ -10,7 +10,10 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
+import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
+import no.elg.infiniteBootleg.world.ecs.system.restriction.ServerSystem
 
 class ThreadSafeEngine : Engine(), Disposable {
 
@@ -54,7 +57,27 @@ class ThreadSafeEngine : Engine(), Disposable {
 
   override fun addSystem(system: EntitySystem): Unit =
     synchronized(engineLock) {
-      super.addSystem(system)
+      if (system is ClientSystem && system is ServerSystem) {
+        Main.logger().debug("Engine", "Adding duplex system ${system::class.simpleName}")
+        super.addSystem(system)
+      } else if (system is ClientSystem) {
+        if (Main.isClient) {
+          Main.logger().debug("Engine", "Adding client only system ${system::class.simpleName}")
+          super.addSystem(system)
+        } else {
+          Main.logger().debug("Engine", "Not adding client only system ${system::class.simpleName}")
+        }
+      } else if (system is ServerSystem) {
+        if (Main.isServer) {
+          Main.logger().debug("Engine", "Adding server only system ${system::class.simpleName}")
+          super.addSystem(system)
+        } else {
+          Main.logger().debug("Engine", "Not adding server only system ${system::class.simpleName}")
+        }
+      } else {
+        Main.logger().warn("Engine", "System ${system::class.simpleName} is not a client or server system, it might be using server/client main and might crash when used")
+        super.addSystem(system)
+      }
     }
 
   override fun removeSystem(system: EntitySystem): Unit =

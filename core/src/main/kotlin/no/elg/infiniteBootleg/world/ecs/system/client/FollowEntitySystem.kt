@@ -15,10 +15,11 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
+import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import kotlin.math.abs
 
-object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_DEFAULT) {
+object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_DEFAULT), ClientSystem {
 
   const val SCROLL_SPEED = 0.25f
   private const val CAMERA_LERP = 2.5f

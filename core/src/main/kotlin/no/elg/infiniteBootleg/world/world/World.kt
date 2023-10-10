@@ -238,8 +238,6 @@ abstract class World(
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(ReadBox2DStateSystem)
     engine.addSystem(WriteBox2DStateSystem)
-    engine.addSystem(InputSystem)
-    engine.addSystem(ControlSystem)
     engine.addSystem(PhysicsSystem)
     engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)
@@ -249,9 +247,9 @@ abstract class World(
     engine.addSystem(DisposedChunkCheckSystem)
     engine.addSystem(MineBlockSystem)
     engine.addSystem(NoGravityInUnloadedChunksSystem)
-    if (Main.isClient) {
-      engine.addSystem(FollowEntitySystem)
-    }
+    engine.addSystem(FollowEntitySystem)
+    engine.addSystem(InputSystem)
+    engine.addSystem(ControlSystem)
     addSystems(engine)
   }
 

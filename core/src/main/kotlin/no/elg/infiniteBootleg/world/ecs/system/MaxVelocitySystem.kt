@@ -6,13 +6,14 @@ import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.toFamily
 import kotlin.math.abs
 
 /**
  * Limit the velocity of a box2D body
  */
-object MaxVelocitySystem : IteratingSystem(VelocityComponent::class.toFamily(), UPDATE_PRIORITY_DEFAULT) {
+object MaxVelocitySystem : IteratingSystem(VelocityComponent::class.toFamily(), UPDATE_PRIORITY_DEFAULT), DuplexSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val velocity = entity.velocityComponent

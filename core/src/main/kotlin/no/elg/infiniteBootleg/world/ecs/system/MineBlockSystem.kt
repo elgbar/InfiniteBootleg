@@ -17,8 +17,11 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 
-object MineBlockSystem : IteratingSystem(allOf(WorldComponent::class, LocallyControlledComponent::class, SelectedInventoryItemComponent::class).get(), UPDATE_PRIORITY_DEFAULT) {
+object MineBlockSystem :
+  IteratingSystem(allOf(WorldComponent::class, LocallyControlledComponent::class, SelectedInventoryItemComponent::class).get(), UPDATE_PRIORITY_DEFAULT),
+  ClientSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val controls = entity.locallyControlledComponent

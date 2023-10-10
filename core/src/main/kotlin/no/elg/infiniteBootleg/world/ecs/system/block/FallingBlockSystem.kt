@@ -16,11 +16,12 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Compa
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
 /**
  * About the priority: We want this to run after the [UpdateGridBlockSystem] so that the block is properly removed
  */
-object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_LATE) {
+object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_LATE), DuplexSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val material = entity.materialOrNull ?: return
     val world = entity.world

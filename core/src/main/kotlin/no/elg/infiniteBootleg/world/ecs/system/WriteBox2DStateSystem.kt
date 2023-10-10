@@ -12,11 +12,12 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.v
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
+import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
 /**
  * Write the position of the entity from the box2D entity
  */
-object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST) {
+object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST), DuplexSystem {
 
   private val tmp = Vector2()
 
