@@ -71,7 +71,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     world.disposeSafely()
   }
 
-  val isDebugMenuVisible: Boolean get() = debugMenu.isDebugMenuVisible
+  val isDebugMenuVisible: Boolean get() = ::debugMenu.isInitialized && debugMenu.isDebugMenuVisible
 
   fun toggleDebugMenu() {
     debugMenu.toggleDebugMenu()

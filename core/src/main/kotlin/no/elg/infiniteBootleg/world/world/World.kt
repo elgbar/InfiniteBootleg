@@ -291,7 +291,6 @@ abstract class World(
       }
     }
 
-    check(!worldTicker.isStarted) { "World has already been started" }
     worldTicker.start()
 
     if (!willDispatchChunksLoadedEvent) {

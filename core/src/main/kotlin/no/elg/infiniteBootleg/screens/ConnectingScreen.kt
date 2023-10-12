@@ -31,6 +31,10 @@ object ConnectingScreen : StageScreen() {
    */
   private var connectAttempt = 0
   private var livelinessTest: ScheduledFuture<*>? = null
+    set(value) {
+      field?.cancel(false)
+      field = value
+    }
 
   fun startLivelinessTest() {
     val attempt = connectAttempt
@@ -53,7 +57,6 @@ object ConnectingScreen : StageScreen() {
   override fun hide() {
     super.hide()
     connectAttempt++
-    livelinessTest?.cancel(false)
     livelinessTest = null
   }
 

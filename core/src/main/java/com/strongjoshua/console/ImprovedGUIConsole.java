@@ -570,7 +570,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
       for (int i = 0; i < size; i++) {
         LogEntry le = entries.get(i);
         Label l;
-        // recycle the labels so we don't create new ones every refresh
+        // recycle the labels, so we don't create new ones every refresh
         if (labels.size > i) {
           l = labels.get(i);
         } else {
@@ -601,12 +601,16 @@ public class ImprovedGUIConsole extends AbstractConsole {
         l.setColor(le.getColor());
         logEntries.add(l).expandX().fillX().top().left().row();
       }
-      scroll.validate();
+      try {
+        scroll.validate();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
       scroll.setScrollPercentY(1);
     }
 
-    private void setHidden(boolean h) {
-      hidden = h;
+    private void setHidden(boolean hide) {
+      hidden = hide;
       if (hidden) {
         consoleWindow.setTouchable(Touchable.disabled);
         stage.setKeyboardFocus(null);
