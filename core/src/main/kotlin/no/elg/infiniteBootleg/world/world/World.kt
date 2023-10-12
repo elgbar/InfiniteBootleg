@@ -217,7 +217,9 @@ abstract class World(
       Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!" }
       Main.inst().scheduler.executeSync {
         addSystems()
-        dispatchEvent(WorldLoadedEvent(this))
+        if (Main.isSingleplayer) {
+          dispatchEvent(WorldLoadedEvent(this))
+        }
       }
     }
   }

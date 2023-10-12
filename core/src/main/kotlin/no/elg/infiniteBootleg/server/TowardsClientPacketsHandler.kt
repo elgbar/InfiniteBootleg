@@ -4,7 +4,6 @@ import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.events.api.EventManager.oneShotListener
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -44,9 +43,7 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.s
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.load
-import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 /**
@@ -87,8 +84,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     }
 
     CB_INITIAL_CHUNKS_SENT -> {
-      Main.logger().debug("CB_INITIAL_CHUNKS_SENT", "Setting chunks as loaded")
-      chunksLoaded = true
+      handleInitialChunkSent()
     }
 
     DX_MOVE_ENTITY -> if (packet.hasMoveEntity() && started) {
@@ -217,6 +213,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
   val protoWorld = startGame.world
   this.world = ServerClientWorld(protoWorld, this).apply {
     loadFromProtoWorld(protoWorld)
+    worldTicker.start()
   }
 
   if (startGame.controlling.entityType != PLAYER) {
@@ -224,7 +221,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
   } else {
     this.controllingEntity = startGame.controlling
     Main.logger().debug("LOGIN", "World loaded, player loaded, waiting for chunks")
-    ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED))
+    ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
   }
 }
 
@@ -256,6 +253,16 @@ fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus.ServerStatus) 
   }
 }
 
+private fun ServerClient.handleInitialChunkSent() {
+  Main.logger().debug("CB_INITIAL_CHUNKS_SENT", "Setting chunks as loaded")
+  chunksLoaded = true
+  val world = world ?: run {
+    ctx.fatal("Failed to find world")
+    return
+  }
+  dispatchEvent(InitialChunksOfWorldLoadedEvent(world))
+}
+
 private fun ServerClient.handleLoginSuccess() {
   val world = world
   if (world == null) {
@@ -270,35 +277,24 @@ private fun ServerClient.handleLoginSuccess() {
   }
   this.futurePlayer = null
 
-  Main.inst().scheduler.executeSync {
-    dispatchEvent(InitialChunksOfWorldLoadedEvent(world))
-  }
-
-  val worldFuture: CompletableFuture<ClientWorld> = CompletableFuture<ClientWorld>().orTimeout(10, TimeUnit.SECONDS)
-  oneShotListener<WorldLoadedEvent> {
-    Main.logger().debug("ClientWorld") { "Completing World loaded future" }
-    worldFuture.complete(it.world as ClientWorld)
-  }
-
   ConnectingScreen.info = "Waiting for world to be ready..."
 
-  val handledPlayer = futurePlayer.whenCompleteAsync { player, e ->
+  futurePlayer.whenCompleteAsync { player, e ->
     if (e != null) {
-      ctx.fatal("Invalid player client side\n  ${e::class.simpleName}: ${e.message}")
+      ctx.fatal("Invalid player client side ${e::class.simpleName}: ${e.message}")
       return@whenCompleteAsync
     } else {
       this@handleLoginSuccess.player = player
       player.box2d.enableGravity()
       Main.logger().debug("handleSpawnEntity", "Server sent the entity to control")
-    }
-  }
 
-  worldFuture.thenCombine(handledPlayer) { _, _ ->
-    Main.inst().scheduler.executeSync {
-      started = true
-      ClientMain.inst().screen = WorldScreen(world, false)
-      setupHeartbeat()
-      Main.logger().debug("LOGIN", "Logged into server successfully")
+      Main.inst().scheduler.executeSync {
+        started = true
+        ClientMain.inst().screen = WorldScreen(world, false)
+        dispatchEvent(WorldLoadedEvent(world)) // must be after setting the world screen for the event to be listened to
+        setupHeartbeat()
+        Main.logger().debug("LOGIN", "Logged into server successfully")
+      }
     }
   }
 }
