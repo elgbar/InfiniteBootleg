@@ -34,7 +34,6 @@ import no.elg.infiniteBootleg.util.findWhichInnerEdgesOfChunk
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isNextTo
-import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
@@ -607,7 +606,7 @@ class ChunkImpl(
         x = chunkX
         y = chunkY
       }
-      blocks += this@ChunkImpl.asSequence().filter { it.isNotAir() }.mapNotNull { it?.save()?.build() }.toSet()
+      blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
     }
 
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
