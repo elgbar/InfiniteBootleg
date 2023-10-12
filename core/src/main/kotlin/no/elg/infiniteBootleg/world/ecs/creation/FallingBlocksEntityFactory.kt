@@ -72,6 +72,7 @@ fun Engine.createGravityAffectedBlockEntity(
   material: Material
 ) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
   this.entity.gravityAffected = true
+  this.entity.authoritativeOnly = true
 }
 
 fun Engine.createLeafEntity(
