@@ -49,7 +49,7 @@ inline fun <reified T : Component> EngineEntity.with(component: T, configure: (@
  * @return the future created [Entity].
  */
 inline fun Engine.futureEntity(configure: EngineEntity.(whenReady: CompletableFuture<Unit>) -> Unit = {}): CompletableFuture<Entity> {
-  contract { callsInPlace(configure, InvocationKind.EXACTLY_ONCE) }
+  contract { callsInPlace(configure, InvocationKind.AT_MOST_ONCE) }
   val entity: Entity = createEntity()
   val configurationFuture = CompletableFuture<Unit>().orTimeout(1, TimeUnit.SECONDS).exceptionally { throw IllegalStateException("Failed to complete future entity init", it) }
   EngineEntity(this, entity).configure(configurationFuture)
