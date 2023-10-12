@@ -110,17 +110,14 @@ fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, fi
   }
 }
 
-/**
- * @author Elg
- */
-fun ServerClient.serverBoundPacket(type: Type): Packet.Builder {
+fun ServerClient.serverBoundPacketBuilder(type: Type): Packet.Builder {
   return Packet.newBuilder()
     .setDirection(SERVER)
     .setSecret(sharedInformation!!.secret) // FIXME
     .setType(type)
 }
 
-fun clientBoundPacket(type: Type): Packet.Builder {
+fun clientBoundPacketBuilder(type: Type): Packet.Builder {
   return Packet.newBuilder()
     .setDirection(CLIENT)
     .setType(type)
@@ -143,7 +140,7 @@ fun serverBoundLoginPacket(name: String, uuid: UUID): Packet {
 }
 
 fun ServerClient.serverBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?): Packet {
-  return serverBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
+  return serverBoundPacketBuilder(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
       .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
@@ -151,7 +148,7 @@ fun ServerClient.serverBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, 
 }
 
 fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInformation): Packet {
-  return serverBoundPacket(DX_SECRET_EXCHANGE).setSecretExchange(
+  return serverBoundPacketBuilder(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(sharedInformation.secret)
       .setEntityUUID(sharedInformation.entityUUID)
@@ -163,11 +160,11 @@ fun ServerClient.serverBoundChunkRequestPacket(x: Int, y: Int): Packet {
 }
 
 fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Vector2i): Packet {
-  return serverBoundPacket(SB_CHUNK_REQUEST).setChunkRequest(Packets.ChunkRequest.newBuilder().setChunkLocation(chunkLocation)).build()
+  return serverBoundPacketBuilder(SB_CHUNK_REQUEST).setChunkRequest(Packets.ChunkRequest.newBuilder().setChunkLocation(chunkLocation)).build()
 }
 
 fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Packet {
-  return serverBoundPacket(DX_DISCONNECT).let {
+  return serverBoundPacketBuilder(DX_DISCONNECT).let {
     if (!reason.isNullOrBlank()) {
       it.setDisconnect(Disconnect.newBuilder().setReason(reason))
     }
@@ -176,7 +173,7 @@ fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Pack
 }
 
 fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
-  return serverBoundPacket(DX_MOVE_ENTITY).setMoveEntity(
+  return serverBoundPacketBuilder(DX_MOVE_ENTITY).setMoveEntity(
     MoveEntity.newBuilder()
       .setUuid(entity.id)
       .setPosition(entity.positionComponent.toProtoVector2f())
@@ -186,18 +183,18 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
 }
 
 fun ServerClient.serverBoundEntityRequest(uuid: String): Packet {
-  return serverBoundPacket(SB_ENTITY_REQUEST).setEntityRequest(
+  return serverBoundPacketBuilder(SB_ENTITY_REQUEST).setEntityRequest(
     EntityRequest.newBuilder()
       .setUuid(uuid)
   ).build()
 }
 
 fun ServerClient.serverBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet {
-  return worldSettingsPacketBuilder(serverBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
+  return worldSettingsPacketBuilder(serverBoundPacketBuilder(DX_WORLD_SETTINGS), spawn, time, timeScale)
 }
 
 fun ServerClient.serverBoundHeartbeat(): Packet {
-  return heartbeatPacketBuilder(serverBoundPacket(DX_HEARTBEAT))
+  return heartbeatPacketBuilder(serverBoundPacketBuilder(DX_HEARTBEAT))
 }
 
 // ////////////////
@@ -207,7 +204,7 @@ fun ServerClient.serverBoundHeartbeat(): Packet {
 private val PROTO_AIR_BLOCK = Block.save(AIR).build()
 
 fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?): Packet {
-  return clientBoundPacket(DX_BLOCK_UPDATE).setUpdateBlock(
+  return clientBoundPacketBuilder(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
@@ -218,7 +215,7 @@ fun clientBoundSpawnEntity(entity: Entity): Packet {
   if (entity.authoritativeOnly) {
     throw IllegalStateException("Cannot send entity with the tag authoritative only to clients ${entity.toComponentsString()}")
   }
-  return clientBoundPacket(CB_SPAWN_ENTITY).setSpawnEntity(
+  return clientBoundPacketBuilder(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
       .setEntity(entity.save())
       .setUuid(entity.id)
@@ -226,7 +223,7 @@ fun clientBoundSpawnEntity(entity: Entity): Packet {
 }
 
 fun clientBoundDespawnEntity(uuid: String, reason: DespawnReason): Packet {
-  return clientBoundPacket(CB_DESPAWN_ENTITY).setDespawnEntity(
+  return clientBoundPacketBuilder(CB_DESPAWN_ENTITY).setDespawnEntity(
     DespawnEntity.newBuilder()
       .setUuid(uuid)
       .setDespawnReason(reason)
@@ -234,11 +231,11 @@ fun clientBoundDespawnEntity(uuid: String, reason: DespawnReason): Packet {
 }
 
 fun clientBoundLoginStatusPacket(status: ServerLoginStatus.ServerStatus): Packet {
-  return clientBoundPacket(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
+  return clientBoundPacketBuilder(CB_LOGIN_STATUS).setServerLoginStatus(ServerLoginStatus.newBuilder().setStatus(status)).build()
 }
 
 fun clientBoundStartGamePacket(player: Entity): Packet {
-  return clientBoundPacket(CB_START_GAME).setStartGame(
+  return clientBoundPacketBuilder(CB_START_GAME).setStartGame(
     StartGame.newBuilder()
       .setWorld(player.world.toProtobuf())
       .setControlling(player.save())
@@ -246,11 +243,11 @@ fun clientBoundStartGamePacket(player: Entity): Packet {
 }
 
 fun clientBoundUpdateChunkPacket(chunk: Chunk): Packet {
-  return clientBoundPacket(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.saveBlocksOnly())).build()
+  return clientBoundPacketBuilder(CB_UPDATE_CHUNK).setUpdateChunk(UpdateChunk.newBuilder().setChunk(chunk.saveBlocksOnly())).build()
 }
 
 fun clientBoundDisconnectPlayerPacket(reason: String?): Packet {
-  return clientBoundPacket(DX_DISCONNECT).let {
+  return clientBoundPacketBuilder(DX_DISCONNECT).let {
     if (!reason.isNullOrBlank()) {
       it.setDisconnect(Disconnect.newBuilder().setReason(reason))
     }
@@ -259,7 +256,7 @@ fun clientBoundDisconnectPlayerPacket(reason: String?): Packet {
 }
 
 fun clientBoundSecretExchange(sharedInformation: SharedInformation): Packet {
-  return clientBoundPacket(DX_SECRET_EXCHANGE).setSecretExchange(
+  return clientBoundPacketBuilder(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(sharedInformation.secret)
       .setEntityUUID(sharedInformation.entityUUID)
@@ -267,11 +264,11 @@ fun clientBoundSecretExchange(sharedInformation: SharedInformation): Packet {
 }
 
 fun clientBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet {
-  return worldSettingsPacketBuilder(clientBoundPacket(DX_WORLD_SETTINGS), spawn, time, timeScale)
+  return worldSettingsPacketBuilder(clientBoundPacketBuilder(DX_WORLD_SETTINGS), spawn, time, timeScale)
 }
 
 fun clientBoundHeartbeat(): Packet {
-  return heartbeatPacketBuilder(clientBoundPacket(DX_HEARTBEAT))
+  return heartbeatPacketBuilder(clientBoundPacketBuilder(DX_HEARTBEAT))
 }
 
 // ////////////

@@ -228,7 +228,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
         "Sent $sent/$total chunks sent to player ${player.name}"
       }
     }
-    ctx.writeAndFlush(clientBoundPacket(CB_INITIAL_CHUNKS_SENT))
+    ctx.writeAndFlush(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
     Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
     for (entity in world.validEntitiesToSendToClient) {

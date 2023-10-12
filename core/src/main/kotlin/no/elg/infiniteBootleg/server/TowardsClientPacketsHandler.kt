@@ -62,8 +62,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     }
 
     CB_LOGIN_STATUS -> if (packet.hasServerLoginStatus()) {
-      val loginStatus = packet.serverLoginStatus.status
-      handleLoginStatus(loginStatus)
+      handleLoginStatus(packet.serverLoginStatus.status)
     }
 
     CB_START_GAME -> if (packet.hasStartGame()) {
@@ -225,7 +224,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
   } else {
     this.controllingEntity = startGame.controlling
     Main.logger().debug("LOGIN", "World loaded, player loaded, waiting for chunks")
-    ctx.writeAndFlush(serverBoundPacket(SB_CLIENT_WORLD_LOADED))
+    ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED))
   }
 }
 

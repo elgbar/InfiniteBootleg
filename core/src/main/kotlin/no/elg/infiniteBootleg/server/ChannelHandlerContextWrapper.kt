@@ -22,7 +22,7 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
     if (msg is Packet) {
       Main.logger().debug(direction) { TextFormat.printer().shortDebugString(msg) }
     } else {
-      Main.logger().error("Tried to send a non packet $msg")
+      Main.logger().error("Tried to send a non packet (type: ${msg::class}) toString: $msg")
     }
   }
 
