@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.screens.ConnectingScreen.info
  */
 class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboundHandler<Packets.Packet>() {
   override fun channelActive(ctx: ChannelHandlerContext) {
-    client.ctx = ctx
+    client.ctx = ChannelHandlerContextWrapper("client->server", ctx)
   }
 
   override fun channelInactive(ctx: ChannelHandlerContext) {

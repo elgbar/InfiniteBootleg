@@ -15,13 +15,17 @@ import java.util.concurrent.ConcurrentHashMap
  * @author Elg
  */
 class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
+
+  val ctxToWrapper = ConcurrentHashMap<ChannelHandlerContext, ChannelHandlerContextWrapper>()
+
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
     Main.logger().log("Server bound packet ${packet.type}")
     packetsReceived++
     if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
       ctx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
       return
-    } else if (packet.type != Packets.Packet.Type.SB_LOGIN) {
+    }
+    if (packet.type != Packets.Packet.Type.SB_LOGIN) {
       val expectedSecret = clients[ctx.channel()]
       if (expectedSecret == null) {
         ctx.fatal("Unknown client")
@@ -32,7 +36,10 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
         return
       }
     }
-    Main.inst().scheduler.executeSync { handleServerBoundPackets(ctx, packet) }
+    Main.inst().scheduler.executeSync {
+      val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) { ChannelHandlerContextWrapper("server->client", ctx) }
+      handleServerBoundPackets(wrappedCtx, packet)
+    }
   }
 
   override fun channelActive(ctx: ChannelHandlerContext) {

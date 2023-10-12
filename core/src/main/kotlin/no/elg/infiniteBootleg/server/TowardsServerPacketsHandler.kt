@@ -58,8 +58,8 @@ fun spotlessCanStupid() = Unit
  * Handle packets sent TO the server FROM a client, will quietly drop any packets that are malformed
  * @author Elg
  */
-fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet) {
-  Main.logger().debug("client->server") { TextFormat.printer().shortDebugString(packet) }
+fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.Packet) {
+  Main.logger().debug("server<-client") { TextFormat.printer().shortDebugString(packet) }
   when (packet.type) {
     SB_LOGIN -> {
       if (packet.hasLogin()) {
@@ -120,7 +120,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContext, packet: Packets.Packet)
   }
 }
 
-private fun handleWorldSettings(ctx: ChannelHandlerContext, worldSettings: WorldSettings) {
+private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: WorldSettings) {
   Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
   val world = ServerMain.inst().serverWorld
   var spawn: Long? = null
@@ -143,7 +143,7 @@ private fun handleWorldSettings(ctx: ChannelHandlerContext, worldSettings: World
   broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c, _ -> c != ctx.channel() }
 }
 
-private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntity) {
+private fun handlePlayerUpdate(ctx: ChannelHandlerContextWrapper, moveEntity: MoveEntity) {
   val player = ctx.getCurrentPlayer()
   if (player == null) {
     ctx.fatal("No server side player found!")
@@ -156,7 +156,7 @@ private fun handlePlayerUpdate(ctx: ChannelHandlerContext, moveEntity: MoveEntit
 //  player.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
 }
 
-private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: SecretExchange) {
+private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: SecretExchange) {
   val shared = ctx.getSharedInformation()
   if (shared == null) {
     ctx.fatal("No secret with this channel, send login request first")
@@ -181,7 +181,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContext, secretExchange: Sec
   }
 }
 
-private fun handleBlockUpdate(ctx: ChannelHandlerContext, blockUpdate: UpdateBlock) {
+private fun handleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   if (isLocInView(ctx, worldX, worldY)) {
@@ -190,7 +190,7 @@ private fun handleBlockUpdate(ctx: ChannelHandlerContext, blockUpdate: UpdateBlo
   }
 }
 
-private fun handleChunkRequest(ctx: ChannelHandlerContext, chunkRequest: ChunkRequest) {
+private fun handleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkRequest: ChunkRequest) {
   val chunkLoc = chunkRequest.chunkLocation
   val serverWorld = ServerMain.inst().serverWorld
 
@@ -253,7 +253,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   }
 }
 
-private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) {
+private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.Login) {
   val version = Util.getVersion()
   if (login.version != version) {
     ctx.fatal("Version mismatch! Client: '${login.version}' Server: '$version'")
@@ -294,7 +294,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContext, login: Packets.Login) 
     }
 }
 
-private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: EntityRequest) {
+private fun handleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest: EntityRequest) {
   val world = ServerMain.inst().serverWorld
 
   val uuid = entityRequest.uuid
@@ -310,7 +310,7 @@ private fun handleEntityRequest(ctx: ChannelHandlerContext, entityRequest: Entit
   }
 }
 
-private fun handleHeartbeat(ctx: ChannelHandlerContext, heartbeat: Heartbeat) {
+private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper, heartbeat: Heartbeat) {
 //  Main.logger().debug("Heartbeat", "Server got client (" + ctx.getCurrentPlayer()?.name + ") heartbeat: " + heartbeat.keepAliveId)
   ctx.getSharedInformation()?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
 }
@@ -331,7 +331,7 @@ private fun ChannelHandlerContext.getCurrentPlayer(): Entity? {
 /**
  * Use to check if something should be sent to a client
  */
-private fun chunksInView(ctx: ChannelHandlerContext): ChunksInView? {
+private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
   val serverWorld = ServerMain.inst().serverWorld
   val uuid = ctx.getSharedInformation()?.entityUUID
   if (uuid == null) {
@@ -346,10 +346,10 @@ private fun chunksInView(ctx: ChannelHandlerContext): ChunksInView? {
   return chunksInView
 }
 
-private fun isChunkInView(ctx: ChannelHandlerContext, chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
+private fun isChunkInView(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
   return chunksInView(ctx)?.isInView(chunkX, chunkY) ?: false
 }
 
-private fun isLocInView(ctx: ChannelHandlerContext, worldX: WorldCoord, worldY: WorldCoord): Boolean {
+private fun isLocInView(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord): Boolean {
   return chunksInView(ctx)?.isInView(worldX.worldToChunk(), worldY.worldToChunk()) ?: false
 }

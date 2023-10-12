@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
-import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.util.concurrent.CompletableFuture
@@ -17,7 +16,7 @@ class ServerClient(
   var controllingEntity: ProtoWorld.Entity? = null
 ) {
 
-  lateinit var ctx: ChannelHandlerContext
+  lateinit var ctx: ChannelHandlerContextWrapper
   var sharedInformation: SharedInformation? = null
 
   /**
