@@ -140,7 +140,7 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
     timeScale = worldSettings.timeScale
   }
   // Rebroadcast the packet to all clients to stay in sync
-  broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c, _ -> c != ctx.channel() }
+  broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
 }
 
 private fun handlePlayerUpdate(ctx: ChannelHandlerContextWrapper, moveEntity: MoveEntity) {

@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.server
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.group.ChannelMatcher
+import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
@@ -41,6 +43,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
+import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.toComponentsString
@@ -84,13 +87,9 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
 /**
  * Broadcast to all other channels than [this]
  */
-fun broadcast(packet: Packet, filter: ((Channel, SharedInformation) -> Boolean)? = null) {
-  for ((channel, creds) in ServerBoundHandler.clients) {
-    if (filter != null && !filter(channel, creds)) {
-      continue
-    }
-    channel.writeAndFlush(packet)
-  }
+fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
+  require(Main.isServer) { "This broadcasting methods can only be used by servers" }
+  channels.writeAndFlush(packet, filter)
 }
 
 /**
@@ -98,15 +97,16 @@ fun broadcast(packet: Packet, filter: ((Channel, SharedInformation) -> Boolean)?
  *
  * Can only be used by a server instance
  */
-fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ((Channel, SharedInformation) -> Boolean)? = null) {
+fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ((Channel) -> Boolean)? = null) {
   require(Main.isServer) { "This broadcasting methods can only be used by servers" }
   val world = ServerMain.inst().serverWorld
   val renderer = world.render
   val chunkX = worldX.worldToChunk()
   val chunkY = worldY.worldToChunk()
-  broadcast(packet) { c, cc ->
-    val viewing = renderer.getClient(cc.entityUUID) ?: return@broadcast false
-    return@broadcast viewing.isInView(chunkX, chunkY) && (filter == null || filter(c, cc))
+  broadcast(packet) { channel ->
+    val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
+    val viewing = renderer.getClient(sharedInfo.entityUUID) ?: return@broadcast false
+    return@broadcast viewing.isInView(chunkX, chunkY) && filter?.invoke(channel) ?: true
   }
 }
 

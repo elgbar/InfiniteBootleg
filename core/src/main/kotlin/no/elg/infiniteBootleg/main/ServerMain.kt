@@ -28,7 +28,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
       instField = this
     }
     val onShutdown = Runnable {
-      broadcast(clientBoundDisconnectPlayerPacket("Server closed"), null)
+      broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
       serverWorld.save()
       serverWorld.dispose()
       dispose()
