@@ -9,6 +9,8 @@ import no.elg.infiniteBootleg.protobuf.entity
 import no.elg.infiniteBootleg.protobuf.tagsOrNull
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.ecs.api.SavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
@@ -52,6 +54,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.worldComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag
+import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnlyOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.CanBeOutOfBoundsTag.Companion.canBeOutOfBoundsComponentOrNull
@@ -70,41 +73,54 @@ import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.checkShouldLoad as box2DBodyComponentCheckShouldLoad
 
-fun Entity.save(ignoreTransient: Boolean = false): ProtoWorld.Entity? {
-  if (!ignoreTransient && this.isTransientEntity) return null
+/**
+ * Save an entity to a proto entity
+ * @param toAuthoritative Whether the receiver of this entity is authoritative
+ * @param ignoreTransient If true, will force save transient entities
+ */
+fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): ProtoWorld.Entity? {
+  if (!ignoreTransient && this.isTransientEntity || toAuthoritative && this.authoritativeOnly) {
+    return null
+  }
   return entity {
-    this@save.entityTypeComponent.apply { save() }
-    this@save.idComponent.apply { save() }
-    this@save.positionComponent.apply { save() }
-    this@save.worldComponent.apply { save() }
+    trySave(this@save.entityTypeComponent, toAuthoritative)
+    trySave(this@save.idComponent, toAuthoritative)
+    trySave(this@save.positionComponent, toAuthoritative)
+    trySave(this@save.worldComponent, toAuthoritative)
 
     tags = tags {
-      this@save.flyingComponentOrNull?.apply { save() }
-      this@save.followedByCameraComponentOrNull?.apply { save() }
-      this@save.gravityAffectedComponentOrNull?.apply { save() }
-      this@save.ignorePlaceableCheckComponentOrNull?.apply { save() }
-      this@save.leafDecayComponentOrNull?.apply { save() }
-      this@save.canBeOutOfBoundsComponentOrNull?.apply { save() }
-      this@save.authoritativeOnlyOrNull?.apply { save() }
+      trySave(this@save.flyingComponentOrNull, toAuthoritative)
+      trySave(this@save.followedByCameraComponentOrNull, toAuthoritative)
+      trySave(this@save.gravityAffectedComponentOrNull, toAuthoritative)
+      trySave(this@save.ignorePlaceableCheckComponentOrNull, toAuthoritative)
+      trySave(this@save.leafDecayComponentOrNull, toAuthoritative)
+      trySave(this@save.canBeOutOfBoundsComponentOrNull, toAuthoritative)
+      trySave(this@save.authoritativeOnlyOrNull, toAuthoritative)
     }
 
-    this@save.box2dOrNull?.apply { save() }
-    this@save.explosiveComponentOrNull?.apply { save() }
-    this@save.inventoryComponentOrNull?.apply { save() }
-    this@save.killableComponentOrNull?.apply { save() }
-    this@save.lookDirectionComponentOrNull?.apply { save() }
-    this@save.materialComponentOrNull?.apply { save() }
-    this@save.nameComponentOrNull?.apply { save() }
-    this@save.selectedInventoryItemComponentOrNull?.apply { save() }
-    this@save.textureRegionComponentOrNull?.apply { save() }
-    this@save.velocityComponentOrNull?.apply { save() }
-    this@save.locallyControlledComponentOrNull?.apply { save() }
-    this@save.chunkComponentOrNull?.apply { save() }
-    this@save.doorComponentOrNull?.apply { save() }
-    this@save.groundedComponentOrNull?.apply { save() }
-    this@save.occupyingBlocksComponentOrNull?.apply { save() }
-    this@save.inputEventQueueOrNull?.apply { save() }
-    this@save.physicsEventQueueOrNull?.apply { save() }
+    trySave(this@save.box2dOrNull, toAuthoritative)
+    trySave(this@save.explosiveComponentOrNull, toAuthoritative)
+    trySave(this@save.inventoryComponentOrNull, toAuthoritative)
+    trySave(this@save.killableComponentOrNull, toAuthoritative)
+    trySave(this@save.lookDirectionComponentOrNull, toAuthoritative)
+    trySave(this@save.materialComponentOrNull, toAuthoritative)
+    trySave(this@save.nameComponentOrNull, toAuthoritative)
+    trySave(this@save.selectedInventoryItemComponentOrNull, toAuthoritative)
+    trySave(this@save.textureRegionComponentOrNull, toAuthoritative)
+    trySave(this@save.velocityComponentOrNull, toAuthoritative)
+    trySave(this@save.locallyControlledComponentOrNull, toAuthoritative)
+    trySave(this@save.chunkComponentOrNull, toAuthoritative)
+    trySave(this@save.doorComponentOrNull, toAuthoritative)
+    trySave(this@save.groundedComponentOrNull, toAuthoritative)
+    trySave(this@save.occupyingBlocksComponentOrNull, toAuthoritative)
+    trySave(this@save.inputEventQueueOrNull, toAuthoritative)
+    trySave(this@save.physicsEventQueueOrNull, toAuthoritative)
+  }
+}
+
+private fun <DSL, T : SavableComponent<DSL>> DSL.trySave(component: T?, toAuthoritative: Boolean) {
+  if (toAuthoritative || component !is AuthoritativeOnlyComponent) {
+    component?.apply { save() }
   }
 }
 

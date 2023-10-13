@@ -383,7 +383,7 @@ abstract class World(
       generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
       chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
       if (Main.isSingleplayer) {
-        controlledPlayerEntities.firstOrNull()?.save(true)?.also {
+        controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true)?.also {
           player = it
         }
       }

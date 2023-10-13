@@ -232,6 +232,7 @@ private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
     for (entity in world.validEntitiesToSendToClient) {
+      if (entity.id == shared.entityUUID) continue // don't send the player to themselves
       Main.logger().debug("LOGIN") { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
       ctx.write(clientBoundSpawnEntity(entity))
     }
