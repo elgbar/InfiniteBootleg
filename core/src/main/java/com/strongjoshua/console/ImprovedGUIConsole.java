@@ -42,6 +42,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragScrollListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SnapshotArray;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * A simple console that allows live logging, and live execution of methods, from within an
@@ -77,6 +79,8 @@ public class ImprovedGUIConsole extends AbstractConsole {
   private final Class<? extends TextButton> textButtonClass;
   private final Class<? extends Label> labelClass;
   private final Class<? extends ScrollPane> scrollPaneClass;
+
+  private Constructor<? extends Label> labelConstructor;
 
   /**
    * Creates the console using the default skin.<br>
@@ -174,6 +178,12 @@ public class ImprovedGUIConsole extends AbstractConsole {
     this.textFieldClass = textFieldClass;
     this.textButtonClass = textButtonClass;
     this.labelClass = labelClass;
+    try {
+      labelConstructor = labelClass.getConstructor(CharSequence.class, String.class, Color.class);
+    } catch (NoSuchMethodException e) {
+      throw new IllegalArgumentException(
+          "Label class does not support (<String>, <String>, <Color>) constructor", e);
+    }
     this.scrollPaneClass = scrollPaneClass;
 
     this.keyID = keyID;
@@ -557,6 +567,26 @@ public class ImprovedGUIConsole extends AbstractConsole {
       root.addListener(new ImprovedGUIConsole.KeyListener(input));
     }
 
+    private Label getLogEntryLabel(int index) {
+      Label label;
+      // recycle the labels, so we don't create new ones every refresh
+      if (labels.size > index) {
+        label = labels.get(index);
+      } else {
+        try {
+          label = labelConstructor.newInstance("", fontName, LogLevel.DEFAULT.getColor());
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+          throw new RuntimeException(
+              "Failed to create new instance of label class " + labelClass.getSimpleName(), e);
+        }
+        label.setWrap(true);
+        labels.add(label);
+        label.addListener(
+            new ImprovedGUIConsole.LogListener(label, skin.getDrawable(tableBackground)));
+      }
+      return label;
+    }
+
     void refresh() {
       if (disabled || hidden) {
         return;
@@ -569,37 +599,11 @@ public class ImprovedGUIConsole extends AbstractConsole {
       int size = entries.size;
       for (int i = 0; i < size; i++) {
         LogEntry le = entries.get(i);
-        Label l;
-        // recycle the labels, so we don't create new ones every refresh
-        if (labels.size > i) {
-          l = labels.get(i);
-        } else {
-          try {
-            l =
-                labelClass
-                    .getConstructor(CharSequence.class, Skin.class, String.class, Color.class)
-                    .newInstance("", skin, fontName, LogLevel.DEFAULT.getColor());
-          } catch (Exception e) {
-            try {
-              l =
-                  labelClass
-                      .getConstructor(CharSequence.class, String.class, Color.class)
-                      .newInstance("", fontName, LogLevel.DEFAULT.getColor());
-            } catch (Exception e2) {
-              throw new RuntimeException(
-                  "Label class does not support either (<String>, <Skin>, <String>, <Color>) or"
-                      + " (<String>, <String>, <Color>) constructors.");
-            }
-          }
-          l.setWrap(true);
-          labels.add(l);
-          l.addListener(new ImprovedGUIConsole.LogListener(l, skin.getDrawable(tableBackground)));
-        }
-        // I'm not sure about the extra space, but it makes the label highlighting look much better
-        // with VisUI
-        l.setText(" " + le.toConsoleString());
-        l.setColor(le.getColor());
-        logEntries.add(l).expandX().fillX().top().left().row();
+        Label label = getLogEntryLabel(i);
+
+        label.setText(" " + le.toConsoleString());
+        label.setColor(le.getColor());
+        logEntries.add(label).expandX().fillX().top().left().row();
       }
       try {
         scroll.validate();
