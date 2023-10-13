@@ -10,12 +10,13 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.HOLE_DETECTOR_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_FOOT_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_LEFT_ARM_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_RIGHT_ARM_USER_DATA
 
-class GroundedComponent : EntitySavableComponent {
+class GroundedComponent : EntitySavableComponent, AuthoritativeOnlyComponent {
 
   val feetContacts = LongContactTracker(PLAYERS_FOOT_USER_DATA)
   val holeContacts = LongContactTracker(HOLE_DETECTOR_USER_DATA)

@@ -28,6 +28,6 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent> {
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): PhysicsEventQueueComponent = with<PhysicsEventQueueComponent>()
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasPhysicsEvent()
-    val PROTO_PHYSICS_EVENT = ProtoWorld.Entity.PhysicsEvent.getDefaultInstance()
+    val PROTO_PHYSICS_EVENT: ProtoWorld.Entity.PhysicsEvent = ProtoWorld.Entity.PhysicsEvent.getDefaultInstance()
   }
 }

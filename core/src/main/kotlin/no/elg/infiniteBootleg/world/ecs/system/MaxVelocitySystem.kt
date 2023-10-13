@@ -3,10 +3,10 @@ package no.elg.infiniteBootleg.world.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
-import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.toFamily
 import kotlin.math.abs
 

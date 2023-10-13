@@ -16,13 +16,14 @@ import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 
 data class LocallyControlledComponent(
   var brushSize: Float = INITIAL_BRUSH_SIZE,
   var interactRadius: Float = INITIAL_INTERACT_RADIUS,
   var instantBreak: Boolean = INITIAL_INSTANT_BREAK
-) : EntitySavableComponent {
+) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
   fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedInventoryItemComponentOrNull?.element?.itemType == ItemType.TOOL
 

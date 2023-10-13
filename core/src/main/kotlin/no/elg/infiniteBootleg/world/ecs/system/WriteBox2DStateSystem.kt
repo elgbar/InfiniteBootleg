@@ -5,6 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
+import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
@@ -12,7 +13,6 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.v
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
-import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
 /**
  * Write the position of the entity from the box2D entity

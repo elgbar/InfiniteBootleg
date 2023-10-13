@@ -34,7 +34,7 @@ class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: Chunk): ChunkComponent = with(ChunkComponent(state))
     override fun ProtoWorld.Entity.checkShouldLoad(state: () -> Chunk): Boolean = hasChunk()
-    val PROTO_CHUNK_BASED = ProtoWorld.Entity.ChunkBased.getDefaultInstance()
+    val PROTO_CHUNK_BASED: ProtoWorld.Entity.ChunkBased = ProtoWorld.Entity.ChunkBased.getDefaultInstance()
   }
 
   override fun EntityKt.Dsl.save() {

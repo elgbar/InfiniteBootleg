@@ -10,6 +10,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.world.blocks.Block
 
+// FIXME should not be transient, it is useful in a multiplayer setting
 class CurrentlyBreakingComponent : Component {
 
   val breaking: LongMap<CurrentlyBreaking> = LongMap(16, 0.8f)

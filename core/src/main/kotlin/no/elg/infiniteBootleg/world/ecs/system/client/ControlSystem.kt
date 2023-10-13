@@ -17,13 +17,13 @@ import no.elg.infiniteBootleg.util.jump
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.util.setVel
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EARLY
+import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.controlledEntityFamily
-import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 import kotlin.math.min

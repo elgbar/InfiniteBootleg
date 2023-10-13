@@ -9,11 +9,14 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ecs.api.TagLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.TagSavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 
 /**
- * This entity should not be sent to clients, since it is only used for server side logic
+ * This entity should not be sent to clients, since it is only used for server side logic.
+ *
+ * This is different from, [AuthoritativeOnlyComponent] since that component is used for types of components that should not be sent to clients
  */
-class AuthoritativeOnlyTag : TagSavableComponent {
+class AuthoritativeOnlyTag : TagSavableComponent, AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<AuthoritativeOnlyTag>() {
     var Entity.authoritativeOnly by tagFor<AuthoritativeOnlyTag>()

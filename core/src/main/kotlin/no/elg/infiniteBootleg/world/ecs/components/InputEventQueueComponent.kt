@@ -8,12 +8,13 @@ import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent.Companion.queueEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class InputEventQueueComponent : ECSEventQueueComponent<InputEvent> {
+class InputEventQueueComponent : ECSEventQueueComponent<InputEvent>, AuthoritativeOnlyComponent {
   override val events = ConcurrentLinkedQueue<InputEvent>()
 
   override fun EntityKt.Dsl.save() {

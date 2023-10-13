@@ -7,17 +7,19 @@ import ktx.collections.removeAll
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
-import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
 /**
  * Sets a marker block in the world to indicate that an entity is occupying that block
  */
-object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFamily, UPDATE_PRIORITY_DEFAULT), DuplexSystem {
+object UpdateGridBlockSystem :
+  IteratingSystem(standaloneGridOccupyingBlocksFamily, UPDATE_PRIORITY_DEFAULT),
+  DuplexSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world

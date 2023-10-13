@@ -15,12 +15,12 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent.Companion.explosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
-import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.abs
 

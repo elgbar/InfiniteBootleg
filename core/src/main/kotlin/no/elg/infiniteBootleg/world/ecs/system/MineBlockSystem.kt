@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
@@ -17,7 +18,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 
 object MineBlockSystem :
   IteratingSystem(allOf(WorldComponent::class, LocallyControlledComponent::class, SelectedInventoryItemComponent::class).get(), UPDATE_PRIORITY_DEFAULT),

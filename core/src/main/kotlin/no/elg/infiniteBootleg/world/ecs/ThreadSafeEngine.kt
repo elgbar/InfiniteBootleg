@@ -11,9 +11,9 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.ServerSystem
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
-import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
-import no.elg.infiniteBootleg.world.ecs.system.restriction.ServerSystem
 
 class ThreadSafeEngine : Engine(), Disposable {
 

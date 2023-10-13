@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Tool
+import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
@@ -17,9 +18,10 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
-import no.elg.infiniteBootleg.world.ecs.system.restriction.ClientSystem
 
-object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueueComponent.mapper), ClientSystem {
+object InputSystem :
+  EventSystem<InputEvent, InputEventQueueComponent>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueueComponent.mapper),
+  ClientSystem {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     val worldEntity = WorldEntity(entity.world, entity)

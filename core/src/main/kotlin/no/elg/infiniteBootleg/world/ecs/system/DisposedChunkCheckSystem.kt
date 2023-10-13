@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
+import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunkComponent
@@ -14,7 +15,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
 object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).get(), UPDATE_PRIORITY_BEFORE_EVENTS), DuplexSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {

@@ -17,8 +17,9 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 
-class InventoryComponent(private val maxSize: Int) : EntitySavableComponent {
+class InventoryComponent(private val maxSize: Int) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
   private val items = GdxSet<Item>()
 

@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EARLY
+import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -14,7 +15,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.InUnloadedChunkTag.Companion.isInUnloadedChunk
-import no.elg.infiniteBootleg.world.ecs.system.restriction.DuplexSystem
 
 object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY), DuplexSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {

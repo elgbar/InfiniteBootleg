@@ -11,7 +11,10 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
-class ExplosiveComponent(var fuse: Float = FUSE_DURATION_SECONDS, val strength: Float = EXPLOSION_STRENGTH.toFloat()) : EntitySavableComponent {
+class ExplosiveComponent(
+  var fuse: Float = FUSE_DURATION_SECONDS,
+  val strength: Float = EXPLOSION_STRENGTH.toFloat()
+) : EntitySavableComponent {
 
   override fun EntityKt.Dsl.save() {
     explosive = explosive {

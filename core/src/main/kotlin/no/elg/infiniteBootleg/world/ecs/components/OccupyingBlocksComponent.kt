@@ -26,7 +26,7 @@ class OccupyingBlocksComponent : EntitySavableComponent {
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasOccupyingBlocks()
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): OccupyingBlocksComponent = with(OccupyingBlocksComponent())
-    val PROTO_OCCUPYING_BLOCKS = ProtoWorld.Entity.OccupyingBlocks.getDefaultInstance()
+    val PROTO_OCCUPYING_BLOCKS: ProtoWorld.Entity.OccupyingBlocks = ProtoWorld.Entity.OccupyingBlocks.getDefaultInstance()
   }
 
   override fun EntityKt.Dsl.save() {
