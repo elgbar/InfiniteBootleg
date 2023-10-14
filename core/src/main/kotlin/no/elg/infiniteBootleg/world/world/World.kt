@@ -1132,7 +1132,7 @@ abstract class World(
     } finally {
       chunksLock.writeLock().unlock()
     }
-    if (!transientWorld) {
+    if (Main.isAuthoritative && !transientWorld) {
       val worldFolder = worldFolder
       if (worldFolder != null && worldFolder.isDirectory) {
         if (!deleteLockFile(uuid)) {
