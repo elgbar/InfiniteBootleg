@@ -82,45 +82,46 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
   if (!ignoreTransient && this.isTransientEntity || toAuthoritative && this.authoritativeOnly) {
     return null
   }
+
+  fun <DSL, T : SavableComponent<DSL>> DSL.trySave(component: T?) {
+    if (toAuthoritative || component !is AuthoritativeOnlyComponent) {
+      component?.apply { save() }
+    }
+  }
+
   return entity {
-    trySave(this@save.entityTypeComponent, toAuthoritative)
-    trySave(this@save.idComponent, toAuthoritative)
-    trySave(this@save.positionComponent, toAuthoritative)
-    trySave(this@save.worldComponent, toAuthoritative)
+    trySave(this@save.entityTypeComponent)
+    trySave(this@save.idComponent)
+    trySave(this@save.positionComponent)
+    trySave(this@save.worldComponent)
 
     tags = tags {
-      trySave(this@save.flyingComponentOrNull, toAuthoritative)
-      trySave(this@save.followedByCameraComponentOrNull, toAuthoritative)
-      trySave(this@save.gravityAffectedComponentOrNull, toAuthoritative)
-      trySave(this@save.ignorePlaceableCheckComponentOrNull, toAuthoritative)
-      trySave(this@save.leafDecayComponentOrNull, toAuthoritative)
-      trySave(this@save.canBeOutOfBoundsComponentOrNull, toAuthoritative)
-      trySave(this@save.authoritativeOnlyOrNull, toAuthoritative)
+      trySave(this@save.flyingComponentOrNull)
+      trySave(this@save.followedByCameraComponentOrNull)
+      trySave(this@save.gravityAffectedComponentOrNull)
+      trySave(this@save.ignorePlaceableCheckComponentOrNull)
+      trySave(this@save.leafDecayComponentOrNull)
+      trySave(this@save.canBeOutOfBoundsComponentOrNull)
+      trySave(this@save.authoritativeOnlyOrNull)
     }
 
-    trySave(this@save.box2dOrNull, toAuthoritative)
-    trySave(this@save.explosiveComponentOrNull, toAuthoritative)
-    trySave(this@save.inventoryComponentOrNull, toAuthoritative)
-    trySave(this@save.killableComponentOrNull, toAuthoritative)
-    trySave(this@save.lookDirectionComponentOrNull, toAuthoritative)
-    trySave(this@save.materialComponentOrNull, toAuthoritative)
-    trySave(this@save.nameComponentOrNull, toAuthoritative)
-    trySave(this@save.selectedInventoryItemComponentOrNull, toAuthoritative)
-    trySave(this@save.textureRegionComponentOrNull, toAuthoritative)
-    trySave(this@save.velocityComponentOrNull, toAuthoritative)
-    trySave(this@save.locallyControlledComponentOrNull, toAuthoritative)
-    trySave(this@save.chunkComponentOrNull, toAuthoritative)
-    trySave(this@save.doorComponentOrNull, toAuthoritative)
-    trySave(this@save.groundedComponentOrNull, toAuthoritative)
-    trySave(this@save.occupyingBlocksComponentOrNull, toAuthoritative)
-    trySave(this@save.inputEventQueueOrNull, toAuthoritative)
-    trySave(this@save.physicsEventQueueOrNull, toAuthoritative)
-  }
-}
-
-private fun <DSL, T : SavableComponent<DSL>> DSL.trySave(component: T?, toAuthoritative: Boolean) {
-  if (toAuthoritative || component !is AuthoritativeOnlyComponent) {
-    component?.apply { save() }
+    trySave(this@save.box2dOrNull)
+    trySave(this@save.explosiveComponentOrNull)
+    trySave(this@save.inventoryComponentOrNull)
+    trySave(this@save.killableComponentOrNull)
+    trySave(this@save.lookDirectionComponentOrNull)
+    trySave(this@save.materialComponentOrNull)
+    trySave(this@save.nameComponentOrNull)
+    trySave(this@save.selectedInventoryItemComponentOrNull)
+    trySave(this@save.textureRegionComponentOrNull)
+    trySave(this@save.velocityComponentOrNull)
+    trySave(this@save.locallyControlledComponentOrNull)
+    trySave(this@save.chunkComponentOrNull)
+    trySave(this@save.doorComponentOrNull)
+    trySave(this@save.groundedComponentOrNull)
+    trySave(this@save.occupyingBlocksComponentOrNull)
+    trySave(this@save.inputEventQueueOrNull)
+    trySave(this@save.physicsEventQueueOrNull)
   }
 }
 

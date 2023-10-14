@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
-import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -23,18 +22,15 @@ import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
  *
  * @author Elg
  */
-class ServerWorld : World {
+class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : World(generator, seed, worldName) {
   override val render = HeadlessWorldRenderer(this)
-
-  constructor(protoWorld: ProtoWorld.World) : super(protoWorld)
-  constructor(generator: ChunkGenerator, seed: Long, worldName: String) : super(generator, seed, worldName)
 
   fun disconnectPlayer(uuid: String, kicked: Boolean) {
     val player = getEntity(uuid)
     if (player != null) {
       removeEntity(player, if (kicked) DespawnReason.PLAYER_KICKED else DespawnReason.PLAYER_QUIT)
     } else {
-      Main.logger().warn("Failed to find player $uuid to remove")
+      Main.logger().warn("SERVER", "Failed to find player $uuid to remove")
     }
   }
 
