@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
-import no.elg.infiniteBootleg.world.ecs.creation.CONTROLLED_CLIENT_PLAYER_FAMILIES
+import no.elg.infiniteBootleg.world.ecs.creation.NON_CONTROLLED_PLAYER_FAMILIES
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBodyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockBodyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createPlayerBodyComponent
@@ -77,7 +77,7 @@ class Box2DBodyComponent(
       val pos = entity.position
       val vel = entity.velocityOrZero
       when (protoEntity.box2D.bodyType) {
-        PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, CONTROLLED_CLIENT_PLAYER_FAMILIES, state)
+        PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, NON_CONTROLLED_PLAYER_FAMILIES, state)
         FALLING_BLOCK -> createFallingBlockBodyComponent(world, pos.x, pos.y, vel.x, vel.y, state)
         DOOR -> createDoorBodyComponent(world, pos.x.toInt(), pos.y.toInt(), state)
         else -> error("Unknown body type ${protoEntity.box2D.bodyType}")

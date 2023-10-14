@@ -54,13 +54,13 @@ val COMMON_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   playerFamily to "playerFamily",
   basicDynamicEntityFamily to "basicDynamicEntityFamily"
 )
-val CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
+val NON_CONTROLLED_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
   *COMMON_PLAYER_FAMILIES,
   drawableEntitiesFamily to "drawableEntitiesFamily",
   entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
 )
 val CONTROLLED_CLIENT_PLAYER_FAMILIES: Array<Pair<Family, String>> = arrayOf(
-  *CLIENT_PLAYER_FAMILIES,
+  *NON_CONTROLLED_PLAYER_FAMILIES,
   drawableEntitiesFamily to "drawableEntitiesFamily",
   localPlayerFamily to "localPlayerFamily",
   controlledEntityFamily to "controlledEntityFamily",
