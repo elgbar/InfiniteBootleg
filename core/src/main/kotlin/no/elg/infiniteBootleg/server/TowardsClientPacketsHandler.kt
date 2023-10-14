@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
@@ -44,6 +45,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 /**
@@ -168,16 +170,8 @@ private fun ServerClient.handleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   Main.logger().debug("handleSpawnEntity") { "Spawning a ${spawnEntity.entity.entityType}" }
 
   when (spawnEntity.entity.entityType) {
-    PLAYER -> {
-      val controlled = uuid == spawnEntity.uuid
-      val future = world.load(spawnEntity.entity)
-      if (controlled) {
-        futurePlayer = future
-      }
-    }
-
+    PLAYER -> world.load(spawnEntity.entity)
     FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, spawnEntity.entity)
-
     else -> Main.logger().error("Cannot spawn a ${spawnEntity.entity.entityType} yet")
   }
 }
@@ -270,14 +264,13 @@ private fun ServerClient.handleLoginSuccess() {
     return
   }
 
-  val futurePlayer = futurePlayer?.orTimeout(10, TimeUnit.SECONDS)
-  if (futurePlayer == null) {
+  val protoPlayerEntity = controllingEntity
+  if (protoPlayerEntity == null) {
     ctx.fatal("Invalid player client side: Did not a receive an entity to control")
     return
   }
-  this.futurePlayer = null
-
-  ConnectingScreen.info = "Waiting for world to be ready..."
+  val futurePlayer: CompletableFuture<Entity> = world.load(protoPlayerEntity).orTimeout(10, TimeUnit.SECONDS)
+  ConnectingScreen.info = "Login successful! Waiting for player to be spawned..."
 
   futurePlayer.whenCompleteAsync { player, e ->
     if (e != null) {
@@ -302,7 +295,6 @@ private fun ServerClient.handleLoginSuccess() {
 private fun ServerClient.setupHeartbeat() {
   val sharedInformation = sharedInformation!!
   sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
-//          Main.logger().log("Sending heartbeat to server")
     ctx.writeAndFlush(serverBoundHeartbeat())
     if (sharedInformation.lostConnection()) {
       ctx.fatal("Server stopped responding, heartbeats not received")

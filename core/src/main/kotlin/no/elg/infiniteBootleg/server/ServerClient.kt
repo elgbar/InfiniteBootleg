@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.server
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
-import java.util.concurrent.CompletableFuture
 
 /**
  * A client of a server
@@ -27,5 +26,4 @@ class ServerClient(
 
   val uuid get() = sharedInformation!!.entityUUID // FIXME
   var player: Entity? = null
-  var futurePlayer: CompletableFuture<Entity>? = null
 }
