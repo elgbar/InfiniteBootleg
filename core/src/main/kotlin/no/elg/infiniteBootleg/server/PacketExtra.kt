@@ -67,15 +67,15 @@ import java.util.UUID
 
 internal fun ChannelHandlerContext.fatal(msg: String) {
   if (Settings.client) {
+    Main.inst().scheduler.scheduleAsync(50L) {
+      close()
+    }
     Main.inst().scheduler.executeSync {
       ConnectingScreen.info = msg
       ClientMain.inst().screen = ConnectingScreen
       val serverClient = ClientMain.inst().serverClient
       if (serverClient?.sharedInformation != null) {
         this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
-      }
-      Main.inst().scheduler.scheduleSync(50L) {
-        close()
       }
     }
   } else {
