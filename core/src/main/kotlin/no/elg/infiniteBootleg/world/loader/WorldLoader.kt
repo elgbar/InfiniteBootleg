@@ -38,35 +38,42 @@ object WorldLoader {
   fun spawnServerPlayer(world: ServerWorld, uuid: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
     val fileHandle = getServerPlayerFile(world, uuid)
 
+    fun createNewServerPlayer(): CompletableFuture<Entity> {
+      val protoEntity = world.createNewProtoPlayer(controlled = true) {
+        this.uuid = uuid
+        this.name = username
+      }
+      return world.load(protoEntity) {
+        with(SharedInformationComponent(sharedInformation))
+      }.thenApply {
+        saveServerPlayer(it)
+        Main.logger().debug("SERVER", "Created persisted player profile for $uuid")
+        it
+      }
+    }
+
     if (fileHandle != null && fileHandle.exists()) {
       Main.logger().debug("SERVER", "Trying to load persisted player profile for $uuid")
       try {
         val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
-        val future = world.load(proto) {
+        return world.load(proto) {
           with(SharedInformationComponent(sharedInformation))
+        }.handle { entity, ex ->
+          if (ex != null) {
+            Main.logger().warn("SERVER", "Failed to load player profile, creating new player", ex)
+            return@handle createNewServerPlayer().join()
+          } else {
+            Main.logger().debug("SERVER", "Loaded persisted player profile for $uuid")
+          }
+          return@handle entity
         }
-        future.thenAccept {
-          Main.logger().debug("SERVER", "Loaded persisted player profile for $uuid")
-        }
-        return future
       } catch (e: Exception) {
         Main.logger().warn("SERVER", "Failed to load player profile", e)
         // fall through
       }
     }
     Main.logger().debug("SERVER", "Creating fresh player profile for $uuid")
-    val newProtoPlayer = world.createNewProtoPlayer {
-      this.uuid = uuid
-      this.name = username
-    }
-    val future = world.load(newProtoPlayer) {
-      with(SharedInformationComponent(sharedInformation))
-    }
-    future.thenAccept {
-      saveServerPlayer(it)
-      Main.logger().debug("SERVER", "Created persisted player profile for $uuid")
-    }
-    return future
+    return createNewServerPlayer()
   }
 
   private fun saveServerPlayer(player: Entity) {
