@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
-import com.google.protobuf.TextFormat
 import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -59,7 +59,7 @@ fun spotlessCanStupid() = Unit
  * @author Elg
  */
 fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.Packet) {
-  Main.logger().debug("server<-client") { TextFormat.printer().shortDebugString(packet) }
+  logPacket("server<-client", packet)
   when (packet.type) {
     SB_LOGIN -> {
       if (packet.hasLogin()) {

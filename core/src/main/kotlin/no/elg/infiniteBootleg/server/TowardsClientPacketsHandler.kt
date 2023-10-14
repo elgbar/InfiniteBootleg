@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.server
 
-import com.google.protobuf.TextFormat
+import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit
  * @author Elg
  */
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
-  Main.logger().debug("client<-server") { TextFormat.printer().shortDebugString(packet) }
+  logPacket("client<-server", packet)
   when (packet.type) {
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) {
       handleHeartbeat(packet.heartbeat)

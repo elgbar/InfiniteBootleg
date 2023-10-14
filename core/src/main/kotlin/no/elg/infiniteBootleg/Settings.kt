@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg
 
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import java.awt.GraphicsEnvironment
 
@@ -73,6 +74,14 @@ object Settings {
 
   var renderAirBlocks = false
 
+  var logPackets = true
+
+  /**
+   * Never log these packets
+   */
+  val filterOutPackets = mutableListOf<Packets.Packet.Type>().also {
+    it += Packets.Packet.Type.DX_HEARTBEAT
+  }
   @JvmField
   var enableCameraFollowLerp = true
 

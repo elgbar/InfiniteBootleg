@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.server
 
-import com.google.protobuf.TextFormat
 import io.netty.buffer.ByteBufAllocator
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
@@ -12,6 +11,7 @@ import io.netty.channel.ChannelPromise
 import io.netty.util.Attribute
 import io.netty.util.AttributeKey
 import io.netty.util.concurrent.EventExecutor
+import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import java.net.SocketAddress
@@ -20,7 +20,7 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
 
   private fun logPacketWrite(msg: Any) {
     if (msg is Packet) {
-      Main.logger().debug(direction) { TextFormat.printer().shortDebugString(msg) }
+      logPacket(direction, msg)
     } else {
       Main.logger().error("Tried to send a non packet (type: ${msg::class}) toString: $msg")
     }
