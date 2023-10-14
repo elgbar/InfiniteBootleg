@@ -121,7 +121,6 @@ interface ConsoleLogger : ApplicationLogger {
     exception?.printStackTrace(System.out)
   }
 
-
   companion object {
     const val DEBUG_PREFIX = "DBG"
   }

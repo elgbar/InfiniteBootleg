@@ -48,24 +48,19 @@ object Settings {
   @JvmField
   var tps = DEFAULT_TICKS_PER_SECOND
 
-  @JvmField
   var dayTicking = true
 
   @JvmField
   var renderLight = true
 
-  @JvmField
   var renderBox2dDebug = false
 
-  @JvmField
   var debugEntityLight = false
 
-  @JvmField
   var debugBlockLight = false
 
   var debugEntityMarkerBlocks = false
 
-  @JvmField
   var renderChunkBounds = false
 
   var renderChunkUpdates = false

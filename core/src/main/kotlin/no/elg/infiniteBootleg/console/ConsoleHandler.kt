@@ -167,7 +167,7 @@ class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolea
       return
     }
     if (msg.startsWith(DEBUG_PREFIX)) {
-      //Do not log debug messages to in-game console since it will be spammed
+      // Do not log debug messages to in-game console since it will be spammed
       println(msg)
       return
     }
