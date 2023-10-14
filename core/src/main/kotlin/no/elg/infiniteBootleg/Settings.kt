@@ -82,6 +82,26 @@ object Settings {
   val filterOutPackets = mutableListOf<Packets.Packet.Type>().also {
     it += Packets.Packet.Type.DX_HEARTBEAT
   }
+
+  enum class WrongThreadAsyncEventAction {
+    /**
+     * Throw an exception when an async event is handled on the wrong thread
+     */
+    THROW,
+
+    /**
+     * Print a stacktrace when an async event is handled on the wrong thread
+     */
+    STACKTRACE,
+
+    /**
+     * Log a warning when an async event is handled on the wrong thread
+     */
+    LOG
+  }
+
+  var handleWrongThreadAsyncEvents: WrongThreadAsyncEventAction = WrongThreadAsyncEventAction.STACKTRACE
+
   @JvmField
   var enableCameraFollowLerp = true
 
