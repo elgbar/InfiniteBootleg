@@ -50,11 +50,6 @@ import java.util.concurrent.TimeUnit
 private val secureRandom = SecureRandom.getInstanceStrong()
 
 /**
- * There must exist at least two public top-level functions
- */
-fun spotlessCanStupid() = Unit
-
-/**
  * Handle packets sent TO the server FROM a client, will quietly drop any packets that are malformed
  * @author Elg
  */
