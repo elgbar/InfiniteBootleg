@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.Settings
  */
 @JvmDefaultWithoutCompatibility
 interface ConsoleLogger : ApplicationLogger {
+
   /**
    * Log a level with [LogLevel.DEFAULT] loglevel
    *
@@ -105,18 +106,23 @@ interface ConsoleLogger : ApplicationLogger {
 
   override fun debug(tag: String, message: String) {
     if (Settings.debug) {
-      log(LogLevel.DEFAULT, "DBG [$tag] $message")
+      log(LogLevel.DEFAULT, "$DEBUG_PREFIX [$tag] $message")
     }
   }
 
   fun debug(tag: String, message: () -> String) {
     if (Settings.debug) {
-      log(LogLevel.DEFAULT, "DBG [$tag] ${message.invoke()}")
+      log(LogLevel.DEFAULT, "$DEBUG_PREFIX [$tag] ${message.invoke()}")
     }
   }
 
   override fun debug(tag: String, message: String, exception: Throwable?) {
     debug(tag, message)
     exception?.printStackTrace(System.out)
+  }
+
+
+  companion object {
+    const val DEBUG_PREFIX = "DBG"
   }
 }

@@ -12,6 +12,7 @@ import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
+import no.elg.infiniteBootleg.console.ConsoleLogger.Companion.DEBUG_PREFIX
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole
 import no.elg.infiniteBootleg.console.consoles.StdConsole
 import no.elg.infiniteBootleg.main.ClientMain
@@ -157,16 +158,23 @@ class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolea
   }
 
   /**
-   * @see com.strongjoshua.console.Console.log
+   * Log a message.
+   * If the message starts with [DEBUG_PREFIX] it will not be logged to the in-game console
    */
-  @Synchronized
   override fun log(level: LogLevel, msg: String) {
     if (disposed) {
       println("[POST DISPOSED LOGGING] <" + level.name + "> " + msg)
       return
     }
+    if (msg.startsWith(DEBUG_PREFIX)) {
+      //Do not log debug messages to in-game console since it will be spammed
+      println(msg)
+      return
+    }
     try {
-      console.log(msg, level)
+      synchronized(this) {
+        console.log(msg, level)
+      }
     } catch (ex: Exception) {
       System.err.printf(
         "Failed to log the message '%s' with level %s due to the exception %s: %s%n",
