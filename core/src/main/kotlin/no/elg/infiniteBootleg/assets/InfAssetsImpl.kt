@@ -54,7 +54,6 @@ class InfAssetsImpl : InfAssets {
 
   override lateinit var breakingBlockTextures: Array<RotatableTextureRegion>
 
-
   fun getInitializer(pts: Int): BitmapFont {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()

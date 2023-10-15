@@ -210,6 +210,16 @@ fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?
   ).build()
 }
 
+fun clientBoundMoveEntity(entity: Entity): Packet {
+  return clientBoundPacketBuilder(DX_MOVE_ENTITY).setMoveEntity(
+    MoveEntity.newBuilder()
+      .setUuid(entity.id)
+      .setPosition(entity.positionComponent.toProtoVector2f())
+      .setVelocity(entity.velocityComponent.toVector2f())
+//      .setLookAngleDeg(entity.lookDeg)
+  ).build()
+}
+
 fun clientBoundSpawnEntity(entity: Entity): Packet {
   if (entity.authoritativeOnly) {
     throw IllegalStateException("Cannot send entity with the tag authoritative only to clients ${entity.toComponentsString()}")

@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.server
 
-import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 
@@ -12,7 +11,7 @@ import no.elg.infiniteBootleg.world.world.ServerClientWorld
 class ServerClient(
   val name: String,
   var world: ServerClientWorld? = null,
-  var controllingEntity: ProtoWorld.Entity? = null
+  var protoEntity: ProtoWorld.Entity? = null
 ) {
 
   lateinit var ctx: ChannelHandlerContextWrapper
@@ -24,6 +23,5 @@ class ServerClient(
   var started: Boolean = false
   var chunksLoaded: Boolean = false
 
-  val uuid get() = sharedInformation!!.entityUUID // FIXME
-  var player: Entity? = null
+  val uuid get() = sharedInformation?.entityUUID ?: error("Cannot access uuid of entity before it is given by the server")
 }

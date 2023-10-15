@@ -9,6 +9,8 @@ fun Vector2.dstd(v: Vector2): Double {
   return sqrt((dx * dx + dy * dy).toDouble())
 }
 
+fun Vector2.dst2(v: Vector2): Float = this.dst2(v.x, v.y)
+
 fun isWithin(loc1: Long, loc2: Long, radius: Number): Boolean = isWithin(loc1.decompactLocX(), loc1.decompactLocY(), loc2.decompactLocX(), loc2.decompactLocY(), radius)
 
 fun isWithin(

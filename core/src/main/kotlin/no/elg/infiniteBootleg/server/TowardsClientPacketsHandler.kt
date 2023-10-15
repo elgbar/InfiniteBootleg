@@ -48,10 +48,13 @@ import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ClientBoundHandler.Companion.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.toCompact
+import no.elg.infiniteBootleg.util.toVector2
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.load
@@ -177,7 +180,7 @@ private fun ServerClient.handleLoginSuccess() {
     return
   }
 
-  val protoPlayerEntity = controllingEntity
+  val protoPlayerEntity = protoEntity
   if (protoPlayerEntity == null) {
     ctx.fatal("Invalid player client side: Did not a receive an entity to control")
     return
@@ -190,7 +193,6 @@ private fun ServerClient.handleLoginSuccess() {
       ctx.fatal("Invalid player client side ${e::class.simpleName}: ${e.message}")
       return@whenCompleteAsync
     } else {
-      this@handleLoginSuccess.player = player
       player.box2d.enableGravity()
       Main.logger().debug("handleSpawnEntity", "Server sent the entity to control")
 
@@ -217,7 +219,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
     if (startGame.controlling.entityType != PLAYER) {
       ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
     } else {
-      this.controllingEntity = startGame.controlling
+      this.protoEntity = startGame.controlling
       Main.logger().debug("LOGIN", "World loaded, waiting for chunks")
       ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
     }
@@ -330,6 +332,14 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
     ctx.writeAndFlush(serverBoundEntityRequest(uuid))
     return
+  }
+  if (entity.id == this.uuid) {
+    val localPos = entity.position
+    val serverPos = moveEntity.position.toVector2()
+    if (localPos.dst2(serverPos) <= 2) {
+      // If we're less then 2 blocks away from the server, we don't need to move
+      return
+    }
   }
   entity.teleport(moveEntity.position.x, moveEntity.position.y)
   entity.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)

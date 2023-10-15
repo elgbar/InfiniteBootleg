@@ -28,6 +28,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
+import no.elg.infiniteBootleg.protobuf.blockOrNull
 import no.elg.infiniteBootleg.protobuf.chunkRequestOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
 import no.elg.infiniteBootleg.protobuf.entityRequestOrNull
@@ -69,7 +70,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   logPacket("server<-client", packet)
   when (packet.type) {
     DX_HEARTBEAT -> handleHeartbeat(ctx)
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handlePlayerUpdate(ctx, it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handleMovePlayer(ctx, it) } }
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
     SB_CHUNK_REQUEST -> packet.chunkRequestOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it) } }
     SB_ENTITY_REQUEST -> packet.entityRequestOrNull?.let { scheduler.executeAsync { asyncHandleEntityRequest(ctx, it) } }
@@ -113,7 +114,7 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
   broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
 }
 
-private fun handlePlayerUpdate(ctx: ChannelHandlerContextWrapper, moveEntity: MoveEntity) {
+private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: MoveEntity) {
   val player = ctx.getCurrentPlayer()
   if (player == null) {
     ctx.fatal("No server side player found!")
@@ -210,8 +211,7 @@ private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdat
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   if (isLocInView(ctx, worldX, worldY)) {
-    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-    ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
+    ServerMain.inst().serverWorld.setBlock(worldX, worldY, blockUpdate.blockOrNull, true)
   }
 }
 
@@ -318,7 +318,7 @@ private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
   }
   val chunksInView = serverWorld.render.getClient(uuid)
   if (chunksInView == null) {
-    Main.logger().error("handleChunkRequest", "Failed to get chunks in view")
+    Main.logger().error("handleChunkRequest", "Failed to get chunks in view of entity $uuid")
     return null
   }
   return chunksInView
