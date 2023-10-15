@@ -254,7 +254,7 @@ class ChunkImpl(
       if (Main.isServer) {
         Main.inst().scheduler.executeAsync {
           val packet = clientBoundBlockUpdate(worldX, worldY, block)
-          broadcastToInView(packet, worldX, worldY, null)
+          broadcastToInView(packet, worldX, worldY)
         }
       } else if (Main.isServerClient) {
         Main.inst().scheduler.executeAsync {

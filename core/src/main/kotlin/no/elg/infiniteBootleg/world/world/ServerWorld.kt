@@ -54,8 +54,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
         broadcastToInView(
           clientBoundSpawnEntity(entity),
           entity.getComponent(PositionComponent::class.java).blockX,
-          entity.getComponent(PositionComponent::class.java).blockY,
-          null
+          entity.getComponent(PositionComponent::class.java).blockY
         )
       }
     }

@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
-import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
@@ -97,7 +96,7 @@ fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
  *
  * Can only be used by a server instance
  */
-fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ((Channel) -> Boolean)? = null) {
+fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
   require(Main.isServer) { "This broadcasting methods can only be used by servers" }
   val world = ServerMain.inst().serverWorld
   val renderer = world.render
@@ -106,7 +105,7 @@ fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, fi
   broadcast(packet) { channel ->
     val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
     val viewing = renderer.getClient(sharedInfo.entityUUID) ?: return@broadcast false
-    return@broadcast viewing.isInView(chunkX, chunkY) && filter?.invoke(channel) ?: true
+    return@broadcast viewing.isInView(chunkX, chunkY) && filter.matches(channel)
   }
 }
 
