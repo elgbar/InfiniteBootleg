@@ -4,18 +4,12 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
-import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.server.broadcastToInView
-import no.elg.infiniteBootleg.server.clientBoundMoveEntity
-import no.elg.infiniteBootleg.server.serverBoundMoveEntityPacket
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
@@ -37,18 +31,6 @@ object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_
     if (entity.updateBox2DVelocity) {
       entity.updateBox2DVelocity = false
       body.setLinearVelocity(entity.velocityComponent.dx, entity.velocityComponent.dy)
-
-      if (Main.isServerClient) {
-        ClientMain.inst().serverClient?.let {
-          if (it.uuid == entity.id) {
-            Main.inst().scheduler.executeAsync {
-              it.ctx.writeAndFlush(it.serverBoundMoveEntityPacket(entity))
-            }
-          }
-        }
-      } else if (Main.isServer) {
-        broadcastToInView(clientBoundMoveEntity(entity), body.position.x.toInt(), body.position.x.toInt())
-      }
     }
   }
 

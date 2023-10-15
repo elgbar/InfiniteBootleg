@@ -3,6 +3,11 @@ package no.elg.infiniteBootleg.world.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.physics.box2d.Body
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.server.broadcastToInView
+import no.elg.infiniteBootleg.server.clientBoundMoveEntity
+import no.elg.infiniteBootleg.server.serverBoundMoveEntityPacket
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
@@ -10,6 +15,7 @@ import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
@@ -22,8 +28,21 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody
+
     readPosition(entity, body)
     readVelocity(entity, body)
+
+    if (Main.isServerClient) {
+      ClientMain.inst().serverClient?.let {
+        if (it.uuid == entity.id) {
+          Main.inst().scheduler.executeAsync {
+            it.ctx.writeAndFlush(it.serverBoundMoveEntityPacket(entity))
+          }
+        }
+      }
+    } else if (Main.isServer) {
+      broadcastToInView(clientBoundMoveEntity(entity), body.position.x.toInt(), body.position.x.toInt())
+    }
   }
 
   private fun readPosition(entity: Entity, body: Body) {
