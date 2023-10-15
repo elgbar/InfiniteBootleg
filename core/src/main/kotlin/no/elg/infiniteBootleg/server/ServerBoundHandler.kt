@@ -48,6 +48,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
 
   override fun channelInactive(ctx: ChannelHandlerContext) {
     channels.remove(ctx.channel())
+    ctxToWrapper.remove(ctx)
     val client = clients.remove(ctx.channel())
     val playerId = client?.entityUUID ?: "<Unknown>"
     Main.logger().debug(TAG, "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)")
