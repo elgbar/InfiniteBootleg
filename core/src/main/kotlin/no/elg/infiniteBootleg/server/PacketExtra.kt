@@ -226,7 +226,7 @@ fun clientBoundSpawnEntity(entity: Entity): Packet {
   }
   return clientBoundPacketBuilder(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
-      .setEntity(entity.save(toAuthoritative = false))
+      .setEntity(entity.save(toAuthoritative = false, ignoreTransient = true))
       .setUuid(entity.id)
   ).build()
 }
@@ -247,7 +247,7 @@ fun clientBoundStartGamePacket(player: Entity): Packet {
   return clientBoundPacketBuilder(CB_START_GAME).setStartGame(
     StartGame.newBuilder()
       .setWorld(player.world.toProtobuf())
-      .setControlling(player.save(toAuthoritative = true))
+      .setControlling(player.save(toAuthoritative = true, ignoreTransient = true))
   ).build()
 }
 
