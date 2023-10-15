@@ -29,7 +29,7 @@ object DebugText {
 
   val dotFourFormat = DecimalFormat("0.0000")
 
-  inline fun fpsString(sb: StringBuilder, world: ClientWorld?) {
+  fun fpsString(sb: StringBuilder, world: ClientWorld?) {
     val worldTps = world?.worldTicker?.realTPS ?: -1
     val physicsTps = world?.worldTicker?.box2DTicker?.ticker?.realTPS ?: -1
 

@@ -315,7 +315,7 @@ abstract class World(
   }
 
   /**
-   * @return Will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
+   * @return Whether this will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
    */
   fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
     Main.logger().debug("PB World") { TextFormat.printer().shortDebugString(protoWorld) }

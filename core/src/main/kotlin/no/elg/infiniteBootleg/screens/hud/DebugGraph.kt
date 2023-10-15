@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.hud.helper.TickerGraph
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
+@Suppress("NOTHING_TO_INLINE")
 object DebugGraph : Resizable {
 
   private lateinit var fbo: FrameBuffer

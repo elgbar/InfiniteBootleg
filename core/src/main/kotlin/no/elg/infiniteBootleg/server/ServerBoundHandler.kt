@@ -51,7 +51,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
     ctxToWrapper.remove(ctx)
     val client = clients.remove(ctx.channel())
     val playerId = client?.entityUUID ?: "<Unknown>"
-    Main.logger().debug(TAG, "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)")
+    Main.logger().debug(SERVER_TAG, "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)")
     if (client != null) {
       val task = client.heartbeatTask
       task?.cancel(false)
@@ -62,7 +62,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
   companion object {
     val channels: ChannelGroup = DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
     val clients: MutableMap<Channel, SharedInformation> = ConcurrentHashMap()
-    const val TAG = "SERVER"
+    const val SERVER_TAG = "SERVER"
     var packetsReceived: Long = 0
   }
 }
