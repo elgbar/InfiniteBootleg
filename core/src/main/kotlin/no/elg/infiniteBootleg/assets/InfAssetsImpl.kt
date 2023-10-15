@@ -26,7 +26,6 @@ import no.elg.infiniteBootleg.assets.InfAssets.Companion.createTextureRegion
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.ClientMain.Companion.SCALE
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
@@ -55,14 +54,18 @@ class InfAssetsImpl : InfAssets {
 
   override lateinit var breakingBlockTextures: Array<RotatableTextureRegion>
 
-  override val font: BitmapFont by lazy {
+
+  fun getInitializer(pts: Int): BitmapFont {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()
-    parameter.size = ScreenRenderer.FONT_SIZE * SCALE
+    parameter.size = pts * SCALE
 
     parameter.minFilter = Linear
-    generator.generateFont(parameter)
+    return generator.generateFont(parameter)
   }
+
+  override val font20pt: BitmapFont by lazy { getInitializer(20) }
+  override val font10pt: BitmapFont by lazy { getInitializer(10) }
 
   override fun loadAssets() {
     safeTextureAtlas = SafeTextureAtlas(TEXTURES_BLOCK_FILE)
@@ -92,8 +95,8 @@ class InfAssetsImpl : InfAssets {
     if (Main.isClient) {
       // Only load vis ui on clients
       with(VisUI.getSkin() as Skin) {
-        val notFlippedFont = font
-        val boldNotFlippedFont = font
+        val notFlippedFont = font20pt
+        val boldNotFlippedFont = font20pt
 
         this["default-font"] = notFlippedFont
 
