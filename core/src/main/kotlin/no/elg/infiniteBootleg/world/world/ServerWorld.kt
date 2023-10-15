@@ -5,14 +5,16 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
+import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
-import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer
 import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
@@ -36,33 +38,35 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   override fun addEntityListeners(engine: Engine) {
     engine.addEntityListener(
-      playerFamily,
+      basicDynamicEntityFamily,
       object : EntityListener {
-        override fun entityAdded(entity: Entity): Unit = onEntityAdd(entity)
-        override fun entityRemoved(entity: Entity): Unit = onEntityRemove(entity)
+        fun isPlayer(entity: Entity) = entity.entityTypeComponent.entityType == ProtoWorld.Entity.EntityType.PLAYER
+        override fun entityAdded(entity: Entity) {
+          if (isPlayer(entity)) onEntityAdd(entity)
+        }
+
+        override fun entityRemoved(entity: Entity) {
+          if (isPlayer(entity)) onEntityRemove(entity)
+        }
       }
     )
   }
 
-  private fun onEntityAdd(entity: Entity) {
-    if (playerFamily.matches(entity)) {
-      render.addClient(entity.id, ServerClientChunksInView(entity.positionComponent.x.worldToChunk(), entity.positionComponent.y.worldToChunk()))
-    }
+  private fun onEntityAdd(player: Entity) {
+    render.addClient(player.id, ServerClientChunksInView(player.positionComponent.x.worldToChunk(), player.positionComponent.y.worldToChunk()))
     render.update()
-    if (entity.shouldSendToClients) {
+    if (player.shouldSendToClients) {
       Main.inst().scheduler.executeSync {
         broadcastToInView(
-          clientBoundSpawnEntity(entity),
-          entity.getComponent(PositionComponent::class.java).blockX,
-          entity.getComponent(PositionComponent::class.java).blockY
+          clientBoundSpawnEntity(player),
+          player.getComponent(PositionComponent::class.java).blockX,
+          player.getComponent(PositionComponent::class.java).blockY
         )
       }
     }
   }
 
-  private fun onEntityRemove(entity: Entity) {
-    if (playerFamily.matches(entity)) {
-      render.removeClient(entity.id)
-    }
+  private fun onEntityRemove(player: Entity) {
+    render.removeClient(player.id)
   }
 }
