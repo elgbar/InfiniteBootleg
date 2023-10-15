@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createNewProtoPlayer
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
@@ -38,14 +39,17 @@ object WorldLoader {
   fun spawnServerPlayer(world: ServerWorld, uuid: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
     val fileHandle = getServerPlayerFile(world, uuid)
 
+    val serverPlayerConfig: Entity.() -> Unit = {
+      with(SharedInformationComponent(sharedInformation))
+      isTransientEntity = true
+    }
+
     fun createNewServerPlayer(): CompletableFuture<Entity> {
       val protoEntity = world.createNewProtoPlayer(controlled = true) {
         this.uuid = uuid
         this.name = username
       }
-      return world.load(protoEntity) {
-        with(SharedInformationComponent(sharedInformation))
-      }.thenApply {
+      return world.load(protoEntity, configure = serverPlayerConfig).thenApply {
         saveServerPlayer(it)
         Main.logger().debug("SERVER", "Created persisted player profile for $uuid")
         it
@@ -56,9 +60,7 @@ object WorldLoader {
       Main.logger().debug("SERVER", "Trying to load persisted player profile for $uuid")
       try {
         val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
-        return world.load(proto) {
-          with(SharedInformationComponent(sharedInformation))
-        }.handle { entity, ex ->
+        return world.load(proto, configure = serverPlayerConfig).handle { entity, ex ->
           if (ex != null) {
             Main.logger().warn("SERVER", "Failed to load player profile, creating new player", ex)
             return@handle createNewServerPlayer().join()
@@ -77,7 +79,7 @@ object WorldLoader {
   }
 
   private fun saveServerPlayer(player: Entity) {
-    val protoPlayer = player.save(toAuthoritative = true) ?: return
+    val protoPlayer = player.save(toAuthoritative = true, ignoreTransient = true) ?: return
     val fileHandle = getServerPlayerFile(player.world, player.id) ?: return
     try {
       fileHandle.writeBytes(protoPlayer.toByteArray(), false)
