@@ -71,11 +71,11 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { Main.inst().scheduler.executeAsync { asyncHandleMoveEntity(it) } }
-    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { Main.inst().scheduler.executeAsync { asyncHandleBlockUpdate(it) } }
-    CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { Main.inst().scheduler.executeAsync { asyncHandleSpawnEntity(it) } }
-    CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { Main.inst().scheduler.executeAsync { asyncHandleUpdateChunk(it) } }
-    CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { Main.inst().scheduler.executeAsync { asyncHandleDespawnEntity(it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeAsync { asyncHandleMoveEntity(it) } }
+    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(it) } }
+    CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleSpawnEntity(it) } }
+    CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { scheduler.executeAsync { asyncHandleUpdateChunk(it) } }
+    CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleDespawnEntity(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
@@ -207,18 +207,20 @@ private fun ServerClient.handleLoginSuccess() {
 
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   Main.logger().debug("LOGIN", "Initialization okay, loading world")
-  val protoWorld = startGame.world
-  this.world = ServerClientWorld(protoWorld, this).apply {
-    loadFromProtoWorld(protoWorld)
-    worldTicker.start()
-  }
+  scheduler.executeSync {
+    val protoWorld = startGame.world
+    this.world = ServerClientWorld(protoWorld, this).apply {
+      loadFromProtoWorld(protoWorld)
+      worldTicker.start()
+    }
 
-  if (startGame.controlling.entityType != PLAYER) {
-    ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
-  } else {
-    this.controllingEntity = startGame.controlling
-    Main.logger().debug("LOGIN", "World loaded, waiting for chunks")
-    ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
+    if (startGame.controlling.entityType != PLAYER) {
+      ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
+    } else {
+      this.controllingEntity = startGame.controlling
+      Main.logger().debug("LOGIN", "World loaded, waiting for chunks")
+      ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
+    }
   }
 }
 
