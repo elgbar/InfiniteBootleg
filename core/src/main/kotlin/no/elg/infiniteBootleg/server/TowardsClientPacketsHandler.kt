@@ -317,8 +317,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   }
   val chunkLoc = worldXYtoChunkCompactLoc(moveEntity.position.x.toInt(), moveEntity.position.y.toInt())
   if (!world.isChunkLoaded(chunkLoc)) {
-    // Chunk is not loaded, so ignore this entity update
-    // TODO (from the server) only send entity packets of loaded chunks
+    Main.logger().warn("Server sent move entity packet to unloaded chunk")
     return
   }
 
