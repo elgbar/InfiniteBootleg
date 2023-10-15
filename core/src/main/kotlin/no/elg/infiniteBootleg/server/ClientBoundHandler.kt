@@ -31,12 +31,11 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   }
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
-    Main.logger().log("Client bound packet ${packet.type}")
     if (packet.direction == Packets.Packet.Direction.SERVER || packet.type.name.startsWith("SB_")) {
       ctx.fatal("Client got a server packet ${packet.type} direction ${packet.direction}")
       return
     }
-    Main.inst().scheduler.executeSync { client.handleClientBoundPackets(packet) }
+    client.handleClientBoundPackets(packet)
   }
 
   @Deprecated("Deprecated in Java")
