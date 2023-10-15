@@ -94,9 +94,8 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
 }
 
 // ///////////////////////
-// NOT SYNCED HANDLERS //
+// NOT SYNCED HANDLERS  //
 // ///////////////////////
-
 
 private fun ServerClient.setupHeartbeat() {
   val sharedInformation = sharedInformation!!
@@ -206,7 +205,6 @@ private fun ServerClient.handleLoginSuccess() {
   }
 }
 
-
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   Main.logger().debug("LOGIN", "Initialization okay, loading world")
   val protoWorld = startGame.world
@@ -235,7 +233,7 @@ private fun ServerClient.handleInitialChunkSent() {
 }
 
 // //////////////////
-// ASYNC HANDLERS //
+// ASYNC HANDLERS  //
 // //////////////////
 
 private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {

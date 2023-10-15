@@ -9,8 +9,8 @@ import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY
+import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
-import no.elg.infiniteBootleg.protobuf.Packets.Heartbeat
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
@@ -28,6 +28,14 @@ import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
+import no.elg.infiniteBootleg.protobuf.chunkRequestOrNull
+import no.elg.infiniteBootleg.protobuf.disconnectOrNull
+import no.elg.infiniteBootleg.protobuf.entityRequestOrNull
+import no.elg.infiniteBootleg.protobuf.loginOrNull
+import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
+import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
+import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
+import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
@@ -38,8 +46,10 @@ import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
@@ -49,6 +59,8 @@ import java.util.concurrent.TimeUnit
 
 private val secureRandom = SecureRandom.getInstanceStrong()
 
+val scheduler by lazy { Main.inst().scheduler }
+
 /**
  * Handle packets sent TO the server FROM a client, will quietly drop any packets that are malformed
  * @author Elg
@@ -56,64 +68,27 @@ private val secureRandom = SecureRandom.getInstanceStrong()
 fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.Packet) {
   logPacket("server<-client", packet)
   when (packet.type) {
-    SB_LOGIN -> {
-      if (packet.hasLogin()) {
-        handleLoginPacket(ctx, packet.login)
-      }
-    }
+    DX_HEARTBEAT -> handleHeartbeat(ctx)
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handlePlayerUpdate(ctx, it) } }
+    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
+    SB_CHUNK_REQUEST -> packet.chunkRequestOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it) } }
+    SB_ENTITY_REQUEST -> packet.entityRequestOrNull?.let { scheduler.executeAsync { asyncHandleEntityRequest(ctx, it) } }
 
-    SB_CLIENT_WORLD_LOADED -> handleClientsWorldLoaded(ctx)
-    SB_CHUNK_REQUEST -> {
-      if (packet.hasChunkRequest()) {
-        handleChunkRequest(ctx, packet.chunkRequest)
-      }
-    }
+    SB_LOGIN -> packet.loginOrNull?.let { scheduler.executeSync { handleLoginPacket(ctx, it) } }
+    SB_CLIENT_WORLD_LOADED -> scheduler.executeAsync { asyncHandleClientsWorldLoaded(ctx) }
+    DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { scheduler.executeSync { handleSecretExchange(ctx, it) } }
 
-    DX_SECRET_EXCHANGE -> {
-      if (packet.hasSecretExchange()) {
-        handleSecretExchange(ctx, packet.secretExchange)
-      }
-    }
+    DX_DISCONNECT -> scheduler.executeSync { handleDisconnect(ctx, packet.disconnectOrNull) }
+    DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { scheduler.executeSync { handleWorldSettings(ctx, it) } }
 
-    DX_HEARTBEAT -> {
-      if (packet.hasHeartbeat()) {
-        handleHeartbeat(ctx, packet.heartbeat)
-      }
-    }
-
-    DX_MOVE_ENTITY -> {
-      if (packet.hasMoveEntity()) {
-        handlePlayerUpdate(ctx, packet.moveEntity)
-      }
-    }
-
-    DX_BLOCK_UPDATE -> {
-      if (packet.hasUpdateBlock()) {
-        handleBlockUpdate(ctx, packet.updateBlock)
-      }
-    }
-
-    DX_DISCONNECT -> {
-      Main.logger().log("Client sent disconnect packet. Reason: " + if (packet.hasDisconnect()) packet.disconnect?.reason else "No reason given")
-      ctx.close()
-    }
-
-    SB_ENTITY_REQUEST -> {
-      if (packet.hasEntityRequest()) {
-        handleEntityRequest(ctx, packet.entityRequest)
-      }
-    }
-
-    DX_WORLD_SETTINGS -> {
-      if (packet.hasWorldSettings()) {
-        handleWorldSettings(ctx, packet.worldSettings)
-      }
-    }
-
-    UNRECOGNIZED -> ctx.fatal("Unknown packet type received")
+    UNRECOGNIZED, null -> ctx.fatal("Unknown packet type received ${packet.type}")
     else -> ctx.fatal("Cannot handle packet of type " + packet.type)
   }
 }
+
+// ///////////////////////
+// NOT SYNCED HANDLERS  //
+// ///////////////////////
 
 private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: WorldSettings) {
   Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
@@ -148,7 +123,8 @@ private fun handlePlayerUpdate(ctx: ChannelHandlerContextWrapper, moveEntity: Mo
     ctx.fatal("Client tried to update someone else")
     return
   }
-//  player.translate(moveEntity.position.x, moveEntity.position.y, moveEntity.velocity.x, moveEntity.velocity.y, moveEntity.lookAngleDeg, false)
+  player.teleport(moveEntity.position.x, moveEntity.position.y)
+  player.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
 }
 
 private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: SecretExchange) {
@@ -173,79 +149,6 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
   } catch (e: Exception) {
     ctx.fatal("handleSecretExchange: Failed to parse entity")
     e.printStackTrace()
-  }
-}
-
-private fun handleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: UpdateBlock) {
-  val worldX = blockUpdate.pos.x
-  val worldY = blockUpdate.pos.y
-  if (isLocInView(ctx, worldX, worldY)) {
-    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-    ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
-  }
-}
-
-private fun handleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkRequest: ChunkRequest) {
-  val chunkLoc = chunkRequest.chunkLocation
-  val serverWorld = ServerMain.inst().serverWorld
-
-  // Only send chunks which the player is allowed to see
-  if (isChunkInView(ctx, chunkLoc.x, chunkLoc.y)) {
-    val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y, true) ?: return // if no chunk, don't send a chunk update
-    ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
-  }
-}
-
-private fun handleClientsWorldLoaded(ctx: ChannelHandlerContext) {
-  val world = ServerMain.inst().serverWorld
-  val shared = ctx.getSharedInformation()
-  val player = ctx.getCurrentPlayer()
-  if (player == null || shared == null) {
-    ctx.fatal("Player not loaded server-side")
-    return
-  }
-
-  Main.logger().debug("LOGIN", "Client world ready, sending chunks to client ${player.nameComponent}")
-
-  Main.inst().scheduler.executeAsync {
-    // Send chunk packets to client
-    val ix = player.positionComponent.blockX.worldToChunk()
-    val iy = player.positionComponent.blockY.worldToChunk()
-    for (cx in -Settings.viewDistance..Settings.viewDistance) {
-      for (cy in -Settings.viewDistance..Settings.viewDistance) {
-        val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
-        ctx.write(clientBoundUpdateChunkPacket(chunk))
-      }
-      ctx.flush()
-      Main.logger().debug("LOGIN") {
-        val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
-        val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
-        "Sent $sent/$total chunks sent to player ${player.name}"
-      }
-    }
-    ctx.writeAndFlush(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
-    Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
-
-    for (entity in world.validEntitiesToSendToClient) {
-      if (entity.id == shared.entityUUID) continue // don't send the player to themselves
-      Main.logger().debug("LOGIN") { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
-      ctx.write(clientBoundSpawnEntity(entity))
-    }
-
-    ctx.flush()
-    Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
-
-    ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
-
-    shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
-//    Main.logger().log("Sending heartbeat to client")
-      ctx.writeAndFlush(clientBoundHeartbeat())
-      if (shared.lostConnection()) {
-        Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
-        ctx.close()
-      }
-    }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
-    Main.logger().log("Player ${player.name} joined")
   }
 }
 
@@ -290,7 +193,91 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
     }
 }
 
-private fun handleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest: EntityRequest) {
+private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper) {
+  ctx.getSharedInformation()?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
+}
+
+private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Disconnect?) {
+  Main.logger().log("Client sent disconnect packet. Reason: ${disconnect?.reason ?: "No reason given"}")
+  ctx.close()
+}
+
+// //////////////////
+// ASYNC HANDLERS  //
+// //////////////////
+
+private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: UpdateBlock) {
+  val worldX = blockUpdate.pos.x
+  val worldY = blockUpdate.pos.y
+  if (isLocInView(ctx, worldX, worldY)) {
+    val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
+    ServerMain.inst().serverWorld.setBlock(worldX, worldY, protoBlock, true)
+  }
+}
+
+private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkRequest: ChunkRequest) {
+  val chunkLoc = chunkRequest.chunkLocation
+  val serverWorld = ServerMain.inst().serverWorld
+
+  // Only send chunks which the player is allowed to see
+  if (isChunkInView(ctx, chunkLoc.x, chunkLoc.y)) {
+    val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y, true) ?: return // if no chunk, don't send a chunk update
+    ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
+  }
+}
+
+private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContext) {
+  val world = ServerMain.inst().serverWorld
+  val shared = ctx.getSharedInformation()
+  val player = ctx.getCurrentPlayer()
+  if (player == null || shared == null) {
+    ctx.fatal("Player not loaded server-side")
+    return
+  }
+
+  Main.logger().debug("LOGIN", "Client world ready, sending chunks to client ${player.nameComponent}")
+
+  // Send chunk packets to client
+  val ix = player.positionComponent.blockX.worldToChunk()
+  val iy = player.positionComponent.blockY.worldToChunk()
+  for (cx in -Settings.viewDistance..Settings.viewDistance) {
+    for (cy in -Settings.viewDistance..Settings.viewDistance) {
+      val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
+      ctx.write(clientBoundUpdateChunkPacket(chunk))
+    }
+    ctx.flush()
+    Main.logger().debug("LOGIN") {
+      val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
+      val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
+      "Sent $sent/$total chunks sent to player ${player.name}"
+    }
+  }
+  ctx.writeAndFlush(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
+  Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
+
+  for (entity in world.validEntitiesToSendToClient) {
+    if (entity.id == shared.entityUUID) continue // don't send the player to themselves
+    Main.logger().debug("LOGIN") { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
+    ctx.write(clientBoundSpawnEntity(entity))
+  }
+
+  ctx.flush()
+  Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
+
+  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
+
+  shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
+//    Main.logger().log("Sending heartbeat to client")
+    ctx.writeAndFlush(clientBoundHeartbeat())
+    if (shared.lostConnection()) {
+      Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
+      ctx.close()
+    }
+  }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+  Main.logger().log("Player ${player.name} joined")
+}
+
+private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest: EntityRequest) {
   val world = ServerMain.inst().serverWorld
 
   val uuid = entityRequest.uuid
@@ -304,11 +291,6 @@ private fun handleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest
   } else {
     ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
   }
-}
-
-private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper, heartbeat: Heartbeat) {
-//  Main.logger().debug("Heartbeat", "Server got client (" + ctx.getCurrentPlayer()?.name + ") heartbeat: " + heartbeat.keepAliveId)
-  ctx.getSharedInformation()?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
 }
 
 // ///////////
