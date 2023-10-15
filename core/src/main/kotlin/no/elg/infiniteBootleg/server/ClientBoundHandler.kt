@@ -41,7 +41,7 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   @Deprecated("Deprecated in Java")
   override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
     info = "Exception caught, ${cause.javaClass.simpleName}: ${cause.message}"
-    cause.printStackTrace()
+    Main.logger().error(TAG, "Exception in netty IO", cause)
     ctx.close()
   }
 
