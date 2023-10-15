@@ -926,7 +926,7 @@ abstract class World(
   fun containsEntity(uuid: String): Boolean = getEntity(uuid) != null
 
   fun getEntity(uuid: String): Entity? {
-    for (entity in playersEntities) {
+    for (entity in standaloneEntities) {
       if (entity.getComponent(IdComponent::class.java).id == uuid) {
         return entity
       }
