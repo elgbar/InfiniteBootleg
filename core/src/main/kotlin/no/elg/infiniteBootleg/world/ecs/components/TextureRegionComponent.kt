@@ -11,10 +11,9 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.components.ClientComponent
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
-data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntitySavableComponent, ClientComponent {
+data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntitySavableComponent {
   companion object : EntityLoadableMapper<TextureRegionComponent>() {
     var Entity.textureRegionComponent by propertyFor(mapper)
     var Entity.textureRegionComponentOrNull by optionalPropertyFor(mapper)
