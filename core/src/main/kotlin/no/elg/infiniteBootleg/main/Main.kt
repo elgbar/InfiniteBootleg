@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.main
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.assets.InfAssets
@@ -29,6 +30,13 @@ interface Main : ApplicationListener {
   val renderThreadName: String
   val assets: InfAssets
 
+  /**
+   * If we are allowed to make changes or move a given entity
+   *
+   * As a client we are only allowed to change our own entity and as a server or while in singleplayer we are allowed to change any entity
+   */
+  fun isAuthorizedToChange(entity: Entity): Boolean
+
   companion object {
     fun logger(): ConsoleLogger = inst().consoleLogger
 
@@ -56,7 +64,7 @@ interface Main : ApplicationListener {
      * @return If this is a singleplayer instance
      */
     val isSingleplayer: Boolean
-      get() = isClient && ClientMain.inst().isSinglePlayer
+      get() = isClient && ClientMain.inst().isSingleplayer
 
     /**
      * @return If the current instance is multiplayer (either as the server or a client of a server)

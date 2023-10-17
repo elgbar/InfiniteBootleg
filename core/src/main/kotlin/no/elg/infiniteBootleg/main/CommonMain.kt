@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.main
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
@@ -12,6 +13,7 @@ import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.assets.InfAssetsImpl
 import no.elg.infiniteBootleg.console.ConsoleHandler
 import no.elg.infiniteBootleg.console.ConsoleLogger
+import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler
 import no.elg.infiniteBootleg.util.Util
 
@@ -47,6 +49,8 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
   override val engine: Engine? get() = world?.engine
   override val isNotTest: Boolean get() = !test
   override val consoleLogger: ConsoleLogger get() = console
+
+  override fun isAuthorizedToChange(entity: Entity): Boolean = isAuthoritative
 
   override fun dispose() {
     console.dispose()

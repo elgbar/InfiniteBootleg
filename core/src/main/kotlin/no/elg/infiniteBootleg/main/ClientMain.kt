@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.main
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
@@ -20,6 +21,7 @@ import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
@@ -53,7 +55,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   /**
    * @return If the player is singleplayer
    */
-  var isSinglePlayer = false
+  var isSingleplayer = false
     private set
 
   /**
@@ -61,6 +63,8 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
    */
   var isMultiplayer = false
     private set
+
+  override fun isAuthorizedToChange(entity: Entity): Boolean = super.isAuthorizedToChange(entity) || entity.id == serverClient?.uuid
 
   override lateinit var renderThreadName: String
     private set
@@ -157,9 +161,9 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   }
 
   fun updateStatus(world: ClientWorld?) {
-    isSinglePlayer = world is SinglePlayerWorld
+    isSingleplayer = world is SinglePlayerWorld
     isMultiplayer = world is ServerClientWorld
-    logger().debug("STATUS", "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSinglePlayer")
+    logger().debug("STATUS", "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer")
   }
 
   fun shouldNotIgnoreWorldInput(): Boolean = !shouldIgnoreWorldInput()
