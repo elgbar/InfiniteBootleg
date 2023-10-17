@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.InventoryElement
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.MaterialItem
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.material
 import no.elg.infiniteBootleg.util.LocalCoord
@@ -153,16 +154,19 @@ enum class Material(
     protoEntity: ProtoWorld.Entity? = null
   ): Block {
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
-      protoEntity?.let { world.load(it, chunk) }
-        ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
-          futureEntity.thenApply {
-            if (block.isDisposed) {
-              world.removeEntity(it)
-            } else {
-              block.entity = it
+      if (Main.isAuthoritative) {
+        // Blocks client side should not have any entity in them
+        protoEntity?.let { world.load(it, chunk) }
+          ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
+            futureEntity.thenApply {
+              if (block.isDisposed) {
+                world.removeEntity(it)
+              } else {
+                block.entity = it
+              }
             }
           }
-        }
+      }
     }
   }
 
