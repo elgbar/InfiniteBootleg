@@ -25,7 +25,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
   val maxDx: Float = MAX_X_VEL
   val maxDy: Float = MAX_Y_VEL
 
-  fun toVector2f(): ProtoWorld.Vector2f =
+  fun toProtoVector2f(): ProtoWorld.Vector2f =
     vector2f {
       x = this@VelocityComponent.dx
       y = this@VelocityComponent.dy
@@ -37,7 +37,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
   }
 
   override fun EntityKt.Dsl.save() {
-    velocity = toVector2f()
+    velocity = toProtoVector2f()
   }
 
   fun toVector2(): Vector2 = Vector2(dx, dy)

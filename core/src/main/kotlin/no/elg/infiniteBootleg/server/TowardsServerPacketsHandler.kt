@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.protobuf.chunkRequestOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
 import no.elg.infiniteBootleg.protobuf.entityRequestOrNull
 import no.elg.infiniteBootleg.protobuf.loginOrNull
+import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
 import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
 import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
 import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
@@ -44,6 +45,8 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
@@ -126,6 +129,9 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Move
   }
   player.teleport(moveEntity.position.x, moveEntity.position.y)
   player.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
+
+  // Only set look direction if it exists on the entity from before
+  moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
 }
 
 private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: SecretExchange) {

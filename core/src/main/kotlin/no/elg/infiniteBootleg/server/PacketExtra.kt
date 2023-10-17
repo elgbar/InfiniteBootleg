@@ -41,6 +41,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
+import no.elg.infiniteBootleg.protobuf.moveEntity
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
 import no.elg.infiniteBootleg.util.Util
@@ -51,6 +52,7 @@ import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Material.AIR
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -122,6 +124,15 @@ fun clientBoundPacketBuilder(type: Type): Packet.Builder {
     .setType(type)
 }
 
+fun entityMovePacket(entity: Entity): MoveEntity {
+  return moveEntity {
+    uuid = entity.id
+    position = entity.positionComponent.toProtoVector2f()
+    velocity = entity.velocityComponent.toProtoVector2f()
+    entity.lookDirectionComponentOrNull?.direction?.toProtoVector2i()?.let { lookDirection = it }
+  }
+}
+
 // ////////////////
 // server bound //
 // ////////////////
@@ -172,13 +183,9 @@ fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Pack
 }
 
 fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
-  return serverBoundPacketBuilder(DX_MOVE_ENTITY).setMoveEntity(
-    MoveEntity.newBuilder()
-      .setUuid(entity.id)
-      .setPosition(entity.positionComponent.toProtoVector2f())
-      .setVelocity(entity.velocityComponent.toVector2f())
-//      .setLookAngleDeg(entity.lookDeg)
-  ).build()
+  return serverBoundPacketBuilder(DX_MOVE_ENTITY)
+    .setMoveEntity(entityMovePacket(entity))
+    .build()
 }
 
 fun ServerClient.serverBoundEntityRequest(uuid: String): Packet {
@@ -211,13 +218,9 @@ fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?
 }
 
 fun clientBoundMoveEntity(entity: Entity): Packet {
-  return clientBoundPacketBuilder(DX_MOVE_ENTITY).setMoveEntity(
-    MoveEntity.newBuilder()
-      .setUuid(entity.id)
-      .setPosition(entity.positionComponent.toProtoVector2f())
-      .setVelocity(entity.velocityComponent.toVector2f())
-//      .setLookAngleDeg(entity.lookDeg)
-  ).build()
+  return clientBoundPacketBuilder(DX_MOVE_ENTITY)
+    .setMoveEntity(entityMovePacket(entity))
+    .build()
 }
 
 fun clientBoundSpawnEntity(entity: Entity): Packet {

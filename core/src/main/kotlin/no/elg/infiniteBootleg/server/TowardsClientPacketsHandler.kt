@@ -35,6 +35,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.FALLING_BLOC
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.protobuf.despawnEntityOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
+import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
 import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
 import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
 import no.elg.infiniteBootleg.protobuf.serverLoginStatusOrNull
@@ -51,9 +52,10 @@ import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toVector2
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
+import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
@@ -332,7 +334,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     ctx.writeAndFlush(serverBoundEntityRequest(uuid))
     return
   }
-  if (entity.id == this.uuid) {
+  if (Main.inst().isAuthorizedToChange(entity)) {
     val clientPos = entity.position
     val serverPos = moveEntity.position.toVector2()
 
@@ -344,6 +346,9 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   }
   entity.teleport(moveEntity.position.x, moveEntity.position.y)
   entity.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
+
+  // Only set look direction if it exists on the entity from before
+  moveEntity.lookDirectionOrNull?.let { entity.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
 }
 
 private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) {

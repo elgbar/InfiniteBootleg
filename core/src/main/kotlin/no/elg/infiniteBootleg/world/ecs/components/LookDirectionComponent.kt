@@ -6,7 +6,6 @@ import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.lookDirection
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.util.with
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
@@ -20,17 +19,14 @@ data class LookDirectionComponent(var direction: Direction = Direction.WEST) : E
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): LookDirectionComponent {
       val vector = protoEntity.lookDirection.direction
-      val direction = Direction.valueOf(vector.x, vector.y)
+      val direction = Direction.valueOf(vector)
       return with(LookDirectionComponent(direction))
     }
   }
 
   override fun EntityKt.Dsl.save() {
     lookDirection = lookDirection {
-      direction = vector2i {
-        this.x = this@LookDirectionComponent.direction.dx
-        this.y = this@LookDirectionComponent.direction.dy
-      }
+      direction = this@LookDirectionComponent.direction.toProtoVector2i()
     }
   }
 }
