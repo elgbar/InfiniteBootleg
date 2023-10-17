@@ -2,6 +2,8 @@ package no.elg.infiniteBootleg.util
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
+import ktx.math.component1
+import ktx.math.component2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
@@ -24,13 +26,13 @@ fun Entity.interactableBlocks(
   radius: Float,
   interactionRadius: Float
 ): Sequence<Long> {
-  val pos = this.position
+  val (worldX, worldY) = this.position
   return World.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
-    .filter { (worldX, worldY) ->
+    .filter { (targetX, targetY) ->
       ignorePlaceableCheck || (
-        isBlockInsideRadius(pos.x, pos.y, worldX, worldY, interactionRadius) &&
-          (!Settings.renderLight || world.getBlockLight(worldX, worldY, false)?.isLit ?: true)
+        isBlockInsideRadius(worldX, worldY, targetX, targetY, interactionRadius) &&
+          (!Settings.renderLight || world.getBlockLight(targetX, targetY, false)?.isLit ?: true)
         )
     }
 }

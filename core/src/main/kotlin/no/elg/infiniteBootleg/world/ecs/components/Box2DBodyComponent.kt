@@ -5,6 +5,8 @@ import com.badlogic.gdx.physics.box2d.Body
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import ktx.math.component1
+import ktx.math.component2
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -74,12 +76,12 @@ class Box2DBodyComponent(
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: (Entity) -> Unit): Box2DBodyComponent? {
       val world = entity.world
-      val pos = entity.position
-      val vel = entity.velocityOrZero
+      val (worldX, worldY) = entity.position
+      val (velX, velY) = entity.velocityOrZero
       when (protoEntity.box2D.bodyType) {
-        PLAYER -> createPlayerBodyComponent(world, pos.x, pos.y, vel.x, vel.y, NON_CONTROLLED_PLAYER_FAMILIES, state)
-        FALLING_BLOCK -> createFallingBlockBodyComponent(world, pos.x, pos.y, vel.x, vel.y, state)
-        DOOR -> createDoorBodyComponent(world, pos.x.toInt(), pos.y.toInt(), state)
+        PLAYER -> createPlayerBodyComponent(world, worldX, worldY, velX, velY, NON_CONTROLLED_PLAYER_FAMILIES, state)
+        FALLING_BLOCK -> createFallingBlockBodyComponent(world, worldX, worldY, velX, velY, state)
+        DOOR -> createDoorBodyComponent(world, worldX.toInt(), worldY.toInt(), state)
         else -> error("Unknown body type ${protoEntity.box2D.bodyType}")
       }
       return null

@@ -21,6 +21,8 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
 data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponent {
 
+  private val pos by lazy { Vector2(x, y) }
+
   val blockX: WorldCoord get() = worldToBlock(x)
   val blockY: WorldCoord get() = worldToBlock(y)
 
@@ -35,7 +37,10 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
       y = this@PositionComponent.y
     }
 
-  fun toVector2(): Vector2 = Vector2(x, y)
+  /**
+   * Returns the same vector each time
+   */
+  fun toVector2(): Vector2 = pos.also { it.set(x, y) }
 
   override fun EntityKt.Dsl.save() {
     position = vector2f {
