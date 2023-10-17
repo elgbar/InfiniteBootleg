@@ -937,7 +937,6 @@ abstract class World(
   /**
    * Remove and disposes the given entity.
    *
-   *
    * Even if the given entity is not a part of this world, it will be disposed
    *
    * @param entity The entity to remove

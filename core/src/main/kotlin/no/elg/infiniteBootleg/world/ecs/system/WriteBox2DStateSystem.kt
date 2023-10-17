@@ -5,7 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
-import no.elg.infiniteBootleg.world.ecs.api.restriction.DuplexSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVe
 /**
  * Write the position of the entity from the box2D entity
  */
-object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST), DuplexSystem {
+object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST), UniversalSystem {
 
   private val tmp = Vector2()
 

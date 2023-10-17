@@ -11,8 +11,10 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ServerSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
 
 class ThreadSafeEngine : Engine(), Disposable {
@@ -56,27 +58,30 @@ class ThreadSafeEngine : Engine(), Disposable {
     }
 
   override fun addSystem(system: EntitySystem): Unit =
+
     synchronized(engineLock) {
-      if (system is ClientSystem && system is ServerSystem) {
-        Main.logger().debug("Engine", "Adding duplex system ${system::class.simpleName}")
-        super.addSystem(system)
-      } else if (system is ClientSystem) {
-        if (Main.isClient) {
-          Main.logger().debug("Engine", "Adding client only system ${system::class.simpleName}")
+      fun addToSystemConditionally(system: EntitySystem, type: String, cond: () -> Boolean) {
+        if (cond()) {
+          Main.logger().debug("Engine", "Adding $type system ${system::class.simpleName}")
           super.addSystem(system)
         } else {
-          Main.logger().debug("Engine", "Not adding client only system ${system::class.simpleName}")
+          Main.logger().debug("Engine", "Not adding $type system ${system::class.simpleName}")
         }
-      } else if (system is ServerSystem) {
-        if (Main.isServer) {
-          Main.logger().debug("Engine", "Adding server only system ${system::class.simpleName}")
+      }
+
+      when (system) {
+        is UniversalSystem -> {
+          Main.logger().debug("Engine", "Adding universal system ${system::class.simpleName}")
           super.addSystem(system)
-        } else {
-          Main.logger().debug("Engine", "Not adding server only system ${system::class.simpleName}")
         }
-      } else {
-        Main.logger().warn("Engine", "System ${system::class.simpleName} is not a client or server system, it might be using server/client main and might crash when used")
-        super.addSystem(system)
+
+        is ClientSystem -> addToSystemConditionally(system, "client") { Main.isClient }
+        is ServerSystem -> addToSystemConditionally(system, "server") { Main.isServer }
+        is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.isAuthoritative }
+        else -> {
+          Main.logger().warn("Engine", "System ${system::class.simpleName} is not a client or server system, it might be using server/client main and might crash when used")
+          super.addSystem(system)
+        }
       }
     }
 
