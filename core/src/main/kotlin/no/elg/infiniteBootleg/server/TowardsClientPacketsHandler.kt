@@ -333,9 +333,11 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     return
   }
   if (entity.id == this.uuid) {
-    val localPos = entity.position
+    val clientPos = entity.position
     val serverPos = moveEntity.position.toVector2()
-    if (localPos.dst2(serverPos) <= 2) {
+
+    val clientServerDiffSquaredToUpdateControllingEntity = 2
+    if (clientPos.dst2(serverPos) <= clientServerDiffSquaredToUpdateControllingEntity) {
       // If we're less then 2 blocks away from the server, we don't need to move
       return
     }
