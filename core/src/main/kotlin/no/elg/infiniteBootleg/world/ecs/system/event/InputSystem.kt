@@ -56,7 +56,7 @@ object InputSystem :
 
   private fun WorldEntity.keyDown(entity: Entity, keycode: Int): Boolean {
     when (keycode) {
-      Input.Keys.T -> entity.teleport(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY)
+      Input.Keys.T -> entity.teleport(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY, killVelocity = true)
       Input.Keys.Q -> interpolate(true, ::placeBlocks)
     }
 

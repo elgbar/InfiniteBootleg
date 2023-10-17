@@ -302,7 +302,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     if (entities.size() > 0) {
       logger.logf(LogLevel.SUCCESS, "Teleported entity to (% .2f,% .2f)", worldX, worldY)
       world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
-      entities.forEach { it.teleport(worldX, worldY) }
+      entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
     }
   }
 

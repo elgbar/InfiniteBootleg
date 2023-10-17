@@ -40,7 +40,7 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
   /**
    * Returns the same vector each time
    */
-  fun toVector2(): Vector2 = pos.also { it.set(x, y) }
+  fun toVector2(): Vector2 = pos.set(x, y)
 
   override fun EntityKt.Dsl.save() {
     position = vector2f {
@@ -55,12 +55,21 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
     val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(x.worldToChunk(), y.worldToChunk()) }
     val Entity.positionComponent by propertyFor(mapper)
 
-    fun Entity.teleport(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
+    /**
+     * Teleport the entity to the given world coordinates
+     *
+     * @param worldX The world x coordinate to teleport to
+     * @param worldY The world y coordinate to teleport to
+     * @param killVelocity If the velocity of the entity should be set to zero
+     */
+    fun Entity.teleport(worldX: WorldCoordNumber, worldY: WorldCoordNumber, killVelocity: Boolean = false) {
       val position = positionComponent
       position.x = worldX.toFloat()
       position.y = worldY.toFloat()
       updateBox2DPosition = true
-      setVelocity(0f, 0f)
+      if (killVelocity) {
+        setVelocity(0f, 0f)
+      }
     }
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(PositionComponent(protoEntity.position.x, protoEntity.position.y))
