@@ -6,7 +6,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.world.world.World
@@ -17,7 +17,7 @@ data class WorldComponent(val world: World) : EntitySavableComponent {
     val Entity.world get() = worldComponent.world
     val Entity.worldComponent by propertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: World): WorldComponent = with(WorldComponent(state))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: World): WorldComponent? = safeWith { (.+) }
     override fun ProtoWorld.Entity.checkShouldLoad(state: () -> World): Boolean =
       (worldUUID == state().uuid).also { if (!it) Main.logger().error("Loaded entity in wrong world! Expected $worldUUID, but got ${state().uuid}") }
   }

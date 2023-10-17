@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.selectedItem
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
@@ -31,8 +31,8 @@ class SelectedInventoryItemComponent(var element: InventoryElement) : EntitySava
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasSelectedItem()
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): SelectedInventoryItemComponent =
-      with(SelectedInventoryItemComponent(protoEntity.selectedItem.element.fromProto()))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): SelectedInventoryItemComponent? =
+      safeWith { SelectedInventoryItemComponent(protoEntity.selectedItem.element.fromProto()) }
   }
 
   override fun EntityKt.Dsl.save() {

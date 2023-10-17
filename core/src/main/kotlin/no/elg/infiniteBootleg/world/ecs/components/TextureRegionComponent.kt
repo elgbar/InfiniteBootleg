@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
@@ -19,9 +19,9 @@ data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntityS
     var Entity.textureRegionComponentOrNull by optionalPropertyFor(mapper)
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasTexture()
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent {
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent? {
       val region = Main.inst().assets.safeTextureAtlas.findRotationAwareRegion(protoEntity.texture.texture, false)
-      return with(TextureRegionComponent(region))
+      return safeWith { TextureRegionComponent(region) }
     }
   }
 

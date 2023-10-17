@@ -3,30 +3,30 @@ package no.elg.infiniteBootleg.util
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import ktx.ashley.AshleyDsl
 import ktx.ashley.CreateComponentException
 import ktx.ashley.EngineEntity
 import ktx.ashley.create
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.world.ecs.api.restriction.components.ClientComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.full.isSubclassOf
 
 /**
  * Get or creates an instance of the component [T] and adds it to this [entity][EngineEntity].
  *
  * @param T the [Component] type to get or create.
- * @param configure inlined function with [T] as the receiver to allow additional configuration of the [Component].
  * @return the created ƒ[Component].
  * @throws [CreateComponentException] if the engine was unable to create the component
  * @see [create]
  */
-inline fun <reified T : Component> Entity.with(component: T, configure: (@AshleyDsl T).() -> Unit = {}): T {
-  contract { callsInPlace(configure, InvocationKind.EXACTLY_ONCE) }
-  component.configure()
-  add(component)
-  return component
+inline fun <reified T : Component> Entity.safeWith(component: () -> T): T? {
+  contract { callsInPlace(component, InvocationKind.AT_MOST_ONCE) }
+  if (Main.isServer && T::class.isSubclassOf(ClientComponent::class)) return null
+  return component().also { add(it) }
 }
 
 /**
@@ -38,7 +38,7 @@ inline fun <reified T : Component> Entity.with(component: T, configure: (@Ashley
  * @throws [CreateComponentException] if the engine was unable to create the component
  * @see [create]
  */
-inline fun <reified T : Component> EngineEntity.with(component: T, configure: (@AshleyDsl T).() -> Unit = {}): T = entity.with(component, configure)
+inline fun <reified T : Component> EngineEntity.safeWith(component: () -> T): T? = entity.safeWith(component)
 
 /**
  * Create and add an [Entity] to the [Engine].

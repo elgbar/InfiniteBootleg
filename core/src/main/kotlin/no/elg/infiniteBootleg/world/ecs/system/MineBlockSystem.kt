@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.util.LongMapUtil.component1
 import no.elg.infiniteBootleg.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.util.breakableLocs
 import no.elg.infiniteBootleg.util.inputMouseLocator
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
@@ -33,7 +33,7 @@ object MineBlockSystem :
       return
     }
 
-    val breakingComponent = entity.currentlyBreakingComponentOrNull ?: entity.with(CurrentlyBreakingComponent())
+    val breakingComponent = entity.currentlyBreakingComponentOrNull ?: entity.safeWith { CurrentlyBreakingComponent() } ?: return
 
     breakingComponent.breaking.removeAll { (loc, breaking) ->
       loc !in currentLocs || world.getMaterial(loc) != breaking.block.material

@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.findTextures
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -71,7 +71,7 @@ enum class Material(
   GRASS(hardness = 0.8f, hasTransparentTexture = false),
   TNT(hardness = 0.5f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
     world.engine.createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
-      with(ExplosiveComponent())
+      safeWith { ExplosiveComponent() }
     }
   }),
   SAND(

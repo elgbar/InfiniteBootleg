@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.MAX_X_VEL
 import no.elg.infiniteBootleg.util.MAX_Y_VEL
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
@@ -58,7 +58,7 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
       }
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(VelocityComponent(protoEntity.velocity.x, protoEntity.velocity.y))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { VelocityComponent(protoEntity.velocity.x, protoEntity.velocity.y) }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasVelocity()
   }

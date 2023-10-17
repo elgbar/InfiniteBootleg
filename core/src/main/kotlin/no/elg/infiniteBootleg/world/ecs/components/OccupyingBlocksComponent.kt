@@ -7,7 +7,7 @@ import ktx.ashley.propertyFor
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -25,7 +25,7 @@ class OccupyingBlocksComponent : EntitySavableComponent {
     var Entity.occupyingBlocksComponentOrNull by optionalPropertyFor(OccupyingBlocksComponent.mapper)
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasOccupyingBlocks()
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): OccupyingBlocksComponent = with(OccupyingBlocksComponent())
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): OccupyingBlocksComponent? = safeWith { OccupyingBlocksComponent() }
     val PROTO_OCCUPYING_BLOCKS: ProtoWorld.Entity.OccupyingBlocks = ProtoWorld.Entity.OccupyingBlocks.getDefaultInstance()
   }
 

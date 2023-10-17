@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.futureEntity
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
@@ -42,10 +42,10 @@ fun EngineEntity.withRequiredComponents(
   worldY: Number,
   id: String? = null
 ) {
-  with(EntityTypeComponent.getType(entityType))
-  with(id?.let { IdComponent(it) } ?: IdComponent.createRandomId())
-  with(WorldComponent(world))
-  with(PositionComponent(worldX.toFloat(), worldY.toFloat()))
+  safeWith { EntityTypeComponent.getType(entityType) }
+  safeWith { id?.let { IdComponent(it) } ?: IdComponent.createRandomId() }
+  safeWith { WorldComponent(world) }
+  safeWith { PositionComponent(worldX.toFloat(), worldY.toFloat()) }
 }
 
 fun EntityKt.Dsl.withRequiredComponents(
@@ -77,8 +77,8 @@ fun Engine.createBlockEntity(
   additionalConfiguration: EngineEntity.() -> Unit = {}
 ) = futureEntity { future ->
   withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
-  with(ChunkComponent(chunk))
-  with(MaterialComponent(material))
+  safeWith { ChunkComponent(chunk) }
+  safeWith { MaterialComponent(material) }
   additionalConfiguration()
   checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
 

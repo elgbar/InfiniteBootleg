@@ -9,7 +9,7 @@ import ktx.math.component2
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.chunkOffset
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -32,7 +32,7 @@ class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
         return chunk.getBlock(worldX.toInt().chunkOffset(), worldY.toInt().chunkOffset())
       }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: Chunk): ChunkComponent = with(ChunkComponent(state))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: Chunk): ChunkComponent? = safeWith { ChunkComponent(state) }
     override fun ProtoWorld.Entity.checkShouldLoad(state: () -> Chunk): Boolean = hasChunk()
     val PROTO_CHUNK_BASED: ProtoWorld.Entity.ChunkBased = ProtoWorld.Entity.ChunkBased.getDefaultInstance()
   }

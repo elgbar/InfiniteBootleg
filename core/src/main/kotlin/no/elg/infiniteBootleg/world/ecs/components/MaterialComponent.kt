@@ -6,7 +6,7 @@ import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Material.Companion.asProto
 import no.elg.infiniteBootleg.world.Material.Companion.fromProto
@@ -25,7 +25,7 @@ data class MaterialComponent(val material: Material) : EntitySavableComponent {
     val Entity.materialComponent by propertyFor(mapper)
     var Entity.materialComponentOrNull by optionalPropertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(MaterialComponent(protoEntity.material.fromProto()))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { MaterialComponent(protoEntity.material.fromProto()) }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasMaterial()
   }

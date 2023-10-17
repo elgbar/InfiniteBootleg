@@ -6,7 +6,7 @@ import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.futureEntity
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
@@ -49,13 +49,12 @@ fun Engine.createFallingBlockStandaloneEntity(
     withRequiredComponents(ProtoWorld.Entity.EntityType.FALLING_BLOCK, world, worldX, worldY, id)
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
-    with(VelocityComponent(dx, dy))
-
-    with(TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")))
+    safeWith { VelocityComponent(dx, dy) }
+    safeWith { TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.name} material texture region")) }
 
     // This entity will handle input events
     with<PhysicsEventQueueComponent>()
-    with(MaterialComponent(material))
+    safeWith { MaterialComponent(material) }
     with<OccupyingBlocksComponent>()
     createFallingBlockBodyComponent(world, worldX, worldY, dx, dy) {
       onReady(it)

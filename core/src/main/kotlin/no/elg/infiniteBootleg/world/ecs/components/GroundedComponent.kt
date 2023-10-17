@@ -6,7 +6,7 @@ import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -46,7 +46,7 @@ class GroundedComponent : EntitySavableComponent, AuthoritativeOnlyComponent {
     var Entity.groundedComponent by propertyFor(mapper)
     var Entity.groundedComponentOrNull by optionalPropertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): GroundedComponent = with(GroundedComponent())
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): GroundedComponent? = safeWith { GroundedComponent() }
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasGrounded()
     val PROTO_GROUNDED = ProtoWorld.Entity.Grounded.getDefaultInstance()
   }

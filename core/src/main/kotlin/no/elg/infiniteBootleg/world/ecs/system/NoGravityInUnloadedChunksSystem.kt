@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Compa
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.InUnloadedChunkTag.Companion.isInUnloadedChunk
 
-
+// TODO refactor this system to be NoMovementInUnlockedChunksSystem, disabling all movement and setting velocity to 0
 object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY), UniversalSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world

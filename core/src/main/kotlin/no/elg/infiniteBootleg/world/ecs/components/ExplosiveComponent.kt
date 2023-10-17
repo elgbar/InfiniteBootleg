@@ -7,7 +7,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.explosive
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
@@ -44,7 +44,7 @@ class ExplosiveComponent(
     /** Maximum explosion radius  */
     const val EXPLOSION_STRENGTH = 40
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(ExplosiveComponent(protoEntity.explosive.fuse, protoEntity.explosive.strength))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { ExplosiveComponent(protoEntity.explosive.fuse, protoEntity.explosive.strength) }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasExplosive()
   }

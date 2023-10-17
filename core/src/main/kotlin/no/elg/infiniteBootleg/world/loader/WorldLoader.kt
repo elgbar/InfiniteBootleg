@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
@@ -40,7 +40,7 @@ object WorldLoader {
     val fileHandle = getServerPlayerFile(world, uuid)
 
     val serverPlayerConfig: Entity.() -> Unit = {
-      with(SharedInformationComponent(sharedInformation))
+      safeWith { SharedInformationComponent(sharedInformation) }
       isTransientEntity = true
     }
 

@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.compactLoc
-import no.elg.infiniteBootleg.util.with
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
@@ -72,7 +72,7 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
       }
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = with(PositionComponent(protoEntity.position.x, protoEntity.position.y))
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { PositionComponent(protoEntity.position.x, protoEntity.position.y) }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasPosition()
   }
