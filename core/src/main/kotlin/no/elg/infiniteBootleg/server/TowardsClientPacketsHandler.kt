@@ -350,14 +350,10 @@ private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) 
     Main.logger().error("handleDespawnEntity", "Failed to find world")
     return
   }
-  val uuid = despawnEntity.uuid
-  if (uuid == null) {
-    Main.logger().error("handleDespawnEntity", "Failed to parse UUID '${despawnEntity.uuid}'")
-    return
-  }
+  val uuid: String = despawnEntity.uuid
   val entity = world.getEntity(uuid)
   if (entity == null) {
-    Main.logger().error("handleDespawnEntity", "Failed to get entity with uuid '${despawnEntity.uuid}'")
+    Main.logger().warn("handleDespawnEntity", "Failed to get entity with uuid '${despawnEntity.uuid}'")
     return
   }
   world.removeEntity(entity)
