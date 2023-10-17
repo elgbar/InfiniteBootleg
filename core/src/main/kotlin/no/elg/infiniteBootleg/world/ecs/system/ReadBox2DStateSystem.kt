@@ -83,7 +83,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     }
 
     val lookDirection = entity.lookDirectionComponentOrNull ?: return updateServer
-    if (abs(newDx) > MIN_VELOCITY_TO_FLIP) {
+    if (abs(newDx) > MIN_VELOCITY_TO_FLIP && Main.inst().isAuthorizedToChange(entity)) {
       lookDirection.direction = if (newDx < 0f) Direction.WEST else Direction.EAST
     }
     return updateServer
