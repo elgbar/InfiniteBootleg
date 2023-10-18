@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.findTextures
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.util.serverRotatableTextureRegion
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -135,7 +136,7 @@ enum class Material(
         throw NullPointerException("Failed to find a texture for $name")
       }
     } else {
-      textureRegion = null
+      textureRegion = serverRotatableTextureRegion(textureName)
     }
   }
 
