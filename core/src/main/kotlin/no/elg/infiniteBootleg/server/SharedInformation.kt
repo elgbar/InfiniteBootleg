@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.server
 
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledFuture
 
 /**
@@ -12,6 +13,8 @@ import java.util.concurrent.ScheduledFuture
 data class SharedInformation(val entityUUID: String, val secret: String) {
 
   private var lastHeartbeat: Instant = Instant.now()
+
+  val requestedEntities = ConcurrentHashMap.newKeySet<String>()
 
   var heartbeatTask: ScheduledFuture<*>? = null
     set(value) {

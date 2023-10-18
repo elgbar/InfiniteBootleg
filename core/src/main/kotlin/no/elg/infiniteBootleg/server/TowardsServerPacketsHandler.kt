@@ -59,6 +59,7 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import java.security.SecureRandom
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 private val secureRandom = SecureRandom.getInstanceStrong()
@@ -76,7 +77,12 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handleMovePlayer(ctx, it) } }
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
     SB_CHUNK_REQUEST -> packet.chunkRequestOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it) } }
-    SB_ENTITY_REQUEST -> packet.entityRequestOrNull?.let { scheduler.executeAsync { asyncHandleEntityRequest(ctx, it) } }
+    SB_ENTITY_REQUEST -> packet.entityRequestOrNull?.let {
+      val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
+      if (requestedEntities.contains(it.uuid)) return@let
+      requestedEntities += it.uuid
+      scheduler.executeAsync { asyncHandleEntityRequest(ctx, it, requestedEntities) }
+    }
 
     SB_LOGIN -> packet.loginOrNull?.let { scheduler.executeSync { handleLoginPacket(ctx, it) } }
     SB_CLIENT_WORLD_LOADED -> scheduler.executeAsync { asyncHandleClientsWorldLoaded(ctx) }
@@ -283,20 +289,17 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   Main.logger().log("Player ${player.name} joined")
 }
 
-private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest: EntityRequest) {
+private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest: EntityRequest, requestedEntities: ConcurrentHashMap.KeySetView<String, Boolean>) {
   val world = ServerMain.inst().serverWorld
-
   val uuid = entityRequest.uuid
-  if (uuid == null) {
-    Main.logger().error("handleEntityRequest", "Failed to parse UUID '${entityRequest.uuid}'")
-    return
-  }
+
   val entity = world.getEntity(uuid)
   if (entity != null && entity.shouldSendToClients && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
     ctx.writeAndFlush(clientBoundSpawnEntity(entity))
   } else {
     ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
   }
+  requestedEntities -= uuid
 }
 
 // ///////////
