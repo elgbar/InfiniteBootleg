@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.directionTo
 import no.elg.infiniteBootleg.util.findWhichInnerEdgesOfChunk
 import no.elg.infiniteBootleg.util.isInsideChunk
+import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isNextTo
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
@@ -256,7 +257,7 @@ class ChunkImpl(
           val packet = clientBoundBlockUpdate(worldX, worldY, block)
           broadcastToInView(packet, worldX, worldY)
         }
-      } else if (Main.isServerClient) {
+      } else if (Main.isServerClient && !block.isMarkerBlock()) {
         Main.inst().scheduler.executeAsync {
           val client = ClientMain.inst().serverClient
           if (client != null) {
