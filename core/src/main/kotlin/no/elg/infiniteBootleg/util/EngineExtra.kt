@@ -6,14 +6,11 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.CreateComponentException
 import ktx.ashley.EngineEntity
 import ktx.ashley.create
-import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.world.ecs.api.restriction.components.ClientComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.reflect.full.isSubclassOf
 
 /**
  * Get or creates an instance of the component [T] and adds it to this [entity][EngineEntity].
@@ -25,7 +22,7 @@ import kotlin.reflect.full.isSubclassOf
  */
 inline fun <reified T : Component> Entity.safeWith(component: () -> T): T? {
   contract { callsInPlace(component, InvocationKind.AT_MOST_ONCE) }
-  if (Main.isServer && T::class.isSubclassOf(ClientComponent::class)) return null
+//  if (Main.isServer && T::class.isSubclassOf(ClientComponent::class)) return null
   return component().also { add(it) }
 }
 
