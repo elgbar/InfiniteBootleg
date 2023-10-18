@@ -17,7 +17,7 @@ data class WorldComponent(val world: World) : EntitySavableComponent {
     val Entity.world get() = worldComponent.world
     val Entity.worldComponent by propertyFor(mapper)
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: World): WorldComponent? = safeWith { (.+) }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: World): WorldComponent? = safeWith { WorldComponent(state) }
     override fun ProtoWorld.Entity.checkShouldLoad(state: () -> World): Boolean =
       (worldUUID == state().uuid).also { if (!it) Main.logger().error("Loaded entity in wrong world! Expected $worldUUID, but got ${state().uuid}") }
   }
