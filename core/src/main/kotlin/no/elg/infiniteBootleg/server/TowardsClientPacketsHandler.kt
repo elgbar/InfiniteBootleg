@@ -354,6 +354,11 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   moveEntity.lookDirectionOrNull?.let { entity.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
 }
 
+/**
+ * List of despawn reasons that should not be logged as a warning
+ */
+private val nonWarnDespawnReasons = listOf(DespawnEntity.DespawnReason.UNKNOWN_ENTITY, DespawnEntity.DespawnReason.CHUNK_UNLOADED)
+
 private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) {
   val world = world
   if (world == null) {
@@ -362,7 +367,7 @@ private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) 
   }
   val uuid: String = despawnEntity.uuid
   val entity: Entity = world.getEntity(uuid) ?: run {
-    if (despawnEntity.despawnReason != DespawnEntity.DespawnReason.UNKNOWN_ENTITY) {
+    if (despawnEntity.despawnReason !in nonWarnDespawnReasons) {
       Main.logger().warn("handleDespawnEntity", "Failed to despawn unknown entity with uuid '${despawnEntity.uuid}', reason ${despawnEntity.despawnReason}")
     }
     return
