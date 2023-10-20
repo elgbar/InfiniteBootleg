@@ -41,6 +41,15 @@ object GlobalInputListener : InputAdapter() {
           return true
         }
       }
+
+      Input.Keys.F7 -> {
+        if (Main.isClient) {
+          val screen = ClientMain.inst().screen
+          if (screen is WorldScreen) {
+            screen.toggleDebugMenu()
+          }
+        }
+      }
     }
     return false
   }

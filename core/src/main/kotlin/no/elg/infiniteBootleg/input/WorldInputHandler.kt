@@ -58,13 +58,6 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
         }
       }
 
-      Input.Keys.F7 -> {
-        val screen = ClientMain.inst().screen
-        if (screen is WorldScreen) {
-          screen.toggleDebugMenu()
-        }
-      }
-
       else -> return false
     }
     return true
