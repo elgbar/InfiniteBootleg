@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BREAKING_BLOCK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
@@ -33,6 +34,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.FALLING_BLOCK
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
+import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
 import no.elg.infiniteBootleg.protobuf.despawnEntityOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
 import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
@@ -81,6 +83,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleSpawnEntity(it) } }
     CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { scheduler.executeAsync { asyncHandleUpdateChunk(it) } }
     CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleDespawnEntity(it) } }
+    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
@@ -366,4 +369,10 @@ private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) 
   }
   Main.logger().debug("handleDespawnEntity", "Despawning entity ${despawnEntity.uuid} with reason ${despawnEntity.despawnReason}")
   world.removeEntity(entity)
+}
+
+private fun ServerClient.asyncHandleBreakingBlock(breakingBlock: Packets.BreakingBlock) {
+  for (breakingProgress in breakingBlock.breakingProgressList) {
+    breakingBlockCache.put(breakingProgress.blockLocation.toCompact(), breakingProgress.progress)
+  }
 }

@@ -29,6 +29,7 @@ message Packet {
     SB_ENTITY_REQUEST = 13;
     CB_INITIAL_CHUNKS_SENT = 14; //no message associated
     DX_WORLD_SETTINGS = 15;
+    DX_BREAKING_BLOCK = 16;
   }
 
   enum Direction {
@@ -57,6 +58,7 @@ message Packet {
   optional ChunkRequest chunkRequest = 23; //server bound
   optional EntityRequest entityRequest = 24;
   optional WorldSettings worldSettings = 25;
+  optional BreakingBlock breakingBlock = 26;
 }
 
 ////////////////
@@ -165,4 +167,13 @@ message ChunkRequest {
 
 message EntityRequest {
   string uuid = 1;
+}
+
+message BreakingBlock {
+  message BreakingProgress {
+    .persistence.Vector2i blockLocation = 1;
+    // 0-1
+    float progress = 2;
+  }
+  repeated BreakingProgress breakingProgress = 1;
 }

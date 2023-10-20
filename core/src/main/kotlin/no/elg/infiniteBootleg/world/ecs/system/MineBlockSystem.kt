@@ -50,6 +50,7 @@ object MineBlockSystem :
       .filter { breaking -> breaking.progressHandler.update(deltaTime) }
       .mapTo(mutableSetOf()) { it.block.compactWorldLoc }
 
+    breakingComponent.sendCurrentProgress()
     world.removeBlocks(justDone, prioritize = true)
   }
 }

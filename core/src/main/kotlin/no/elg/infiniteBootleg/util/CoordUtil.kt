@@ -210,6 +210,8 @@ inline fun isBlockInsideRadius(
   radius: Float
 ): Boolean = abs(Vector2.dst2(worldX, worldY, targetBlockX + World.HALF_BLOCK_SIZE, targetBlockY + World.HALF_BLOCK_SIZE)) < radius * radius
 
+typealias Progress = Float
+
 typealias LocalCompactLoc = Long
 typealias WorldCompactLoc = Long
 typealias ChunkCompactLoc = Long

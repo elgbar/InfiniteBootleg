@@ -7,16 +7,32 @@ import com.badlogic.gdx.utils.LongMap
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.BreakingBlockKt.breakingProgress
+import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.server.serverBoundBreakingBlock
 import no.elg.infiniteBootleg.util.ProgressHandler
+import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 
-// FIXME should not be transient, it is useful in a multiplayer setting
 class CurrentlyBreakingComponent : Component {
 
   val breaking: LongMap<CurrentlyBreaking> = LongMap(16, 0.8f)
 
   fun reset() {
+    sendCurrentProgress(true)
     breaking.clear()
+  }
+
+  fun sendCurrentProgress(zeroProgress: Boolean = false) {
+    if (Main.isServerClient && breaking.size > 0) {
+      ClientMain.inst().serverClient?.run {
+        val progresses = breaking.values().map { it.toBreakingProgress(zeroProgress) }
+        ctx.writeAndFlush(serverBoundBreakingBlock(progresses))
+      }
+    }
   }
 
   companion object : Mapper<CurrentlyBreakingComponent>() {
@@ -27,5 +43,11 @@ class CurrentlyBreakingComponent : Component {
   data class CurrentlyBreaking(
     val block: Block,
     val progressHandler: ProgressHandler = ProgressHandler(block.material.hardness, Interpolation.linear, 0f, 1f)
-  )
+  ) {
+    fun toBreakingProgress(zeroProgress: Boolean): Packets.BreakingBlock.BreakingProgress =
+      breakingProgress {
+        blockLocation = block.compactWorldLoc.toVector2i()
+        progress = if (zeroProgress) 0f else progressHandler.progress
+      }
+  }
 }

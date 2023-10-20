@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.Progress
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.breakableLocs
 import no.elg.infiniteBootleg.util.component1
@@ -43,10 +44,17 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
         val breakableBlocks = entity.breakableLocs(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
         breakableBlocks.forEach { blockWorldLoc ->
           if (isBreaking) {
-            val progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: 0f
-            val textures = Main.inst().assets.breakingBlockTextures.size - 1f
-            val index = (textures * progress).roundToInt()
-            renderPlaceableBlock(world, Main.inst().assets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
+            val rawProgress: Progress = breakingComponent?.breaking?.get(blockWorldLoc)?.progressHandler?.progress ?: run { 0f }
+            if (Main.isServerClient) {
+              ClientMain.inst().serverClient?.let {
+                val serverProgress = it.breakingBlockCache.getIfPresent(blockWorldLoc)
+                if (serverProgress != null && serverProgress > rawProgress) {
+                  // If the server progress is greater than the local progress, do not render the local progress
+                  return@forEach
+                }
+              }
+            }
+            renderBreakingOverlay(world, blockWorldLoc, rawProgress)
           } else {
             renderPlaceableBlock(world, Main.inst().assets.breakableBlockTexture.textureRegion, blockWorldLoc)
           }
@@ -58,7 +66,26 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
             renderPlaceableBlock(world, texture, blockWorldLoc)
           }
       }
+      if (Main.isServerClient) {
+        ClientMain.inst().serverClient?.let {
+          it.breakingBlockCache.asMap()
+            .forEach { (blockWorldLoc, rawProgress) ->
+              renderBreakingOverlay(world, blockWorldLoc, rawProgress)
+            }
+        }
+      }
     }
+  }
+
+  private fun renderBreakingOverlay(world: World, blockWorldLoc: WorldCompactLoc, rawProgress: Progress) {
+    val progress = rawProgress.coerceIn(0f, 1f)
+    if (progress == 0f) {
+      // Render nothing when there is no progress made yet
+      return
+    }
+    val textures = Main.inst().assets.breakingBlockTextures.size - 1f
+    val index = (textures * progress).roundToInt()
+    renderPlaceableBlock(world, Main.inst().assets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
   }
 
   private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldLoc: WorldCompactLoc, overrideAlpha: Float? = null) {

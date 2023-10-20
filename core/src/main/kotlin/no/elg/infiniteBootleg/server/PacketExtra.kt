@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BREAKING_BLOCK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
@@ -201,6 +202,12 @@ fun ServerClient.serverBoundWorldSettings(spawn: Long?, time: Float?, timeScale:
 
 fun ServerClient.serverBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(serverBoundPacketBuilder(DX_HEARTBEAT))
+}
+
+fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.BreakingProgress>): Packet {
+  return serverBoundPacketBuilder(DX_BREAKING_BLOCK)
+    .setBreakingBlock(Packets.BreakingBlock.newBuilder().addAllBreakingProgress(progress))
+    .build()
 }
 
 // ////////////////
