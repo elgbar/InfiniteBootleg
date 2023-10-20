@@ -21,7 +21,13 @@ fun main(args: Array<String>) {
     config.disableAudio(true)
     config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
     config.useVsync(Settings.vsync)
-    config.setTitle("Infinite Terraria")
+    var title = "Infinite Terraria "
+    when {
+      Settings.debug -> title += "(debug) "
+      Settings.ignoreWorldLock -> title += "dangerous! "
+      !Settings.loadWorldFromDisk -> title += "transient "
+    }
+    config.setTitle(title)
     config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 16)
     config.setForegroundFPS(Settings.foregroundFPS)
     config.setWindowIcon("textures/icon_64.png")
