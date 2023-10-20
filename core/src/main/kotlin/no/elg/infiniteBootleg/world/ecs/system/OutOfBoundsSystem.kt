@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EARLY
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
@@ -22,7 +23,7 @@ object OutOfBoundsSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_P
       if (Settings.debug) {
         Main.logger().log("OutOfBoundsSystem", "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)}")
       }
-      world.removeEntity(entity)
+      world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED)
     }
   }
 }

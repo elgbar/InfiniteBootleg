@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.world.Direction
@@ -55,7 +56,7 @@ class BlockImpl(
     }
     isDisposed = true
     entity?.also {
-      world.removeEntity(it)
+      world.removeEntity(it, Packets.DespawnEntity.DespawnReason.NATURAL)
     }
   }
 

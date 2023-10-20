@@ -358,10 +358,12 @@ private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) 
     return
   }
   val uuid: String = despawnEntity.uuid
-  val entity = world.getEntity(uuid)
-  if (entity == null) {
-    Main.logger().debug("handleDespawnEntity", "Failed to despawn unknown entity with uuid '${despawnEntity.uuid}'")
+  val entity: Entity = world.getEntity(uuid) ?: run {
+    if (despawnEntity.despawnReason != DespawnEntity.DespawnReason.UNKNOWN_ENTITY) {
+      Main.logger().warn("handleDespawnEntity", "Failed to despawn unknown entity with uuid '${despawnEntity.uuid}', reason ${despawnEntity.despawnReason}")
+    }
     return
   }
+  Main.logger().debug("handleDespawnEntity", "Despawning entity ${despawnEntity.uuid} with reason ${despawnEntity.despawnReason}")
   world.removeEntity(entity)
 }

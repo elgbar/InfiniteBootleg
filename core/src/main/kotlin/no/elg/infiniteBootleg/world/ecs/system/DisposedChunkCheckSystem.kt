@@ -5,6 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import ktx.ashley.allOf
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
@@ -29,7 +30,7 @@ object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).g
             "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)} (components: ${entity.components.joinToString()})"
           )
         }
-        world.removeEntity(entity)
+        world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED)
       } else {
         // Replace chunk with a loaded chunk
         entity.chunkComponent.chunk = loadedChunk
