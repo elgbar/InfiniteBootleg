@@ -57,13 +57,13 @@ private fun updateAllValues() {
 }
 
 @Scene2dDsl
-private fun KTable.toggleableDebugButton(name: String, booleanGetter: () -> Boolean, onToggle: () -> Unit): VisTextButton =
+private fun KTable.toggleableDebugButton(name: String, description: String? = null, booleanGetter: () -> Boolean, onToggle: () -> Unit): VisTextButton =
   visTextButton(name, style = "debug-menu-button") {
     pad(5f)
     isDisabled = booleanGetter()
 
     val tooltipLabel: VisLabel
-    fun tooltipText() = "$name is ${isDisabled.toAbled()}"
+    fun tooltipText() = description ?: "$name is ${isDisabled.toAbled()}"
     visTextTooltip(tooltipText()) {
       tooltipLabel = this.content as VisLabel
     }
@@ -156,31 +156,89 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       }
 
       section {
-        toggleableDebugButton("General debug", Settings::debug, Main.inst().console.exec::debug)
-        toggleableDebugButton("Render chunks borders", Settings::renderChunkBounds, Main.inst().console.exec::debChu)
-        toggleableDebugButton("Render chunk updates", Settings::renderChunkUpdates, Main.inst().console.exec::debChuUpd)
-        toggleableDebugButton("Render entity markers", Settings::debugEntityMarkerBlocks) { Settings.debugEntityMarkerBlocks = !Settings.debugEntityMarkerBlocks }
+        toggleableDebugButton(
+          "General debug",
+          "Handles whether to log debug messages and\nsmaller debug features without a dedicated debug option",
+          Settings::debug,
+          Main.inst().console.exec::debug
+        )
+        toggleableDebugButton(
+          "Render chunks borders",
+          "Render an outline around each chunk",
+          Settings::renderChunkBounds,
+          Main.inst().console.exec::debChu
+        )
+        toggleableDebugButton(
+          "Render chunk updates",
+          "Flash a chunk when a chunks texture changes",
+          Settings::renderChunkUpdates,
+          Main.inst().console.exec::debChuUpd
+        )
+        toggleableDebugButton(
+          "Render entity markers",
+          "Render entity block markers, a block to connect entities which represent a block as a temporary marker in the block world",
+          Settings::debugEntityMarkerBlocks
+        ) { Settings.debugEntityMarkerBlocks = !Settings.debugEntityMarkerBlocks }
       }
       section {
-        toggleableDebugButton("Render existing air", Settings::renderAirBlocks) { Settings.renderAirBlocks = !Settings.renderAirBlocks }
+        toggleableDebugButton(
+          "Render existing air",
+          "Render air blocks, which are normally indistinguishable from non-existing blocks, as cute little clouds ",
+          Settings::renderAirBlocks
+        ) { Settings.renderAirBlocks = !Settings.renderAirBlocks }
+        toggleableDebugButton(
+          "Validate families",
+          "Whether entity families should be validated. If invalid the entity will not be added to the entity engine",
+          Settings::validateEntityFamilies
+        ) { Settings.validateEntityFamilies = !Settings.validateEntityFamilies }
       }
       // Lights
       section {
-        toggleableDebugButton("Render entity lighting", Settings::debugEntityLight, Main.inst().console.exec::debEntLit)
-        toggleableDebugButton("Render block lighting", Settings::debugBlockLight, Main.inst().console.exec::debBlkLit)
-        toggleableDebugButton("Render light updates", Settings::renderBlockLightUpdates, Main.inst().console.exec::debLitUpd)
-        toggleableDebugButton("Render lights", Settings::renderLight, Main.inst().console.exec::lights)
+        toggleableDebugButton(
+          "Render entity lighting",
+          "Render a small dot at the block the entity's light level is calculated from",
+          Settings::debugEntityLight,
+          Main.inst().console.exec::debEntLit
+        )
+        toggleableDebugButton(
+          "Render block lighting",
+          """Render an overlay which displays which blocks the light level of the block under the mouse is calculated.
+A red overlay denotes a luminescent block, while a yellow overlay denotes the skylight is the source of the light.""",
+          Settings::debugBlockLight,
+          Main.inst().console.exec::debBlkLit
+        )
+        toggleableDebugButton(
+          "Render light updates",
+          "Render a small dot over blocks with new lighting",
+          Settings::renderBlockLightUpdates,
+          Main.inst().console.exec::debLitUpd
+        )
+        toggleableDebugButton(
+          "Render lights",
+          "Whether to render light at all. Will break lighting information if the world is updated with this off",
+          Settings::renderLight,
+          Main.inst().console.exec::lights
+        )
       }
       // Event tracker
       section {
-        toggleableDebugButton("Log events", EventManager::isLoggingAnyEvents, Main.inst().console.exec::trackEvents)
-        toggleableDebugButton("Log events dispatched", EventManager::isLoggingEventsDispatched) {
+        toggleableDebugButton(
+          "Log events",
+          "Whether to log when anything event related happens",
+          EventManager::isLoggingAnyEvents,
+          Main.inst().console.exec::trackEvents
+        )
+        toggleableDebugButton("Log events dispatched", "Whether to log when an event is dispatched", EventManager::isLoggingEventsDispatched) {
           EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_DISPATCHED }
         }
-        toggleableDebugButton("Log listeners change", EventManager::isLoggingEventListenersChange) {
+        toggleableDebugButton("Log listeners change", "Whether to log when an event is listener is registered", EventManager::isLoggingEventListenersChange) {
           EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENT_LISTENERS_CHANGE }
         }
-        toggleableDebugButton("Log events listened to", EventManager::isLoggingEventsListenedTo) {
+        toggleableDebugButton(
+          "Log events listened to",
+          "Whether to log when an event is listened to. This is very spammy",
+          EventManager::isLoggingEventsListenedTo
+        ) {
           EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_LISTENED_TO }
         }
       }
@@ -190,24 +248,36 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       section {
         val entities = world.controlledPlayerEntities
         val instantBreakGetter: () -> Boolean = {
-          entities
-            .map { it.locallyControlledComponentOrNull }
-            .firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
+          entities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.instantBreak ?: INITIAL_INSTANT_BREAK
         }
 
         val brushSizeGetter: () -> Number = {
-          entities
-            .map { it.locallyControlledComponentOrNull }
-            .firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
+          entities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.brushSize ?: INITIAL_BRUSH_SIZE
         }
         val reachRadiusGetter: () -> Number = {
-          entities
-            .map { it.locallyControlledComponentOrNull }
-            .firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
+          entities.map { it.locallyControlledComponentOrNull }.firstOrNull()?.interactRadius ?: INITIAL_INTERACT_RADIUS
         }
-        toggleableDebugButton("Ignore place check", { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } }, Main.inst().console.exec::placeCheck)
-        toggleableDebugButton("Instant break", instantBreakGetter, Main.inst().console.exec::instantBreak)
-        floatSpinner("Brush size", brushSizeGetter, 1f, 64f, 0.25f, 2, Main.inst().console.exec::brush)
+        toggleableDebugButton(
+          "Ignore place check",
+          "Whether to ignore the placeable check when placing blocks. This is useful for debugging and building",
+          { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } },
+          Main.inst().console.exec::placeCheck
+        )
+        toggleableDebugButton(
+          "Instant break",
+          "Whether to instantly break blocks instead of slowly mining them",
+          instantBreakGetter,
+          Main.inst().console.exec::instantBreak
+        )
+        floatSpinner(
+          "Brush size",
+          brushSizeGetter,
+          1f,
+          64f,
+          0.25f,
+          2,
+          Main.inst().console.exec::brush
+        )
         floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, 0, Main.inst().console.exec::interactRadius)
       }
 
@@ -222,21 +292,21 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
 
       val box2dDebug = world.render.box2DDebugRenderer
       section {
-        toggleableDebugButton("Debug Box2D", Settings::renderBox2dDebug, Main.inst().console.exec::debBox)
+        toggleableDebugButton("Debug Box2D", booleanGetter = Settings::renderBox2dDebug, onToggle = Main.inst().console.exec::debBox)
       }
       section {
-        toggleableDebugButton("Box2D draw bodies", box2dDebug::isDrawBodies, Main.inst().console.exec::drawBodies)
-        toggleableDebugButton("Box2D draw joints", box2dDebug::isDrawJoints, Main.inst().console.exec::drawJoints)
-        toggleableDebugButton("Box2D draw AABBs", box2dDebug::isDrawAABBs, Main.inst().console.exec::drawAABBs)
-        toggleableDebugButton("Box2D draw inactiveBodies", box2dDebug::isDrawInactiveBodies, Main.inst().console.exec::drawInactiveBodies)
+        toggleableDebugButton("Box2D draw bodies", booleanGetter = box2dDebug::isDrawBodies, onToggle = Main.inst().console.exec::drawBodies)
+        toggleableDebugButton("Box2D draw joints", booleanGetter = box2dDebug::isDrawJoints, onToggle = Main.inst().console.exec::drawJoints)
+        toggleableDebugButton("Box2D draw AABBs", booleanGetter = box2dDebug::isDrawAABBs, onToggle = Main.inst().console.exec::drawAABBs)
+        toggleableDebugButton("Box2D draw inactiveBodies", booleanGetter = box2dDebug::isDrawInactiveBodies, onToggle = Main.inst().console.exec::drawInactiveBodies)
       }
       section {
-        toggleableDebugButton("Box2D draw velocities", box2dDebug::isDrawVelocities, Main.inst().console.exec::drawVelocities)
-        toggleableDebugButton("Box2D draw contacts", box2dDebug::isDrawContacts, Main.inst().console.exec::drawContacts)
+        toggleableDebugButton("Box2D draw velocities", booleanGetter = box2dDebug::isDrawVelocities, onToggle = Main.inst().console.exec::drawVelocities)
+        toggleableDebugButton("Box2D draw contacts", booleanGetter = box2dDebug::isDrawContacts, onToggle = Main.inst().console.exec::drawContacts)
       }
       aSeparator()
       section {
-        toggleableDebugButton("Vsync", Settings::vsync) { Settings.vsync = !Settings.vsync }
+        toggleableDebugButton("Vsync", booleanGetter = Settings::vsync) { Settings.vsync = !Settings.vsync }
         floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1, 0) { Settings.foregroundFPS = it.toInt() }
         val oneDayInSeconds = 86400f
         floatSpinner("Save every (sec)", Settings::savePeriodSeconds, 1f, oneDayInSeconds, 1f, 0) {

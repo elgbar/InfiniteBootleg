@@ -71,6 +71,8 @@ object Settings {
 
   var logPackets = true
 
+  var validateEntityFamilies = true
+
   /**
    * Never log these packets
    */
