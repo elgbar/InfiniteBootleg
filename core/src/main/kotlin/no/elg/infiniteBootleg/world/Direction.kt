@@ -10,19 +10,22 @@ import kotlin.math.sign
  * @author Elg
  */
 enum class Direction(val dx: Int, val dy: Int) {
-  CENTER(0, 0),
-  NORTH(0, 1),
-  NORTH_EAST(1, 1),
-  EAST(1, 0),
-  SOUTH_EAST(1, -1),
-  SOUTH(0, -1),
-  SOUTH_WEST(-1, -1),
-  WEST(-1, 0),
-  NORTH_WEST(-1, 1);
+  CENTER(ALIGNED, ALIGNED),
+  NORTH(ALIGNED, NORTHWARD),
+  NORTH_EAST(EASTWARD, NORTHWARD),
+  EAST(EASTWARD, ALIGNED),
+  SOUTH_EAST(EASTWARD, SOUTHWARD),
+  SOUTH(ALIGNED, SOUTHWARD),
+  SOUTH_WEST(WESTWARD, SOUTHWARD),
+  WEST(WESTWARD, ALIGNED),
+  NORTH_WEST(WESTWARD, NORTHWARD);
 
   override fun toString(): String {
     return "Direction[$name]{dx=$dx, dy=$dy}"
   }
+
+  val horizontalDirection = HorizontalDirection.of(dx)
+  val verticalDirection = VerticalDirection.of(dy)
 
   fun toProtoVector2i(): ProtoWorld.Vector2i =
     vector2i {
@@ -31,6 +34,7 @@ enum class Direction(val dx: Int, val dy: Int) {
     }
 
   companion object {
+
     val CARDINAL = arrayOf(NORTH, EAST, SOUTH, WEST)
     val NON_CARDINAL = arrayOf(NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST)
     val NEIGHBORS = arrayOf(NORTH, EAST, SOUTH, WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST)

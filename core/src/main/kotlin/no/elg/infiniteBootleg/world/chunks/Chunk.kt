@@ -214,6 +214,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   companion object {
     const val CHUNK_SIZE = 16
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.BLOCK_SIZE
+    const val CHUNK_CENTER: LocalCoord = CHUNK_SIZE / 2
     val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
 
     fun Chunk?.isValid(): Boolean {
