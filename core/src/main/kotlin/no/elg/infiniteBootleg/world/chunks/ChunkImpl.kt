@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatedEvent.Companion.CHUNK_CENTER
+import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -127,7 +127,7 @@ class ChunkImpl(
   @GuardedBy("fboLock")
   private var fbo: FrameBuffer? = null
 
-  private val updateChunkLightEventListener = EventListener { (chunk, originLocalX, originLocalY): ChunkLightUpdatedEvent ->
+  private val updateChunkLightEventListener = EventListener { (chunk, originLocalX, originLocalY): ChunkLightUpdatingEvent ->
     if (this.isNeighbor(chunk)) {
       val dir = chunk.directionTo(this)
       val localX = (originLocalX + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
@@ -360,7 +360,7 @@ class ChunkImpl(
 
   override fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord) {
     if (Settings.renderLight) {
-      dispatchEvent(ChunkLightUpdatedEvent(this, localX, localY))
+      dispatchEvent(ChunkLightUpdatingEvent(this, localX, localY))
       doUpdateLight(getWorldX(localX), getWorldY(localY), true)
     }
   }
