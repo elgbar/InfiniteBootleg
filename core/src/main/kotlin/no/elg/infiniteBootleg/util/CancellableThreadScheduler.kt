@@ -87,11 +87,13 @@ class CancellableThreadScheduler(threads: Int) {
    */
   fun scheduleSync(ms: Long, runnable: Runnable): ScheduledFuture<*> = executor.schedule({ Gdx.app.postRunnable(runnable) }, ms, TimeUnit.MILLISECONDS)
 
-  fun schedulePeriodicSync(
-    delayMs: Long, rateMs: Long, runnable: Runnable
-  ): ScheduledFuture<*> = executor.scheduleWithFixedDelay(
-    { Gdx.app.postRunnable(runnable) }, delayMs, rateMs, TimeUnit.MILLISECONDS
-  )
+  fun schedulePeriodicSync(delayMs: Long, rateMs: Long, runnable: Runnable): ScheduledFuture<*> =
+    executor.scheduleWithFixedDelay(
+      { Gdx.app.postRunnable(runnable) },
+      delayMs,
+      rateMs,
+      TimeUnit.MILLISECONDS
+    )
 
   /** Shut down the thread  */
   fun shutdown() {
@@ -106,12 +108,13 @@ class CancellableThreadScheduler(threads: Int) {
   }
 
   companion object {
-    private fun caughtRunnable(runnable: Runnable): Runnable = Runnable {
-      try {
-        runnable.run()
-      } catch (e: Exception) {
-        logger().log("SCHEDULER", "Exception caught on " + currentThreadType(), e)
+    private fun caughtRunnable(runnable: Runnable): Runnable =
+      Runnable {
+        try {
+          runnable.run()
+        } catch (e: Exception) {
+          logger().log("SCHEDULER", "Exception caught on " + currentThreadType(), e)
+        }
       }
-    }
   }
 }
