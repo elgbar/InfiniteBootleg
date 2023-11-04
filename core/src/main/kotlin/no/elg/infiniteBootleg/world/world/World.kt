@@ -219,7 +219,10 @@ abstract class World(
       Main.inst().scheduler.executeSync {
         addSystems()
         if (Main.isSingleplayer) {
-          dispatchEvent(WorldLoadedEvent(this))
+          // Add a delay to make sure the light is calculated
+          Main.inst().scheduler.scheduleAsync(200L) {
+            dispatchEvent(WorldLoadedEvent(this))
+          }
         }
       }
     }

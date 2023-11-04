@@ -42,10 +42,11 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
 //    EventManager.clear()
 
+    val showed = System.currentTimeMillis()
     EventManager.oneShotListener { event: WorldLoadedEvent ->
       if (event.world === world) {
         worldFinishedLoading = true
-        Main.logger().log("Finished loading world ${world.name} (${world.uuid})")
+        Main.logger().log("Finished loading world ${world.name} (${world.uuid}) in ${System.currentTimeMillis() - showed}ms")
       }
     }
 
