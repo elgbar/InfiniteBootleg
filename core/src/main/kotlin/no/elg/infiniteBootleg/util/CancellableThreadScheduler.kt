@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.Gdx
-import com.google.common.base.Preconditions
-import no.elg.infiniteBootleg.events.api.ThreadType
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
 import no.elg.infiniteBootleg.main.Main.Companion.logger
 import java.util.concurrent.ScheduledFuture
@@ -20,20 +18,6 @@ class CancellableThreadScheduler(threads: Int) {
     val coreThreads = threads.coerceAtLeast(1)
     executor = ScheduledThreadPoolExecutor(coreThreads) { runnable: Runnable, _: ThreadPoolExecutor ->
       Gdx.app.postRunnable(runnable)
-    }
-  }
-
-  private val activeThreads: Int get() = executor.getActiveCount()
-
-  /**
-   * Block until all scheduled tasks have been completed. Must be on the main thread, and not hold
-   * any locks
-   */
-  @Deprecated("This method is not safe to use")
-  fun waitForTasks() {
-    Preconditions.checkState(ThreadType.currentThreadType() == ThreadType.ASYNC, "Can only wait for tasks on main thread")
-    while (activeThreads > 0) {
-      Thread.onSpinWait()
     }
   }
 

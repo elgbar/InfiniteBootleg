@@ -822,7 +822,6 @@ abstract class World(
       if (wasNotPaused) {
         worldTicker.pause()
       }
-      Main.inst().scheduler.waitForTasks()
 
       chunksLock.writeLock().lock()
       try {
