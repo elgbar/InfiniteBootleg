@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -27,6 +26,7 @@ import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.directionTo
@@ -37,11 +37,18 @@ import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isNextTo
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.HorizontalDirection.EASTWARD
+import no.elg.infiniteBootleg.world.HorizontalDirection.HORIZONTALLY_ALIGNED
+import no.elg.infiniteBootleg.world.HorizontalDirection.WESTWARD
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.VerticalDirection.NORTHWARD
+import no.elg.infiniteBootleg.world.VerticalDirection.SOUTHWARD
+import no.elg.infiniteBootleg.world.VerticalDirection.VERTICALLY_ALIGNED
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -129,23 +136,21 @@ class ChunkImpl(
 
   private val updateChunkLightEventListener = EventListener { (chunk, originLocalX, originLocalY): ChunkLightUpdatingEvent ->
     if (this.isNeighbor(chunk)) {
-      val dir = chunk.directionTo(this)
-      val localX = (originLocalX + dir.dx * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
-      val localY = (originLocalY + dir.dy * World.LIGHT_SOURCE_LOOK_BLOCKS).toInt()
-      val xCheck = when (dir.dx) {
-        -1 -> localX < 0
-        0 -> true
-        1 -> localX > Chunk.CHUNK_SIZE
-        else -> false
+      val dirToThis = chunk.directionTo(this)
+      val localX = originLocalX + dirToThis.dx * World.LIGHT_SOURCE_LOOK_BLOCKS
+      val localY = originLocalY + dirToThis.dy * World.LIGHT_SOURCE_LOOK_BLOCKS
+      val withinHorizontally = when (dirToThis.horizontalDirection) {
+        WESTWARD -> localX <= 0
+        HORIZONTALLY_ALIGNED -> true
+        EASTWARD -> localX >= Chunk.CHUNK_SIZE
       }
-      val yCheck = when (dir.dy) {
-        -1 -> localY < 0
-        0 -> true
-        1 -> localY > Chunk.CHUNK_SIZE
-        else -> false
+      val withinVertically = when (dirToThis.verticalDirection) {
+        NORTHWARD -> localY >= Chunk.CHUNK_SIZE
+        VERTICALLY_ALIGNED -> true
+        SOUTHWARD -> localY <= 0
       }
-      if (xCheck && yCheck) {
-        doUpdateLight(chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY), true)
+      if (withinHorizontally && withinVertically) {
+        doUpdateLight(chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY), checkDistance = true, dispatchEvent = false)
       }
     }
   }
@@ -354,51 +359,55 @@ class ChunkImpl(
 
   override fun updateAllBlockLights() {
     if (Settings.renderLight) {
-      doUpdateLight(CHUNK_CENTER, CHUNK_CENTER, false)
+      doUpdateLight(getWorldX(CHUNK_CENTER), getWorldY(CHUNK_CENTER), checkDistance = false, dispatchEvent = false)
     }
   }
 
   override fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord) {
     if (Settings.renderLight) {
-      dispatchEvent(ChunkLightUpdatingEvent(this, localX, localY))
-      doUpdateLight(getWorldX(localX), getWorldY(localY), true)
+      doUpdateLight(getWorldX(localX), getWorldY(localY), checkDistance = true, dispatchEvent = true)
     }
   }
 
-  private fun doUpdateLight(originWorldX: WorldCoord, originWorldY: WorldCoord, checkDistance: Boolean = true) {
-    synchronized(blockLights) {
-      // If we reached this point before the light is done recalculating then we must start again
-      cancelCurrentBlockLightUpdate()
-      val updateId = currentUpdateId.incrementAndGet()
-      lightUpdater = Main.inst().scheduler.executeAsync { updateBlockLights(updateId, originWorldX, originWorldY, checkDistance) }
-    }
-  }
-
-  /** Should only be used by [blockLightUpdatedAt]  */
-  private fun updateBlockLights(updateId: Int, originWorldX: WorldCoord, originWorldY: WorldCoord, checkDistance: Boolean) {
-    synchronized(tasks) {
-      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-        for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-          if (updateId != currentUpdateId.get()) {
-            break@outer
-          }
-          if (checkDistance) {
-            val dst2 = Vector2.dst2(originWorldX.toFloat(), originWorldY.toFloat(), getWorldX(localX).toFloat(), getWorldY(localY).toFloat())
-            if (dst2 > World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
-              continue
+  /**
+   * Update the light of the chunk, will not fire a [ChunkLightUpdatingEvent]
+   */
+  private fun doUpdateLight(originWorldX: WorldCoord, originWorldY: WorldCoord, checkDistance: Boolean, dispatchEvent: Boolean) {
+    if (Settings.renderLight) {
+      if (dispatchEvent) {
+        dispatchEvent(ChunkLightUpdatingEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
+      }
+      synchronized(blockLights) {
+        // If we reached this point before the light is done recalculating then we must start again
+        cancelCurrentBlockLightUpdate()
+        val updateId = currentUpdateId.incrementAndGet()
+        lightUpdater = Main.inst().scheduler.executeAsync {
+          synchronized(tasks) {
+            outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+              for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+                if (updateId != currentUpdateId.get()) {
+                  break@outer
+                }
+                if (checkDistance) {
+                  val dst2 = Vector2.dst2(originWorldX.toFloat(), originWorldY.toFloat(), getWorldX(localX).toFloat(), getWorldY(localY).toFloat())
+                  if (dst2 > World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
+                    continue
+                  }
+                }
+                blockLights[localX][localY].recalculateLighting(updateId)
+              }
             }
           }
-          blockLights[localX][localY].recalculateLighting(updateId)
-        }
-      }
-    }
-    if (updateId == currentUpdateId.get()) {
-      // TODO only re-render if any lights changed
+          if (updateId == currentUpdateId.get()) {
+            // TODO only re-render if any lights changed
 
-      // Re-render the chunk with the new lighting
-      val render = world.render
-      if (render is ClientWorldRender) {
-        render.chunkRenderer.queueRendering(this, false)
+            // Re-render the chunk with the new lighting
+            val render = world.render
+            if (render is ClientWorldRender) {
+              render.chunkRenderer.queueRendering(this, false)
+            }
+          }
+        }
       }
     }
   }
