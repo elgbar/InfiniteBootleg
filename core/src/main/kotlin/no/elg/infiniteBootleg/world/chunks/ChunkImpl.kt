@@ -232,11 +232,11 @@ class ChunkImpl(
   }
 
   override fun getWorldX(localX: LocalCoord): WorldCoord {
-    return chunkToWorld(chunkX, localX)
+    return chunkX.chunkToWorld(localX)
   }
 
   override fun getWorldY(localY: LocalCoord): WorldCoord {
-    return chunkToWorld(chunkY, localY)
+    return chunkY.chunkToWorld(localY)
   }
 
   @Synchronized
@@ -547,7 +547,7 @@ class ChunkImpl(
   }
 
   fun queryEntities(callback: ((Iterable<Entity>) -> Boolean)) =
-    world.worldBody.queryEntities(chunkX.chunkToWorld(), chunkY.chunkToWorld(), chunkToWorld(chunkX, Chunk.CHUNK_SIZE), chunkToWorld(chunkY, Chunk.CHUNK_SIZE), callback)
+    world.worldBody.queryEntities(chunkX.chunkToWorld(), chunkY.chunkToWorld(), chunkX.chunkToWorld(Chunk.CHUNK_SIZE), chunkY.chunkToWorld(Chunk.CHUNK_SIZE), callback)
 
   override fun save(): CompletableFuture<ProtoWorld.Chunk> {
     val future = CompletableFuture<ProtoWorld.Chunk>()

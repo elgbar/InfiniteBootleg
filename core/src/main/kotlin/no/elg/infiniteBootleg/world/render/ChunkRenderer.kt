@@ -143,7 +143,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
             var texture: RotatableTextureRegion
             var secondaryTexture: RotatableTextureRegion?
 
-            val worldY = chunkToWorld(chunk.chunkY, localY)
+            val worldY = chunk.chunkY.chunkToWorld(localY)
             if (material.invisibleBlock || block.isMarkerBlock()) {
               texture = if (topBlockHeight > worldY) Main.inst().assets.caveTexture else Main.inst().assets.skyTexture
               secondaryTexture = null
@@ -187,7 +187,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   }
 
   private fun calculateRotation(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): Int {
-    val noise = rotationNoise.getNoise(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
+    val noise = rotationNoise.getNoise(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
     val cardinalDirections = 4
     val cardinalDirectionDegrees = 90
     return (noise * cardinalDirections).toInt() * cardinalDirectionDegrees

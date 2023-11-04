@@ -33,25 +33,6 @@ inline fun Number.worldToChunk(): ChunkCoord = toInt().worldToChunk()
 inline fun WorldCompactLoc.worldToChunk(): ChunkCompactLoc = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
 
 /**
- * Convert a chunk coordinate to world coordinate
- *
- * @param this@chunkToWorld The chunk coordinate to convert
- * @return The chunk coordinate in world view
- */
-
-@Contract(pure = true)
-inline fun ChunkCoord.chunkToWorld(): WorldCoord = this shl Chunk.CHUNK_SIZE_SHIFT
-
-/**
- * Convert a chunk coordinate to world coordinate
- *
- * @param this@chunkToWorld The chunk coordinate to convert
- * @return The chunk coordinate in world view
- */
-@Contract(pure = true)
-inline fun Number.chunkToWorld(): WorldCoord = toInt().chunkToWorld()
-
-/**
  * Convert a chunk coordinate to world coordinate with an offset within the chunk
  *
  * @param chunkCoord The chunk coordinate to convert
@@ -59,9 +40,8 @@ inline fun Number.chunkToWorld(): WorldCoord = toInt().chunkToWorld()
  * `0 <= offset < `[Chunk.CHUNK_SIZE]
  * @return The chunk coordinate in world view plus the offset
  */
-
 @Contract(pure = true)
-inline fun chunkToWorld(chunkCoord: ChunkCoord, offset: LocalCoord): WorldCoord = chunkCoord.chunkToWorld() + offset
+inline fun ChunkCoord.chunkToWorld(offset: LocalCoord = 0): WorldCoord = (this shl Chunk.CHUNK_SIZE_SHIFT) + offset
 
 /**
  * Calculate the offset the given world coordinate have in its chunk
@@ -160,7 +140,7 @@ inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactL
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl SIZE or (b.toInt() and 0xffff)
 
 inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
-  compactLoc(chunkToWorld(chunk.chunkX, localX), chunkToWorld(chunk.chunkY, localY))
+  compactLoc(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
 
 /**
  * @param this@decompactShortA A long created by [.compactLoc]
@@ -184,7 +164,7 @@ inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block
 
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 
-inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunkToWorld(chunk.chunkX, localX)},${chunkToWorld(chunk.chunkY, localY)})"
+inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunk.chunkX.chunkToWorld(localX)},${chunk.chunkY.chunkToWorld(localY)})"
 
 /**
  * @param worldCoord A part of a coordinate in the world

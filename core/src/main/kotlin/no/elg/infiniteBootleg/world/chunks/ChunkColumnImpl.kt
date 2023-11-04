@@ -56,18 +56,10 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
     }
   }
 
-  private fun topSkylight(localX: LocalCoord): WorldCoord {
-    synchronized(syncLocks[localX]) {
-      return topWorldYLight[localX]
-    }
-  }
-
-  override fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag): Block? {
-    return getWorldBlock(localX, topBlockHeight(localX, features))
-  }
+  override fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag): Block? = getWorldBlock(localX, topBlockHeight(localX, features))
 
   override fun isChunkAboveTopBlock(chunkY: ChunkCoord, features: ChunkColumnFeatureFlag): Boolean {
-    val maxWorldY = chunkToWorld(chunkY, CHUNK_SIZE - 1)
+    val maxWorldY = chunkY.chunkToWorld(CHUNK_SIZE - 1)
     for (localX in 0 until CHUNK_SIZE) {
       if (!isBlockAboveTopBlock(localX, maxWorldY, features)) {
         return false
@@ -76,17 +68,11 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
     return true
   }
 
-  override fun isBlockAboveTopBlock(localX: LocalCoord, worldY: WorldCoord, features: ChunkColumnFeatureFlag): Boolean {
-    return topBlockHeight(localX, features) < worldY
-  }
+  override fun isBlockAboveTopBlock(localX: LocalCoord, worldY: WorldCoord, features: ChunkColumnFeatureFlag): Boolean = topBlockHeight(localX, features) < worldY
 
-  private fun getWorldX(localX: LocalCoord): WorldCoord {
-    return chunkToWorld(chunkX, localX)
-  }
+  private fun getWorldX(localX: LocalCoord): WorldCoord = chunkX.chunkToWorld(localX)
 
-  private fun getWorldBlock(localX: LocalCoord, worldY: WorldCoord): Block? {
-    return world.getBlock(getWorldX(localX), worldY)
-  }
+  private fun getWorldBlock(localX: LocalCoord, worldY: WorldCoord): Block? = world.getBlock(getWorldX(localX), worldY)
 
   private fun getLoadedChunk(chunkY: ChunkCoord, chunkX: ChunkCoord = this.chunkX): Chunk? {
     val compactLoc = compactLoc(chunkX, chunkY)
@@ -95,9 +81,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
 
   private fun getLoadedChunkFromWorldY(worldY: WorldCoord, chunkX: ChunkCoord = this.chunkX): Chunk? = getLoadedChunk(worldY.worldToChunk(), chunkX)
 
-  private fun getChunk(chunkY: ChunkCoord): Chunk? {
-    return world.getChunk(chunkX, chunkY, true)
-  }
+  private fun getChunk(chunkY: ChunkCoord): Chunk? = world.getChunk(chunkX, chunkY, true)
 
   private fun setTopBlock(currentTops: WorldCoordArray, localX: LocalCoord, worldY: WorldCoord) {
     val oldTop: WorldCoord
@@ -216,8 +200,7 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
 
   companion object {
     const val MAX_CHUNKS_TO_LOOK_UPWARDS = CHUNK_SIZE
-    fun fromProtobuf(world: World, protoCC: ProtoWorld.ChunkColumn): ChunkColumn {
-      return ChunkColumnImpl(world, protoCC.chunkX, protoCC.topSolidBlocksList.toIntArray(), protoCC.topTransparentBlocksList.toIntArray())
-    }
+    fun fromProtobuf(world: World, protoCC: ProtoWorld.ChunkColumn): ChunkColumn =
+      ChunkColumnImpl(world, protoCC.chunkX, protoCC.topSolidBlocksList.toIntArray(), protoCC.topTransparentBlocksList.toIntArray())
   }
 }

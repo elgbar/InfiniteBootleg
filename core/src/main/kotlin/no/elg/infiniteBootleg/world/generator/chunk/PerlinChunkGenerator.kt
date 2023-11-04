@@ -74,7 +74,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk {
     val chunk = ChunkImpl(world, chunkX, chunkY)
     for (localX in 0 until Chunk.CHUNK_SIZE) {
-      val worldX = chunkToWorld(chunkX, localX)
+      val worldX = chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
       val genHeight = biome.heightAt(this, worldX)
       val genChunkY = genHeight.worldToChunk()
@@ -96,7 +96,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
 
   override fun generateFeatures(chunk: Chunk) {
     for (localX in 0 until Chunk.CHUNK_SIZE) {
-      val worldX = chunkToWorld(chunk.chunkX, localX)
+      val worldX = chunk.chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
       val genHeight = biome.heightAt(this, worldX)
       val genChunkY = genHeight.worldToChunk()
