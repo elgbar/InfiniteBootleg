@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.LongMap
-import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
@@ -30,7 +29,7 @@ import no.elg.infiniteBootleg.world.world.ClientWorld
 
 class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
 
-  private val lr: ShapeRenderer = ShapeRenderer(1000).also {
+  private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000).also {
     it.color = BLOCK_LIGHT_UPDATE_COLOR
   }
 
@@ -52,14 +51,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   }
 
   private fun renderLightUpdates() {
-    val textureSize = BLOCK_SIZE.toFloat()
     newlyUpdatedChunks.removeAll { (_, it: ProgressHandler?) -> it == null || it.isDone() }
     Gdx.gl.glEnable(GL30.GL_BLEND)
-    lr.use(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
+    shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
       for ((compactLoc, visualizeUpdate: ProgressHandler?) in newlyUpdatedChunks.entries()) {
         val (worldX, worldY) = compactLoc
-        lr.color.a = visualizeUpdate?.updateAndGetProgress(Gdx.graphics.deltaTime) ?: continue
-        lr.rect(worldX * textureSize + textureSize / 2f, worldY * textureSize + textureSize / 2f, textureSize / 4f, textureSize / 4f)
+        shapeRenderer.color.a = visualizeUpdate?.updateAndGetProgress(Gdx.graphics.deltaTime) ?: continue
+        shapeRenderer.rect(worldX * TEXTURE_SIZE + TEXTURE_SIZE / 2f, worldY * TEXTURE_SIZE + TEXTURE_SIZE / 2f, TEXTURE_SIZE / 4f, TEXTURE_SIZE / 4f)
       }
     }
   }
@@ -90,11 +88,12 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   }
 
   override fun dispose() {
-    lr.dispose()
+    shapeRenderer.dispose()
     EventManager.removeListener(listener)
   }
 
   companion object {
     val BLOCK_LIGHT_UPDATE_COLOR: Color = Color.PURPLE
+    const val TEXTURE_SIZE = BLOCK_SIZE.toFloat()
   }
 }
