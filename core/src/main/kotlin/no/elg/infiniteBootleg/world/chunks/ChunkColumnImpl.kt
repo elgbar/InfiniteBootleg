@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.chunks
 
+import no.elg.infiniteBootleg.events.ChunkColumnUpdatedEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -22,8 +24,12 @@ import kotlin.contracts.contract
 import kotlin.math.max
 import kotlin.math.min
 
-class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord, initialTopSolid: WorldCoordArray? = null, initialTopLight: WorldCoordArray? = null) :
-  ChunkColumn {
+class ChunkColumnImpl(
+  override val world: World,
+  override val chunkX: ChunkCoord,
+  initialTopSolid: WorldCoordArray? = null,
+  initialTopLight: WorldCoordArray? = null
+) : ChunkColumn {
 
   private val topWorldYSolid = IntArray(CHUNK_SIZE)
   private val topWorldYLight = IntArray(CHUNK_SIZE)
@@ -90,11 +96,19 @@ class ChunkColumnImpl(override val world: World, override val chunkX: ChunkCoord
       currentTops[localX] = worldY
     }
 
+    if (oldTop != worldY) {
+      if (currentTops === topWorldYLight) {
+        EventManager.dispatchEvent(ChunkColumnUpdatedEvent(chunkX, localX, worldY, oldTop, BLOCKS_LIGHT_FLAG))
+      } else if (currentTops === topWorldYSolid) {
+        EventManager.dispatchEvent(ChunkColumnUpdatedEvent(chunkX, localX, worldY, oldTop, SOLID_FLAG))
+      }
+    }
+
     val oldChunk = oldTop.worldToChunk()
     val newChunk = worldY.worldToChunk()
     val min = min(oldChunk, newChunk) - 1
     val max = max(oldChunk, newChunk)
-    val worldX = chunkToWorld(chunkX, localX)
+    val worldX = chunkX.chunkToWorld(localX)
     for (chunkY in min..max) {
       getLoadedChunk(chunkY)?.updateAllBlockLights()
 

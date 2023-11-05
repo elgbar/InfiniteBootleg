@@ -69,6 +69,8 @@ object Settings {
 
   var renderAirBlocks = false
 
+  var renderTopBlockChanges = false
+
   var logPackets = true
 
   var validateEntityFamilies = true

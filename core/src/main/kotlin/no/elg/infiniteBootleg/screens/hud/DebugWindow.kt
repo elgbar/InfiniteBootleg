@@ -180,6 +180,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           Settings::debugEntityMarkerBlocks
         ) { Settings.debugEntityMarkerBlocks = !Settings.debugEntityMarkerBlocks }
       }
+
       section {
         toggleableDebugButton(
           "Render existing air",
@@ -191,7 +192,13 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           "Whether entity families should be validated. If invalid the entity will not be added to the entity engine",
           Settings::validateEntityFamilies
         ) { Settings.validateEntityFamilies = !Settings.validateEntityFamilies }
+        toggleableDebugButton(
+          "Render top block changes",
+          "Render changes to the top block of a chunk column",
+          Settings::renderTopBlockChanges
+        ) { Settings.renderTopBlockChanges = !Settings.renderTopBlockChanges }
       }
+
       // Lights
       section {
         toggleableDebugButton(
