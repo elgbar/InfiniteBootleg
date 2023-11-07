@@ -30,11 +30,13 @@ import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.toAbled
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import java.math.BigDecimal
+import kotlin.concurrent.withLock
 
 class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow) {
 
@@ -57,8 +59,14 @@ private fun updateAllValues() {
 }
 
 @Scene2dDsl
-private fun KTable.toggleableDebugButton(name: String, description: String? = null, booleanGetter: () -> Boolean, onToggle: () -> Unit): VisTextButton =
-  visTextButton(name, style = "debug-menu-button") {
+private fun KTable.toggleableDebugButton(
+  name: String,
+  description: String? = null,
+  style: String = "debug-menu-button",
+  booleanGetter: () -> Boolean,
+  onToggle: () -> Unit
+): VisTextButton =
+  visTextButton(name, style) {
     pad(5f)
     isDisabled = booleanGetter()
 
@@ -159,25 +167,25 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton(
           "General debug",
           "Handles whether to log debug messages and\nsmaller debug features without a dedicated debug option",
-          Settings::debug,
-          Main.inst().console.exec::debug
+          booleanGetter = Settings::debug,
+          onToggle = Main.inst().console.exec::debug
         )
         toggleableDebugButton(
           "Render chunks borders",
           "Render an outline around each chunk",
-          Settings::renderChunkBounds,
-          Main.inst().console.exec::debChu
+          booleanGetter = Settings::renderChunkBounds,
+          onToggle = Main.inst().console.exec::debChu
         )
         toggleableDebugButton(
           "Render chunk updates",
           "Flash a chunk when a chunks texture changes",
-          Settings::renderChunkUpdates,
-          Main.inst().console.exec::debChuUpd
+          booleanGetter = Settings::renderChunkUpdates,
+          onToggle = Main.inst().console.exec::debChuUpd
         )
         toggleableDebugButton(
           "Render entity markers",
           "Render entity block markers, a block to connect entities which represent a block as a temporary marker in the block world",
-          Settings::debugEntityMarkerBlocks
+          booleanGetter = Settings::debugEntityMarkerBlocks
         ) { Settings.debugEntityMarkerBlocks = !Settings.debugEntityMarkerBlocks }
       }
 
@@ -185,17 +193,17 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton(
           "Render existing air",
           "Render air blocks, which are normally indistinguishable from non-existing blocks, as cute little clouds ",
-          Settings::renderAirBlocks
+          booleanGetter = Settings::renderAirBlocks
         ) { Settings.renderAirBlocks = !Settings.renderAirBlocks }
         toggleableDebugButton(
           "Validate families",
           "Whether entity families should be validated. If invalid the entity will not be added to the entity engine",
-          Settings::validateEntityFamilies
+          booleanGetter = Settings::validateEntityFamilies
         ) { Settings.validateEntityFamilies = !Settings.validateEntityFamilies }
         toggleableDebugButton(
           "Render top block changes",
           "Render changes to the top block of a chunk column",
-          Settings::renderTopBlockChanges
+          booleanGetter = Settings::renderTopBlockChanges
         ) { Settings.renderTopBlockChanges = !Settings.renderTopBlockChanges }
       }
 
@@ -204,47 +212,59 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         toggleableDebugButton(
           "Render entity lighting",
           "Render a small dot at the block the entity's light level is calculated from",
-          Settings::debugEntityLight,
-          Main.inst().console.exec::debEntLit
+          booleanGetter = Settings::debugEntityLight,
+          onToggle = Main.inst().console.exec::debEntLit
         )
         toggleableDebugButton(
           "Render block lighting",
           """Render an overlay which displays which blocks the light level of the block under the mouse is calculated.
 A red overlay denotes a luminescent block, while a yellow overlay denotes the skylight is the source of the light.""",
-          Settings::debugBlockLight,
-          Main.inst().console.exec::debBlkLit
+          booleanGetter = Settings::debugBlockLight,
+          onToggle = Main.inst().console.exec::debBlkLit
         )
         toggleableDebugButton(
           "Render light updates",
           "Render a small dot over blocks with new lighting",
-          Settings::renderBlockLightUpdates,
-          Main.inst().console.exec::debLitUpd
+          booleanGetter = Settings::renderBlockLightUpdates,
+          onToggle = Main.inst().console.exec::debLitUpd
         )
         toggleableDebugButton(
           "Render lights",
           "Whether to render light at all. Will break lighting information if the world is updated with this off",
-          Settings::renderLight,
-          Main.inst().console.exec::lights
+          booleanGetter = Settings::renderLight,
+          onToggle = Main.inst().console.exec::lights
         )
+      }
+      section {
+        toggleableDebugButton(
+          "Recalculate lights",
+          "Re-render all lights in the world.",
+          "toggle-menu-button",
+          { false }
+        ) {
+          world.chunksLock.writeLock().withLock {
+            world.chunks.values().forEach(Chunk::updateAllBlockLights)
+          }
+        }
       }
       // Event tracker
       section {
         toggleableDebugButton(
           "Log events",
           "Whether to log when anything event related happens",
-          EventManager::isLoggingAnyEvents,
-          Main.inst().console.exec::trackEvents
+          booleanGetter = EventManager::isLoggingAnyEvents,
+          onToggle = Main.inst().console.exec::trackEvents
         )
-        toggleableDebugButton("Log events dispatched", "Whether to log when an event is dispatched", EventManager::isLoggingEventsDispatched) {
+        toggleableDebugButton("Log events dispatched", "Whether to log when an event is dispatched", booleanGetter = EventManager::isLoggingEventsDispatched) {
           EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_DISPATCHED }
         }
-        toggleableDebugButton("Log listeners change", "Whether to log when an event is listener is registered", EventManager::isLoggingEventListenersChange) {
+        toggleableDebugButton("Log listeners change", "Whether to log when an event is listener is registered", booleanGetter = EventManager::isLoggingEventListenersChange) {
           EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENT_LISTENERS_CHANGE }
         }
         toggleableDebugButton(
           "Log events listened to",
           "Whether to log when an event is listened to. This is very spammy",
-          EventManager::isLoggingEventsListenedTo
+          booleanGetter = EventManager::isLoggingEventsListenedTo
         ) {
           EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_LISTENED_TO }
         }
@@ -267,14 +287,14 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
         toggleableDebugButton(
           "Ignore place check",
           "Whether to ignore the placeable check when placing blocks. This is useful for debugging and building",
-          { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } },
-          Main.inst().console.exec::placeCheck
+          booleanGetter = { world.controlledPlayerEntities.any { it.ignorePlaceableCheck } },
+          onToggle = Main.inst().console.exec::placeCheck
         )
         toggleableDebugButton(
           "Instant break",
           "Whether to instantly break blocks instead of slowly mining them",
-          instantBreakGetter,
-          Main.inst().console.exec::instantBreak
+          booleanGetter = instantBreakGetter,
+          onToggle = Main.inst().console.exec::instantBreak
         )
         floatSpinner(
           "Brush size",

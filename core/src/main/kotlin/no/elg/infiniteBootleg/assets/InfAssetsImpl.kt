@@ -138,6 +138,13 @@ class InfAssetsImpl : InfAssets {
           checkedOver = over
           disabled = newDrawable("white", Color.FOREST)
         }
+
+        visTextButton(name = "toggle-menu-button", extend = "debug-menu-button") {
+          down = newDrawable("white", Color.PURPLE)
+          up = down
+          over = newDrawable("white", Color.PURPLE.cpy().mul(0.9f))
+          checkedOver = over
+        }
       }
     }
   }
