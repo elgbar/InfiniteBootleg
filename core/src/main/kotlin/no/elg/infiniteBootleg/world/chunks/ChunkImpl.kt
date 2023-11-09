@@ -292,9 +292,13 @@ class ChunkImpl(
     }
 
     // Render the world with the changes (but potentially without the light changes)
+    queueForRendering(wasPrioritize)
+  }
+
+  internal fun queueForRendering(prioritize: Boolean = this.prioritize) {
     val render = world.render
     if (render is ClientWorldRender) {
-      render.chunkRenderer.queueRendering(this, wasPrioritize)
+      render.chunkRenderer.queueRendering(this, prioritize)
     }
   }
 
@@ -354,15 +358,7 @@ class ChunkImpl(
               }
             }
           }
-          if (updateId == currentUpdateId.get()) {
-            // TODO only re-render if any lights changed
-
-            // Re-render the chunk with the new lighting
-            val render = world.render
-            if (render is ClientWorldRender) {
-              render.chunkRenderer.queueRendering(this, false)
-            }
-          }
+          queueForRendering(false)
         }
       }
     }
