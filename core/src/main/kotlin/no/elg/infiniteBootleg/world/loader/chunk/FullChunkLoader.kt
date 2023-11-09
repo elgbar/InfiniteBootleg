@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world.loader.chunk
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.ChunkCoord
-import no.elg.infiniteBootleg.util.decompactLocX
-import no.elg.infiniteBootleg.util.decompactLocY
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
@@ -21,8 +21,7 @@ import no.elg.infiniteBootleg.world.world.World
 class FullChunkLoader(override val world: World, generator: ChunkGenerator) : ChunkLoader(generator) {
 
   override fun fetchChunk(chunkLoc: Long): LoadedChunk {
-    val chunkX = chunkLoc.decompactLocX()
-    val chunkY = chunkLoc.decompactLocY()
+    val (chunkX, chunkY) = chunkLoc
     val loadChunkFromFile = loadChunkFromFile(chunkX, chunkY)
     return LoadedChunk(loadChunkFromFile ?: generateChunk(chunkX, chunkY), loadChunkFromFile == null)
   }

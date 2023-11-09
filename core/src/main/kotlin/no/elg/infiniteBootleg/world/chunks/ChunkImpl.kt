@@ -575,20 +575,16 @@ class ChunkImpl(
     }
 
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
-    Preconditions.checkState(
-      initializing,
-      "Cannot load from proto chunk after chunk has been initialized"
-    )
-
+    check(initializing) { "Cannot load from proto chunk after chunk has been initialized" }
     Main.logger().debug("PB Chunk") { TextFormat.printer().shortDebugString(protoChunk) }
     val chunkPosition = protoChunk.position
-    val posErrorMsg = "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})"
-    Preconditions.checkArgument(chunkPosition.x == chunkX, posErrorMsg)
-    Preconditions.checkArgument(chunkPosition.y == chunkY, posErrorMsg)
-    Preconditions.checkArgument(
-      protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE,
+    val posErrorMsg = { "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})" }
+    check(chunkPosition.x == chunkX, posErrorMsg)
+    check(chunkPosition.y == chunkY, posErrorMsg)
+    check(protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
       "Invalid number of blocks. expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
-    )
+    }
+
     var index = 0
     val protoBlocks = protoChunk.blocksList
     synchronized(this) {
