@@ -53,19 +53,21 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
   }
 
   private val listener = EventManager.registerListener { e: ChunkColumnUpdatedEvent ->
-    for (flag in chunkColumnFeatureFlags) {
-      if (e.flag and flag != 0) {
-        val index = compactLoc(e.chunkX.chunkToWorld(e.localX), flag)
-        val flagSetting = flagSettings[flag] ?: continue
-        val chunkColumnUpdate = ChunkColumnUpdate(
-          progress = ProgressHandler(1.3f),
-          index = index,
-          worldX = e.chunkX.chunkToWorld(e.localX).toFloat(),
-          worldNewY = e.newTopCoord.toFloat(),
-          worldOldY = e.oldTopCoord.toFloat(),
-          flagSetting = flagSetting
-        )
-        newlyUpdatedChunks[index] = chunkColumnUpdate
+    if (Settings.renderTopBlockChanges) {
+      for (flag in chunkColumnFeatureFlags) {
+        if (e.flag and flag != 0) {
+          val index = compactLoc(e.chunkX.chunkToWorld(e.localX), flag)
+          val flagSetting = flagSettings[flag] ?: continue
+          val chunkColumnUpdate = ChunkColumnUpdate(
+            progress = ProgressHandler(1.3f),
+            index = index,
+            worldX = e.chunkX.chunkToWorld(e.localX).toFloat(),
+            worldNewY = e.newTopWorldY.toFloat(),
+            worldOldY = e.oldTopWorldY.toFloat(),
+            flagSetting = flagSetting
+          )
+          newlyUpdatedChunks[index] = chunkColumnUpdate
+        }
       }
     }
   }

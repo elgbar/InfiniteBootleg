@@ -6,11 +6,25 @@ import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.chunkToWorld
+import no.elg.infiniteBootleg.world.world.World
+import kotlin.math.abs
 
 data class ChunkColumnUpdatedEvent(
   val chunkX: ChunkCoord,
   val localX: LocalCoord,
-  val newTopCoord: WorldCoord,
-  val oldTopCoord: WorldCoord,
+  val newTopWorldY: WorldCoord,
+  val oldTopWorldY: WorldCoord,
   val flag: ChunkColumnFeatureFlag
-) : AsyncEvent(ThreadType.ASYNC)
+) : AsyncEvent(ThreadType.ASYNC) {
+
+  /**
+   * Calculate all locations from the old top coordinate to the new top coordinate, including the new changed coordinates
+   */
+  fun calculatedDiffColumn(): LongArray {
+    val worldX = chunkX.chunkToWorld(localX)
+    val newTopY = newTopWorldY.toFloat()
+    val halfOffset = abs(newTopY - oldTopWorldY) / 2f
+    return World.getLocationsAABB(worldX.toFloat(), newTopY, 0f, halfOffset)
+  }
+}

@@ -35,7 +35,9 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
   private val newlyUpdatedChunks = LongMap<ProgressHandler>()
   private val listener = EventManager.registerListener { e: BlockLightChangedEvent ->
-    newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), ProgressHandler(1f))
+    if (Settings.renderBlockLightUpdates) {
+      newlyUpdatedChunks.put(compactChunkToWorld(e.chunk, e.localX, e.localY), ProgressHandler(1f))
+    }
   }
 
   private val skylightDebugTexture by lazy { Main.inst().assets.skylightDebugTexture.textureRegion }
