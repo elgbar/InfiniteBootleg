@@ -28,6 +28,8 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
@@ -36,7 +38,6 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
-import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_CENTER
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
@@ -318,41 +319,52 @@ class ChunkImpl(
   }
 
   override fun updateAllBlockLights() {
-    if (Settings.renderLight) {
-      doUpdateLight(getWorldX(CHUNK_CENTER), getWorldY(CHUNK_CENTER), checkDistance = false, dispatchEvent = false)
-    }
+    doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
+
   }
 
   override fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord) {
     if (Settings.renderLight) {
-      doUpdateLight(getWorldX(localX), getWorldY(localY), checkDistance = true, dispatchEvent = true)
+      val originWorldX = getWorldX(localX)
+      val originWorldY = getWorldY(localY)
+      dispatchEvent(ChunkLightUpdatingEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
+      doUpdateLight(originWorldX, originWorldY, checkDistance = true)
     }
   }
 
   /**
    * Update the light of the chunk
    */
-  internal fun doUpdateLight(originWorldX: WorldCoord, originWorldY: WorldCoord, checkDistance: Boolean, dispatchEvent: Boolean) {
+  internal fun doUpdateLight(originWorldX: WorldCoord = 0, originWorldY: WorldCoord = 0, checkDistance: Boolean = false) {
+    val sources = if (checkDistance) longArrayOf(compactLoc(originWorldX, originWorldY)) else NOT_CHECKING_DISTANCE
+    doUpdateLightMultipleSources(sources, checkDistance)
+  }
+
+  private fun isNoneWithinDistance(sources: LongArray, worldX: WorldCoord, worldY: WorldCoord): Boolean =
+    sources.none { (srcX: WorldCoord, srcY: WorldCoord) ->
+      val dstFromChange2blk = Vector2.dst2(worldX.toFloat(), worldY.toFloat(), srcX.toFloat(), srcY.toFloat())
+      dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
+    }
+
+  internal fun doUpdateLightMultipleSources(sources: LongArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      if (dispatchEvent) {
-        dispatchEvent(ChunkLightUpdatingEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
-      }
       synchronized(blockLights) {
         // If we reached this point before the light is done recalculating then we must start again
         cancelCurrentBlockLightUpdate()
         val updateId = currentUpdateId.incrementAndGet()
+
+        // An update can only be cancelled if we do not check the distance
+        fun isLightUpdateCancelled(updateId: Int): Boolean = !checkDistance && updateId != currentUpdateId.get()
+
         lightUpdater = Main.inst().scheduler.executeAsync {
           synchronized(tasks) {
             outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
               for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-                if (updateId != currentUpdateId.get()) {
-                  break@outer
+                if (isLightUpdateCancelled(updateId)) {
+                  return@executeAsync
                 }
-                if (checkDistance) {
-                  val dst2 = Vector2.dst2(originWorldX.toFloat(), originWorldY.toFloat(), getWorldX(localX).toFloat(), getWorldY(localY).toFloat())
-                  if (dst2 > World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
-                    continue
-                  }
+                if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+                  continue
                 }
                 blockLights[localX][localY].recalculateLighting(updateId)
               }
@@ -435,17 +447,19 @@ class ChunkImpl(
   @get:Contract(pure = true)
   override val compactLocation: Long
     get() = compactLoc(chunkX, chunkY)
+
+  /**
+   * @return Location of this chunk in world coordinates
+   */
   override val worldX: WorldCoord
-    /**
-     * @return Location of this chunk in world coordinates
-     */
     get() = chunkX.chunkToWorld()
+
+  /**
+   * This is the same as doing `CoordUtil.chunkToWorld(getLocation())`
+   *
+   * @return Location of this chunk in world coordinates
+   */
   override val worldY: WorldCoord
-    /**
-     * This is the same as doing `CoordUtil.chunkToWorld(getLocation())`
-     *
-     * @return Location of this chunk in world coordinates
-     */
     get() = chunkY.chunkToWorld()
 
   /**
@@ -479,8 +493,8 @@ class ChunkImpl(
   }
 
   /**
-   * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
-   * @param localY The local y ie a value between 0 and [CHUNK_SIZE]
+   * @param localX The local x ie a value between 0 and [Chunk.CHUNK_SIZE]
+   * @param localY The local y ie a value between 0 and [Chunk.CHUNK_SIZE]
    * @return The block instance of the given coordinates, a new air block will be created if there is no existing block
    */
   override fun getBlock(localX: LocalCoord, localY: LocalCoord): Block {
@@ -634,6 +648,7 @@ class ChunkImpl(
   companion object {
     val AIR_BLOCK_PROTO_BUILDER = Block.save(Material.AIR)
     val AIR_BLOCK_PROTO = AIR_BLOCK_PROTO_BUILDER.build()
+    val NOT_CHECKING_DISTANCE = LongArray(0)
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
       return blockA.materialOrAir() === Material.AIR && blockB.materialOrAir() === Material.AIR
