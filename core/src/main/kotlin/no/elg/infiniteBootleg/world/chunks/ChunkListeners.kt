@@ -1,47 +1,69 @@
 package no.elg.infiniteBootleg.world.chunks
 
+import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.events.BlockChangedEvent
+import no.elg.infiniteBootleg.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.events.api.EventListener
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
-import no.elg.infiniteBootleg.util.directionTo
+import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.util.findWhichInnerEdgesOfChunk
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isNextTo
 import no.elg.infiniteBootleg.world.Direction
-import no.elg.infiniteBootleg.world.HorizontalDirection
-import no.elg.infiniteBootleg.world.VerticalDirection
-import no.elg.infiniteBootleg.world.world.World
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 
-val ChunkImpl.updateChunkLightEventListener: EventListener<ChunkLightUpdatingEvent>
-  get() = EventListener { (chunk, originLocalX, originLocalY): ChunkLightUpdatingEvent ->
-    if (this.isNeighbor(chunk)) {
-      val dirToThis = chunk.directionTo(this)
-      val localX = originLocalX + dirToThis.dx * World.LIGHT_SOURCE_LOOK_BLOCKS
-      val localY = originLocalY + dirToThis.dy * World.LIGHT_SOURCE_LOOK_BLOCKS
-      val withinHorizontally = when (dirToThis.horizontalDirection) {
-        HorizontalDirection.WESTWARD -> localX <= 0
-        HorizontalDirection.HORIZONTALLY_ALIGNED -> true
-        HorizontalDirection.EASTWARD -> localX >= Chunk.CHUNK_SIZE
-      }
-      val withinVertically = when (dirToThis.verticalDirection) {
-        VerticalDirection.NORTHWARD -> localY >= Chunk.CHUNK_SIZE
-        VerticalDirection.VERTICALLY_ALIGNED -> true
-        VerticalDirection.SOUTHWARD -> localY <= 0
-      }
-      if (withinHorizontally && withinVertically) {
-        doUpdateLight(chunk.getWorldX(originLocalX), chunk.getWorldY(originLocalY), checkDistance = true, dispatchEvent = false)
-      }
+class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
+
+  private val updateChunkLightEventListener: EventListener<ChunkLightUpdatingEvent> = EventListener { (eventChunk, originLocalX, originLocalY): ChunkLightUpdatingEvent ->
+    if (chunk.isNeighbor(eventChunk)) {
+      chunk.doUpdateLight(eventChunk.getWorldX(originLocalX), eventChunk.getWorldY(originLocalY), checkDistance = true)
     }
   }
 
-val ChunkImpl.blockChangedEventListener: EventListener<BlockChangedEvent>
-  get() = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
+  private val updateLuminescentBlockChangedEventListener: EventListener<BlockChangedEvent> = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
+    val block = oldBlock ?: newBlock ?: return@EventListener
+    if (oldBlock?.material?.emitsLight == true || newBlock?.material?.emitsLight == true) {
+      chunk.doUpdateLightMultipleSources(longArrayOf(block.compactWorldLoc), checkDistance = true)
+    }
+  }
+
+  private val blockChangedEventListener: EventListener<BlockChangedEvent> = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
     val block = oldBlock ?: newBlock ?: return@EventListener
 
-    if (block.isNextTo(this)) {
+    if (block.isNextTo(chunk)) {
       val changeDirection = block.findWhichInnerEdgesOfChunk()
-      if (Direction.direction(block.chunk.chunkX, block.chunk.chunkY, chunkX, chunkY) in changeDirection) {
-        dirty()
+      if (Direction.direction(block.chunk.chunkX, block.chunk.chunkY, chunk.chunkX, chunk.chunkY) in changeDirection) {
+        chunk.queueForRendering()
       }
     }
   }
+
+  private val chunkColumnLightUpdatedListener: EventListener<ChunkColumnUpdatedEvent> = EventListener { event: ChunkColumnUpdatedEvent ->
+    if (event.flag and ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG != 0) {
+      chunk.doUpdateLightMultipleSources(event.calculatedDiffColumn(), checkDistance = true)
+    }
+  }
+
+  private val chunkLoadedEventListener: EventListener<ChunkLoadedEvent> = EventListener { (eventChunk, _): ChunkLoadedEvent ->
+    if (eventChunk.isNeighbor(chunk)) {
+      chunk.doUpdateLight()
+    }
+  }
+
+  fun registerListeners() {
+    EventManager.registerListener(updateChunkLightEventListener)
+    EventManager.registerListener(updateLuminescentBlockChangedEventListener)
+    EventManager.registerListener(blockChangedEventListener)
+    EventManager.registerListener(chunkColumnLightUpdatedListener)
+    EventManager.registerListener(chunkLoadedEventListener)
+  }
+
+  override fun dispose() {
+    EventManager.removeListener(updateChunkLightEventListener)
+    EventManager.removeListener(updateLuminescentBlockChangedEventListener)
+    EventManager.removeListener(blockChangedEventListener)
+    EventManager.removeListener(chunkColumnLightUpdatedListener)
+    EventManager.removeListener(chunkLoadedEventListener)
+  }
+}

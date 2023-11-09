@@ -12,7 +12,6 @@ import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
@@ -123,6 +122,8 @@ class ChunkImpl(
   @GuardedBy("fboLock")
   private var fbo: FrameBuffer? = null
 
+  private val chunkListeners by lazy { ChunkListeners(this) }
+
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   override fun setBlock(
     localX: LocalCoord,
@@ -173,9 +174,9 @@ class ChunkImpl(
       return null
     }
     if (block != null) {
-      Preconditions.checkArgument(block.localX == localX)
-      Preconditions.checkArgument(block.localY == localY)
-      Preconditions.checkArgument(block.chunk === this)
+      require(block.localX == localX) { "The local coordinate of the block does not match the given localX. Block localX: ${block.localX} != localX $localX" }
+      require(block.localY == localY) { "The local coordinate of the block does not match the given localY. Block localY: ${block.localY} != localY $localY" }
+      require(block.chunk === this) { "The chunk of the block is not this chunk. block chunk: ${block.chunk}, this: $this" }
     }
     val bothAirish: Boolean
     synchronized(this) {
@@ -320,7 +321,6 @@ class ChunkImpl(
 
   override fun updateAllBlockLights() {
     doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
-
   }
 
   override fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord) {
@@ -518,6 +518,7 @@ class ChunkImpl(
     disposed = true
     allowUnload = false
     chunkBody.dispose()
+    chunkListeners.dispose()
     synchronized(fboLock) {
       fbo?.also {
         Main.inst().scheduler.executeSync { it.dispose() }
@@ -550,9 +551,7 @@ class ChunkImpl(
     initializing = false
     dirty()
     chunkBody.update()
-    // Register events
-    registerListener(updateChunkLightEventListener)
-    registerListener(blockChangedEventListener)
+    chunkListeners.registerListeners()
     Main.inst().scheduler.executeAsync(::updateAllBlockLights)
   }
 
