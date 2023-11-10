@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isNextTo
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
 
@@ -40,7 +41,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   }
 
   private val chunkColumnLightUpdatedListener: EventListener<ChunkColumnUpdatedEvent> = EventListener { event: ChunkColumnUpdatedEvent ->
-    if (event.flag and ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG != 0) {
+    if (event.flag and BLOCKS_LIGHT_FLAG != 0) {
       chunk.doUpdateLightMultipleSources(event.calculatedDiffColumn(), checkDistance = true)
     }
   }

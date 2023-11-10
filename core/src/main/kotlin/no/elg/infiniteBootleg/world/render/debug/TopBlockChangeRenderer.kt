@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
@@ -35,7 +37,8 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
     val worldX: Float,
     val worldNewY: Float,
     val worldOldY: Float,
-    val flagSetting: FlagSetting
+    val flagSetting: FlagSetting,
+    val diff: LongArray
   )
 
   data class FlagSetting(
@@ -59,12 +62,13 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
           val index = compactLoc(e.chunkX.chunkToWorld(e.localX), flag)
           val flagSetting = flagSettings[flag] ?: continue
           val chunkColumnUpdate = ChunkColumnUpdate(
-            progress = ProgressHandler(1.3f),
+            progress = ProgressHandler(2f),
             index = index,
             worldX = e.chunkX.chunkToWorld(e.localX).toFloat(),
             worldNewY = e.newTopWorldY.toFloat(),
             worldOldY = e.oldTopWorldY.toFloat(),
-            flagSetting = flagSetting
+            flagSetting = flagSetting,
+            diff = e.calculatedDiffColumn()
           )
           newlyUpdatedChunks[index] = chunkColumnUpdate
         }
@@ -76,14 +80,14 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
     if (Settings.renderTopBlockChanges && newlyUpdatedChunks.isNotEmpty()) {
       Gdx.gl.glEnable(GL30.GL_BLEND)
       shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
-        for ((progressHandler, index, worldX, worldNewY, worldOldY, flagSetting) in newlyUpdatedChunks.values) {
+        for ((progressHandler, index, worldX, worldNewY, worldOldY, flagSetting, diff) in newlyUpdatedChunks.values) {
           val progress = progressHandler.updateAndGetProgress(Gdx.graphics.deltaTime)
           if (progressHandler.isDone()) {
             newlyUpdatedChunks.remove(index)
             continue
           }
 
-          fun renderBlock(color: Color, worldY: Float) {
+          fun renderBlock(color: Color, worldX: Float, worldY: Float) {
             shapeRenderer.color.set(color)
             shapeRenderer.color.a = progress
             shapeRenderer.rect(
@@ -93,8 +97,21 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
               flagSetting.height
             )
           }
-          renderBlock(flagSetting.newColor, worldNewY)
-          renderBlock(flagSetting.oldColor, worldOldY)
+
+          val color = Color(flagSetting.oldColor)
+          val tmp = Color(flagSetting.oldColor)
+          val size = diff.size.toFloat()
+          for ((i, pos) in diff.withIndex()) {
+            val colorProgress = i / size
+            val newColorPercent = tmp.set(flagSetting.newColor).mul(1f - colorProgress)
+            color.set(flagSetting.oldColor).mul(colorProgress).add(newColorPercent)
+            val (x, y) = pos
+            renderBlock(color, x.toFloat(), y.toFloat())
+          }
+          
+          //Rendering the changed block twice will highlight the changes
+          renderBlock(flagSetting.newColor, worldX, worldNewY)
+          renderBlock(flagSetting.oldColor, worldX, worldOldY)
         }
       }
     }
@@ -106,7 +123,7 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
   }
 
   companion object {
-    val OLD_LIGHT_COLOR = Color(.1f, .1f, .9f, 1f)
+    val OLD_LIGHT_COLOR = Color(.7f, .1f, .9f, 1f)
     val NEW_LIGHT_COLOR = Color(.9f, .9f, 0.2f, 1f)
 
     val OLD_SOLID_COLOR = Color(.8f, .2f, .2f, 1f)
