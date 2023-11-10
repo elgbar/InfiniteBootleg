@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.ProgressHandler
+import no.elg.infiniteBootleg.util.blend
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.component1
@@ -99,17 +100,15 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
           }
 
           val color = Color(flagSetting.oldColor)
-          val tmp = Color(flagSetting.oldColor)
           val size = diff.size.toFloat()
           for ((i, pos) in diff.withIndex()) {
-            val colorProgress = i / size
-            val newColorPercent = tmp.set(flagSetting.newColor).mul(1f - colorProgress)
-            color.set(flagSetting.oldColor).mul(colorProgress).add(newColorPercent)
             val (x, y) = pos
+            val colorProgress = i / size
+            color.blend(flagSetting.oldColor, flagSetting.newColor, colorProgress)
             renderBlock(color, x.toFloat(), y.toFloat())
           }
-          
-          //Rendering the changed block twice will highlight the changes
+
+          // Rendering the changed block twice will highlight the changes
           renderBlock(flagSetting.newColor, worldX, worldNewY)
           renderBlock(flagSetting.oldColor, worldX, worldOldY)
         }

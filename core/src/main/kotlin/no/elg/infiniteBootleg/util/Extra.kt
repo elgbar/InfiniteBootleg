@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.util
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -157,3 +158,20 @@ inline fun <SR : ShapeRenderer> SR.safeUse(type: ShapeRenderer.ShapeType, projec
     end()
   }
 }
+
+/**
+ * Blend two colors together
+ *
+ * @param from the color to blend from, i.e. the color at progress 0
+ * @param to the color to blend to, i.e. the color at progress 1
+ * @param progress the progress between the two colors, expected to be between 0 and 1
+ *
+ * @return the same instance as this
+ */
+fun Color.blend(from: Color, to: Color, progress: Float): Color =
+  this.set(
+    from.r * progress + to.r * (1f - progress),
+    from.g * progress + to.g * (1f - progress),
+    from.b * progress + to.b * (1f - progress),
+    from.a * progress + to.a * (1f - progress)
+  )
