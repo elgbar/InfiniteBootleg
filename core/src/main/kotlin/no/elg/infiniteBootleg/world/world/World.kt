@@ -389,7 +389,7 @@ abstract class World(
       generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
       chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
       if (Main.isSingleplayer) {
-        controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true)?.also {
+        controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {
           player = it
         }
       }
@@ -1185,12 +1185,19 @@ abstract class World(
     }
 
     /**
-     * @param worldX X center (center of each block
+     * @param worldX X center
      * @param worldY Y center
      * @param radius Radius to be equal or less from center
      * @return Set of blocks within the given radius
      */
     fun getLocationsWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+
+    /**
+     * @param worldX X center
+     * @param worldY Y center
+     * @param radius Radius to be equal or less from center
+     * @return Set of blocks within the given radius
+     */
     fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
       Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
       val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)

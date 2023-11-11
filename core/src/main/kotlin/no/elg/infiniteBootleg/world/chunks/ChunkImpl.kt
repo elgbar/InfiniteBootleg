@@ -567,7 +567,14 @@ class ChunkImpl(
       }
       blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
       queryEntities { entities ->
-        this.entities += entities.mapNotNull { it.save(toAuthoritative = true) }
+        this.entities += entities.mapNotNull {
+          if (world.playersEntities.contains(it)) {
+            // do not save players
+            null
+          } else {
+            it.save(toAuthoritative = true)
+          }
+        }
         future.complete(this._build())
       }
     }
