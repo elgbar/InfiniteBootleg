@@ -880,17 +880,8 @@ abstract class World(
     }
 
   fun isChunkLoaded(compactedChunkLoc: ChunkCompactLoc): Boolean {
-    val chunk: Chunk? = getLoadedChunk(compactedChunkLoc)
+    val chunk: Chunk? = getChunk(compactedChunkLoc, load = false)
     return chunk != null && chunk.isNotDisposed
-  }
-
-  fun getLoadedChunk(compactChunkLoc: ChunkCompactLoc): Chunk? {
-    chunksLock.readLock().lock()
-    return try {
-      chunks[compactChunkLoc]
-    } finally {
-      chunksLock.readLock().unlock()
-    }
   }
 
   /**

@@ -21,7 +21,7 @@ object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).g
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val entityChunk = entity.chunk
-    val loadedChunk = world.getLoadedChunk(entity.compactChunkLoc)
+    val loadedChunk = world.getChunk(entity.compactChunkLoc, load = false)
     if (entityChunk.isDisposed) {
       if (loadedChunk == null || loadedChunk.isDisposed) {
         if (Settings.debug) {

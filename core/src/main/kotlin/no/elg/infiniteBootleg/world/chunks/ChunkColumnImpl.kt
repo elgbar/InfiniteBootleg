@@ -81,7 +81,7 @@ class ChunkColumnImpl(
 
   private fun getLoadedChunk(chunkY: ChunkCoord, chunkX: ChunkCoord = this.chunkX): Chunk? {
     val compactLoc = compactLoc(chunkX, chunkY)
-    return world.getLoadedChunk(compactLoc)
+    return world.getChunk(compactLoc, false)
   }
 
   private fun getLoadedChunkFromWorldY(worldY: WorldCoord, chunkX: ChunkCoord = this.chunkX): Chunk? = getLoadedChunk(worldY.worldToChunk(), chunkX)
