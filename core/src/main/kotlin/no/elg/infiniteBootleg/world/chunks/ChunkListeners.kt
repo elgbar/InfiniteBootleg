@@ -7,11 +7,8 @@ import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
-import no.elg.infiniteBootleg.util.findWhichInnerEdgesOfChunk
 import no.elg.infiniteBootleg.util.isNeighbor
-import no.elg.infiniteBootleg.util.isNextTo
-import no.elg.infiniteBootleg.world.Direction
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.util.isWithinRadius
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
@@ -23,20 +20,13 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   }
 
   private val updateLuminescentBlockChangedEventListener: EventListener<BlockChangedEvent> = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
-    val block = oldBlock ?: newBlock ?: return@EventListener
-    if (oldBlock?.material?.emitsLight == true || newBlock?.material?.emitsLight == true) {
-      chunk.doUpdateLightMultipleSources(longArrayOf(block.compactWorldLoc), checkDistance = true)
-    }
-  }
-
-  private val blockChangedEventListener: EventListener<BlockChangedEvent> = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
-    val block = oldBlock ?: newBlock ?: return@EventListener
-
-    if (block.isNextTo(chunk)) {
-      val changeDirection = block.findWhichInnerEdgesOfChunk()
-      if (Direction.direction(block.chunk.chunkX, block.chunk.chunkY, chunk.chunkX, chunk.chunkY) in changeDirection) {
-        chunk.queueForRendering()
-      }
+    val block = oldBlock ?: newBlock ?: return@EventListener false
+    if (block.chunk == chunk) return@EventListener false
+    if (chunk.isWithinRadius(block, 1f)) {
+      chunk.queueForRendering()
+      true
+    } else {
+      false
     }
   }
 
@@ -56,7 +46,6 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   fun registerListeners() {
     EventManager.registerListener(updateChunkLightEventListener)
     EventManager.registerListener(updateLuminescentBlockChangedEventListener)
-    EventManager.registerListener(blockChangedEventListener)
     EventManager.registerListener(chunkColumnLightUpdatedListener)
     EventManager.registerListener(chunkLoadedEventListener)
   }
@@ -64,7 +53,6 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   override fun dispose() {
     EventManager.removeListener(updateChunkLightEventListener)
     EventManager.removeListener(updateLuminescentBlockChangedEventListener)
-    EventManager.removeListener(blockChangedEventListener)
     EventManager.removeListener(chunkColumnLightUpdatedListener)
     EventManager.removeListener(chunkLoadedEventListener)
   }

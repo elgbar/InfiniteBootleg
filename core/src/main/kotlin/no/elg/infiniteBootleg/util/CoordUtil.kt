@@ -6,9 +6,14 @@ import com.badlogic.gdx.math.Vector2
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.HorizontalDirection
+import no.elg.infiniteBootleg.world.VerticalDirection
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.lang.Short.SIZE
@@ -60,7 +65,7 @@ inline fun WorldCoord.chunkOffset(): LocalCoord = this - worldToChunk().chunkToW
  * (exclusive)
  */
 @Contract(pure = true)
-inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX >= 0 && localX < Chunk.CHUNK_SIZE && localY >= 0 && localY < Chunk.CHUNK_SIZE
+inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = localX >= 0 && localX < CHUNK_SIZE && localY >= 0 && localY < CHUNK_SIZE
 
 /**
  * @param localX The chunk local x coordinate
@@ -68,14 +73,14 @@ inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = loca
  * @return If given x and y are on the edge of a chunk, while still inside the chunk
  */
 @Contract(pure = true)
-inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == Chunk.CHUNK_SIZE - 1
+inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == CHUNK_SIZE - 1
 
 inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> =
   mutableListOf<Direction>().also {
     if (localX == 0) it += Direction.WEST
-    if (localX == Chunk.CHUNK_SIZE - 1) it += Direction.EAST
+    if (localX == CHUNK_SIZE - 1) it += Direction.EAST
     if (localY == 0) it += Direction.SOUTH
-    if (localY == Chunk.CHUNK_SIZE - 1) it += Direction.NORTH
+    if (localY == CHUNK_SIZE - 1) it += Direction.NORTH
   }
 
 /**
@@ -100,6 +105,31 @@ inline fun Chunk.isCardinalNeighbor(chunk: Chunk) = abs(chunk.chunkX - this.chun
  * @return If this block is on the edge to the given chunk
  */
 inline fun Block.isNextTo(chunk: Chunk): Boolean = this.chunk.isCardinalNeighbor(chunk) && isInnerEdgeOfChunk(localX, localY)
+
+/**
+ * @return The closest point in this chunk to the given block
+ */
+fun Chunk.closestPointTo(block: Block): LocalCompactLoc {
+  val dirToBlock = this.directionTo(block.chunk)
+  val closestPointLocalX = when (dirToBlock.horizontalDirection) {
+    HorizontalDirection.WESTWARD -> 0
+    HorizontalDirection.HORIZONTALLY_ALIGNED -> block.localX
+    HorizontalDirection.EASTWARD -> CHUNK_SIZE
+  }
+  val closestPointLocalY = when (dirToBlock.verticalDirection) {
+    VerticalDirection.NORTHWARD -> CHUNK_SIZE
+    VerticalDirection.VERTICALLY_ALIGNED -> block.localY
+    VerticalDirection.SOUTHWARD -> 0
+  }
+  return compactLoc(closestPointLocalX, closestPointLocalY)
+}
+
+fun Chunk.shortestDistanceSquared(block: Block): Float {
+  val (localX, localY) = closestPointTo(block)
+  return Vector2.dst2(getWorldX(localX).toFloat(), getWorldY(localY).toFloat(), block.worldX.toFloat(), block.worldY.toFloat())
+}
+
+fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanceSquared(block) < radius * radius
 
 /**
  * @param worldX The world x coordinate
@@ -165,6 +195,8 @@ inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 
 inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunk.chunkX.chunkToWorld(localX)},${chunk.chunkY.chunkToWorld(localY)})"
+inline fun stringifyChunkToWorld(chunk: Chunk, localLoc: LocalCompactLoc): String =
+  "(${chunk.chunkX.chunkToWorld(localLoc.decompactLocX())},${chunk.chunkY.chunkToWorld(localLoc.decompactLocY())})"
 
 /**
  * @param worldCoord A part of a coordinate in the world
