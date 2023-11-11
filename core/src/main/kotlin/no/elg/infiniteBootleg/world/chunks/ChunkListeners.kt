@@ -49,6 +49,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   private val chunkLoadedEventListener: EventListener<ChunkLoadedEvent> = EventListener { (eventChunk, _): ChunkLoadedEvent ->
     if (eventChunk.isNeighbor(chunk)) {
       chunk.doUpdateLight()
+      chunk.queueForRendering()
     }
   }
 
