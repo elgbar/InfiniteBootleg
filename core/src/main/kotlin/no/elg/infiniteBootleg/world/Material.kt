@@ -120,19 +120,10 @@ enum class Material(
 
   override var textureRegion: RotatableTextureRegion? = null
 
-  /**
-   * @param impl The implementation a block of this material must have
-   * @param itemType
-   * @param hardness
-   * @param solid If objects can pass through this material
-   * @param blocksLight If this material will block light
-   * @param placable If a block of this material can be placed by a player
-   * @param transparent
-   */
   init {
-    if (Settings.client && !invisibleBlock) {
+    if (Settings.client) {
       textureRegion = this.findTextures(textureName)
-      if (textureRegion == null) {
+      if (textureRegion == null && !invisibleBlock) {
         throw NullPointerException("Failed to find a texture for $name")
       }
     } else {

@@ -60,7 +60,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
           }
         }
       } else if (element.itemType == ItemType.BLOCK && !isBreaking) {
-        val texture = element.textureRegion?.textureRegion ?: continue
+        val texture = element.textureRegion?.textureRegionOrNull ?: continue
         entity.placeableBlocks(world, mouseLocator.mouseBlockX, mouseLocator.mouseBlockY, controls.interactRadius)
           .forEach { blockWorldLoc ->
             renderPlaceableBlock(world, texture, blockWorldLoc)
