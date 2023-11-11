@@ -313,6 +313,7 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
         floatSlider("Zoom", zoomValueGetter, 0.1f, MAX_ZOOM * 5, 0.1f) {
           val clientWorld = ClientMain.inst().world ?: return@floatSlider
           clientWorld.render.camera.zoom = it
+          clientWorld.render.update()
         }
       }
       aSeparator()
