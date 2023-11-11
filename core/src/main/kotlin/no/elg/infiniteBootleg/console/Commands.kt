@@ -517,7 +517,10 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
 
   @ConsoleDoc(description = "Save the world server side")
   fun save() {
-    world?.save()
+    val world = world ?: return
+    Main.logger().info("World") { "Starting to manually save world '${world.name}'" }
+    world.save()
+    Main.logger().info("World") { "Finish manually saving '${world.name}'" }
   }
 
   @ClientsideOnly
