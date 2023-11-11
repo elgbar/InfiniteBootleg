@@ -8,7 +8,8 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.world.world.World
-import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 data class ChunkColumnUpdatedEvent(
   val chunkX: ChunkCoord,
@@ -23,8 +24,9 @@ data class ChunkColumnUpdatedEvent(
    */
   fun calculatedDiffColumn(): LongArray {
     val worldX = chunkX.chunkToWorld(localX)
-    val newTopY = newTopWorldY.toFloat()
-    val halfOffset = abs(newTopY - oldTopWorldY) / 2f
-    return World.getLocationsAABB(worldX.toFloat(), newTopY, 0f, halfOffset)
+    val minY = min(oldTopWorldY, newTopWorldY).toFloat()
+    val maxY = max(oldTopWorldY, newTopWorldY).toFloat()
+    val offset = maxY - minY
+    return World.getLocationsAABBFromCorner(worldX.toFloat(), maxY, 0f, offset)
   }
 }

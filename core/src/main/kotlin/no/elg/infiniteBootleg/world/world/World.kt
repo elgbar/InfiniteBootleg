@@ -36,6 +36,7 @@ import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.component1
@@ -973,7 +974,7 @@ abstract class World(
   fun getBlocksWithin(worldX: Float, worldY: Float, radius: Float): ObjectSet<Block> {
     Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
     val blocks = ObjectSet<Block>()
-    for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
+    for (compact in getLocationsAABBFromCenter(worldX, worldY, radius, radius)) {
       val blockWorldX = compact.decompactLocX()
       val blockWorldY = compact.decompactLocY()
       val distance = abs(Vector2.dst2(worldX, worldY, blockWorldX + HALF_BLOCK_SIZE, blockWorldY + HALF_BLOCK_SIZE))
@@ -1153,14 +1154,27 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2f
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100L
 
-    fun getLocationsAABB(worldX: Float, worldY: Float, offsetX: Float, offsetY: Float): LongArray {
+    fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): LongArray =
+      getLocationsAABBFromCenter(
+        centerWorldX = cornerWorldX.toFloat() - offsetX / 2f,
+        centerWorldY = cornerWorldY.toFloat() - offsetY / 2f,
+        offsetX = offsetX / 2f,
+        offsetY = offsetY / 2f
+      )
+
+    /**
+     * @return A square of locations within the given offset from the center
+     */
+    fun getLocationsAABBFromCenter(centerWorldX: WorldCoordNumber, centerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): LongArray {
       val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
       val blocks = GdxLongArray(true, capacity)
-      var x = MathUtils.floor(worldX - offsetX)
-      val maxX = worldX + offsetX
-      val maxY = worldY + offsetY
+      val centerWorldXF = centerWorldX.toFloat()
+      val centerWorldYF = centerWorldY.toFloat()
+      var x = MathUtils.floor(centerWorldXF - offsetX)
+      val maxX = centerWorldXF + offsetX
+      val maxY = centerWorldYF + offsetY
       while (x <= maxX) {
-        var y = MathUtils.floor(worldY - offsetY)
+        var y = MathUtils.floor(centerWorldYF - offsetY)
         while (y <= maxY) {
           blocks.add(compactLoc(x, y))
           y++
@@ -1180,7 +1194,7 @@ abstract class World(
     fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
       Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
       val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
-      for (compact in getLocationsAABB(worldX, worldY, radius, radius)) {
+      for (compact in getLocationsAABBFromCenter(worldX, worldY, radius, radius)) {
         if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
           locs.add(compact)
         }
