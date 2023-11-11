@@ -15,7 +15,7 @@ class CancellableThreadScheduler(threads: Int) {
   private val executor: ScheduledThreadPoolExecutor
 
   init {
-    val coreThreads = threads.coerceAtLeast(1)
+    val coreThreads = if (threads < 1) Runtime.getRuntime().availableProcessors() / 2 else threads
     executor = ScheduledThreadPoolExecutor(coreThreads) { runnable: Runnable, _: ThreadPoolExecutor ->
       Gdx.app.postRunnable(runnable)
     }
