@@ -22,7 +22,6 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.SOL
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.contracts.contract
 import kotlin.math.max
-import kotlin.math.min
 
 class ChunkColumnImpl(
   override val world: World,
@@ -101,26 +100,6 @@ class ChunkColumnImpl(
         EventManager.dispatchEvent(ChunkColumnUpdatedEvent(chunkX, localX, worldY, oldTop, BLOCKS_LIGHT_FLAG))
       } else if (currentTops === topWorldYSolid) {
         EventManager.dispatchEvent(ChunkColumnUpdatedEvent(chunkX, localX, worldY, oldTop, SOLID_FLAG))
-      }
-    }
-
-    val oldChunk = oldTop.worldToChunk()
-    val newChunk = worldY.worldToChunk()
-    val min = min(oldChunk, newChunk) - 1
-    val max = max(oldChunk, newChunk)
-    val worldX = chunkX.chunkToWorld(localX)
-    for (chunkY in min..max) {
-      getLoadedChunk(chunkY)?.updateAllBlockLights()
-
-      // Update chunks to the sides, if the light reaches that far
-      val leftChunkX = (worldX - World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt().worldToChunk()
-      if (leftChunkX != chunkX) {
-        getLoadedChunk(chunkY, leftChunkX)?.updateAllBlockLights()
-      }
-
-      val rightChunkX = (worldX + World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt().worldToChunk()
-      if (rightChunkX != chunkX) {
-        getLoadedChunk(chunkY, rightChunkX)?.updateAllBlockLights()
       }
     }
   }
