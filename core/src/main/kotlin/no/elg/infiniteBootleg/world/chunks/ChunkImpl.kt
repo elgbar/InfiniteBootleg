@@ -297,7 +297,10 @@ class ChunkImpl(
     queueForRendering(wasPrioritize)
   }
 
-  internal fun queueForRendering(prioritize: Boolean = this.prioritize) {
+  /**
+   * Queue this chunk to be rendered
+   */
+  override fun queueForRendering(prioritize: Boolean) {
     val render = world.render
     if (render is ClientWorldRender) {
       render.chunkRenderer.queueRendering(this, prioritize)
@@ -305,16 +308,13 @@ class ChunkImpl(
   }
 
   private fun cancelCurrentBlockLightUpdate() {
-    if (Settings.renderLight) {
-      synchronized(blockLights) {
-        // If we reached this point before the light is done recalculating then we must start again
-        val currLU = lightUpdater
-        if (currLU != null) {
-          // Note that the previous thread will dispose itself (therefor it should not be
-          // interrupted)
-          currLU.cancel(false)
-          lightUpdater = null
-        }
+    synchronized(blockLights) {
+      // If we reached this point before the light is done recalculating then we must start again
+      val currLU = lightUpdater
+      if (currLU != null) {
+        // Note that the previous thread will dispose itself (so it should not be interrupted)
+        currLU.cancel(false)
+        lightUpdater = null
       }
     }
   }
@@ -643,7 +643,7 @@ class ChunkImpl(
   }
 
   override fun toString(): String {
-    return "Chunk{world=$world, chunkX=$chunkX, chunkY=$chunkY, valid=$isValid}"
+    return "Chunk{world=${world.name}, chunkX=$chunkX, chunkY=$chunkY, valid=$isValid}"
   }
 
   override fun compareTo(o: Chunk): Int {

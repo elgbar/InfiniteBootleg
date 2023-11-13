@@ -119,7 +119,6 @@ import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs
@@ -195,7 +194,7 @@ abstract class World(
   var spawn: Long
 
   @JvmField
-  val chunksLock: ReadWriteLock = ReentrantReadWriteLock()
+  val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 
   private var transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient
 

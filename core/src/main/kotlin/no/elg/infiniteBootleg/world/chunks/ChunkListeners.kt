@@ -20,13 +20,10 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   }
 
   private val updateLuminescentBlockChangedEventListener: EventListener<BlockChangedEvent> = EventListener { (oldBlock, newBlock): BlockChangedEvent ->
-    val block = oldBlock ?: newBlock ?: return@EventListener false
-    if (block.chunk == chunk) return@EventListener false
+    val block = oldBlock ?: newBlock ?: return@EventListener
+    if (block.chunk == chunk) return@EventListener
     if (chunk.isWithinRadius(block, 1f)) {
-      chunk.queueForRendering()
-      true
-    } else {
-      false
+      chunk.queueForRendering(false)
     }
   }
 
@@ -39,7 +36,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   private val chunkLoadedEventListener: EventListener<ChunkLoadedEvent> = EventListener { (eventChunk, _): ChunkLoadedEvent ->
     if (eventChunk.isNeighbor(chunk)) {
       chunk.doUpdateLight()
-      chunk.queueForRendering()
+      chunk.queueForRendering(false)
     }
   }
 

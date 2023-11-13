@@ -57,6 +57,33 @@ class EntityMarkerBlock(
 
   override val texture: RotatableTextureRegion? = if (debugEntityMarkerBlocks) Main.inst().assets.handTexture else null
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is EntityMarkerBlock) return false
+
+    if (chunk != other.chunk) return false
+    if (world != other.world) return false
+    if (localX != other.localX) return false
+    if (localY != other.localY) return false
+    if (entity != other.entity) return false
+    if (isDisposed != other.isDisposed) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = chunk.hashCode()
+    result = 31 * result + world.hashCode()
+    result = 31 * result + localX
+    result = 31 * result + localY
+    result = 31 * result + entity.hashCode()
+    return result
+  }
+
+  override fun toString(): String {
+    return "EntityMarkerBlock(chunk=$chunk, localX=$localX, localY=$localY, entity=$entity, material=$material)"
+  }
+
   companion object {
     /**
      * Replace a block with a [EntityMarkerBlock].
