@@ -36,7 +36,7 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import java.math.BigDecimal
-import kotlin.concurrent.withLock
+import kotlin.concurrent.read
 
 class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow) {
 
@@ -238,12 +238,22 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
       section {
         toggleableDebugButton(
           "Recalculate lights",
-          "Re-render all lights in the world.",
+          "Recalulate all lights in the world and re-render the chunks",
           "toggle-menu-button",
           { false }
         ) {
-          world.chunksLock.writeLock().withLock {
+          world.chunksLock.read {
             world.chunks.values().forEach(Chunk::updateAllBlockLights)
+          }
+        }
+        toggleableDebugButton(
+          "Render all chunks",
+          "Re-render the texture of all loaded chunks in the world",
+          "toggle-menu-button",
+          { false }
+        ) {
+          world.chunksLock.read {
+            world.chunks.values().forEach { it.queueForRendering(false) }
           }
         }
       }
