@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy
+import kotlin.concurrent.write
 
 internal class WorldTickee(private val world: World) : Ticking {
 
@@ -24,8 +25,7 @@ internal class WorldTickee(private val world: World) : Ticking {
     // tick all chunks and blocks in chunks
     val tick = world.worldTicker.tickId
     chunksToTick.clear()
-    world.chunksLock.writeLock().lock()
-    try {
+    world.chunksLock.write {
       chunkIterator.reset()
       while (chunkIterator.hasNext()) {
         val chunk: Chunk? = chunkIterator.next().value
@@ -47,8 +47,6 @@ internal class WorldTickee(private val world: World) : Ticking {
         }
         chunksToTick += chunk
       }
-    } finally {
-      world.chunksLock.writeLock().unlock()
     }
   }
 

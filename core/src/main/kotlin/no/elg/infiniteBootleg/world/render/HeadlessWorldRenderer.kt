@@ -12,8 +12,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.world.ServerWorld
-import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 /**
  * @author Elg
@@ -21,8 +22,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   private val viewingChunks: ObjectMap<String, ServerClientChunksInView> = OrderedMap()
   private val lock = ReentrantReadWriteLock()
-  private val readLock: Lock = lock.readLock()
-  private val writeLock: Lock = lock.writeLock()
+
   private val entities: ImmutableArray<Entity> = world.engine.getEntitiesFor(playerFamily)
 
   @Synchronized
@@ -39,8 +39,7 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   override fun dispose() {}
   override fun resize(width: Int, height: Int) {}
   override fun update() {
-    readLock.lock()
-    try {
+    lock.read {
       for (entity in entities) {
         val chunksInView = viewingChunks.get(entity.id)
         if (chunksInView != null) {
@@ -48,24 +47,19 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
           chunksInView.setCenter(x.worldToChunk(), y.worldToChunk())
         }
       }
-    } finally {
-      readLock.unlock()
     }
   }
 
   override fun isOutOfView(chunk: Chunk): Boolean = isOutOfView(chunk.chunkX, chunk.chunkY)
 
   override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
-    readLock.lock()
-    return try {
+    return lock.read {
       for (inView in viewingChunks.values()) {
         if (inView.isInView(chunkX, chunkY)) {
           return false
         }
       }
       true
-    } finally {
-      readLock.unlock()
     }
   }
 
@@ -75,29 +69,20 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     get() = viewingChunks.values().flatMap { it.iterator().asSequence() }.iterator()
 
   fun addClient(uuid: String, civ: ServerClientChunksInView) {
-    writeLock.lock()
-    try {
+    lock.write {
       viewingChunks.put(uuid, civ)
-    } finally {
-      writeLock.unlock()
     }
   }
 
   fun removeClient(uuid: String) {
-    writeLock.lock()
-    try {
+    lock.write {
       viewingChunks.remove(uuid)
-    } finally {
-      writeLock.unlock()
     }
   }
 
   fun getClient(uuid: String): ServerClientChunksInView? {
-    readLock.lock()
-    return try {
+    return lock.read {
       viewingChunks.get(uuid)
-    } finally {
-      readLock.unlock()
     }
   }
 }

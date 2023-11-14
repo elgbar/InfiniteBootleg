@@ -121,6 +121,8 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.concurrent.GuardedBy
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 import kotlin.math.abs
 
 /**
@@ -357,8 +359,7 @@ abstract class World(
     }
     val worldFolder = worldFolder ?: return
     Main.logger().debug("World") { "Starting to save world '$name'" }
-    chunksLock.writeLock().lock()
-    try {
+    chunksLock.write {
       val chunkLoader = chunkLoader
       if (chunkLoader is FullChunkLoader) {
         for (chunk in chunks.values()) {
@@ -372,8 +373,6 @@ abstract class World(
         worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"))
       }
       worldInfoFile.writeBytes(builder.toByteArray(), false)
-    } finally {
-      chunksLock.writeLock().unlock()
     }
     Main.logger().debug("World") { "Done saving world '$name'" }
   }
@@ -447,11 +446,8 @@ abstract class World(
 
   fun updateChunk(chunk: Chunk) {
     Preconditions.checkState(chunk.isValid)
-    chunksLock.writeLock().lock()
-    val old: Chunk? = try {
+    val old: Chunk? = chunksLock.write {
       chunks.put(chunk.compactLocation, chunk)
-    } finally {
-      chunksLock.writeLock().unlock()
     }
     old?.dispose()
   }
@@ -521,26 +517,26 @@ abstract class World(
       Main.logger().debug("World", "Ticker paused will not load chunk")
       return null
     }
-    var old: Chunk? = null
-    chunksLock.writeLock().lock()
-    return try {
+    val old: Chunk?
+    return chunksLock.write {
       if (returnIfLoaded) {
         val current: Chunk? = chunks[chunkLoc]
         if (current != null) {
           if (current.isValid) {
-            return current
-          }
-          if (current.isNotDisposed) {
+            old = null
+            return@write current
+          } else if (current.isNotDisposed) {
+            old = null
             // If the current chunk is not valid, but not disposed either, so it should be loading
             // We don't want to load a new chunk when the current one is finishing its loading
-            return null
+            return@write null
           }
         }
       }
 
       val loadedChunk = chunkLoader.fetchChunk(chunkLoc)
       val chunk = loadedChunk.chunk
-      if (chunk == null) {
+      return@write if (chunk == null) {
         // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
         // date, and the loading should be re-tried
         old = chunks.remove(chunkLoc)
@@ -551,8 +547,7 @@ abstract class World(
         dispatchEvent(ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated))
         chunk
       }
-    } finally {
-      chunksLock.writeLock().unlock()
+    }.also {
       old?.dispose()
     }
   }
@@ -826,8 +821,7 @@ abstract class World(
         worldTicker.pause()
       }
 
-      chunksLock.writeLock().lock()
-      try {
+      chunksLock.write {
         for (chunk in chunks.values()) {
           if (chunk != null && !unloadChunk(chunk, force = true, save = false)) {
             Main.logger().warn("Failed to unload chunk ${stringifyCompactLoc(chunk)}")
@@ -837,8 +831,6 @@ abstract class World(
         if (loadedChunks != 0) {
           Main.logger().warn("Failed to clear chunks during reload, there are $loadedChunks loaded chunks")
         }
-      } finally {
-        chunksLock.writeLock().unlock()
       }
       engine.removeAllEntities()
       postBox2dRunnable {
@@ -864,8 +856,7 @@ abstract class World(
    */
   val loadedChunks: Array<Chunk>
     get() {
-      chunksLock.readLock().lock()
-      return try {
+      return chunksLock.read {
         val loadedChunks = Array<Chunk>(true, chunks.size, Chunk::class.java)
         for (chunk in chunks.values()) {
           if (chunk != null && chunk.isNotDisposed) {
@@ -873,8 +864,6 @@ abstract class World(
           }
         }
         loadedChunks
-      } finally {
-        chunksLock.readLock().unlock()
       }
     }
 
@@ -897,14 +886,12 @@ abstract class World(
         Main.logger().warn("Tried to unload chunk from different world")
         return false
       }
-      chunksLock.writeLock().lock()
-      val removedChunk: Chunk? = try {
+
+      val removedChunk: Chunk? = chunksLock.write {
         if (save && chunkLoader is FullChunkLoader) {
           chunkLoader.save(chunk)
         }
         chunks.remove(chunk.compactLocation)
-      } finally {
-        chunksLock.writeLock().unlock()
       }
       chunk.dispose()
       if (removedChunk != null && chunk !== removedChunk) {
@@ -1117,14 +1104,11 @@ abstract class World(
     worldTicker.dispose()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
 
-    chunksLock.writeLock().lock()
-    try {
+    chunksLock.write {
       for (chunk in chunks.values()) {
         chunk.dispose()
       }
       chunks.clear()
-    } finally {
-      chunksLock.writeLock().unlock()
     }
     if (Main.isAuthoritative && !transientWorld) {
       val worldFolder = worldFolder
