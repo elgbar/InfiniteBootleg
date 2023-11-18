@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.assets
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
+import com.badlogic.gdx.graphics.Texture.TextureFilter.MipMap
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
@@ -54,17 +55,18 @@ class InfAssetsImpl : InfAssets {
 
   override lateinit var breakingBlockTextures: Array<RotatableTextureRegion>
 
-  fun getInitializer(pts: Int): BitmapFont {
+  private fun createFont(pts: Int): BitmapFont {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()
     parameter.size = pts * SCALE
 
     parameter.minFilter = Linear
+    parameter.magFilter = MipMap
     return generator.generateFont(parameter)
   }
 
-  override val font20pt: BitmapFont by lazy { getInitializer(20) }
-  override val font10pt: BitmapFont by lazy { getInitializer(10) }
+  override val font20pt: BitmapFont by lazy { createFont(20) }
+  override val font10pt: BitmapFont by lazy { createFont(10) }
 
   override fun loadAssets() {
     safeTextureAtlas = SafeTextureAtlas(TEXTURES_BLOCK_FILE)
