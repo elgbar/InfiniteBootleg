@@ -69,7 +69,7 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
             worldNewY = e.newTopWorldY.toFloat(),
             worldOldY = e.oldTopWorldY.toFloat(),
             flagSetting = flagSetting,
-            diff = e.calculatedDiffColumn()
+            diff = e.calculatedDiffColumn
           )
           newlyUpdatedChunks[index] = chunkColumnUpdate
         }

@@ -35,6 +35,7 @@ import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCompactLoc
+import no.elg.infiniteBootleg.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.chunkOffset
@@ -1129,7 +1130,7 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2f
     const val TRY_LOCK_CHUNKS_DURATION_MS = 100L
 
-    fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): LongArray =
+    fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): WorldCompactLocArray =
       getLocationsAABBFromCenter(
         centerWorldX = cornerWorldX.toFloat() - offsetX / 2f,
         centerWorldY = cornerWorldY.toFloat() - offsetY / 2f,
@@ -1140,7 +1141,7 @@ abstract class World(
     /**
      * @return A square of locations within the given offset from the center
      */
-    fun getLocationsAABBFromCenter(centerWorldX: WorldCoordNumber, centerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): LongArray {
+    fun getLocationsAABBFromCenter(centerWorldX: WorldCoordNumber, centerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): WorldCompactLocArray {
       val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
       val blocks = GdxLongArray(true, capacity)
       val centerWorldXF = centerWorldX.toFloat()
