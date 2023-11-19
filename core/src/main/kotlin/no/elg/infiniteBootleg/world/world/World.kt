@@ -685,7 +685,7 @@ abstract class World(
   }
 
   private inline fun actionOnBlocks(
-    locations: Iterable<Long>,
+    locations: Iterable<WorldCompactLoc>,
     loadChunk: Boolean = true,
     action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> Unit
   ): Iterable<Chunk> {
@@ -700,7 +700,8 @@ abstract class World(
 
   fun getBlocks(locs: GdxLongArray, loadChunk: Boolean = true): Iterable<Block> = getBlocks(locs.toArray(), loadChunk)
   fun getBlocks(locs: LongArray, loadChunk: Boolean = true): Iterable<Block> = locs.map { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }.filterNotNullTo(mutableSetOf())
-  fun getBlocks(locs: Iterable<Long>, loadChunk: Boolean = true): Iterable<Block> = locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
+  fun getBlocks(locs: Iterable<WorldCompactLoc>, loadChunk: Boolean = true): Iterable<Block> =
+    locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
 
   fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false) {
     val blockChunks = ObjectSet<Chunk>()
@@ -714,7 +715,7 @@ abstract class World(
   }
 
   @JvmName("removeLocs")
-  fun removeBlocks(blocks: Iterable<Long>, prioritize: Boolean = false) {
+  fun removeBlocks(blocks: Iterable<WorldCompactLoc>, prioritize: Boolean = false) {
     val blockChunks = actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks
       chunk.removeBlock(localX, localY, updateTexture = false)
