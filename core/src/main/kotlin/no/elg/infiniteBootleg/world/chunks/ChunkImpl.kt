@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkToWorld
@@ -44,7 +45,6 @@ import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ForkJoinTask
-import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.atomic.AtomicInteger
 import javax.annotation.concurrent.GuardedBy
 
@@ -61,9 +61,6 @@ class ChunkImpl(
 
   override val chunkBody: ChunkBody = ChunkBody(this)
 
-  @Volatile
-  @GuardedBy("field")
-  private var lightUpdater: ScheduledFuture<*>? = null
   private val tasks = ObjectSet<ForkJoinTask<*>>(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE, 0.99f)
 
   /**
@@ -179,7 +176,7 @@ class ChunkImpl(
       require(block.chunk === this) { "The chunk of the block is not this chunk. block chunk: ${block.chunk}, this: $this" }
     }
     val bothAirish: Boolean
-    synchronized(this) {
+    val currBlock = synchronized(this) {
       val currBlock = getRawBlock(localX, localY)
       if (currBlock === block) {
         return currBlock
@@ -191,27 +188,33 @@ class ChunkImpl(
         block?.dispose()
         return currBlock
       }
-      currBlock?.dispose()
       blocks[localX][localY] = block
-      if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
-        blockLightUpdatedAt(localX, localY)
-      }
-      modified = true
-      if (updateTexture) {
-        dirty()
-        this.prioritize = this.prioritize or prioritize // do not remove prioritization if chunk already is prioritized
-      }
-      if (!bothAirish) {
-        if (currBlock != null) {
-          chunkBody.removeBlock(currBlock)
-        }
-        if (block != null) {
-          chunkBody.addBlock(block, null)
-        }
-        Main.inst().scheduler.executeAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
-      }
-      dispatchEvent(BlockChangedEvent(currBlock, block))
+      currBlock
     }
+    modified = true
+    if (updateTexture) {
+      dirty()
+      this.prioritize = this.prioritize or prioritize // do not remove prioritization if chunk already is prioritized
+    }
+    if (!bothAirish) {
+      if (currBlock != null) {
+        chunkBody.removeBlock(currBlock)
+      }
+      if (block != null) {
+        chunkBody.addBlock(block, null)
+      }
+      Main.inst().scheduler.executeAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
+    }
+
+    dispatchEvent(BlockChangedEvent(currBlock, block))
+    if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
+      if (Settings.renderLight) {
+        val originWorldX = getWorldX(localX)
+        val originWorldY = getWorldY(localY)
+        dispatchEvent(ChunkLightUpdatingEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
+      }
+    }
+    currBlock?.dispose()
     val worldX = getWorldX(localX)
     val worldY = getWorldY(localY)
     if (sendUpdatePacket && isValid && !bothAirish) {
@@ -307,71 +310,30 @@ class ChunkImpl(
     }
   }
 
-  private fun cancelCurrentBlockLightUpdate() {
-    synchronized(blockLights) {
-      // If we reached this point before the light is done recalculating then we must start again
-      val currLU = lightUpdater
-      if (currLU != null) {
-        // Note that the previous thread will dispose itself (so it should not be interrupted)
-        currLU.cancel(false)
-        lightUpdater = null
-      }
-    }
-  }
-
   override fun updateAllBlockLights() {
     doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
   }
 
-  override fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord) {
-    if (Settings.renderLight) {
-      val originWorldX = getWorldX(localX)
-      val originWorldY = getWorldY(localY)
-      dispatchEvent(ChunkLightUpdatingEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
-      doUpdateLight(originWorldX, originWorldY, checkDistance = true)
-    }
-  }
-
-  /**
-   * Update the light of the chunk
-   */
-  internal fun doUpdateLight(originWorldX: WorldCoord = 0, originWorldY: WorldCoord = 0, checkDistance: Boolean = false) {
-    val sources = if (checkDistance) longArrayOf(compactLoc(originWorldX, originWorldY)) else NOT_CHECKING_DISTANCE
-    doUpdateLightMultipleSources(sources, checkDistance)
-  }
-
-  private fun isNoneWithinDistance(sources: LongArray, worldX: WorldCoord, worldY: WorldCoord): Boolean =
+  private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean =
     sources.none { (srcX: WorldCoord, srcY: WorldCoord) ->
       val dstFromChange2blk = Vector2.dst2(worldX.toFloat(), worldY.toFloat(), srcX.toFloat(), srcY.toFloat())
       dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     }
 
-  internal fun doUpdateLightMultipleSources(sources: LongArray, checkDistance: Boolean) {
+  internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      synchronized(blockLights) {
-        // If we reached this point before the light is done recalculating then we must start again
-        cancelCurrentBlockLightUpdate()
-        val updateId = currentUpdateId.incrementAndGet()
-
-        // An update can only be cancelled if we do not check the distance
-        fun isLightUpdateCancelled(updateId: Int): Boolean = !checkDistance && updateId != currentUpdateId.get()
-
-        lightUpdater = Main.inst().scheduler.executeAsync {
-          synchronized(tasks) {
-            outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-              for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-                if (isLightUpdateCancelled(updateId)) {
-                  return@executeAsync
-                }
-                if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
-                  continue
-                }
-                blockLights[localX][localY].recalculateLighting(updateId)
+      Main.inst().scheduler.executeAsync {
+        synchronized(tasks) {
+          outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+            for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+              if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+                continue
               }
+              blockLights[localX][localY].recalculateLighting(0)
             }
           }
-          queueForRendering(false)
         }
+        queueForRendering(false)
       }
     }
   }
@@ -654,7 +616,7 @@ class ChunkImpl(
   companion object {
     val AIR_BLOCK_PROTO_BUILDER = Block.save(Material.AIR)
     val AIR_BLOCK_PROTO = AIR_BLOCK_PROTO_BUILDER.build()
-    val NOT_CHECKING_DISTANCE = LongArray(0)
+    val NOT_CHECKING_DISTANCE = WorldCompactLocArray(0)
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
       return blockA.materialOrAir() === Material.AIR && blockB.materialOrAir() === Material.AIR

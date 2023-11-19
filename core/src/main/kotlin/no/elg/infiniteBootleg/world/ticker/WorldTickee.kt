@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.LongMap
-import ktx.collections.GdxArray
-import ktx.collections.plusAssign
 import no.elg.infiniteBootleg.api.Ticking
+import no.elg.infiniteBootleg.events.WorldTickedEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
@@ -14,17 +14,14 @@ internal class WorldTickee(private val world: World) : Ticking {
 
   @GuardedBy("world.chunksLock")
   private val chunkIterator: LongMap.Entries<Chunk> = LongMap.Entries(world.chunks)
-
-  private val chunksToTick = GdxArray<Chunk>(false, 64)
+  private val worldTickedEvent = WorldTickedEvent(world)
 
   @Synchronized
   override fun tick() {
-    val wr = world.render
     val chunkUnloadTime = world.worldTicker.tps * 5
 
     // tick all chunks and blocks in chunks
     val tick = world.worldTicker.tickId
-    chunksToTick.clear()
     world.chunksLock.write {
       chunkIterator.reset()
       while (chunkIterator.hasNext()) {
@@ -40,14 +37,14 @@ internal class WorldTickee(private val world: World) : Ticking {
           chunkIterator.remove()
           continue
         }
-        if (chunk.isAllowedToUnload && wr.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime) {
+        if (chunk.isAllowedToUnload && world.render.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime) {
           chunkIterator.remove()
           world.unloadChunk(chunk, force = false, save = true)
           continue
         }
-        chunksToTick += chunk
       }
     }
+    dispatchEvent(worldTickedEvent)
   }
 
   override fun tickRare() {

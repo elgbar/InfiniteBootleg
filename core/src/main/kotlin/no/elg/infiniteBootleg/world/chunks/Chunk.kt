@@ -165,11 +165,6 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   fun hasTextureRegion(): Boolean
   fun queueForRendering(prioritize: Boolean)
 
-  /**
-   * Block light was updated in this chunk at the given local coordinates
-   */
-  fun blockLightUpdatedAt(localX: LocalCoord, localY: LocalCoord)
-
   /** Update the light of the chunk  */
   fun updateAllBlockLights()
 
