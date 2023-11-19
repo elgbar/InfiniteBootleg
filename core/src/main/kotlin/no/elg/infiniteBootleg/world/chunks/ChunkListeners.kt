@@ -6,11 +6,11 @@ import no.elg.infiniteBootleg.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.events.WorldTickedEvent
 import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCompactLocArray
-import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isWithinRadius
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
@@ -34,9 +34,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
     }
   }
 
-  private val updateChunkLightEventListener: EventListener<ChunkLightUpdatingEvent> = EventListener { (eventChunk, originLocalX, originLocalY): ChunkLightUpdatingEvent ->
+  private val updateChunkLightEventListener: EventListener<ChunkLightChangedEvent> = EventListener { (eventChunk, originLocalX, originLocalY): ChunkLightChangedEvent ->
     if (chunk.isNeighbor(eventChunk) || chunk == eventChunk) {
-      val compactLoc = compactLoc(eventChunk.getWorldX(originLocalX), eventChunk.getWorldY(originLocalY))
+      val compactLoc = compactChunkToWorld(eventChunk, originLocalX, originLocalY)
       synchronized(lightLocs) {
         lightLocs += compactLoc
       }

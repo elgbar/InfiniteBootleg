@@ -12,7 +12,7 @@ import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.events.chunks.ChunkLightUpdatingEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -211,7 +211,7 @@ class ChunkImpl(
       if (Settings.renderLight) {
         val originWorldX = getWorldX(localX)
         val originWorldY = getWorldY(localY)
-        dispatchEvent(ChunkLightUpdatingEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
+        dispatchEvent(ChunkLightChangedEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
       }
     }
     currBlock?.dispose()
