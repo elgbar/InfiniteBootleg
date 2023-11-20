@@ -126,10 +126,10 @@ fun Chunk.closestPointTo(block: Block): LocalCompactLoc {
 
 fun Chunk.shortestDistanceSquared(block: Block): Float {
   val (localX, localY) = closestPointTo(block)
-  return Vector2.dst2(getWorldX(localX).toFloat(), getWorldY(localY).toFloat(), block.worldX.toFloat(), block.worldY.toFloat())
+  return Vector2.dst2(getWorldX(localX) + 0.5f, getWorldY(localY) + 0.5f, block.worldX + 0.5f, block.worldY + 0.5f)
 }
 
-fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanceSquared(block) < radius * radius
+fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanceSquared(block) <= radius * radius
 
 /**
  * @param worldX The world x coordinate
@@ -140,16 +140,13 @@ fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanc
 inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): ChunkCompactLoc = compactLoc(worldX.worldToChunk(), worldY.worldToChunk())
 
 /**
- * Store two integers inside a single long
+ * An int have 32 bits and long 64, we can store two ints inside a long
  *
  * @param x The x coordinate of the location
  * @param y The y coordinate of the location
  * @return A long containing both the x and y int
  */
-
-inline fun compactLoc(x: Int, y: Int): Long =
-  // as an int have 32 bits and long 64, we can store two ints inside a long
-  x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
+inline fun compactLoc(x: Int, y: Int): Long = x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
 
 /**
  * @param this@decompactLocX A long created by [.compactLoc]
