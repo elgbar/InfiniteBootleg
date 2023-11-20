@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.google.protobuf.InvalidProtocolBufferException
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -22,7 +23,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
    * @param chunkLoc The coordinates of the chunk (in chunk view)
    * @return The loaded chunk or null if something went wrong
    */
-  abstract fun fetchChunk(chunkLoc: Long): LoadedChunk
+  abstract fun fetchChunk(chunkLoc: ChunkCompactLoc): LoadedChunk
 
   open fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
     val chunkPosition = protoChunk.position
