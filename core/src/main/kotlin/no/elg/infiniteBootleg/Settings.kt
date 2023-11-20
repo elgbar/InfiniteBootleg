@@ -109,7 +109,7 @@ object Settings {
 
   var host = ""
   var stageDebug = false
-  var viewDistance = 4 // ish max chunks when fully zoomed out
+  var viewDistance = 6 // ish max chunks when fully zoomed out
 
   var vsync = true
     set(value) {
