@@ -323,6 +323,7 @@ class ChunkImpl(
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
       Main.inst().scheduler.executeAsync {
+        var anyLightRecalucated = false
         synchronized(tasks) {
           outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
             for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
@@ -330,10 +331,13 @@ class ChunkImpl(
                 continue
               }
               blockLights[localX][localY].recalculateLighting(0)
+              anyLightRecalucated = true
             }
           }
         }
-        queueForRendering(false)
+        if (anyLightRecalucated) {
+          queueForRendering(false)
+        }
       }
     }
   }
