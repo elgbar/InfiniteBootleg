@@ -445,12 +445,16 @@ abstract class World(
     return getChunk(chunkX, chunkY, load)
   }
 
-  fun updateChunk(chunk: Chunk) {
+  fun updateChunk(chunk: Chunk, newlyGenerated: Boolean) {
     Preconditions.checkState(chunk.isValid)
     val old: Chunk? = chunksLock.write {
       chunks.put(chunk.compactLocation, chunk)
     }
-    old?.dispose()
+    if (old != null) {
+      old.dispose()
+    } else {
+      dispatchEvent(ChunkLoadedEvent(chunk, newlyGenerated))
+    }
   }
 
   fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? {
@@ -518,16 +522,13 @@ abstract class World(
       Main.logger().debug("World", "Ticker paused will not load chunk")
       return null
     }
-    val old: Chunk?
     return chunksLock.write {
       if (returnIfLoaded) {
         val current: Chunk? = chunks[chunkLoc]
         if (current != null) {
           if (current.isValid) {
-            old = null
             return@write current
           } else if (current.isNotDisposed) {
-            old = null
             // If the current chunk is not valid, but not disposed either, so it should be loading
             // We don't want to load a new chunk when the current one is finishing its loading
             return@write null
@@ -540,16 +541,11 @@ abstract class World(
       return@write if (chunk == null) {
         // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
         // date, and the loading should be re-tried
-        old = chunks.remove(chunkLoc)
         null
       } else {
-        Preconditions.checkState(chunk.isValid)
-        old = chunks.put(chunkLoc, chunk)
-        dispatchEvent(ChunkLoadedEvent(chunk, loadedChunk.isNewlyGenerated))
+        updateChunk(chunk, loadedChunk.isNewlyGenerated)
         chunk
       }
-    }.also {
-      old?.dispose()
     }
   }
 
