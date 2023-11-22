@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.assets
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import no.elg.infiniteBootleg.main.Main
@@ -32,6 +33,7 @@ interface InfAssets {
   val visibleAirTexture: RotatableTextureRegion
 
   val breakingBlockTextures: Array<RotatableTextureRegion>
+  val playerIdleTextures: Animation<RotatableTextureRegion>
 
   /**
    * Load all assets

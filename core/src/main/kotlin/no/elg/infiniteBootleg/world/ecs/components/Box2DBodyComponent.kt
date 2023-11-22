@@ -33,7 +33,7 @@ import no.elg.infiniteBootleg.world.ecs.creation.createPlayerBodyComponent
  */
 class Box2DBodyComponent(
   body: Body,
-  private val type: ProtoWorld.Entity.Box2D.BodyType,
+  val type: ProtoWorld.Entity.Box2D.BodyType,
   private val box2dWidth: Float,
   private val box2dHeight: Float
 ) : EntitySavableComponent, CheckableDisposable {

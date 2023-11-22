@@ -1,112 +1,121 @@
 textures.png
-	size: 156, 268
+	size: 310, 138
 	repeat: xy
 birch_leaves-air-north-air-east-birch_leaves-south-birch_leaves-west
-	bounds: 69, 81, 32, 32
+	bounds: 135, 37, 32, 32
 birch_leaves-air-north-air-west-birch_leaves-south-birch_leaves-east
-	bounds: 1, 103, 32, 32
+	bounds: 67, 105, 32, 32
 birch_leaves-air-south-air-east-birch_leaves-north-birch_leaves-west
-	bounds: 35, 69, 32, 32
+	bounds: 203, 105, 32, 32
 birch_leaves-air-south-air-west-birch_leaves-north-birch_leaves-east
-	bounds: 1, 69, 32, 32
+	bounds: 169, 71, 32, 32
 birch_leaves_rotatable
-	bounds: 35, 35, 32, 32
+	bounds: 237, 105, 32, 32
 birch_trunk
-	bounds: 103, 81, 16, 16
+	bounds: 179, 19, 16, 16
 birch_trunk-birch_leaves-east
-	bounds: 101, 201, 32, 32
+	bounds: 135, 71, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west
-	bounds: 35, 103, 32, 32
+	bounds: 67, 71, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west-birch_leaves-north
-	bounds: 67, 201, 32, 32
+	bounds: 67, 37, 32, 32
 birch_trunk-birch_leaves-east-birch_trunk-west
-	bounds: 67, 235, 32, 32
+	bounds: 101, 105, 32, 32
 birch_trunk-birch_leaves-west
-	bounds: 101, 167, 32, 32
+	bounds: 169, 105, 32, 32
 birch_trunk-birch_leaves-west-birch_trunk-east
-	bounds: 69, 115, 32, 32
+	bounds: 135, 105, 32, 32
 birch_trunk-birch_trunk-east
-	bounds: 1, 35, 32, 32
+	bounds: 203, 71, 32, 32
 birch_trunk-birch_trunk-east-birch_leaves-north-birch_leaves-west
-	bounds: 101, 235, 32, 32
+	bounds: 101, 37, 32, 32
 birch_trunk-birch_trunk-east-birch_trunk-west
-	bounds: 67, 167, 32, 32
+	bounds: 101, 71, 32, 32
 birch_trunk-birch_trunk-west
-	bounds: 69, 13, 32, 32
+	bounds: 203, 37, 32, 32
 birch_trunk-birch_trunk-west-birch_leaves-north-birch_leaves-east
-	bounds: 69, 47, 32, 32
-break
-	index: 4
-	bounds: 67, 149, 16, 16
+	bounds: 169, 37, 32, 32
 break
 	index: 9
-	bounds: 103, 117, 16, 16
+	bounds: 125, 19, 16, 16
 break
 	index: 1
-	bounds: 103, 99, 16, 16
+	bounds: 143, 19, 16, 16
 break
 	index: 6
-	bounds: 103, 9, 16, 16
+	bounds: 255, 87, 16, 16
 break
 	index: 3
-	bounds: 135, 233, 16, 16
+	bounds: 273, 89, 16, 16
 break
 	index: 8
-	bounds: 135, 215, 16, 16
+	bounds: 273, 71, 16, 16
 break
 	index: 5
-	bounds: 121, 63, 16, 16
+	bounds: 107, 1, 16, 16
 break
 	index: 2
-	bounds: 121, 9, 16, 16
+	bounds: 197, 1, 16, 16
 break
 	index: 7
-	bounds: 139, 77, 16, 16
+	bounds: 233, 1, 16, 16
+break
+	index: 4
+	bounds: 291, 35, 16, 16
 breaking_block
-	bounds: 139, 41, 16, 16
+	bounds: 273, 35, 16, 16
 brick
-	bounds: 121, 99, 16, 16
+	bounds: 291, 71, 16, 16
 dirt_rotatable
-	bounds: 85, 149, 16, 16
+	bounds: 107, 19, 16, 16
 door
-	bounds: 135, 197, 16, 16
+	bounds: 291, 89, 16, 16
 door_closed
-	bounds: 1, 1, 16, 32
+	bounds: 237, 37, 16, 32
 door_open
-	bounds: 19, 1, 16, 32
+	bounds: 237, 71, 16, 32
 glass
-	bounds: 135, 251, 16, 16
+	bounds: 255, 51, 16, 16
 grass-dirt-east
-	bounds: 139, 131, 16, 16
+	bounds: 161, 1, 16, 16
 grass-dirt-south
-	bounds: 121, 45, 16, 16
+	bounds: 125, 1, 16, 16
 grass-dirt-south-dirt-east
-	bounds: 121, 27, 16, 16
+	bounds: 143, 1, 16, 16
 grass-dirt-south-dirt-west
-	bounds: 139, 113, 16, 16
+	bounds: 179, 1, 16, 16
 grass-dirt-south-dirt-west-dirt-east
-	bounds: 103, 27, 16, 16
+	bounds: 233, 19, 16, 16
 grass-dirt-west
-	bounds: 139, 95, 16, 16
+	bounds: 215, 1, 16, 16
 grass_rotatable
-	bounds: 135, 179, 16, 16
+	bounds: 273, 53, 16, 16
 hand
-	bounds: 1, 203, 64, 64
+	bounds: 1, 73, 64, 64
 pickaxe
-	bounds: 1, 137, 64, 64
+	bounds: 1, 7, 64, 64
 player
-	bounds: 37, 3, 18, 30
+	bounds: 271, 107, 18, 30
+player_idle
+	index: 1
+	bounds: 271, 107, 18, 30
+player_idle
+	index: 3
+	bounds: 67, 5, 18, 30
+player_idle
+	index: 2
+	bounds: 87, 5, 18, 30
 player_old
-	bounds: 103, 135, 18, 30
+	bounds: 291, 107, 18, 30
 sand_rotatable
-	bounds: 121, 81, 16, 16
+	bounds: 291, 53, 16, 16
 sandstone_rotatable
-	bounds: 139, 59, 16, 16
+	bounds: 255, 33, 16, 16
 stone_rotatable
-	bounds: 123, 149, 16, 16
+	bounds: 255, 69, 16, 16
 tnt
-	bounds: 103, 63, 16, 16
+	bounds: 197, 19, 16, 16
 torch
-	bounds: 103, 45, 16, 16
+	bounds: 161, 19, 16, 16
 visible_air
-	bounds: 121, 117, 16, 16
+	bounds: 215, 19, 16, 16
