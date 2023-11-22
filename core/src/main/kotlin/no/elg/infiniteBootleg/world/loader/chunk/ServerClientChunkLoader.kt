@@ -19,7 +19,7 @@ class ServerClientChunkLoader(override val world: ServerClientWorld, generator: 
 
   override fun fetchChunk(chunkLoc: ChunkCompactLoc): LoadedChunk =
     toBeLoadedChunks.get(chunkLoc) {
-      //Abuse cache to only fetch chunk if we haven't done so within the last second
+      // Abuse cache to only fetch chunk if we haven't done so within the last second
       val (chunkX, chunkY) = chunkLoc
       val serverClient = world.serverClient
       serverClient.ctx.writeAndFlush(serverClient.serverBoundChunkRequestPacket(chunkX, chunkY))

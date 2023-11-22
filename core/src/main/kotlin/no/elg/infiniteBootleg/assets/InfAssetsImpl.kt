@@ -2,8 +2,7 @@ package no.elg.infiniteBootleg.assets
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
-import com.badlogic.gdx.graphics.Texture.TextureFilter.MipMap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
@@ -60,9 +59,10 @@ class InfAssetsImpl : InfAssets {
     val parameter = FreeTypeFontParameter()
     parameter.size = pts * SCALE
 
-    parameter.minFilter = Linear
-    parameter.magFilter = MipMap
-    return generator.generateFont(parameter)
+    parameter.minFilter = Texture.TextureFilter.Linear
+    parameter.magFilter = Texture.TextureFilter.MipMapLinearLinear
+    parameter.genMipMaps = true
+    return generator.generateFont(parameter).also { it.setUseIntegerPositions(false) }
   }
 
   override val font20pt: BitmapFont by lazy { createFont(20) }
