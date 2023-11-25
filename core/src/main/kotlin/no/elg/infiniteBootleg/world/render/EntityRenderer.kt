@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
-import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
@@ -22,7 +21,9 @@ import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Compan
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
+import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
+import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.roundToInt
 
@@ -56,7 +57,17 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     globalAnimationTimer += Gdx.graphics.deltaTime
     for (entity in entities) {
       val box2d = entity.box2d
-      val centerPos = entity.box2dBody.position
+
+      @Suppress("GDXKotlinFlushInsideLoop")
+      val centerPos = if (entity.followedByCamera) {
+        // We must render the entity we're following at the same position as the last calculated position, otherwise we'll get a weird jitter effect
+        // Also to make camera is correct we must update the projection matrix again
+        batch.projectionMatrix = worldRender.camera.combined
+        FollowEntitySystem.processedPosition
+      } else {
+        entity.box2dBody.position
+      }
+
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
       var lightX = 0f

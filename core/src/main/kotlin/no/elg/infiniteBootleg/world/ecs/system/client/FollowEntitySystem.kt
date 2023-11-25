@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -34,11 +35,19 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
     }
   }
 
+  /**
+   * The position of the entity was last time the camera was updated.
+   *
+   * Should be treated as read only outside the class
+   */
+  val processedPosition: Vector2 = Vector2()
+
   private fun processEntity(entity: Entity, deltaTime: Float) {
     val worldRender = entity.world.render
     if (worldRender is ClientWorldRender) {
       val camera: OrthographicCamera = worldRender.camera
       val position = entity.positionComponent
+      processedPosition.set(position.x, position.y)
       val x = position.x * Block.BLOCK_SIZE
       val y = position.y * Block.BLOCK_SIZE
       val diffX = x - camera.position.x

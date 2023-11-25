@@ -105,7 +105,6 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   }
 
   override fun render() {
-//    update()
     batch.projectionMatrix = camera.combined
     chunkRenderer.renderMultiple()
     prepareChunks()
