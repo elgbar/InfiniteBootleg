@@ -37,8 +37,20 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     get() = worldRender.batch
   private val world: ClientWorld
     get() = worldRender.world
-  private val worldBody: WorldBody
-    get() = world.worldBody
+
+  private fun Entity.currentTexture(): TextureRegion {
+    val lookDirectionOrNull = lookDirectionComponentOrNull
+    val velocityOrNull = velocityOrNull
+    val texture: TextureRegion =
+      if (box2d.type == ProtoWorld.Entity.Box2D.BodyType.PLAYER && velocityOrNull?.isZero(0.01f) == true) {
+        Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
+      } else {
+        textureRegionComponent.texture.textureRegion
+      }
+    val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
+    texture.flip(shouldFlipX, false)
+    return texture
+  }
 
   override fun render() {
     globalAnimationTimer += Gdx.graphics.deltaTime
@@ -73,21 +85,11 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
           }
         }
       }
+
       val screenX = worldToScreen(worldX)
       val screenY = worldToScreen(worldY)
 
-      val lookDirectionOrNull = entity.lookDirectionComponentOrNull
-      val velocityOrNull = entity.velocityOrNull
-      val texture: TextureRegion =
-        if (box2d.type == ProtoWorld.Entity.Box2D.BodyType.PLAYER && velocityOrNull?.isZero(0.01f) == true) {
-          Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
-        } else {
-          entity.textureRegionComponent.texture.textureRegion
-        }
-      val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
-
-      texture.flip(shouldFlipX, false)
-      batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
+      batch.draw(entity.currentTexture(), screenX, screenY, box2d.worldWidth, box2d.worldHeight)
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
         val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
