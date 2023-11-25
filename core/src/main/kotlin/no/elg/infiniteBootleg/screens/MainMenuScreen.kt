@@ -21,7 +21,7 @@ object MainMenuScreen : StageScreen() {
         }
         row()
         visTextButton("Multiplayer") {
-          onInteract(stage, Keys.NUM_1) {
+          onInteract(stage, Keys.NUM_2) {
             ClientMain.inst().screen = ServerScreen
           }
         }
