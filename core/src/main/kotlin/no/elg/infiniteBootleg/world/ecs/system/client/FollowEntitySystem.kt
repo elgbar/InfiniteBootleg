@@ -21,8 +21,7 @@ import kotlin.math.abs
 
 object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_DEFAULT), ClientSystem {
 
-  const val SCROLL_SPEED = 0.25f
-  private const val CAMERA_LERP = 2.5f
+  private const val CAMERA_LERP = 10f
   private const val LERP_CUTOFF = 5f
 
   override fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float) {
@@ -49,8 +48,8 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
         camera.position.x = x
         camera.position.y = y
       } else {
-        val dx = diffX * CAMERA_LERP * Block.BLOCK_SIZE
-        val dy = diffY * CAMERA_LERP * Block.BLOCK_SIZE
+        val dx = diffX * CAMERA_LERP
+        val dy = diffY * CAMERA_LERP
         if (abs(dx) > LERP_CUTOFF || abs(dy) > LERP_CUTOFF) {
           camera.position.x += dx * deltaTime
           camera.position.y += dy * deltaTime

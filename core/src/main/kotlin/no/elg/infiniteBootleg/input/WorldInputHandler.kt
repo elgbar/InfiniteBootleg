@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
-import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem.SCROLL_SPEED
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.Ticker
@@ -82,5 +81,9 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
 
   override fun dispose() {
     ClientMain.inst().inputMultiplexer.removeProcessor(this)
+  }
+
+  companion object {
+    private const val SCROLL_SPEED = 0.25f
   }
 }

@@ -101,7 +101,6 @@ object Settings {
 
   var handleWrongThreadAsyncEvents: WrongThreadAsyncEventAction = WrongThreadAsyncEventAction.STACKTRACE
 
-  @JvmField
   var enableCameraFollowLerp = true
 
   @JvmField
