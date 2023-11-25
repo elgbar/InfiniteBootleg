@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.safeUse
-import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 
@@ -34,9 +33,6 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
       val chunksInView = worldRender.chunksInView
       val yEnd = chunksInView.verticalEnd
       val xEnd = chunksInView.horizontalEnd
-      val worldBody = worldRender.world.worldBody
-      val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
-      val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
       val textureSize = Chunk.CHUNK_TEXTURE_SIZE
 
       if (Settings.renderChunkUpdates) {
@@ -52,7 +48,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
                 newlyUpdatedChunks.remove(compactLoc)
                 continue
               }
-              shapeRenderer.rect(x * textureSize + 0.5f + worldOffsetX, y * textureSize + 0.5f + worldOffsetY, textureSize - 1f, textureSize - 1f)
+              shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
             }
           }
         }
@@ -67,7 +63,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
               } else {
                 WITHIN_CAMERA_COLOR
               }
-              shapeRenderer.rect(x * textureSize + 0.5f + worldOffsetX, y * textureSize + 0.5f + worldOffsetY, textureSize - 1f, textureSize - 1f)
+              shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
             }
           }
         }

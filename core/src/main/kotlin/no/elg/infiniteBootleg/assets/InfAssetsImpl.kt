@@ -62,7 +62,6 @@ class InfAssetsImpl : InfAssets {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()
     parameter.size = pts * SCALE
-
     parameter.minFilter = Texture.TextureFilter.Linear
     parameter.magFilter = Texture.TextureFilter.MipMapLinearLinear
     parameter.genMipMaps = true

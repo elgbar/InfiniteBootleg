@@ -41,8 +41,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     get() = world.worldBody
 
   override fun render() {
-    val worldOffsetX = worldBody.worldOffsetX
-    val worldOffsetY = worldBody.worldOffsetY
     globalAnimationTimer += Gdx.graphics.deltaTime
     for (entity in entities) {
       val box2d = entity.box2d
@@ -56,8 +54,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         val blockY = centerPos.y.roundToInt()
         val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
         if (blockY > topX) {
-          lightX = worldToScreen(blockX.toFloat(), worldOffsetX)
-          lightY = worldToScreen((topX + 1).toFloat(), worldOffsetY)
+          lightX = worldToScreen(blockX.toFloat())
+          lightY = worldToScreen((topX + 1).toFloat())
           batch.color = Color.WHITE
         } else {
           val blockLight = world.getBlockLight(blockX, blockY, false)
@@ -70,13 +68,13 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
             } else {
               batch.color = Color.BLACK
             }
-            lightX = worldToScreen(blockX.toFloat(), worldOffsetX)
-            lightY = worldToScreen(blockY.toFloat(), worldOffsetY)
+            lightX = worldToScreen(blockX.toFloat())
+            lightY = worldToScreen(blockY.toFloat())
           }
         }
       }
-      val screenX = worldToScreen(worldX, worldOffsetX)
-      val screenY = worldToScreen(worldY, worldOffsetY)
+      val screenX = worldToScreen(worldX)
+      val screenY = worldToScreen(worldY)
 
       val lookDirectionOrNull = entity.lookDirectionComponentOrNull
       val velocityOrNull = entity.velocityOrNull

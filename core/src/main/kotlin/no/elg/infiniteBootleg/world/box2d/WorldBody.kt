@@ -37,10 +37,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   lateinit var box2dWorld: Box2dWorld
 
   private var timeStep = 0f
-  var worldOffsetX = 0f
-    private set
-  var worldOffsetY = 0f
-    private set
 
   @field:Volatile
   private var disposed = false
@@ -149,7 +145,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     callback: ((Fixture) -> Boolean)
   ) {
     postBox2dRunnable {
-      box2dWorld.QueryAABB(callback, worldX.toFloat() + worldOffsetX, worldY.toFloat() + worldOffsetY, worldWidth.toFloat(), worldHeight.toFloat())
+      box2dWorld.QueryAABB(callback, worldX.toFloat(), worldY.toFloat(), worldWidth.toFloat(), worldHeight.toFloat())
     }
   }
 
@@ -166,7 +162,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         (it.body.userData as? Entity)?.also { entity -> entities += entity }
         true
       }
-      box2dWorld.QueryAABB(queryCallback, worldX.toFloat() + worldOffsetX, worldY.toFloat() + worldOffsetY, worldWidth.toFloat(), worldHeight.toFloat())
+      box2dWorld.QueryAABB(queryCallback, worldX.toFloat(), worldY.toFloat(), worldWidth.toFloat(), worldHeight.toFloat())
       callback(entities)
     }
   }

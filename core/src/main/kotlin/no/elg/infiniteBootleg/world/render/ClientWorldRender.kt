@@ -108,14 +108,12 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 //    update()
     batch.projectionMatrix = camera.combined
     chunkRenderer.renderMultiple()
-    val worldOffsetX = world.worldBody.worldOffsetX * Block.BLOCK_SIZE
-    val worldOffsetY = world.worldBody.worldOffsetY * Block.BLOCK_SIZE
     prepareChunks()
     batch.safeUse {
       for ((chunk, textureRegion) in chunksToDraw.entries()) {
-        val dx = chunk.chunkX * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetX
-        val dy = chunk.chunkY * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetY
-        batch.draw(textureRegion, dx, dy, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
+        val dx = chunk.chunkX * Chunk.CHUNK_TEXTURE_SIZE
+        val dy = chunk.chunkY * Chunk.CHUNK_TEXTURE_SIZE
+        batch.draw(textureRegion, dx.toFloat(), dy.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
       }
       for (renderer in renderers) {
         renderer.render()
@@ -133,12 +131,9 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     box2dDebugM4.set(camera.combined).scl(Block.BLOCK_SIZE.toFloat())
     val width = camera.viewportWidth * camera.zoom
     val height = camera.viewportHeight * camera.zoom
-    val worldBody = world.worldBody
-    val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
-    val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
     val w = width * abs(camera.up.y) + height * abs(camera.up.x)
     val h = height * abs(camera.up.y) + width * abs(camera.up.x)
-    viewBound[camera.position.x - worldOffsetX - w / 2, camera.position.y - worldOffsetY - h / 2, w] = h
+    viewBound[camera.position.x - w / 2, camera.position.y - h / 2, w] = h
     chunksInView.horizontalStart = MathUtils.floor(viewBound.x / Chunk.CHUNK_TEXTURE_SIZE) - WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS
     chunksInView.horizontalEnd =
       (MathUtils.floor((viewBound.x + viewBound.width + Chunk.CHUNK_TEXTURE_SIZE) / Chunk.CHUNK_TEXTURE_SIZE) + WorldRender.CHUNKS_IN_VIEW_HORIZONTAL_PHYSICS)

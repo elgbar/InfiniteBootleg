@@ -33,8 +33,8 @@ class AirBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
   private fun renderAirBlock(airBlock: Block) {
     worldRender.batch.draw(
       assets.visibleAirTexture.textureRegion,
-      worldToScreen(airBlock.worldX.toFloat(), worldBody.worldOffsetX),
-      worldToScreen(airBlock.worldY.toFloat(), worldBody.worldOffsetY),
+      worldToScreen(airBlock.worldX.toFloat()),
+      worldToScreen(airBlock.worldY.toFloat()),
       Block.BLOCK_SIZE.toFloat(),
       Block.BLOCK_SIZE.toFloat()
     )

@@ -47,9 +47,8 @@ class MouseLocator {
       previousMouseBlockX = mouseBlockX
       previousMouseBlockY = mouseBlockY
 
-      val worldBody = world.worldBody
-      mouseWorldX = screenInputVec.x / Block.BLOCK_SIZE - worldBody.worldOffsetX
-      mouseWorldY = screenInputVec.y / Block.BLOCK_SIZE - worldBody.worldOffsetY
+      mouseWorldX = screenInputVec.x / Block.BLOCK_SIZE
+      mouseWorldY = screenInputVec.y / Block.BLOCK_SIZE
       mouseWorldInput.set(mouseWorldX, mouseWorldY)
       mouseBlockX = worldToBlock(mouseWorldX)
       mouseBlockY = worldToBlock(mouseWorldY)

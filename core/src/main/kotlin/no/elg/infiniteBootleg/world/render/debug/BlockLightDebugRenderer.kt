@@ -69,8 +69,6 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   private fun renderLightSrc() {
     val batch: Batch = worldRender.batch
     val world: ClientWorld = worldRender.world
-    val worldOffsetX = world.worldBody.worldOffsetX
-    val worldOffsetY = world.worldBody.worldOffsetY
     val mouseLocator = ClientMain.inst().mouseLocator
     val pointerWorldX = mouseLocator.mouseBlockX
     val pointerWorldY = mouseLocator.mouseBlockY
@@ -78,14 +76,14 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
     val light = world.getBlockLight(pointerWorldX, pointerWorldY, false) ?: return
     batch.safeUse {
       for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
-        val lightX = worldToScreen(luminescentBlock.worldX.toFloat(), worldOffsetX)
-        val lightY = worldToScreen(luminescentBlock.worldY.toFloat(), worldOffsetY)
+        val lightX = worldToScreen(luminescentBlock.worldX.toFloat())
+        val lightY = worldToScreen(luminescentBlock.worldY.toFloat())
         batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
       }
 
       for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
-        val lightX = worldToScreen(skyblock.worldX.toFloat(), worldOffsetX)
-        val lightY = worldToScreen(skyblock.worldY.toFloat(), worldOffsetY)
+        val lightX = worldToScreen(skyblock.worldX.toFloat())
+        val lightY = worldToScreen(skyblock.worldY.toFloat())
         batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
       }
     }
