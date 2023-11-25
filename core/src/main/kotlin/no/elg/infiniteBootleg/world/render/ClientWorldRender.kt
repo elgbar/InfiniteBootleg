@@ -7,7 +7,10 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.OrderedMap
+import ktx.collections.component1
+import ktx.collections.component2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
@@ -32,21 +35,22 @@ import kotlin.math.abs
 class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   private val viewBound: Rectangle = Rectangle()
-  private val m4 = Matrix4()
+  private val box2dDebugM4 = Matrix4()
   private val renderers: List<Renderer> = listOf(
     AirBlockRenderer(this),
     HoveringBlockRenderer(this),
-    EntityRenderer(this)
+    EntityRenderer(this),
+    DebugChunkRenderer(this),
+    BlockLightDebugRenderer(this),
+    TopBlockChangeRenderer(this)
   )
-  private val chunkDebugRenderer: DebugChunkRenderer = DebugChunkRenderer(this)
-  private val blockLightDebugRenderer: BlockLightDebugRenderer = BlockLightDebugRenderer(this)
-  private val topBlockChangeRenderer: TopBlockChangeRenderer = TopBlockChangeRenderer(this)
 
   private var lastZoom = 0f
 
-  val draw: OrderedMap<Chunk, TextureRegion> = OrderedMap<Chunk, TextureRegion>().apply {
+  private val chunksToDraw: OrderedMap<Chunk, TextureRegion> = OrderedMap<Chunk, TextureRegion>().apply {
     orderedKeys().ordered = false
   }
+
   val chunksInView: ClientChunksInView = ClientChunksInView()
   val batch: SpriteBatch = SpriteBatch()
   val camera: OrthographicCamera = OrthographicCamera().also {
@@ -56,21 +60,16 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     it.position.y = 0f
   }
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
-  val box2DDebugRenderer: Box2DDebugRenderer = Box2DDebugRenderer(true, false, false, false, true, false)
+  val box2DDebugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer(true, false, false, false, true, false) }
 
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
     camera.position.set(worldX.toFloat(), worldY.toFloat(), 0f)
     update()
   }
 
-  override fun render() {
-    batch.projectionMatrix = camera.combined
-    chunkRenderer.renderMultiple()
-    draw.clear(chunksInView.size)
-    draw.ensureCapacity(chunksInView.size)
-    val worldBody = world.worldBody
-    val worldOffsetX = worldBody.worldOffsetX * Block.BLOCK_SIZE
-    val worldOffsetY = worldBody.worldOffsetY * Block.BLOCK_SIZE
+  private fun prepareChunks() {
+    chunksToDraw.clear(chunksInView.size)
+    chunksToDraw.ensureCapacity(chunksInView.size)
     val verticalStart = chunksInView.verticalStart
     val verticalEnd = chunksInView.verticalEnd
     for (chunkY in verticalStart until verticalEnd) {
@@ -100,36 +99,38 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
           chunkRenderer.queueRendering(chunk, false)
           continue
         }
-        draw.put(chunk, textureRegion)
+        chunksToDraw.put(chunk, textureRegion)
       }
     }
+  }
+
+  override fun render() {
+//    update()
+    batch.projectionMatrix = camera.combined
+    chunkRenderer.renderMultiple()
+    val worldOffsetX = world.worldBody.worldOffsetX * Block.BLOCK_SIZE
+    val worldOffsetY = world.worldBody.worldOffsetY * Block.BLOCK_SIZE
+    prepareChunks()
     batch.safeUse {
-      for (entry in draw.entries()) {
-        val dx = entry.key.chunkX * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetX
-        val dy = entry.key.chunkY * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetY
-        batch.draw(entry.value, dx, dy, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
+      for ((chunk, textureRegion) in chunksToDraw.entries()) {
+        val dx = chunk.chunkX * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetX
+        val dy = chunk.chunkY * Chunk.CHUNK_TEXTURE_SIZE + worldOffsetY
+        batch.draw(textureRegion, dx, dy, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
       }
       for (renderer in renderers) {
         renderer.render()
       }
     }
-    if (Settings.renderChunkUpdates || Settings.renderChunkBounds) {
-      chunkDebugRenderer.render()
-    }
     if (Settings.renderBox2dDebug) {
       synchronized(BOX2D_LOCK) {
-        box2DDebugRenderer.render(worldBody.box2dWorld, m4)
+        box2DDebugRenderer.render(world.worldBody.box2dWorld, box2dDebugM4)
       }
     }
-    if (Settings.renderLight) {
-      blockLightDebugRenderer.render()
-    }
-    topBlockChangeRenderer.render()
   }
 
   override fun update() {
     camera.update()
-    m4.set(camera.combined).scl(Block.BLOCK_SIZE.toFloat())
+    box2dDebugM4.set(camera.combined).scl(Block.BLOCK_SIZE.toFloat())
     val width = camera.viewportWidth * camera.zoom
     val height = camera.viewportHeight * camera.zoom
     val worldBody = world.worldBody
@@ -160,7 +161,9 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     batch.dispose()
     chunkRenderer.dispose()
     box2DDebugRenderer.dispose()
-    chunkDebugRenderer.dispose()
+    for (renderer in renderers.filterIsInstance<Disposable>()) {
+      renderer.dispose()
+    }
   }
 
   override fun isOutOfView(chunk: Chunk): Boolean = chunksInView.isOutOfView(chunk.chunkX, chunk.chunkY)

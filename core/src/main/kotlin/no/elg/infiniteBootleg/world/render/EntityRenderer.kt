@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
@@ -32,10 +33,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   private val layout = GlyphLayout()
   private var globalAnimationTimer = 0f
 
+  private val batch: Batch
+    get() = worldRender.batch
+  private val world: ClientWorld
+    get() = worldRender.world
+  private val worldBody: WorldBody
+    get() = world.worldBody
+
   override fun render() {
-    val batch: Batch = worldRender.batch
-    val world: ClientWorld = worldRender.world
-    val worldBody = world.worldBody
     val worldOffsetX = worldBody.worldOffsetX
     val worldOffsetY = worldBody.worldOffsetY
     globalAnimationTimer += Gdx.graphics.deltaTime

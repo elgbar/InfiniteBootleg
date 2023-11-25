@@ -44,11 +44,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   private val luminanceDebugTexture by lazy { Main.inst().assets.luminanceDebugTexture.textureRegion }
 
   override fun render() {
-    if (Settings.debugBlockLight) {
-      renderLightSrc()
-    }
-    if (Settings.renderBlockLightUpdates) {
-      renderLightUpdates()
+    if (Settings.renderLight) {
+      if (Settings.debugBlockLight) {
+        renderLightSrc()
+      }
+      if (Settings.renderBlockLightUpdates) {
+        renderLightUpdates()
+      }
     }
   }
 
