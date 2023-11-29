@@ -34,6 +34,7 @@ interface InfAssets {
 
   val breakingBlockTextures: Array<RotatableTextureRegion>
   val playerIdleTextures: Animation<RotatableTextureRegion>
+  val playerWalkingTextures: Animation<RotatableTextureRegion>
 
   /**
    * Load all assets

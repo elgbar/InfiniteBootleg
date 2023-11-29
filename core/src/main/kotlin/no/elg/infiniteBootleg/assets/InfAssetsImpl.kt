@@ -57,6 +57,7 @@ class InfAssetsImpl : InfAssets {
 
   override lateinit var breakingBlockTextures: Array<RotatableTextureRegion>
   override lateinit var playerIdleTextures: Animation<RotatableTextureRegion>
+  override lateinit var playerWalkingTextures: Animation<RotatableTextureRegion>
 
   private fun createFont(pts: Int): BitmapFont {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
@@ -101,6 +102,7 @@ class InfAssetsImpl : InfAssets {
     }.toTypedArray()
 
     playerIdleTextures = findAnimation("player_idle", 3, 0.35f, startIndex = 1)
+    playerWalkingTextures = findAnimation("player_walking", 3, 0.2f, startIndex = 0)
 
     skyTexture = createTextureRegion(ClientMain.CLEAR_COLOR_R, ClientMain.CLEAR_COLOR_G, ClientMain.CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)
     caveTexture = createTextureRegion(ChunkRenderer.CAVE_CLEAR_COLOR_R, ChunkRenderer.CAVE_CLEAR_COLOR_G, ChunkRenderer.CAVE_CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)

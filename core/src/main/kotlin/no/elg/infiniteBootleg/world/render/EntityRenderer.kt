@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Comp
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.world.ClientWorld
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
@@ -43,8 +44,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val lookDirectionOrNull = lookDirectionComponentOrNull
     val velocityOrNull = velocityOrNull
     val texture: TextureRegion =
-      if (box2d.type == ProtoWorld.Entity.Box2D.BodyType.PLAYER && velocityOrNull?.isZero(0.01f) == true) {
-        Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
+      if (box2d.type == ProtoWorld.Entity.Box2D.BodyType.PLAYER && velocityOrNull != null) {
+        if (velocityOrNull.isZero(0.01f)) {
+          Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
+        } else if (abs(velocityOrNull.x) > 0.01f) {
+          Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer).textureRegion
+        } else {
+          textureRegionComponent.texture.textureRegion
+        }
       } else {
         textureRegionComponent.texture.textureRegion
       }
@@ -67,7 +74,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       } else {
         entity.box2dBody.position
       }
-
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
       var lightX = 0f
