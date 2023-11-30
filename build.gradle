@@ -136,10 +136,10 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.100.Final"
+    implementation "io.netty:netty-all:4.1.101.Final"
     implementation "org.apache.commons:commons-collections4:4.4"
-    implementation "org.apache.commons:commons-lang3:3.13.0"
-    implementation "org.jetbrains:annotations:24.0.1"
+    implementation "org.apache.commons:commons-lang3:3.14.0"
+    implementation "org.jetbrains:annotations:24.1.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
