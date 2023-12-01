@@ -11,12 +11,13 @@ import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
+import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
@@ -33,7 +34,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(drawableEntitiesFamily)
 
   private val layout = GlyphLayout()
-  private var globalAnimationTimer = 0f
 
   private val batch: Batch
     get() = worldRender.batch
@@ -44,10 +44,10 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val lookDirectionOrNull = lookDirectionComponentOrNull
     val velocityOrNull = velocityOrNull
     val texture: TextureRegion =
-      if (box2d.type == ProtoWorld.Entity.Box2D.BodyType.PLAYER && velocityOrNull != null) {
-        if (velocityOrNull.isZero(0.01f)) {
+      if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
+        if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
           Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
-        } else if (abs(velocityOrNull.x) > 0.01f) {
+        } else if (abs(velocityOrNull.x) > EFFECTIVE_ZERO && groundedComponentOrNull?.onGround == true) {
           Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer).textureRegion
         } else {
           textureRegionComponent.texture.textureRegion
@@ -121,5 +121,10 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
     }
     batch.color = Color.WHITE
+  }
+
+  companion object {
+    const val EFFECTIVE_ZERO = 0.01f
+    var globalAnimationTimer = 0f
   }
 }
