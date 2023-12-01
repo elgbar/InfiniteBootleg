@@ -48,7 +48,7 @@ object Settings {
   @JvmField
   var tps = DEFAULT_TICKS_PER_SECOND
 
-  var dayTicking = true
+  var dayTicking = false
 
   @JvmField
   var renderLight = true
