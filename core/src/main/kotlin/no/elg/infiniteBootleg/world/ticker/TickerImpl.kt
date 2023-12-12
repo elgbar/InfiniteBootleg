@@ -92,17 +92,7 @@ class TickerImpl(
     // Round down ok as realTPS is a long
     tpsWarnThreshold = (TPS_LOSS_PERCENTAGE * tps).toLong()
     nagDelayTicks = Math.max(0.0, tps * nagDelay).toLong()
-    Main.logger()
-      .debug(
-        tag,
-        "Starting ticking thread for '" +
-          name +
-          "' with tps = " +
-          tps +
-          " (warn when tps <= " +
-          tpsWarnThreshold +
-          ")"
-      )
+    Main.logger().debug(tag) { "Starting ticking thread for '$name' with tps = $tps (warn when tps <= $tpsWarnThreshold)" }
     tickerThread = PauseableThread(this)
     tickerThread.name = tag
     tickerThread.isDaemon = true

@@ -122,8 +122,17 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
-      box2dWorld.step(timeStep, 10, 10)
-      world.engine.update(timeStep)
+      try {
+        box2dWorld.step(timeStep, 10, 10)
+      } catch (e: Throwable) {
+        Main.logger().error("BOX2D", "Failed to step box2d world", e)
+      }
+
+      try {
+        world.engine.update(timeStep)
+      } catch (e: Throwable) {
+        Main.logger().error("BOX2D", "Failed to update ashley engine", e)
+      }
 
       postRunnable.executeRunnables()
       for (chunkBody in updatingChunksIterator) {
