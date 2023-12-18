@@ -9,8 +9,6 @@ import ktx.ashley.create
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * Get or creates an instance of the component [T] and adds it to this [entity][EngineEntity].
@@ -21,7 +19,6 @@ import kotlin.contracts.contract
  * @see [create]
  */
 inline fun <reified T : Component> Entity.safeWith(component: () -> T): T? {
-  contract { callsInPlace(component, InvocationKind.AT_MOST_ONCE) }
 //  if (Main.isServer && T::class.isSubclassOf(ClientComponent::class)) return null
   return component().also { add(it) }
 }
