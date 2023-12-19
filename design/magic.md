@@ -13,20 +13,22 @@ The power of a staff is specific to each spell. Some attributes can be increased
 
 ## Staff
 
+---
+
 Staff determines how powerful a spell can be combined into.
 
 ### Wood types
 
 All staff are made from wood, but can be made from different kind of wood.
 
-| Wood type   | Gem slots | Ring slots | Special modifier                   | drying rate | Description                                           |
-|-------------|-----------|------------|------------------------------------|-------------|-------------------------------------------------------|
-| Birch       | 1         | 0          | N/A                                | 100%        | The most common wood type                             |
-| Aerowode    | 1         | 2          | Spells are not affected by gravity | 100%        | The wood seems to no be affected by gravity           |
-| Red wood    | 1         | 0          | Will start fires, at random        | 200%        | The wood crackles and smokes                          |
-| driftwood   | 1         | 3          | Works while under water            | 25%         | Even when dried, drops of water forms around its base |
-| Wisted wood | 2         | 1          | N/A                                | 100%        | The wood is twisted to fit two gems                   |
-| Trekant     | 3         | 2          | N/A                                | 100%        | The wood is twisted to fit three gems                 |
+| Wood type   | Gem slots | Ring slots | drying rate | Cast delay at 100% | Special modifier            | Description                                           |
+|-------------|-----------|------------|-------------|--------------------|-----------------------------|-------------------------------------------------------|
+| Birch       | 1         | 0          | 100%        | 333 ms             | N/A                         | The most common wood type                             |
+| Aerowode    | 1         | 2          | 100%        | 250 ms             | N/A                         | The wood seems to no be affected by gravity           |
+| Red wood    | 1         | 0          | 200%        | 150 ms             | Will start fires, at random | The wood crackles and smokes                          |
+| driftwood   | 1         | 3          | 25%         | 300 ms             | Works while under water     | Even when dried, drops of water forms around its base |
+| Wisted wood | 2         | 1          | 100%        | 100 ms             | N/A                         | The wood is twisted to fit two gems                   |
+| Trekant     | 3         | 2          | 100%        | 50 ms              | N/A                         | The wood is twisted to fit three gems                 |
 
 ### Wood rating
 
@@ -45,32 +47,38 @@ The drying rate is also affected by the wood type. Some wood types will dry fast
 
 ## Gems
 
+---
+
 Each gem will produce a different spell. The power of the spell is determined by the quality of the gem (flaw rating).
 
 ### Types of gems
 
-| Gem type   | Power meaning                                     | Effect when power at 100% | Description                                                                                                                                           |
-|------------|---------------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Diamond    | Greater break radius, i.e,. more blocks at a time | 10 block radius           | Allows to break blocks, slow and a small radius, but will always give blocks to the player                                                            |
-| Enineer    | Greater build radius, i.e,. more blocks at a time | 10 block radius           | will create blocks in a radius (radius is customizable during use of the staff)                                                                       |
-| Trapiche   | Greater teleport radius.                          | 10000 block radius        | Teleports the player to the location of the staff, The staff must be placed there by a player. Needs a "twin" staff tuned to the same tag to teleport |
-| Sky gem    | More damage per thunderbolt                       | 100% of players health    | Summons a thunderbolt to the location of the staff, can be used to create a defensive barrier                                                         |
-| Blast opal | Greater explosion                                 | 100 blocks                | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
-| Dartle Gem | Dart further                                      | 10 blocks                 | Allow player to teleport short distances (i.e., dart)                                                                                                 |
-| Obsidian   | More damage pr projectile                         | 100% of players health    | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
+| Gem type   | Power meaning                                     | Effect when power at 100% | cast delay at 100% power | Description                                                                                                                                           |
+|------------|---------------------------------------------------|---------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Diamond    | Greater break radius, i.e,. more blocks at a time | 10 block radius           | 0.1s                     | Allows to break blocks, slow and a small radius, but will always give blocks to the player                                                            |
+| Quartz     | Greater build radius, i.e,. more blocks at a time | 10 block radius           | 0.1s                     | will create blocks in a radius (radius is customizable during use of the staff)                                                                       |
+| Trapiche   | Greater teleport radius.                          | 10000 block radius        |                          | Teleports the player to the location of the staff, The staff must be placed there by a player. Needs a "twin" staff tuned to the same tag to teleport |
+| Sky gem    | More damage per thunderbolt                       | 100% of players health    |                          | Summons a thunderbolt to the location of the staff, can be used to create a defensive barrier                                                         |
+| Blast opal | Greater explosion                                 | 100 blocks                |                          | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
+| Dartle Gem | Dart further                                      | 10 blocks                 |                          | Allow player to teleport short distances (i.e., dart)                                                                                                 |
+| Obsidian   | More damage pr projectile                         | 100% of players health    |                          | Destroys blocks in a radius, a low % will be mined, the rest will be destroyed                                                                        |
 
 ### Flaw ratings - more flawed decrease the power of the gem
+
+Note that the flaw rating will only affect the power of the gem, not the whole staff
 
 | Flaw rating | Absolute power | Relative Power decrease (this - above) | Description                                               |
 |-------------|----------------|----------------------------------------|-----------------------------------------------------------|
 | Flawless    | 100%           | N/A                                    | I didn't know this perfection of existed anymore!         |
 | Scratched   | 85%            | -15%                                   | A few surface scratches shouldn't be too much of an issue |
 | Chipped     | 70%            | -15%                                   | Someone hit this on with a hammer!                        |
-| Fractured   | 50%            | -20%                                   | Not bad, not great                                        |
-| Shattered   | 25%            | -25%                                   | At least its not broken                                   |
+| Cracked     | 50%            | -20%                                   | Not bad, not great                                        |
+| Fractured   | 25%            | -25%                                   | At least its not broken                                   |
 | Ruined      | 0%             | -25%                                   | This is useless                                           |
 
 ## Rings
+
+---
 
 Rings can be used to modify the spell. Each ring will have a different effect on the spell.
 
@@ -87,24 +95,24 @@ Some rings will have a special effect on the spell, these will not have a flaw r
 
 To give some meat here is the boring list of all the "normal" rings
 
-| Ring type  | Effect                                                                        |
-|------------|-------------------------------------------------------------------------------|
-| Opal       | Gem power                                                                     |
-| Emerald    | spell range                                                                   |
-| Ruby       | incarnation speed (decreases delay between each cast)                         |
-| Sapphire   | spell speed                                                                   |
-| Aeromir    | Allow the player to move faster                                               |
-| Bright Gem | Adds a cone of light to each spell and will a halo of light around the player |
+| Ring type | Effect                                                                        |
+|-----------|-------------------------------------------------------------------------------|
+| Opal      | Gem power                                                                     |
+| Emerald   | spell range                                                                   |
+| Ruby      | incarnation speed (decreases delay between each cast)                         |
+| Sapphire  | spell speed                                                                   |
+| Aeromir   | Allow the player to move faster                                               |
+| Lys       | Adds a cone of light to each spell and will a halo of light around the player |
 
-| Flaw rating       | +Power% | Relative increase | Description                                                     |
-|-------------------|---------|-------------------|-----------------------------------------------------------------|
-| Flawless          | 60%     | 10%               | I didn't know this perfection of existed anymore!               |
-| Minorly scratched | 50%     | 5%                | A small few surface scratches shouldn't be too much of an issue |
-| Majorly scratched | 45%     | 5%                | A large few surface scratches, might be an issue                |
-| Minorly chipped   | 40%     | 5%                | Someone got a matching small piece of this                      |
-| Majorly chipped   | 35%     | 10%               | Someone got a matching big piece of this                        |
-| Large fragment    | 25%     | 10%               | Almost whole, just missing most of it                           |
-| Small fragment    | 15%     | 5%                | More than the pieces                                            |
-| Some pieces       | 10%     | 5%                | Pieces, nothing more                                            |
-| Small pieces      | 5%      | 4%                | At least its not _just_ dust                                    |
-| Dust              | 1%      | 1%                | This is useless                                                 |
+| Flaw rating       | +Effect% | Relative increase | Description                                                     |
+|-------------------|----------|-------------------|-----------------------------------------------------------------|
+| Flawless          | 160%     | 10%               | I didn't know this perfection of existed anymore!               |
+| Minorly scratched | 150%     | 5%                | A small few surface scratches shouldn't be too much of an issue |
+| Majorly scratched | 145%     | 5%                | A large few surface scratches, might be an issue                |
+| Minorly chipped   | 140%     | 5%                | Someone got a matching small piece of this                      |
+| Majorly chipped   | 135%     | 10%               | Someone got a matching big piece of this                        |
+| Large fragment    | 125%     | 10%               | Almost whole, just missing most of it                           |
+| Small fragment    | 115%     | 5%                | More than the pieces                                            |
+| Some pieces       | 110%     | 5%                | Pieces, nothing more                                            |
+| Small pieces      | 105%     | 4%                | At least its not _just_ dust                                    |
+| Dust              | 101%     | 1%                | This is useless                                                 |

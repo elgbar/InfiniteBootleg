@@ -147,3 +147,4 @@ tests/
 
 .idea/
 /textures/gdx-texturepacker.jar
+.kotlin/
