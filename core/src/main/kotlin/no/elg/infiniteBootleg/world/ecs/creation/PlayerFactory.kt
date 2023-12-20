@@ -2,16 +2,20 @@ package no.elg.infiniteBootleg.world.ecs.creation
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import no.elg.infiniteBootleg.items.InventoryElement.Companion.asProto
 import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
+import no.elg.infiniteBootleg.protobuf.EntityKt.StaffKt.gem
+import no.elg.infiniteBootleg.protobuf.EntityKt.StaffKt.wood
 import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
+import no.elg.infiniteBootleg.protobuf.EntityKt.element
 import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
 import no.elg.infiniteBootleg.protobuf.EntityKt.killable
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.EntityKt.lookDirection
 import no.elg.infiniteBootleg.protobuf.EntityKt.selectedItem
+import no.elg.infiniteBootleg.protobuf.EntityKt.staff
 import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -24,6 +28,7 @@ import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.world.InventoryElement.Companion.asProto
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
@@ -39,6 +44,10 @@ import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
+import no.elg.infiniteBootleg.world.magic.parts.Birch
+import no.elg.infiniteBootleg.world.magic.parts.Diamond
+import no.elg.infiniteBootleg.world.magic.parts.GemRating
+import no.elg.infiniteBootleg.world.magic.parts.WoodRating
 import no.elg.infiniteBootleg.world.world.World
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -99,6 +108,23 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
     maxSize = Material.entries.size + Tool.entries.size
     items += Material.entries.map { it.toItem().asProto() }
     items += Tool.entries.map { it.toItem().asProto() }
+    items += item {
+      maxStock = 128
+      stock = 128
+      element = element {
+        itemType = ProtoWorld.Entity.Element.ItemType.STAFF
+        staff = staff {
+          wood = wood {
+            type = Birch.displayName
+            rating = WoodRating.PETRIFIED.name
+          }
+          primaryGem = gem {
+            type = Diamond.displayName
+            rating = GemRating.FLAWLESS.name
+          }
+        }
+      }
+    }
   }
   box2D = box2D {
     bodyType = ProtoWorld.Entity.Box2D.BodyType.PLAYER
@@ -115,7 +141,7 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
     }
 
     selectedItem = selectedItem {
-      element = Tool.PICKAXE.asProto()
+      element = this@addCommonClientPlayerComponentsProto.inventory.itemsList.lastOrNull()?.element ?: Tool.PICKAXE.asProto()
     }
   }
   physicsEvent = PROTO_PHYSICS_EVENT
@@ -136,7 +162,6 @@ fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, config
   entity {
     val world = this@createNewProtoPlayer
     val (spawnX, spawnY) = world.spawn
-    addCommonClientPlayerComponentsProto(controlled)
     addCommonPlayerComponentsProto(
       id = UUID.randomUUID().toString(),
       world = world,
@@ -147,5 +172,6 @@ fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, config
       name = "Player",
       controlled = controlled
     )
+    addCommonClientPlayerComponentsProto(controlled)
     configure()
   }

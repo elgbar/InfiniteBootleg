@@ -14,13 +14,22 @@ import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 
 object MineBlockSystem :
-  IteratingSystem(allOf(WorldComponent::class, LocallyControlledComponent::class, SelectedInventoryItemComponent::class).get(), UPDATE_PRIORITY_DEFAULT),
+  IteratingSystem(
+    allOf(
+      WorldComponent::class,
+      LocallyControlledComponent::class,
+      SelectedInventoryItemComponent::class,
+      PositionComponent::class
+    ).get(),
+    UPDATE_PRIORITY_DEFAULT
+  ),
   ClientSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {

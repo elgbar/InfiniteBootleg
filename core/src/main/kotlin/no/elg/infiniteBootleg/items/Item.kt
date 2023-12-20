@@ -1,9 +1,10 @@
 package no.elg.infiniteBootleg.items
 
-import no.elg.infiniteBootleg.items.InventoryElement.Companion.asProto
-import no.elg.infiniteBootleg.items.InventoryElement.Companion.fromProto
 import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.world.InventoryElement
+import no.elg.infiniteBootleg.world.InventoryElement.Companion.asProto
+import no.elg.infiniteBootleg.world.InventoryElement.Companion.fromProto
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 
 sealed interface Item {
@@ -49,6 +50,7 @@ sealed interface Item {
     return when (this) {
       is MaterialItem -> MaterialItem(element, maxStock, stock + other.stock)
       is ToolItem -> ToolItem(element, maxStock, stock + other.stock)
+      is StaffItem -> StaffItem(element, maxStock, stock + other.stock)
     }
   }
 

@@ -47,6 +47,7 @@ class InfAssetsImpl : InfAssets {
   override lateinit var doorOpenTexture: RotatableTextureRegion
   override lateinit var doorClosedTexture: RotatableTextureRegion
   override lateinit var pickaxeTexture: RotatableTextureRegion
+  override lateinit var staffTexture: RotatableTextureRegion
 
   override lateinit var skyTexture: RotatableTextureRegion
   override lateinit var caveTexture: RotatableTextureRegion
@@ -94,8 +95,9 @@ class InfAssetsImpl : InfAssets {
     playerTexture = safeTextureAtlas.findRotationAwareRegion("player", false)
     doorOpenTexture = safeTextureAtlas.findRotationAwareRegion("door_open", false)
     doorClosedTexture = safeTextureAtlas.findRotationAwareRegion("door_closed", false)
-    pickaxeTexture = safeTextureAtlas.findRotationAwareRegion("pickaxe", false)
     visibleAirTexture = safeTextureAtlas.findRotationAwareRegion("visible_air", false)
+    pickaxeTexture = safeTextureAtlas.findRotationAwareRegion("pickaxe", false)
+    staffTexture = safeTextureAtlas.findRotationAwareRegion("stick", false)
 
     breakingBlockTextures = (1..9).map {
       safeTextureAtlas.findRotationAwareRegion("break", false, it)

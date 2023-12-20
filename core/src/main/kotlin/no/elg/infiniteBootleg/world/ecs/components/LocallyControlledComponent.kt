@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -14,6 +13,7 @@ import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
@@ -25,7 +25,7 @@ data class LocallyControlledComponent(
   var instantBreak: Boolean = INITIAL_INSTANT_BREAK
 ) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
-  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedInventoryItemComponentOrNull?.element?.itemType == ItemType.TOOL
+  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedInventoryItemComponentOrNull?.element is Tool
 
   companion object : EntityLoadableMapper<LocallyControlledComponent>() {
     var Entity.locallyControlledComponent by propertyFor(mapper)

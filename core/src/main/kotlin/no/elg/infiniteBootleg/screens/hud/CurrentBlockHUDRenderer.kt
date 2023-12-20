@@ -24,7 +24,7 @@ object CurrentBlockHUDRenderer {
   fun render(screenRenderer: ScreenRenderer, world: World) {
     val entity = world.controlledPlayerEntities.firstOrNull() ?: return
     val item = entity.selectedItem ?: return
-    val texture = (item.element.textureRegion ?: Main.inst().assets.breakableBlockTexture).textureRegionOrNull ?: return
+    val texture = (item.element.textureRegion?.textureRegionOrNull ?: Main.inst().assets.breakableBlockTexture.textureRegion)
     with(screenRenderer) {
       batch.draw(texture, Gdx.graphics.width - x4Block, Gdx.graphics.height - x3Block, x2Block, x2Block)
       layout.setText(font, "${item.stock} / ${item.maxStock}", Color.WHITE, x10Block, Align.right, true)

@@ -19,7 +19,22 @@ sealed class WoodType(
   val ringSlots: UInt,
   val dryingRate: Double,
   val castDelay: Duration
-) : Named, MagicEffectsWithRating<WoodRating>
+) : Named, MagicEffectsWithRating<WoodRating> {
+  companion object {
+
+    fun valueOf(displayName: String): WoodType {
+      return when (displayName) {
+        Birch.displayName -> Birch
+        Aerowode.displayName -> Aerowode
+        RedWood.displayName -> RedWood
+        Driftwood.displayName -> Driftwood
+        WistedWood.displayName -> WistedWood
+        Trekant.displayName -> Trekant
+        else -> throw IllegalArgumentException("Unknown wood type $displayName")
+      }
+    }
+  }
+}
 
 data object Birch : WoodType(1u, 0u, 1.0, 333.milliseconds) {
   override val displayName: String get() = "Birch"

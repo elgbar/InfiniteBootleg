@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.magic
 
 import com.badlogic.ashley.core.Entity
+import no.elg.infiniteBootleg.world.Staff
 import kotlin.time.Duration
 
 interface SpellState {

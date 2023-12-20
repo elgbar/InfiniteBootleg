@@ -20,7 +20,22 @@ enum class RingRating(val effectPercent: Double) {
   DUST(1.01)
 }
 
-sealed interface RingType<R : RingRating?> : Named, Equippable, MagicEffectsWithRating<R>
+sealed interface RingType<in R : RingRating?> : Named, Equippable, MagicEffectsWithRating<R> {
+  companion object {
+
+    fun valueOf(displayName: String): RingType<RingRating?> {
+      @Suppress("UNCHECKED_CAST")
+      return when (displayName) {
+        AntiGravityRing.displayName -> AntiGravityRing
+        OpalRing.displayName -> OpalRing
+        EmeraldRing.displayName -> EmeraldRing
+        RubyRing.displayName -> RubyRing
+        SapphireRing.displayName -> SapphireRing
+        else -> throw IllegalArgumentException("Unknown ring type $displayName")
+      } as RingType<RingRating?>
+    }
+  }
+}
 
 sealed interface RatelessRingType : Named, RingType<RingRating?>
 sealed interface RatedRingType : Named, RingType<RingRating>

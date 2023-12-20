@@ -113,12 +113,40 @@ message Entity {
   }
 
   message Element {
-    uint32 index = 1;
-    ItemType itemType = 2;
+    ItemType itemType = 1;
+    optional EnumElement enumElement = 2;
+    optional Staff staff = 3;
 
     enum ItemType {
       MATERIAL = 0;
       TOOL = 1;
+      STAFF = 2;
+    }
+
+    message EnumElement {
+      uint32 index = 1;
+    }
+  }
+
+  message Staff {
+    Wood wood = 1;
+    Gem primaryGem = 2;
+    repeated Gem secondaryGems = 3;
+    repeated Ring rings = 4;
+
+    message Wood {
+      string type = 1;
+      string rating = 2;
+    }
+
+    message Gem {
+      string type = 1;
+      string rating = 2;
+    }
+
+    message Ring {
+      string type = 1;
+      optional string rating = 2;
     }
   }
 

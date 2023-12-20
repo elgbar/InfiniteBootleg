@@ -7,7 +7,6 @@ import ktx.ashley.propertyFor
 import ktx.collections.GdxSet
 import ktx.collections.minusAssign
 import ktx.collections.plusAssign
-import no.elg.infiniteBootleg.items.InventoryElement
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.items.Item.Companion.fromProto
@@ -15,6 +14,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.world.InventoryElement
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent

@@ -115,4 +115,4 @@ To give some meat here is the boring list of all the "normal" rings
 | Small fragment    | 115%     | 5%                | More than the pieces                                            |
 | Some pieces       | 110%     | 5%                | Pieces, nothing more                                            |
 | Small pieces      | 105%     | 4%                | At least its not _just_ dust                                    |
-| Dust              | 101%     | 1%                | This is useless                                                 |
+| Dust              | 101%     | 1%                | This is almost useless                                          |

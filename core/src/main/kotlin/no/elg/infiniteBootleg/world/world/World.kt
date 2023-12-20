@@ -90,6 +90,7 @@ import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.DisposedChunkCheckSystem
+import no.elg.infiniteBootleg.world.ecs.system.MagicSystem
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.NoGravityInUnloadedChunksSystem
@@ -262,6 +263,7 @@ abstract class World(
     engine.addSystem(InputSystem)
     engine.addSystem(ControlSystem)
     engine.addSystem(KickPlayerWithoutChannel)
+    engine.addSystem(MagicSystem)
     addSystems(engine)
   }
 

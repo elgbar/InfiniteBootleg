@@ -17,7 +17,16 @@ enum class GemRating(val powerPercent: Double) {
   RUINED(0.0)
 }
 
-sealed interface GemType : Named, MagicEffectsWithRating<GemRating>
+sealed interface GemType : Named, MagicEffectsWithRating<GemRating> {
+  companion object {
+    fun valueOf(displayName: String): GemType {
+      return when (displayName) {
+        Diamond.displayName -> Diamond
+        else -> throw IllegalArgumentException("Unknown gem type $displayName")
+      }
+    }
+  }
+}
 
 data object Diamond : GemType {
   override val displayName: String = "Diamond"

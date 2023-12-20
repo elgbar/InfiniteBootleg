@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.items.InventoryElement
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.MaterialItem
 import no.elg.infiniteBootleg.main.Main
@@ -182,8 +181,6 @@ enum class Material(
   override val itemType: ItemType get() = ItemType.BLOCK
 
   override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
-
-  override val index: Int get() = ordinal
 
   companion object : ProtoConverter<Material, ProtoWorld.Material> {
 
