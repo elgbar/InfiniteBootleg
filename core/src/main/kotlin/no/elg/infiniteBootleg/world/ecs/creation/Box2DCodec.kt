@@ -52,7 +52,7 @@ fun EngineEntity.createPlayerBodyComponent(
     PLAYER_WIDTH,
     PLAYER_HEIGHT,
     wantedFamilies,
-    afterBodyCreated = whenReady
+    afterBodyComponentAdded = whenReady
   ) { body: Body ->
     body.isBullet = true
     createPlayerFixture(body, body, 0f) { set(playerVertices) }
@@ -176,7 +176,7 @@ fun EngineEntity.createSpellBodyComponent(
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
       standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
     ),
-    afterBodyCreated = onReady
+    afterBodyComponentAdded = onReady
   ) {
     val shape = PolygonShape()
     shape.setAsBox(0.25f, 0.25f)
@@ -210,8 +210,8 @@ internal fun createBody2DBodyComponent(
   height: Float,
   wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
   bodyType: BodyDef.BodyType = BodyDef.BodyType.DynamicBody,
-  afterBodyCreated: (Entity) -> Unit = {},
-  createBody: (Body) -> Unit
+  afterBodyComponentAdded: (Entity) -> Unit = {},
+  beforeBodyComponentAdded: (Body) -> Unit
 ) {
   val bodyDef = BodyDef()
   bodyDef.type = bodyType
@@ -230,14 +230,14 @@ internal fun createBody2DBodyComponent(
     it.gravityScale = Constants.DEFAULT_GRAVITY_SCALE
     it.userData = entity
 
-    createBody(it)
+    beforeBodyComponentAdded(it)
     entity += Box2DBodyComponent(it, serializationType, width, height)
+    afterBodyComponentAdded(entity)
     if (Settings.debug) {
       check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
       checkFamilies(entity, wantedFamilies)
       Main.logger().debug("BOX2D", "Finishing setting up box2d entity")
     }
-    afterBodyCreated(entity)
   }
 }
 
