@@ -35,7 +35,7 @@ fun Engine.createSpellEntity(
     // This entity will handle input events
     with<PhysicsEventQueueComponent>()
     with<OccupyingBlocksComponent>()
-    safeWith { SpellStateComponent(spellState) }
+    safeWith { SpellStateComponent(spellState, worldX, worldY) }
     createSpellBodyComponent(world, worldX, worldY, dx, dy) { entity ->
       spellState.entityModifications.forEach { modification -> entity.modification() }
       onReady(entity)

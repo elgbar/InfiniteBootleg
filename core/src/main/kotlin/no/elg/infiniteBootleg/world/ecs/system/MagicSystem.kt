@@ -44,9 +44,9 @@ object MagicSystem :
     if (existingSpellState.canCastAgain() && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
       // TODO Increase (distance/speed) by holding right click?
 
-      val newSpellState = heldStaff.createSpellState(entity).also { entity.add(SpellStateComponent(it)) }
       val world = entity.world
       val position = entity.position
+      val newSpellState = heldStaff.createSpellState(entity).also { entity.add(SpellStateComponent(it, position.x, position.y)) }
       val velocityOrZero = entity.velocityOrZero
       world.engine.createSpellEntity(
         world,

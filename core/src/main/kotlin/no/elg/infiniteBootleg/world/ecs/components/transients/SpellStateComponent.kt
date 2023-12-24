@@ -7,7 +7,7 @@ import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.world.magic.SpellState
 
-class SpellStateComponent(val state: SpellState) : Component {
+class SpellStateComponent(val state: SpellState, val worldX: Float, val worldY: Float) : Component {
   companion object : Mapper<SpellStateComponent>() {
     var Entity.spellStateComponent: SpellStateComponent by propertyFor(SpellStateComponent.mapper)
     var Entity.spellStateComponentOrNull: SpellStateComponent? by optionalPropertyFor(SpellStateComponent.mapper)

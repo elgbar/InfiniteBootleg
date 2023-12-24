@@ -105,6 +105,7 @@ import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem
+import no.elg.infiniteBootleg.world.ecs.system.magic.SpellRemovalSystem
 import no.elg.infiniteBootleg.world.ecs.system.server.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.loader.WorldLoader
@@ -265,6 +266,7 @@ abstract class World(
     engine.addSystem(ControlSystem)
     engine.addSystem(KickPlayerWithoutChannel)
     engine.addSystem(MagicSystem)
+    engine.addSystem(SpellRemovalSystem)
     addSystems(engine)
   }
 
