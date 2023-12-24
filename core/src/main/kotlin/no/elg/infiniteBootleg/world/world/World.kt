@@ -126,6 +126,7 @@ import javax.annotation.concurrent.GuardedBy
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.math.abs
+import kotlin.system.measureTimeMillis
 
 /**
  * Different kind of views
@@ -308,7 +309,9 @@ abstract class World(
 
       Main.inst().scheduler.executeAsync {
         if (Main.isSingleplayer) {
-          this.createNewPlayer()
+          this.createNewPlayer().thenApply {
+            Main.logger().debug("World", "Spawned new singleplayer player")
+          }
           Main.logger().debug("World", "Spawning new singleplayer player")
         }
         render.chunkLocationsInView.forEach(::loadChunk)
@@ -471,29 +474,36 @@ abstract class World(
     // This is a long lock, it must appear to be an atomic operation though
     var readChunk: Chunk? = null
     var acquiredLock = false
-    try {
-      acquiredLock = chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS, TimeUnit.MILLISECONDS)
-      if (acquiredLock) {
-        readChunk = chunks[chunkLoc]
-      }
-    } catch (ignore: InterruptedException) {
-    } finally {
-      if (acquiredLock) {
-        chunksLock.readLock().unlock()
+    val acquireTime = measureTimeMillis {
+      try {
+        acquiredLock = chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS, TimeUnit.MILLISECONDS)
+        if (acquiredLock) {
+          readChunk = chunks[chunkLoc]
+        }
+      } catch (ignore: InterruptedException) {
+      } finally {
+        if (acquiredLock) {
+          chunksLock.readLock().unlock()
+        }
       }
     }
     if (!acquiredLock) {
-      Main.logger().warn("World", "Failed to acquire chunks read lock in $TRY_LOCK_CHUNKS_DURATION_MS ms")
+      Main.logger().warn("World") { "Failed to acquire chunks read lock in $acquireTime ms (wanted to read ${stringifyCompactLoc(chunkLoc)})" }
       return null
+    } else {
+      if (acquireTime > 0) {
+        Main.logger().debug("World") { "Acquired chunks read lock in $acquireTime ms" }
+      }
     }
-    return if (readChunk == null || readChunk.isInvalid) {
+    val finalReadChunk = readChunk
+    return if (finalReadChunk == null || finalReadChunk.isInvalid) {
       if (!load) {
         null
       } else {
         loadChunk(chunkLoc, true)
       }
     } else {
-      readChunk
+      finalReadChunk
     }
   }
 
