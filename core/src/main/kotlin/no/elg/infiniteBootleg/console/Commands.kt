@@ -552,6 +552,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     client?.ctx?.writeAndFlush(
       client.serverBoundClientDisconnectPacket("Disconnect command")
     )
+    if (Main.isAuthoritative) {
+      world?.save()
+    }
     info = "Disconnected"
     Main.inst()
       .scheduler
