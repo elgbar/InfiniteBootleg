@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.world.box2d.service.DoorService
 import no.elg.infiniteBootleg.world.box2d.service.FallingBlockContactService
 import no.elg.infiniteBootleg.world.box2d.service.OnGroundService
+import no.elg.infiniteBootleg.world.box2d.service.SpellContactService
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
@@ -34,6 +35,7 @@ object PhysicsSystem :
         OnGroundService.handleOnGroundContactBeginsEvent(entity, event)
         FallingBlockContactService.handleFallingBlockContactBeginsEvent(entity, event)
         DoorService.handleDoorContactBeginsEvent(entity, event)
+        SpellContactService.handleSpellContactBeginsEvent(entity, event)
       }
 
       is PhysicsEvent.ContactEndsEvent -> {

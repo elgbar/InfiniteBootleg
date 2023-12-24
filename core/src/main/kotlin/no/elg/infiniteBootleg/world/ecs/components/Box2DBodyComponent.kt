@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.DOOR
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.FALLING_BLOCK
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.PLAYER
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.SPELL
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -25,6 +26,7 @@ import no.elg.infiniteBootleg.world.ecs.creation.NON_CONTROLLED_PLAYER_FAMILIES
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBodyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockBodyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createPlayerBodyComponent
+import no.elg.infiniteBootleg.world.ecs.creation.createSpellBodyComponent
 
 /**
  *
@@ -82,6 +84,7 @@ class Box2DBodyComponent(
         PLAYER -> createPlayerBodyComponent(world, worldX, worldY, velX, velY, NON_CONTROLLED_PLAYER_FAMILIES, state)
         FALLING_BLOCK -> createFallingBlockBodyComponent(world, worldX, worldY, velX, velY, state)
         DOOR -> createDoorBodyComponent(world, worldX.toInt(), worldY.toInt(), state)
+        SPELL -> createSpellBodyComponent(world, worldX, worldY, velX, velY, state)
         else -> error("Unknown body type ${protoEntity.box2D.bodyType}")
       }
       return null

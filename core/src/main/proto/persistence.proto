@@ -85,6 +85,7 @@ message Entity {
     FALLING_BLOCK = 1; //Standalone falling block
     BLOCK = 2; // Entity related to a grid block
     PLAYER = 3; // A human controlled entity
+    SPELL = 4;
   }
 
   message Tags {
@@ -180,6 +181,7 @@ message Entity {
       PLAYER = 0;
       DOOR = 1;
       FALLING_BLOCK = 2;
+      SPELL = 3;
     }
   }
 

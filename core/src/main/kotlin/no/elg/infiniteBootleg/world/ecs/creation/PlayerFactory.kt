@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
 import no.elg.infiniteBootleg.protobuf.EntityKt.StaffKt.gem
+import no.elg.infiniteBootleg.protobuf.EntityKt.StaffKt.ring
 import no.elg.infiniteBootleg.protobuf.EntityKt.StaffKt.wood
 import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
 import no.elg.infiniteBootleg.protobuf.EntityKt.element
@@ -44,6 +45,7 @@ import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
+import no.elg.infiniteBootleg.world.magic.parts.AntiGravityRing
 import no.elg.infiniteBootleg.world.magic.parts.Birch
 import no.elg.infiniteBootleg.world.magic.parts.Diamond
 import no.elg.infiniteBootleg.world.magic.parts.GemRating
@@ -121,6 +123,9 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
           primaryGem = gem {
             type = Diamond.displayName
             rating = GemRating.FLAWLESS.name
+          }
+          rings += ring {
+            type = AntiGravityRing.displayName
           }
         }
       }

@@ -18,16 +18,19 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
 
   companion object : EntityLoadableMapper<EntityTypeComponent>() {
     val Entity.entityTypeComponent by propertyFor(mapper)
+    fun Entity.isType(entityType: EntityType) = entityTypeComponent.entityType == entityType
 
     private val PLAYER_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.PLAYER)
     private val BLOCK_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.BLOCK)
     private val FALLING_BLOCK_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.FALLING_BLOCK)
+    private val SPELL_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.SPELL)
 
     fun getType(entityType: EntityType): EntityTypeComponent {
       return when (entityType) {
         EntityType.BLOCK -> BLOCK_ENTITY_TYPE_COMPONENT
         EntityType.PLAYER -> PLAYER_ENTITY_TYPE_COMPONENT
         EntityType.FALLING_BLOCK -> FALLING_BLOCK_ENTITY_TYPE_COMPONENT
+        EntityType.SPELL -> SPELL_ENTITY_TYPE_COMPONENT
         EntityType.UNRECOGNIZED -> error("Unrecognized entity type")
         EntityType.GENERIC_ENTITY -> error("Generic entities are not supported")
       }

@@ -16,7 +16,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Constants
-import no.elg.infiniteBootleg.world.Constants.DEFAULT_FIXTURE_FRICTION
 import no.elg.infiniteBootleg.world.box2d.Filters
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
@@ -57,7 +56,7 @@ fun EngineEntity.createPlayerBodyComponent(
   ) { body: Body ->
     body.isBullet = true
     createPlayerFixture(body, body, 0f) { set(playerVertices) }
-    createPlayerFixture(body, PLAYERS_FOOT_USER_DATA, DEFAULT_FIXTURE_FRICTION) {
+    createPlayerFixture(body, PLAYERS_FOOT_USER_DATA, Constants.DEFAULT_FIXTURE_FRICTION) {
       setAsBox(
         PLAYER_WIDTH / 3.5f,
         ESSENTIALLY_ZERO,
@@ -150,6 +149,48 @@ fun EngineEntity.createFallingBlockBodyComponent(
     fix.userData = it.userData
     shape.dispose()
     onReady(this.entity)
+  }
+}
+
+fun EngineEntity.createSpellBodyComponent(
+  world: World,
+  worldX: Float,
+  worldY: Float,
+  dx: Float,
+  dy: Float,
+  onReady: (Entity) -> Unit = {}
+) {
+  createBody2DBodyComponent(
+    ProtoWorld.Entity.Box2D.BodyType.SPELL,
+    entity,
+    world,
+    worldX,
+    worldY,
+    dx,
+    dy,
+    0.5f,
+    0.5f,
+    arrayOf(
+      basicDynamicEntityFamily to "basicDynamicEntityFamily",
+      drawableEntitiesFamily to "drawableEntitiesFamily",
+      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
+      standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
+    ),
+    afterBodyCreated = onReady
+  ) {
+    val shape = PolygonShape()
+    shape.setAsBox(0.25f, 0.25f)
+
+    val def = FixtureDef()
+    def.shape = shape
+    def.density = Constants.DEFAULT_FIXTURE_DENSITY
+    def.friction = Constants.DEFAULT_FIXTURE_FRICTION
+    def.restitution = 0f
+
+    val fix: Fixture = it.createFixture(def)
+    fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
+    fix.userData = it.userData
+    shape.dispose()
   }
 }
 

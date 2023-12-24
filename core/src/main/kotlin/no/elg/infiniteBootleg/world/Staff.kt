@@ -7,10 +7,12 @@ import no.elg.infiniteBootleg.items.StaffItem
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt.staff
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.magic.Equippable
 import no.elg.infiniteBootleg.world.magic.Gem
 import no.elg.infiniteBootleg.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.world.magic.Ring
+import no.elg.infiniteBootleg.world.magic.SpellState
 import no.elg.infiniteBootleg.world.magic.Wood
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
@@ -37,6 +39,18 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
     gems.forEach { it.onSpellCreate(state) }
     rings.forEach { it.onSpellCreate(state) }
     return state
+  }
+
+  fun castSpell(state: SpellState, spellEntity: Entity) {
+    wood.onSpellCast(state, spellEntity)
+    gems.forEach { it.onSpellCast(state, spellEntity) }
+    rings.forEach { it.onSpellCast(state, spellEntity) }
+  }
+
+  fun spellLand(state: SpellState, spellEntity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
+    wood.onSpellLand(state, spellEntity)
+    gems.forEach { it.onSpellLand(state, spellEntity) }
+    rings.forEach { it.onSpellLand(state, spellEntity) }
   }
 
   override fun onEquip(entity: Entity) {
