@@ -16,7 +16,7 @@ object SpellContactService {
   fun handleSpellContactBeginsEvent(entity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
     if (Main.isAuthoritative && entity.isType(ProtoWorld.Entity.EntityType.SPELL)) {
       val spellState = entity.spellStateOrNull ?: return
-      spellState.staff.spellLand(spellState, entity, event)
+      spellState.staff.onSpellLand(spellState, entity, event)
       // remove the spell state component at once to prevent multiple landings
       entity.remove<SpellStateComponent>()
       entity.world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)

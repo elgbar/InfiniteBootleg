@@ -57,7 +57,7 @@ object MagicSystem :
         newSpellState
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay
-        newSpellState.staff.castSpell(newSpellState, it)
+        newSpellState.staff.onSpellCast(newSpellState, it)
       }
     }
   }

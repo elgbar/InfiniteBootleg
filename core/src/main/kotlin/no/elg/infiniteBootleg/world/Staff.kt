@@ -41,13 +41,13 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
     return state
   }
 
-  fun castSpell(state: SpellState, spellEntity: Entity) {
+  fun onSpellCast(state: SpellState, spellEntity: Entity) {
     wood.onSpellCast(state, spellEntity)
     gems.forEach { it.onSpellCast(state, spellEntity) }
     rings.forEach { it.onSpellCast(state, spellEntity) }
   }
 
-  fun spellLand(state: SpellState, spellEntity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
+  fun onSpellLand(state: SpellState, spellEntity: Entity, event: PhysicsEvent.ContactBeginsEvent) {
     wood.onSpellLand(state, spellEntity)
     gems.forEach { it.onSpellLand(state, spellEntity) }
     rings.forEach { it.onSpellLand(state, spellEntity) }
