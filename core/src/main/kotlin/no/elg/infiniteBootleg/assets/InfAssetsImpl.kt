@@ -48,6 +48,7 @@ class InfAssetsImpl : InfAssets {
   override lateinit var doorClosedTexture: RotatableTextureRegion
   override lateinit var pickaxeTexture: RotatableTextureRegion
   override lateinit var staffTexture: RotatableTextureRegion
+  override lateinit var spellTexture: RotatableTextureRegion
 
   override lateinit var skyTexture: RotatableTextureRegion
   override lateinit var caveTexture: RotatableTextureRegion
@@ -98,13 +99,14 @@ class InfAssetsImpl : InfAssets {
     visibleAirTexture = safeTextureAtlas.findRotationAwareRegion("visible_air", false)
     pickaxeTexture = safeTextureAtlas.findRotationAwareRegion("pickaxe", false)
     staffTexture = safeTextureAtlas.findRotationAwareRegion("stick", false)
+    spellTexture = safeTextureAtlas.findRotationAwareRegion("spell", false)
 
     breakingBlockTextures = (1..9).map {
       safeTextureAtlas.findRotationAwareRegion("break", false, it)
     }.toTypedArray()
 
     playerIdleTextures = findAnimation("player_idle", 3, 0.35f, startIndex = 1)
-    playerWalkingTextures = findAnimation("player_walking", 3, 0.2f, startIndex = 0)
+    playerWalkingTextures = findAnimation("player_walking", 2, 0.2f, startIndex = 0)
 
     skyTexture = createTextureRegion(ClientMain.CLEAR_COLOR_R, ClientMain.CLEAR_COLOR_G, ClientMain.CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)
     caveTexture = createTextureRegion(ChunkRenderer.CAVE_CLEAR_COLOR_R, ChunkRenderer.CAVE_CLEAR_COLOR_G, ChunkRenderer.CAVE_CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)

@@ -25,6 +25,7 @@ interface InfAssets {
   val doorClosedTexture: RotatableTextureRegion
   val pickaxeTexture: RotatableTextureRegion
   val staffTexture: RotatableTextureRegion
+  val spellTexture: RotatableTextureRegion
 
   val skyTexture: RotatableTextureRegion
   val caveTexture: RotatableTextureRegion
