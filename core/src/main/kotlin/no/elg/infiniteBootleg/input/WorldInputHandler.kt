@@ -64,7 +64,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
   }
 
   override fun scrolled(amountX: Float, amountY: Float): Boolean {
-    if (ClientMain.inst().shouldIgnoreWorldInput()) {
+    if (ClientMain.inst().shouldIgnoreWorldInput() || !isControlPressed()) {
       return false
     }
     val camera = worldRender.camera
