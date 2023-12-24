@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.input
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.utils.Disposable
@@ -8,6 +7,8 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
+import no.elg.infiniteBootleg.util.isControlPressed
+import no.elg.infiniteBootleg.util.isShiftPressed
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.Ticker
@@ -38,7 +39,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
             hud.disableMode(HUDRenderer.DISPLAY_DEBUG)
             hud.disableMode(HUDRenderer.DISPLAY_MINIMAL_DEBUG)
           }
-          if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+          if (isShiftPressed()) {
             hud.toggleMode(HUDRenderer.DISPLAY_GRAPH_FPS)
           }
         }

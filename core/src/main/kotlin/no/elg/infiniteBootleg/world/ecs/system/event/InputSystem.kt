@@ -1,12 +1,12 @@
 package no.elg.infiniteBootleg.world.ecs.system.event
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import no.elg.infiniteBootleg.util.WorldEntity
 import no.elg.infiniteBootleg.util.breakBlocks
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.interpolate
+import no.elg.infiniteBootleg.util.isShiftPressed
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Tool
@@ -62,7 +62,7 @@ object InputSystem :
 
     val selectedMaterial = entity.selectedInventoryItemComponentOrNull ?: return true
 
-    val extra = if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) 10 else 0
+    val extra = if (isShiftPressed()) 10 else 0
     try {
       when (keycode) {
         Input.Keys.NUM_0, Input.Keys.NUMPAD_0 -> Material.entries[0 + extra]

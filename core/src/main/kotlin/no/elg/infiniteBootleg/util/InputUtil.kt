@@ -23,6 +23,9 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
 
+fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)
+fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
+
 class WorldEntity(val world: World, val entity: Entity)
 
 const val JUMP_VERTICAL_VEL = 10f
