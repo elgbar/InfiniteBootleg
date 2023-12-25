@@ -84,13 +84,12 @@ object EventManager {
    */
   inline fun <reified T : Event> dispatchEvent(event: T) {
     val backingListeners: MutableSet<EventListener<out Event>>
-    val correctListeners: List<EventListener<T>>
     synchronized(listeners) {
       backingListeners = listeners[T::class] ?: return
-      correctListeners = backingListeners.filterIsInstance<EventListener<T>>()
     }
 
     synchronized(backingListeners) {
+      val correctListeners = backingListeners.filterIsInstance<EventListener<T>>()
       eventsTracker?.onEventDispatched(event)
       for (listener in correctListeners) {
         eventsTracker?.onEventListenedTo(event, listener)
