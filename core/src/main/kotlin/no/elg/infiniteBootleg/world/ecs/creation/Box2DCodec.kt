@@ -173,8 +173,7 @@ fun EngineEntity.createSpellBodyComponent(
     arrayOf(
       basicDynamicEntityFamily to "basicDynamicEntityFamily",
       drawableEntitiesFamily to "drawableEntitiesFamily",
-      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
-      standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
+      entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
     ),
     afterBodyComponentAdded = onReady
   ) {
