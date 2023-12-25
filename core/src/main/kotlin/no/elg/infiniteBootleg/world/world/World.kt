@@ -493,7 +493,7 @@ abstract class World(
       Main.logger().warn("World") { "Failed to acquire chunks read lock in $acquireTime ms (wanted to read ${stringifyCompactLoc(chunkLoc)})" }
       return null
     } else {
-      if (acquireTime > 0) {
+      if (acquireTime > TRY_LOCK_CHUNKS_DURATION_MS / 2f) {
         Main.logger().debug("World") { "Acquired chunks read lock in $acquireTime ms" }
       }
     }
