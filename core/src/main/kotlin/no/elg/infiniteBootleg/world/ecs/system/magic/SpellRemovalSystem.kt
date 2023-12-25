@@ -17,7 +17,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent.Companion.spellStateComponent
-import no.elg.infiniteBootleg.world.render.EntityRenderer.Companion.EFFECTIVE_ZERO
 
 object SpellRemovalSystem :
   IteratingSystem(
@@ -38,7 +37,7 @@ object SpellRemovalSystem :
     val currentPos = entity.position
 
     val distanceTravelled = Vector2.dst2(spellStateComponent.spawnX.toFloat(), spellStateComponent.spawnY.toFloat(), currentPos.x, currentPos.y)
-    if (distanceTravelled > maxTravelDistance * maxTravelDistance || entity.velocityOrZero.isZero(EFFECTIVE_ZERO)) {
+    if (distanceTravelled > maxTravelDistance * maxTravelDistance || entity.velocityOrZero.isZero(1f)) {
       entity.world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
       entity.remove<SpellStateComponent>()
     }
