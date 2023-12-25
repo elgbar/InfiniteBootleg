@@ -35,10 +35,13 @@ object MagicSystem :
   ),
   ClientSystem {
 
+  private val vector = Vector2()
+
   override fun processEntity(entity: Entity, deltaTime: Float) {
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
       return
     }
+    val world = entity.clientWorld ?: return
     val heldStaff = entity.selectedInventoryItemComponentOrNull?.element as? Staff ?: return
     val existingSpellState = entity.spellStateOrNull
     if (existingSpellState.canCastAgain() && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
@@ -48,12 +51,19 @@ object MagicSystem :
       val position = entity.position
       val newSpellState = heldStaff.createSpellState(entity).also { entity.add(SpellStateComponent(it, position.x, position.y)) }
       val velocityOrZero = entity.velocityOrZero
+
+      inputMouseLocator.update(world)
+      vector
+        .set(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY)
+        .sub(position.x, position.y)
+        .nor()
+
       world.engine.createSpellEntity(
         world,
         position.x,
         position.y,
-        velocityOrZero.x * 5 + 10,
-        velocityOrZero.y * 5 + 5,
+        vector.x * abs(velocityOrZero.x) * newSpellState.spellVelocity.toFloat(),
+        vector.y * abs(velocityOrZero.y) * newSpellState.spellVelocity.toFloat(),
         newSpellState
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay

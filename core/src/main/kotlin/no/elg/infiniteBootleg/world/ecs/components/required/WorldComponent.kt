@@ -9,12 +9,14 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.LoadableMapper
+import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
 
 data class WorldComponent(val world: World) : EntitySavableComponent {
 
   companion object : LoadableMapper<WorldComponent, ProtoWorld.Entity, World>() {
     val Entity.world get() = worldComponent.world
+    val Entity.clientWorld get() = this.world as? ClientWorld
     val Entity.worldComponent by propertyFor(mapper)
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: World): WorldComponent? = safeWith { WorldComponent(state) }

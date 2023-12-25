@@ -32,7 +32,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
       // FIXME placeholder
       gemPower = 1.0,
       // FIXME placeholder
-      spellVelocity = 10.0,
+      spellVelocity = 5.0,
       entityModifications = mutableListOf()
     )
     wood.onSpellCreate(state)
