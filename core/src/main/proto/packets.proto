@@ -99,6 +99,15 @@ message WorldSettings {
   optional .persistence.Vector2i spawn = 3;
 }
 
+message BreakingBlock {
+  message BreakingProgress {
+    .persistence.Vector2i blockLocation = 1;
+    // 0-1
+    float progress = 2;
+  }
+  repeated BreakingProgress breakingProgress = 1;
+}
+
 //////////////////
 // CLIENT BOUND //
 //////////////////
@@ -167,13 +176,4 @@ message ChunkRequest {
 
 message EntityRequest {
   string uuid = 1;
-}
-
-message BreakingBlock {
-  message BreakingProgress {
-    .persistence.Vector2i blockLocation = 1;
-    // 0-1
-    float progress = 2;
-  }
-  repeated BreakingProgress breakingProgress = 1;
 }

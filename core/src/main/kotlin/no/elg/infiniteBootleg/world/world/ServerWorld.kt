@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.isType
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -40,7 +40,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     engine.addEntityListener(
       basicDynamicEntityFamily,
       object : EntityListener {
-        fun isPlayer(entity: Entity) = entity.entityTypeComponent.entityType == ProtoWorld.Entity.EntityType.PLAYER
+        fun isPlayer(entity: Entity) = entity.isType(ProtoWorld.Entity.EntityType.PLAYER)
         override fun entityAdded(entity: Entity) {
           if (isPlayer(entity)) onEntityAdd(entity)
         }

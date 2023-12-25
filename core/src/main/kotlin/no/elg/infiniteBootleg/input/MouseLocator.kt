@@ -3,27 +3,29 @@ package no.elg.infiniteBootleg.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.WorldCoordFloat
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 class MouseLocator {
-  var mouseBlockX = 0
+  var mouseBlockX: WorldCoord = 0
     private set
-  var mouseBlockY = 0
+  var mouseBlockY: WorldCoord = 0
     private set
-  var mouseWorldX = 0f
+  var mouseWorldX: WorldCoordFloat = 0f
     private set
-  var mouseWorldY = 0f
+  var mouseWorldY: WorldCoordFloat = 0f
     private set
-  var previousMouseBlockX = 0
+  var previousMouseBlockX: WorldCoord = 0
     private set
-  var previousMouseBlockY = 0
+  var previousMouseBlockY: WorldCoord = 0
     private set
-  var previousMouseWorldX = 0f
+  var previousMouseWorldX: WorldCoordFloat = 0f
     private set
-  var previousMouseWorldY = 0f
+  var previousMouseWorldY: WorldCoordFloat = 0f
     private set
 
   private val mouseWorldInput = Vector2()
