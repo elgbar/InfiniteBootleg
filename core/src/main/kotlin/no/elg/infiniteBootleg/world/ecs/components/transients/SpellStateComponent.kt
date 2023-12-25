@@ -5,13 +5,14 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.world.magic.SpellState
 
-class SpellStateComponent(val state: SpellState, val worldX: Float, val worldY: Float) : Component {
+// The spell state of a spell entity
+class SpellStateComponent(val state: SpellState, val spawnX: WorldCoordNumber, val spawnY: WorldCoordNumber) : Component {
   companion object : Mapper<SpellStateComponent>() {
     var Entity.spellStateComponent: SpellStateComponent by propertyFor(SpellStateComponent.mapper)
     var Entity.spellStateComponentOrNull: SpellStateComponent? by optionalPropertyFor(SpellStateComponent.mapper)
     val Entity.spellStateOrNull: SpellState? get() = spellStateComponentOrNull?.state
-    val Entity.spellState: SpellState get() = spellStateComponent.state
   }
 }

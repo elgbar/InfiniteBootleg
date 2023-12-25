@@ -6,13 +6,11 @@ import com.badlogic.gdx.math.Vector2
 import ktx.ashley.allOf
 import ktx.ashley.remove
 import no.elg.infiniteBootleg.protobuf.Packets
-import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.isType
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
@@ -35,16 +33,14 @@ object SpellRemovalSystem :
   AuthoritativeSystem {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    if (entity.isType(ProtoWorld.Entity.EntityType.SPELL)) {
-      val spellStateComponent = entity.spellStateComponent
-      val maxTravelDistance = spellStateComponent.state.spellRange
-      val currentPos = entity.position
+    val spellStateComponent = entity.spellStateComponent
+    val maxTravelDistance = spellStateComponent.state.spellRange
+    val currentPos = entity.position
 
-      val distanceTravelled = Vector2.dst2(spellStateComponent.worldX, spellStateComponent.worldY, currentPos.x, currentPos.y)
-      if (distanceTravelled > maxTravelDistance * maxTravelDistance || entity.velocityOrZero.isZero(EFFECTIVE_ZERO)) {
-        entity.world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
-        entity.remove<SpellStateComponent>()
-      }
+    val distanceTravelled = Vector2.dst2(spellStateComponent.spawnX.toFloat(), spellStateComponent.spawnY.toFloat(), currentPos.x, currentPos.y)
+    if (distanceTravelled > maxTravelDistance * maxTravelDistance || entity.velocityOrZero.isZero(EFFECTIVE_ZERO)) {
+      entity.world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
+      entity.remove<SpellStateComponent>()
     }
   }
 }
