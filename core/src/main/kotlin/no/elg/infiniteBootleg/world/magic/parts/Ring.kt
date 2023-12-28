@@ -47,6 +47,7 @@ sealed interface RatedRingType : Named, RingType<RingRating>
 
 data object AntiGravityRing : RatelessRingType {
   override val displayName: String = "Anti Gravity"
+  override val serializedName: String = "Anti Gravity"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating?) {
     state.entityModifications += { spell: Entity -> spell.box2dOrNull?.disableGravity() }
@@ -54,7 +55,8 @@ data object AntiGravityRing : RatelessRingType {
 }
 
 data object OpalRing : RatedRingType {
-  override val displayName: String = "Opal"
+  override val displayName: String = "Power opal"
+  override val serializedName: String = "Opal"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.gemPower *= rating.effectPercent
@@ -62,7 +64,8 @@ data object OpalRing : RatedRingType {
 }
 
 data object EmeraldRing : RatedRingType {
-  override val displayName: String = "Emerald"
+  override val displayName: String = "Range emerald"
+  override val serializedName: String = "Emerald"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.spellRange *= rating.effectPercent
@@ -70,7 +73,8 @@ data object EmeraldRing : RatedRingType {
 }
 
 data object RubyRing : RatedRingType {
-  override val displayName: String = "Ruby"
+  override val displayName: String = "Incarnation ruby"
+  override val serializedName: String = "Ruby"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.castDelay /= rating.effectPercent
@@ -78,7 +82,8 @@ data object RubyRing : RatedRingType {
 }
 
 data object SapphireRing : RatedRingType {
-  override val displayName: String = "Sapphire"
+  override val displayName: String = "Speed sapphire"
+  override val serializedName: String = "Sapphire"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.spellVelocity *= rating.effectPercent
