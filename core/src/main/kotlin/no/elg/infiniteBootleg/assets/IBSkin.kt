@@ -7,6 +7,7 @@ import ktx.style.imageTextButton
 import ktx.style.label
 import ktx.style.menu
 import ktx.style.menuItem
+import ktx.style.selectBox
 import ktx.style.set
 import ktx.style.textButton
 import ktx.style.textField
@@ -51,6 +52,8 @@ fun InfAssets.loadInfBootSkin() {
       window(extend = "resizable") { titleFont = boldNotFlippedFont }
       window(extend = "noborder") { titleFont = boldNotFlippedFont }
       window(extend = "dialog") { titleFont = boldNotFlippedFont }
+
+      selectBox(extend = "default") { font = notFlippedFont }
 
       menuItem(extend = "default") { font = notFlippedFont }
       menu { openButtonStyle = newOpenButtonStyle }
