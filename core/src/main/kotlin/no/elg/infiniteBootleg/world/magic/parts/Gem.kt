@@ -21,7 +21,7 @@ sealed interface GemType : Named, MagicEffectsWithRating<GemRating> {
   companion object {
     fun valueOf(displayName: String): GemType {
       return when (displayName) {
-        Diamond.displayName -> Diamond
+        Diamond.serializedName -> Diamond
         else -> throw IllegalArgumentException("Unknown gem type $displayName")
       }
     }

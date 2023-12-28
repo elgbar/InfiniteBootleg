@@ -26,11 +26,11 @@ sealed interface RingType<in R : RingRating?> : Named, Equippable, MagicEffectsW
     fun valueOf(displayName: String): RingType<RingRating?> {
       @Suppress("UNCHECKED_CAST")
       return when (displayName) {
-        AntiGravityRing.displayName -> AntiGravityRing
-        OpalRing.displayName -> OpalRing
-        EmeraldRing.displayName -> EmeraldRing
-        RubyRing.displayName -> RubyRing
-        SapphireRing.displayName -> SapphireRing
+        AntiGravityRing.serializedName -> AntiGravityRing
+        OpalRing.serializedName -> OpalRing
+        EmeraldRing.serializedName -> EmeraldRing
+        RubyRing.serializedName -> RubyRing
+        SapphireRing.serializedName -> SapphireRing
         else -> throw IllegalArgumentException("Unknown ring type $displayName")
       } as RingType<RingRating?>
     }

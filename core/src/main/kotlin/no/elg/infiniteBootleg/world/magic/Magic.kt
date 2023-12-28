@@ -56,7 +56,7 @@ data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) : Magi
 
   fun toProto(): ProtoWorld.Entity.Staff.Ring =
     ring {
-      this.type = this@Ring.type.displayName
+      this.type = this@Ring.type.serializedName
       this@Ring.rating?.let { this.rating = it.name }
     }
 

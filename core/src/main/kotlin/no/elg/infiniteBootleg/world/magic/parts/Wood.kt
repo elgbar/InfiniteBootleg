@@ -24,12 +24,12 @@ sealed class WoodType(
 
     fun valueOf(displayName: String): WoodType {
       return when (displayName) {
-        Birch.displayName -> Birch
-        Aerowode.displayName -> Aerowode
-        RedWood.displayName -> RedWood
-        Driftwood.displayName -> Driftwood
-        WistedWood.displayName -> WistedWood
-        Trekant.displayName -> Trekant
+        Birch.serializedName -> Birch
+        Aerowode.serializedName -> Aerowode
+        RedWood.serializedName -> RedWood
+        Driftwood.serializedName -> Driftwood
+        WistedWood.serializedName -> WistedWood
+        Trekant.serializedName -> Trekant
         else -> throw IllegalArgumentException("Unknown wood type $displayName")
       }
     }
