@@ -23,7 +23,6 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.LastSpellCastCompo
 import no.elg.infiniteBootleg.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
 import no.elg.infiniteBootleg.world.ecs.creation.createSpellEntity
 import no.elg.infiniteBootleg.world.magic.SpellState.Companion.canCastAgain
-import kotlin.math.abs
 import kotlin.time.TimeSource
 
 object MagicSystem :
@@ -65,8 +64,8 @@ object MagicSystem :
         world,
         position.x,
         position.y,
-        vector.x * abs(velocityOrZero.x) * newSpellState.spellVelocity.toFloat(),
-        vector.y * abs(velocityOrZero.y) * newSpellState.spellVelocity.toFloat(),
+        vector.x * newSpellState.spellVelocity.toFloat() + velocityOrZero.x,
+        vector.y * newSpellState.spellVelocity.toFloat() + velocityOrZero.y,
         newSpellState
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay
