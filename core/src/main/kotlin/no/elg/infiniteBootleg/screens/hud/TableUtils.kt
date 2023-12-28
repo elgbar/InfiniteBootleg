@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.screens.hud
 
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
@@ -9,19 +10,20 @@ import ktx.collections.GdxArray
 import ktx.collections.isNotEmpty
 import ktx.collections.toGdxArray
 import ktx.scene2d.KTable
+import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.horizontalGroup
-import ktx.scene2d.vis.KVisSelectBox
 import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visLabel
-import ktx.scene2d.vis.visSelectBox
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
+import no.elg.infiniteBootleg.util.IBVisSelectBox
 import no.elg.infiniteBootleg.util.sealedSubclassObjectInstances
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.toTitleCase
+import no.elg.infiniteBootleg.util.visIBSelectBox
 import java.math.BigDecimal
 
 fun updateAllValues(onAnyElementChanged: MutableList<() -> Unit>) {
@@ -86,41 +88,39 @@ fun KTable.floatSpinner(
 }
 
 @Scene2dDsl
-inline fun <reified T : Enum<T>> KTable.enumSelector(
+inline fun <reified T : Enum<T>> KWidget<Actor>.enumSelector(
   onAnyElementChanged: MutableList<() -> Unit>,
   initialElement: T,
   name: String = T::class.java.simpleName.toTitleCase(),
   noinline onChange: (T) -> Unit = {}
-): KVisSelectBox<T> {
-  val model = enumValues<T>().toGdxArray()
-  return genericSelector(onAnyElementChanged, name, model, initialElement, onChange)
+): IBVisSelectBox<T> {
+  val items = enumValues<T>().toGdxArray()
+  return genericSelector(onAnyElementChanged, name, items, initialElement, onChange)
 }
 
 @Scene2dDsl
-inline fun <reified T : Any> KTable.sealedSelector(
+inline fun <reified T : Any> KWidget<Actor>.sealedSelector(
   onAnyElementChanged: MutableList<() -> Unit>,
   initialElement: T,
   name: String = T::class.java.simpleName.toTitleCase(),
   noinline onChange: (T) -> Unit = {}
-): KVisSelectBox<T> {
-  val model = sealedSubclassObjectInstances<T>().toGdxArray()
-  return genericSelector(onAnyElementChanged, name, model, initialElement, onChange)
+): IBVisSelectBox<T> {
+  val items = sealedSubclassObjectInstances<T>().toGdxArray()
+  return genericSelector(onAnyElementChanged, name, items, initialElement, onChange)
 }
 
 @Scene2dDsl
-fun <T> KTable.genericSelector(
+fun <T> KWidget<Actor>.genericSelector(
   onAnyElementChanged: MutableList<() -> Unit>,
   name: String,
-  model: GdxArray<T>,
+  items: GdxArray<T>,
   initialElement: T,
   onChange: (T) -> Unit = {}
-): KVisSelectBox<T> {
-  require(model.isNotEmpty()) { "Model must have at least one element" }
+): IBVisSelectBox<T> {
+  require(items.isNotEmpty()) { "Model must have at least one element" }
   horizontalGroup {
-    visLabel(name)
-    return visSelectBox {
-      items = model
-      selected = initialElement
+    visLabel("$name ")
+    return visIBSelectBox(items, initialElement) {
       onChange {
         onChange(this.selected)
         updateAllValues(onAnyElementChanged)
