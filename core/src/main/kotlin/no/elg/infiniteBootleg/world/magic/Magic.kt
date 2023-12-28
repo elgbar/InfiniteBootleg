@@ -64,7 +64,7 @@ data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) : Magi
     fun fromProto(proto: ProtoWorld.Entity.Staff.Ring): Ring {
       return Ring(
         RingType.valueOf(proto.type),
-        if (proto.hasRating()) RingRating.valueOf(proto.type) else null
+        if (proto.hasRating()) RingRating.valueOf(proto.rating) else null
       )
     }
   }
