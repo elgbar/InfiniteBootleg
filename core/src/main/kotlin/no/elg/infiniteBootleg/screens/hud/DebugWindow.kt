@@ -1,12 +1,11 @@
 package no.elg.infiniteBootleg.screens.hud
 
+import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.isShown
-import ktx.scene2d.KTable
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
-import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.EventManager
@@ -14,6 +13,8 @@ import no.elg.infiniteBootleg.events.api.EventsTracker
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
+import no.elg.infiniteBootleg.screens.onKeyDown
+import no.elg.infiniteBootleg.screens.show
 import no.elg.infiniteBootleg.screens.toggleShown
 import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
@@ -25,7 +26,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.concurrent.read
 
-class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow) {
+class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow, private val onAnyElementChanged: MutableList<() -> Unit>) {
 
   val isDebugMenuVisible: Boolean get() = debugMenu.isVisible || debugMenu.isShown()
 
@@ -37,31 +38,19 @@ class DebugWindow(private val stage: Stage, private val debugMenu: VisWindow) {
   }
 }
 
-private val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
-
 fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
   actors {
+    val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
+    val staffCreator = addStaffCreatorOverlay(world)
     val debugMenu = visWindow("Debug Menu") {
+      onKeyDown(Keys.ESCAPE) { hide() }
       hide()
       defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
       val cols = 5
 
       @Scene2dDsl
-      fun section(theRow: KTable.() -> Unit) {
-        theRow()
-        row()
-      }
-
-      @Scene2dDsl
-      fun aSeparator() {
-        section {
-          separator {
-            it.fillX()
-            it.colspan(cols)
-          }
-        }
-      }
+      fun aSeparator() = aSeparator(cols)
 
       section {
         toggleableDebugButton(
@@ -175,6 +164,17 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
             }
           }
         )
+        toggleableDebugButton(
+          "Show staff creator",
+          "Show the staff creator overlay",
+          "toggle-menu-button",
+          onAnyElementChanged,
+          { false },
+          {
+//            this@visWindow.hide()
+            staffCreator.show(this@addDebugOverlay, true)
+          }
+        )
       }
       // Event tracker
       section {
@@ -192,7 +192,8 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
           booleanGetter = EventManager::isLoggingEventsDispatched,
           onToggle = {
             EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_DISPATCHED }
-          })
+          }
+        )
         toggleableDebugButton(
           "Log listeners change",
           "Whether to log when an event is listener is registered",
@@ -319,6 +320,6 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
       }
       pack()
     }
-    return DebugWindow(this@addDebugOverlay, debugMenu)
+    return DebugWindow(this@addDebugOverlay, debugMenu, onAnyElementChanged)
   }
 }
