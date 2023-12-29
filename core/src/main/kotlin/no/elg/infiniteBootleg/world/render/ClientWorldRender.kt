@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
+import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
@@ -165,4 +166,5 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isInView(chunkX, chunkY)
 
   override val chunkLocationsInView get() = chunksInView.iterator()
+  override val chunkColumnsInView get() = chunksInView.chunkColumnsInView()
 }

@@ -30,6 +30,11 @@ interface WorldRender : Updatable, Renderer, Disposable, Resizable {
   val world: World
   val chunkLocationsInView: Iterator<Long>
 
+  /**
+   * List of chunk columns coordinates that are in view
+   */
+  val chunkColumnsInView: Set<ChunkCoord>
+
   companion object {
     const val MIN_ZOOM = 0.25f
 

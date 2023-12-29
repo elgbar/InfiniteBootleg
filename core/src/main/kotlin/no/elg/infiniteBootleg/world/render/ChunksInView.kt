@@ -8,13 +8,13 @@ import no.elg.infiniteBootleg.world.world.World
 
 interface ChunksInView {
 
-  var horizontalStart: Int
+  var horizontalStart: ChunkCoord
 
-  var horizontalEnd: Int
+  var horizontalEnd: ChunkCoord
 
-  var verticalStart: Int
+  var verticalStart: ChunkCoord
 
-  var verticalEnd: Int
+  var verticalEnd: ChunkCoord
 
   val horizontalLength: Int
     get() = horizontalEnd - horizontalStart
@@ -54,5 +54,7 @@ interface ChunksInView {
       }
       return locs.toArray().iterator()
     }
+
+    fun ChunksInView.chunkColumnsInView(): Set<ChunkCoord> = (horizontalStart..horizontalEnd).toSet()
   }
 }

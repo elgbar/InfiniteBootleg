@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.playerFamily
+import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -67,6 +68,9 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
 
   override val chunkLocationsInView: Iterator<Long>
     get() = viewingChunks.values().flatMap { it.iterator().asSequence() }.iterator()
+
+  override val chunkColumnsInView: Set<ChunkCoord>
+    get() = viewingChunks.values().flatMapTo(mutableSetOf()) { it.chunkColumnsInView() }
 
   fun addClient(uuid: String, civ: ServerClientChunksInView) {
     lock.write {

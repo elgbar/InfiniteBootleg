@@ -153,6 +153,22 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
           }
         )
         toggleableDebugButton(
+          "Recalculate topblock lights",
+          "Recalulate all lights in the world and re-render the chunks",
+          "toggle-menu-button",
+          onAnyElementChanged,
+          { false },
+          {
+            world.render.chunkColumnsInView.forEach {
+              Main.inst().scheduler.executeAsync {
+                for (localX in 0 until Chunk.CHUNK_SIZE) {
+                  world.getChunkColumn(it).updateTopBlock(localX)
+                }
+              }
+            }
+          }
+        )
+        toggleableDebugButton(
           "Render all chunks",
           "Re-render the texture of all loaded chunks in the world",
           "toggle-menu-button",
@@ -170,10 +186,7 @@ A red overlay denotes a luminescent block, while a yellow overlay denotes the sk
           "toggle-menu-button",
           onAnyElementChanged,
           { false },
-          {
-//            this@visWindow.hide()
-            staffCreator.show(this@addDebugOverlay, true)
-          }
+          { staffCreator.show(this@addDebugOverlay, true) }
         )
       }
       // Event tracker

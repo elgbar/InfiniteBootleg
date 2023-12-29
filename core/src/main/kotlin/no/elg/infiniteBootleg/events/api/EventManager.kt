@@ -99,7 +99,7 @@ object EventManager {
   }
 
   /**
-   * Prevent (by removing) the given listener from reciving any more events
+   * Prevent (by removing) the given listener from receiving any more events
    */
   inline fun <reified T : Event> removeListener(listener: EventListener<T>) {
     val eventListeners: MutableSet<EventListener<out Event>>

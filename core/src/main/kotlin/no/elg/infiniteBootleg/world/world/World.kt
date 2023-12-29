@@ -70,6 +70,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
+import no.elg.infiniteBootleg.world.chunks.ChunkColumnListeners
 import no.elg.infiniteBootleg.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamilyToSendToClient
@@ -185,6 +186,7 @@ abstract class World(
    * Must be accessed under `synchronized(chunkColumns)`
    */
   protected val chunkColumns = IntMap<ChunkColumn>()
+  private val chunkColumnListeners = ChunkColumnListeners()
 
   @Volatile
   private var worldFile: FileHandle? = null
@@ -219,6 +221,8 @@ abstract class World(
     spawn = compactLoc(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
     worldBody = WorldBody(this)
+
+    chunkColumnListeners.registerListeners()
 
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
       Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!" }
@@ -1115,6 +1119,8 @@ abstract class World(
     saveTask = null
     worldTicker.dispose()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
+
+    chunkColumnListeners.dispose()
 
     chunksLock.write {
       for (chunk in chunks.values()) {
