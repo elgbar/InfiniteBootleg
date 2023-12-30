@@ -1,13 +1,19 @@
 package no.elg.infiniteBootleg.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.EventListener
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.MenuItem
 import com.kotcrab.vis.ui.widget.PopupMenu
 import com.kotcrab.vis.ui.widget.Separator
+import com.kotcrab.vis.ui.widget.VisImageButton
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.kotcrab.vis.ui.widget.VisWindow.FADE_TIME
 import ktx.actors.isShown
@@ -84,6 +90,37 @@ fun VisWindow.toggleShown(stage: Stage, center: Boolean = true) {
   } else {
     hide()
   }
+}
+
+/** Toggle if this window is shown or not */
+fun VisWindow.hideOnEscape() {
+  onKeyDown(Input.Keys.ESCAPE) { hide() }
+}
+
+fun VisWindow.addHideButton(fadeTime: Float = 0f) {
+  val titleLabel = titleLabel
+  val titleTable = titleTable
+
+  val closeButton = VisImageButton("close-window")
+  titleTable.add(closeButton).padRight(-padRight + 0.7f)
+  closeButton.addListener(object : ChangeListener() {
+    override fun changed(event: ChangeEvent, actor: Actor) {
+      hide(fadeTime)
+    }
+  })
+  closeButton.addListener(object : ClickListener() {
+    override fun touchDown(
+      event: InputEvent,
+      x: Float,
+      y: Float,
+      pointer: Int,
+      button: Int
+    ): Boolean {
+      event.cancel()
+      return true
+    }
+  })
+  if (titleLabel.labelAlign == Align.center && titleTable.children.size == 2) titleTable.getCell(titleLabel).padLeft(closeButton.width * 2)
 }
 
 operator fun Stage.plusAssign(eventListener: EventListener) {

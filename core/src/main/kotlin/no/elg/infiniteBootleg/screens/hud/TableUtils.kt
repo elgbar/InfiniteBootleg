@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.screens.hud
 
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.spinner.FloatSpinnerModel
@@ -12,11 +11,11 @@ import ktx.collections.toGdxArray
 import ktx.scene2d.KTable
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
-import ktx.scene2d.horizontalGroup
-import ktx.scene2d.vis.KVisWindow
+import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visLabel
+import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.infiniteBootleg.util.IBVisSelectBox
@@ -88,7 +87,7 @@ fun KTable.floatSpinner(
 }
 
 @Scene2dDsl
-inline fun <reified T : Enum<T>> KWidget<Actor>.enumSelector(
+inline fun <reified T : Enum<T>> KWidget<*>.enumSelector(
   onAnyElementChanged: MutableList<() -> Unit>,
   initialElement: T,
   name: String = T::class.java.simpleName.toTitleCase(),
@@ -99,7 +98,7 @@ inline fun <reified T : Enum<T>> KWidget<Actor>.enumSelector(
 }
 
 @Scene2dDsl
-inline fun <reified T : Any> KWidget<Actor>.sealedSelector(
+inline fun <reified T : Any> KWidget<*>.sealedSelector(
   onAnyElementChanged: MutableList<() -> Unit>,
   initialElement: T,
   name: String = T::class.java.simpleName.toTitleCase(),
@@ -110,7 +109,7 @@ inline fun <reified T : Any> KWidget<Actor>.sealedSelector(
 }
 
 @Scene2dDsl
-fun <T> KWidget<Actor>.genericSelector(
+fun <T> KWidget<*>.genericSelector(
   onAnyElementChanged: MutableList<() -> Unit>,
   name: String,
   items: GdxArray<T>,
@@ -118,8 +117,8 @@ fun <T> KWidget<Actor>.genericSelector(
   onChange: (T) -> Unit = {}
 ): IBVisSelectBox<T> {
   require(items.isNotEmpty()) { "Model must have at least one element" }
-  horizontalGroup {
-    visLabel("$name ")
+  visTable(true) {
+    visLabel(name)
     return visIBSelectBox(items, initialElement) {
       onChange {
         onChange(this.selected)
@@ -130,13 +129,13 @@ fun <T> KWidget<Actor>.genericSelector(
 }
 
 @Scene2dDsl
-fun KVisWindow.section(theRow: KTable.() -> Unit) {
+fun KVisTable.section(theRow: KTable.() -> Unit) {
   theRow()
   row()
 }
 
 @Scene2dDsl
-fun KVisWindow.aSeparator(cols: Int = 1) {
+fun KVisTable.aSeparator(cols: Int = this.columns) {
   section {
     separator {
       it.fillX()
