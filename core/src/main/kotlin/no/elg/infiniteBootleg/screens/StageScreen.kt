@@ -51,13 +51,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
 
   override fun render(delta: Float) {
     stage.act()
-    try {
-      stage.draw()
-    } finally {
-      if (stage.batch.isDrawing) {
-        stage.batch.end()
-      }
-    }
+    stage.draw()
   }
 
   override fun show() {

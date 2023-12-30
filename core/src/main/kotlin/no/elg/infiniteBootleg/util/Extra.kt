@@ -131,7 +131,9 @@ inline fun <B : Batch> B.safeUse(projectionMatrix: Matrix4? = null, action: (B) 
   try {
     action(this)
   } finally {
-    end()
+    if (isDrawing) {
+      end()
+    }
   }
 }
 
