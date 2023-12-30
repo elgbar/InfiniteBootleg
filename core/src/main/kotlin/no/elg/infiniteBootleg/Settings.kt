@@ -39,7 +39,7 @@ object Settings {
   var debug = false
 
   @JvmField
-  var schedulerThreads = -1
+  var schedulerThreads = 1
 
   /**
    * The ticks per seconds to use by default. Changing this will only apply to new instances
