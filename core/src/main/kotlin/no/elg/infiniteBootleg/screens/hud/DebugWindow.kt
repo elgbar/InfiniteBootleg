@@ -105,6 +105,14 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           booleanGetter = Settings::renderTopBlockChanges,
           onToggle = { Settings.renderTopBlockChanges = !Settings.renderTopBlockChanges }
         )
+
+        toggleableDebugButton(
+          "UI debug",
+          "Toggles debugging for scene 2d",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = this@addDebugOverlay::isDebugAll,
+          onToggle = { this@addDebugOverlay.isDebugAll = !this@addDebugOverlay.isDebugAll }
+        )
       }
 
       // Lights
