@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
@@ -121,6 +122,10 @@ fun VisWindow.addHideButton(fadeTime: Float = 0f) {
     }
   })
   if (titleLabel.labelAlign == Align.center && titleTable.children.size == 2) titleTable.getCell(titleLabel).padLeft(closeButton.width * 2)
+}
+
+fun Table.setIBDefaults() {
+  defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 }
 
 operator fun Stage.plusAssign(eventListener: EventListener) {

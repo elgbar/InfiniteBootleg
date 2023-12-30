@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.addHideButton
 import no.elg.infiniteBootleg.screens.hide
 import no.elg.infiniteBootleg.screens.hideOnEscape
+import no.elg.infiniteBootleg.screens.setIBDefaults
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
@@ -103,7 +104,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
       addHideButton()
       hideOnEscape()
       hide()
-      defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+      setIBDefaults()
 
       val gems = mutableListOf<() -> Gem?>()
       val rings = mutableListOf<() -> Ring?>()
@@ -137,7 +138,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
         var type: WoodType = Birch
         var rating: WoodRating = WoodRating.FRESHLY_CUT
         visTable {
-          defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+          setIBDefaults()
           sealedSelector<WoodType>(onAnyElementChanged, type) {
             type = it
             container.addGemsAndRings(type)
@@ -150,7 +151,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
       val wood = addWoodSelector()
       row()
       actor(container) {
-        defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+        setIBDefaults()
         addGemsAndRings(wood().type)
       }
       row()

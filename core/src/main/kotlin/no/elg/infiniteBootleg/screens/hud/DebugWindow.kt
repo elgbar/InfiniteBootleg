@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
 import no.elg.infiniteBootleg.screens.hideOnEscape
+import no.elg.infiniteBootleg.screens.setIBDefaults
 import no.elg.infiniteBootleg.screens.show
 import no.elg.infiniteBootleg.screens.toggleShown
 import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
@@ -54,7 +55,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       hide()
 
       visTable {
-        defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+        setIBDefaults()
 
         @Scene2dDsl
         fun sep() = aSeparator()
