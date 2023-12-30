@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.events.api
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleWrongThreadAsyncEvents
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.stacktrace
 
 open class AsyncEvent(vararg expectedThreadType: ThreadType) : Event {
 
@@ -15,7 +16,7 @@ open class AsyncEvent(vararg expectedThreadType: ThreadType) : Event {
       }
       when (handleWrongThreadAsyncEvents) {
         Settings.WrongThreadAsyncEventAction.LOG -> Main.logger().warn("AsyncEvent", message)
-        Settings.WrongThreadAsyncEventAction.STACKTRACE -> RuntimeException("(not real exception, stacktrace only) ${message()}").printStackTrace()
+        Settings.WrongThreadAsyncEventAction.STACKTRACE -> Main.logger().warn("AsyncEvent", "${message()}\n${stacktrace()}")
         Settings.WrongThreadAsyncEventAction.THROW -> throw RuntimeException(message())
       }
     }
