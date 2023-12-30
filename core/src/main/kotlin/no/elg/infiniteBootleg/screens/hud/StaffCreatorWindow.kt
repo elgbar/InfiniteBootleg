@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.screens.hud
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.kotcrab.vis.ui.widget.VisSelectBox
 import ktx.actors.onChange
@@ -21,6 +22,7 @@ import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hide
+import no.elg.infiniteBootleg.screens.onKeyDown
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
@@ -101,7 +103,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
     val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
     return visWindow("Staff Creator") {
       addCloseButton()
-      closeOnEscape()
+      onKeyDown(Input.Keys.ESCAPE) { hide() }
       hide()
       defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
 
