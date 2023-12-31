@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import java.awt.GraphicsEnvironment
 
@@ -82,24 +83,8 @@ object Settings {
     it += Packets.Packet.Type.DX_HEARTBEAT
   }
 
-  enum class WrongThreadAsyncEventAction {
-    /**
-     * Throw an exception when an async event is handled on the wrong thread
-     */
-    THROW,
-
-    /**
-     * Print a stacktrace when an async event is handled on the wrong thread
-     */
-    STACKTRACE,
-
-    /**
-     * Log a warning when an async event is handled on the wrong thread
-     */
-    LOG
-  }
-
-  var handleWrongThreadAsyncEvents: WrongThreadAsyncEventAction = WrongThreadAsyncEventAction.STACKTRACE
+  var handleWrongThreadAsyncEvents: IllegalAction = IllegalAction.STACKTRACE
+  var handleChangingBlockInDeposedChunk: IllegalAction = IllegalAction.STACKTRACE
 
   var enableCameraFollowLerp = true
 

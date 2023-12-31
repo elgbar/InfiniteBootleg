@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
@@ -167,7 +168,7 @@ class ChunkImpl(
     sendUpdatePacket: Boolean
   ): Block? {
     if (isDisposed) {
-      Main.logger().warn("Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block")
+      handleChangingBlockInDeposedChunk.handle("ChunkImpl") { "Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block" }
       return null
     }
     if (block != null) {
