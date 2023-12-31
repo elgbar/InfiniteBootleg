@@ -161,14 +161,14 @@ enum class Material(
     }
   }
 
-  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true) {
-    createBlocks(world, locs.asIterable(), prioritize)
+  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) {
+    createBlocks(world, locs.asIterable(), prioritize, allowOverwiteNonAir)
   }
 
-  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true) {
+  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) {
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
-      if (world.isAirBlock(worldX, worldY, markerIsAir = false)) {
+      if (allowOverwiteNonAir || world.isAirBlock(worldX, worldY, markerIsAir = false)) {
         val block = world.setBlock(worldX, worldY, this, false, prioritize)
         chunks += block?.chunk ?: continue
       }
