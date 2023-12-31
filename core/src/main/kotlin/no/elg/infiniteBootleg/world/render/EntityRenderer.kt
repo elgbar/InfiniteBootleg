@@ -20,6 +20,7 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
@@ -58,6 +59,10 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
     texture.flip(shouldFlipX, false)
     return texture
+  }
+
+  private fun Entity.holdingTexture(): TextureRegion? {
+    return selectedInventoryItemComponentOrNull?.element?.textureRegion?.textureRegionOrNull
   }
 
   override fun render() {
@@ -107,6 +112,11 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val screenY = worldToScreen(worldY)
 
       batch.draw(entity.currentTexture(), screenX, screenY, box2d.worldWidth, box2d.worldHeight)
+      entity.holdingTexture()?.also { holding ->
+        val size = Block.BLOCK_SIZE / 2f
+        val ratio = holding.regionWidth.toFloat() / holding.regionHeight.toFloat()
+        batch.draw(holding, screenX, screenY, size, size * ratio)
+      }
       batch.color = Color.WHITE
       if (Settings.debugEntityLight) {
         val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
