@@ -21,6 +21,7 @@ import ktx.actors.isShown
 import ktx.actors.onChange
 import ktx.actors.onKeyDown
 import ktx.scene2d.Scene2dDsl
+import no.elg.infiniteBootleg.util.applyIf
 
 /**
  * Alias for [PopupMenu.addSeparator] to make it blend better in with the scene 2d DSL, but without
@@ -124,8 +125,8 @@ fun VisWindow.addHideButton(fadeTime: Float = 0f) {
   if (titleLabel.labelAlign == Align.center && titleTable.children.size == 2) titleTable.getCell(titleLabel).padLeft(closeButton.width * 2)
 }
 
-fun Table.setIBDefaults() {
-  defaults().space(5f).padLeft(2.5f).padRight(2.5f).padBottom(2.5f)
+fun Table.setIBDefaults(space: Boolean = true, pad: Boolean = true) {
+  defaults().applyIf(space) { space(5f) }.applyIf(pad) { padLeft(2.5f).padRight(2.5f).padBottom(2.5f) }
 }
 
 operator fun Stage.plusAssign(eventListener: EventListener) {
@@ -141,7 +142,7 @@ inline fun <T : Actor> T.onKeyDown(keycode: Int, catchEvent: Boolean = false, on
   }
 }
 
-/** Call listener when all of the given keys are pressed and one of them are in the fired onKeyDown event */
+/** Call listener when all the given keys are pressed and one of them are in the fired onKeyDown event */
 inline fun <T : Actor> T.onAllKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->

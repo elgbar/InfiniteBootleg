@@ -70,6 +70,7 @@ fun KTable.floatSlider(
   }
 }
 
+@Scene2dDsl
 inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable.addSelector(
   initType: TYPE,
   initRating: RATING,
@@ -104,23 +105,25 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
       addHideButton()
       hideOnEscape()
       hide()
-      setIBDefaults()
 
       val gems = mutableListOf<() -> Gem?>()
       val rings = mutableListOf<() -> Ring?>()
 
+      @Scene2dDsl
       fun KVisTable.addGemSelector(allowDisable: Boolean = true): () -> Gem? =
         addSelector<GemType, GemRating, Gem>(Diamond, GemRating.FLAWLESS, onAnyElementChanged, allowDisable) { type, rating -> Gem(type, rating) }
 
+      @Scene2dDsl
       fun KVisTable.addRingSelector(): () -> Ring? =
         addSelector<RingType<RingRating?>, RingRating, Ring>(AntiGravityRing, RingRating.FLAWLESS, onAnyElementChanged) { type, rating -> Ring(type, rating) }
 
+      @Scene2dDsl
       fun KVisTable.addGemsAndRings(type: WoodType) {
         clear()
         gems.clear()
         rings.clear()
 
-        aSeparator()
+        row()
         gems += addGemSelector(false)
         for (i in 1u until type.gemSlots) {
           gems += addGemSelector()
@@ -134,7 +137,9 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
       }
 
       val container = KVisTable(true)
-      fun addWoodSelector(): () -> Wood {
+
+      @Scene2dDsl
+      fun KVisTable.addWoodSelector(): () -> Wood {
         var type: WoodType = Birch
         var rating: WoodRating = WoodRating.FRESHLY_CUT
         visTable {
@@ -148,24 +153,28 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
         return { Wood(type, rating) }
       }
 
-      val wood = addWoodSelector()
-      row()
-      actor(container) {
+      visTable {
         setIBDefaults()
-        addGemsAndRings(wood().type)
-      }
-      row()
-      visTextButton("Create Staff") {
-        onClick {
-          val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
+        val wood = addWoodSelector()
+        row()
+        aSeparator()
+        actor(container) {
+          setIBDefaults(pad = false)
+          addGemsAndRings(wood().type)
+        }
+        row()
+        visTextButton("Create Staff") {
+          onClick {
+            val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
 
-          world.controlledPlayerEntities.forEach { player ->
-            Main.logger().log("Giving player ${player.nameOrNull} a new staff $newStaff")
-            val existing = player.selectedInventoryItemComponentOrNull
-            if (existing != null) {
-              existing.element = newStaff
-            } else {
-              player += SelectedInventoryItemComponent(newStaff)
+            world.controlledPlayerEntities.forEach { player ->
+              Main.logger().log("Giving player ${player.nameOrNull} a new staff $newStaff")
+              val existing = player.selectedInventoryItemComponentOrNull
+              if (existing != null) {
+                existing.element = newStaff
+              } else {
+                player += SelectedInventoryItemComponent(newStaff)
+              }
             }
           }
         }
