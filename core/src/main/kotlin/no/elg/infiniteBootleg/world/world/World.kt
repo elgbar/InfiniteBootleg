@@ -1144,7 +1144,7 @@ abstract class World(
     const val HALF_BLOCK_SIZE = BLOCK_SIZE / 2f
     const val LIGHT_SOURCE_LOOK_BLOCKS = 10f
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2f
-    const val TRY_LOCK_CHUNKS_DURATION_MS = 10L
+    const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
 
     fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): WorldCompactLocArray =
       getLocationsAABBFromCenter(
