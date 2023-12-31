@@ -294,15 +294,16 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    val entities = clientWorld.controlledPlayerEntities
+    Main.inst().scheduler.executeAsync {
+      clientWorld.render.lookAt(worldX, worldY)
+      logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
 
-    clientWorld.render.lookAt(worldX, worldY)
-    logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
-
-    if (entities.size() > 0) {
-      logger.logf(LogLevel.SUCCESS, "Teleported entity to (% .2f,% .2f)", worldX, worldY)
-      world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
-      entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
+      val entities = clientWorld.controlledPlayerEntities
+      if (entities.size() > 0) {
+        world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
+        entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
+        logger.logf(LogLevel.SUCCESS, "Teleported entity to (% .2f,% .2f)", worldX, worldY)
+      }
     }
   }
 
