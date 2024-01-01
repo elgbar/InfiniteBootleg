@@ -21,7 +21,7 @@ enum class IllegalAction {
   fun handle(tag: String = "IllegalAction", message: () -> String) {
     when (this) {
       THROW -> throw RuntimeException(message())
-      STACKTRACE -> Main.logger().warn(tag, stacktrace())
+      STACKTRACE -> Main.logger().warn(tag, "${message()}\n${stacktrace()}")
       LOG -> Main.logger().warn(tag, message())
     }
   }
