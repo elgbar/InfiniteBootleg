@@ -11,7 +11,11 @@ class ChunkGeneratedListener(generator: ChunkGenerator) : Disposable {
 
   private val updateChunkLightEventListener = EventListener { (chunk, isNewlyGenerated): ChunkLoadedEvent ->
     if (isNewlyGenerated) {
-      Main.inst().scheduler.executeAsync { generator.generateFeatures(chunk) }
+      Main.inst().scheduler.executeAsync {
+        if (chunk.isValid) {
+          generator.generateFeatures(chunk)
+        }
+      }
     }
   }
 
