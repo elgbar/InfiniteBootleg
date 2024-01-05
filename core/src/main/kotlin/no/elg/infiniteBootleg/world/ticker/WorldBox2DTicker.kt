@@ -18,6 +18,7 @@ class WorldBox2DTicker(private val world: World, tick: Boolean) : Ticking {
 
   companion object {
     const val BOX2D_TPS = 60L
+    const val BOX2D_TIME_STEP = 1f / BOX2D_TPS
     const val BOX2D_TICKER_TAG_PREFIX = "Box2DWorld-"
   }
 }

@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ticker.PostRunnableHandler
-import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TPS
+import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TIME_STEP
 import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs
@@ -35,8 +35,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    */
   @GuardedBy("BOX2D_LOCK")
   lateinit var box2dWorld: Box2dWorld
-
-  private var timeStep = 0f
 
   @field:Volatile
   private var disposed = false
@@ -123,13 +121,13 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
     synchronized(BOX2D_LOCK) {
       try {
-        box2dWorld.step(timeStep, 10, 10)
+        box2dWorld.step(BOX2D_TIME_STEP, 10, 10)
       } catch (e: Throwable) {
         Main.logger().error("BOX2D", "Failed to step box2d world", e)
       }
 
       try {
-        world.engine.update(timeStep)
+        world.engine.update(BOX2D_TIME_STEP)
       } catch (e: Throwable) {
         Main.logger().error("BOX2D", "Failed to update ashley engine", e)
       }
@@ -178,7 +176,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   companion object {
     const val X_WORLD_GRAVITY = 0f
-    const val Y_WORLD_GRAVITY = -9.8f
+    const val Y_WORLD_GRAVITY = 2f * -9.8f
 
     const val WORLD_MOVE_OFFSET_THRESHOLD: Float = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE.toFloat()
 
@@ -206,7 +204,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       synchronized(BOX2D_LOCK) {
         box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
         box2dWorld.setContactListener(contactManager)
-        timeStep = 1f / BOX2D_TPS
       }
     }
   }
