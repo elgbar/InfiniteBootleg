@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.world.render.FuturePositionRenderer
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.concurrent.read
@@ -244,6 +245,34 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
             onToggle = {
               EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_LISTENED_TO }
             }
+          )
+        }
+        // Future positions renderers
+        section {
+          toggleableDebugButton(
+            "Render future positions",
+            "Render the N future position of spell entities",
+            onAnyElementChanged = onAnyElementChanged,
+            booleanGetter = FuturePositionRenderer::enabled,
+            onToggle = { FuturePositionRenderer.enabled = !FuturePositionRenderer.enabled }
+          )
+          toggleableDebugButton(
+            "Check collisions",
+            "Will stop rendering if a point is inside a block",
+            onAnyElementChanged = onAnyElementChanged,
+            booleanGetter = FuturePositionRenderer::collisionCheck,
+            onToggle = { FuturePositionRenderer.collisionCheck = !FuturePositionRenderer.collisionCheck }
+          )
+
+          floatSpinner(
+            name = "Number of steps",
+            srcValueGetter = FuturePositionRenderer::numberOfStepsToSee,
+            min = 1f,
+            max = 256f,
+            step = 8f,
+            decimals = 0,
+            onAnyElementChanged = onAnyElementChanged,
+            onChange = { FuturePositionRenderer.numberOfStepsToSee = it.toInt() }
           )
         }
 

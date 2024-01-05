@@ -9,7 +9,13 @@ import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.world.magic.SpellState
 
 // The spell state of a spell entity
-class SpellStateComponent(val state: SpellState, val spawnX: WorldCoordNumber, val spawnY: WorldCoordNumber) : Component {
+class SpellStateComponent(
+  val state: SpellState,
+  val spawnX: WorldCoordNumber,
+  val spawnY: WorldCoordNumber,
+  val spawnDx: Number,
+  val spawnDy: Number
+) : Component {
   companion object : Mapper<SpellStateComponent>() {
     var Entity.spellStateComponent: SpellStateComponent by propertyFor(SpellStateComponent.mapper)
     var Entity.spellStateComponentOrNull: SpellStateComponent? by optionalPropertyFor(SpellStateComponent.mapper)
