@@ -82,6 +82,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.ToBeDestroyedTag.Companion.toBeDestroyed
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
@@ -97,6 +98,7 @@ import no.elg.infiniteBootleg.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.NoGravityInUnloadedChunksSystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
+import no.elg.infiniteBootleg.world.ecs.system.RemoveStaleEntitiesSystem
 import no.elg.infiniteBootleg.world.ecs.system.WriteBox2DStateSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
@@ -271,6 +273,7 @@ abstract class World(
     engine.addSystem(KickPlayerWithoutChannel)
     engine.addSystem(MagicSystem)
     engine.addSystem(SpellRemovalSystem)
+    engine.addSystem(RemoveStaleEntitiesSystem)
     addSystems(engine)
   }
 
@@ -941,6 +944,7 @@ abstract class World(
   @JvmOverloads
   fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
     despawnEntity(entity, reason)
+    entity.toBeDestroyed = true
     engine.removeEntityAsync(entity)
   }
 
