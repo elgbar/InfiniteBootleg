@@ -13,15 +13,10 @@ abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(
   family: Family,
   eventType: KClass<T>,
   private val queueMapper: ComponentMapper<out Q>
-) :
-  IteratingSystem(family, UPDATE_PRIORITY_EVENT_HANDLING) {
-
-  private val sealedSubclasses = eventType.sealedSubclasses
+) : IteratingSystem(family, UPDATE_PRIORITY_EVENT_HANDLING) {
 
   init {
-    if (!eventType.isSealed) {
-      error("Event components must be sealed types. The type ${eventType.simpleName} is not a sealed type!")
-    }
+    require(eventType.isSealed) { "Event components must be sealed types. The type $eventType is not a sealed type!" }
   }
 
   final override fun processEntity(entity: Entity, deltaTime: Float) {

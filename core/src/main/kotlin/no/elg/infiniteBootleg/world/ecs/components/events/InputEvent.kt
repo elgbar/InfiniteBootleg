@@ -1,5 +1,7 @@
 package no.elg.infiniteBootleg.world.ecs.components.events
 
+import no.elg.infiniteBootleg.world.Staff
+
 sealed interface InputEvent : ECSEvent {
 
   interface MouseInputEvent {
@@ -22,4 +24,6 @@ sealed interface InputEvent : ECSEvent {
   data class MouseMovedEvent(override val screenX: Int, override val screenY: Int) : InputEvent, MouseInputEvent
 
   data class ScrolledEvent(val amountX: Float, val amountY: Float) : InputEvent
+
+  data class SpellCastEvent(val staff: Staff) : InputEvent
 }

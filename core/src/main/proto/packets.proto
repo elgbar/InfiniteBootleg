@@ -30,6 +30,7 @@ message Packet {
     CB_INITIAL_CHUNKS_SENT = 14; //no message associated
     DX_WORLD_SETTINGS = 15;
     DX_BREAKING_BLOCK = 16;
+    SB_CAST_SPELL = 17; //No message associated
   }
 
   enum Direction {

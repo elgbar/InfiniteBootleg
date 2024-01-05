@@ -31,6 +31,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
@@ -208,6 +209,10 @@ fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.B
   return serverBoundPacketBuilder(DX_BREAKING_BLOCK)
     .setBreakingBlock(Packets.BreakingBlock.newBuilder().addAllBreakingProgress(progress))
     .build()
+}
+
+fun ServerClient.serverBoundSpellSpawn(): Packet {
+  return serverBoundPacketBuilder(SB_CAST_SPELL).build()
 }
 
 // ////////////////

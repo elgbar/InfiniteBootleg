@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
@@ -49,11 +50,15 @@ import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.Staff
+import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.inputEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -96,14 +101,16 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     DX_DISCONNECT -> scheduler.executeSync { handleDisconnect(ctx, packet.disconnectOrNull) }
     DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { scheduler.executeSync { handleWorldSettings(ctx, it) } }
 
-    UNRECOGNIZED, null -> ctx.fatal("Unknown packet type received ${packet.type}")
-    else -> ctx.fatal("Cannot handle packet of type " + packet.type)
+    SB_CAST_SPELL -> scheduler.executeAsync { asyncHandleCastSpell(ctx) }
+
+    UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
+    else -> ctx.fatal("Server cannot handle packet of type ${packet.type}")
   }
 }
 
-// ///////////////////////
-// NOT SYNCED HANDLERS  //
-// ///////////////////////
+// ///////////////////
+// SYNCED HANDLERS  //
+// ///////////////////
 
 private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: WorldSettings) {
   Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
@@ -310,6 +317,13 @@ private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRe
 private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: BreakingBlock) {
   // Naive and simple re-broadcast
   broadcast(clientBoundPacketBuilder(DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
+}
+
+private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
+  val player = ctx.getCurrentPlayer() ?: return
+  val staff = player.selectedInventoryItemComponentOrNull?.element as? Staff ?: return
+  val inputEventQueue = player.inputEventQueueOrNull ?: return
+  inputEventQueue.events += InputEvent.SpellCastEvent(staff)
 }
 
 // ///////////

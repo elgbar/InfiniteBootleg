@@ -96,8 +96,8 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { handleWorldSettings(it) }
 
     // Error handling
-    UNRECOGNIZED -> ctx.fatal("Unknown packet type received")
-    else -> ctx.fatal("Cannot handle packet of type " + packet.type)
+    UNRECOGNIZED -> ctx.fatal("Unknown packet type received by client: ${packet.type}")
+    else -> ctx.fatal("Client cannot handle packet of type ${packet.type}")
   }
 }
 
