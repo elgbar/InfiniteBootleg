@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
 class AirBlockRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private val assets get() = Main.inst().assets
-  private val worldBody = worldRender.world.worldBody
 
   override fun render() {
     if (renderAirBlocks) {

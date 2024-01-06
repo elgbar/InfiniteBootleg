@@ -11,4 +11,7 @@ interface Named {
    */
   val serializedName: String get() = displayName
 }
+
+interface Description {
+  val description: String
 }

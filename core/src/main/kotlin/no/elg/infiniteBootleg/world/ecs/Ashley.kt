@@ -128,9 +128,9 @@ const val UPDATE_PRIORITY_LATE = 1_000
 const val UPDATE_PRIORITY_LAST = 2_000
 
 fun ensureUniquenessListener(engine: Engine) {
-  val idFamiliy = IdComponent::class.toFamily()
-  val duplicateEntities = engine.getEntitiesFor(idFamiliy)
-  engine.onEntityAdded(idFamiliy, UPDATE_PRIORITY_ID_CHECK) { entity ->
+  val idFamily = IdComponent::class.toFamily()
+  val duplicateEntities = engine.getEntitiesFor(idFamily)
+  engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { entity ->
     if (duplicateEntities.filter { it.id == entity.id }.size > 1) {
       Main.logger().warn("Duplicate entity with id '${entity.id}' removed: Components ${entity.components.map { it::class.simpleName }}")
       engine.removeEntity(entity)

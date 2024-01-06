@@ -60,7 +60,7 @@ object InputSystem :
       Input.Keys.Q -> interpolate(true, ::placeBlocks)
     }
 
-    val selectedMaterial = entity.selectedInventoryItemComponentOrNull ?: return true
+    val selectedMaterial = entity.selectedInventoryItemComponentOrNull ?: return false
 
     val extra = if (isShiftPressed()) 10 else 0
     try {
