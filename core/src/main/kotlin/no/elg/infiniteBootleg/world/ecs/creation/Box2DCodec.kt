@@ -10,10 +10,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
 import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
+import ktx.box2d.circle
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.toRadians
 import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.box2d.Filters
@@ -27,6 +29,7 @@ import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 import no.elg.infiniteBootleg.world.world.World
+import kotlin.math.sqrt
 
 // ////////////
 // CREATION //
@@ -52,9 +55,12 @@ fun EngineEntity.createPlayerBodyComponent(
     PLAYER_WIDTH,
     PLAYER_HEIGHT,
     wantedFamilies,
+    bodyDefModifier = {
+      bullet = true
+    },
     afterBodyComponentAdded = whenReady
-  ) { body: Body ->
-    body.isBullet = true
+  ) {
+    val body = this
     createPlayerFixture(body, body, 0f) { set(playerVertices) }
     createPlayerFixture(body, PLAYERS_FOOT_USER_DATA, Constants.DEFAULT_FIXTURE_FRICTION) {
       setAsBox(
@@ -89,8 +95,10 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
       standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
     ),
-    BodyDef.BodyType.StaticBody,
-    whenReady
+    bodyDefModifier = {
+      type = BodyDef.BodyType.StaticBody
+    },
+    afterBodyComponentAdded = whenReady
   ) {
     val shape = PolygonShape()
     shape.setAsBox(DOOR_WIDTH / 2f, DOOR_HEIGHT / 2f)
@@ -101,9 +109,9 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
     def.friction = Constants.DEFAULT_FIXTURE_FRICTION
     def.restitution = 0f
 
-    val fix: Fixture = it.createFixture(def)
+    val fix: Fixture = createFixture(def)
     fix.filterData = Filters.EN__GROUND_FILTER
-    fix.userData = it.userData
+    fix.userData = this.userData
     fix.isSensor = true
 
     shape.dispose()
@@ -144,11 +152,11 @@ fun EngineEntity.createFallingBlockBodyComponent(
     def.friction = Constants.DEFAULT_FIXTURE_FRICTION
     def.restitution = 0f
 
-    val fix: Fixture = it.createFixture(def)
+    val fix: Fixture = createFixture(def)
     fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
-    fix.userData = it.userData
+    fix.userData = this.userData
     shape.dispose()
-    onReady(this.entity)
+    onReady(entity)
   }
 }
 
@@ -160,6 +168,7 @@ fun EngineEntity.createSpellBodyComponent(
   dy: Float,
   onReady: (Entity) -> Unit = {}
 ) {
+  val size = 0.25f
   createBody2DBodyComponent(
     ProtoWorld.Entity.Box2D.BodyType.SPELL,
     entity,
@@ -168,28 +177,26 @@ fun EngineEntity.createSpellBodyComponent(
     worldY,
     dx,
     dy,
-    0.5f,
-    0.5f,
+    size,
+    size,
     arrayOf(
       basicDynamicEntityFamily to "basicDynamicEntityFamily",
       drawableEntitiesFamily to "drawableEntitiesFamily",
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
     ),
+    bodyDefModifier = {
+      bullet = true
+      fixedRotation = false
+      angle = 22.5f.toRadians()
+      angularVelocity = (90f * sqrt(dx * dx + dy * dy)).toRadians()
+    },
     afterBodyComponentAdded = onReady
   ) {
-    val shape = PolygonShape()
-    shape.setAsBox(0.25f, 0.25f)
-
-    val def = FixtureDef()
-    def.shape = shape
-    def.density = Constants.DEFAULT_FIXTURE_DENSITY
-    def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-    def.restitution = 0f
-
-    val fix: Fixture = it.createFixture(def)
-    fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
-    fix.userData = it.userData
-    shape.dispose()
+    circle(size) {
+      filter.set(Filters.GR_FB__FALLING_BLOCK_FILTER)
+      isSensor = true
+      userData = this@createBody2DBodyComponent.userData
+    }
   }
 }
 
@@ -208,16 +215,17 @@ internal fun createBody2DBodyComponent(
   width: Float,
   height: Float,
   wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
-  bodyType: BodyDef.BodyType = BodyDef.BodyType.DynamicBody,
+  bodyDefModifier: BodyDef.() -> Unit = {},
   afterBodyComponentAdded: (Entity) -> Unit = {},
-  beforeBodyComponentAdded: (Body) -> Unit
+  beforeBodyComponentAdded: Body.() -> Unit
 ) {
   val bodyDef = BodyDef()
-  bodyDef.type = bodyType
+  bodyDef.type = BodyDef.BodyType.DynamicBody
   bodyDef.position.set(worldX, worldY)
   bodyDef.linearVelocity.set(dx, dy)
   bodyDef.linearDamping = 0.5f
   bodyDef.fixedRotation = true
+  bodyDefModifier(bodyDef)
 
   world.worldBody.createBody(bodyDef) {
     if (entity.isRemoving || entity.isScheduledForRemoval) {

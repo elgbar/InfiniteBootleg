@@ -12,9 +12,11 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D
+import no.elg.infiniteBootleg.util.toDegrees
 import no.elg.infiniteBootleg.util.worldToScreen
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
@@ -65,13 +67,33 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     return selectedInventoryItemComponentOrNull?.element?.textureRegion?.textureRegionOrNull
   }
 
+
+  fun Batch.drawBox2d(box2d: Box2DBodyComponent, texture: TextureRegion, screenX: Float, screenY: Float) {
+    if (box2d.body.isFixedRotation) {
+      draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
+    } else {
+      draw(
+        texture,
+        screenX,
+        screenY,
+        box2d.worldWidth / 2f,
+        box2d.worldHeight / 2f,
+        box2d.worldWidth,
+        box2d.worldHeight,
+        1f,
+        1f,
+        box2d.body.angle.toDegrees()
+      )
+    }
+  }
+
   override fun render() {
     globalAnimationTimer += Gdx.graphics.deltaTime
     for (entity in entities) {
-      val box2d = entity.box2d
+      val box2d: Box2DBodyComponent = entity.box2d
 
       @Suppress("GDXKotlinFlushInsideLoop")
-      val centerPos = if (entity.followedByCamera) {
+      val centerPos: Vector2 = if (entity.followedByCamera) {
         // We must render the entity we're following at the same position as the last calculated position, otherwise we'll get a weird jitter effect
         // Also to make camera is correct we must update the projection matrix again
         batch.projectionMatrix = worldRender.camera.combined
@@ -111,7 +133,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val screenX = worldToScreen(worldX)
       val screenY = worldToScreen(worldY)
 
-      batch.draw(entity.currentTexture(), screenX, screenY, box2d.worldWidth, box2d.worldHeight)
+      batch.drawBox2d(box2d, entity.currentTexture(), screenX, screenY)
+
       entity.holdingTexture()?.also { holding ->
         val size = Block.BLOCK_SIZE / 2f
         val ratio = holding.regionWidth.toFloat() / holding.regionHeight.toFloat()
