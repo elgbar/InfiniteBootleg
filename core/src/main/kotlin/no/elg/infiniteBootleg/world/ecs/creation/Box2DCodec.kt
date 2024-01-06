@@ -56,6 +56,7 @@ fun EngineEntity.createPlayerBodyComponent(
     PLAYER_HEIGHT,
     wantedFamilies,
     bodyDefModifier = {
+      linearDamping = 0.5f
       bullet = true
     },
     afterBodyComponentAdded = whenReady
@@ -223,7 +224,6 @@ internal fun createBody2DBodyComponent(
   bodyDef.type = BodyDef.BodyType.DynamicBody
   bodyDef.position.set(worldX, worldY)
   bodyDef.linearVelocity.set(dx, dy)
-  bodyDef.linearDamping = 0.5f
   bodyDef.fixedRotation = true
   bodyDefModifier(bodyDef)
 
