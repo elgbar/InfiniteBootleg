@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.magic.SpellState
 import no.elg.infiniteBootleg.world.world.World
 
@@ -31,6 +32,7 @@ fun Engine.createSpellEntity(
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
     safeWith { TextureRegionComponent(Main.inst().assets.spellTexture) }
+    this.entity.isTransientEntity = true
 
     // This entity will handle input events
     with<PhysicsEventQueueComponent>()
