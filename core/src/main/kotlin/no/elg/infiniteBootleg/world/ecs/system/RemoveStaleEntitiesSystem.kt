@@ -10,11 +10,17 @@ import no.elg.infiniteBootleg.world.ecs.toFamily
 
 object RemoveStaleEntitiesSystem : IteratingSystem(ToBeDestroyedTag::class.toFamily(), UPDATE_PRIORITY_LAST), UniversalSystem {
 
+  private val seenEntities = HashSet<Entity>()
+
   override fun processEntity(entity: Entity, deltaTime: Float) {
     if (entity.isRemoving) {
       return
     }
-    Main.logger().warn("RemoveStaleEntitiesSystem", "Seen a stale entity with components ${entity.components}")
-    engine.removeEntity(entity)
+    if (entity in seenEntities) {
+      Main.logger().warn("RemoveStaleEntitiesSystem", "Seen a stale entity with components ${entity.components}")
+      engine.removeEntity(entity)
+    } else {
+      seenEntities += entity
+    }
   }
 }
