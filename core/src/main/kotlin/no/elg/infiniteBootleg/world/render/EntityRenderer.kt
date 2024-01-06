@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
@@ -67,6 +68,33 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     return selectedInventoryItemComponentOrNull?.element?.textureRegion?.textureRegionOrNull
   }
 
+  private val lightVector: Vector2 = Vector2()
+
+  private fun setupEntityLight(centerPos: Vector2, box2d: Box2DBodyComponent) {
+    val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
+    val blockY = centerPos.y.roundToInt()
+    val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
+    if (blockY > topX) {
+      lightVector.set(worldToScreen(blockX), worldToScreen(topX + 1))
+      batch.color = Color.WHITE
+    } else {
+      val blockLight = world.getBlockLight(blockX, blockY, false)
+      if (blockLight != null) {
+        if (blockLight.isSkylight) {
+          batch.color = Color.WHITE
+        } else if (blockLight.isLit) {
+          val v = blockLight.averageBrightness
+          batch.setColor(v, v, v, 1f)
+        } else {
+          batch.color = Color.BLACK
+        }
+        lightVector.set(worldToScreen(blockX), worldToScreen(blockY))
+      } else {
+        lightVector.setZero()
+        batch.color = Color.WHITE
+      }
+    }
+  }
 
   fun Batch.drawBox2d(box2d: Box2DBodyComponent, texture: TextureRegion, screenX: Float, screenY: Float) {
     if (box2d.body.isFixedRotation) {
@@ -103,31 +131,12 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
-      var lightX = 0f
-      var lightY = 0f
+
       if (Settings.renderLight) {
-        val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
-        val blockY = centerPos.y.roundToInt()
-        val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
-        if (blockY > topX) {
-          lightX = worldToScreen(blockX.toFloat())
-          lightY = worldToScreen((topX + 1).toFloat())
-          batch.color = Color.WHITE
-        } else {
-          val blockLight = world.getBlockLight(blockX, blockY, false)
-          if (blockLight != null) {
-            if (blockLight.isSkylight) {
-              batch.color = Color.WHITE
-            } else if (blockLight.isLit) {
-              val v = blockLight.averageBrightness
-              batch.setColor(v, v, v, 1f)
-            } else {
-              batch.color = Color.BLACK
-            }
-            lightX = worldToScreen(blockX.toFloat())
-            lightY = worldToScreen(blockY.toFloat())
-          }
-        }
+        setupEntityLight(centerPos, box2d)
+      } else {
+        lightVector.setZero()
+        batch.color = Color.WHITE
       }
 
       val screenX = worldToScreen(worldX)
@@ -140,11 +149,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         val ratio = holding.regionWidth.toFloat() / holding.regionHeight.toFloat()
         batch.draw(holding, screenX, screenY, size, size * ratio)
       }
+
+      // Draw ignoring the light from here on out
       batch.color = Color.WHITE
+
       if (Settings.debugEntityLight) {
         val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
         val offset = Block.BLOCK_SIZE / 2f - size / 2f
-        batch.draw(Main.inst().assets.whiteTexture.textureRegion, lightX + offset, lightY + offset, size, size)
+        batch.draw(Main.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
       }
 
       entity.nameOrNull?.let { name ->
