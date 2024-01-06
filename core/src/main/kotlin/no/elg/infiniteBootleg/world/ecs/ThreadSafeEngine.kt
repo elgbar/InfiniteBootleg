@@ -151,6 +151,18 @@ class ThreadSafeEngine : Engine(), Disposable {
       super.update(deltaTime)
     }
 
+  override fun addEntityInternal(entity: Entity?) {
+    synchronized(engineLock) {
+      super.addEntityInternal(entity)
+    }
+  }
+
+  override fun removeEntityInternal(entity: Entity?) {
+    synchronized(engineLock) {
+      super.removeEntityInternal(entity)
+    }
+  }
+
   override fun dispose() {
     ECSEventQueueComponent.entitiesCache.clear()
   }
