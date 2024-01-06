@@ -6,8 +6,10 @@ import com.badlogic.gdx.math.Vector2
 import ktx.ashley.allOf
 import ktx.ashley.remove
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
@@ -37,7 +39,9 @@ object SpellRemovalSystem :
     val currentPos = entity.position
 
     val distanceTravelled = Vector2.dst2(spellStateComponent.spawnX.toFloat(), spellStateComponent.spawnY.toFloat(), currentPos.x, currentPos.y)
-    if (distanceTravelled > maxTravelDistance * maxTravelDistance || entity.velocityOrZero.isZero(1f)) {
+    fun willRemainStationary(): Boolean = entity.velocityOrZero.isZero(1f) && entity.box2dBody.gravityScale < Constants.DEFAULT_GRAVITY_SCALE / 2f
+    val haveTravelledMaxDistance = distanceTravelled > maxTravelDistance * maxTravelDistance
+    if (haveTravelledMaxDistance || willRemainStationary()) {
       entity.world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)
       entity.remove<SpellStateComponent>()
     }
