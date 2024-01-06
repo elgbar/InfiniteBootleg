@@ -95,7 +95,8 @@ fun VisWindow.toggleShown(stage: Stage, center: Boolean = true) {
 }
 
 /** Toggle if this window is shown or not */
-fun VisWindow.hideOnEscape() {
+@Suppress("NOTHING_TO_INLINE") // must be inlined otherwise it does not work (wtf!??)
+inline fun VisWindow.hideOnEscape() {
   onKeyDown(Input.Keys.ESCAPE) { hide() }
 }
 
