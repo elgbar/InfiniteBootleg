@@ -23,8 +23,8 @@ abstract class ClientWorld : World {
     input = WorldInputHandler(render)
   }
 
-  constructor(protoWorld: ProtoWorld.World) : super(protoWorld)
-  constructor(generator: ChunkGenerator, seed: Long, worldName: String) : super(generator, seed, worldName)
+  constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean) : super(protoWorld, forceTransient)
+  constructor(generator: ChunkGenerator, seed: Long, worldName: String, forceTransient: Boolean) : super(generator, seed, worldName, forceTransient)
 
   override fun resize(width: Int, height: Int) {
     render.resize(width, height)

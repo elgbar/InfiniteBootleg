@@ -151,8 +151,11 @@ abstract class World(
    * @return The random seed of this world
    */
   val seed: Long,
-  worldName: String
+  worldName: String,
+  forceTransient: Boolean = false
 ) : Disposable, Resizable {
+
+  constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name, forceTransient)
 
   /**
    * @return Unique identification of this world
@@ -206,13 +209,11 @@ abstract class World(
   @JvmField
   val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 
-  private var transientWorld = !Settings.loadWorldFromDisk || Main.isServerClient
+  protected var transientWorld: Boolean = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
 
   val tick get() = worldTicker.tickId
 
   private var saveTask: ScheduledFuture<*>? = null
-
-  constructor(protoWorld: ProtoWorld.World) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name)
 
   init {
     MathUtils.random.setSeed(seed)
@@ -291,8 +292,10 @@ abstract class World(
         Main.logger().warn("World", "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!")
       }
     }
-    if (transientWorld || worldFolder == null) {
+    if (worldFolder == null) {
       Main.logger().log("No world save found")
+    } else if (transientWorld) {
+      Main.logger().log("World is transient, will not load from disk")
     } else {
       Main.logger().log("Loading world from '${worldFolder.file().absolutePath}'")
       if (writeLockFile(uuid)) {
