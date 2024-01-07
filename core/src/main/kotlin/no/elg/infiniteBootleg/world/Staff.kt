@@ -28,11 +28,10 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
       staff = this,
       // FIXME placeholder
       spellRange = 32.0,
-      castDelay = wood.type.castDelay / wood.rating.powerPercent,
+      castDelay = wood.castDelay,
+      gemPower = wood.rating.powerPercent,
       // FIXME placeholder
-      gemPower = 1.0,
-      // FIXME placeholder
-      spellVelocity = 5.0,
+      spellVelocity = 10.0,
       entityModifications = mutableListOf()
     )
     wood.onSpellCreate(state)
