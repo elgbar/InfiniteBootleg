@@ -13,6 +13,9 @@ import no.elg.infiniteBootleg.world.magic.parts.WoodRating
 import no.elg.infiniteBootleg.world.magic.parts.WoodType
 
 data class Wood(val type: WoodType, val rating: WoodRating) : MagicEffects, Equippable {
+
+  val castDelay by lazy { type.castDelay / rating.powerPercent }
+
   override fun onSpellCreate(state: MutableSpellState) = type.onSpellCreate(state, rating)
   override fun onSpellCast(state: SpellState, spellEntity: Entity) = type.onSpellCast(state, spellEntity, rating)
   override fun onSpellLand(state: SpellState, spellEntity: Entity) = type.onSpellLand(state, spellEntity, rating)
@@ -31,6 +34,9 @@ data class Wood(val type: WoodType, val rating: WoodRating) : MagicEffects, Equi
 }
 
 data class Gem(val type: GemType, val rating: GemRating) : MagicEffects, Equippable {
+
+  val power = rating.powerPercent
+
   override fun onSpellCreate(state: MutableSpellState) = type.onSpellCreate(state, rating)
   override fun onSpellCast(state: SpellState, spellEntity: Entity) = type.onSpellCast(state, spellEntity, rating)
   override fun onSpellLand(state: SpellState, spellEntity: Entity) = type.onSpellLand(state, spellEntity, rating)

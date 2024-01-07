@@ -18,6 +18,9 @@ enum class GemRating(val powerPercent: Double) {
 }
 
 sealed interface GemType : Named, MagicEffectsWithRating<GemRating> {
+
+  val maxPower: Double
+
   companion object {
     fun valueOf(displayName: String): GemType {
       return when (displayName) {
@@ -29,11 +32,13 @@ sealed interface GemType : Named, MagicEffectsWithRating<GemRating> {
 }
 
 data object Diamond : GemType {
+
   override val displayName: String = "Diamond"
-  const val FULL_POWER = 10 // blocks radius
+
+  override val maxPower: Double = 5.0 // blocks radius
 
   override fun onSpellLand(state: SpellState, spellEntity: Entity, rating: GemRating) {
-    val breakRadius = (FULL_POWER * state.gemPower * rating.powerPercent).coerceAtLeast(1.0)
+    val breakRadius = (maxPower * state.gemPower * rating.powerPercent).coerceAtLeast(1.0)
     val world = spellEntity.world
     val pos = spellEntity.positionComponent
 

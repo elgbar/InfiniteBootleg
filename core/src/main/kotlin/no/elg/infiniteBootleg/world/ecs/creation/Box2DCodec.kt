@@ -194,6 +194,7 @@ fun EngineEntity.createSpellBodyComponent(
     },
     afterBodyComponentAdded = onReady
   ) {
+    gravityScale = 0f
     circle(size) {
       filter.set(Filters.GR_FB__FALLING_BLOCK_FILTER)
       isSensor = true
@@ -234,8 +235,6 @@ internal fun createBody2DBodyComponent(
       entity.world.worldBody.destroyBody(it)
       return@createBody
     }
-
-    it.gravityScale = Constants.DEFAULT_GRAVITY_SCALE
     it.userData = entity
 
     beforeBodyComponentAdded(it)

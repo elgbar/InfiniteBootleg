@@ -26,7 +26,7 @@ sealed interface RingType<in R : RingRating?> : Named, Equippable, MagicEffectsW
     fun valueOf(displayName: String): RingType<RingRating?> {
       @Suppress("UNCHECKED_CAST")
       return when (displayName) {
-        AntiGravityRing.serializedName -> AntiGravityRing
+        GravityRing.serializedName -> GravityRing
         OpalRing.serializedName -> OpalRing
         EmeraldRing.serializedName -> EmeraldRing
         RubyRing.serializedName -> RubyRing
@@ -45,12 +45,12 @@ sealed interface RatedRingType : Named, RingType<RingRating>
 //
 // }
 
-data object AntiGravityRing : RatelessRingType {
-  override val displayName: String = "Anti Gravity"
-  override val serializedName: String = "Anti Gravity"
+data object GravityRing : RatelessRingType {
+  override val displayName: String = "Gravity"
+  override val serializedName: String = "Gravity"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating?) {
-    state.entityModifications += { spell: Entity -> spell.box2dOrNull?.disableGravity() }
+    state.entityModifications += { spell: Entity -> spell.box2dOrNull?.enableGravity() }
   }
 }
 

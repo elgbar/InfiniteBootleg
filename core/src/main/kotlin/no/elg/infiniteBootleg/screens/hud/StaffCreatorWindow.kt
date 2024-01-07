@@ -30,11 +30,11 @@ import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponen
 import no.elg.infiniteBootleg.world.magic.Gem
 import no.elg.infiniteBootleg.world.magic.Ring
 import no.elg.infiniteBootleg.world.magic.Wood
-import no.elg.infiniteBootleg.world.magic.parts.AntiGravityRing
 import no.elg.infiniteBootleg.world.magic.parts.Birch
 import no.elg.infiniteBootleg.world.magic.parts.Diamond
 import no.elg.infiniteBootleg.world.magic.parts.GemRating
 import no.elg.infiniteBootleg.world.magic.parts.GemType
+import no.elg.infiniteBootleg.world.magic.parts.GravityRing
 import no.elg.infiniteBootleg.world.magic.parts.RingRating
 import no.elg.infiniteBootleg.world.magic.parts.RingType
 import no.elg.infiniteBootleg.world.magic.parts.WoodRating
@@ -115,7 +115,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
 
       @Scene2dDsl
       fun KVisTable.addRingSelector(): () -> Ring? =
-        addSelector<RingType<RingRating?>, RingRating, Ring>(AntiGravityRing, RingRating.FLAWLESS, onAnyElementChanged) { type, rating -> Ring(type, rating) }
+        addSelector<RingType<RingRating?>, RingRating, Ring>(GravityRing, RingRating.FLAWLESS, onAnyElementChanged) { type, rating -> Ring(type, rating) }
 
       @Scene2dDsl
       fun KVisTable.addGemsAndRings(type: WoodType) {

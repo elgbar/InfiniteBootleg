@@ -3,7 +3,8 @@
 Main component is a wand that is configured differently to cast different spells.
 These spells should be customizable by the player.
 
-Each staff is created by combinng a type of wood and a gem. The wood will determine the power of the staff, the gem will determine the spell, Rings can be used to modify the spell.
+Each staff is created by combining a type of wood and a gem. The wood will determine the power of the staff, the gem will determine the spell, Rings can be used to modify the
+spell.
 Each staff has 1+ slots and 0+ ring slots. The slots types are determined by the wood type.
 
 Each staff can be "forged" with a different spell. The wood used will determine how powerful the spell is.
@@ -89,7 +90,7 @@ Some rings will have a special effect on the spell, these will not have a flaw r
 | Special Ring type | Effect                                     |
 |-------------------|--------------------------------------------|
 | palantir          | visualize where the spell will land/travel |
-| anti-gravity      | the spell will not be affected by gravity  |
+| gravity           | the spell will be affected by gravity      |
 
 ### Normal rings
 
