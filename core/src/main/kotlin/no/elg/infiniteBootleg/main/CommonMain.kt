@@ -43,6 +43,9 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
     console.alpha = 0.85f
     assets.loadAssets()
     console.log(LogLevel.SUCCESS, "Version #${Util.getVersion()}")
+    Util.getLastCommitDate("relative")?.also {
+      console.log(LogLevel.SUCCESS, "Last commit created $it")
+    }
     console.log("You can also start the program with arguments for '--help' or '-?' as arg to see all possible options")
   }
 

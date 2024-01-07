@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import no.elg.infiniteBootleg.main.ClientMain;
 import no.elg.infiniteBootleg.main.Main;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,7 +22,7 @@ public class Util {
 
   public static final String DEFAULT_HASH = "UNKNOWN";
   public static final int DEFAULT_COMMIT_COUNT = 0;
-  public static final String VERSION_DELIMITER = "-";
+  public static final String VERSION_DELIMITER = ".";
   public static final String FALLBACK_VERSION =
       DEFAULT_HASH + VERSION_DELIMITER + DEFAULT_COMMIT_COUNT;
   public static final int CIRCLE_DEG = 360;
@@ -104,10 +103,15 @@ public class Util {
   }
 
   public static String getVersion() {
-    String calcHash = getLastGitCommitID(false) + VERSION_DELIMITER + commitCount();
+    String calcHash =
+        getLastGitCommitID()
+            + VERSION_DELIMITER
+            + commitCount()
+            + VERSION_DELIMITER
+            + getLastCommitDate("iso8601-strict");
     String savedHash;
     try {
-      savedHash = Gdx.files.internal(ClientMain.VERSION_FILE).readString();
+      savedHash = Gdx.files.internal(Main.VERSION_FILE).readString();
     } catch (Exception e) {
       savedHash = FALLBACK_VERSION;
     }
@@ -116,7 +120,7 @@ public class Util {
       return FALLBACK_VERSION;
     }
     if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
-      FileHandle versionFile = Gdx.files.absolute(ClientMain.VERSION_FILE);
+      FileHandle versionFile = Gdx.files.absolute(Main.VERSION_FILE);
       try {
         versionFile.writeString(calcHash, false);
       } catch (Exception ignore) {
@@ -129,17 +133,13 @@ public class Util {
   /**
    * @return The latest commit ID in the current repo
    */
-  public static String getLastGitCommitID(boolean full) {
-    String result = executeCommand("git", "log", "--format=%H", "-n", "1");
+  @NotNull
+  public static String getLastGitCommitID() {
+    String result = executeCommand("git", "log", "-1", "--format=%h");
     if (result == null) {
       return DEFAULT_HASH;
     }
-    var hash = result.toUpperCase();
-    if (full) {
-      return hash;
-    } else {
-      return hash.substring(0, 6);
-    }
+    return result.toUpperCase();
   }
 
   /**
@@ -157,6 +157,18 @@ public class Util {
     }
   }
 
+  /**
+   * @return The number of commits in this repository
+   */
+  @Nullable
+  public static String getLastCommitDate(String dateFormat) {
+    String result = executeCommand("git", "log", "-1", "--format=%cd", "--date=" + dateFormat);
+    if (result == null) {
+      return null;
+    }
+    return result.replace(':', '-');
+  }
+
   @Nullable
   private static <T> String executeCommand(String... command) {
     try {
@@ -172,7 +184,7 @@ public class Util {
         }
       }
     } catch (Exception e) {
-      return "";
+      return null;
     }
   }
 
