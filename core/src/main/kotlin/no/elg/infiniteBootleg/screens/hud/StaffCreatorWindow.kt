@@ -102,8 +102,8 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
   actors {
     val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
     return visWindow("Staff Creator") {
-      addHideButton()
       hideOnEscape()
+      addHideButton()
       hide()
 
       val gems = mutableListOf<() -> Gem?>()
