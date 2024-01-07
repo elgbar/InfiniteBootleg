@@ -34,6 +34,7 @@ object InputSystem :
       is InputEvent.ScrolledEvent -> Unit
       is InputEvent.TouchDraggedEvent -> Unit
       is InputEvent.TouchUpEvent -> Unit
+      is InputEvent.SpellCastEvent -> Unit
     }
   }
 

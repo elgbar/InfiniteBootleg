@@ -7,10 +7,11 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.allOf
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.server.serverBoundSpellSpawn
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
-import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
@@ -35,7 +36,7 @@ object MagicSystem :
     ).get(),
     UPDATE_PRIORITY_DEFAULT
   ),
-  ClientSystem {
+  AuthoritativeSystem {
 
   private val vector = Vector2()
 
@@ -46,7 +47,8 @@ object MagicSystem :
     val world = entity.clientWorld ?: return
     val heldStaff = entity.selectedInventoryItemComponentOrNull?.element as? Staff ?: return
     val existingSpellState = entity.lastSpellCastOrNull
-    if (existingSpellState.canCastAgain() && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+    val doCastNow = Gdx.input.isButtonPressed(Input.Buttons.LEFT)
+    if (existingSpellState.canCastAgain() && doCastNow) {
       // TODO Increase (distance/speed) by holding right click?
 
       val position = entity.position
@@ -70,6 +72,10 @@ object MagicSystem :
       ) {
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay
         newSpellState.staff.onSpellCast(newSpellState, it)
+
+        ClientMain.inst().serverClient?.also { client ->
+          client.ctx.writeAndFlush(client.serverBoundSpellSpawn())
+        }
       }
     }
   }
