@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.box2d.service
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.util.isBeingRemoved
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -22,7 +23,7 @@ object FallingBlockContactService {
       val newY: Int = block.worldY
       val world = block.world
       synchronized(world) {
-        if (entity.isScheduledForRemoval || entity.isRemoving) {
+        if (entity.isBeingRemoved) {
           return
         }
         world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.NATURAL)

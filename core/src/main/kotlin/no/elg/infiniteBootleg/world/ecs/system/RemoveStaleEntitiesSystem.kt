@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.isBeingRemoved
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.ToBeDestroyedTag
@@ -13,7 +14,7 @@ object RemoveStaleEntitiesSystem : IteratingSystem(ToBeDestroyedTag::class.toFam
   private val seenEntities = HashSet<Entity>()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    if (entity.isRemoving) {
+    if (entity.isBeingRemoved) {
       return
     }
     if (entity in seenEntities) {

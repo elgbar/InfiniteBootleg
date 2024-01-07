@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.isBeingRemoved
 import no.elg.infiniteBootleg.util.toRadians
 import no.elg.infiniteBootleg.util.useDispose
 import no.elg.infiniteBootleg.world.Constants
@@ -228,7 +229,7 @@ internal fun createBody2DBodyComponent(
   bodyDefModifier(bodyDef)
 
   world.worldBody.createBody(bodyDef) {
-    if (entity.isRemoving || entity.isScheduledForRemoval) {
+    if (entity.isBeingRemoved) {
       // If the entity was removed before the body was created, destroy the body
       entity.world.worldBody.destroyBody(it)
       return@createBody
