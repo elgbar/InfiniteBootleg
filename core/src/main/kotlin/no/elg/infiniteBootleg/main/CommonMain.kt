@@ -42,7 +42,7 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
     Gdx.app.logLevel = if (test || Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     console.alpha = 0.85f
     assets.loadAssets()
-    console.log(LogLevel.SUCCESS, "Version #${Util.getVersion()}")
+    console.log(LogLevel.SUCCESS, "Version ${Util.getVersion()}")
     Util.getLastCommitDate("relative")?.also {
       console.log(LogLevel.SUCCESS, "Last commit created $it")
     }

@@ -8,6 +8,10 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +26,10 @@ public class Util {
 
   public static final String DEFAULT_HASH = "UNKNOWN";
   public static final int DEFAULT_COMMIT_COUNT = 0;
-  public static final String VERSION_DELIMITER = ".";
-  public static final String FALLBACK_VERSION =
-      DEFAULT_HASH + VERSION_DELIMITER + DEFAULT_COMMIT_COUNT;
+  public static final String FALLBACK_VERSION = DEFAULT_HASH;
   public static final int CIRCLE_DEG = 360;
+  private static DateTimeFormatter ZULU_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm'Z'");
 
   /**
    * Based on <a
@@ -104,10 +108,11 @@ public class Util {
 
   public static String getVersion() {
     String calcHash =
-        getLastGitCommitID()
-            + VERSION_DELIMITER
+        "#"
             + commitCount()
-            + VERSION_DELIMITER
+            + "-"
+            + getLastGitCommitID()
+            + "@"
             + getLastCommitDate("iso8601-strict");
     String savedHash;
     try {
@@ -162,11 +167,16 @@ public class Util {
    */
   @Nullable
   public static String getLastCommitDate(String dateFormat) {
-    String result = executeCommand("git", "log", "-1", "--format=%cd", "--date=" + dateFormat);
-    if (result == null) {
+    String date = executeCommand("git", "log", "-1", "--format=%cd", "--date=" + dateFormat);
+    if (date == null) {
       return null;
     }
-    return result.replace(':', '-');
+    try {
+      ZonedDateTime parse = ZonedDateTime.parse(date).withZoneSameInstant(ZoneOffset.UTC);
+      return parse.format(ZULU_FORMATTER);
+    } catch (DateTimeParseException e) {
+      return null;
+    }
   }
 
   @Nullable
