@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Compan
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
+import no.elg.infiniteBootleg.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -142,8 +143,12 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val screenX = worldToScreen(worldX)
       val screenY = worldToScreen(worldY)
 
-      batch.drawBox2d(box2d, entity.currentTexture(), screenX, screenY)
+      // Draw with a tint if there is one
+      entity.tintedComponentOrNull?.also {
+        batch.color = batch.color.mul(it.tint)
+      }
 
+      batch.drawBox2d(box2d, entity.currentTexture(), screenX, screenY)
       entity.holdingTexture()?.also { holding ->
         val size = Block.BLOCK_SIZE / 2f
         val ratio = holding.regionWidth.toFloat() / holding.regionHeight.toFloat()

@@ -79,6 +79,7 @@ message Entity {
   optional Door door = 30;
   optional InputEvent inputEvent = 31;
   optional PhysicsEvent physicsEvent = 32;
+  optional Tinted tinted = 33;
 
   enum EntityType {
     GENERIC_ENTITY = 0; // default
@@ -189,6 +190,10 @@ message Entity {
     bool instantBreak = 1;
     float brushRadius = 2;
     float interactRadius = 3;
+  }
+
+  message Tinted{
+    int32 rgba8888 = 1;
   }
 
   message ChunkBased {}
