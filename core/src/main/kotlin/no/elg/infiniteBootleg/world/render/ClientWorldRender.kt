@@ -98,7 +98,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
         // get texture here to update last viewed in chunk
         val textureRegion = chunk.textureRegion
         if (textureRegion == null) {
-          chunkRenderer.queueRendering(chunk, false)
+          chunk.queueForRendering(true)
           continue
         }
         chunksToDraw.put(chunk, textureRegion)
