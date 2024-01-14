@@ -2,25 +2,19 @@ package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.OrderedMap
-import ktx.collections.component1
-import ktx.collections.component2
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
@@ -38,6 +32,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   private val viewBound: Rectangle = Rectangle()
   private val box2dDebugM4 = Matrix4()
   private val renderers: List<Renderer> = listOf(
+    CachedChunkRenderer(this),
     AirBlockRenderer(this),
     HoveringBlockRenderer(this),
     EntityRenderer(this),
@@ -48,10 +43,6 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   )
 
   private var lastZoom = 0f
-
-  private val chunksToDraw: OrderedMap<Chunk, TextureRegion> = OrderedMap<Chunk, TextureRegion>().apply {
-    orderedKeys().ordered = false
-  }
 
   val chunksInView: ClientChunksInView = ClientChunksInView()
   val batch: SpriteBatch = SpriteBatch()
@@ -69,53 +60,10 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     update()
   }
 
-  private fun prepareChunks() {
-    chunksToDraw.clear(chunksInView.size)
-    chunksToDraw.ensureCapacity(chunksInView.size)
-    val verticalStart = chunksInView.verticalStart
-    val verticalEnd = chunksInView.verticalEnd
-    for (chunkY in verticalStart until verticalEnd) {
-      val horizontalStart = chunksInView.horizontalStart
-      val horizontalEnd = chunksInView.horizontalEnd
-      for (chunkX in horizontalStart until horizontalEnd) {
-        val chunk = world.getChunk(chunkX, chunkY, false)
-        if (chunk == null) {
-          Main.inst().scheduler.executeAsync { world.loadChunk(chunkX, chunkY) }
-          continue
-        }
-        chunk.view()
-
-        // No need to update texture when out of view, but in loaded zone
-        if (chunkY == verticalEnd - 1 ||
-          chunkY == verticalStart ||
-          chunkX == horizontalStart ||
-          chunkX == horizontalEnd - 1 ||
-          (chunk.isAllAir && chunk.chunkColumn.isChunkAboveTopBlock(chunk.chunkY, TOP_MOST_FLAG))
-        ) {
-          continue
-        }
-
-        // get texture here to update last viewed in chunk
-        val textureRegion = chunk.textureRegion
-        if (textureRegion == null) {
-          chunk.queueForRendering(true)
-          continue
-        }
-        chunksToDraw.put(chunk, textureRegion)
-      }
-    }
-  }
-
   override fun render() {
     batch.projectionMatrix = camera.combined
     chunkRenderer.renderMultiple()
-    prepareChunks()
     batch.safeUse {
-      for ((chunk, textureRegion) in chunksToDraw.entries()) {
-        val dx = chunk.chunkX * Chunk.CHUNK_TEXTURE_SIZE
-        val dy = chunk.chunkY * Chunk.CHUNK_TEXTURE_SIZE
-        batch.draw(textureRegion, dx.toFloat(), dy.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
-      }
       for (renderer in renderers) {
         renderer.render()
       }
