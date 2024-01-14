@@ -153,11 +153,9 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
 
   override fun dispose() {
     super.dispose()
-    if (Settings.client) {
-      screen.dispose()
-      screenRenderer.dispose()
-      VisUI.dispose()
-    }
+    screen.dispose()
+    screenRenderer.dispose()
+    VisUI.dispose()
   }
 
   fun updateStatus(world: ClientWorld?) {
