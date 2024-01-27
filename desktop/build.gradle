@@ -18,18 +18,25 @@ task debug(dependsOn: classes, type: JavaExec) {
   debug = true
 }
 
-task dist(type: Jar) {
-  setDuplicatesStrategy(DuplicatesStrategy.WARN)
-  from files(sourceSets.main.output.getClassesDirs()[0])
-  from files(sourceSets.main.output.resourcesDir)
-
-  project.configurations.getByName("implementation").setCanBeResolved(true)
-  from { configurations.implementation.collect { zipTree(it) } }
-  from files(project.assetsDir);
-  archiveBaseName = appName + "-desktop"
+tasks.register('dist', Jar) {
+  dependsOn classes
+  with jar
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
+  archiveBaseName = appName + "-desktop"
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  dependsOn configurations.runtimeClasspath
+  from {
+    configurations.runtimeClasspath.collect {
+      exclude 'META-INF/DEPENDENCIES'
+      exclude 'META-INF/NOTICE'
+      exclude 'META-INF/LICENSE'
+      exclude 'META-INF/LICENSE.txt'
+      exclude 'META-INF/NOTICE.txt'
+      exclude 'META-INF/INDEX.LIST'
+      exclude '**/module-info.class'
+      it.isDirectory() ? it : zipTree(it)
+    }
+  }
 }
-
-dist.dependsOn classes
