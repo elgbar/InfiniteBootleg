@@ -14,6 +14,11 @@ import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_NOTHING
+import no.elg.infiniteBootleg.inventory.container.Inventory
+import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
+import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
+import no.elg.infiniteBootleg.inventory.container.impl.CreativeInventory
+import no.elg.infiniteBootleg.inventory.container.impl.InventoryImpl
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
@@ -30,6 +35,8 @@ import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component
+import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -592,5 +599,38 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     for (recordedEvent in eventTracker.recordedEvents) {
       logger.log(eventTracker.toString())
     }
+  }
+
+  @ConsoleDoc(description = "Switch inventory of player", paramDescriptions = ["The inventory to use, can be 'creative', 'autosort' or 'container'"])
+  @ClientsideOnly
+  fun inv(invType: String) {
+    val world = clientWorld ?: return
+    val entities = world.controlledPlayerEntities
+    if (entities.size() == 0) {
+      logger.error("There is no local, controlled, player in this world")
+      return
+    }
+
+    val player = entities.first()
+    val oldInventory = player.inventory2ComponentOrNull?.inventory
+    oldInventory?.close()
+
+    val newInventory: Inventory = when (invType.lowercase(Locale.getDefault())) {
+      "creative", "cr" -> CreativeInventory(player)
+      "autosort", "as" -> InventoryImpl(player, AutoSortedContainer(40, "Auto Sorted Inventory"))
+      "container", "co" -> InventoryImpl(player, ContainerImpl(40, "Inventory", true))
+      else -> {
+        logger.error("Unknown storage type '$invType'")
+        return
+      }
+    }
+
+    val newContainer = newInventory.container
+    if (newContainer != null) {
+      val oldContent = oldInventory?.container?.content?.filterNotNull()?.toTypedArray() ?: emptyArray()
+      newContainer.add(*oldContent)
+    }
+    player.inventory2ComponentOrNull = Inventory2Component(newInventory)
+    logger.success("New inventory type is ${(newContainer ?: newInventory)::class.simpleName}")
   }
 }

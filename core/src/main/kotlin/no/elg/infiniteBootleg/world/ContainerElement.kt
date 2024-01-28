@@ -11,16 +11,18 @@ import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity as ProtoEntity
 
-sealed interface InventoryElement {
+sealed interface ContainerElement {
 
   val textureRegion: RotatableTextureRegion?
 
   val itemType: ItemType
 
+  val name: String get() = textureRegion?.name ?: this::class.simpleName ?: itemType.name
+
   fun toItem(maxStock: UInt = DEFAULT_MAX_STOCK, stock: UInt = DEFAULT_MAX_STOCK): Item
 
-  companion object : ProtoConverter<InventoryElement, ProtoEntity.Element> {
-    override fun ProtoEntity.Element.fromProto(): InventoryElement {
+  companion object : ProtoConverter<ContainerElement, ProtoEntity.Element> {
+    override fun ProtoEntity.Element.fromProto(): ContainerElement {
       return when (itemType) {
         ProtoEntity.Element.ItemType.MATERIAL -> Material.fromOrdinal(enumElement.index)
         ProtoEntity.Element.ItemType.TOOL -> Tool.fromOrdinal(enumElement.index)
@@ -29,7 +31,7 @@ sealed interface InventoryElement {
       }
     }
 
-    override fun InventoryElement.asProto(): ProtoEntity.Element =
+    override fun ContainerElement.asProto(): ProtoEntity.Element =
       element {
         when (this@asProto) {
           is Material -> {

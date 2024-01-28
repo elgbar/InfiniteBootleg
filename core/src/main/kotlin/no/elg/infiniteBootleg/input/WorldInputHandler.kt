@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.util.isControlPressed
 import no.elg.infiniteBootleg.util.isShiftPressed
+import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.Ticker
@@ -20,7 +21,7 @@ import no.elg.infiniteBootleg.world.world.ClientWorld
 class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapter(), Disposable {
 
   override fun keyDown(keycode: Int): Boolean {
-    if (ClientMain.inst().shouldIgnoreWorldInput() || (Main.isMultiplayer && keycode != Input.Keys.F3)) {
+    if (keycode != Input.Keys.TAB && (ClientMain.inst().shouldIgnoreWorldInput() || (Main.isMultiplayer && keycode != Input.Keys.F3))) {
       return false
     }
     when (keycode) {
@@ -43,6 +44,10 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
             hud.toggleMode(HUDRenderer.DISPLAY_GRAPH_FPS)
           }
         }
+      }
+
+      Input.Keys.TAB -> world.controlledPlayerEntities.forEach {
+        it.inventory2ComponentOrNull?.inventory?.toggle() ?: Main.logger().warn("No inventory")
       }
 
       Input.Keys.F5 -> world.save()

@@ -56,7 +56,7 @@ enum class Material(
    */
   val invisibleBlock: Boolean = false,
   private val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
-) : InventoryElement {
+) : ContainerElement {
   AIR(
     hardness = 0f,
     hasTransparentTexture = true,

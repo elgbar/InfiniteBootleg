@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.world.magic.SpellState
 import no.elg.infiniteBootleg.world.magic.Wood
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
-data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : Equippable, InventoryElement {
+data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : Equippable, ContainerElement {
 
   init {
     check(gems.isNotEmpty()) { "A staff must have at least one gem" }

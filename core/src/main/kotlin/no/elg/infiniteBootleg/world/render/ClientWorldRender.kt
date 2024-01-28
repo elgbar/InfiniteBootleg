@@ -6,9 +6,15 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.ui.ContainerActor
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.screens.StageScreen
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.safeUse
@@ -22,6 +28,7 @@ import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
 /**
@@ -44,6 +51,8 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   private var lastZoom = 0f
 
+  val maybeStage: Stage? get() = (ClientMain.inst().screen as? StageScreen)?.stage
+
   val chunksInView: ClientChunksInView = ClientChunksInView()
   val batch: SpriteBatch = SpriteBatch()
   val camera: OrthographicCamera = OrthographicCamera().also {
@@ -54,6 +63,25 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   }
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
   val box2DDebugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer(true, false, false, false, true, false) }
+
+  private val containers: MutableMap<Container, ContainerActor> = ConcurrentHashMap<Container, ContainerActor>()
+  private val dad: DragAndDrop = DragAndDrop()
+
+  /**
+   * Register an IContainer with the UI, if one is already registered return a saved instance
+   *
+   * @return The ContainerActor for the given container
+   */
+  fun getContainerActor(container: Container): ContainerActor? {
+    var actor = containers[container]
+    val stage = maybeStage ?: return null
+    if (actor == null) {
+      actor = ContainerActor(container, dad)
+      stage.addActor(actor)
+      containers[container] = actor
+    }
+    return actor
+  }
 
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
     camera.position.set(worldX.toFloat(), worldY.toFloat(), 0f)

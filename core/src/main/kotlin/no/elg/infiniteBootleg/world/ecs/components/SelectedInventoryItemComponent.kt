@@ -9,15 +9,15 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.selectedItem
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
-import no.elg.infiniteBootleg.world.InventoryElement
-import no.elg.infiniteBootleg.world.InventoryElement.Companion.asProto
-import no.elg.infiniteBootleg.world.InventoryElement.Companion.fromProto
+import no.elg.infiniteBootleg.world.ContainerElement
+import no.elg.infiniteBootleg.world.ContainerElement.Companion.asProto
+import no.elg.infiniteBootleg.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryComponentOrNull
 
-class SelectedInventoryItemComponent(var element: InventoryElement) : EntitySavableComponent, AuthoritativeOnlyComponent {
+class SelectedInventoryItemComponent(var element: ContainerElement) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
   companion object : EntityLoadableMapper<SelectedInventoryItemComponent>() {
     var Entity.selectedInventoryItemComponent by propertyFor(SelectedInventoryItemComponent.mapper)

@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.inventory
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
-import no.elg.infiniteBootleg.world.InventoryElement
+import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
@@ -30,7 +30,7 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent, Aut
 
   operator fun plusAssign(item: Item) {
     val existing = this[item]
-    val updatedItem = existing?.merge(item) ?: item
+    val updatedItem = existing?.merge(item)?.firstOrNull() ?: item // TODO THIS is wrong
     replace(updatedItem)
   }
 
@@ -41,17 +41,17 @@ class InventoryComponent(private val maxSize: Int) : EntitySavableComponent, Aut
   }
 
   operator fun get(item: Item): Item? = items.find { it == item }
-  operator fun get(element: InventoryElement): Item? = items.find { it.element == element }
+  operator fun get(element: ContainerElement): Item? = items.find { it.element == element }
 
-  fun getAll(element: InventoryElement): List<Item> = items.filter { it.element == element }
+  fun getAll(element: ContainerElement): List<Item> = items.filter { it.element == element }
 
   operator fun contains(item: Item): Boolean = items.any { it == item }
-  operator fun contains(element: InventoryElement): Boolean = items.any { it.element == element }
+  operator fun contains(element: ContainerElement): Boolean = items.any { it.element == element }
 
   /**
    * @return If the item was used
    */
-  fun use(element: InventoryElement, usages: UInt = 1u): Boolean {
+  fun use(element: ContainerElement, usages: UInt = 1u): Boolean {
     val item = getAll(element).firstOrNull { it.canBeUsed(usages) } ?: return false
     val updatedItem = item.use(usages) ?: return false
     replace(updatedItem)

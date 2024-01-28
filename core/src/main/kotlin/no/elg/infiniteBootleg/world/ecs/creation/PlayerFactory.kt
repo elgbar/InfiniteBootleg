@@ -28,7 +28,7 @@ import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
-import no.elg.infiniteBootleg.world.InventoryElement.Companion.asProto
+import no.elg.infiniteBootleg.world.ContainerElement.Companion.asProto
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily

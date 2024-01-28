@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
+import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
@@ -168,8 +169,9 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
 
   fun shouldIgnoreWorldInput(): Boolean {
     val debugMenuVisible = worldScreen?.isDebugMenuVisible ?: false
+    val inventoryVisible = world?.controlledPlayerEntities?.any { it.inventory2ComponentOrNull?.inventory?.isOpen ?: false } ?: false
     val consoleVisible = console.isVisible
-    return consoleVisible || debugMenuVisible
+    return consoleVisible || debugMenuVisible || inventoryVisible
   }
 
   companion object {

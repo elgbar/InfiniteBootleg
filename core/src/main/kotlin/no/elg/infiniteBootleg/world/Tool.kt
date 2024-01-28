@@ -4,7 +4,7 @@ import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.ToolItem
 import no.elg.infiniteBootleg.util.findTextures
 
-enum class Tool(textureName: String? = null) : InventoryElement {
+enum class Tool(textureName: String? = null) : ContainerElement {
   PICKAXE;
 
   override val textureRegion = findTextures(textureName)
