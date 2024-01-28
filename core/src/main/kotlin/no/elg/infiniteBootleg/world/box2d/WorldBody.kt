@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.OrderedSet
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.util.FailureWatchdog
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ticker.PostRunnableHandler
@@ -103,6 +104,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     }
   }
 
+  private val box2dWatchdog = FailureWatchdog("step Box2D")
+  private val ashleyWatchdog = FailureWatchdog("update ESC engine (ashley)")
+
   /**
    * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
    */
@@ -120,16 +124,12 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     updatingChunksIterator.reset()
 
     synchronized(BOX2D_LOCK) {
-      try {
+      box2dWatchdog.watch {
         box2dWorld.step(BOX2D_TIME_STEP, 10, 10)
-      } catch (e: Throwable) {
-        Main.logger().error("BOX2D", "Failed to step box2d world", e)
       }
 
-      try {
+      ashleyWatchdog.watch {
         world.engine.update(BOX2D_TIME_STEP)
-      } catch (e: Throwable) {
-        Main.logger().error("BOX2D", "Failed to update ashley engine", e)
       }
 
       postRunnable.executeRunnables()

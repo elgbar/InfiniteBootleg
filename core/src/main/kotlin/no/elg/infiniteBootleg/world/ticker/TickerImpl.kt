@@ -4,9 +4,10 @@ import com.badlogic.gdx.utils.PauseableThread
 import com.badlogic.gdx.utils.TimeUtils
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.api.ThreadType
+import no.elg.infiniteBootleg.events.api.ThreadType.Companion.checkCorrectThreadType
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
-import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.FailureWatchdog
 
 /**
  * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default it will call it every [ ][.msDelayBetweenTicks].
@@ -106,16 +107,16 @@ class TickerImpl(
 
   override fun postRunnable(runnable: () -> Unit) = postRunnableHandler.postRunnable(runnable)
 
+  private val watchdog = FailureWatchdog("tick '$name' ticker")
+
   override fun run() {
     val start = TimeUtils.nanoTime()
-    try {
+    watchdog.watch {
       ticking.tick()
       if (tickId % tickRareRate == 0L) {
         ticking.tickRare()
       }
       postRunnableHandler.executeRunnables()
-    } catch (e: Throwable) {
-      Main.logger().error(tag, "Failed to tick", e)
     }
     tickId++
 
@@ -138,29 +139,16 @@ class TickerImpl(
       }
     } else if (tickId - lastTickNagged >= nagDelayTicks && tpsWarnThreshold >= realTPS) {
       lastTickNagged = tickId
-      Main.logger()
-        .error(
-          tag,
-          "Cant keep up a single tick took around " +
-            TimeUtils.nanosToMillis(tpsDelta) +
-            " ms, while at max it should take " +
-            msDelayBetweenTicks +
-            " ms " +
-            nanoDelayBetweenTicks +
-            " ns"
-        )
+      Main.logger().error(tag) {
+        "Cant keep up a single tick took around ${TimeUtils.nanosToMillis(tpsDelta)} ms, while at max it should take $msDelayBetweenTicks ms $nanoDelayBetweenTicks ns"
+      }
     }
   }
 
   override fun start() {
     check(!isStarted) { "Ticker thread has already been started" }
+    checkCorrectThreadType(ThreadType.RENDER) { "Tickers can only be started from the render thread, it was called from ${currentThreadType()}" }
     isStarted = true
-    val threadType = currentThreadType()
-    if (threadType !== ThreadType.RENDER) {
-      throw CalledFromWrongThreadTypeException(
-        "Tickers can only be started from the render thread, it was called from $threadType"
-      )
-    }
     tickerThread.start()
   }
 

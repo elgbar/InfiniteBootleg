@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.events.api
 
+import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.world.ticker.WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX
@@ -34,6 +35,14 @@ enum class ThreadType {
   UNKNOWN;
 
   companion object {
+
+    fun checkCorrectThreadType(expected: ThreadType, message: () -> String = { "Expected event to be dispatched from $expected but was dispatched from ${currentThreadType()}" }) {
+      val current = currentThreadType()
+      if (current != expected) {
+        throw CalledFromWrongThreadTypeException(message())
+      }
+    }
+
     fun currentThreadType(): ThreadType {
       val threadName = Thread.currentThread().name
       if (threadName == Main.inst().renderThreadName) {

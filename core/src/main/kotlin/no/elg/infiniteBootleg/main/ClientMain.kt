@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
+import no.elg.infiniteBootleg.util.FailureWatchdog
 import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -82,6 +83,8 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   private val worldScreen: WorldScreen? get() = screen as? WorldScreen
   val serverClient: ServerClient? get() = (world as? ServerClientWorld)?.serverClient
 
+  private val watchdog = FailureWatchdog("render")
+
   init {
     check(!isServer) { "Cannot create client main as a server!" }
     synchronized(Main.INST_LOCK) {
@@ -139,16 +142,9 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     world?.also {
       mouseLocator.update(it)
     }
-    try {
+    watchdog.watch {
       screen.render(Gdx.graphics.deltaTime)
       renderFailuresInARow = 0
-    } catch (e: Exception) {
-      renderFailuresInARow++
-      if (renderFailuresInARow >= MAX_RENDER_FAILURES_IN_A_ROW) {
-        throw RuntimeException("Render failed $MAX_RENDER_FAILURES_IN_A_ROW times in a row", e)
-      } else {
-        logger().warn("Render failed (failed render attempt $renderFailuresInARow)", e)
-      }
     }
   }
 
@@ -181,8 +177,6 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     const val CLEAR_COLOR_G = (68.0 / 255.0).toFloat()
     const val CLEAR_COLOR_B = 1f
     const val CLEAR_COLOR_A = 1f
-
-    private const val MAX_RENDER_FAILURES_IN_A_ROW = 5
 
     private lateinit var instField: ClientMain
     fun inst(): ClientMain {

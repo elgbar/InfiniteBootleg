@@ -95,6 +95,10 @@ interface ConsoleLogger : ApplicationLogger {
     log(LogLevel.ERROR, message)
   }
 
+  fun error(tag: String, message: () -> String) {
+    log(LogLevel.ERROR, "[$tag] ${message()}")
+  }
+
   override fun error(tag: String, message: String) {
     log(LogLevel.ERROR, "[$tag] $message")
   }
