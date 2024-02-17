@@ -137,7 +137,7 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.104.Final"
+    implementation "io.netty:netty-all:4.1.106.Final"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.14.0"
     implementation "org.jetbrains:annotations:24.1.0"
