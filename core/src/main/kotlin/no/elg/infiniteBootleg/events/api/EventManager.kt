@@ -15,7 +15,10 @@ object EventManager {
    * The inner set is in reality a [WeakHashMap]
    */
   @GuardedBy("itself")
-  val listeners: WeakHashMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
+  val weakListeners: WeakHashMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
+
+  @GuardedBy("itself")
+  val strongListeners: MutableMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = ConcurrentHashMap()
   val oneShotStrongRefs: MutableMap<EventListener<out Event>, EventListener<out Event>> = ConcurrentHashMap()
 
   val isLoggingAnyEvents: Boolean get() = eventsTracker?.logAnything ?: false
@@ -34,11 +37,15 @@ object EventManager {
    * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
-  inline fun <reified T : Event> registerListener(listener: EventListener<T>): EventListener<T> {
-    val eventListeners: MutableSet<EventListener<out Event>>
-    synchronized(listeners) {
-      eventListeners = listeners.getOrPut(T::class) { Collections.newSetFromMap(WeakHashMap()) }
-    }
+  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<T>): EventListener<T> {
+    val eventListeners: MutableSet<EventListener<out Event>> =
+      if (keepStrongReference) {
+        strongListeners.getOrPut(T::class) { Collections.newSetFromMap(ConcurrentHashMap()) }
+      } else {
+        synchronized(weakListeners) {
+          weakListeners.getOrPut(T::class) { Collections.newSetFromMap(WeakHashMap()) }
+        }
+      }
     synchronized(eventListeners) {
       eventListeners.add(listener)
       eventsTracker?.onListenerRegistered(T::class, listener)
@@ -74,7 +81,7 @@ object EventManager {
     }
 
     oneShotStrongRefs[listener] = wrappedListener
-    registerListener(wrappedListener)
+    registerListener(listener = wrappedListener)
   }
 
   /**
@@ -83,13 +90,10 @@ object EventManager {
    * @param event The event to notify about
    */
   inline fun <reified T : Event> dispatchEvent(event: T) {
-    val backingListeners: MutableSet<EventListener<out Event>>
-    synchronized(listeners) {
-      backingListeners = listeners[T::class] ?: return
-    }
+    val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
 
-    synchronized(backingListeners) {
-      val correctListeners = backingListeners.filterIsInstance<EventListener<T>>()
+    synchronized(eventListeners) {
+      val correctListeners = eventListeners.filterIsInstance<EventListener<T>>()
       eventsTracker?.onEventDispatched(event)
       for (listener in correctListeners) {
         eventsTracker?.onEventListenedTo(event, listener)
@@ -102,13 +106,10 @@ object EventManager {
    * Prevent (by removing) the given listener from receiving any more events
    */
   inline fun <reified T : Event> removeListener(listener: EventListener<T>) {
-    val eventListeners: MutableSet<EventListener<out Event>>
-    synchronized(listeners) {
-      eventListeners = listeners[T::class] ?: return
-    }
+    val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
     synchronized(eventListeners) {
-      eventsTracker?.onListenerUnregistered(T::class, listener)
       eventListeners.remove(listener)
+      eventsTracker?.onListenerUnregistered(T::class, listener)
     }
   }
 
@@ -116,8 +117,10 @@ object EventManager {
    * Remove all listeners registered
    */
   fun clear() {
-    synchronized(listeners) {
-      listeners.clear()
+    synchronized(weakListeners) {
+      weakListeners.clear()
     }
+    strongListeners.clear()
+    oneShotStrongRefs.clear()
   }
 }
