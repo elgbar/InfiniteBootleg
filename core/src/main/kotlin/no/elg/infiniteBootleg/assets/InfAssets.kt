@@ -16,6 +16,7 @@ interface InfAssets {
 
   val safeTextureAtlas: SafeTextureAtlas
   val font20pt: BitmapFont
+  val font15pt: BitmapFont
   val font10pt: BitmapFont
 
   val breakableBlockTexture: RotatableTextureRegion
