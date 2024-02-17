@@ -26,7 +26,7 @@ class ChunkColumnListeners : Disposable {
   }
 
   fun registerListeners() {
-    EventManager.registerListener(validateChunkTopBlockOnChunkLoad)
+    EventManager.registerListener(listener = validateChunkTopBlockOnChunkLoad)
   }
 
   override fun dispose() {

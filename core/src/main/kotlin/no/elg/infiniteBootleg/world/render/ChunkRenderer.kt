@@ -12,10 +12,6 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
-import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_A
-import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_B
-import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_G
-import no.elg.infiniteBootleg.main.ClientMain.Companion.CLEAR_COLOR_R
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
@@ -129,12 +125,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     val blocks = chunk.blocks
     fbo.use {
       batch.safeUse {
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        if (aboveGround) {
-          Gdx.gl.glClearColor(CLEAR_COLOR_R, CLEAR_COLOR_G, CLEAR_COLOR_B, CLEAR_COLOR_A)
-        } else {
-          Gdx.gl.glClearColor(CAVE_CLEAR_COLOR_R, CAVE_CLEAR_COLOR_G, CAVE_CLEAR_COLOR_B, CLEAR_COLOR_A)
-        }
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           val topBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {

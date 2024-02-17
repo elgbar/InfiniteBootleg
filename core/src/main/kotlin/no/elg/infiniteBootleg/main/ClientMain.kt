@@ -32,8 +32,6 @@ import java.awt.Toolkit
 class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progArgs) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
 
-  private var renderFailuresInARow = 0
-
   lateinit var screenRenderer: ScreenRenderer
     private set
 
@@ -94,7 +92,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   }
 
   override fun create() {
-    VisUI.load(if (SCALE > 1) VisUI.SkinScale.X2 else VisUI.SkinScale.X1)
+    VisUI.load(if (scale > 1) VisUI.SkinScale.X2 else VisUI.SkinScale.X1)
     // must load VisUI first
     super.create()
     renderThreadName = Thread.currentThread().name
@@ -144,7 +142,6 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     }
     watchdog.watch {
       screen.render(Gdx.graphics.deltaTime)
-      renderFailuresInARow = 0
     }
   }
 
@@ -172,7 +169,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
 
   companion object {
     /** Only use this when a server is present  */
-    val SCALE = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
+    val scale = if (Toolkit.getDefaultToolkit().screenSize.width > 2560) 2 else 1
     const val CLEAR_COLOR_R = 0.2f
     const val CLEAR_COLOR_G = (68.0 / 255.0).toFloat()
     const val CLEAR_COLOR_B = 1f

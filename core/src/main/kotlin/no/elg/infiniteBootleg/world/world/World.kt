@@ -736,14 +736,16 @@ abstract class World(
   }
 
   @JvmName("removeLocs")
-  fun removeBlocks(blocks: Iterable<WorldCompactLoc>, prioritize: Boolean = false) {
+  fun removeBlocks(blocks: Iterable<WorldCompactLoc>, prioritize: Boolean = false): Set<Block> {
+    val removed = mutableSetOf<Block>()
     val blockChunks = actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks
-      chunk.removeBlock(localX, localY, updateTexture = false)
+      chunk.removeBlock(localX, localY, updateTexture = false)?.also { removed += it }
     }
     for (chunk in blockChunks) {
       chunk.updateTexture(prioritize)
     }
+    return removed
   }
 
   fun getEntities(worldX: WorldCoord, worldY: WorldCoord): Array<Entity> {

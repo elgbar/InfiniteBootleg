@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.safeUse
 
 class ScreenRenderer : Disposable, Resizable {
-  private val spacing = FONT_SIZE * ClientMain.SCALE / 2
+  private val spacing = FONT_SIZE * ClientMain.scale / 2
   val font: BitmapFont = Main.inst().assets.font20pt
   val batch: SpriteBatch = SpriteBatch().also {
     it.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())

@@ -37,7 +37,7 @@ class HUDRenderer : Renderer, Resizable {
     val sr = ClientMain.inst().screenRenderer
     reset()
     sr.use {
-      if (hasMode(DISPLAY_MINIMAL_DEBUG) || hasMode(DISPLAY_DEBUG)) {
+      if (hasMode(DISPLAY_MINIMAL_DEBUG or DISPLAY_DEBUG)) {
         fpsString(builder, world)
       }
       if (hasMode(DISPLAY_DEBUG) && world != null) {

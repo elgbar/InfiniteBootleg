@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.assets.InfAssets.Companion.FONTS_FOLDER
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.TEXTURES_BLOCK_FILE
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.createTextureRegion
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.ClientMain.Companion.SCALE
+import no.elg.infiniteBootleg.main.ClientMain.Companion.scale
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
@@ -50,7 +50,7 @@ class InfAssetsImpl : InfAssets {
   private fun createFont(pts: Int): BitmapFont {
     val generator = FreeTypeFontGenerator(Gdx.files.internal(FONTS_FOLDER + "UbuntuMono-R.ttf"))
     val parameter = FreeTypeFontParameter()
-    parameter.size = pts * SCALE
+    parameter.size = pts * scale
     parameter.minFilter = Texture.TextureFilter.Linear
     parameter.magFilter = Texture.TextureFilter.MipMapLinearLinear
     parameter.genMipMaps = true

@@ -81,11 +81,11 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   }
 
   fun registerListeners() {
-    EventManager.registerListener(registerLightChangeForNearbyChunks)
-    EventManager.registerListener(updateChunkTextureOnBlockChange)
-    EventManager.registerListener(updateChunkLightOnChunkColumnUpdatedEvent)
-    EventManager.registerListener(updateChunkTextureAndLightOnNeighborChunkLoaded)
-    EventManager.registerListener(updateChunkLightsOnWorldTick)
+    EventManager.registerListener(listener = registerLightChangeForNearbyChunks)
+    EventManager.registerListener(listener = updateChunkTextureOnBlockChange)
+    EventManager.registerListener(listener = updateChunkLightOnChunkColumnUpdatedEvent)
+    EventManager.registerListener(listener = updateChunkTextureAndLightOnNeighborChunkLoaded)
+    EventManager.registerListener(listener = updateChunkLightsOnWorldTick)
   }
 
   override fun dispose() {

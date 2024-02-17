@@ -20,7 +20,7 @@ class ChunkGeneratedListener(generator: ChunkGenerator) : Disposable {
   }
 
   init {
-    EventManager.registerListener(updateChunkLightEventListener)
+    EventManager.registerListener(listener = updateChunkLightEventListener)
   }
 
   override fun dispose() {

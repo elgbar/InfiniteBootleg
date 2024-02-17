@@ -25,6 +25,7 @@ import kotlin.math.min
 
 fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)
 fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
+fun isAltPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)
 
 class WorldEntity(val world: World, val entity: Entity)
 

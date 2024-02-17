@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.world.world.World
 
 object CurrentBlockHUDRenderer {
 
-  private val blockScale = Block.BLOCK_SIZE * ClientMain.SCALE
+  private val blockScale = Block.BLOCK_SIZE * ClientMain.scale
   private val x2Block = blockScale * 2f
   private val x3Block = blockScale * 3f
   private val x4Block = blockScale * 4f
@@ -24,7 +24,7 @@ object CurrentBlockHUDRenderer {
   fun render(screenRenderer: ScreenRenderer, world: World) {
     val entity = world.controlledPlayerEntities.firstOrNull() ?: return
     val item = entity.selectedItem ?: return
-    val texture = (item.element.textureRegion?.textureRegionOrNull ?: Main.inst().assets.breakableBlockTexture.textureRegion)
+    val texture = item.element.textureRegion?.textureRegionOrNull ?: Main.inst().assets.breakableBlockTexture.textureRegion
     with(screenRenderer) {
       batch.draw(texture, Gdx.graphics.width - x4Block, Gdx.graphics.height - x3Block, x2Block, x2Block)
       layout.setText(font, "${item.stock} / ${item.maxStock}", Color.WHITE, x10Block, Align.right, true)

@@ -11,7 +11,8 @@ import no.elg.infiniteBootleg.util.isControlPressed
 import no.elg.infiniteBootleg.util.isShiftPressed
 import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
+import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MIN_ZOOM
 import no.elg.infiniteBootleg.world.ticker.Ticker
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
@@ -73,12 +74,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
       return false
     }
     val camera = worldRender.camera
-    camera.zoom += (amountX + amountY) / 2 * SCROLL_SPEED
-    if (camera.zoom < WorldRender.MIN_ZOOM) {
-      camera.zoom = WorldRender.MIN_ZOOM
-    } else if (camera.zoom > WorldRender.MAX_ZOOM) {
-      camera.zoom = WorldRender.MAX_ZOOM
-    }
+    camera.zoom = (camera.zoom + (amountY * SCROLL_SPEED)).coerceIn(MIN_ZOOM, MAX_ZOOM)
     worldRender.update()
     return true
   }
@@ -90,6 +86,6 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
   }
 
   companion object {
-    private const val SCROLL_SPEED = 0.25f
+    private const val SCROLL_SPEED = 1 / 8f
   }
 }

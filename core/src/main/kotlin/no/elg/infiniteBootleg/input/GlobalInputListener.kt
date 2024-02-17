@@ -28,7 +28,7 @@ object GlobalInputListener : InputAdapter() {
         if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
           val mode = Gdx.graphics.displayMode
           if (Gdx.graphics.isFullscreen) {
-            if (ClientMain.SCALE > 1) {
+            if (ClientMain.scale > 1) {
               Gdx.graphics.setWindowedMode(1920, 1080)
             } else {
               Gdx.graphics.setWindowedMode(1280, 720)

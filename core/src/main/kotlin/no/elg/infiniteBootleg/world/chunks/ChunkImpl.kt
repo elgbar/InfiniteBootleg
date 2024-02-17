@@ -148,16 +148,14 @@ class ChunkImpl(
     updateTexture: Boolean,
     prioritize: Boolean,
     sendUpdatePacket: Boolean
-  ) {
-    setBlock(
-      localX = localX,
-      localY = localY,
-      block = null as Block?,
-      updateTexture = updateTexture,
-      prioritize = prioritize,
-      sendUpdatePacket = sendUpdatePacket
-    )
-  }
+  ) = setBlock(
+    localX = localX,
+    localY = localY,
+    block = null as Block?,
+    updateTexture = updateTexture,
+    prioritize = prioritize,
+    sendUpdatePacket = sendUpdatePacket
+  )
 
   override fun setBlock(
     localX: LocalCoord,

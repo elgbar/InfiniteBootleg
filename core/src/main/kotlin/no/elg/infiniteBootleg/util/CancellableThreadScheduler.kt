@@ -40,9 +40,10 @@ class CancellableThreadScheduler(threads: Int) {
   private val isAlwaysSync: Boolean = threads == 0
 
   /**
-   * Post the given runnable as fast as possible (though not as fast as calling [ ][Application.postRunnable])
+   * Post the given runnable as fast as possible
    *
    * @param runnable What to do
+   *
    * @see Application.postRunnable
    */
   fun executeSync(runnable: Runnable) {
