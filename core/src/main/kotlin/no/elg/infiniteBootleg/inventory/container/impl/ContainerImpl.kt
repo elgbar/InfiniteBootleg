@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.inventory.container.impl
 
 import com.google.common.base.Preconditions
+import no.elg.infiniteBootleg.events.ContainerEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.Container
-import no.elg.infiniteBootleg.inventory.container.ContainerSlot
+import no.elg.infiniteBootleg.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.mergeAll
 import no.elg.infiniteBootleg.world.ContainerElement
@@ -11,13 +13,11 @@ import no.elg.infiniteBootleg.world.ContainerElement
  * @author kheba
  */
 open class ContainerImpl(
-  override val size: Int,
-  override var name: String = "Container",
-  override val validOnly: Boolean = true
+  final override val size: Int,
+  override var name: String = "Container"
 ) : Container {
 
   override val content: Array<Item?> = arrayOfNulls(size)
-//  private val actor: ContainerActor? = null
 
   init {
     Preconditions.checkArgument(size > 0, "Inventory size must be greater than zero")
@@ -50,7 +50,7 @@ open class ContainerImpl(
   }
 
   override fun add(tileType: ContainerElement, amount: UInt): UInt {
-    var amount = amount
+    var amountNotAdded = amount
     var index = first(tileType)
     if (index < 0) {
       index = firstEmpty()
@@ -67,15 +67,17 @@ open class ContainerImpl(
         content[index] = merge[0]
         add(merge[1])
       }
+      updateContainer()
       return 0u
     } else {
       val item = tileType.toItem(Item.DEFAULT_MAX_STOCK, amount)
       for (stack in content) {
         if (stack != null && stack.element === tileType && stack.stock < Item.DEFAULT_MAX_STOCK) {
           val needed = Item.DEFAULT_MAX_STOCK - stack.stock
-          val given = amount.coerceAtMost(needed)
-          amount -= given
-          if (amount == 0u) {
+          val given = amountNotAdded.coerceAtMost(needed)
+          amountNotAdded -= given
+          if (amountNotAdded == 0u) {
+            updateContainer()
             return 0u
           }
         }
@@ -84,7 +86,7 @@ open class ContainerImpl(
 
     val validStacks =
       mergeAll(
-        listOf(tileType.toItem(Item.DEFAULT_MAX_STOCK, amount)),
+        listOf(tileType.toItem(Item.DEFAULT_MAX_STOCK, amountNotAdded)),
         Item.DEFAULT_MAX_STOCK
       )
 
@@ -100,7 +102,7 @@ open class ContainerImpl(
       content[index] = validStacks[i]
       i++
     }
-
+    updateContainer()
     // if we do not need to skip anything the loop finished successfully
     if (toSkip == -1) {
       return 0u
@@ -154,7 +156,7 @@ open class ContainerImpl(
     var i = 0
     val length = content.size
     while (i < length) {
-      if (item.equals(content[i])) {
+      if (item == content[i]) {
         content[i] = null
       }
       i++
@@ -163,7 +165,6 @@ open class ContainerImpl(
   }
 
   override fun remove(index: Int) {
-    Preconditions.checkPositionIndex(index, size - 1)
     content[index] = null
     updateContainer()
   }
@@ -180,7 +181,7 @@ open class ContainerImpl(
       return false
     }
     for (slot in this) {
-      if (item.equals(slot.content)) {
+      if (item == slot.content) {
         return true
       }
     }
@@ -207,32 +208,35 @@ open class ContainerImpl(
     Preconditions.checkPositionIndex(index, size - 1)
     require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
     content[index] = item
+    updateContainer()
   }
 
-  override fun updateContainer() {
-    // might happen during tests or when the app is headless
-    //    if (GameMain.ui == null) {
-    //      return;
-    //    }
-    //    if (actor == null) {
-    //      actor = GameMain.ui.getContainerActor(this);
-    //    }
-//    actor!!.update()
+  override fun swap(index1: Int, index2: Int) {
+    Preconditions.checkPositionIndex(index1, size - 1)
+    val item1 = content[index1]
+    content[index1] = content[index2]
+    content[index2] = item1
+    updateContainer()
   }
 
-  override fun iterator(): MutableIterator<ContainerSlot> {
-    return object : MutableIterator<ContainerSlot> {
+  protected open fun updateContainer() {
+    EventManager.dispatchEvent(ContainerEvent.Changed(this))
+  }
+
+  override fun iterator(): MutableIterator<IndexedItem> {
+    return object : MutableIterator<IndexedItem> {
       var index: Int = 0
 
       override fun hasNext(): Boolean {
         return index < size
       }
 
-      override fun next(): ContainerSlot {
-        return ContainerSlot(index, content[index++])
+      override fun next(): IndexedItem {
+        return IndexedItem(index, content[index++])
       }
 
       override fun remove() {
+        updateContainer()
         content[index] = null
       }
     }

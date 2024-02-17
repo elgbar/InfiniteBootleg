@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.util
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
 import no.elg.infiniteBootleg.main.Main.Companion.logger
+import org.jetbrains.annotations.Async
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.ThreadPoolExecutor
@@ -12,7 +14,7 @@ import java.util.concurrent.TimeUnit
  * Run (cancellable) tasks on other threads
  */
 class CancellableThreadScheduler(threads: Int) {
-  private val executor: ScheduledThreadPoolExecutor
+  private val executor: ScheduledExecutorService
 
   init {
     val coreThreads = if (threads < 1) Runtime.getRuntime().availableProcessors() / 2 else threads
@@ -93,10 +95,12 @@ class CancellableThreadScheduler(threads: Int) {
   }
 
   companion object {
-    private fun caughtRunnable(runnable: Runnable): Runnable =
-      Runnable {
+    private fun run(@Async.Execute runnable: Runnable): Unit = runnable.run()
+
+    private fun caughtRunnable(@Async.Schedule runnable: Runnable): () -> Unit =
+      {
         try {
-          runnable.run()
+          run(runnable)
         } catch (e: Exception) {
           logger().log("SCHEDULER", "Exception caught on " + currentThreadType(), e)
         }

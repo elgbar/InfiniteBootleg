@@ -29,7 +29,7 @@ interface Inventory {
   /**
    * @return The index of the selected item
    */
-  val sel: Int
+  val selected: Int
 
   /**
    * @return The entity that holds this container. Only this entity should have access to the

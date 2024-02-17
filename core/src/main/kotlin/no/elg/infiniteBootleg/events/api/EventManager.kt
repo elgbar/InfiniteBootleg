@@ -34,7 +34,7 @@ object EventManager {
   /**
    * React to events [dispatchEvent]-ed by someone else.
    *
-   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
+   * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
   inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<T>): EventListener<T> {
@@ -52,6 +52,19 @@ object EventManager {
     }
     return listener
   }
+
+  /**
+   * React to events [dispatchEvent]-ed by someone else.
+   *
+   * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
+   * This is to automatically un-register listeners which no longer can react to events.
+   */
+  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, crossinline filter: (T) -> Boolean, crossinline listener: T.() -> Unit): EventListener<T> =
+    registerListener(keepStrongReference) { event ->
+      if (filter(event)) {
+        listener(event)
+      }
+    }
 
   /**
    * React to the next event [dispatchEvent]-ed of a certain type.

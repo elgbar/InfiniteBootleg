@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.util.isControlPressed
 import no.elg.infiniteBootleg.util.isShiftPressed
-import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.toggleInventory
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MIN_ZOOM
@@ -47,9 +47,7 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
         }
       }
 
-      Input.Keys.TAB -> world.controlledPlayerEntities.forEach {
-        it.inventory2ComponentOrNull?.inventory?.toggle() ?: Main.logger().warn("No inventory")
-      }
+      Input.Keys.TAB -> world.controlledPlayerEntities.forEach { it.toggleInventory() }
 
       Input.Keys.F5 -> world.save()
       Input.Keys.F9 -> world.reload()

@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
@@ -98,12 +98,25 @@ inline fun <T : Disposable, R> T.useDispose(onError: (Exception) -> Unit = {}, a
   }
 }
 
-inline fun SpriteBatch.withColor(
+inline fun Batch.withColor(
   r: Float = this.color.r,
   g: Float = this.color.g,
   b: Float = this.color.b,
   a: Float = this.color.a,
-  action: (SpriteBatch) -> Unit
+  action: (Batch) -> Unit
+) {
+  val oldColor = this.color.cpy()
+  this.setColor(r, g, b, a)
+  action(this)
+  this.color = oldColor
+}
+
+inline fun BitmapFont.withColor(
+  r: Float = this.color.r,
+  g: Float = this.color.g,
+  b: Float = this.color.b,
+  a: Float = this.color.a,
+  action: (BitmapFont) -> Unit
 ) {
   val oldColor = this.color.cpy()
   this.setColor(r, g, b, a)

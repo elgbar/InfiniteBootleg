@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.world.blocks.Block
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.world.World
 
 object CurrentBlockHUDRenderer {

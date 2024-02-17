@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 
 data class LocallyControlledComponent(
   var brushSize: Float = INITIAL_BRUSH_SIZE,
@@ -25,7 +25,7 @@ data class LocallyControlledComponent(
   var instantBreak: Boolean = INITIAL_INSTANT_BREAK
 ) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
-  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedInventoryItemComponentOrNull?.element is Tool
+  fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool
 
   companion object : EntityLoadableMapper<LocallyControlledComponent>() {
     var Entity.locallyControlledComponent by propertyFor(mapper)

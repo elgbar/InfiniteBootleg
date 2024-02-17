@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.selectedMaterialComponentFamily
 import no.elg.infiniteBootleg.world.world.World
@@ -36,7 +36,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
     for (entity in entities) {
       val controls = entity.locallyControlledComponentOrNull ?: continue
-      val element = entity.selectedInventoryItemComponentOrNull?.element ?: continue
+      val element = entity.selectedItem?.element ?: continue
       val isBreaking = controls.isBreaking(entity)
       val breakingComponent = entity.currentlyBreakingComponentOrNull
 

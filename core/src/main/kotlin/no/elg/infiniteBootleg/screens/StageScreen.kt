@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.utils.Layout
 import com.badlogic.gdx.utils.Scaling.fit
 import com.badlogic.gdx.utils.viewport.ScalingViewport
 import com.kotcrab.vis.ui.widget.VisWindow
@@ -65,11 +66,8 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
     stage.viewport.update(width, height, true)
     updateCamera()
 
-    for (actor in stage.actors) {
-      if (actor is VisWindow) {
-        actor.centerWindow()
-      }
-    }
+    stage.actors.filterIsInstance<Layout>().forEach { it.invalidateHierarchy() }
+    stage.actors.filterIsInstance<VisWindow>().forEach { it.centerWindow() }
   }
 
   override fun dispose() {

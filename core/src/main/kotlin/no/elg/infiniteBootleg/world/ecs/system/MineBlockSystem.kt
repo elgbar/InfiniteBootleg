@@ -9,11 +9,11 @@ import no.elg.infiniteBootleg.util.breakableLocs
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.ecs.INVENTORY_COMPONENTS
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
@@ -25,8 +25,8 @@ object MineBlockSystem :
     allOf(
       WorldComponent::class,
       LocallyControlledComponent::class,
-      SelectedInventoryItemComponent::class,
-      PositionComponent::class
+      PositionComponent::class,
+      *INVENTORY_COMPONENTS
     ).get(),
     UPDATE_PRIORITY_DEFAULT
   ),

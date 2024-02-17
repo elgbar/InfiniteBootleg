@@ -23,8 +23,6 @@ import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.inputEventQueueOrNull
-import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
-import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent.Companion.inventoryComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent.Companion.killableComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
@@ -39,12 +37,14 @@ import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -107,12 +107,12 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
 
     trySave(this@save.box2dOrNull)
     trySave(this@save.explosiveComponentOrNull)
-    trySave(this@save.inventoryComponentOrNull)
+    trySave(this@save.containerComponentOrNull)
+    trySave(this@save.hotbarComponentOrNull)
     trySave(this@save.killableComponentOrNull)
     trySave(this@save.lookDirectionComponentOrNull)
     trySave(this@save.materialComponentOrNull)
     trySave(this@save.nameComponentOrNull)
-    trySave(this@save.selectedInventoryItemComponentOrNull)
     trySave(this@save.textureRegionComponentOrNull)
     trySave(this@save.velocityComponentOrNull)
     trySave(this@save.locallyControlledComponentOrNull)
@@ -154,12 +154,12 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     }
 
     ExplosiveComponent.load(this, protoEntity)
-    InventoryComponent.load(this, protoEntity)
+    ContainerComponent.load(this, protoEntity)
+    HotbarComponent.load(this, protoEntity)
     KillableComponent.load(this, protoEntity)
     LookDirectionComponent.load(this, protoEntity)
     MaterialComponent.load(this, protoEntity)
     NameComponent.load(this, protoEntity)
-    SelectedInventoryItemComponent.load(this, protoEntity)
     TextureRegionComponent.load(this, protoEntity)
     VelocityComponent.load(this, protoEntity)
     LocallyControlledComponent.load(this, protoEntity)

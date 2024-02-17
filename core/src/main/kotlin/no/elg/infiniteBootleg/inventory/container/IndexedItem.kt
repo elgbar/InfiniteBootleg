@@ -7,4 +7,4 @@ import no.elg.infiniteBootleg.items.Item
  *
  * @author kheba
  */
-class ContainerSlot(val index: Int, val content: Item?)
+data class IndexedItem(val index: Int, val content: Item?)

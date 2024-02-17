@@ -6,14 +6,16 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.inventory.container.Container
-import no.elg.infiniteBootleg.inventory.ui.ContainerActor
+import no.elg.infiniteBootleg.inventory.ui.createContainerActor
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.StageScreen
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
@@ -28,6 +30,7 @@ import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
@@ -51,7 +54,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   private var lastZoom = 0f
 
-  val maybeStage: Stage? get() = (ClientMain.inst().screen as? StageScreen)?.stage
+  private val maybeStage: Stage? get() = (ClientMain.inst().screen as? StageScreen)?.stage
 
   val chunksInView: ClientChunksInView = ClientChunksInView()
   val batch: SpriteBatch = SpriteBatch()
@@ -64,23 +67,31 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
   val box2DDebugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer(true, false, false, false, true, false) }
 
-  private val containers: MutableMap<Container, ContainerActor> = ConcurrentHashMap<Container, ContainerActor>()
+  private val containers: MutableMap<Container, Actor> = ConcurrentHashMap<Container, Actor>()
   private val dad: DragAndDrop = DragAndDrop()
+
+  fun isContainerOpen(container: Container): Boolean = containers[container]?.isVisible ?: false
 
   /**
    * Register an IContainer with the UI, if one is already registered return a saved instance
    *
    * @return The ContainerActor for the given container
    */
-  fun getContainerActor(container: Container): ContainerActor? {
-    var actor = containers[container]
-    val stage = maybeStage ?: return null
-    if (actor == null) {
-      actor = ContainerActor(container, dad)
-      stage.addActor(actor)
-      containers[container] = actor
+  fun getContainerActor(container: Container): CompletableFuture<Actor>? {
+    val storedActor = containers[container]
+    if (storedActor == null) {
+      val stage = maybeStage ?: return null
+      val future = CompletableFuture<Actor>()
+      Main.inst().scheduler.executeSync {
+        // Make sure that we don't double create the same container
+        val actor = containers[container] ?: stage.createContainerActor(container, dad, batch)
+        containers[container] = actor
+        future.complete(actor)
+      }
+      return future
+    } else {
+      return CompletableFuture.completedFuture(storedActor)
     }
-    return actor
   }
 
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {

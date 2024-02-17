@@ -26,7 +26,7 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = false // handleEvent(InputEvent.TouchDraggedEvent(screenX, screenY, pointer))
   override fun mouseMoved(screenX: Int, screenY: Int): Boolean = false // handleEvent(InputEvent.MouseMovedEvent(screenX, screenY))
-  override fun scrolled(amountX: Float, amountY: Float): Boolean = false // handleEvent(InputEvent.ScrolledEvent(amountX, amountY))
+  override fun scrolled(amountX: Float, amountY: Float): Boolean = handleEvent(InputEvent.ScrolledEvent(amountX, amountY))
 
   override fun dispose() {
     ClientMain.inst().inputMultiplexer.removeProcessor(this)

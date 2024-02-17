@@ -9,53 +9,11 @@ import no.elg.infiniteBootleg.items.Item
  *
  * @author kheba
  */
-class AutoSortedContainer @JvmOverloads constructor(
+class AutoSortedContainer(
   size: Int,
   name: String,
-  disallowInvalid: Boolean = true,
-  sortOrder: SortOrder = SortOrder(
-    false,
-    SortOrder.TT_NAME_DESC,
-    SortOrder.AMOUNT_DESC
-  )
-) : ContainerImpl(size, name, disallowInvalid) {
-  // do not allow change of valid stacks as the implementation would be hard to do correctly
-  private val disallowInvalid: Boolean
-
-  // You can modify the sortOrder directly
-  val sortOrder: SortOrder
-
-  /**
-   * A normal container that disallows invalid [Item]s and sorts first by name then by tile
-   * amount in an descending order, with the name 'Container'
-   *
-   * @param size The size of the container
-   */
-  constructor(size: Int) : this(size, "Auto Sorted Container")
-
-  /**
-   * @param size The size of the container
-   * @param disallowInvalid if this container does not allow invalid [Item]s
-   * @param sortOrder The way to sort the validate each time it is modified
-   */
-  /**
-   * A container that sorts first by name then by tile amount in an descending order
-   *
-   * @param size The size of the container
-   * @param disallowInvalid if this container does not allow invalid [Item]s
-   */
-  /**
-   * A normal container that disallows invalid [Item]s and sorts first by name then by tile
-   * amount in an descending order
-   *
-   * @param size The size of the container
-   */
-  init {
-    Preconditions.checkNotNull(sortOrder, "The sort order cannot be null")
-
-    this.disallowInvalid = disallowInvalid
-    this.sortOrder = sortOrder
-  }
+  private val sortOrder: SortOrder = defaultSortOrder
+) : ContainerImpl(size, name) {
 
   override fun updateContainer() {
     super.updateContainer()
@@ -64,8 +22,12 @@ class AutoSortedContainer @JvmOverloads constructor(
 
   override fun put(index: Int, item: Item?) {
     Preconditions.checkPositionIndex(index, size - 1)
-    require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
+    require(!validOnly || item == null || item.isValid()) { "This container does not allow invalid stacks" }
     content[index] = null
     add(item ?: return)
+  }
+
+  companion object {
+    val defaultSortOrder = SortOrder.compileComparator(false, SortOrder.ELEM_NAME_DESC, SortOrder.AMOUNT_DESC)
   }
 }

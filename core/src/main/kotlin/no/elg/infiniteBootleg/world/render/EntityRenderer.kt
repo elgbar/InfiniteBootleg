@@ -23,10 +23,10 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
@@ -66,7 +66,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   }
 
   private fun Entity.holdingTexture(): TextureRegion? {
-    return selectedInventoryItemComponentOrNull?.element?.textureRegion?.textureRegionOrNull
+    return selectedItem?.element?.textureRegion?.textureRegionOrNull
   }
 
   private val lightVector: Vector2 = Vector2()

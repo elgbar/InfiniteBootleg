@@ -15,16 +15,16 @@ import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
-import no.elg.infiniteBootleg.world.ecs.components.InventoryComponent
 import no.elg.infiniteBootleg.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -71,6 +71,8 @@ val CONTROLLED_STANDALONE_ENTITY = arrayOf(
   InputEventQueueComponent::class
 )
 
+val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
+
 val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
 val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).get()
 
@@ -83,18 +85,18 @@ val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY
 
 val PLAYERS_ENTITY_ARRAY = arrayOf(
   *DYNAMIC_STANDALONE_ENTITY,
+  *INVENTORY_COMPONENTS,
   GroundedComponent::class,
   NameComponent::class,
   KillableComponent::class,
-  InventoryComponent::class,
   PhysicsEventQueueComponent::class
 )
 val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
 val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
+  *INVENTORY_COMPONENTS,
   LocallyControlledComponent::class,
   FollowedByCameraTag::class,
-  SelectedInventoryItemComponent::class,
   TextureRegionComponent::class,
   InputEventQueueComponent::class,
   PhysicsEventQueueComponent::class
@@ -104,7 +106,7 @@ val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).get()
 val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).exclude(AuthoritativeOnlyTag::class).get()
 val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).get()
 val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionComponent::class).get()
-val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, SelectedInventoryItemComponent::class).get()
+val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).get()
 val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).get()
 
 val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).get()

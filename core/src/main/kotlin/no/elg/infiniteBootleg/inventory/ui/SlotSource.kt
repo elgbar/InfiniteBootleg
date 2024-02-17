@@ -1,43 +1,47 @@
 package no.elg.infiniteBootleg.inventory.ui
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Scaling
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.world.blocks.Block
 
-/**
- * @author Daniel Holderbaum
- */
-class SlotSource(actor: SlotActor) : DragAndDrop.Source(actor) {
-  private val sourceSlot: Slot = actor.slot
+class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndDrop.Source(actor) {
 
   override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload? {
-    val srcTs = sourceSlot.stack ?: return null
+    val srcTs = sourceSlot.item ?: return null
 
-    if (srcTs.stock == 0u || sourceSlot.containerActor.container is AutoSortedContainer) {
+    if (srcTs.stock == 0u || sourceSlot.container is AutoSortedContainer) {
       return null
     }
 
     val payload = Payload()
-    val payloadSlot = Slot(sourceSlot)
-
-    //        srcTs.take(srcTs.getStock());
-    payload.setObject(payloadSlot)
+    payload.setObject(sourceSlot)
 
     val icon = srcTs.element.textureRegion ?: return null
+    val textureRegion = TextureRegionDrawable(icon.textureRegionOrNull ?: ClientMain.inst().assets.whiteTexture.textureRegion)
 
-    val image = Image(icon.textureRegion)
-    val dragActor: Actor = image
+    fun image(): Image =
+      Image(textureRegion, Scaling.fit).also {
+        it.setSize(DRAG_ICON_SIZE, DRAG_ICON_SIZE)
+      }
+
+    val dragActor = image()
+    dragActor.color = Color.WHITE.cpy().mul(0.75f, 0.75f, 0.75f, 1f)
     payload.dragActor = dragActor
 
-    val validDragActor: Actor = image
-    // validDragActor.setColor(0, 1, 0, 1);
+    val validDragActor: Actor = image()
     payload.validDragActor = validDragActor
 
-    val invalidDragActor: Actor = image
-    // invalidDragActor.setColor(1, 0, 0, 1);
+    val invalidDragActor: Actor = image()
+    invalidDragActor.color = Color.WHITE.cpy().mul(1f, 0f, 0f, 1f)
     payload.invalidDragActor = invalidDragActor
 
     return payload
@@ -51,33 +55,31 @@ class SlotSource(actor: SlotActor) : DragAndDrop.Source(actor) {
     payload: Payload?,
     target: DragAndDrop.Target?
   ) {
-    val payloadSlot = payload?.getObject() as? Slot ?: return
+    val payloadSlot = payload?.getObject() as? InventorySlot ?: return
     if (target != null) {
-      val targetSlot = (target.actor as? SlotActor)?.slot ?: return
+      val targetSlot = (target.actor.userObject as? InventorySlot) ?: return
 
-      val container = targetSlot.containerActor.container
+      val container = targetSlot.container
 
-      val targetItem = targetSlot.stack
-      val draggingSlot = payloadSlot.stack ?: return
-      if (targetItem == null) {
-        container.put(targetSlot.index, draggingSlot)
-        container.remove(payloadSlot.index)
-      } else if (targetItem.element == draggingSlot.element) {
-        // FIXME This is probably borked :D
-        val change = targetItem.change(draggingSlot.stock.toInt())
-        container.put(targetSlot.index, draggingSlot)
-        container.remove(payloadSlot.index)
+      if (targetSlot.index == payloadSlot.index) {
+        Main.logger().debug("DAD", "Dragging to same slot, ignoring")
+        return
+      }
+
+      val targetItem = targetSlot.item
+      val draggingItem = payloadSlot.item ?: return
+      if (targetItem?.element != draggingItem.element) {
+        container.swap(targetSlot.index, payloadSlot.index)
       } else {
-        // swap the two items
-        val targetTs = container[targetSlot.index]
-        val payloadTs = container[payloadSlot.index]
-
-        container.put(targetSlot.index, payloadTs)
-        container.put(payloadSlot.index, targetTs)
+        // FIXME This is probably borked :D
+        //        val change = targetItem.change(draggingItem.stock.toInt())
+        //        container.put(targetSlot.index, draggingItem)
+        //        container.remove(payloadSlot.index)
       }
     }
-    //        else {
-    //            this.sourceSlot.add(payloadSlot.getItem(), payloadSlot.getStock());
-    //        }
+  }
+
+  companion object {
+    const val DRAG_ICON_SIZE = Block.BLOCK_SIZE * 3f
   }
 }

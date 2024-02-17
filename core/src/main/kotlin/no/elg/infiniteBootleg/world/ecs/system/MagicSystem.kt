@@ -10,12 +10,12 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.server.serverBoundSpellSpawn
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.world.Staff
+import no.elg.infiniteBootleg.world.ecs.INVENTORY_COMPONENTS
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
@@ -31,7 +31,7 @@ object MagicSystem :
     allOf(
       WorldComponent::class,
       LocallyControlledComponent::class,
-      SelectedInventoryItemComponent::class,
+      *INVENTORY_COMPONENTS,
       PositionComponent::class
     ).get(),
     UPDATE_PRIORITY_DEFAULT
@@ -45,7 +45,7 @@ object MagicSystem :
       return
     }
     val world = entity.clientWorld ?: return
-    val heldStaff = entity.selectedInventoryItemComponentOrNull?.element as? Staff ?: return
+    val heldStaff = entity.selectedItem?.element as? Staff ?: return
     val existingSpellState = entity.lastSpellCastOrNull
     val doCastNow = Gdx.input.isButtonPressed(Input.Buttons.LEFT)
     if (existingSpellState.canCastAgain() && doCastNow) {

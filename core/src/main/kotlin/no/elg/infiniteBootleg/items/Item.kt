@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.items
 
-import no.elg.infiniteBootleg.protobuf.EntityKt.InventoryKt.item
+import no.elg.infiniteBootleg.protobuf.EntityKt.ContainerKt.item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ContainerElement.Companion.asProto
@@ -78,8 +78,10 @@ sealed interface Item {
    */
   override fun equals(other: Any?): Boolean
 
-  companion object : ProtoConverter<Item, ProtoWorld.Entity.Inventory.Item> {
+  companion object : ProtoConverter<Item, ProtoWorld.Entity.Container.Item> {
     const val DEFAULT_MAX_STOCK = 65_536u
+
+    val Item?.labelText: String get() = this?.run { "$stock / $maxStock" } ?: "<empty>"
 
     fun mergeAll(items: List<Item>, newElementMaxStock: UInt = DEFAULT_MAX_STOCK): List<Item> {
       if (items.isEmpty() || items.none { it != items.first() }) {
@@ -104,9 +106,9 @@ sealed interface Item {
       return result
     }
 
-    override fun ProtoWorld.Entity.Inventory.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
+    override fun ProtoWorld.Entity.Container.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
 
-    override fun Item.asProto(): ProtoWorld.Entity.Inventory.Item =
+    override fun Item.asProto(): ProtoWorld.Entity.Container.Item =
       item {
         stock = this@asProto.stock.toInt()
         maxStock = this@asProto.maxStock.toInt()

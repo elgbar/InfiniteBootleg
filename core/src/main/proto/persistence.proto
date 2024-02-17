@@ -67,10 +67,10 @@ message Entity {
   optional Player player = 18;
   optional Vector2f velocity = 19;
   optional Explosive explosive = 20;
-  optional Inventory inventory = 21;
+  optional Container container = 21;
   optional Texture texture = 22;
   optional LookDirection lookDirection = 23;
-  optional SelectedItem selectedItem = 24;
+  optional Hotbar hotbar = 24;
   optional Box2D box2d = 25;
   optional LocallyControlled locallyControlled = 26;
   optional ChunkBased chunk = 27;
@@ -152,13 +152,20 @@ message Entity {
     }
   }
 
-  message SelectedItem {
-    Element element = 2;
+  message Hotbar {
+    int32 selected = 1;
+    repeated int32 hotbarItems = 2;
   }
 
-  message Inventory {
+  message Container {
     int32 maxSize = 1;
-    repeated Item items = 2;
+    repeated IndexedItem items = 2;
+    optional string name = 3;
+
+    message IndexedItem {
+      uint32 index = 1;
+      optional Item item = 2;
+    }
 
     message Item {
       uint32 stock = 1;

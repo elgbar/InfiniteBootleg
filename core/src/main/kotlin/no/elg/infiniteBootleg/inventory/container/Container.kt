@@ -1,8 +1,14 @@
 package no.elg.infiniteBootleg.inventory.container
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.scenes.scene2d.Actor
+import no.elg.infiniteBootleg.events.ContainerEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.DEFAULT_MAX_STOCK
 import no.elg.infiniteBootleg.world.ContainerElement
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
+import java.util.concurrent.CompletableFuture
 
 /**
  * An interface for things that holds items.
@@ -20,7 +26,7 @@ import no.elg.infiniteBootleg.world.ContainerElement
  *
  * @author kheba
  */
-interface Container : Iterable<ContainerSlot> {
+interface Container : Iterable<IndexedItem> {
   /**
    * @return The name of the container
    */
@@ -34,7 +40,7 @@ interface Container : Iterable<ContainerSlot> {
    */
   val size: Int
 
-  val validOnly: Boolean
+  val validOnly: Boolean get() = true
 
   /**
    * @return The first empty slot in the container, return a negative number if none is found
@@ -104,7 +110,7 @@ interface Container : Iterable<ContainerSlot> {
       val failedToAdd = add(element, stock)
       // if any tiles failed to be added, add them here
       if (failedToAdd > 0u) {
-        notAdded.add(element.toItem(Item.DEFAULT_MAX_STOCK, failedToAdd))
+        notAdded.add(element.toItem(DEFAULT_MAX_STOCK, failedToAdd))
       }
     }
     return notAdded
@@ -133,8 +139,7 @@ interface Container : Iterable<ContainerSlot> {
   /**
    * Remove tile at index
    *
-   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to
-   * [.getSize]
+   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
   fun remove(index: Int)
 
@@ -142,20 +147,20 @@ interface Container : Iterable<ContainerSlot> {
   fun clear()
 
   /**
-   * @param Item The item to check for
+   * @param item The item to check for
    * @return False if `Item` is null, true if this container has the given `Item`
    */
   fun contains(item: Item?): Boolean
 
   /**
-   * @return If this container has the given `Item`, `false` is returned if tiletype is
+   * @return If this container has the given `Item`, `false` is returned if [ContainerElement] is
    * `null` or if size is less than 0
    */
   fun contains(tileType: ContainerElement?, size: Int): Boolean {
     if (tileType == null || size < 0) {
       return false
     }
-    return contains(tileType.toItem(Item.DEFAULT_MAX_STOCK, size.toUInt()))
+    return contains(tileType.toItem(DEFAULT_MAX_STOCK, size.toUInt()))
   }
 
   /**
@@ -167,8 +172,7 @@ interface Container : Iterable<ContainerSlot> {
    * This method returns the [Item] as is at the given location, there will be no check
    *
    * @return The `Item` at the given location, `null` if there is nothing there
-   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to
-   * [.getSize]
+   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
   operator fun get(index: Int): Item?
 
@@ -176,8 +180,7 @@ interface Container : Iterable<ContainerSlot> {
    * @param index The index of the item to get
    * @return An array of valid stacks (will pass [Item.isValid]) from the tile stack at the
    * given location
-   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to
-   * [.getSize]
+   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
   @Deprecated("")
   fun getValid(index: Int): Array<Item?>
@@ -188,16 +191,63 @@ interface Container : Iterable<ContainerSlot> {
    *
    * @param index The index to place the `Item` at
    * @param Item The Item to put at `index`
-   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to
-   * [.getSize]
+   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
   fun put(index: Int, item: Item?)
+
+  fun swap(index1: Int, index2: Int)
 
   /**
    * @return The underlying array of the container
    */
   val content: Array<Item?>
 
-  /** Update the GUI of the displayed container.  */
-  fun updateContainer()
+  operator fun plusAssign(item: Item) {
+    add(item)
+  }
+
+  operator fun minusAssign(item: Item) {
+    remove(item)
+  }
+
+  companion object {
+
+    fun getContainerActor(entity: Entity, container: Container?): CompletableFuture<Actor>? {
+      return entity.clientWorld?.render?.getContainerActor(container ?: return null)
+    }
+
+    fun Container?.isOpen(entity: Entity): Boolean = this?.let { container -> entity.clientWorld?.render?.isContainerOpen(container) } ?: false
+
+    private fun Container.containerActorOpen(actor: Actor) {
+      if (!actor.isVisible) {
+        EventManager.dispatchEvent(ContainerEvent.Opening(this))
+        actor.isVisible = true
+      }
+    }
+
+    private fun Container.containerActorClose(actor: Actor) {
+      if (actor.isVisible) {
+        actor.isVisible = false
+        EventManager.dispatchEvent(ContainerEvent.Closed(this))
+      }
+    }
+
+    fun Container.open(entity: Entity) {
+      getContainerActor(entity, this)?.thenApply { containerActorOpen(it) }
+    }
+
+    fun Container.close(entity: Entity) {
+      getContainerActor(entity, this)?.thenApply { containerActorClose(it) }
+    }
+
+    fun Container.toggle(entity: Entity) {
+      getContainerActor(entity, this)?.thenApply {
+        if (it.isVisible) {
+          containerActorClose(it)
+        } else {
+          containerActorOpen(it)
+        }
+      }
+    }
+  }
 }

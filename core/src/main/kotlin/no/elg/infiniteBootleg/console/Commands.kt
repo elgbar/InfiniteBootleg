@@ -14,11 +14,9 @@ import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_NOTHING
-import no.elg.infiniteBootleg.inventory.container.Inventory
+import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
-import no.elg.infiniteBootleg.inventory.container.impl.CreativeInventory
-import no.elg.infiniteBootleg.inventory.container.impl.InventoryImpl
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
@@ -29,16 +27,19 @@ import no.elg.infiniteBootleg.server.clientBoundWorldSettings
 import no.elg.infiniteBootleg.server.sendDuplexPacket
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
+import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component
-import no.elg.infiniteBootleg.world.ecs.components.Inventory2Component.Companion.inventory2ComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.closeInventory
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -569,6 +570,13 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       .scheduleSync(50L) { ClientMain.inst().screen = MainMenuScreen }
   }
 
+  @HiddenCommand
+  @CmdArgNames("action")
+  @ConsoleDoc(description = "Do something illegal")
+  fun illegalAction(action: String) {
+    IllegalAction.valueOf(action.trim().uppercase()).handle { "Illegal test action $action" }
+  }
+
   @ConsoleDoc(description = "Some debug info")
   fun chunkInfo() {
     val world = world ?: return
@@ -612,25 +620,23 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
 
     val player = entities.first()
-    val oldInventory = player.inventory2ComponentOrNull?.inventory
-    oldInventory?.close()
+    val oldContainer = player.containerOrNull?.also { player.closeInventory() }
 
-    val newInventory: Inventory = when (invType.lowercase(Locale.getDefault())) {
-      "creative", "cr" -> CreativeInventory(player)
-      "autosort", "as" -> InventoryImpl(player, AutoSortedContainer(40, "Auto Sorted Inventory"))
-      "container", "co" -> InventoryImpl(player, ContainerImpl(40, "Inventory", true))
+    val newContainer: Container = when (invType.lowercase(Locale.getDefault())) {
+//      "creative", "cr" -> CreativeInventory(player)
+      "autosort", "as" -> AutoSortedContainer(40, "Auto Sorted Inventory")
+      "container", "co" -> ContainerImpl(40, "Inventory")
       else -> {
         logger.error("Unknown storage type '$invType'")
         return
       }
     }
 
-    val newContainer = newInventory.container
-    if (newContainer != null) {
-      val oldContent = oldInventory?.container?.content?.filterNotNull()?.toTypedArray() ?: emptyArray()
+    if (oldContainer != null) {
+      val oldContent = oldContainer.content.filterNotNull().toTypedArray()
       newContainer.add(*oldContent)
     }
-    player.inventory2ComponentOrNull = Inventory2Component(newInventory)
-    logger.success("New inventory type is ${(newContainer ?: newInventory)::class.simpleName}")
+    player.containerComponentOrNull = ContainerComponent(newContainer)
+    logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
   }
 }

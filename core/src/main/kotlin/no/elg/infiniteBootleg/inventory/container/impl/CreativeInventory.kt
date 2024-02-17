@@ -12,18 +12,18 @@ import no.elg.infiniteBootleg.main.Main.Companion.logger
  */
 class CreativeInventory(override val holder: Entity) : Inventory {
   private val currHolding: Item? = null
-  override val sel: Int = 0
+  override val selected: Int = 0
 
   init {
     select(0)
   }
 
   override fun next() {
-    select(sel + 1)
+    select(selected + 1)
   }
 
   override fun prev() {
-    select(sel - 1)
+    select(selected - 1)
   }
 
   override fun holding(): Item? {

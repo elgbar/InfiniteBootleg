@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.kotcrab.vis.ui.widget.VisSelectBox
 import ktx.actors.onChange
 import ktx.actors.onClick
-import ktx.ashley.plusAssign
 import ktx.scene2d.KTable
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actor
@@ -25,8 +24,7 @@ import no.elg.infiniteBootleg.screens.hideOnEscape
 import no.elg.infiniteBootleg.screens.setIBDefaults
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent
-import no.elg.infiniteBootleg.world.ecs.components.SelectedInventoryItemComponent.Companion.selectedInventoryItemComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.world.magic.Gem
 import no.elg.infiniteBootleg.world.magic.Ring
 import no.elg.infiniteBootleg.world.magic.Wood
@@ -136,7 +134,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
         this@visWindow.centerWindow()
       }
 
-      val container = KVisTable(true)
+      val containerTable = KVisTable(true)
 
       @Scene2dDsl
       fun KVisTable.addWoodSelector(): () -> Wood {
@@ -146,7 +144,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
           setIBDefaults()
           sealedSelector<WoodType>(onAnyElementChanged, type) {
             type = it
-            container.addGemsAndRings(type)
+            containerTable.addGemsAndRings(type)
           }
           enumSelector<WoodRating>(onAnyElementChanged, rating) { rating = it }
         }
@@ -158,7 +156,7 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
         val wood = addWoodSelector()
         row()
         aSeparator()
-        actor(container) {
+        actor(containerTable) {
           setIBDefaults(pad = false)
           addGemsAndRings(wood().type)
         }
@@ -167,14 +165,10 @@ fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
           onClick {
             val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
 
-            world.controlledPlayerEntities.forEach { player ->
+            for (player in world.controlledPlayerEntities) {
               Main.logger().log("Giving player ${player.nameOrNull} a new staff $newStaff")
-              val existing = player.selectedInventoryItemComponentOrNull
-              if (existing != null) {
-                existing.element = newStaff
-              } else {
-                player += SelectedInventoryItemComponent(newStaff)
-              }
+              val container = player.containerOrNull ?: continue
+              container += newStaff.toItem()
             }
           }
         }
