@@ -96,7 +96,7 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
   }
   container = container {
     maxSize = 40
-    items += Material.entries.mapIndexed { i, it ->
+    items += Material.normalMaterials.mapIndexed { i, it ->
       indexedItem {
         index = i
         item = it.toItem().asProto()

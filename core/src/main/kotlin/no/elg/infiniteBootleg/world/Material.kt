@@ -55,6 +55,11 @@ enum class Material(
    * @return If this material can be rotated, but the entity can handle the rendering
    */
   val invisibleBlock: Boolean = false,
+  /**
+   *
+   * @return If this material can be handled by the player, otherwise this is a meta material
+   */
+  val canBeHandled: Boolean = true,
   private val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
 ) : ContainerElement {
   AIR(
@@ -63,7 +68,8 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     emitsLight = false,
-    invisibleBlock = true
+    invisibleBlock = true,
+    canBeHandled = false
   ),
   STONE(hardness = 1.5f, hasTransparentTexture = false),
   BRICK(hardness = 2f, hasTransparentTexture = false),
@@ -122,7 +128,7 @@ enum class Material(
   init {
     if (Settings.client) {
       textureRegion = this.findTextures(textureName)
-      if (textureRegion == null && !invisibleBlock) {
+      if (textureRegion == null && !canBeHandled) {
         throw NullPointerException("Failed to find a texture for $name")
       }
     } else {
@@ -183,6 +189,11 @@ enum class Material(
   override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
 
   companion object : ProtoConverter<Material, ProtoWorld.Material> {
+
+    /**
+     * All materials that can be interacted in a normal fashion by the player
+     */
+    val normalMaterials: List<Material> = values().filter(Material::canBeHandled)
 
     override fun Material.asProto(): ProtoWorld.Material =
       material {

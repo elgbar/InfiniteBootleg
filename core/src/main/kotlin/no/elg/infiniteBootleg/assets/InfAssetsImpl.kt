@@ -102,7 +102,7 @@ class InfAssetsImpl : InfAssets {
     luminanceDebugTexture = createTextureRegion(Color.FIREBRICK, 0.5f)
 
     // Do some dummy work to load textures and constructors
-    Main.logger().debug("Material", "Loaded ${Material.entries.size} materials")
+    Main.logger().debug("Material", "Loaded ${Material.normalMaterials.size} materials")
     TextureNeighbor.generateNeighborMap(safeTextureAtlas)
 
     loadInfBootSkin()
