@@ -136,7 +136,7 @@ open class ContainerImpl(
           content[i] = null
         } else {
           if (newAmount != 0) {
-            item.use(counter)
+            content[i] = item.use(counter)
           } else {
             content[i] = null
           }
