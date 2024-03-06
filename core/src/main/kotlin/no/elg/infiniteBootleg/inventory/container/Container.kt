@@ -59,22 +59,22 @@ interface Container : Iterable<IndexedItem> {
   fun firstEmpty(): Int
 
   /**
-   * @param tileType The tileType to match against
+   * @param element The element to match against
    * @return The index of the first tile where there are at least [Item.getStock] tiles. If
    * the input is null, this method is identical to [.firstEmpty]
    */
-  fun first(containerElement: ContainerElement?): Int {
-    if (containerElement == null) {
+  fun first(element: ContainerElement?): Int {
+    if (element == null) {
       return firstEmpty()
     }
-    return first(containerElement.toItem(DEFAULT_MAX_STOCK, 0u))
+    return first(element.toItem(DEFAULT_MAX_STOCK, 0u))
   }
 
   /**
    * x
    *
    * @param Item The Item to match against
-   * @return The index of the first tile where there are at least `Item.getStock` tiles,
+   * @return The index of the first element where there are at least `Item.getStock` elements,
    * return negative number if not found. If the input is null, this method is identical to
    * [.firstEmpty]
    */
@@ -83,11 +83,11 @@ interface Container : Iterable<IndexedItem> {
   /**
    * Add an item to the container
    *
-   * @return How many of the given tiletype not added
+   * @return How many of the given element not added
    * @throws IllegalArgumentException if `ContainerElement` is `null` or amount is less
    * than zero
    */
-  fun add(tileType: ContainerElement, amount: UInt): UInt
+  fun add(element: ContainerElement, amount: UInt): UInt
 
   /**
    * Add one or more items to the container
@@ -102,7 +102,7 @@ interface Container : Iterable<IndexedItem> {
    * Add one or more items to the container
    *
    * @param items What to add
-   * @return A list of all tiles not added, the returned stack might not be valid.
+   * @return A list of all elements not added, the returned stack might not be valid.
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
   fun add(items: List<Item>): List<Item?>? {
@@ -119,7 +119,7 @@ interface Container : Iterable<IndexedItem> {
     // then add them all type by type
     for ((element, stock) in collector) {
       val failedToAdd = add(element, stock)
-      // if any tiles failed to be added, add them here
+      // if any elements failed to be added, add them here
       if (failedToAdd > 0u) {
         notAdded.add(element.toItem(DEFAULT_MAX_STOCK, failedToAdd))
       }
@@ -127,57 +127,57 @@ interface Container : Iterable<IndexedItem> {
     return notAdded
   }
 
-  /** Remove all tile stacks with the given tile type  */
-  fun removeAll(tileType: ContainerElement)
+  /** Remove all element stacks with the given element type  */
+  fun removeAll(element: ContainerElement)
 
   /**
-   * Remove `amount` of the given tile type
+   * Remove `amount` of the given element type
    *
    * @param amount How many to remove
-   * @param tileType What tile to remove
-   * @return How many tiles that were not removed
+   * @param element What element to remove
+   * @return How many elements that were not removed
    */
-  fun remove(tileType: ContainerElement, amount: UInt): UInt
+  fun remove(element: ContainerElement, amount: UInt): UInt
 
   /**
-   * Remove tile stacks in the container that match the given element
+   * Remove element stacks in the container that match the given element
    *
-   * @param Item The tile validate to remove
+   * @param Item The item to remove
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
   fun remove(item: Item)
 
   /**
-   * Remove tile at index
+   * Remove item at index
    *
    * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
   fun remove(index: Int)
 
-  /** Clear the container of all tile stacks  */
+  /** Clear the container of everything  */
   fun clear()
 
   /**
    * @param item The item to check for
    * @return False if `Item` is null, true if this container has the given `Item`
    */
-  fun contains(item: Item?): Boolean
+  operator fun contains(item: Item?): Boolean
 
   /**
    * @return If this container has the given `Item`, `false` is returned if [ContainerElement] is
    * `null` or if size is less than 0
    */
-  fun contains(tileType: ContainerElement?, size: Int): Boolean {
-    if (tileType == null || size < 0) {
+  fun contains(element: ContainerElement?, size: Int): Boolean {
+    if (element == null || size < 0) {
       return false
     }
-    return contains(tileType.toItem(DEFAULT_MAX_STOCK, size.toUInt()))
+    return contains(element.toItem(DEFAULT_MAX_STOCK, size.toUInt()))
   }
 
   /**
    * @return If the container has an item of this ContainerElement
    */
-  fun containsAny(tileType: ContainerElement?): Boolean
+  fun containsAny(element: ContainerElement?): Boolean
 
   /**
    * This method returns the [Item] as is at the given location, there will be no check
@@ -189,7 +189,7 @@ interface Container : Iterable<IndexedItem> {
 
   /**
    * @param index The index of the item to get
-   * @return An array of valid stacks (will pass [Item.isValid]) from the tile stack at the
+   * @return An array of valid stacks (will pass [Item.isValid]) from the item at the
    * given location
    * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */

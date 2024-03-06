@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.mergeAll
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ContainerElement
 
@@ -51,9 +52,9 @@ open class ContainerImpl(
     return -1
   }
 
-  override fun add(tileType: ContainerElement, amount: UInt): UInt {
+  override fun add(element: ContainerElement, amount: UInt): UInt {
     var amountNotAdded = amount
-    var index = first(tileType)
+    var index = first(element)
     if (index < 0) {
       index = firstEmpty()
     }
@@ -61,7 +62,7 @@ open class ContainerImpl(
       return amount
     } else if (!validOnly) {
       val ts = content[index]
-      val item = tileType.toItem(Item.DEFAULT_MAX_STOCK, amount)
+      val item = element.toItem(Item.DEFAULT_MAX_STOCK, amount)
       if (ts == null) {
         content[index] = item
       } else {
@@ -72,9 +73,9 @@ open class ContainerImpl(
       updateContainer()
       return 0u
     } else {
-      val item = tileType.toItem(Item.DEFAULT_MAX_STOCK, amount)
+      val item = element.toItem(Item.DEFAULT_MAX_STOCK, amount)
       for (stack in content) {
-        if (stack != null && stack.element === tileType && stack.stock < Item.DEFAULT_MAX_STOCK) {
+        if (stack != null && stack.element === element && stack.stock < Item.DEFAULT_MAX_STOCK) {
           val needed = Item.DEFAULT_MAX_STOCK - stack.stock
           val given = amountNotAdded.coerceAtMost(needed)
           amountNotAdded -= given
@@ -88,7 +89,7 @@ open class ContainerImpl(
 
     val validStacks =
       mergeAll(
-        listOf(tileType.toItem(Item.DEFAULT_MAX_STOCK, amountNotAdded)),
+        listOf(element.toItem(Item.DEFAULT_MAX_STOCK, amountNotAdded)),
         Item.DEFAULT_MAX_STOCK
       )
 
@@ -114,22 +115,23 @@ open class ContainerImpl(
     return validStacks.drop(toSkip).sumOf { it.stock }
   }
 
-  override fun removeAll(tileType: ContainerElement) {
+  override fun removeAll(element: ContainerElement) {
     for (i in 0 until size) {
-      if (content[i] != null && content[i]!!.element === tileType) {
+      if (content[i] != null && content[i]!!.element === element) {
         content[i] = null
       }
     }
     updateContainer()
   }
 
-  override fun remove(tileType: ContainerElement, amount: UInt): UInt {
+  override fun remove(element: ContainerElement, amount: UInt): UInt {
+    Main.logger().debug("Container", "Removing $amount of $element")
     var counter = amount
     var i = 0
     val length = content.size
     while (i < length) {
       val item = content[i]
-      if (item != null && tileType === item.element) {
+      if (item != null && element === item.element) {
         val newAmount = (item.stock - counter).toInt()
         if (newAmount < 0) {
           counter -= item.stock
@@ -191,7 +193,7 @@ open class ContainerImpl(
   }
 
   // TODO implement
-  override fun containsAny(tileType: ContainerElement?): Boolean {
+  override fun containsAny(element: ContainerElement?): Boolean {
     return false
   }
 
