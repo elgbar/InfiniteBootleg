@@ -20,7 +20,7 @@ class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarS
 
   init {
     // Make sure the hotbar is filled with empty slots if there is nothing else there
-    HotbarSlot.entries.forEach { hotbarItems.putIfAbsent(it, EMPTY_INDEX) }
+    HotbarSlot.entries.forEach { hotbarItems.putIfAbsent(it, it.ordinal) }
   }
 
   /**
