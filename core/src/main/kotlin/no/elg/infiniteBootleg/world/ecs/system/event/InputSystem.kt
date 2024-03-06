@@ -2,20 +2,32 @@ package no.elg.infiniteBootleg.world.ecs.system.event
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.math.Vector2
+import no.elg.infiniteBootleg.util.FLY_VEL
+import no.elg.infiniteBootleg.util.JUMP_VERTICAL_VEL
+import no.elg.infiniteBootleg.util.MAX_X_VEL
 import no.elg.infiniteBootleg.util.WorldEntity
 import no.elg.infiniteBootleg.util.breakBlocks
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
+import no.elg.infiniteBootleg.util.setVel
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
+import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
+import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
+import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
+import no.elg.infiniteBootleg.world.world.ClientWorld
+import kotlin.math.abs
+import kotlin.math.min
 import kotlin.math.sign
 
 object InputSystem :
@@ -24,9 +36,12 @@ object InputSystem :
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     val worldEntity = WorldEntity(entity.world, entity)
+    val entityWorld = entity.world as? ClientWorld ?: return
+    inputMouseLocator.update(entityWorld)
     when (event) {
-      is InputEvent.KeyDownEvent -> worldEntity.keyDown(entity, event.keycode)
+      is InputEvent.KeyDownEvent -> worldEntity.keyDown(event.keycode)
       is InputEvent.TouchDownEvent -> worldEntity.touchDown(event.button)
+      is InputEvent.KeyIsDownEvent -> worldEntity.move(event.keycode)
       is InputEvent.KeyTypedEvent -> Unit
       is InputEvent.KeyUpEvent -> Unit
       is InputEvent.MouseMovedEvent -> Unit
@@ -54,6 +69,23 @@ object InputSystem :
     }
   }
 
+  private fun WorldEntity.move(keycode: Int) {
+    if (entity.flying) {
+      when (keycode) {
+        Input.Keys.W -> fly(dy = FLY_VEL)
+        Input.Keys.S -> fly(dy = -FLY_VEL)
+        Input.Keys.A -> fly(dx = -FLY_VEL)
+        Input.Keys.D -> fly(dx = FLY_VEL)
+      }
+    } else {
+      when (keycode) {
+        Input.Keys.W -> if (entity.groundedComponent.onGround) setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
+        Input.Keys.A -> moveHorz(-1f)
+        Input.Keys.D -> moveHorz(1f)
+      }
+    }
+  }
+
   private fun WorldEntity.scrolled(amountY: Float) {
     val hotbarComponent = entity.hotbarComponentOrNull ?: return
     val direction = sign(amountY).toInt()
@@ -62,7 +94,7 @@ object InputSystem :
     hotbarComponent.selected = HotbarSlot.fromOrdinal(newOrdinal)
   }
 
-  private fun WorldEntity.keyDown(entity: Entity, keycode: Int): Boolean {
+  private fun WorldEntity.keyDown(keycode: Int): Boolean {
     when (keycode) {
       Input.Keys.T -> entity.teleport(inputMouseLocator.mouseWorldX, inputMouseLocator.mouseWorldY, killVelocity = true)
       Input.Keys.Q -> interpolate(true, ::placeBlocks)
@@ -83,5 +115,31 @@ object InputSystem :
     }
     hotbarComponent.selected = hotbarSlot
     return true
+  }
+
+  private val tmpVec = Vector2()
+
+  private fun WorldEntity.fly(dx: Float = 0f, dy: Float = 0f) {
+    setVel { oldX, oldY -> oldX + dx to oldY + dy }
+  }
+
+  private fun WorldEntity.moveHorz(dir: Float) {
+    world.postBox2dRunnable {
+      val groundedComponent = entity.groundedComponent
+      if (groundedComponent.canMove(dir)) {
+        val body = entity.box2dBody
+        val currSpeed = body.linearVelocity.x
+        val wantedSpeed = dir * if (groundedComponent.onGround) {
+          MAX_X_VEL
+        } else {
+          MAX_X_VEL * (2f / 3f)
+        }
+        val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
+
+        tmpVec.set(impulse, entity.velocityComponent.dy)
+
+        body.applyLinearImpulse(tmpVec, body.worldCenter, true)
+      }
+    }
   }
 }

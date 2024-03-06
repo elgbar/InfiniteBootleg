@@ -11,6 +11,8 @@ sealed interface InputEvent : ECSEvent {
 
   data class KeyDownEvent(val keycode: Int) : InputEvent
 
+  data class KeyIsDownEvent(val keycode: Int) : InputEvent
+
   data class KeyUpEvent(val keycode: Int) : InputEvent
 
   data class KeyTypedEvent(val char: Char) : InputEvent

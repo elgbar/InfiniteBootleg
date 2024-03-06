@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
@@ -108,7 +109,6 @@ import no.elg.infiniteBootleg.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.LeavesDecaySystem
 import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
-import no.elg.infiniteBootleg.world.ecs.system.client.ControlSystem
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem
@@ -276,16 +276,15 @@ abstract class World(
     engine.addSystem(NoGravityInUnloadedChunksSystem)
     engine.addSystem(FollowEntitySystem)
     engine.addSystem(InputSystem)
-    engine.addSystem(ControlSystem)
     engine.addSystem(KickPlayerWithoutChannel)
     engine.addSystem(MagicSystem)
     engine.addSystem(SpellRemovalSystem)
     engine.addSystem(RemoveStaleEntitiesSystem)
-    addSystems(engine)
+    additionalSystems().forEach(engine::addSystem)
   }
 
   protected open fun addEntityListeners(engine: Engine) {}
-  protected open fun addSystems(engine: Engine) {}
+  protected open fun additionalSystems(): Set<EntitySystem> = setOf()
 
   fun initialize() {
     var willDispatchChunksLoadedEvent = false

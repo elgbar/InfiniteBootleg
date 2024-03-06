@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.input.ECSInputListener
 import no.elg.infiniteBootleg.input.WorldInputHandler
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.world.ecs.system.event.ContinuousInputSystem
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 
@@ -29,6 +30,8 @@ abstract class ClientWorld : World {
   override fun resize(width: Int, height: Int) {
     render.resize(width, height)
   }
+
+  override fun additionalSystems() = setOf(ContinuousInputSystem(ecsInput))
 
   override fun dispose() {
     super.dispose()

@@ -9,15 +9,27 @@ import no.elg.infiniteBootleg.world.world.World
 
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
-  private fun handleEvent(inputEvent: InputEvent): Boolean {
+  fun handleEvent(inputEvent: InputEvent): Boolean {
     world.engine.queueInputEvent(inputEvent) {
       ClientMain.inst().shouldNotIgnoreWorldInput()
     }
     return false
   }
 
-  override fun keyDown(keycode: Int): Boolean = handleEvent(InputEvent.KeyDownEvent(keycode))
-  override fun keyUp(keycode: Int): Boolean = false // handleEvent(InputEvent.KeyUpEvent(keycode))
+  private val keysDownSet = mutableSetOf<Int>()
+  val keysDown: Set<Int> = keysDownSet
+
+  override fun keyDown(keycode: Int): Boolean {
+    keysDownSet += keycode
+    return handleEvent(InputEvent.KeyDownEvent(keycode))
+  }
+
+  override fun keyUp(keycode: Int): Boolean {
+    keysDownSet -= keycode
+    // handleEvent(InputEvent.KeyUpEvent(keycode))
+    return false
+  }
+
   override fun keyTyped(character: Char): Boolean = false // handleEvent(InputEvent.KeyTypedEvent(character))
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = handleEvent(InputEvent.TouchDownEvent(screenX, screenY, pointer, button))
   override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false // handleEvent(InputEvent.TouchUpEvent(screenX, screenY, pointer, button))
