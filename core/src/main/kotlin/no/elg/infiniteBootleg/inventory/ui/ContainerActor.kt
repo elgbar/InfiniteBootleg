@@ -54,7 +54,7 @@ fun Stage.createContainerActor(container: Container, dragAndDrop: DragAndDrop, b
       }
 
       val filter: (ContainerEvent) -> Boolean = { it.container == container }
-      val listener: ContainerEvent.() -> Unit = { updateAllSlots() }
+      val listener: ContainerEvent.() -> Unit = { Main.inst().scheduler.executeSync(::updateAllSlots) }
       registerListener<ContainerEvent.Changed>(true, filter, listener)
       registerListener<ContainerEvent.Opening>(true, filter, listener)
 
