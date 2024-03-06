@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.ecs.system.event
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
+import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.util.FLY_VEL
 import no.elg.infiniteBootleg.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.util.MAX_X_VEL
@@ -18,6 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.g
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -40,30 +42,38 @@ object InputSystem :
     inputMouseLocator.update(entityWorld)
     when (event) {
       is InputEvent.KeyDownEvent -> worldEntity.keyDown(event.keycode)
-      is InputEvent.TouchDownEvent -> worldEntity.touchDown(event.button)
+      is InputEvent.TouchDownEvent -> worldEntity.openChest(event.button)
       is InputEvent.KeyIsDownEvent -> worldEntity.move(event.keycode)
       is InputEvent.KeyTypedEvent -> Unit
       is InputEvent.KeyUpEvent -> Unit
       is InputEvent.MouseMovedEvent -> Unit
       is InputEvent.ScrolledEvent -> worldEntity.scrolled(event.amountY)
-      is InputEvent.TouchDraggedEvent -> Unit
+      is InputEvent.TouchDraggedEvent -> worldEntity.mouseDragged(event.buttons)
       is InputEvent.TouchUpEvent -> Unit
       is InputEvent.SpellCastEvent -> Unit
     }
   }
 
-  private fun WorldEntity.touchDown(button: Int) {
-    val update =
-      when (button) {
-        Input.Buttons.LEFT -> {
-          entity.currentlyBreakingComponentOrNull?.reset()
-          interpolate(true, ::breakBlocks)
-        }
-
-        Input.Buttons.RIGHT -> interpolate(true, ::placeBlocks)
-        else -> false
+  private fun WorldEntity.openChest(button: Int) {
+    when (button) {
+      Input.Buttons.RIGHT -> {
+        val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
+        val container = block.entity?.containerOrNull ?: return
+        container.open(this.entity)
       }
+    }
+  }
 
+  private fun WorldEntity.mouseDragged(set: Set<Int>) {
+    val update =
+      if (Input.Buttons.LEFT in set) {
+        entity.currentlyBreakingComponentOrNull?.reset()
+        interpolate(true, ::breakBlocks)
+      } else if (Input.Buttons.RIGHT in set) {
+        interpolate(true, ::placeBlocks)
+      } else {
+        false
+      }
     if (update) {
       world.render.update()
     }
