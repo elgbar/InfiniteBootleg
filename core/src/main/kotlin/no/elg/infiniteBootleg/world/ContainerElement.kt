@@ -21,10 +21,13 @@ sealed interface ContainerElement {
 
   fun toItem(maxStock: UInt = DEFAULT_MAX_STOCK, stock: UInt = DEFAULT_MAX_STOCK): Item
 
-  companion object : ProtoConverter<ContainerElement, ProtoEntity.Element> {
-    override fun ProtoEntity.Element.fromProto(): ContainerElement {
+  companion object : ProtoConverter<ContainerElement, ProtoElement> {
+
+    fun valueOf(name: String): ContainerElement? = valueOfOrNull<Material>(name) ?: valueOfOrNull<Tool>(name)
+
+    override fun ProtoElement.fromProto(): ContainerElement {
       return when (itemType) {
-        ProtoEntity.Element.ItemType.MATERIAL -> Material.fromOrdinal(enumElement.index)
+        ProtoElement.ItemType.MATERIAL -> Material.fromOrdinal(enumElement.index)
         ProtoEntity.Element.ItemType.TOOL -> Tool.fromOrdinal(enumElement.index)
         ProtoEntity.Element.ItemType.STAFF -> staff.fromProto()
         else -> error("Unknown item type $itemType")

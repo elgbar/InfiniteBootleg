@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_NOTHING
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
+import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
@@ -31,6 +32,7 @@ import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -638,5 +640,32 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
     player.containerComponentOrNull = ContainerComponent(newContainer)
     logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
+  }
+
+  @CmdArgNames("item", "quantity")
+  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
+  fun give(elementName: String, quantity: Int) {
+    if (quantity < 1) {
+      logger.error("Quantity must be at least 1")
+      return
+    }
+    val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
+      logger.error("Unknown container element '$elementName'")
+      return
+    }
+
+    val world = clientWorld ?: return
+    val entities = world.controlledPlayerEntities
+    if (entities.size() == 0) {
+      logger.error("There is no local, controlled, player in this world")
+      return
+    }
+    val player = entities.first()
+    val container = player.containerOrNull ?: run {
+      logger.error("Player has no container")
+      return
+    }
+    container += item
+    logger.success("Gave player $quantity of $item")
   }
 }
