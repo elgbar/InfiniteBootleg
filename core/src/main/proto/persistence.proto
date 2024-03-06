@@ -26,6 +26,7 @@ message World {
   Vector2i spawn = 4;
   float timeScale = 5;
   repeated ChunkColumn chunkColumns = 6;
+  WorldContainers worldContainers = 7;
 
   Generator generator = 16;
   optional Entity player = 17;
@@ -35,6 +36,15 @@ message World {
     FLAT = 1;
     EMPTY = 2;
   }
+
+  message WorldContainers {
+    message WorldContainer {
+      Vector2i position = 1;
+      Container container = 2;
+    }
+    repeated WorldContainer containers = 1;
+  }
+
 }
 
 message Block {
@@ -52,6 +62,67 @@ message ChunkColumn {
   int32 chunkX = 1;
   repeated int32 top_solid_blocks = 2;
   repeated int32 top_transparent_blocks = 3;
+}
+
+message Element {
+  ItemType itemType = 1;
+  optional EnumElement enumElement = 2;
+  optional Staff staff = 3;
+
+  enum ItemType {
+    MATERIAL = 0;
+    TOOL = 1;
+    STAFF = 2;
+  }
+
+  message EnumElement {
+    uint32 index = 1;
+  }
+
+  message Staff {
+    Wood wood = 1;
+    Gem primaryGem = 2;
+    repeated Gem secondaryGems = 3;
+    repeated Ring rings = 4;
+
+    message Wood {
+      string type = 1;
+      string rating = 2;
+    }
+
+    message Gem {
+      string type = 1;
+      string rating = 2;
+    }
+
+    message Ring {
+      string type = 1;
+      optional string rating = 2;
+    }
+  }
+}
+
+message Container {
+  repeated IndexedItem items = 1;
+  int32 maxSize = 2;
+  Type type = 3;
+  optional string name = 4;
+
+  enum Type {
+    GENERIC = 0;
+    AUTO_SORTED = 1;
+  }
+
+  message IndexedItem {
+    uint32 index = 1;
+    optional Item item = 2;
+  }
+
+  message Item {
+    uint32 stock = 1;
+    uint32 maxStock = 2;
+    Element element = 3;
+  }
 }
 
 message Entity {
@@ -114,64 +185,9 @@ message Entity {
     float strength = 2;
   }
 
-  message Element {
-    ItemType itemType = 1;
-    optional EnumElement enumElement = 2;
-    optional Staff staff = 3;
-
-    enum ItemType {
-      MATERIAL = 0;
-      TOOL = 1;
-      STAFF = 2;
-    }
-
-    message EnumElement {
-      uint32 index = 1;
-    }
-  }
-
-  message Staff {
-    Wood wood = 1;
-    Gem primaryGem = 2;
-    repeated Gem secondaryGems = 3;
-    repeated Ring rings = 4;
-
-    message Wood {
-      string type = 1;
-      string rating = 2;
-    }
-
-    message Gem {
-      string type = 1;
-      string rating = 2;
-    }
-
-    message Ring {
-      string type = 1;
-      optional string rating = 2;
-    }
-  }
-
   message Hotbar {
     int32 selected = 1;
     repeated int32 hotbarItems = 2;
-  }
-
-  message Container {
-    int32 maxSize = 1;
-    repeated IndexedItem items = 2;
-    optional string name = 3;
-
-    message IndexedItem {
-      uint32 index = 1;
-      optional Item item = 2;
-    }
-
-    message Item {
-      uint32 stock = 1;
-      uint32 maxStock = 2;
-      Element element = 3;
-    }
   }
 
   message Texture {

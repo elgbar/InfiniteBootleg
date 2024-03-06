@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.items
 
-import no.elg.infiniteBootleg.protobuf.EntityKt.ContainerKt.item
+import no.elg.infiniteBootleg.protobuf.ContainerKt.item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ContainerElement.Companion.asProto
@@ -78,7 +78,7 @@ sealed interface Item {
    */
   override fun equals(other: Any?): Boolean
 
-  companion object : ProtoConverter<Item, ProtoWorld.Entity.Container.Item> {
+  companion object : ProtoConverter<Item, ProtoWorld.Container.Item> {
     const val DEFAULT_MAX_STOCK = 65_536u
 
     val Item?.labelText: String get() = this?.run { "$stock / $maxStock" } ?: "<empty>"
@@ -106,9 +106,9 @@ sealed interface Item {
       return result
     }
 
-    override fun ProtoWorld.Entity.Container.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
+    override fun ProtoWorld.Container.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
 
-    override fun Item.asProto(): ProtoWorld.Entity.Container.Item =
+    override fun Item.asProto(): ProtoWorld.Container.Item =
       item {
         stock = this@asProto.stock.toInt()
         maxStock = this@asProto.maxStock.toInt()

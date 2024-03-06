@@ -5,18 +5,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.Container.Companion.asProto
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.close
+import no.elg.infiniteBootleg.inventory.container.Container.Companion.fromProto
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.isOpen
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.toggle
-import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
-import no.elg.infiniteBootleg.items.Item.Companion.asProto
-import no.elg.infiniteBootleg.items.Item.Companion.fromProto
 import no.elg.infiniteBootleg.protobuf.EntityKt
-import no.elg.infiniteBootleg.protobuf.EntityKt.ContainerKt.indexedItem
-import no.elg.infiniteBootleg.protobuf.EntityKt.container
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.itemOrNull
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -25,6 +21,10 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Compa
 import java.util.concurrent.CompletableFuture
 
 class ContainerComponent(val container: Container) : EntitySavableComponent, AuthoritativeOnlyComponent {
+
+  override fun EntityKt.Dsl.save() {
+    container = this@ContainerComponent.container.asProto()
+  }
 
   companion object : EntityLoadableMapper<ContainerComponent>() {
     var Entity.containerComponentOrNull by optionalPropertyFor(mapper)
@@ -49,35 +49,8 @@ class ContainerComponent(val container: Container) : EntitySavableComponent, Aut
       containerOrNull?.toggle(this)
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
-      safeWith {
-        val protoContainer = protoEntity.container
-        val container = ContainerImpl(protoContainer.maxSize, protoContainer.name).apply {
-          // note: if an index does not exist in the proto, the slot is implicitly empty
-          for (indexedItem in protoContainer.itemsList) {
-            content[indexedItem.index] = indexedItem.itemOrNull?.fromProto()
-          }
-        }
-        ContainerComponent(container)
-      }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { ContainerComponent(protoEntity.container.fromProto()) }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasContainer()
-  }
-
-  override fun EntityKt.Dsl.save() {
-    container = container {
-      val container1 = this@ContainerComponent.container
-      maxSize = container1.size
-      name = container1.name
-      // Only add items with a value, indices without a value are implicitly null
-      items += container1.content.mapIndexed { containerIndex, maybeItem ->
-        maybeItem?.let {
-          indexedItem {
-            index = containerIndex
-            item = it.asProto()
-          }
-        }
-      }.filterNotNull()
-    }
   }
 }

@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.mergeAll
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ContainerElement
 
 /**
@@ -18,6 +19,7 @@ open class ContainerImpl(
 ) : Container {
 
   override val content: Array<Item?> = arrayOfNulls(size)
+  override val type: ProtoWorld.Container.Type get() = ProtoWorld.Container.Type.GENERIC
 
   init {
     Preconditions.checkArgument(size > 0, "Inventory size must be greater than zero")

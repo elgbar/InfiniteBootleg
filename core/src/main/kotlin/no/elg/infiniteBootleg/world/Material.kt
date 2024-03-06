@@ -20,6 +20,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createBlockEntity
+import no.elg.infiniteBootleg.world.ecs.creation.createContainerEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createLeafEntity
@@ -121,6 +122,14 @@ enum class Material(
   SANDSTONE(
     hardness = 1f,
     hasTransparentTexture = false
+  ),
+  CONTAINER(
+    hardness = 1f,
+    hasTransparentTexture = false,
+    isCollidable = false,
+    createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createContainerEntity(world, chunk, worldX, worldY, material)
+    }
   );
 
   override var textureRegion: RotatableTextureRegion? = null

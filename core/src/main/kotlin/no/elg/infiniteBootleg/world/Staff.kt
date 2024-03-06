@@ -5,8 +5,7 @@ import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.StaffItem
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.protobuf.EntityKt.staff
-import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.ElementKt.staff
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.magic.Equippable
 import no.elg.infiniteBootleg.world.magic.Gem
@@ -15,6 +14,7 @@ import no.elg.infiniteBootleg.world.magic.Ring
 import no.elg.infiniteBootleg.world.magic.SpellState
 import no.elg.infiniteBootleg.world.magic.Wood
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : Equippable, ContainerElement {
 
@@ -69,14 +69,14 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
   override fun toItem(maxStock: UInt, stock: UInt): Item = StaffItem(this, maxStock, stock)
 
   companion object {
-    fun ProtoWorld.Entity.Staff.fromProto(): Staff =
+    fun ProtoElement.Staff.fromProto(): Staff =
       Staff(
         wood = Wood.fromProto(wood),
         gems = (listOf(primaryGem) + secondaryGemsList).map(Gem::fromProto),
         rings = ringsList.map(Ring::fromProto)
       )
 
-    fun Staff.toProto(): ProtoWorld.Entity.Staff =
+    fun Staff.toProto(): ProtoElement.Staff =
       staff {
         wood = this@toProto.wood.toProto()
         val (firstGem, otherGems) = gems.firstOrNull()?.let { it to gems.drop(1) } ?: return@staff

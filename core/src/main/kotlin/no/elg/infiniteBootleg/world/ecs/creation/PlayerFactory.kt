@@ -2,12 +2,9 @@ package no.elg.infiniteBootleg.world.ecs.creation
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
-import no.elg.infiniteBootleg.protobuf.EntityKt.ContainerKt.indexedItem
 import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
-import no.elg.infiniteBootleg.protobuf.EntityKt.container
 import no.elg.infiniteBootleg.protobuf.EntityKt.hotbar
 import no.elg.infiniteBootleg.protobuf.EntityKt.killable
 import no.elg.infiniteBootleg.protobuf.EntityKt.locallyControlled
@@ -16,6 +13,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
+import no.elg.infiniteBootleg.protobuf.container
 import no.elg.infiniteBootleg.protobuf.entity
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.protobuf.vector2i
@@ -24,7 +22,6 @@ import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
-import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.PROTO_INPUT_EVENT
@@ -75,7 +72,7 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
   worldY: Float,
   dx: Float,
   dy: Float,
-  name: String,
+  playerName: String,
   controlled: Boolean
 ) {
   withRequiredComponents(EntityType.PLAYER, world, worldX, worldY, id)
@@ -88,7 +85,7 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
     x = dx
     y = dy
   }
-  this.name = name
+  name = playerName
   grounded = GroundedComponent.PROTO_GROUNDED
   killable = killable {
     health = DEFAULT_MAX_HEALTH
@@ -96,12 +93,10 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
   }
   container = container {
     maxSize = 40
-    items += Material.normalMaterials.mapIndexed { i, it ->
-      indexedItem {
-        index = i
-        item = it.toItem().asProto()
-      }
-    }
+    name = "Inventory"
+  }
+  hotbar = hotbar {
+    selected = 0
   }
   box2D = box2D {
     bodyType = ProtoWorld.Entity.Box2D.BodyType.PLAYER
@@ -146,7 +141,7 @@ fun World.createNewProtoPlayer(controlled: Boolean = Main.isSingleplayer, config
       worldY = spawnY.toFloat(),
       dx = 0f,
       dy = 0f,
-      name = "Player",
+      playerName = "Player",
       controlled = controlled
     )
     addCommonClientPlayerComponentsProto(controlled)

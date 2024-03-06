@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.inventory.container.impl
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.inventory.container.SortOrder
 import no.elg.infiniteBootleg.items.Item
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 /**
  * A container that will auto sort the storage when updated
@@ -14,6 +15,8 @@ class AutoSortedContainer(
   name: String,
   private val sortOrder: SortOrder = defaultSortOrder
 ) : ContainerImpl(size, name) {
+
+  override val type: ProtoWorld.Container.Type get() = ProtoWorld.Container.Type.AUTO_SORTED
 
   override fun updateContainer() {
     super.updateContainer()

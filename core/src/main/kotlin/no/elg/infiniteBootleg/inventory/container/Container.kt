@@ -4,11 +4,22 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.scenes.scene2d.Actor
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
+import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.DEFAULT_MAX_STOCK
+import no.elg.infiniteBootleg.items.Item.Companion.asProto
+import no.elg.infiniteBootleg.items.Item.Companion.fromProto
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.ContainerKt
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.container
+import no.elg.infiniteBootleg.protobuf.itemOrNull
 import no.elg.infiniteBootleg.world.ContainerElement
+import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
 import java.util.concurrent.CompletableFuture
+import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
 
 /**
  * An interface for things that holds items.
@@ -210,7 +221,9 @@ interface Container : Iterable<IndexedItem> {
     remove(item)
   }
 
-  companion object {
+  val type: ProtoContainer.Type
+
+  companion object : ProtoConverter<Container, ProtoContainer> {
 
     fun getContainerActor(entity: Entity, container: Container?): CompletableFuture<Actor>? {
       return entity.clientWorld?.render?.getContainerActor(container ?: return null)
@@ -249,5 +262,33 @@ interface Container : Iterable<IndexedItem> {
         }
       }
     }
+
+    override fun ProtoWorld.Container.fromProto(): Container =
+      when (type) {
+        ProtoWorld.Container.Type.GENERIC -> ContainerImpl(maxSize, name)
+        ProtoWorld.Container.Type.AUTO_SORTED -> AutoSortedContainer(maxSize, name)
+        else -> ContainerImpl(maxSize, name).also { Main.logger().error("Unknown container type $type") }
+      }.apply {
+        // note: if an index does not exist in the proto, the slot is implicitly empty
+        for (indexedItem in itemsList) {
+          content[indexedItem.index] = indexedItem.itemOrNull?.fromProto()
+        }
+      }
+
+    override fun Container.asProto(): ProtoWorld.Container =
+      container {
+        maxSize = this@asProto.size
+        name = this@asProto.name
+        type = this@asProto.type
+        // Only add items with a value, indices without a value are implicitly null
+        items += this@asProto.content.mapIndexed { containerIndex, maybeItem ->
+          maybeItem?.let {
+            ContainerKt.indexedItem {
+              index = containerIndex
+              item = it.asProto()
+            }
+          }
+        }.filterNotNull()
+      }
   }
 }

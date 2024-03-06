@@ -29,6 +29,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.world
+import no.elg.infiniteBootleg.protobuf.worldContainersOrNull
 import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
@@ -58,6 +59,9 @@ import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.WorldContainerManager
+import no.elg.infiniteBootleg.world.WorldContainerManager.Companion.asProto
+import no.elg.infiniteBootleg.world.WorldContainerManager.Companion.fromProto
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -135,7 +139,6 @@ import kotlin.system.measureTimeMillis
 /**
  * Different kind of views
  *
- *
  *  * Chunk view: One unit in chunk view is [Chunk.CHUNK_SIZE] times larger than a unit in
  * world view
  *  * World view: One unit in world view is [Block.BLOCK_SIZE] times larger than a unit in
@@ -192,6 +195,9 @@ abstract class World(
    */
   protected val chunkColumns = IntMap<ChunkColumn>()
   private val chunkColumnListeners = ChunkColumnListeners()
+
+  var worldContainerManager: WorldContainerManager = WorldContainerManager()
+    private set
 
   @Volatile
   private var worldFile: FileHandle? = null
@@ -347,6 +353,7 @@ abstract class World(
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
+    protoWorld.worldContainersOrNull?.let { worldContainerManager = it.fromProto() }
     synchronized(chunkColumns) {
       for (protoCC in protoWorld.chunkColumnsList) {
         val chunkColumn = fromProtobuf(this, protoCC)
@@ -403,6 +410,7 @@ abstract class World(
       timeScale = this@World.worldTime.timeScale
       spawn = this@World.spawn.toVector2i()
       generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
+      worldContainers = this@World.worldContainerManager.asProto()
       chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
       if (Main.isSingleplayer) {
         controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {

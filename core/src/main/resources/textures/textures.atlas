@@ -2,19 +2,19 @@ textures.png
 	size: 512, 128
 	repeat: xy
 birch_leaves-air-north-air-east-birch_leaves-south-birch_leaves-west
-	bounds: 467, 85, 32, 32
+	bounds: 171, 19, 32, 32
 birch_leaves-air-north-air-west-birch_leaves-south-birch_leaves-east
 	bounds: 1, 19, 32, 32
 birch_leaves-air-south-air-east-birch_leaves-north-birch_leaves-west
-	bounds: 205, 19, 32, 32
+	bounds: 239, 19, 32, 32
 birch_leaves-air-south-air-west-birch_leaves-north-birch_leaves-east
-	bounds: 171, 19, 32, 32
+	bounds: 205, 19, 32, 32
 birch_leaves_rotatable
-	bounds: 331, 51, 32, 32
+	bounds: 365, 51, 32, 32
 birch_trunk
 	bounds: 55, 1, 16, 16
 birch_trunk-birch_leaves-east
-	bounds: 433, 85, 32, 32
+	bounds: 137, 19, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west
 	bounds: 331, 85, 32, 32
 birch_trunk-birch_leaves-east-birch_leaves-west-birch_leaves-north
@@ -22,22 +22,22 @@ birch_trunk-birch_leaves-east-birch_leaves-west-birch_leaves-north
 birch_trunk-birch_leaves-east-birch_trunk-west
 	bounds: 35, 19, 32, 32
 birch_trunk-birch_leaves-west
-	bounds: 137, 19, 32, 32
+	bounds: 467, 85, 32, 32
 birch_trunk-birch_leaves-west-birch_trunk-east
-	bounds: 399, 85, 32, 32
-birch_trunk-birch_trunk-east
-	bounds: 273, 19, 32, 32
-birch_trunk-birch_trunk-east-birch_leaves-north-birch_leaves-west
 	bounds: 103, 19, 32, 32
+birch_trunk-birch_trunk-east
+	bounds: 331, 51, 32, 32
+birch_trunk-birch_trunk-east-birch_leaves-north-birch_leaves-west
+	bounds: 433, 85, 32, 32
 birch_trunk-birch_trunk-east-birch_trunk-west
-	bounds: 69, 19, 32, 32
+	bounds: 399, 85, 32, 32
 birch_trunk-birch_trunk-west
-	bounds: 365, 51, 32, 32
+	bounds: 399, 51, 32, 32
 birch_trunk-birch_trunk-west-birch_leaves-north-birch_leaves-east
-	bounds: 239, 19, 32, 32
+	bounds: 273, 19, 32, 32
 break
 	index: 9
-	bounds: 387, 33, 16, 16
+	bounds: 427, 33, 16, 16
 break
 	index: 1
 	bounds: 19, 1, 16, 16
@@ -55,25 +55,27 @@ break
 	bounds: 289, 1, 16, 16
 break
 	index: 2
-	bounds: 405, 15, 16, 16
+	bounds: 361, 1, 16, 16
 break
 	index: 7
-	bounds: 423, 17, 16, 16
+	bounds: 491, 67, 16, 16
 break
 	index: 4
-	bounds: 459, 35, 16, 16
+	bounds: 445, 15, 16, 16
 breaking_block
-	bounds: 441, 17, 16, 16
+	bounds: 445, 33, 16, 16
 brick
 	bounds: 253, 1, 16, 16
+container
+	bounds: 69, 19, 32, 32
 dirt_rotatable
 	bounds: 1, 1, 16, 16
 door
 	bounds: 217, 1, 16, 16
 door_closed
-	bounds: 369, 17, 16, 32
+	bounds: 409, 17, 16, 32
 door_open
-	bounds: 399, 51, 16, 32
+	bounds: 433, 51, 16, 32
 glass
 	bounds: 163, 1, 16, 16
 grass-dirt-east
@@ -81,13 +83,13 @@ grass-dirt-east
 grass-dirt-south
 	bounds: 307, 3, 16, 16
 grass-dirt-south-dirt-east
-	bounds: 387, 15, 16, 16
+	bounds: 427, 15, 16, 16
 grass-dirt-south-dirt-west
-	bounds: 405, 33, 16, 16
+	bounds: 343, 1, 16, 16
 grass-dirt-south-dirt-west-dirt-east
 	bounds: 109, 1, 16, 16
 grass-dirt-west
-	bounds: 423, 35, 16, 16
+	bounds: 379, 1, 16, 16
 grass_rotatable
 	bounds: 235, 1, 16, 16
 hand
@@ -95,31 +97,31 @@ hand
 pickaxe
 	bounds: 265, 53, 64, 64
 player
-	bounds: 417, 53, 18, 30
+	bounds: 451, 53, 18, 30
 player_idle
 	index: 1
-	bounds: 417, 53, 18, 30
+	bounds: 451, 53, 18, 30
 player_idle
 	index: 3
-	bounds: 477, 53, 18, 30
+	bounds: 369, 19, 18, 30
 player_idle
 	index: 2
-	bounds: 349, 19, 18, 30
+	bounds: 389, 19, 18, 30
 player_old
-	bounds: 457, 53, 18, 30
+	bounds: 349, 19, 18, 30
 player_walking
 	index: 2
 	bounds: 307, 21, 19, 30
 player_walking
 	index: 1
-	bounds: 437, 53, 18, 30
+	bounds: 471, 53, 18, 30
 player_walking
 	index: 0
 	bounds: 328, 20, 19, 29
 sand_rotatable
 	bounds: 271, 1, 16, 16
 sandstone_rotatable
-	bounds: 441, 35, 16, 16
+	bounds: 491, 49, 16, 16
 spell
 	bounds: 67, 53, 64, 64
 stick
