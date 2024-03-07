@@ -94,7 +94,7 @@ interface Container : Iterable<IndexedItem> {
    *
    * @param Item What to add
    */
-  fun add(vararg items: Item): List<Item?>? {
+  fun add(vararg items: Item): List<Item>? {
     return add(items.toList())
   }
 
@@ -105,7 +105,7 @@ interface Container : Iterable<IndexedItem> {
    * @return A list of all elements not added, the returned stack might not be valid.
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
-  fun add(items: List<Item>): List<Item?>? {
+  fun add(items: List<Item>): List<Item>? {
     val collector: MutableMap<ContainerElement, UInt> = HashMap()
 
     // tally up how many we got of each type
@@ -114,7 +114,7 @@ interface Container : Iterable<IndexedItem> {
       collector[stack.element] = collector.getOrDefault(stack.element, 0u) + stack.stock
     }
 
-    val notAdded: MutableList<Item?> = ArrayList()
+    val notAdded: MutableList<Item> = ArrayList()
 
     // then add them all type by type
     for ((element, stock) in collector) {

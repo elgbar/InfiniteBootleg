@@ -666,6 +666,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
     container += item
-    logger.success("Gave player $quantity of $item")
+    logger.success("Gave player $item")
   }
 }
