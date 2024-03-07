@@ -23,7 +23,8 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
   override fun keyDown(keycode: Int): Boolean {
     keysDownSet += keycode
-    return handleEvent(InputEvent.KeyDownEvent(keycode))
+    handleEvent(InputEvent.KeyDownEvent(keycode))
+    return handleEvent(InputEvent.KeyIsDownEvent(keycode))
   }
 
   override fun keyUp(keycode: Int): Boolean {
@@ -35,7 +36,8 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
   override fun keyTyped(character: Char): Boolean = false // handleEvent(InputEvent.KeyTypedEvent(character))
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     buttonsDownSet += button
-    return handleEvent(InputEvent.TouchDownEvent(screenX, screenY, pointer, button))
+    handleEvent(InputEvent.TouchDownEvent(screenX, screenY, pointer, button))
+    return handleEvent(InputEvent.TouchDraggedEvent(screenX, screenY, pointer, buttonsDownSet))
   }
 
   override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
