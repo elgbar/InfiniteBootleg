@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
+import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
@@ -55,26 +56,59 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
     payload: Payload?,
     target: DragAndDrop.Target?
   ) {
-    val payloadSlot = payload?.getObject() as? InventorySlot ?: return
-    if (target != null) {
-      val targetSlot = (target.actor.userObject as? InventorySlot) ?: return
+    val sourceSlot = payload?.getObject() as? InventorySlot ?: return
+    val targetSlot = target?.actor?.userObject as? InventorySlot ?: return
+    if (targetSlot.container == sourceSlot.container) {
+      sameContainer(sourceSlot.container, sourceSlot, targetSlot)
+    } else {
+      differentContainer(sourceSlot, targetSlot)
+    }
+  }
 
-      val container = targetSlot.container
+  private fun sameContainer(container: Container, sourceSlot: InventorySlot, targetSlot: InventorySlot) {
+    if (targetSlot.index == sourceSlot.index) {
+      Main.logger().debug("DAD", "Dragging to same slot, ignoring")
+      return
+    }
 
-      if (targetSlot.index == payloadSlot.index) {
-        Main.logger().debug("DAD", "Dragging to same slot, ignoring")
-        return
-      }
+    val targetItem = targetSlot.item
+    val draggingItem = sourceSlot.item ?: return
+    if (targetItem?.element != draggingItem.element) {
+      container.swap(targetSlot.index, sourceSlot.index)
+    } else {
+      val change = targetItem.change(draggingItem.stock.toInt())
+      container.remove(sourceSlot.index)
+      container.put(targetSlot.index, change.firstOrNull())
+      container.add(change.drop(1))
+    }
+  }
 
-      val targetItem = targetSlot.item
-      val draggingItem = payloadSlot.item ?: return
-      if (targetItem?.element != draggingItem.element) {
-        container.swap(targetSlot.index, payloadSlot.index)
-      } else {
-        // FIXME This is probably borked :D
-        //        val change = targetItem.change(draggingItem.stock.toInt())
-        //        container.put(targetSlot.index, draggingItem)
-        //        container.remove(payloadSlot.index)
+  private fun differentContainer(sourceSlot: InventorySlot, targetSlot: InventorySlot) {
+    val sourceContainer = sourceSlot.container
+    val targetContainer = targetSlot.container
+
+    val sourceItem = sourceSlot.item ?: return
+    val targetItem = targetSlot.item
+
+    if (targetItem == null || targetItem.element != sourceItem.element) {
+      targetContainer.put(targetSlot.index, sourceItem)
+      sourceContainer.put(sourceSlot.index, targetItem)
+    } else if (targetItem.element == sourceItem.element) {
+      val change = targetItem.change(sourceItem.stock.toInt())
+      sourceContainer.remove(sourceSlot.index)
+      targetContainer.put(targetSlot.index, change.firstOrNull())
+      val remaining = targetContainer.add(change.drop(1))
+
+      if (remaining.isNotEmpty()) {
+        if (remaining.size == 1) {
+          sourceContainer.put(sourceSlot.index, remaining.single())
+        } else {
+          val remainingRemaining = sourceContainer.add(remaining)
+          if (remainingRemaining.isNotEmpty()) {
+            // wtf
+            Main.logger().error("DAD", "Remaining remaining (???): $remainingRemaining")
+          }
+        }
       }
     }
   }
