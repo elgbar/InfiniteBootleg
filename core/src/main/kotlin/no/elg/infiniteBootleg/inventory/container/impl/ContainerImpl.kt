@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.items.Item
-import no.elg.infiniteBootleg.items.Item.Companion.mergeAll
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ContainerElement
@@ -26,93 +25,33 @@ open class ContainerImpl(
     Preconditions.checkArgument(size > 0, "Inventory size must be greater than zero")
   }
 
-  override fun firstEmpty(): Int {
-    for (i in 0 until size) {
-      if (content[i] == null) {
-        return i
-      }
-    }
-    return -1
-  }
+  override fun indexOfFirstEmpty(): Int = content.indexOfFirst { it == null }
+  override fun indexOfFirstNonFull(element: ContainerElement): Int = content.indexOfFirst { it?.element == element && it.stock < it.maxStock }
+  override fun indexOfFirst(element: ContainerElement): Int = content.indexOfFirst { it?.element == element }
 
-  override fun first(item: Item?): Int {
-    if (item == null) {
-      return firstEmpty()
-    }
-    // if invalid stacks is not allows this cannot have a invalid validate
-    if (validOnly && !item.isValid()) {
-      return -1
-    }
-    for (i in 0 until size) {
-      val loopTs = content[i]
-      if (loopTs != null && loopTs.element === item.element && item.stock <= loopTs.stock) {
-        return i
-      }
-    }
-    return -1
-  }
+  override fun indexOfFirst(filter: (Item?) -> Boolean): Int = content.indexOfFirst(filter)
 
   override fun add(element: ContainerElement, amount: UInt): UInt {
-    var amountNotAdded = amount
-    var index = first(element)
-    if (index < 0) {
-      index = firstEmpty()
-    }
-    if (index < 0) {
-      return amount
-    } else if (!validOnly) {
-      val ts = content[index]
-      val item = element.toItem(Item.DEFAULT_MAX_STOCK, amount)
-      if (ts == null) {
-        content[index] = item
-      } else {
-        val merge = ts.merge(item)
-        content[index] = merge[0]
-        add(merge[1])
-      }
-      updateContainer()
-      return 0u
-    } else {
-      val item = element.toItem(Item.DEFAULT_MAX_STOCK, amount)
-      for (stack in content) {
-        if (stack != null && stack.element === element && stack.stock < Item.DEFAULT_MAX_STOCK) {
-          val needed = Item.DEFAULT_MAX_STOCK - stack.stock
-          val given = amountNotAdded.coerceAtMost(needed)
-          amountNotAdded -= given
-          if (amountNotAdded == 0u) {
-            updateContainer()
-            return 0u
-          }
+    if (amount == 0u) return 0u
+    try {
+      var amountNotAdded = amount
+      while (amountNotAdded > 0u) {
+        val index = indexOfFirstNonFull(element).let { if (it < 0) indexOfFirstEmpty() else it }
+        if (index < 0) {
+          return amountNotAdded
         }
+        val existingItem = content[index] ?: element.toItem(stock = 0u)
+        val canFitInThisItem = Item.DEFAULT_MAX_STOCK - existingItem.stock
+        val toAdd = canFitInThisItem.coerceAtMost(amountNotAdded)
+        amountNotAdded -= toAdd
+
+        val newItem = existingItem.change(toAdd.toInt()).single()
+        content[index] = newItem
       }
+      return amountNotAdded
+    } finally {
+      updateContainer()
     }
-
-    val validStacks =
-      mergeAll(
-        listOf(element.toItem(Item.DEFAULT_MAX_STOCK, amountNotAdded)),
-        Item.DEFAULT_MAX_STOCK
-      )
-
-    var toSkip = -1
-    var i = 0
-    val length = validStacks.size
-    while (i < length) {
-      index = firstEmpty()
-      if (index < 0) {
-        toSkip = i
-        break // no more empty slots
-      }
-      content[index] = validStacks[i]
-      i++
-    }
-    updateContainer()
-    // if we do not need to skip anything the loop finished successfully
-    if (toSkip == -1) {
-      return 0u
-    }
-
-    // skip the ones already added, then sum up the rest
-    return validStacks.drop(toSkip).sumOf { it.stock }
   }
 
   override fun removeAll(element: ContainerElement) {
@@ -129,27 +68,29 @@ open class ContainerImpl(
     var counter = amount
     var i = 0
     val length = content.size
-    while (i < length) {
-      val item = content[i]
-      if (item != null && element === item.element) {
-        val newAmount = (item.stock - counter).toInt()
-        if (newAmount < 0) {
-          counter -= item.stock
-          content[i] = null
-        } else {
-          if (newAmount != 0) {
-            content[i] = item.use(counter)
-          } else {
+    try {
+      while (i < length) {
+        val item = content[i]
+        if (item != null && element === item.element) {
+          val newAmount = (item.stock - counter).toInt()
+          if (newAmount < 0) {
+            counter -= item.stock
             content[i] = null
+          } else {
+            if (newAmount != 0) {
+              content[i] = item.use(counter)
+            } else {
+              content[i] = null
+            }
+            return 0u
           }
-          updateContainer()
-          return 0u
         }
+        i++
       }
-      i++
+      return counter
+    } finally {
+      updateContainer()
     }
-    updateContainer()
-    return counter
   }
 
   override fun remove(item: Item) {

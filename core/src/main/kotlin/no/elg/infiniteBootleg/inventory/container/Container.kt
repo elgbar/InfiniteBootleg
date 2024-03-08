@@ -32,17 +32,11 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
  * However for [.getValid] the returned Item <bold>MUST</bold> be a valid stacks (or
  * null) if this is not the desired use [.get] for invalid stacks
  *
- *
- * TODO implement a chest (that can be opened, somehow) TODO let some entities have inventories
- *
  * @author kheba
  */
 interface Container : Iterable<IndexedItem> {
   /**
    * @return The name of the container
-   */
-  /**
-   * @param name The new name of the container
    */
   var name: String
 
@@ -56,29 +50,25 @@ interface Container : Iterable<IndexedItem> {
   /**
    * @return The first empty slot in the container, return a negative number if none is found
    */
-  fun firstEmpty(): Int
+  fun indexOfFirstEmpty(): Int
 
   /**
    * @param element The element to match against
-   * @return The index of the first tile where there are at least [Item.getStock] tiles. If
-   * the input is null, this method is identical to [.firstEmpty]
+   * @return The index of the first element of type `element` and where the stock is less than max stock
    */
-  fun first(element: ContainerElement?): Int {
-    if (element == null) {
-      return firstEmpty()
-    }
-    return first(element.toItem(DEFAULT_MAX_STOCK, 0u))
-  }
+  fun indexOfFirstNonFull(element: ContainerElement): Int
 
   /**
-   * x
-   *
-   * @param Item The Item to match against
-   * @return The index of the first element where there are at least `Item.getStock` elements,
-   * return negative number if not found. If the input is null, this method is identical to
-   * [.firstEmpty]
+   * @param element The element to match against
+   * @return The index of the first element of type `element`
    */
-  fun first(item: Item?): Int
+  fun indexOfFirst(element: ContainerElement): Int
+
+  /**
+   * @param filter The filter to match against
+   * @return The index of the first slot that matches the given filter
+   */
+  fun indexOfFirst(filter: (Item?) -> Boolean): Int
 
   /**
    * Add an item to the container
@@ -94,9 +84,7 @@ interface Container : Iterable<IndexedItem> {
    *
    * @param Item What to add
    */
-  fun add(vararg items: Item): List<Item>? {
-    return add(items.toList())
-  }
+  fun add(vararg items: Item): List<Item> = add(items.toList())
 
   /**
    * Add one or more items to the container
@@ -105,7 +93,7 @@ interface Container : Iterable<IndexedItem> {
    * @return A list of all elements not added, the returned stack might not be valid.
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
-  fun add(items: List<Item>): List<Item>? {
+  fun add(items: List<Item>): List<Item> {
     val collector: MutableMap<ContainerElement, UInt> = HashMap()
 
     // tally up how many we got of each type
@@ -114,14 +102,14 @@ interface Container : Iterable<IndexedItem> {
       collector[stack.element] = collector.getOrDefault(stack.element, 0u) + stack.stock
     }
 
-    val notAdded: MutableList<Item> = ArrayList()
+    val notAdded = mutableListOf<Item>()
 
     // then add them all type by type
     for ((element, stock) in collector) {
       val failedToAdd = add(element, stock)
       // if any elements failed to be added, add them here
       if (failedToAdd > 0u) {
-        notAdded.add(element.toItem(DEFAULT_MAX_STOCK, failedToAdd))
+        notAdded += element.toItem(DEFAULT_MAX_STOCK, failedToAdd)
       }
     }
     return notAdded
