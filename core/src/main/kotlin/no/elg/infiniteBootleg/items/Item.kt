@@ -46,7 +46,7 @@ sealed interface Item {
     } else if (delta < 0) {
       use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
     } else {
-      Item.mergeAll(listOf(this), maxStock)
+      Item.mergeAll(listOf(this, this.element.toItem(Int.MAX_VALUE.toUInt(), delta.toUInt())), maxStock)
     }
   }
 
@@ -87,23 +87,17 @@ sealed interface Item {
       if (items.isEmpty() || items.none { it != items.first() }) {
         return items
       }
-      var remainingStock = items.sumOf { it.stock }
-      val sortedMaxStock = items.sortedByDescending { it.maxStock }
-      val result = mutableListOf<Item>()
-      for (item in sortedMaxStock) {
-        val stockToPlace = remainingStock.coerceAtMost(item.maxStock)
-        remainingStock -= stockToPlace
-        result += item.element.toItem(item.maxStock, stockToPlace)
-        if (stockToPlace == 0u) {
-          break
+      val element = items.first().element
+      val totalStock = items.sumOf { it.stock }
+      if (totalStock <= newElementMaxStock) {
+        return listOf(element.toItem(newElementMaxStock, totalStock))
+      } else {
+        val mergedItems = (0u until totalStock / newElementMaxStock).mapTo(mutableListOf()) { element.toItem(newElementMaxStock, newElementMaxStock) }
+        if (totalStock % newElementMaxStock != 0u) {
+          mergedItems += element.toItem(newElementMaxStock, totalStock % newElementMaxStock)
         }
+        return mergedItems
       }
-      while (remainingStock > 0u) {
-        val stockToPlace = remainingStock.coerceAtMost(newElementMaxStock)
-        remainingStock -= stockToPlace
-        result += items.first().element.toItem(newElementMaxStock, stockToPlace)
-      }
-      return result
     }
 
     override fun ProtoWorld.Container.Item.fromProto(): Item = element.fromProto().toItem(maxStock.toUInt(), stock.toUInt())
