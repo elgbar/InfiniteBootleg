@@ -642,18 +642,13 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
   }
 
+  @CmdArgNames("item")
+  @ConsoleDoc(description = "Give an item to player", paramDescriptions = ["Item to given"])
+  fun give(elementName: String) = give(elementName, 1)
+
   @CmdArgNames("item", "quantity")
   @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
   fun give(elementName: String, quantity: Int) {
-    if (quantity < 1) {
-      logger.error("Quantity must be at least 1")
-      return
-    }
-    val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
-      logger.error("Unknown container element '$elementName'")
-      return
-    }
-
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
@@ -665,6 +660,16 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       logger.error("Player has no container")
       return
     }
+
+    if (quantity < 1) {
+      logger.error("Quantity must be at least 1")
+      return
+    }
+    val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
+      logger.error("Unknown container element '$elementName'")
+      return
+    }
+
     container += item
     logger.success("Gave player $item")
   }
