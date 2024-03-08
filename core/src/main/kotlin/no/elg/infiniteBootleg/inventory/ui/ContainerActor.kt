@@ -50,7 +50,6 @@ fun Stage.createContainerActor(container: Container, dragAndDrop: DragAndDrop, b
         updateFunctions.forEach { it() }
         invalidateHierarchy()
         pack()
-        centerWindow()
       }
 
       val filter: (ContainerEvent) -> Boolean = { it.container == container }
@@ -84,7 +83,11 @@ fun Stage.createContainerActor(container: Container, dragAndDrop: DragAndDrop, b
         if ((containerSlot.index + 1) % 10 == 0) row()
       }
       pack()
-      Main.inst().scheduler.executeSync { updateAllSlots() }
+      centerWindow()
+      Main.inst().scheduler.executeSync {
+        updateAllSlots()
+        centerWindow()
+      }
     }
   }
 }
