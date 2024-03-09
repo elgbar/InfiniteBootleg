@@ -29,6 +29,7 @@ import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.safeUse
+import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.withColor
 
 @Scene2dDsl
@@ -76,8 +77,7 @@ fun Stage.createContainerActor(container: Container, dragAndDrop: DragAndDrop, b
               fbo = null
               defaultDrawable
             }
-            it.pad(2f).space(2f)
-            tooltip.setText(item?.element?.name ?: "<Empty>")
+            tooltip.setText(item?.run { element.name.lowercase().toTitleCase() } ?: "<Empty>")
           }
 
           it.pad(2f).space(2f)
