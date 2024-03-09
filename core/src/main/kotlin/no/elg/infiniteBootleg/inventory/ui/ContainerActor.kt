@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.kotcrab.vis.ui.widget.VisWindow
+import ktx.assets.disposeSafely
 import ktx.graphics.use
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actors
@@ -61,11 +62,20 @@ fun Stage.createContainerActor(container: Container, dragAndDrop: DragAndDrop, b
         visImageButton {
           val tooltip = visTextTooltip("")
 
+          var fbo: FrameBuffer? = null
           fun updateSlot() {
             val item = container[containerSlot.index]
 
-            val drawable = createDrawable(batch, item, containerSlot.index) ?: defaultDrawable
-            style.imageUp = drawable
+            val slotDrawable = createDrawable(batch, item, containerSlot.index, fbo)
+            style.imageUp = if (slotDrawable != null) {
+              val (newFbo, drawable) = slotDrawable
+              fbo = newFbo
+              drawable
+            } else {
+              fbo?.disposeSafely()
+              fbo = null
+              defaultDrawable
+            }
             it.pad(2f).space(2f)
             tooltip.setText(item?.element?.name ?: "<Empty>")
           }
@@ -97,9 +107,7 @@ const val FBO_SLOT_SIZE: Float = SLOT_SIZE
 val drawIndex: Boolean get() = Settings.debug
 
 val defaultDrawable: Drawable by lazy {
-  val fboSize = FBO_SLOT_SIZE
-  val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, fboSize.toInt(), fboSize.toInt(), false)
-  frameBuffer.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+  val frameBuffer = createFBO()
   frameBuffer.use {
     Gdx.gl.glClearColor(1f, 0f, 1f, 0f)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -107,23 +115,25 @@ val defaultDrawable: Drawable by lazy {
   TextureRegionDrawable(TextureRegion(frameBuffer.colorBufferTexture).also { it.flip(false, true) })
 }
 
-fun createDrawable(batch: Batch, maybeItem: Item?, index: Int): Drawable? {
-  val item = maybeItem ?: return null
-  val fboSize = FBO_SLOT_SIZE
+private fun createFBO(): FrameBuffer =
+  FrameBuffer(Pixmap.Format.RGBA8888, FBO_SLOT_SIZE.toInt(), FBO_SLOT_SIZE.toInt(), false).also {
+    it.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+  }
 
+fun createDrawable(batch: Batch, maybeItem: Item?, index: Int, fbo: FrameBuffer?): Pair<FrameBuffer, Drawable>? {
+  val item = maybeItem ?: return null
   val texture = item.element.textureRegion?.textureRegionOrNull ?: return null
-  val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, fboSize.toInt(), fboSize.toInt(), false)
-  frameBuffer.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+  val frameBuffer = fbo ?: createFBO()
   frameBuffer.use {
     // clear junk that might appear behind transparent textures
     Gdx.gl.glClearColor(1f, 0f, 1f, 0f)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-    batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, fboSize, fboSize)
+    batch.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, FBO_SLOT_SIZE, FBO_SLOT_SIZE)
     batch.safeUse {
-      batch.draw(texture, 0f, 0f, fboSize, fboSize)
+      batch.draw(texture, 0f, 0f, FBO_SLOT_SIZE, FBO_SLOT_SIZE)
       if (drawIndex) {
         Main.inst().assets.font15pt.withColor(r = 0.75f, g = 0.75f, b = 0.75f, a = 1f) { font ->
-          font.draw(batch, "i:$index", 0f, fboSize - font.capHeight / 3f)
+          font.draw(batch, "i:$index", 0f, FBO_SLOT_SIZE - font.capHeight / 3f)
         }
       }
       Main.inst().assets.font20pt.also { font ->
@@ -131,5 +141,5 @@ fun createDrawable(batch: Batch, maybeItem: Item?, index: Int): Drawable? {
       }
     }
   }
-  return TextureRegionDrawable(TextureRegion(frameBuffer.colorBufferTexture).also { it.flip(false, true) })
+  return frameBuffer to TextureRegionDrawable(TextureRegion(frameBuffer.colorBufferTexture).also { it.flip(false, true) })
 }
