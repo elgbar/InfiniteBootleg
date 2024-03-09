@@ -143,12 +143,6 @@ open class ContainerImpl(
     return content[index]
   }
 
-  @Deprecated("")
-  override fun getValid(index: Int): Array<Item?> {
-    Preconditions.checkPositionIndex(index, size - 1)
-    return arrayOf(get(index))
-  }
-
   override fun put(index: Int, item: Item?) {
     Preconditions.checkPositionIndex(index, size - 1)
     require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }

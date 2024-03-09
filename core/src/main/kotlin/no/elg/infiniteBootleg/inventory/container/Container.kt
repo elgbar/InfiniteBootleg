@@ -176,15 +176,6 @@ interface Container : Iterable<IndexedItem> {
   operator fun get(index: Int): Item?
 
   /**
-   * @param index The index of the item to get
-   * @return An array of valid stacks (will pass [Item.isValid]) from the item at the
-   * given location
-   * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
-   */
-  @Deprecated("")
-  fun getValid(index: Int): Array<Item?>
-
-  /**
    * Overwrite a the given `Item` at `index`. If the given tile validate is `null`
    * it is the same as calling [.remove].
    *
