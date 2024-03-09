@@ -74,10 +74,11 @@ object DebugText {
     val rawX = ClientMain.inst().mouseLocator.mouseWorldX
     val rawY = ClientMain.inst().mouseLocator.mouseWorldY
     val exists = block != null
-    val blockDebug = block?.hudDebug() ?: ""
+    val ent = block?.entity?.let { " ${ent(it)}" } ?: ""
+    val blockDebug = block?.let { " ${it.hudDebug()}" } ?: ""
 
-    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s %s"
-    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug))
+    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s%s%s"
+    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug, ent))
   }
 
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
@@ -173,7 +174,9 @@ object DebugText {
   fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {
     sb.append("E = \n")
     for (entity in world.getEntities(mouseWorldX, mouseWorldY)) {
-      sb.append("${entity.id}: ${entity.toComponentsString()}").appendLine()
+      sb.append(ent(entity)).appendLine()
     }
   }
+
+  private fun ent(entity: Entity): String = "${entity.id}: ${entity.toComponentsString()}"
 }
