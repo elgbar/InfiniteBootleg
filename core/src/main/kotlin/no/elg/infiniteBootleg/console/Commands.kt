@@ -670,7 +670,11 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
 
-    container += item
-    logger.success("Gave player $item")
+    val notAdded = container.add(item)
+    if (notAdded.isEmpty()) {
+      logger.success("Gave player $item")
+    } else {
+      logger.error("Failed to give player $item, not enough space for $notAdded")
+    }
   }
 }
