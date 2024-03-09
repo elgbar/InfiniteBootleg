@@ -132,7 +132,7 @@ fun createDrawable(batch: Batch, maybeItem: Item?, index: Int, fbo: FrameBuffer?
     batch.safeUse {
       batch.draw(texture, 0f, 0f, FBO_SLOT_SIZE, FBO_SLOT_SIZE)
       if (drawIndex) {
-        Main.inst().assets.font15pt.withColor(r = 0.75f, g = 0.75f, b = 0.75f, a = 1f) { font ->
+        Main.inst().assets.font16pt.withColor(r = 0.75f, g = 0.75f, b = 0.75f, a = 1f) { font ->
           font.draw(batch, "i:$index", 0f, FBO_SLOT_SIZE - font.capHeight / 3f)
         }
       }

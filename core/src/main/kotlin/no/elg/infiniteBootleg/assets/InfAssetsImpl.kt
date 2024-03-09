@@ -72,7 +72,7 @@ class InfAssetsImpl : InfAssets {
   }
 
   override val font20pt: BitmapFont by lazy { createFont(20) }
-  override val font15pt: BitmapFont by lazy { createFont(15) }
+  override val font16pt: BitmapFont by lazy { createFont(16) }
   override val font10pt: BitmapFont by lazy { createFont(10) }
 
   override fun loadAssets() {
