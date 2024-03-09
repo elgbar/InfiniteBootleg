@@ -64,6 +64,7 @@ open class ContainerImpl(
   }
 
   override fun remove(element: ContainerElement, amount: UInt): UInt {
+    if (amount == 0u) return 0u
     Main.logger().debug("Container", "Removing $amount of $element")
     var counter = amount
     var i = 0
@@ -94,8 +95,7 @@ open class ContainerImpl(
   }
 
   override fun remove(item: Item) {
-    Preconditions.checkNotNull(item, "cannot remove a null element")
-    if (validOnly && !item.isValid()) {
+    if (validOnly && !item.isValid() || item.stock == 0u) {
       return
     }
     var i = 0
@@ -110,8 +110,10 @@ open class ContainerImpl(
   }
 
   override fun remove(index: Int) {
-    content[index] = null
-    updateContainer()
+    if (content[index] != null) {
+      content[index] = null
+      updateContainer()
+    }
   }
 
   override fun clear() {
