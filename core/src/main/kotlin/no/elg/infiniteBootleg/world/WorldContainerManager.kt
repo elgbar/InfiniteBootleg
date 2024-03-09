@@ -26,7 +26,7 @@ class WorldContainerManager {
 
   fun findOrCreate(worldX: WorldCoord, worldY: WorldCoord): Container {
     val compact = compactLoc(worldX, worldY)
-    return containers.getOrDefault(compact, createContainer(compact))
+    return containers.getOrPut(compact) { createContainer(compact) }
   }
 
   companion object : ProtoConverter<WorldContainerManager, ProtoWorld.WorldContainers> {
