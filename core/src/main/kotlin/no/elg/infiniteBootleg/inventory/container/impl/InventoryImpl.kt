@@ -1,15 +1,13 @@
 package no.elg.infiniteBootleg.inventory.container.impl
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.close
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.inventory.container.Inventory
 import no.elg.infiniteBootleg.items.Item
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
-import java.util.concurrent.CompletableFuture
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.getContainerActor
 
 /**
  * An abstracted storage that handles what item is selected
@@ -20,7 +18,9 @@ class InventoryImpl(override val holder: Entity, override val container: Contain
   override var selected: Int = 0
     private set
 
-  override val isOpen: Boolean get() = containerActor.let { it?.isDone == true && it.get().isVisible }
+  override val isOpen: Boolean
+    get() = holder.getContainerActor(container)
+      .let { future -> future?.isDone == true && future.get().let { (actor, correctStage) -> actor.isVisible && actor.stage == correctStage } }
 
   override fun next() {
     selected = (selected + 1) % this.size
@@ -33,9 +33,6 @@ class InventoryImpl(override val holder: Entity, override val container: Contain
     }
     selected = (selected - 1) % this.size
   }
-
-  private val containerActor: CompletableFuture<Actor>?
-    get() = holder.clientWorld?.render?.getContainerActor(container)
 
   override fun open() {
     container.open(holder)

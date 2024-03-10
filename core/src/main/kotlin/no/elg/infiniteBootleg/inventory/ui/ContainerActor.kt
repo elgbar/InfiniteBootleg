@@ -9,95 +9,94 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.assets.disposeSafely
 import ktx.graphics.use
 import ktx.scene2d.Scene2dDsl
-import ktx.scene2d.actors
 import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visTextTooltip
-import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.ContainerEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.IBVisWindow
+import no.elg.infiniteBootleg.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.withColor
 
 @Scene2dDsl
-fun Stage.createContainerActor(container: Container, dragAndDrop: DragAndDrop, batch: Batch): VisWindow {
-  actors {
-    return visWindow(container.name) {
-      isVisible = false
-      isMovable = true
-      isResizable = false
+fun createContainerActor(container: Container, dragAndDrop: DragAndDrop, batch: Batch): IBVisWindow {
+  val onClose: () -> Unit = { dispatchEvent(ContainerEvent.Closed(container)) }
+  return ibVisWindowClosed(container.name, onClose = onClose) {
+    isMovable = true
+    isResizable = false
+    addCloseButton()
+    closeOnEscape()
 
-      defaults().maxWidth(object : Value() {
-        override fun get(actor: Actor?): Float {
-          return Gdx.graphics.width * 0.75f
+    defaults().maxWidth(object : Value() {
+      override fun get(actor: Actor?): Float {
+        return Gdx.graphics.width * 0.75f
+      }
+    })
+
+    val updateFunctions: MutableList<() -> Unit> = mutableListOf()
+
+    fun updateAllSlots() {
+      updateFunctions.forEach { it() }
+      invalidateHierarchy()
+      pack()
+    }
+
+    val filter: (ContainerEvent) -> Boolean = { it.container == container }
+    val listener: ContainerEvent.() -> Unit = { Main.inst().scheduler.executeSync(::updateAllSlots) }
+    registerListener<ContainerEvent.Changed>(true, filter, listener)
+    registerListener<ContainerEvent.Opening>(true, filter, listener)
+
+    for (containerSlot in container) {
+      visImageButton {
+        val tooltip = visTextTooltip("")
+
+        var fbo: FrameBuffer? = null
+        fun updateSlot() {
+          val item = container[containerSlot.index]
+
+          val slotDrawable = createDrawable(batch, item, containerSlot.index, fbo)
+          style.imageUp = if (slotDrawable != null) {
+            val (newFbo, drawable) = slotDrawable
+            fbo = newFbo
+            drawable
+          } else {
+            fbo?.disposeSafely()
+            fbo = null
+            defaultDrawable
+          }
+          tooltip.setText(item?.run { element.name.lowercase().toTitleCase() } ?: "<Empty>")
         }
-      })
 
-      val updateFunctions: MutableList<() -> Unit> = mutableListOf()
+        it.pad(2f).space(2f)
+        updateSlot()
+        updateFunctions += ::updateSlot
 
-      fun updateAllSlots() {
-        updateFunctions.forEach { it() }
-        invalidateHierarchy()
+        val slot = InventorySlot(container, containerSlot.index)
+        userObject = slot
+        dragAndDrop.addSource(SlotSource(this@visImageButton, slot))
+        dragAndDrop.addTarget(SlotTarget(this@visImageButton))
         pack()
       }
-
-      val filter: (ContainerEvent) -> Boolean = { it.container == container }
-      val listener: ContainerEvent.() -> Unit = { Main.inst().scheduler.executeSync(::updateAllSlots) }
-      registerListener<ContainerEvent.Changed>(true, filter, listener)
-      registerListener<ContainerEvent.Opening>(true, filter, listener)
-
-      for (containerSlot in container) {
-        visImageButton {
-          val tooltip = visTextTooltip("")
-
-          var fbo: FrameBuffer? = null
-          fun updateSlot() {
-            val item = container[containerSlot.index]
-
-            val slotDrawable = createDrawable(batch, item, containerSlot.index, fbo)
-            style.imageUp = if (slotDrawable != null) {
-              val (newFbo, drawable) = slotDrawable
-              fbo = newFbo
-              drawable
-            } else {
-              fbo?.disposeSafely()
-              fbo = null
-              defaultDrawable
-            }
-            tooltip.setText(item?.run { element.name.lowercase().toTitleCase() } ?: "<Empty>")
-          }
-
-          it.pad(2f).space(2f)
-          updateSlot()
-          updateFunctions += ::updateSlot
-
-          val slot = InventorySlot(container, containerSlot.index)
-          userObject = slot
-          dragAndDrop.addSource(SlotSource(this@visImageButton, slot))
-          dragAndDrop.addTarget(SlotTarget(this@visImageButton))
-          pack()
-        }
-        if ((containerSlot.index + 1) % 10 == 0) row()
-      }
-      pack()
+      if ((containerSlot.index + 1) % 10 == 0) row()
+    }
+    pack()
+    centerWindow()
+    Main.inst().scheduler.executeSync {
+      updateAllSlots()
       centerWindow()
-      Main.inst().scheduler.executeSync {
-        updateAllSlots()
-        centerWindow()
-      }
     }
   }
 }
@@ -136,7 +135,7 @@ fun createDrawable(batch: Batch, maybeItem: Item?, index: Int, fbo: FrameBuffer?
           font.draw(batch, "i:$index", 0f, FBO_SLOT_SIZE - font.capHeight / 3f)
         }
       }
-      Main.inst().assets.font20pt.also { font ->
+      Main.inst().assets.font20pt.withColor(1f, 1f, 1f, 1f) { font ->
         font.draw(batch, "${item.stock}", 0f, font.capHeight)
       }
     }

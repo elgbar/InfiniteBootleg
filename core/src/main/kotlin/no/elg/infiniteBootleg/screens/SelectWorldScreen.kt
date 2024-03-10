@@ -7,6 +7,7 @@ import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.util.onInteract
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
 import kotlin.math.absoluteValue

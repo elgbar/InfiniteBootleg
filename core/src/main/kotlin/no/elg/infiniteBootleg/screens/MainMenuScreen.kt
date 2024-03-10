@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input.Keys
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.util.onInteract
 
 /**
  * @author Elg

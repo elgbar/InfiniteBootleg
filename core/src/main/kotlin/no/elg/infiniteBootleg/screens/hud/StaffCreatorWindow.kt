@@ -1,27 +1,22 @@
 package no.elg.infiniteBootleg.screens.hud
 
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.kotcrab.vis.ui.widget.VisSelectBox
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.scene2d.KTable
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actor
-import ktx.scene2d.actors
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.KVisTable
-import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visCheckBox
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visSlider
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import ktx.scene2d.vis.visWindow
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.screens.addHideButton
-import no.elg.infiniteBootleg.screens.hide
-import no.elg.infiniteBootleg.screens.hideOnEscape
-import no.elg.infiniteBootleg.screens.setIBDefaults
+import no.elg.infiniteBootleg.util.IBVisWindow
+import no.elg.infiniteBootleg.util.ibVisWindowClosed
+import no.elg.infiniteBootleg.util.setIBDefaults
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
@@ -96,84 +91,81 @@ inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable
   return { if (enabledBox.isChecked) gen(type, rating) else null }
 }
 
-fun Stage.addStaffCreatorOverlay(world: ClientWorld): KVisWindow {
-  actors {
-    val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
-    return visWindow("Staff Creator") {
-      hideOnEscape()
-      addHideButton()
-      hide()
+fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
+  val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
+  return ibVisWindowClosed("Staff Creator") {
+    closeOnEscape()
+    addCloseButton()
 
-      val gems = mutableListOf<() -> Gem?>()
-      val rings = mutableListOf<() -> Ring?>()
+    val gems = mutableListOf<() -> Gem?>()
+    val rings = mutableListOf<() -> Ring?>()
 
-      @Scene2dDsl
-      fun KVisTable.addGemSelector(allowDisable: Boolean = true): () -> Gem? =
-        addSelector<GemType, GemRating, Gem>(Diamond, GemRating.FLAWLESS, onAnyElementChanged, allowDisable) { type, rating -> Gem(type, rating) }
+    @Scene2dDsl
+    fun KVisTable.addGemSelector(allowDisable: Boolean = true): () -> Gem? =
+      addSelector<GemType, GemRating, Gem>(Diamond, GemRating.FLAWLESS, onAnyElementChanged, allowDisable) { type, rating -> Gem(type, rating) }
 
-      @Scene2dDsl
-      fun KVisTable.addRingSelector(): () -> Ring? =
-        addSelector<RingType<RingRating?>, RingRating, Ring>(GravityRing, RingRating.FLAWLESS, onAnyElementChanged) { type, rating -> Ring(type, rating) }
+    @Scene2dDsl
+    fun KVisTable.addRingSelector(): () -> Ring? =
+      addSelector<RingType<RingRating?>, RingRating, Ring>(GravityRing, RingRating.FLAWLESS, onAnyElementChanged) { type, rating -> Ring(type, rating) }
 
-      @Scene2dDsl
-      fun KVisTable.addGemsAndRings(type: WoodType) {
-        clear()
-        gems.clear()
-        rings.clear()
+    @Scene2dDsl
+    fun KVisTable.addGemsAndRings(type: WoodType) {
+      clear()
+      gems.clear()
+      rings.clear()
 
-        row()
-        gems += addGemSelector(false)
-        for (i in 1u until type.gemSlots) {
-          gems += addGemSelector()
-        }
-        aSeparator()
-        for (i in 0u until type.ringSlots) {
-          rings += addRingSelector()
-        }
-        this@visWindow.pack()
-        this@visWindow.centerWindow()
+      row()
+      gems += addGemSelector(false)
+      for (i in 1u until type.gemSlots) {
+        gems += addGemSelector()
       }
-
-      val containerTable = KVisTable(true)
-
-      @Scene2dDsl
-      fun KVisTable.addWoodSelector(): () -> Wood {
-        var type: WoodType = Birch
-        var rating: WoodRating = WoodRating.FRESHLY_CUT
-        visTable {
-          setIBDefaults()
-          sealedSelector<WoodType>(onAnyElementChanged, type) {
-            type = it
-            containerTable.addGemsAndRings(type)
-          }
-          enumSelector<WoodRating>(onAnyElementChanged, rating) { rating = it }
-        }
-        return { Wood(type, rating) }
+      aSeparator()
+      for (i in 0u until type.ringSlots) {
+        rings += addRingSelector()
       }
+      this@ibVisWindowClosed.pack()
+      this@ibVisWindowClosed.centerWindow()
+    }
 
+    val containerTable = KVisTable(true)
+
+    @Scene2dDsl
+    fun KVisTable.addWoodSelector(): () -> Wood {
+      var type: WoodType = Birch
+      var rating: WoodRating = WoodRating.FRESHLY_CUT
       visTable {
         setIBDefaults()
-        val wood = addWoodSelector()
-        row()
-        aSeparator()
-        actor(containerTable) {
-          setIBDefaults(pad = false)
-          addGemsAndRings(wood().type)
+        sealedSelector<WoodType>(onAnyElementChanged, type) {
+          type = it
+          containerTable.addGemsAndRings(type)
         }
-        row()
-        visTextButton("Create Staff") {
-          onClick {
-            val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
+        enumSelector<WoodRating>(onAnyElementChanged, rating) { rating = it }
+      }
+      return { Wood(type, rating) }
+    }
 
-            for (player in world.controlledPlayerEntities) {
-              Main.logger().log("Giving player ${player.nameOrNull} a new staff $newStaff")
-              val container = player.containerOrNull ?: continue
-              container += newStaff.toItem()
-            }
+    visTable {
+      setIBDefaults()
+      val wood = addWoodSelector()
+      row()
+      aSeparator()
+      actor(containerTable) {
+        setIBDefaults(pad = false)
+        addGemsAndRings(wood().type)
+      }
+      row()
+      visTextButton("Create Staff") {
+        onClick {
+          val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
+
+          for (player in world.controlledPlayerEntities) {
+            Main.logger().log("Giving player ${player.nameOrNull} a new staff $newStaff")
+            val container = player.containerOrNull ?: continue
+            container += newStaff.toItem()
           }
         }
       }
-      pack()
     }
+    pack()
   }
 }

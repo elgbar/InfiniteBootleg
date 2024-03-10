@@ -9,6 +9,7 @@ import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.fatal
+import no.elg.infiniteBootleg.util.onInteract
 import java.util.concurrent.ScheduledFuture
 
 /**

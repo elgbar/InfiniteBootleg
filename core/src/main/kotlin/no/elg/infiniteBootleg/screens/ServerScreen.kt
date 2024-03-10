@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.server.ClientChannel
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
 import no.elg.infiniteBootleg.util.generateUUIDFromString
+import no.elg.infiniteBootleg.util.onInteract
 
 /**
  * @author Elg

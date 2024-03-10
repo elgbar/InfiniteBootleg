@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.ecs.components.inventory
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.inventory.container.Container
@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.toggle
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.IBVisWindow
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -31,7 +32,7 @@ class ContainerComponent(val container: Container) : EntitySavableComponent, Aut
 
     val Entity.containerOrNull: Container? get() = containerComponentOrNull?.container
 
-    private fun Entity.getContainerActor(container: Container?): CompletableFuture<Actor>? {
+    fun Entity.getContainerActor(container: Container?): CompletableFuture<Pair<IBVisWindow, Stage>>? {
       return this.clientWorld?.render?.getContainerActor(container ?: return null)
     }
 

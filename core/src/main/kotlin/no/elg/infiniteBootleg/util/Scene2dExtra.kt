@@ -7,11 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.EventListener
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.kotcrab.vis.ui.widget.MenuItem
 import com.kotcrab.vis.ui.widget.PopupMenu
 import com.kotcrab.vis.ui.widget.Separator
 import com.kotcrab.vis.ui.widget.VisWindow
-import com.kotcrab.vis.ui.widget.VisWindow.FADE_TIME
 import ktx.actors.isShown
 import ktx.actors.onChange
 import ktx.actors.onClick
@@ -22,11 +22,8 @@ import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.StageWidget
 import ktx.scene2d.defaultStyle
 import ktx.scene2d.table
-import ktx.scene2d.vis.KVisWindow
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
-import ktx.scene2d.vis.visWindow
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -106,30 +103,6 @@ fun Button.onInteract(
   }
 }
 
-/** Add and fade in this window if it is is not [isShown] */
-fun VisWindow.show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
-  if (!isShown()) {
-    stage.addActor(fadeIn(fadeTime))
-    if (center) {
-      centerWindow()
-    }
-  }
-}
-
-/** Alias for [VisWindow.fadeOut] with a default fadeout duration of `0f` */
-fun VisWindow.hide(fadeTime: Float = 0f) {
-  fadeOut(fadeTime)
-}
-
-/** Toggle if this window is shown or not */
-fun VisWindow.toggleShown(stage: Stage, center: Boolean = true) {
-  if (!isShown()) {
-    show(stage, center)
-  } else {
-    hide()
-  }
-}
-
 operator fun Stage.plusAssign(eventListener: EventListener) {
   addListener(eventListener)
 }
@@ -168,11 +141,11 @@ inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Bo
 }
 
 @Scene2dDsl
-fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindow.() -> Unit = {}, whenConfirmed: KVisWindow.() -> Unit): KVisWindow {
-  return this.visWindow(title) {
+fun StageWidget.confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow {
+  return this.ibVisWindow(title) {
     isMovable = false
     isModal = true
-    hide()
+    close()
 
     visLabel(text)
     row()
@@ -196,8 +169,8 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindo
         it.expandX()
         it.center()
         onClick {
-          this@visWindow.whenConfirmed()
-          this@visWindow.fadeOut()
+          this@ibVisWindow.whenConfirmed()
+          this@ibVisWindow.fadeOut()
         }
       }
       visLabel("") {
@@ -210,8 +183,8 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindo
         it.expandX()
         it.center()
         onClick {
-          this@visWindow.whenDenied()
-          this@visWindow.fadeOut()
+          this@ibVisWindow.whenDenied()
+          this@ibVisWindow.fadeOut()
         }
       }
       visLabel("") {
@@ -221,7 +194,7 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindo
     }
     centerWindow()
     onAnyKeysDownEvent(Input.Keys.ESCAPE, Input.Keys.BACK, catchEvent = true) {
-      this@visWindow.fadeOut()
+      this@ibVisWindow.fadeOut()
     }
     pack()
     fadeOut(0f)
@@ -229,11 +202,11 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: KVisWindo
 }
 
 @Scene2dDsl
-fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVisWindow.() -> Unit>, whenConfirmed: KVisWindow.() -> Unit, text: () -> String): VisWindow {
-  return visWindow(title) {
+fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow {
+  return ibVisWindow(title) {
     isMovable = false
     isModal = true
-    this.hide()
+    this.close()
     val label = visLabel("")
 
     labelUpdater[this] = {
@@ -251,8 +224,8 @@ fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVi
       it.space(10f)
       it.pad(platformSpacing)
       onClick {
-        this@visWindow.whenConfirmed()
-        this@visWindow.fadeOut()
+        this@ibVisWindow.whenConfirmed()
+        this@ibVisWindow.fadeOut()
       }
     }
 
@@ -263,16 +236,57 @@ fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<KVisWindow, KVi
 }
 
 @Scene2dDsl
-@OptIn(ExperimentalContracts::class)
-inline fun RootWidget.ibVisWindow(title: String, style: String = defaultStyle, noinline onClose: () -> Unit, init: IBKVisWindow.() -> Unit = {}): IBKVisWindow {
+inline fun RootWidget.ibVisWindow(title: String, style: String = defaultStyle, noinline onClose: () -> Unit = {}, init: IBVisWindow.() -> Unit = {}): IBVisWindow {
   contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-  return storeActor(IBKVisWindow(title, style, onClose)).apply(init)
+  return storeActor(IBVisWindow(title, style, onClose)).apply(init)
+}
+
+/**
+ * A [IBVisWindow] that is initially closed
+ */
+@Scene2dDsl
+inline fun ibVisWindowClosed(title: String, style: String = defaultStyle, noinline onClose: () -> Unit = {}, init: IBVisWindow.() -> Unit = {}): IBVisWindow {
+  contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
+  return IBVisWindow(title, style, onClose).apply(init)
 }
 
 @Scene2dDsl
-class IBKVisWindow(title: String, styleName: String, val onClose: () -> Unit) : VisWindow(title, styleName), KTable {
-  override fun close() {
-    super.close()
+class IBVisWindow(title: String, styleName: String, val onClose: () -> Unit) : VisWindow(title, styleName), KTable {
+  public override fun close() {
+    fadeOut(0f)
     onClose()
   }
+
+  /** Add and fade in this window if it is is not [isShown] */
+  fun show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
+    if (!isShown()) {
+      isVisible = true
+      stage.addActor(fadeIn(fadeTime))
+      if (center) {
+        centerWindow()
+      }
+    }
+  }
+
+  /** Toggle if this window is shown or not */
+  fun toggleShown(stage: Stage, center: Boolean = true) {
+    if (!isShown()) {
+      show(stage, center)
+    } else {
+      close()
+    }
+  }
+}
+
+/** Toggle if this window is shown or not */
+@Suppress("NOTHING_TO_INLINE") // must be inlined otherwise it does not work (wtf!??)
+@Deprecated("Use the extension function instead", ReplaceWith("this.closeOnEscape()"))
+inline fun IBVisWindow.hideOnEscape() {
+  onAnyKeysDownEvent(Input.Keys.ESCAPE, Input.Keys.BACK, catchEvent = true) {
+    close()
+  }
+}
+
+fun Table.setIBDefaults(space: Boolean = true, pad: Boolean = true) {
+  defaults().applyIf(space) { space(5f) }.applyIf(pad) { padLeft(2.5f).padRight(2.5f).padBottom(2.5f) }
 }

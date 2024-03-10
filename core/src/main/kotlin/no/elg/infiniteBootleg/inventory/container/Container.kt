@@ -1,7 +1,8 @@
 package no.elg.infiniteBootleg.inventory.container
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
+import ktx.actors.isShown
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
@@ -15,10 +16,11 @@ import no.elg.infiniteBootleg.protobuf.ContainerKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
 import no.elg.infiniteBootleg.protobuf.itemOrNull
+import no.elg.infiniteBootleg.util.IBVisWindow
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.getContainerActor
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
-import java.util.concurrent.CompletableFuture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
 
 /**
@@ -204,40 +206,36 @@ interface Container : Iterable<IndexedItem> {
 
   companion object : ProtoConverter<Container, ProtoContainer> {
 
-    fun getContainerActor(entity: Entity, container: Container?): CompletableFuture<Actor>? {
-      return entity.clientWorld?.render?.getContainerActor(container ?: return null)
-    }
-
     fun Container?.isOpen(entity: Entity): Boolean = this?.let { container -> entity.clientWorld?.render?.isContainerOpen(container) } ?: false
 
-    private fun Container.containerActorOpen(actor: Actor) {
-      if (!actor.isVisible) {
+    private fun Container.containerActorOpen(window: IBVisWindow, stage: Stage) {
+      if (!window.isShown()) {
         EventManager.dispatchEvent(ContainerEvent.Opening(this))
-        actor.isVisible = true
+        window.show(stage)
       }
     }
 
-    private fun Container.containerActorClose(actor: Actor) {
-      if (actor.isVisible) {
-        actor.isVisible = false
+    private fun Container.containerActorClose(window: IBVisWindow) {
+      if (window.isShown()) {
+        window.close()
         EventManager.dispatchEvent(ContainerEvent.Closed(this))
       }
     }
 
     fun Container.open(entity: Entity) {
-      getContainerActor(entity, this)?.thenApply { containerActorOpen(it) }
+      entity.getContainerActor(this)?.thenApply { (window, stage) -> containerActorOpen(window, stage) }
     }
 
     fun Container.close(entity: Entity) {
-      getContainerActor(entity, this)?.thenApply { containerActorClose(it) }
+      entity.getContainerActor(this)?.thenApply { (window, _) -> containerActorClose(window) }
     }
 
     fun Container.toggle(entity: Entity) {
-      getContainerActor(entity, this)?.thenApply {
-        if (it.isVisible) {
-          containerActorClose(it)
+      entity.getContainerActor(this)?.thenApply { (window, stage) ->
+        if (window.isShown()) {
+          containerActorClose(window)
         } else {
-          containerActorOpen(it)
+          containerActorOpen(window, stage)
         }
       }
     }
