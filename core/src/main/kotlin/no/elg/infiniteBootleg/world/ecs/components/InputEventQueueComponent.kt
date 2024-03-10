@@ -29,6 +29,6 @@ class InputEventQueueComponent : ECSEventQueueComponent<InputEvent>, Authoritati
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): InputEventQueueComponent = with<InputEventQueueComponent>()
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasInputEvent()
-    val PROTO_INPUT_EVENT = ProtoWorld.Entity.InputEvent.getDefaultInstance()
+    val PROTO_INPUT_EVENT: ProtoWorld.Entity.InputEvent = ProtoWorld.Entity.InputEvent.getDefaultInstance()
   }
 }

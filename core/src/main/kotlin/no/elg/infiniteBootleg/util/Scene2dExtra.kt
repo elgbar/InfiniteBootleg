@@ -49,17 +49,10 @@ fun PopupMenu.separator() {
   add(Separator("menu")).fill().expand().row()
 }
 
-fun Button.onInteract(
-  stage: Stage,
-  vararg keyShortcut: Int,
-  playClick: Boolean = true,
-  catchEvent: Boolean = false,
-  interaction: Button.() -> Unit
-) {
+fun Button.onInteract(stage: Stage, vararg keyShortcut: Int, catchEvent: Boolean = false, interaction: Button.() -> Unit) {
   this.onInteract(
     stage = stage,
     keyShortcuts = arrayOf(keyShortcut),
-    playClick = playClick,
     catchEvent = catchEvent,
     interaction = interaction
   )
@@ -69,19 +62,8 @@ fun Button.onInteract(
  * Call [interaction] when either the user clicks on the menu item or when pressing all the given
  * keys.
  */
-fun Button.onInteract(
-  stage: Stage,
-  vararg keyShortcuts: IntArray,
-  catchEvent: Boolean = false,
-  playClick: Boolean = true,
-  interaction: Button.() -> Unit
-) {
-  val interactionWithSound: Button.() -> Unit = {
-    if (playClick) {
-    }
-    interaction()
-  }
-  onChange(interactionWithSound)
+fun Button.onInteract(stage: Stage, vararg keyShortcuts: IntArray, catchEvent: Boolean = false, interaction: Button.() -> Unit) {
+  onChange(interaction)
 
   if (keyShortcuts.isNotEmpty()) {
     if (this is MenuItem) {
@@ -95,7 +77,7 @@ fun Button.onInteract(
         catchEvent = catchEvent,
         listener = {
           if (!isDisabled) {
-            interactionWithSound()
+            interaction()
           }
         }
       )
@@ -257,7 +239,7 @@ class IBVisWindow(title: String, styleName: String, val onClose: () -> Unit) : V
     onClose()
   }
 
-  /** Add and fade in this window if it is is not [isShown] */
+  /** Add and fade in this window if it is not [isShown] */
   fun show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
     if (!isShown()) {
       isVisible = true
@@ -275,15 +257,6 @@ class IBVisWindow(title: String, styleName: String, val onClose: () -> Unit) : V
     } else {
       close()
     }
-  }
-}
-
-/** Toggle if this window is shown or not */
-@Suppress("NOTHING_TO_INLINE") // must be inlined otherwise it does not work (wtf!??)
-@Deprecated("Use the extension function instead", ReplaceWith("this.closeOnEscape()"))
-inline fun IBVisWindow.hideOnEscape() {
-  onAnyKeysDownEvent(Input.Keys.ESCAPE, Input.Keys.BACK, catchEvent = true) {
-    close()
   }
 }
 
