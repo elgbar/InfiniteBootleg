@@ -17,9 +17,11 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
 import no.elg.infiniteBootleg.protobuf.itemOrNull
 import no.elg.infiniteBootleg.util.IBVisWindow
+import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.getContainerActor
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
 
@@ -40,7 +42,7 @@ interface Container : Iterable<IndexedItem> {
   /**
    * @return The name of the container
    */
-  var name: String
+  val name: String
 
   /**
    * @return How many slots this container holds
@@ -208,6 +210,11 @@ interface Container : Iterable<IndexedItem> {
   val type: ProtoContainer.Type
 
   companion object : ProtoConverter<Container, ProtoContainer> {
+
+    fun interfaceId(container: Container, holder: Entity?, worldPos: WorldCompactLoc?): String =
+      "container${createId("name", container.name)}${createId("holder", holder?.id)}${createId("pos", worldPos)}"
+
+    private fun createId(key: String, value: Any?): String = value?.let { "{$key=$it}" } ?: ""
 
     fun Container?.isOpen(entity: Entity): Boolean = this?.let { container -> entity.clientWorld?.render?.isContainerOpen(container) } ?: false
 

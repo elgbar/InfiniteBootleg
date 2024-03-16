@@ -17,13 +17,13 @@ import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.actors.onKeyDown
 import ktx.scene2d.KTable
-import ktx.scene2d.RootWidget
 import ktx.scene2d.Scene2dDsl
-import ktx.scene2d.StageWidget
 import ktx.scene2d.defaultStyle
 import ktx.scene2d.table
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
+import no.elg.infiniteBootleg.main.Main
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -123,11 +123,10 @@ inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Bo
 }
 
 @Scene2dDsl
-fun StageWidget.confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow {
-  return this.ibVisWindow(title) {
+fun confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow {
+  return ibVisWindowClosed(title, title) {
     isMovable = false
     isModal = true
-    close()
 
     visLabel(text)
     row()
@@ -151,8 +150,8 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: VisWindow
         it.expandX()
         it.center()
         onClick {
-          this@ibVisWindow.whenConfirmed()
-          this@ibVisWindow.fadeOut()
+          this@ibVisWindowClosed.whenConfirmed()
+          this@ibVisWindowClosed.fadeOut()
         }
       }
       visLabel("") {
@@ -165,8 +164,8 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: VisWindow
         it.expandX()
         it.center()
         onClick {
-          this@ibVisWindow.whenDenied()
-          this@ibVisWindow.fadeOut()
+          this@ibVisWindowClosed.whenDenied()
+          this@ibVisWindowClosed.fadeOut()
         }
       }
       visLabel("") {
@@ -176,7 +175,7 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: VisWindow
     }
     centerWindow()
     onAnyKeysDownEvent(Input.Keys.ESCAPE, Input.Keys.BACK, catchEvent = true) {
-      this@ibVisWindow.fadeOut()
+      this@ibVisWindowClosed.fadeOut()
     }
     pack()
     fadeOut(0f)
@@ -184,11 +183,10 @@ fun StageWidget.confirmWindow(title: String, text: String, whenDenied: VisWindow
 }
 
 @Scene2dDsl
-fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow {
-  return ibVisWindow(title) {
+fun okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow {
+  return ibVisWindowClosed(title, title) {
     isMovable = false
     isModal = true
-    this.close()
     val label = visLabel("")
 
     labelUpdater[this] = {
@@ -206,8 +204,8 @@ fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisW
       it.space(10f)
       it.pad(platformSpacing)
       onClick {
-        this@ibVisWindow.whenConfirmed()
-        this@ibVisWindow.fadeOut()
+        this@ibVisWindowClosed.whenConfirmed()
+        this@ibVisWindowClosed.fadeOut()
       }
     }
 
@@ -217,23 +215,34 @@ fun StageWidget.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisW
   }
 }
 
-@Scene2dDsl
-inline fun RootWidget.ibVisWindow(title: String, style: String = defaultStyle, noinline onClose: () -> Unit = {}, init: IBVisWindow.() -> Unit = {}): IBVisWindow {
-  contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-  return storeActor(IBVisWindow(title, style, onClose)).apply(init)
-}
-
 /**
  * A [IBVisWindow] that is initially closed
  */
 @Scene2dDsl
-inline fun ibVisWindowClosed(title: String, style: String = defaultStyle, noinline onClose: () -> Unit = {}, init: IBVisWindow.() -> Unit = {}): IBVisWindow {
+inline fun ibVisWindowClosed(
+  title: String,
+  interfaceId: String = title,
+  style: String = defaultStyle,
+  noinline onClose: () -> Unit = {},
+  init: IBVisWindow.() -> Unit = {}
+): IBVisWindow {
   contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-  return IBVisWindow(title, style, onClose).apply(init)
+  return IBVisWindow(title, style, interfaceId, onClose).apply(init)
 }
 
 @Scene2dDsl
-class IBVisWindow(title: String, styleName: String, val onClose: () -> Unit) : VisWindow(title, styleName), KTable {
+class IBVisWindow(title: String, styleName: String, val interfaceId: String, val onClose: () -> Unit) : VisWindow(title, styleName), KTable {
+
+  init {
+    interfaces.compute(interfaceId) { _, old ->
+      old?.let {
+        Main.logger().warn("IBVisWindow", "Duplicate interface id $interfaceId, closing and removing old window")
+        it.close()
+      }
+      this
+    }
+  }
+
   public override fun close() {
     fadeOut(0f)
     onClose()
@@ -256,6 +265,22 @@ class IBVisWindow(title: String, styleName: String, val onClose: () -> Unit) : V
       show(stage, center)
     } else {
       close()
+    }
+  }
+
+  companion object {
+    val interfaces: MutableMap<String, IBVisWindow> = ConcurrentHashMap()
+
+    fun closeInterface(interfaceId: String) {
+      interfaces[interfaceId]?.close()
+    }
+
+    fun openInterface(interfaceId: String, stage: Stage) {
+      interfaces[interfaceId]?.show(stage)
+    }
+
+    fun toggleInterface(interfaceId: String, stage: Stage) {
+      interfaces[interfaceId]?.toggleShown(stage)
     }
   }
 }

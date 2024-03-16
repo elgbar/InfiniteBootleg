@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.world.ContainerElement
  */
 open class ContainerImpl(
   final override val size: Int,
-  override var name: String = "Container"
+  override val name: String = "Container"
 ) : Container {
 
   override val content: Array<Item?> = arrayOfNulls(size)
@@ -56,7 +56,8 @@ open class ContainerImpl(
 
   override fun removeAll(element: ContainerElement) {
     for (i in 0 until size) {
-      if (content[i] != null && content[i]!!.element === element) {
+      val item = content[i]
+      if (item != null && item.element === element) {
         content[i] = null
       }
     }

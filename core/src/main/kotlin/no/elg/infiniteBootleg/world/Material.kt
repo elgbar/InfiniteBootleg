@@ -167,6 +167,7 @@ enum class Material(
             futureEntity.thenApply {
               if (block.isDisposed) {
                 world.removeEntity(it)
+                Main.logger().warn("MATERIAL", "Block was disposed before entity was fully created")
               } else {
                 block.entity = it
               }
