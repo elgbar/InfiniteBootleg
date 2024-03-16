@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.util.IllegalAction
 import java.net.SocketAddress
 
+@Suppress("NOTHING_TO_INLINE", "DEPRECATION")
 class ChannelHandlerContextWrapper(val direction: String, private val handler: ChannelHandlerContext) : ChannelHandlerContext {
 
   private fun logPacketWrite(msg: Any) {
@@ -28,11 +29,9 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
     }
   }
 
-  @Suppress("DEPRECATION")
   @Deprecated("Use Channel#attr(AttributeKey) instead.")
   override fun <T : Any> attr(key: AttributeKey<T>): Attribute<T> = handler.attr(key)
 
-  @Suppress("DEPRECATION")
   @Deprecated("Use Channel#hasAttr(AttributeKey) instead.")
   override fun <T : Any> hasAttr(key: AttributeKey<T>): Boolean = handler.hasAttr(key)
 
@@ -80,11 +79,17 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
 
   override fun read(): ChannelHandlerContext = handler.read()
 
+  inline fun writePacket(msg: Packet): ChannelFuture = write(msg)
+
+  @Deprecated("Unsafe type", replaceWith = ReplaceWith("this.writePacket(msg)"))
   override fun write(msg: Any): ChannelFuture {
     logPacketWrite(msg)
     return handler.write(msg)
   }
 
+  inline fun writePacket(msg: Packet, promise: ChannelPromise): ChannelFuture = write(msg, promise)
+
+  @Deprecated("Unsafe type", replaceWith = ReplaceWith("this.writePacket(msg, promise)"))
   override fun write(msg: Any, promise: ChannelPromise): ChannelFuture {
     logPacketWrite(msg)
     return handler.write(msg, promise)
@@ -92,11 +97,17 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
 
   override fun flush(): ChannelHandlerContext = handler.flush()
 
+  inline fun writeAndFlushPacket(msg: Packet, promise: ChannelPromise): ChannelFuture = writeAndFlush(msg, promise)
+
+  @Deprecated("Unsafe type", replaceWith = ReplaceWith("this.writeAndFlushPacket(msg, promise)"))
   override fun writeAndFlush(msg: Any, promise: ChannelPromise): ChannelFuture {
     logPacketWrite(msg)
     return handler.writeAndFlush(msg, promise)
   }
 
+  inline fun writeAndFlushPacket(msg: Packet): ChannelFuture = writeAndFlush(msg)
+
+  @Deprecated("Unsafe type", replaceWith = ReplaceWith("this.writeAndFlushPacket(msg)"))
   override fun writeAndFlush(msg: Any): ChannelFuture {
     logPacketWrite(msg)
     return handler.writeAndFlush(msg)
