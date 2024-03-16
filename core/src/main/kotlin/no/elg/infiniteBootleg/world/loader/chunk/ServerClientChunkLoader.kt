@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.loader.chunk
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.serverBoundChunkRequestPacket
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.component1
@@ -21,8 +22,7 @@ class ServerClientChunkLoader(override val world: ServerClientWorld, generator: 
     toBeLoadedChunks.get(chunkLoc) {
       // Abuse cache to only fetch chunk if we haven't done so within the last second
       val (chunkX, chunkY) = chunkLoc
-      val serverClient = world.serverClient
-      serverClient.ctx.writeAndFlush(serverClient.serverBoundChunkRequestPacket(chunkX, chunkY))
+      world.serverClient.sendServerBoundPacket { serverBoundChunkRequestPacket(chunkX, chunkY) }
       NULL_LOADED_CHUNK
     }
 

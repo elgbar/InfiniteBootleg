@@ -7,6 +7,7 @@ import ktx.math.component1
 import ktx.math.component2
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundMoveEntity
 import no.elg.infiniteBootleg.server.serverBoundMoveEntityPacket
@@ -38,10 +39,10 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
 
     if (updatePos || updateVel) {
       if (Main.isServerClient) {
-        ClientMain.inst().serverClient?.let {
-          if (it.uuid == entity.id) {
+        ClientMain.inst().serverClient?.let { serverClient ->
+          if (serverClient.uuid == entity.id) {
             Main.inst().scheduler.executeAsync {
-              it.ctx.writeAndFlush(it.serverBoundMoveEntityPacket(entity))
+              serverClient.sendServerBoundPacket { serverBoundMoveEntityPacket(entity) }
             }
           }
         }

@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.server
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.netty.channel.ChannelFuture
-import no.elg.infiniteBootleg.protobuf.Packets.Packet
+import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.Progress
 import no.elg.infiniteBootleg.util.WorldCompactLoc
@@ -38,5 +38,26 @@ class ServerClient(
 
   val uuid get() = sharedInformation?.entityUUID ?: error("Cannot access uuid of entity before it is given by the server")
 
-  fun sendServerBoundPacket(packet: ServerClient.() -> Packet): ChannelFuture = ctx.writeAndFlush(packet())
+  /**
+   * Sends a packet from the client to the server
+   *
+   * This method is to make the api of sending packets more uniform
+   */
+  @Suppress("NOTHING_TO_INLINE")
+  inline fun sendServerBoundPacket(packet: Packets.Packet): ChannelFuture = ctx.writeAndFlushPacket(packet)
+
+  companion object {
+    /**
+     * Sends a packet from the client to the server, given that [packet] and the [ServerClient] is not null
+     */
+    fun ServerClient?.sendServerBoundPacket(packet: ServerClient.() -> Packets.Packet?): ChannelFuture? = this?.run { packet()?.let { sendServerBoundPacket(it) } }
+
+    /**
+     * Sends multiple packets from the client to the server efficiently, given that [packet] and the [ServerClient] is not null
+     */
+    fun ServerClient?.sendServerBoundPackets(packets: ServerClient.() -> Iterable<Packets.Packet>?): List<ChannelFuture>? =
+      this?.run {
+        packets()?.map { packet -> ctx.writePacket(packet) }.also { ctx.flush() }
+      }
+  }
 }

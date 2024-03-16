@@ -20,23 +20,22 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
     packetsReceived++
+    val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) { ChannelHandlerContextWrapper("server->client", ctx) }
     if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
-      ctx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
+      wrappedCtx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
       return
     }
     if (packet.type != Packets.Packet.Type.SB_LOGIN) {
       val expectedSecret = clients[ctx.channel()]
       if (expectedSecret == null) {
-        ctx.fatal("Unknown client")
+        wrappedCtx.fatal("Unknown client")
         return
       }
       if (expectedSecret.secret != packet.secret) {
-        ctx.fatal("Invalid secret given")
+        wrappedCtx.fatal("Invalid secret given")
         return
       }
     }
-
-    val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) { ChannelHandlerContextWrapper("server->client", ctx) }
     handleServerBoundPackets(wrappedCtx, packet)
   }
 

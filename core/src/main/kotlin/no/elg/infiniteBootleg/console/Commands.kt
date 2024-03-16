@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.screens.ConnectingScreen.info
 import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.MainMenuScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.clientBoundWorldSettings
 import no.elg.infiniteBootleg.server.sendDuplexPacket
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
@@ -559,10 +560,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ClientsideOnly
   @ConsoleDoc(description = "Disconnect from the server")
   fun disconnect() {
-    val client = ClientMain.inst().serverClient
-    client?.ctx?.writeAndFlush(
-      client.serverBoundClientDisconnectPacket("Disconnect command")
-    )
+    ClientMain.inst().serverClient?.sendServerBoundPacket { serverBoundClientDisconnectPacket("Disconnect command") }
     if (Main.isAuthoritative) {
       world?.save()
     }

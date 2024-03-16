@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.allOf
 import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.serverBoundSpellSpawn
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.world.Staff
@@ -73,9 +74,7 @@ object MagicSystem :
         newSpellState.castMark = TimeSource.Monotonic.markNow() + newSpellState.castDelay
         newSpellState.staff.onSpellCast(newSpellState, it)
 
-        ClientMain.inst().serverClient?.also { client ->
-          client.ctx.writeAndFlush(client.serverBoundSpellSpawn())
-        }
+        ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundSpellSpawn() }
       }
     }
   }

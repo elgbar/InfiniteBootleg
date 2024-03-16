@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.protobuf.Packets.ContainerUpdate
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
@@ -22,6 +21,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BREAKING_BLOCK
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
@@ -114,7 +114,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
 private fun ServerClient.setupHeartbeat() {
   val sharedInformation = sharedInformation!!
   sharedInformation.heartbeatTask = ctx.executor().scheduleAtFixedRate({
-    ctx.writeAndFlush(serverBoundHeartbeat())
+    sendServerBoundPacket(serverBoundHeartbeat())
     if (sharedInformation.lostConnection()) {
       ctx.fatal("Server stopped responding, heartbeats not received")
     }
@@ -155,7 +155,7 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   val sharedInformation = SharedInformation(uuid, secretExchange.secret)
   this.sharedInformation = sharedInformation
   Main.logger().debug("LOGIN", "Secret received from sever sending response")
-  ctx.writeAndFlush(serverBoundClientSecretResponse(sharedInformation))
+  sendServerBoundPacket(serverBoundClientSecretResponse(sharedInformation))
 }
 
 private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
@@ -232,7 +232,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
     } else {
       this.protoEntity = startGame.controlling
       Main.logger().debug("LOGIN", "World loaded, waiting for chunks")
-      ctx.writeAndFlush(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
+      sendServerBoundPacket(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
     }
   }
 }
@@ -340,7 +340,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   val entity = world.getEntity(uuid)
   if (entity == null) {
     Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
-    ctx.writeAndFlush(serverBoundEntityRequest(uuid))
+    sendServerBoundPacket(serverBoundEntityRequest(uuid))
     return
   }
   if (Main.inst().isAuthorizedToChange(entity)) {

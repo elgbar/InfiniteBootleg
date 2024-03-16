@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.chunk
 import no.elg.infiniteBootleg.protobuf.vector2i
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
@@ -224,11 +225,7 @@ class ChunkImpl(
         }
       } else if (Main.isServerClient && !block.isMarkerBlock()) {
         Main.inst().scheduler.executeAsync {
-          val client = ClientMain.inst().serverClient
-          if (client != null) {
-            val packet = client.serverBoundBlockUpdate(worldX, worldY, block)
-            client.ctx.writeAndFlush(packet)
-          }
+          val client = ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundBlockUpdate(worldX, worldY, block) }
         }
       }
     }

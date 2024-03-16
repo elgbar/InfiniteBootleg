@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.BreakingBlockKt.breakingProgress
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.serverBoundBreakingBlock
 import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.toVector2i
@@ -28,9 +29,9 @@ class CurrentlyBreakingComponent : Component {
 
   fun sendCurrentProgress(zeroProgress: Boolean = false) {
     if (Main.isServerClient && breaking.size > 0) {
-      ClientMain.inst().serverClient?.run {
+      ClientMain.inst().serverClient.sendServerBoundPacket {
         val progresses = breaking.values().map { it.toBreakingProgress(zeroProgress) }
-        ctx.writeAndFlush(serverBoundBreakingBlock(progresses))
+        serverBoundBreakingBlock(progresses)
       }
     }
   }

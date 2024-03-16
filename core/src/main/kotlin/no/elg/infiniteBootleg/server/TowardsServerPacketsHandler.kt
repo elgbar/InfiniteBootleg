@@ -1,13 +1,13 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
-import io.netty.channel.ChannelHandlerContext
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.BreakingBlock
+import no.elg.infiniteBootleg.protobuf.Packets.ContainerUpdate
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
@@ -28,6 +28,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.blockOrNull
 import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
 import no.elg.infiniteBootleg.protobuf.chunkLocationOrNull
@@ -93,7 +94,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
           scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID, requestedEntities) }
         }
       }
-      contentRequest.containerLocationOrNull?.let { scheduler.executeAsync { asyncHandleContainerRequest(ctx, it.x, it.y) } }
+      contentRequest.containerLocationOrNull?.let { pos: ProtoWorld.Vector2i -> scheduler.executeAsync { asyncHandleContainerRequest(ctx, pos) } }
     }
 
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(ctx, it) } }
@@ -171,7 +172,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
     }
     val player = Main.inst().world?.getEntity(shared.entityUUID)
     if (player != null) {
-      ctx.writeAndFlush(clientBoundStartGamePacket(player))
+      ctx.writeAndFlushPacket(clientBoundStartGamePacket(player))
     } else {
       ctx.fatal("handleSecretExchange: Failed to find entity with the given uuid")
     }
@@ -198,12 +199,12 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   }
 
   if (world.hasPlayer(uuid)) {
-    ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
+    ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
     ctx.close()
     return
   }
   // Client is good to login (informational packet)
-  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
+  ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
 
   val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
   val sharedInformation = SharedInformation(uuid, secret.toString())
@@ -214,7 +215,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
     .whenComplete { _, ex ->
       if (ex == null) {
         // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
-        ctx.writeAndFlush(clientBoundSecretExchange(sharedInformation))
+        ctx.writeAndFlushPacket(clientBoundSecretExchange(sharedInformation))
         Main.logger().debug("LOGIN", "Secret sent to player ${sharedInformation.entityUUID}, waiting for confirmation")
       } else {
         ctx.fatal("Failed to spawn player ${sharedInformation.entityUUID} server side.\n  ${ex::class.simpleName}: ${ex.message}")
@@ -249,11 +250,11 @@ private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, worldX: W
   // Only send chunks which the player is allowed to see
   if (isChunkInView(ctx, worldX, worldY)) {
     val chunk = serverWorld.getChunk(worldX, worldY, true) ?: return // if no chunk, don't send a chunk update
-    ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
+    ctx.writeAndFlushPacket(clientBoundUpdateChunkPacket(chunk))
   }
 }
 
-private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContext) {
+private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   val world = ServerMain.inst().serverWorld
   val shared = ctx.getSharedInformation()
   val player = ctx.getCurrentPlayer()
@@ -270,7 +271,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContext) {
   for (cx in -Settings.viewDistance..Settings.viewDistance) {
     for (cy in -Settings.viewDistance..Settings.viewDistance) {
       val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
-      ctx.write(clientBoundUpdateChunkPacket(chunk))
+      ctx.writePacket(clientBoundUpdateChunkPacket(chunk))
     }
     ctx.flush()
     Main.logger().debug("LOGIN") {
@@ -279,23 +280,23 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContext) {
       "Sent $sent/$total chunks sent to player ${player.name}"
     }
   }
-  ctx.writeAndFlush(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
+  ctx.writeAndFlushPacket(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
   Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
 
   for (entity in world.validEntitiesToSendToClient) {
     if (entity.id == shared.entityUUID) continue // don't send the player to themselves
     Main.logger().debug("LOGIN") { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
-    ctx.write(clientBoundSpawnEntity(entity))
+    ctx.writePacket(clientBoundSpawnEntity(entity))
   }
 
   ctx.flush()
   Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
 
-  ctx.writeAndFlush(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
+  ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
 
   shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //    Main.logger().log("Sending heartbeat to client")
-    ctx.writeAndFlush(clientBoundHeartbeat())
+    ctx.writeAndFlushPacket(clientBoundHeartbeat())
     if (shared.lostConnection()) {
       Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
       ctx.close()
@@ -312,9 +313,9 @@ private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, uuid: St
 
   val entity = world.getEntity(uuid)
   if (entity != null && entity.shouldSendToClients && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
-    ctx.writeAndFlush(clientBoundSpawnEntity(entity))
+    ctx.writeAndFlushPacket(clientBoundSpawnEntity(entity))
   } else {
-    ctx.writeAndFlush(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
+    ctx.writeAndFlushPacket(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
   }
   requestedEntities -= uuid
 }
@@ -331,20 +332,20 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   inputEventQueue.events += InputEvent.SpellCastEvent(staff)
 }
 
-private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord) {
-  val container = ServerMain.inst().serverWorld.worldContainerManager.findOrCreate(worldX, worldY)
-  ctx.writeAndFlush(clientBoundContainerUpdate(worldX, worldY, container))
+private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, pos: ProtoWorld.Vector2i) {
+  val container = ServerMain.inst().serverWorld.worldContainerManager.findOrCreate(pos.x, pos.y)
+  ctx.writeAndFlushPacket(duplexContainerUpdate(pos, container))
 }
 
 // ///////////
 //  UTILS  //
 // ///////////
 
-private fun ChannelHandlerContext.getSharedInformation(): SharedInformation? {
+private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformation? {
   return ServerBoundHandler.clients[this.channel()]
 }
 
-private fun ChannelHandlerContext.getCurrentPlayer(): Entity? {
+private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
   val uuid = getSharedInformation()?.entityUUID ?: return null
   return ServerMain.inst().serverWorld.getEntity(uuid)
 }

@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import ktx.actors.isShown
 import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.serverBoundContainerRequest
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord

@@ -77,7 +77,7 @@ import java.util.UUID
 // util functions //
 // //////////////////
 
-internal fun ChannelHandlerContext.fatal(msg: String) {
+internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
   if (Settings.client) {
     Main.inst().scheduler.scheduleAsync(50L) {
       close()
@@ -87,11 +87,11 @@ internal fun ChannelHandlerContext.fatal(msg: String) {
       ClientMain.inst().screen = ConnectingScreen
       val serverClient = ClientMain.inst().serverClient
       if (serverClient?.sharedInformation != null) {
-        this.writeAndFlush(serverClient.serverBoundClientDisconnectPacket(msg))
+        this.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
       }
     }
   } else {
-    this.writeAndFlush(clientBoundDisconnectPlayerPacket(msg))
+    this.writeAndFlushPacket(clientBoundDisconnectPlayerPacket(msg))
   }
   Main.logger().error("IO FATAL", msg)
 }
@@ -347,7 +347,7 @@ fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Pa
     broadcast(ifIsServer())
   } else if (Main.isServerClient) {
     val client = ClientMain.inst().serverClient ?: error("Server client null after check")
-    client.ctx.writeAndFlush(client.ifIsClient())
+    client.ctx.writeAndFlushPacket(client.ifIsClient())
   }
 }
 
