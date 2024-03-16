@@ -237,7 +237,7 @@ abstract class World(
       Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!" }
       Main.inst().scheduler.executeSync {
         addSystems()
-        if (Main.isSingleplayer) {
+        if (Main.isAuthoritative) {
           // Add a delay to make sure the light is calculated
           Main.inst().scheduler.scheduleAsync(200L) {
             dispatchEvent(WorldLoadedEvent(this))

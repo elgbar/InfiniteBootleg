@@ -3,7 +3,9 @@ package no.elg.infiniteBootleg.main
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
-import no.elg.infiniteBootleg.server.Server
+import no.elg.infiniteBootleg.events.WorldLoadedEvent
+import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.server.NettyServer
 import no.elg.infiniteBootleg.server.broadcast
 import no.elg.infiniteBootleg.server.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
@@ -14,8 +16,6 @@ import no.elg.infiniteBootleg.world.world.World
  * @author Elg
  */
 class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progArgs) {
-
-  private val server: Server = Server()
 
   lateinit var serverWorld: ServerWorld
     private set
@@ -44,24 +44,39 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   override fun create() {
     super.create()
     renderThreadName = Thread.currentThread().name
-    val runnable = {
-      try {
-        server.start()
-      } catch (e: InterruptedException) {
-        console.log("SERVER", "Server interruption received", e)
-        Gdx.app.exit()
-      }
-    }
-    Thread(runnable, "Server").also {
-      it.isDaemon = true
-      it.start()
-    }
-
-    console.log("SERVER", "Starting server on port ${Settings.port}")
 
     // TODO load world name from some config
-    serverWorld = ServerWorld(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong(), "Server World")
+    val serverWorld1 = ServerWorld(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong(), "Server World")
+    serverWorld = serverWorld1
     serverWorld.initialize()
+
+    val serverThread: Thread = Thread.ofPlatform()
+      .name("Server")
+      .daemon()
+      .priority(Thread.MAX_PRIORITY)
+      .uncaughtExceptionHandler { thread, e ->
+        try {
+          console.log("SERVER", "Unhandled exception interruption received on thread $thread", e)
+        } finally {
+          Gdx.app.exit()
+        }
+      }
+      .unstarted {
+        try {
+          NettyServer().start()
+        } catch (e: InterruptedException) {
+          console.log("SERVER", "Server interruption received", e)
+        } finally {
+          Gdx.app.exit()
+        }
+      }
+
+    EventManager.oneShotListener { event: WorldLoadedEvent ->
+      if (event.world === serverWorld1) {
+        Main.logger().log("SERVER", "Server world is ready, starting server thread")
+        serverThread.start()
+      }
+    }
   }
 
   override val world: World? get() = if (::serverWorld.isInitialized) serverWorld else null

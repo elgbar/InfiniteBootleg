@@ -12,13 +12,13 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 
 /**
  * @author Elg
  */
-class Server {
-  @Throws(InterruptedException::class)
+class NettyServer {
   fun start() {
     val bossGroup: EventLoopGroup = NioEventLoopGroup()
     val workerGroup: EventLoopGroup = NioEventLoopGroup()
@@ -40,6 +40,8 @@ class Server {
         )
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
+
+      Main.logger().log("NETTY", "Binding server to port ${Settings.port}")
 
       // Bind and start to accept incoming connections.
       val channelFuture = b.bind(Settings.port).sync()

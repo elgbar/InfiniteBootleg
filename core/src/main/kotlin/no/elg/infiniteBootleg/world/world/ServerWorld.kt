@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
  * @author Elg
  */
 class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : World(generator, seed, worldName) {
+
   override val render = HeadlessWorldRenderer(this)
 
   fun disconnectPlayer(uuid: String, kicked: Boolean) {
