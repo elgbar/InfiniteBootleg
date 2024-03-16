@@ -89,7 +89,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { scheduler.executeAsync { asyncHandleUpdateChunk(it) } }
     CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleDespawnEntity(it) } }
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(it) } }
-    CB_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(it) } }
+    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }

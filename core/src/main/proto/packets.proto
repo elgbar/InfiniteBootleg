@@ -31,7 +31,7 @@ message Packet {
     DX_WORLD_SETTINGS = 15;
     DX_BREAKING_BLOCK = 16;
     SB_CAST_SPELL = 17; //No message associated
-    CB_CONTAINER_UPDATE = 18;
+    DX_CONTAINER_UPDATE = 18;
     CB_INTERFACE_UPDATE = 19;
   }
 

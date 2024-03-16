@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
-import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.Settings
@@ -22,7 +21,6 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INTERFACE_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
@@ -31,6 +29,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_UPDATE_CHUNK
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BREAKING_BLOCK
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
@@ -47,12 +46,11 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
-import no.elg.infiniteBootleg.protobuf.WorldKt.WorldContainersKt.worldContainer
+import no.elg.infiniteBootleg.protobuf.WorldKt
 import no.elg.infiniteBootleg.protobuf.containerUpdate
 import no.elg.infiniteBootleg.protobuf.contentRequest
 import no.elg.infiniteBootleg.protobuf.interfaceUpdate
 import no.elg.infiniteBootleg.protobuf.moveEntity
-import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
 import no.elg.infiniteBootleg.util.Util
@@ -221,6 +219,10 @@ fun ServerClient.serverBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(serverBoundPacketBuilder(DX_HEARTBEAT))
 }
 
+fun ServerClient.serverBoundContainerUpdate(pos: Vector2i, container: Container): Packet {
+  return containerUpdateBuilder(serverBoundPacketBuilder(DX_CONTAINER_UPDATE), pos, container)
+}
+
 fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.BreakingProgress>): Packet {
   return serverBoundPacketBuilder(DX_BREAKING_BLOCK)
     .setBreakingBlock(Packets.BreakingBlock.newBuilder().addAllBreakingProgress(progress))
@@ -311,18 +313,7 @@ fun clientBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(clientBoundPacketBuilder(DX_HEARTBEAT))
 }
 
-fun clientBoundContainerUpdate(worldX: WorldCoord, worldY: WorldCoord, aContainer: Container): Packet =
-  clientBoundPacketBuilder(CB_CONTAINER_UPDATE).setContainerUpdate(
-    containerUpdate {
-      worldContainer = worldContainer {
-        position = vector2i {
-          x = worldX
-          y = worldY
-        }
-        container = aContainer.asProto()
-      }
-    }
-  ).build()
+fun clientBoundContainerUpdate(pos: Vector2i, container: Container): Packet = containerUpdateBuilder(clientBoundPacketBuilder(DX_CONTAINER_UPDATE), pos, container)
 
 fun clientBoundInterfaceUpdate(interfaceId: String, updateType: InterfaceUpdate.UpdateType): Packet =
   clientBoundPacketBuilder(CB_INTERFACE_UPDATE).setInterfaceUpdate(
@@ -374,3 +365,13 @@ private fun worldSettingsPacketBuilder(packet: Packet.Builder, spawn: Long?, tim
 private fun heartbeatPacketBuilder(packet: Packet.Builder): Packet {
   return packet.setHeartbeat(Heartbeat.newBuilder().setKeepAliveId(Instant.now().epochSecond.toString()).build()).build()
 }
+
+fun containerUpdateBuilder(packet: Packet.Builder, pos: Vector2i, aContainer: Container): Packet =
+  packet.setContainerUpdate(
+    containerUpdate {
+      worldContainer = WorldKt.WorldContainersKt.worldContainer {
+        position = pos
+        container = aContainer.asProto()
+      }
+    }
+  ).build()

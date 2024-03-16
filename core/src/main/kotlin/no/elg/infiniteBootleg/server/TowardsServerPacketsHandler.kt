@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BREAKING_BLOCK
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
@@ -33,6 +34,7 @@ import no.elg.infiniteBootleg.protobuf.blockOrNull
 import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
 import no.elg.infiniteBootleg.protobuf.chunkLocationOrNull
 import no.elg.infiniteBootleg.protobuf.containerLocationOrNull
+import no.elg.infiniteBootleg.protobuf.containerUpdateOrNull
 import no.elg.infiniteBootleg.protobuf.contentRequestOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
 import no.elg.infiniteBootleg.protobuf.loginOrNull
@@ -98,6 +100,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     }
 
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(ctx, it) } }
+    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(ctx, it) } }
 
     SB_LOGIN -> packet.loginOrNull?.let { scheduler.executeSync { handleLoginPacket(ctx, it) } }
     SB_CLIENT_WORLD_LOADED -> scheduler.executeAsync { asyncHandleClientsWorldLoaded(ctx) }
@@ -325,6 +328,12 @@ private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breaking
   broadcast(clientBoundPacketBuilder(DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
 }
 
+private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: ContainerUpdate) {
+  // Naive and simple re-broadcast
+  // TODO check that the player can do this
+  broadcast(clientBoundPacketBuilder(DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
+}
+
 private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
   val staff = player.selectedItem?.element as? Staff ?: return
@@ -334,7 +343,7 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
 
 private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, pos: ProtoWorld.Vector2i) {
   val container = ServerMain.inst().serverWorld.worldContainerManager.findOrCreate(pos.x, pos.y)
-  ctx.writeAndFlushPacket(duplexContainerUpdate(pos, container))
+  ctx.writeAndFlushPacket(clientBoundContainerUpdate(pos, container))
 }
 
 // ///////////

@@ -34,6 +34,8 @@ abstract class WorldContainerManager {
     return CompletableFuture.completedFuture(container)
   }
 
+  fun find(container: Container): WorldCompactLoc? = containers.entries.find { it.value == container }?.key
+
   open fun asProto(): ProtoWorld.World.WorldContainers = defaultProtoWorldContainers
 
   companion object {
