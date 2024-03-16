@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.INVENTORY_COMPONENTS
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
@@ -36,7 +36,7 @@ object MagicSystem :
     ).get(),
     UPDATE_PRIORITY_DEFAULT
   ),
-  AuthoritativeSystem {
+  ClientSystem {
 
   private val vector = Vector2()
 
