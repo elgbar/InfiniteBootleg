@@ -12,8 +12,8 @@ import io.netty.util.Attribute
 import io.netty.util.AttributeKey
 import io.netty.util.concurrent.EventExecutor
 import no.elg.infiniteBootleg.console.logPacket
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
+import no.elg.infiniteBootleg.util.IllegalAction
 import java.net.SocketAddress
 
 class ChannelHandlerContextWrapper(val direction: String, private val handler: ChannelHandlerContext) : ChannelHandlerContext {
@@ -22,7 +22,9 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
     if (msg is Packet) {
       logPacket(direction, msg)
     } else {
-      Main.logger().error("Tried to send a non packet (type: ${msg::class}) toString: $msg")
+      IllegalAction.STACKTRACE.handle("NETTY") {
+        "Tried to send a non packet (type: ${msg::class}) toString: $msg"
+      }
     }
   }
 
