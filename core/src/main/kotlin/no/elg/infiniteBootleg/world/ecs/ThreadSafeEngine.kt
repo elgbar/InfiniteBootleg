@@ -69,15 +69,21 @@ class ThreadSafeEngine : Engine(), Disposable {
         }
       }
 
+      check(!(system is ClientSystem && system is ServerSystem)) { "System ${system::class.simpleName} is both a client and server system" }
+      check(!(system is UniversalSystem && (system is ClientSystem || system is ServerSystem))) {
+        "System ${system::class.simpleName} is both ${if (system is AuthoritativeSystem) "authoritative" else "universal"} and client/server system"
+      }
+
       when (system) {
+        is ClientSystem -> addToSystemConditionally(system, "client") { Main.isClient }
+        is ServerSystem -> addToSystemConditionally(system, "server") { Main.isServer }
+        is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.isAuthoritative }
+
         is UniversalSystem -> {
           Main.logger().debug("Engine", "Adding universal system ${system::class.simpleName}")
           super.addSystem(system)
         }
 
-        is ClientSystem -> addToSystemConditionally(system, "client") { Main.isClient }
-        is ServerSystem -> addToSystemConditionally(system, "server") { Main.isServer }
-        is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.isAuthoritative }
         else -> {
           Main.logger().warn("Engine", "System ${system::class.simpleName} is not a client or server system, it might be using server/client main and might crash when used")
           super.addSystem(system)
