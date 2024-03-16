@@ -43,8 +43,12 @@ enum class IllegalAction {
       }
 
       TO_MAIN_MENU -> {
-        Main.logger().error(tag, message(), cause)
-        Main.inst().scheduler.executeSync { ClientMain.inst().screen = MainMenuScreen }
+        if (Main.isServer) {
+          CRASH.handle(tag, cause, message)
+        } else {
+          Main.logger().error(tag, message(), cause)
+          Main.inst().scheduler.executeSync { ClientMain.inst().screen = MainMenuScreen }
+        }
       }
     }
   }
