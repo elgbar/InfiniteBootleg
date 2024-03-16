@@ -60,9 +60,6 @@ import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.WorldContainerManager
-import no.elg.infiniteBootleg.world.WorldContainerManager.Companion.asProto
-import no.elg.infiniteBootleg.world.WorldContainerManager.Companion.fromProto
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -124,6 +121,9 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader.writeLockFile
 import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.FullChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.ServerClientChunkLoader
+import no.elg.infiniteBootleg.world.managers.container.AuthoritativeWorldContainerManager
+import no.elg.infiniteBootleg.world.managers.container.ServerClientWorldContainerManager
+import no.elg.infiniteBootleg.world.managers.container.WorldContainerManager
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
@@ -173,6 +173,12 @@ abstract class World(
     FullChunkLoader(this, generator)
   }
 
+  val worldContainerManager: WorldContainerManager = if (this is ServerClientWorld) {
+    ServerClientWorldContainerManager(this)
+  } else {
+    AuthoritativeWorldContainerManager()
+  }
+
   val worldBody: WorldBody
   val worldTime: WorldTime
 
@@ -195,9 +201,6 @@ abstract class World(
    */
   protected val chunkColumns = IntMap<ChunkColumn>()
   private val chunkColumnListeners = ChunkColumnListeners()
-
-  var worldContainerManager: WorldContainerManager = WorldContainerManager()
-    private set
 
   @Volatile
   private var worldFile: FileHandle? = null
@@ -352,7 +355,9 @@ abstract class World(
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
-    protoWorld.worldContainersOrNull?.let { worldContainerManager = it.fromProto() }
+    protoWorld.worldContainersOrNull?.let { protoManager ->
+      (worldContainerManager as? AuthoritativeWorldContainerManager)?.loadFromProto(protoManager)
+    }
     synchronized(chunkColumns) {
       for (protoCC in protoWorld.chunkColumnsList) {
         val chunkColumn = fromProtobuf(this, protoCC)
@@ -382,7 +387,7 @@ abstract class World(
       return
     }
     val worldFolder = worldFolder ?: return
-    Main.logger().debug("World") { "Starting to save world '$name'" }
+    Main.logger().debug("World") { "Saving world '$name'" }
     chunksLock.write {
       val chunkLoader = chunkLoader
       if (chunkLoader is FullChunkLoader) {
@@ -398,7 +403,6 @@ abstract class World(
       }
       worldInfoFile.writeBytes(builder.toByteArray(), false)
     }
-    Main.logger().debug("World") { "Done saving world '$name'" }
   }
 
   fun toProtobuf(): ProtoWorld.World =

@@ -8,10 +8,8 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.BreakingBlock
-import no.elg.infiniteBootleg.protobuf.Packets.ChunkRequest
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
-import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
@@ -22,9 +20,8 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CONTENT_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
@@ -33,9 +30,10 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.blockOrNull
 import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
-import no.elg.infiniteBootleg.protobuf.chunkRequestOrNull
+import no.elg.infiniteBootleg.protobuf.chunkLocationOrNull
+import no.elg.infiniteBootleg.protobuf.containerLocationOrNull
+import no.elg.infiniteBootleg.protobuf.contentRequestOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
-import no.elg.infiniteBootleg.protobuf.entityRequestOrNull
 import no.elg.infiniteBootleg.protobuf.loginOrNull
 import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
 import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
@@ -84,12 +82,18 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     DX_HEARTBEAT -> handleHeartbeat(ctx)
     DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handleMovePlayer(ctx, it) } }
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
-    SB_CHUNK_REQUEST -> packet.chunkRequestOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it) } }
-    SB_ENTITY_REQUEST -> packet.entityRequestOrNull?.let {
-      val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
-      if (requestedEntities.contains(it.uuid)) return@let
-      requestedEntities += it.uuid
-      scheduler.executeAsync { asyncHandleEntityRequest(ctx, it, requestedEntities) }
+
+    SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { contentRequest: Packets.ContentRequest ->
+      contentRequest.chunkLocationOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
+      if (contentRequest.hasEntityUUID()) {
+        val entityUUID: String = contentRequest.entityUUID
+        val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
+        if (entityUUID !in requestedEntities) {
+          requestedEntities += entityUUID
+          scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID, requestedEntities) }
+        }
+      }
+      contentRequest.containerLocationOrNull?.let { scheduler.executeAsync { asyncHandleContainerRequest(ctx, it.x, it.y) } }
     }
 
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(ctx, it) } }
@@ -239,13 +243,12 @@ private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdat
   }
 }
 
-private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkRequest: ChunkRequest) {
-  val chunkLoc = chunkRequest.chunkLocation
+private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord) {
   val serverWorld = ServerMain.inst().serverWorld
 
   // Only send chunks which the player is allowed to see
-  if (isChunkInView(ctx, chunkLoc.x, chunkLoc.y)) {
-    val chunk = serverWorld.getChunk(chunkLoc.x, chunkLoc.y, true) ?: return // if no chunk, don't send a chunk update
+  if (isChunkInView(ctx, worldX, worldY)) {
+    val chunk = serverWorld.getChunk(worldX, worldY, true) ?: return // if no chunk, don't send a chunk update
     ctx.writeAndFlush(clientBoundUpdateChunkPacket(chunk))
   }
 }
@@ -296,14 +299,16 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContext) {
     if (shared.lostConnection()) {
       Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
       ctx.close()
+      ctx.deregister()
+      ctx.channel().close()
+      ctx.channel().disconnect()
     }
   }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
   Main.logger().log("Player ${player.name} joined")
 }
 
-private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityRequest: EntityRequest, requestedEntities: ConcurrentHashMap.KeySetView<String, Boolean>) {
+private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, uuid: String, requestedEntities: ConcurrentHashMap.KeySetView<String, Boolean>) {
   val world = ServerMain.inst().serverWorld
-  val uuid = entityRequest.uuid
 
   val entity = world.getEntity(uuid)
   if (entity != null && entity.shouldSendToClients && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
@@ -324,6 +329,11 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val staff = player.selectedItem?.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
   inputEventQueue.events += InputEvent.SpellCastEvent(staff)
+}
+
+private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord) {
+  val container = ServerMain.inst().serverWorld.worldContainerManager.findOrCreate(worldX, worldY)
+  ctx.writeAndFlush(clientBoundContainerUpdate(worldX, worldY, container))
 }
 
 // ///////////

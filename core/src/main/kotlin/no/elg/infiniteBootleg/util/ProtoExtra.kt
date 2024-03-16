@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.protobuf.vector2i
 
 fun Vector2.toVector2f(): Vector2f = Vector2f.newBuilder().setX(x).setY(y).build()
+fun vector2iOf(x: Int, y: Int): Vector2i = Vector2i.newBuilder().setX(x).setY(y).build()
 
 fun Vector2f.toVector2(): Vector2 = Vector2(x, y)
 fun Vector2f.toCompact(): Long = compactLoc(x.toInt(), y.toInt())

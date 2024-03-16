@@ -5,12 +5,15 @@ import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.inventory.container.Container.Companion.fromProto
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.protobuf.Packets.ContainerUpdate
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
@@ -35,6 +38,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.FALLING_BLOCK
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.PLAYER
 import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
+import no.elg.infiniteBootleg.protobuf.containerUpdateOrNull
 import no.elg.infiniteBootleg.protobuf.despawnEntityOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
 import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
@@ -62,6 +66,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.load
+import no.elg.infiniteBootleg.world.managers.container.ServerClientWorldContainerManager
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
@@ -84,6 +89,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { scheduler.executeAsync { asyncHandleUpdateChunk(it) } }
     CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleDespawnEntity(it) } }
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(it) } }
+    CB_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
@@ -380,4 +386,10 @@ private fun ServerClient.asyncHandleBreakingBlock(breakingBlock: Packets.Breakin
   for (breakingProgress in breakingBlock.breakingProgressList) {
     breakingBlockCache.put(breakingProgress.blockLocation.toCompact(), breakingProgress.progress)
   }
+}
+
+private fun ServerClient.asyncHandleContainerUpdate(containerUpdate: ContainerUpdate) {
+  val containerManager = world?.worldContainerManager as? ServerClientWorldContainerManager ?: return
+  val worldContainer = containerUpdate.worldContainer
+  containerManager.updateContainer(containerUpdate.worldContainer.position.toCompact(), worldContainer.container.fromProto(), containerUpdate.overwrite)
 }

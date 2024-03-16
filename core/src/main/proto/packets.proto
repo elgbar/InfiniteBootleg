@@ -26,11 +26,13 @@ message Packet {
     DX_SECRET_EXCHANGE = 10;
     CB_SPAWN_ENTITY = 11;
     CB_DESPAWN_ENTITY = 12;
-    SB_ENTITY_REQUEST = 13;
+    SB_CONTENT_REQUEST = 13;
     CB_INITIAL_CHUNKS_SENT = 14; //no message associated
     DX_WORLD_SETTINGS = 15;
     DX_BREAKING_BLOCK = 16;
     SB_CAST_SPELL = 17; //No message associated
+    CB_CONTAINER_UPDATE = 18;
+    CB_INTERFACE_UPDATE = 19;
   }
 
   enum Direction {
@@ -53,13 +55,14 @@ message Packet {
   //more rare packets
   optional Login login = 17; //server bound
   optional StartGame startGame = 18; //client bound
-  optional ServerLoginStatus serverLoginStatus = 20; //client bound
-  optional Disconnect disconnect = 21;
-  optional SecretExchange secretExchange = 22;
-  optional ChunkRequest chunkRequest = 23; //server bound
-  optional EntityRequest entityRequest = 24;
-  optional WorldSettings worldSettings = 25;
-  optional BreakingBlock breakingBlock = 26;
+  optional ServerLoginStatus serverLoginStatus = 19; //client bound
+  optional Disconnect disconnect = 20;
+  optional SecretExchange secretExchange = 21;
+  optional ContentRequest contentRequest = 22; //server bound
+  optional WorldSettings worldSettings = 23;
+  optional BreakingBlock breakingBlock = 24;
+  optional ContainerUpdate containerUpdate = 25; //client bound
+  optional InterfaceUpdate interfaceUpdate = 26; //client bound
 }
 
 ////////////////
@@ -160,6 +163,22 @@ message DespawnEntity {
   DespawnReason despawnReason = 2;
 }
 
+message ContainerUpdate {
+  .persistence.World.WorldContainers.WorldContainer worldContainer = 1;
+  // Whether to overwrite the container or not
+  bool overwrite = 2;
+}
+
+message InterfaceUpdate {
+  enum UpdateType {
+    CLOSE = 0;
+    OPEN = 1;
+  }
+  UpdateType updateType = 1;
+  //Id of the interface to update
+  string interfaceId = 2;
+}
+
 //////////////////
 // SERVER BOUND //
 //////////////////
@@ -171,10 +190,9 @@ message Login {
   string version = 3;
 }
 
-message ChunkRequest {
-  .persistence.Vector2i chunkLocation = 1;
-}
-
-message EntityRequest {
-  string uuid = 1;
+//Request something from the server
+message ContentRequest {
+  optional string entityUUID = 1;
+  optional .persistence.Vector2i chunkLocation = 2;
+  optional .persistence.Vector2i containerLocation = 3;
 }

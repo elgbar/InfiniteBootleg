@@ -13,13 +13,15 @@ import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.util.setVel
+import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
-import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -58,8 +60,11 @@ object InputSystem :
     when (button) {
       Input.Buttons.RIGHT -> {
         val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
-        val container = block.entity?.containerOrNull ?: return
-        container.open(this.entity)
+        if (block.material == Material.CONTAINER) {
+          world.worldContainerManager.find(block.worldX, block.worldY).thenApply { container ->
+            container.open(this.entity)
+          }
+        }
       }
     }
   }

@@ -2,6 +2,8 @@ package no.elg.infiniteBootleg.server
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import io.netty.channel.ChannelFuture
+import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.Progress
 import no.elg.infiniteBootleg.util.WorldCompactLoc
@@ -35,4 +37,6 @@ class ServerClient(
   }
 
   val uuid get() = sharedInformation?.entityUUID ?: error("Cannot access uuid of entity before it is given by the server")
+
+  fun sendServerBoundPacket(packet: ServerClient.() -> Packet): ChannelFuture = ctx.writeAndFlush(packet())
 }

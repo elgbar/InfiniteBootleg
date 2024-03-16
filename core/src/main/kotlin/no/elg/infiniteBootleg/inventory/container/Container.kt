@@ -49,6 +49,9 @@ interface Container : Iterable<IndexedItem> {
 
   val validOnly: Boolean get() = true
 
+  fun isEmpty(): Boolean = indexOfFirstEmpty() < 0
+  fun isNotEmpty(): Boolean = !isEmpty()
+
   /**
    * @return The first empty slot in the container, return a negative number if none is found
    */

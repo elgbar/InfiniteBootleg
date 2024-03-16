@@ -5,21 +5,26 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.Container.Companion.asProto
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
+import no.elg.infiniteBootleg.protobuf.ContentRequestKt
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
-import no.elg.infiniteBootleg.protobuf.Packets.EntityRequest
 import no.elg.infiniteBootleg.protobuf.Packets.Heartbeat
+import no.elg.infiniteBootleg.protobuf.Packets.InterfaceUpdate
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_CONTAINER_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INTERFACE_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_START_GAME
@@ -32,8 +37,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CHUNK_REQUEST
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_ENTITY_REQUEST
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CONTENT_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
@@ -43,7 +47,12 @@ import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
+import no.elg.infiniteBootleg.protobuf.WorldKt.WorldContainersKt.worldContainer
+import no.elg.infiniteBootleg.protobuf.containerUpdate
+import no.elg.infiniteBootleg.protobuf.contentRequest
+import no.elg.infiniteBootleg.protobuf.interfaceUpdate
 import no.elg.infiniteBootleg.protobuf.moveEntity
+import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
 import no.elg.infiniteBootleg.util.Util
@@ -171,9 +180,23 @@ fun ServerClient.serverBoundChunkRequestPacket(x: Int, y: Int): Packet {
   return serverBoundChunkRequestPacket(Vector2i.newBuilder().setX(x).setY(y).build())
 }
 
-fun ServerClient.serverBoundChunkRequestPacket(chunkLocation: Vector2i): Packet {
-  return serverBoundPacketBuilder(SB_CHUNK_REQUEST).setChunkRequest(Packets.ChunkRequest.newBuilder().setChunkLocation(chunkLocation)).build()
-}
+private fun ServerClient.serverBoundContentRequest(block: ContentRequestKt.Dsl.() -> Unit): Packet =
+  serverBoundPacketBuilder(SB_CONTENT_REQUEST).setContentRequest(contentRequest(block)).build()
+
+fun ServerClient.serverBoundChunkRequestPacket(location: Vector2i): Packet =
+  serverBoundContentRequest {
+    chunkLocation = location
+  }
+
+fun ServerClient.serverBoundEntityRequest(uuid: String): Packet =
+  serverBoundContentRequest {
+    entityUUID = uuid
+  }
+
+fun ServerClient.serverBoundContainerRequest(location: Vector2i): Packet =
+  serverBoundContentRequest {
+    containerLocation = location
+  }
 
 fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Packet {
   return serverBoundPacketBuilder(DX_DISCONNECT).let {
@@ -188,13 +211,6 @@ fun ServerClient.serverBoundMoveEntityPacket(entity: Entity): Packet {
   return serverBoundPacketBuilder(DX_MOVE_ENTITY)
     .setMoveEntity(entityMovePacket(entity))
     .build()
-}
-
-fun ServerClient.serverBoundEntityRequest(uuid: String): Packet {
-  return serverBoundPacketBuilder(SB_ENTITY_REQUEST).setEntityRequest(
-    EntityRequest.newBuilder()
-      .setUuid(uuid)
-  ).build()
 }
 
 fun ServerClient.serverBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Packet {
@@ -294,6 +310,27 @@ fun clientBoundWorldSettings(spawn: Long?, time: Float?, timeScale: Float?): Pac
 fun clientBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(clientBoundPacketBuilder(DX_HEARTBEAT))
 }
+
+fun clientBoundContainerUpdate(worldX: WorldCoord, worldY: WorldCoord, aContainer: Container): Packet =
+  clientBoundPacketBuilder(CB_CONTAINER_UPDATE).setContainerUpdate(
+    containerUpdate {
+      worldContainer = worldContainer {
+        position = vector2i {
+          x = worldX
+          y = worldY
+        }
+        container = aContainer.asProto()
+      }
+    }
+  ).build()
+
+fun clientBoundInterfaceUpdate(interfaceId: String, updateType: InterfaceUpdate.UpdateType): Packet =
+  clientBoundPacketBuilder(CB_INTERFACE_UPDATE).setInterfaceUpdate(
+    interfaceUpdate {
+      this.interfaceId = interfaceId
+      this.updateType = updateType
+    }
+  ).build()
 
 // ////////////
 //   DUAL   //
