@@ -249,7 +249,7 @@ class IBVisWindow(title: String, styleName: String, val interfaceId: String, val
   }
 
   /** Add and fade in this window if it is not [isShown] */
-  fun show(stage: Stage, center: Boolean = true, fadeTime: Float = FADE_TIME) {
+  fun show(stage: Stage, center: Boolean = true, fadeTime: Float = 0f) {
     if (!isShown()) {
       isVisible = true
       stage.addActor(fadeIn(fadeTime))

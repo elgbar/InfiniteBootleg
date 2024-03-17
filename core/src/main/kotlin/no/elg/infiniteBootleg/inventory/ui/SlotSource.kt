@@ -20,16 +20,16 @@ import no.elg.infiniteBootleg.world.blocks.Block
 class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndDrop.Source(actor) {
 
   override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload? {
-    val srcTs = sourceSlot.item ?: return null
+    val srcItem = sourceSlot.item ?: return null
 
-    if (srcTs.stock == 0u || sourceSlot.container is AutoSortedContainer) {
+    if (srcItem.stock == 0u || sourceSlot.container is AutoSortedContainer) {
       return null
     }
 
     val payload = Payload()
     payload.setObject(sourceSlot)
 
-    val icon = srcTs.element.textureRegion ?: return null
+    val icon = srcItem.element.textureRegion ?: return null
     val textureRegion = TextureRegionDrawable(icon.textureRegionOrNull ?: ClientMain.inst().assets.whiteTexture.textureRegion)
 
     fun image(): Image =

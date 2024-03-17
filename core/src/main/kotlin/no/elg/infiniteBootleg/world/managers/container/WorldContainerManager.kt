@@ -14,7 +14,7 @@ abstract class WorldContainerManager {
 
   protected val containers = ConcurrentHashMap<WorldCompactLoc, Container>()
 
-  fun createContainer(worldCompactLoc: WorldCompactLoc): Container =
+  private fun createContainer(worldCompactLoc: WorldCompactLoc): Container =
     ContainerImpl(40, "Container").also {
       containers[worldCompactLoc] = it
     }
