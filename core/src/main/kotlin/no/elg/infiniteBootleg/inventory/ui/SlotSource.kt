@@ -54,9 +54,9 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
   private fun sendContainerUpdate(vararg containers: Container) {
     if (Main.isServerClient) {
       ClientMain.inst().serverClient.sendServerBoundPackets {
-        containers.mapNotNull {
-          world?.worldContainerManager?.find(it)?.let { compactWorldPos ->
-            serverBoundContainerUpdate(compactWorldPos.toVector2i(), sourceSlot.container)
+        containers.mapNotNull { container ->
+          world?.worldContainerManager?.find(container)?.let { compactWorldPos ->
+            serverBoundContainerUpdate(compactWorldPos.toVector2i(), container)
           }
         }
       }
