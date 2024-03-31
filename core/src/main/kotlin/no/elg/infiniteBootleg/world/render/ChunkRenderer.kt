@@ -110,14 +110,14 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       } while ((chunk.isAllAir && aboveGround) || !chunk.isNotDisposed || worldRender.isOutOfView(chunk))
       curr = chunk
     }
-    doRenderChunk(chunk, aboveGround)
+    doRenderChunk(chunk)
     if (Settings.renderChunkUpdates) {
       EventManager.dispatchEvent(ChunkTextureChangedEvent(chunk))
     }
     curr = null
   }
 
-  private fun doRenderChunk(chunk: Chunk, aboveGround: Boolean) {
+  private fun doRenderChunk(chunk: Chunk) {
     val fbo = chunk.frameBuffer ?: return
     val chunkColumn = chunk.chunkColumn
 
