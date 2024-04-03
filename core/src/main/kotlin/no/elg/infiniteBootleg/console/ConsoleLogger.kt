@@ -95,6 +95,11 @@ interface ConsoleLogger : ApplicationLogger {
     log(LogLevel.ERROR, message)
   }
 
+  fun error(message: String, exception: Throwable) {
+    log(LogLevel.ERROR, message)
+    exception.printStackTrace(System.err)
+  }
+
   fun error(tag: String, message: () -> String) {
     log(LogLevel.ERROR, "[$tag] ${message()}")
   }

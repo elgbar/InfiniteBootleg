@@ -21,6 +21,7 @@ import no.elg.infiniteBootleg.world.generator.chunk.FlatChunkGenerator
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
+import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -119,19 +120,18 @@ object WorldLoader {
         lockInfo.toLong()
       } catch (e: NumberFormatException) {
         Main.logger().warn("World lock file for $uuid did not contain a valid pid, read: $lockInfo")
-        worldLockFile.delete()
         // Invalid pid, allow writing
-        return true
+        return deleteOrLogFile(worldLockFile)
       }
       if (lockPID == ProcessHandle.current().pid()) {
         // We own the lock
         return true
       }
-      if (ProcessHandle.of(lockPID).isEmpty) {
+      val optionalProcessHandle = ProcessHandle.of(lockPID)
+      if (!optionalProcessHandle.map(ProcessHandle::isAlive).orElse(false)) {
         // If there is no process with the read pid, it was probably left from an old instance
-        Main.logger().warn("World lock file for $uuid still existed for a non-existing process, an old lock file found")
-        worldLockFile.delete()
-        return true
+        Main.logger().warn("World lock file for $uuid still existed for a non-existing process (PID $lockPID), an old lock file found")
+        return deleteOrLogFile(worldLockFile)
       }
       return false
     }
@@ -155,10 +155,18 @@ object WorldLoader {
       if (!canWriteToWorld(uuid)) {
         return false
       }
-      getWorldLockFile(uuid).delete()
-      return true
+      return deleteOrLogFile(getWorldLockFile(uuid))
     }
   }
+
+  private fun deleteOrLogFile(file: FileHandle): Boolean =
+    try {
+      Files.delete(file.file().toPath())
+      true
+    } catch (e: Exception) {
+      Main.logger().error("Failed to delete world lock file ${file.path()}", e)
+      false
+    }
 
   @JvmStatic
   fun generatorFromProto(protoWorld: ProtoWorld.World): ChunkGenerator {

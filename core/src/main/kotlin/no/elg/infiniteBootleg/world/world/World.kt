@@ -1134,6 +1134,7 @@ abstract class World(
   }
 
   override fun dispose() {
+    Main.logger().info("World") { "Disposing world '$name'" }
     clear()
     saveTask?.cancel(false)
     saveTask = null
@@ -1151,9 +1152,7 @@ abstract class World(
     if (Main.isAuthoritative && !transientWorld) {
       val worldFolder = worldFolder
       if (worldFolder != null && worldFolder.isDirectory) {
-        if (!deleteLockFile(uuid)) {
-          Main.logger().error("Failed to delete world lock file!")
-        }
+        deleteLockFile(uuid)
       }
     }
     engine.dispose()
