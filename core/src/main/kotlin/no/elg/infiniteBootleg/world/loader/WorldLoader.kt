@@ -89,7 +89,6 @@ object WorldLoader {
     }
   }
 
-  @JvmStatic
   fun getWorldFolder(uuid: String): FileHandle {
     return Gdx.files.external(Main.WORLD_FOLDER + uuid)
   }
@@ -98,7 +97,6 @@ object WorldLoader {
     return getWorldFolder(uuid).child(LOCK_FILE_NAME)
   }
 
-  @JvmStatic
   fun canWriteToWorld(uuid: String): Boolean {
     synchronized(WORLD_LOCK_LOCK) {
       if (Settings.ignoreWorldLock) {
@@ -137,7 +135,6 @@ object WorldLoader {
     }
   }
 
-  @JvmStatic
   fun writeLockFile(uuid: String): Boolean {
     synchronized(WORLD_LOCK_LOCK) {
       if (!canWriteToWorld(uuid)) {
@@ -149,7 +146,6 @@ object WorldLoader {
     }
   }
 
-  @JvmStatic
   fun deleteLockFile(uuid: String): Boolean {
     synchronized(WORLD_LOCK_LOCK) {
       if (!canWriteToWorld(uuid)) {
@@ -168,7 +164,6 @@ object WorldLoader {
       false
     }
 
-  @JvmStatic
   fun generatorFromProto(protoWorld: ProtoWorld.World): ChunkGenerator {
     return when (protoWorld.generator) {
       ProtoWorld.World.Generator.PERLIN, ProtoWorld.World.Generator.UNRECOGNIZED, null -> PerlinChunkGenerator(protoWorld.seed)
