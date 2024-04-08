@@ -25,7 +25,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
   }
 
   companion object {
-    private val TT_NAME: Comparator<Item> = Comparator.comparing { ts: Item -> ts.element.name }
+    private val TT_NAME: Comparator<Item> = Comparator.comparing { ts: Item -> ts.element.displayName }
 
     /** Sort descending by the name of the tile type with null at the end  */
     val ELEM_NAME_DESC: Comparator<Item?> = object : Comparator<Item?> {
@@ -34,7 +34,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
         if (nullCmp != 0) {
           return nullCmp
         }
-        return ts1!!.element.name.compareTo(ts2!!.element.name)
+        return ts1!!.element.displayName.compareTo(ts2!!.element.displayName)
       }
 
       override fun reversed(): Comparator<Item?> {
@@ -49,7 +49,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
         if (nullCmp != 0) {
           return nullCmp
         }
-        return -ts1!!.element.name.compareTo(ts2!!.element.name)
+        return -ts1!!.element.displayName.compareTo(ts2!!.element.displayName)
       }
 
       override fun reversed(): Comparator<Item?> {

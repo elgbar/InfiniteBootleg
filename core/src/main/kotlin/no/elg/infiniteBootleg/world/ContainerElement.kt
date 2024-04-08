@@ -18,7 +18,7 @@ sealed interface ContainerElement {
 
   val itemType: ItemType
 
-  val name: String get() = textureRegion?.name ?: this::class.simpleName ?: itemType.name
+  val displayName: String get() = textureRegion?.name ?: this::class.simpleName ?: itemType.name
 
   fun toItem(maxStock: UInt = DEFAULT_MAX_STOCK, stock: UInt = DEFAULT_MAX_STOCK): Item
 

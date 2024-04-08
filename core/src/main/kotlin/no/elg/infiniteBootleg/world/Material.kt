@@ -138,7 +138,7 @@ enum class Material(
     if (Settings.client) {
       textureRegion = this.findTextures(textureName)
       if (textureRegion == null && !canBeHandled) {
-        throw NullPointerException("Failed to find a texture for $name")
+        throw NullPointerException("Failed to find a texture for $displayName")
       }
     } else {
       textureRegion = serverRotatableTextureRegion(textureName)

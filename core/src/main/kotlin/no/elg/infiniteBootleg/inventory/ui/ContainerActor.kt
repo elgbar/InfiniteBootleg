@@ -77,7 +77,7 @@ fun createContainerActor(container: Container, dragAndDrop: DragAndDrop, batch: 
             fbo = null
             defaultDrawable
           }
-          tooltip.setText(item?.run { element.name.lowercase().toTitleCase() } ?: "<Empty>")
+          tooltip.setText(item?.run { element.displayName.lowercase().toTitleCase() } ?: "<Empty>")
         }
 
         it.pad(2f).space(2f)
