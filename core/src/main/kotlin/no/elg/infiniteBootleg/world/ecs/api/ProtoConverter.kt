@@ -5,9 +5,16 @@ import com.google.protobuf.Message
 /**
  * Convert a type from and to a protobuf message
  */
-interface ProtoConverter<COMP : Any, PROTO : Message> {
+interface ProtoConverter<COMP : Any, PROTO : Message> : OptionalProtoConverter<COMP, PROTO> {
 
-  fun PROTO.fromProto(): COMP
+  override fun PROTO.fromProto(): COMP
 
-  fun COMP.asProto(): PROTO
+  override fun COMP.asProto(): PROTO
+}
+
+interface OptionalProtoConverter<COMP : Any, PROTO : Message> {
+
+  fun PROTO.fromProto(): COMP?
+
+  fun COMP.asProto(): PROTO?
 }

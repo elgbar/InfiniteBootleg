@@ -15,6 +15,8 @@ import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_NOTHING
 import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.items.Item
@@ -40,9 +42,10 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent
-import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.closeInventory
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.closeContainer
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
@@ -620,23 +623,24 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
 
     val player = entities.first()
-    val oldContainer = player.containerOrNull?.also { player.closeInventory() }
+    val oldOwnedContainer = player.ownedContainerOrNull?.also { player.closeContainer() }
 
     val newContainer: Container = when (invType.lowercase(Locale.getDefault())) {
 //      "creative", "cr" -> CreativeInventory(player)
-      "autosort", "as" -> AutoSortedContainer(40, "Auto Sorted Inventory")
-      "container", "co" -> ContainerImpl(40, "Inventory")
+      "autosort", "as" -> AutoSortedContainer("Auto Sorted Inventory")
+      "container", "co" -> ContainerImpl("Inventory")
       else -> {
         logger.error("Unknown storage type '$invType'")
         return
       }
     }
 
-    if (oldContainer != null) {
-      val oldContent = oldContainer.content.filterNotNull().toTypedArray()
+    if (oldOwnedContainer != null) {
+      val oldContent = oldOwnedContainer.container.content.filterNotNull().toTypedArray()
       newContainer.add(*oldContent)
     }
-    player.containerComponentOrNull = ContainerComponent(newContainer)
+    val owner = oldOwnedContainer?.owner ?: ContainerOwner.from(player)
+    player.containerComponentOrNull = ContainerComponent(OwnedContainer(owner, newContainer))
     logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
   }
 

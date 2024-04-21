@@ -12,7 +12,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO_BUILDER
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
@@ -53,7 +53,7 @@ class EntityMarkerBlock(
     }
   }
 
-  override fun save(): ProtoWorld.Block.Builder = AIR_BLOCK_PROTO_BUILDER
+  override fun save(): ProtoWorld.Block = AIR_BLOCK_PROTO
 
   override val texture: RotatableTextureRegion? = if (debugEntityMarkerBlocks) Main.inst().assets.handTexture else null
 

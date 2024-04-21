@@ -79,7 +79,7 @@ import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.
  * @param ignoreTransient If true, will force save transient entities
  */
 fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): ProtoWorld.Entity? {
-  if (!ignoreTransient && this.isTransientEntity || toAuthoritative && this.authoritativeOnly) {
+  if (!ignoreTransient && this.isTransientEntity || toAuthoritative && !this.authoritativeOnly) {
     return null
   }
 

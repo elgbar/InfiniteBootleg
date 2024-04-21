@@ -14,12 +14,12 @@ import no.elg.infiniteBootleg.world.ContainerElement
  * @author kheba
  */
 open class ContainerImpl(
-  final override val size: Int,
-  override val name: String = "Container"
+  override val name: String,
+  final override val size: Int = DEFAULT_SIZE
 ) : Container {
 
-  override val content: Array<Item?> = arrayOfNulls(size)
   override val type: ProtoWorld.Container.Type get() = ProtoWorld.Container.Type.GENERIC
+  override val content: Array<Item?> = arrayOfNulls(size)
 
   init {
     Preconditions.checkArgument(size > 0, "Inventory size must be greater than zero")
@@ -182,5 +182,33 @@ open class ContainerImpl(
         content[index] = null
       }
     }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is ContainerImpl) return false
+
+    if (name != other.name) return false
+    if (size != other.size) return false
+    if (!content.contentEquals(other.content)) return false
+    if (type != other.type) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = name.hashCode()
+    result = 31 * result + size
+    result = 31 * result + content.contentHashCode()
+    result = 31 * result + type.hashCode()
+    return result
+  }
+
+  override fun toString(): String {
+    return "ContainerImpl(name='$name', size=$size, type=$type)"
+  }
+
+  companion object {
+    const val DEFAULT_SIZE = 40
   }
 }

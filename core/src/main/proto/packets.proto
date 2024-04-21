@@ -21,12 +21,12 @@ message Packet {
     CB_UPDATE_CHUNK = 5;
     CB_LOGIN_STATUS = 6;
     SB_CLIENT_WORLD_LOADED = 7; //no message associated
-    SB_CHUNK_REQUEST = 8;
+    SB_CONTENT_REQUEST = 8;
     DX_DISCONNECT = 9;
     DX_SECRET_EXCHANGE = 10;
     CB_SPAWN_ENTITY = 11;
     CB_DESPAWN_ENTITY = 12;
-    SB_CONTENT_REQUEST = 13;
+    reserved 13;
     CB_INITIAL_CHUNKS_SENT = 14; //no message associated
     DX_WORLD_SETTINGS = 15;
     DX_BREAKING_BLOCK = 16;
@@ -164,9 +164,7 @@ message DespawnEntity {
 }
 
 message ContainerUpdate {
-  .persistence.World.WorldContainers.WorldContainer worldContainer = 1;
-  // Whether to overwrite the container or not
-  bool overwrite = 2;
+  .persistence.OwnedContainer worldContainer = 1;
 }
 
 message InterfaceUpdate {
@@ -194,5 +192,5 @@ message Login {
 message ContentRequest {
   optional string entityUUID = 1;
   optional .persistence.Vector2i chunkLocation = 2;
-  optional .persistence.Vector2i containerLocation = 3;
+  optional .persistence.ContainerOwner containerOwner = 3;
 }

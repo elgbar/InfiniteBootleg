@@ -73,6 +73,9 @@ val CONTROLLED_STANDALONE_ENTITY = arrayOf(
 
 val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
 
+val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerComponent::class).get()
+val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).get()
+
 val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
 val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).get()
 

@@ -15,12 +15,12 @@ import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.Material.Companion.fromOrdinal
+import no.elg.infiniteBootleg.world.Material.Companion.fromProto
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
-interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.Builder> {
+interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> {
 
   val texture: RotatableTextureRegion?
   val material: Material
@@ -99,11 +99,11 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block.B
       if (protoBlock == null) {
         return null
       }
-      val mat = fromOrdinal(protoBlock.material.ordinal)
-      if (mat === Material.AIR) {
+      val material = protoBlock.material.fromProto()
+      if (material === Material.AIR) {
         return null
       }
-      return mat.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
+      return material.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
     }
 
     fun save(material: Material): ProtoWorld.Block.Builder =

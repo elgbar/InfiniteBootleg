@@ -1,30 +1,32 @@
 package no.elg.infiniteBootleg.world.managers.container
 
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.asProto
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.fromProto
-import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.protobuf.WorldKt.WorldContainersKt.worldContainer
-import no.elg.infiniteBootleg.protobuf.WorldKt.worldContainers
-import no.elg.infiniteBootleg.util.toCompact
-import no.elg.infiniteBootleg.util.toVector2i
-import no.elg.infiniteBootleg.protobuf.ProtoWorld.World as ProtoWorld
+import com.badlogic.ashley.core.Engine
+import com.badlogic.gdx.utils.Disposable
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer
+import no.elg.infiniteBootleg.world.ecs.blockContainerFamily
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
+import no.elg.infiniteBootleg.world.ecs.entityContainerFamily
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
-class AuthoritativeWorldContainerManager : WorldContainerManager() {
+class AuthoritativeWorldContainerManager(engine: Engine) : Disposable, WorldContainerManager {
 
-  fun loadFromProto(proto: ProtoWorld.WorldContainers) {
-    Main.logger().debug("WorldContainerManager") { "Loading ${proto.containersList.size} containers in world" }
-    proto.containersList.forEach { containerProto ->
-      containers[containerProto.position.toCompact()] = containerProto.container.fromProto()
+  private val internalContainers = ConcurrentHashMap<ContainerOwner, OwnedContainer>()
+
+  private val entityListeners = listOf(
+    ContainerOwnerListener(internalContainers, engine, entityContainerFamily) { ContainerOwner.from(it) },
+    ContainerOwnerListener(internalContainers, engine, blockContainerFamily) {
+      val pos = it.positionComponent
+      ContainerOwner.from(pos.blockX, pos.blockY)
     }
+  )
+
+  override fun find(owner: ContainerOwner): CompletableFuture<OwnedContainer> =
+    internalContainers[owner]?.let { return CompletableFuture.completedFuture(it) }
+      ?: CompletableFuture.failedFuture(NoSuchElementException("No container found with the owner $owner"))
+
+  override fun dispose() {
+    entityListeners.forEach(Disposable::dispose)
   }
-
-  override fun asProto(): ProtoWorld.WorldContainers =
-    worldContainers {
-      containers += this@AuthoritativeWorldContainerManager.containers.map { (loc, worldContainer) ->
-        worldContainer {
-          position = loc.toVector2i()
-          container = worldContainer.asProto()
-        }
-      }
-    }
 }

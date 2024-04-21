@@ -72,7 +72,7 @@ class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarS
         HotbarComponent(HotbarSlot.fromOrdinal(protoHotbar.selected), map)
       }
 
-    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasHotbar() && hasContainer()
+    override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasHotbar() && hasOwnedContainer()
 
     enum class HotbarSlot {
       ONE,

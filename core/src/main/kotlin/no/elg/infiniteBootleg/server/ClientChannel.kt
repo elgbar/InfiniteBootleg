@@ -52,7 +52,7 @@ class ClientChannel(val client: ServerClient) {
         return
       }
       if (onConnect != null) {
-        Main.inst().scheduler.executeSync(onConnect)
+        Main.inst().scheduler.executeSync(runnable = onConnect)
       }
       if (::channel.isInitialized) {
         // Wait until the connection is closed

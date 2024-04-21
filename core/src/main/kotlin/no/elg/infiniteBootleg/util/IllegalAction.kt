@@ -13,7 +13,7 @@ enum class IllegalAction {
   CRASH,
 
   /**
-   * Return to the main menu
+   * Return to the main menu, handles as a [CRASH] if the game is running as the server
    */
   TO_MAIN_MENU,
 

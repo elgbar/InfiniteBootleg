@@ -30,7 +30,6 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.world
-import no.elg.infiniteBootleg.protobuf.worldContainersOrNull
 import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
@@ -173,11 +172,7 @@ abstract class World(
     FullChunkLoader(this, generator)
   }
 
-  val worldContainerManager: WorldContainerManager = if (this is ServerClientWorld) {
-    ServerClientWorldContainerManager(this)
-  } else {
-    AuthoritativeWorldContainerManager()
-  }
+  val worldContainerManager: WorldContainerManager
 
   val worldBody: WorldBody
   val worldTime: WorldTime
@@ -228,11 +223,18 @@ abstract class World(
     MathUtils.random.setSeed(seed)
     uuid = generateUUIDFromLong(seed).toString()
     name = worldName
-    worldTicker = WorldTicker(this, false)
-    worldTime = WorldTime(this)
+    val world: World = this
+    worldTicker = WorldTicker(world, false)
+    worldTime = WorldTime(world)
     spawn = compactLoc(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
-    worldBody = WorldBody(this)
+    worldBody = WorldBody(world)
+
+    worldContainerManager = if (world is ServerClientWorld) {
+      ServerClientWorldContainerManager(world)
+    } else {
+      AuthoritativeWorldContainerManager(engine)
+    }
 
     chunkColumnListeners.registerListeners()
 
@@ -243,7 +245,7 @@ abstract class World(
         if (Main.isAuthoritative) {
           // Add a delay to make sure the light is calculated
           Main.inst().scheduler.scheduleAsync(200L) {
-            dispatchEvent(WorldLoadedEvent(this))
+            dispatchEvent(WorldLoadedEvent(world))
           }
         }
       }
@@ -355,9 +357,6 @@ abstract class World(
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
-    protoWorld.worldContainersOrNull?.let { protoManager ->
-      (worldContainerManager as? AuthoritativeWorldContainerManager)?.loadFromProto(protoManager)
-    }
     synchronized(chunkColumns) {
       for (protoCC in protoWorld.chunkColumnsList) {
         val chunkColumn = fromProtobuf(this, protoCC)
@@ -413,7 +412,6 @@ abstract class World(
       timeScale = this@World.worldTime.timeScale
       spawn = this@World.spawn.toVector2i()
       generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
-      worldContainers = this@World.worldContainerManager.asProto()
       chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
       if (Main.isSingleplayer) {
         controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {

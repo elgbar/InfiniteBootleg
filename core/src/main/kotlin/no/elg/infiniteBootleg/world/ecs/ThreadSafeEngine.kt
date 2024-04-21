@@ -24,9 +24,7 @@ class ThreadSafeEngine : Engine(), Disposable {
   @GuardedBy("entityFamilyCache")
   private val entityFamilyCache = ObjectMap<Family, ImmutableArray<Entity>>()
 
-  override fun createEntity(): Entity {
-    return super.createEntity()
-  }
+  override fun createEntity(): Entity = super.createEntity()
 
   override fun <T : Component> createComponent(componentType: Class<T>): T {
     return super.createComponent(componentType)
@@ -101,6 +99,8 @@ class ThreadSafeEngine : Engine(), Disposable {
       super.removeAllSystems()
     }
 
+  inline fun <reified T : EntitySystem> getSystem(): T? = getSystem(T::class.java)
+
   override fun <T : EntitySystem> getSystem(systemType: Class<T>): T? =
     synchronized(engineLock) {
       return super.getSystem(systemType)
@@ -157,13 +157,13 @@ class ThreadSafeEngine : Engine(), Disposable {
       super.update(deltaTime)
     }
 
-  override fun addEntityInternal(entity: Entity?) {
+  override fun addEntityInternal(entity: Entity) {
     synchronized(engineLock) {
       super.addEntityInternal(entity)
     }
   }
 
-  override fun removeEntityInternal(entity: Entity?) {
+  override fun removeEntityInternal(entity: Entity) {
     synchronized(engineLock) {
       super.removeEntityInternal(entity)
     }

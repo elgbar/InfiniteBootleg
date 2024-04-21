@@ -74,20 +74,23 @@ enum class Material(
   ),
   STONE(hardness = 1.5f, hasTransparentTexture = false),
   BRICK(hardness = 2f, hasTransparentTexture = false),
-  DIRT(hardness = 1f, hasTransparentTexture = false),
+  DIRT(
+    hardness = 1f,
+    hasTransparentTexture = false
+  ),
   GRASS(hardness = 0.8f, hasTransparentTexture = false),
-  TNT(hardness = 0.5f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-    world.engine.createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
-      safeWith { ExplosiveComponent() }
-    }
-  }),
-  SAND(
-    hardness = 0.75f,
+  TNT(
+    hardness = 0.5f,
     hasTransparentTexture = false,
     createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
+      world.engine.createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
+        safeWith { ExplosiveComponent() }
+      }
     }
   ),
+  SAND(hardness = 0.75f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+    world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
+  }),
   TORCH(
     hardness = 0.1f,
     hasTransparentTexture = true,
@@ -123,14 +126,9 @@ enum class Material(
     hardness = 1f,
     hasTransparentTexture = false
   ),
-  CONTAINER(
-    hardness = 1f,
-    hasTransparentTexture = false,
-    isCollidable = false,
-    createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createContainerEntity(world, chunk, worldX, worldY, material)
-    }
-  );
+  CONTAINER(hardness = 1f, hasTransparentTexture = false, isCollidable = false, createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+    world.engine.createContainerEntity(world, chunk, worldX, worldY, material)
+  });
 
   override var textureRegion: RotatableTextureRegion? = null
 
@@ -162,17 +160,15 @@ enum class Material(
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
       if (Main.isAuthoritative) {
         // Blocks client side should not have any entity in them
-        protoEntity?.let { world.load(it, chunk) }
-          ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)?.also { futureEntity ->
-            futureEntity.thenApply {
-              if (block.isDisposed) {
-                world.removeEntity(it)
-                Main.logger().warn("MATERIAL", "Block was disposed before entity was fully created")
-              } else {
-                block.entity = it
-              }
-            }
+        val futureEntity = protoEntity?.let { world.load(it, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
+        futureEntity?.thenApply {
+          if (block.isDisposed) {
+            world.removeEntity(it)
+            Main.logger().warn("MATERIAL", "Block was disposed before entity was fully created")
+          } else {
+            block.entity = it
           }
+        }
       }
     }
   }

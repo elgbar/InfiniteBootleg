@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.Entity
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.inventory.container.Container
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.asProto
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
@@ -45,8 +45,8 @@ import no.elg.infiniteBootleg.protobuf.Packets.StartGame
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateChunk
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
-import no.elg.infiniteBootleg.protobuf.WorldKt
 import no.elg.infiniteBootleg.protobuf.containerUpdate
 import no.elg.infiniteBootleg.protobuf.contentRequest
 import no.elg.infiniteBootleg.protobuf.interfaceUpdate
@@ -162,7 +162,7 @@ fun ServerClient.serverBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, 
   return serverBoundPacketBuilder(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
-      .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
+      .setBlock(block?.save() ?: PROTO_AIR_BLOCK)
   ).build()
 }
 
@@ -191,9 +191,9 @@ fun ServerClient.serverBoundEntityRequest(uuid: String): Packet =
     entityUUID = uuid
   }
 
-fun ServerClient.serverBoundContainerRequest(location: Vector2i): Packet =
+fun ServerClient.serverBoundContainerRequest(owner: ProtoWorld.ContainerOwner): Packet =
   serverBoundContentRequest {
-    containerLocation = location
+    containerOwner = owner
   }
 
 fun ServerClient.serverBoundClientDisconnectPacket(reason: String? = null): Packet {
@@ -219,9 +219,7 @@ fun ServerClient.serverBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(serverBoundPacketBuilder(DX_HEARTBEAT))
 }
 
-fun ServerClient.serverBoundContainerUpdate(pos: Vector2i, container: Container): Packet {
-  return containerUpdateBuilder(serverBoundPacketBuilder(DX_CONTAINER_UPDATE), pos, container)
-}
+fun ServerClient.serverBoundContainerUpdate(ownedContainer: OwnedContainer): Packet = containerUpdateBuilder(serverBoundPacketBuilder(DX_CONTAINER_UPDATE), ownedContainer)
 
 fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.BreakingProgress>): Packet {
   return serverBoundPacketBuilder(DX_BREAKING_BLOCK)
@@ -242,7 +240,7 @@ private val PROTO_AIR_BLOCK = Block.save(AIR).build()
 fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?): Packet {
   return clientBoundPacketBuilder(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
-      .setBlock(block?.save()?.build() ?: PROTO_AIR_BLOCK)
+      .setBlock(block?.save() ?: PROTO_AIR_BLOCK)
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
   ).build()
 }
@@ -313,7 +311,7 @@ fun clientBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(clientBoundPacketBuilder(DX_HEARTBEAT))
 }
 
-fun clientBoundContainerUpdate(pos: Vector2i, container: Container): Packet = containerUpdateBuilder(clientBoundPacketBuilder(DX_CONTAINER_UPDATE), pos, container)
+fun clientBoundContainerUpdate(ownedContainer: OwnedContainer): Packet = containerUpdateBuilder(clientBoundPacketBuilder(DX_CONTAINER_UPDATE), ownedContainer)
 
 fun clientBoundInterfaceUpdate(interfaceId: String, updateType: InterfaceUpdate.UpdateType): Packet =
   clientBoundPacketBuilder(CB_INTERFACE_UPDATE).setInterfaceUpdate(
@@ -366,12 +364,5 @@ private fun heartbeatPacketBuilder(packet: Packet.Builder): Packet {
   return packet.setHeartbeat(Heartbeat.newBuilder().setKeepAliveId(Instant.now().epochSecond.toString()).build()).build()
 }
 
-fun containerUpdateBuilder(packet: Packet.Builder, pos: Vector2i, aContainer: Container): Packet =
-  packet.setContainerUpdate(
-    containerUpdate {
-      worldContainer = WorldKt.WorldContainersKt.worldContainer {
-        position = pos
-        container = aContainer.asProto()
-      }
-    }
-  ).build()
+fun containerUpdateBuilder(packet: Packet.Builder, ownedContainer: OwnedContainer): Packet =
+  packet.setContainerUpdate(containerUpdate { worldContainer = ownedContainer.asProto() }).build()

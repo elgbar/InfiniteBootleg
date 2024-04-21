@@ -20,9 +20,10 @@ import ktx.scene2d.vis.visImageButton
 import ktx.scene2d.vis.visTextTooltip
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.ContainerEvent
-import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.InterfaceEvent
+import no.elg.infiniteBootleg.events.api.Event
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
-import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.IBVisWindow
@@ -30,11 +31,12 @@ import no.elg.infiniteBootleg.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.withColor
+import no.elg.infiniteBootleg.world.world.ClientWorld
 
 @Scene2dDsl
-fun createContainerActor(container: Container, dragAndDrop: DragAndDrop, batch: Batch): IBVisWindow {
-  val onClose: () -> Unit = { dispatchEvent(ContainerEvent.Closed(container)) }
-  return ibVisWindowClosed(container.name, onClose = onClose) {
+fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop: DragAndDrop, batch: Batch): IBVisWindow {
+  val (owner, container) = ownedContainer
+  return ibVisWindowClosed(container.name, owner.toInterfaceId()) {
     isMovable = true
     isResizable = false
     addCloseButton()
@@ -51,13 +53,19 @@ fun createContainerActor(container: Container, dragAndDrop: DragAndDrop, batch: 
     fun updateAllSlots() {
       updateFunctions.forEach { it() }
       invalidateHierarchy()
+      if (Settings.debug) {
+        titleLabel.setText("${container.name} ${owner.toInterfaceId()}")
+      } else {
+        titleLabel.setText(container.name)
+      }
       pack()
     }
 
-    val filter: (ContainerEvent) -> Boolean = { it.container == container }
-    val listener: ContainerEvent.() -> Unit = { Main.inst().scheduler.executeSync(::updateAllSlots) }
-    registerListener<ContainerEvent.Changed>(true, filter, listener)
-    registerListener<ContainerEvent.Opening>(true, filter, listener)
+    val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
+    val listener: Event.() -> Unit = { Main.inst().scheduler.executeSync { updateAllSlots() } }
+    registerListener<ContainerEvent.Changed>(true, { it.container == container }, listener)
+    registerListener<InterfaceEvent.Update>(true, filter, listener)
+    registerListener<InterfaceEvent.Opening>(true, filter, listener)
 
     for (containerSlot in container) {
       visImageButton {
@@ -84,7 +92,7 @@ fun createContainerActor(container: Container, dragAndDrop: DragAndDrop, batch: 
         updateSlot()
         updateFunctions += ::updateSlot
 
-        val slot = InventorySlot(container, containerSlot.index)
+        val slot = InventorySlot(ownedContainer, containerSlot.index)
         userObject = slot
         dragAndDrop.addSource(SlotSource(this@visImageButton, slot))
         dragAndDrop.addTarget(SlotTarget(this@visImageButton))

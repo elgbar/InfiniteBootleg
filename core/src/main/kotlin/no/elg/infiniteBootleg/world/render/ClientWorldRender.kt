@@ -9,10 +9,10 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
-import ktx.actors.isShown
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.InterfaceId
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.ui.createContainerActor
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.managers.interfaces.InterfaceManager
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
@@ -31,8 +32,6 @@ import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
 /**
@@ -55,7 +54,14 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   private var lastZoom = 0f
 
-  private val maybeStage: Stage? get() = (ClientMain.inst().screen as? StageScreen)?.stage
+  private val maybeStage: Stage?
+    get() {
+      return (ClientMain.inst().screen as? StageScreen)?.stage.also { stage ->
+        if (stage == null) {
+          Main.logger().warn("Could not get stage from screen ${ClientMain.inst().screen}")
+        }
+      }
+    }
 
   val chunksInView: ClientChunksInView = ClientChunksInView()
   val batch: SpriteBatch = SpriteBatch()
@@ -68,32 +74,43 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
   val box2DDebugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer(true, false, false, false, true, false) }
 
-  private val containers: MutableMap<Container, IBVisWindow> = ConcurrentHashMap()
   private val dad: DragAndDrop = DragAndDrop()
 
-  fun isContainerOpen(container: Container): Boolean = containers[container]?.isShown() ?: false
+  val interfaceManager = InterfaceManager()
 
-  /**
-   * Register an IContainer with the UI, if one is already registered return a saved instance
-   *
-   * @return The ContainerActor for the given container
-   */
-  fun getContainerActor(container: Container): CompletableFuture<Pair<IBVisWindow, Stage>>? {
-    val stage = maybeStage ?: return null
-    val storedActor = containers[container]
-    return if (storedActor == null) {
-      CompletableFuture<Pair<IBVisWindow, Stage>>().also { future ->
-        Main.inst().scheduler.executeSync {
-          // Make sure that we don't double create the same container
-          val actor = containers[container] ?: createContainerActor(container, dad, batch)
-          containers[container] = actor
-          future.complete(actor to stage)
-        }
-      }
-    } else {
-      CompletableFuture.completedFuture(storedActor to stage)
-    }
+  fun openInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow? = { null }) {
+    interfaceManager.openInterface(interfaceId, maybeStage ?: return, createIfMissing)
   }
+
+  fun closeInterface(interfaceId: InterfaceId) {
+    interfaceManager.closeInterface(interfaceId)
+  }
+
+  fun toggleInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow? = { null }) {
+    interfaceManager.toggleInterface(interfaceId, maybeStage ?: return, createIfMissing)
+  }
+
+//  /**
+//   * Register an IContainer with the UI, if one is already registered return a saved instance
+//   *
+//   * @return The ContainerActor for the given container
+//   */
+//  fun getContainerActor(ownedContainer: OwnedContainer): CompletableFuture<WindowAndStage>? {
+//    val stage = maybeStage ?: return null
+//    val interfaceId = ownedContainer.owner.toInterfaceId()
+//
+//    val storedActor = interfaceManager.getInterface(interfaceId)
+//    return if (storedActor == null) {
+//      Main.inst().scheduler.executeSync {
+//        val actor = interfaceManager.getInterface(interfaceId) ?: createContainerActor(ownedContainer)
+//        WindowAndStage(actor, stage)
+//      }
+//    } else {
+//      CompletableFuture.completedFuture(WindowAndStage(storedActor, stage))
+//    }
+//  }
+
+  fun createContainerActor(ownedContainer: OwnedContainer) = world.createContainerActor(ownedContainer, dad, batch)
 
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
     camera.position.set(worldX.toFloat(), worldY.toFloat(), 0f)

@@ -57,7 +57,7 @@ class ServerClient(
      */
     fun ServerClient?.sendServerBoundPackets(packets: ServerClient.() -> Iterable<Packets.Packet>?): List<ChannelFuture>? =
       this?.run {
-        packets()?.map { packet -> ctx.writePacket(packet) }.also { ctx.flush() }
+        packets()?.map(ctx::writePacket).also { ctx.flush() }
       }
   }
 }

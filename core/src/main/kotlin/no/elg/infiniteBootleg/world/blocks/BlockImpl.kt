@@ -4,15 +4,17 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.Material.Companion.asProto
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.getRawRelative
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.save
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.world.world.World
@@ -36,9 +38,11 @@ class BlockImpl(
   override var isDisposed: Boolean = false
     private set
 
-  override fun save(): ProtoWorld.Block.Builder {
-    return save(material)
-  }
+  override fun save(): ProtoWorld.Block =
+    block {
+      this.material = this@BlockImpl.material.asProto()
+      this@BlockImpl.entity?.save(toAuthoritative = true)?.also { entity = it }
+    }
 
   override val texture: RotatableTextureRegion?
     get() {

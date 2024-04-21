@@ -44,7 +44,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
   val debugWindows = mutableListOf<IBVisWindow>()
   val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
   val staffCreator = addStaffCreatorOverlay(world).also { debugWindows += it }
-  val debugMenu = ibVisWindowClosed("Debug Menu") {
+  val debugMenu = world.ibVisWindowClosed("Debug Menu") {
     closeOnEscape()
 
     visTable {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.utils.Disposable
 import com.kotcrab.vis.ui.widget.MenuItem
 import com.kotcrab.vis.ui.widget.PopupMenu
 import com.kotcrab.vis.ui.widget.Separator
@@ -22,8 +23,10 @@ import ktx.scene2d.defaultStyle
 import ktx.scene2d.table
 import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTextButton
-import no.elg.infiniteBootleg.main.Main
-import java.util.concurrent.ConcurrentHashMap
+import no.elg.infiniteBootleg.events.InterfaceEvent
+import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.inventory.container.InterfaceId
+import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -123,7 +126,7 @@ inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Bo
 }
 
 @Scene2dDsl
-fun confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow {
+fun ClientWorld.confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow {
   return ibVisWindowClosed(title, title) {
     isMovable = false
     isModal = true
@@ -183,7 +186,7 @@ fun confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit 
 }
 
 @Scene2dDsl
-fun okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow {
+fun ClientWorld.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow {
   return ibVisWindowClosed(title, title) {
     isMovable = false
     isModal = true
@@ -219,38 +222,36 @@ fun okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> 
  * A [IBVisWindow] that is initially closed
  */
 @Scene2dDsl
-inline fun ibVisWindowClosed(
-  title: String,
-  interfaceId: String = title,
-  style: String = defaultStyle,
-  noinline onClose: () -> Unit = {},
-  init: IBVisWindow.() -> Unit = {}
-): IBVisWindow {
+inline fun ClientWorld.ibVisWindowClosed(title: String, interfaceId: InterfaceId = title, style: String = defaultStyle, init: IBVisWindow.() -> Unit = {}): IBVisWindow {
   contract { callsInPlace(init, InvocationKind.EXACTLY_ONCE) }
-  return IBVisWindow(title, style, interfaceId, onClose).apply(init)
+  return IBVisWindow(title, style, this, interfaceId).apply(init)
 }
 
 @Scene2dDsl
-class IBVisWindow(title: String, styleName: String, val interfaceId: String, val onClose: () -> Unit) : VisWindow(title, styleName), KTable {
+class IBVisWindow(
+  title: String,
+  styleName: String,
+  val world: ClientWorld,
+  val interfaceId: InterfaceId
+) : VisWindow(title, styleName), KTable, Disposable {
+
+  private val interfaceManager = world.render.interfaceManager
 
   init {
-    interfaces.compute(interfaceId) { _, old ->
-      old?.let {
-        Main.logger().warn("IBVisWindow", "Duplicate interface id $interfaceId, closing and removing old window")
-        it.close()
-      }
-      this
-    }
+    interfaceManager.addInterface(interfaceId, this)
   }
 
   public override fun close() {
-    fadeOut(0f)
-    onClose()
+    if (isShown()) {
+      fadeOut(0f)
+      EventManager.dispatchEvent(InterfaceEvent.Closed(interfaceId))
+    }
   }
 
   /** Add and fade in this window if it is not [isShown] */
   fun show(stage: Stage, center: Boolean = true, fadeTime: Float = 0f) {
     if (!isShown()) {
+      EventManager.dispatchEvent(InterfaceEvent.Opening(interfaceId))
       isVisible = true
       stage.addActor(fadeIn(fadeTime))
       if (center) {
@@ -268,20 +269,9 @@ class IBVisWindow(title: String, styleName: String, val interfaceId: String, val
     }
   }
 
-  companion object {
-    val interfaces: MutableMap<String, IBVisWindow> = ConcurrentHashMap()
-
-    fun closeInterface(interfaceId: String) {
-      interfaces[interfaceId]?.close()
-    }
-
-    fun openInterface(interfaceId: String, stage: Stage) {
-      interfaces[interfaceId]?.show(stage)
-    }
-
-    fun toggleInterface(interfaceId: String, stage: Stage) {
-      interfaces[interfaceId]?.toggleShown(stage)
-    }
+  override fun dispose() {
+    close()
+    interfaceManager.removeInterface(interfaceId)
   }
 }
 

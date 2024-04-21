@@ -3,6 +3,8 @@ package no.elg.infiniteBootleg.server
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.fromProto
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -33,7 +35,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.blockOrNull
 import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
 import no.elg.infiniteBootleg.protobuf.chunkLocationOrNull
-import no.elg.infiniteBootleg.protobuf.containerLocationOrNull
 import no.elg.infiniteBootleg.protobuf.containerUpdateOrNull
 import no.elg.infiniteBootleg.protobuf.contentRequestOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
@@ -96,7 +97,11 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
           scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID, requestedEntities) }
         }
       }
-      contentRequest.containerLocationOrNull?.let { pos: ProtoWorld.Vector2i -> scheduler.executeAsync { asyncHandleContainerRequest(ctx, pos) } }
+      contentRequest.containerOwner?.let { owner: ProtoWorld.ContainerOwner ->
+        scheduler.executeAsync {
+          asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@executeAsync)
+        }
+      }
     }
 
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(ctx, it) } }
@@ -341,9 +346,14 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   inputEventQueue.events += InputEvent.SpellCastEvent(staff)
 }
 
-private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, pos: ProtoWorld.Vector2i) {
-  val container = ServerMain.inst().serverWorld.worldContainerManager.findOrCreate(pos.x, pos.y)
-  ctx.writeAndFlushPacket(clientBoundContainerUpdate(pos, container))
+private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {
+  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
+    if (ownedContainer == null) {
+      Main.logger().warn("asyncHandleContainerRequest", "Failed to find container for $owner")
+    } else {
+      ctx.writeAndFlushPacket(clientBoundContainerUpdate(ownedContainer))
+    }
+  }
 }
 
 // ///////////

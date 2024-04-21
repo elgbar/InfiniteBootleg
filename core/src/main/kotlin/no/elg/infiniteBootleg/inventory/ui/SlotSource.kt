@@ -9,12 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
 import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPackets
 import no.elg.infiniteBootleg.server.serverBoundContainerUpdate
-import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.world.blocks.Block
 
 class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndDrop.Source(actor) {
@@ -22,7 +22,7 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
   override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload? {
     val srcItem = sourceSlot.item ?: return null
 
-    if (srcItem.stock == 0u || sourceSlot.container is AutoSortedContainer) {
+    if (srcItem.stock == 0u || sourceSlot.ownedContainer.container is AutoSortedContainer) {
       return null
     }
 
@@ -51,14 +51,10 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
     return payload
   }
 
-  private fun sendContainerUpdate(vararg containers: Container) {
+  private fun sendContainerUpdate(vararg containers: OwnedContainer) {
     if (Main.isServerClient) {
       ClientMain.inst().serverClient.sendServerBoundPackets {
-        containers.mapNotNull { container ->
-          world?.worldContainerManager?.find(container)?.let { compactWorldPos ->
-            serverBoundContainerUpdate(compactWorldPos.toVector2i(), container)
-          }
-        }
+        containers.map(::serverBoundContainerUpdate)
       }
     }
   }
@@ -73,15 +69,15 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
   ) {
     val sourceSlot = payload?.getObject() as? InventorySlot ?: return
     val targetSlot = target?.actor?.userObject as? InventorySlot ?: return
-    if (targetSlot.container == sourceSlot.container) {
-      val updatedContainer = sameContainer(sourceSlot.container, sourceSlot, targetSlot)
+    if (targetSlot.ownedContainer == sourceSlot.ownedContainer) {
+      val updatedContainer = sameContainer(sourceSlot.ownedContainer.container, sourceSlot, targetSlot)
       if (updatedContainer) {
-        sendContainerUpdate(sourceSlot.container)
+        sendContainerUpdate(sourceSlot.ownedContainer)
       }
     } else {
       val updatedContainer = differentContainer(sourceSlot, targetSlot)
       if (updatedContainer) {
-        sendContainerUpdate(sourceSlot.container, targetSlot.container)
+        sendContainerUpdate(sourceSlot.ownedContainer, targetSlot.ownedContainer)
       }
     }
   }
@@ -106,8 +102,8 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
   }
 
   private fun differentContainer(sourceSlot: InventorySlot, targetSlot: InventorySlot): Boolean {
-    val sourceContainer = sourceSlot.container
-    val targetContainer = targetSlot.container
+    val sourceContainer = sourceSlot.ownedContainer.container
+    val targetContainer = targetSlot.ownedContainer.container
 
     val sourceItem = sourceSlot.item ?: return false
     val targetItem = targetSlot.item

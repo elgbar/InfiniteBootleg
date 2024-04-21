@@ -93,7 +93,7 @@ inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable
 
 fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
   val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
-  return ibVisWindowClosed("Staff Creator") {
+  return world.ibVisWindowClosed("Staff Creator") {
     closeOnEscape()
     addCloseButton()
 

@@ -8,20 +8,20 @@ import no.elg.infiniteBootleg.util.FLY_VEL
 import no.elg.infiniteBootleg.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.util.MAX_X_VEL
 import no.elg.infiniteBootleg.util.WorldEntity
+import no.elg.infiniteBootleg.util.WorldEntity.ClientWorldEntity
 import no.elg.infiniteBootleg.util.breakBlocks
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.util.setVel
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -39,8 +39,8 @@ object InputSystem :
   ClientSystem {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
-    val worldEntity = WorldEntity(entity.world, entity)
     val entityWorld = entity.world as? ClientWorld ?: return
+    val worldEntity = ClientWorldEntity(entityWorld, entity)
     inputMouseLocator.update(entityWorld)
     when (event) {
       is InputEvent.KeyDownEvent -> worldEntity.keyDown(event.keycode)
@@ -56,14 +56,12 @@ object InputSystem :
     }
   }
 
-  private fun WorldEntity.openChest(button: Int) {
+  private fun ClientWorldEntity.openChest(button: Int) {
     when (button) {
       Input.Buttons.RIGHT -> {
         val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
         if (block.material == Material.CONTAINER) {
-          world.worldContainerManager.find(block.worldX, block.worldY).thenApply { container ->
-            container.open(this.entity)
-          }
+          block.entity?.ownedContainerOrNull?.open()
         }
       }
     }

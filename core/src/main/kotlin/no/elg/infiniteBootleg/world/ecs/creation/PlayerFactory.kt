@@ -14,7 +14,9 @@ import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType
 import no.elg.infiniteBootleg.protobuf.container
+import no.elg.infiniteBootleg.protobuf.containerOwner
 import no.elg.infiniteBootleg.protobuf.entity
+import no.elg.infiniteBootleg.protobuf.ownedContainer
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
@@ -91,9 +93,12 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
     health = DEFAULT_MAX_HEALTH
     maxHealth = DEFAULT_MAX_HEALTH
   }
-  container = container {
-    maxSize = 40
-    name = "Inventory"
+  ownedContainer = ownedContainer {
+    owner = containerOwner { entityOwner = id }
+    container = container {
+      maxSize = 40
+      name = "Inventory"
+    }
   }
   hotbar = hotbar {
     selected = 0

@@ -26,7 +26,6 @@ message World {
   Vector2i spawn = 4;
   float timeScale = 5;
   repeated ChunkColumn chunkColumns = 6;
-  WorldContainers worldContainers = 7;
 
   Generator generator = 16;
   optional Entity player = 17;
@@ -36,15 +35,6 @@ message World {
     FLAT = 1;
     EMPTY = 2;
   }
-
-  message WorldContainers {
-    message WorldContainer {
-      Vector2i position = 1;
-      Container container = 2;
-    }
-    repeated WorldContainer containers = 1;
-  }
-
 }
 
 message Block {
@@ -124,6 +114,16 @@ message Container {
     Element element = 3;
   }
 }
+message ContainerOwner {
+  oneof owner {
+    sint64 worldOwner = 1;
+    string entityOwner = 2;
+  }
+}
+message OwnedContainer {
+  Container container = 1;
+  ContainerOwner owner = 2;
+}
 
 message Entity {
   EntityType entityType = 1;
@@ -138,7 +138,7 @@ message Entity {
   optional Player player = 18;
   optional Vector2f velocity = 19;
   optional Explosive explosive = 20;
-  optional Container container = 21;
+  optional OwnedContainer ownedContainer = 21;
   optional Texture texture = 22;
   optional LookDirection lookDirection = 23;
   optional Hotbar hotbar = 24;

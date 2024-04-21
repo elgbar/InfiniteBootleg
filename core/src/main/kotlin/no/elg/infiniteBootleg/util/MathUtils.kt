@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package no.elg.infiniteBootleg.util
 
 const val RADIANS_TO_DEGREES: Float = 57.29578f

@@ -514,7 +514,7 @@ class ChunkImpl(
     dirty()
     chunkBody.update()
     chunkListeners.registerListeners()
-    Main.inst().scheduler.executeAsync(::updateAllBlockLights)
+    Main.inst().scheduler.executeAsync(runnable = ::updateAllBlockLights)
   }
 
   fun queryEntities(callback: ((Iterable<Entity>) -> Boolean)) =
@@ -527,7 +527,7 @@ class ChunkImpl(
         x = chunkX
         y = chunkY
       }
-      blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
+      blocks += this@ChunkImpl.map { it?.save() ?: AIR_BLOCK_PROTO }
       queryEntities { entities ->
         this.entities += entities.mapNotNull {
           if (world.playersEntities.contains(it)) {
@@ -537,7 +537,9 @@ class ChunkImpl(
             it.save(toAuthoritative = true)
           }
         }
-        future.complete(this._build())
+        val protoChunk = _build()
+        Main.logger().debug("PB Chunk Save") { TextFormat.printer().shortDebugString(protoChunk) }
+        future.complete(protoChunk)
       }
     }
     return future
@@ -549,7 +551,7 @@ class ChunkImpl(
         x = chunkX
         y = chunkY
       }
-      blocks += this@ChunkImpl.map { it?.save()?.build() ?: AIR_BLOCK_PROTO }
+      blocks += this@ChunkImpl.map { it?.save() ?: AIR_BLOCK_PROTO }
     }
 
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
@@ -614,8 +616,7 @@ class ChunkImpl(
   }
 
   companion object {
-    val AIR_BLOCK_PROTO_BUILDER = Block.save(Material.AIR)
-    val AIR_BLOCK_PROTO = AIR_BLOCK_PROTO_BUILDER.build()
+    val AIR_BLOCK_PROTO = Block.save(Material.AIR).build()
     val NOT_CHECKING_DISTANCE = WorldCompactLocArray(0)
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {

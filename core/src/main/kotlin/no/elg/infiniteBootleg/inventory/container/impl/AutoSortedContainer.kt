@@ -11,10 +11,10 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
  * @author kheba
  */
 class AutoSortedContainer(
-  size: Int,
   name: String,
+  size: Int = DEFAULT_SIZE,
   private val sortOrder: SortOrder = defaultSortOrder
-) : ContainerImpl(size, name) {
+) : ContainerImpl(name, size) {
 
   override val type: ProtoWorld.Container.Type get() = ProtoWorld.Container.Type.AUTO_SORTED
 

@@ -1,28 +1,19 @@
 package no.elg.infiniteBootleg.inventory.container
 
-import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.scenes.scene2d.Stage
-import ktx.actors.isShown
-import no.elg.infiniteBootleg.events.ContainerEvent
-import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.DEFAULT_MAX_STOCK
 import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.items.Item.Companion.fromProto
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ContainerKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
 import no.elg.infiniteBootleg.protobuf.itemOrNull
-import no.elg.infiniteBootleg.util.IBVisWindow
-import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
-import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.getContainerActor
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
 
 /**
@@ -32,9 +23,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
  * If the container can only hold valid stacks (checked with [Item.isValid]) is up to the
  * implementation.
  *
- *
- * However for [.getValid] the returned Item <bold>MUST</bold> be a valid stacks (or
- * null) if this is not the desired use [.get] for invalid stacks
  *
  * @author kheba
  */
@@ -211,50 +199,25 @@ interface Container : Iterable<IndexedItem> {
 
   companion object : ProtoConverter<Container, ProtoContainer> {
 
-    fun interfaceId(container: Container, holder: Entity?, worldPos: WorldCompactLoc?): String =
-      "container${createId("name", container.name)}${createId("holder", holder?.id)}${createId("pos", worldPos)}"
+    fun OwnedContainer.isOpen(): Boolean = ClientMain.inst().world?.render?.interfaceManager?.isOpen(owner.toInterfaceId()) ?: false
 
-    private fun createId(key: String, value: Any?): String = value?.let { "{$key=$it}" } ?: ""
-
-    fun Container?.isOpen(entity: Entity): Boolean = this?.let { container -> entity.clientWorld?.render?.isContainerOpen(container) } ?: false
-
-    private fun Container.containerActorOpen(window: IBVisWindow, stage: Stage) {
-      if (!window.isShown()) {
-        EventManager.dispatchEvent(ContainerEvent.Opening(this))
-        window.show(stage)
-      }
+    fun OwnedContainer.open() {
+      ClientMain.inst().world?.render?.let { render -> render.openInterface(owner.toInterfaceId()) { render.createContainerActor(this) } }
     }
 
-    private fun Container.containerActorClose(window: IBVisWindow) {
-      if (window.isShown()) {
-        window.close()
-        EventManager.dispatchEvent(ContainerEvent.Closed(this))
-      }
+    fun OwnedContainer.close() {
+      ClientMain.inst().world?.render?.closeInterface(owner.toInterfaceId())
     }
 
-    fun Container.open(entity: Entity) {
-      entity.getContainerActor(this)?.thenApply { (window, stage) -> containerActorOpen(window, stage) }
-    }
-
-    fun Container.close(entity: Entity) {
-      entity.getContainerActor(this)?.thenApply { (window, _) -> containerActorClose(window) }
-    }
-
-    fun Container.toggle(entity: Entity) {
-      entity.getContainerActor(this)?.thenApply { (window, stage) ->
-        if (window.isShown()) {
-          containerActorClose(window)
-        } else {
-          containerActorOpen(window, stage)
-        }
-      }
+    fun OwnedContainer.toggle() {
+      ClientMain.inst().world?.render?.let { render -> render.toggleInterface(owner.toInterfaceId()) { render.createContainerActor(this) } }
     }
 
     override fun ProtoWorld.Container.fromProto(): Container =
       when (type) {
-        ProtoWorld.Container.Type.GENERIC -> ContainerImpl(maxSize, name)
-        ProtoWorld.Container.Type.AUTO_SORTED -> AutoSortedContainer(maxSize, name)
-        else -> ContainerImpl(maxSize, name).also { Main.logger().error("Unknown container type $type") }
+        ProtoWorld.Container.Type.GENERIC -> ContainerImpl(name, maxSize)
+        ProtoWorld.Container.Type.AUTO_SORTED -> AutoSortedContainer(name, maxSize)
+        else -> ContainerImpl(name, maxSize).also { Main.logger().error("Unknown container type $type") }
       }.apply {
         // note: if an index does not exist in the proto, the slot is implicitly empty
         for (indexedItem in itemsList) {
