@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.queueInputEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.world.World
+import java.util.concurrent.CopyOnWriteArraySet
 
 class ECSInputListener(val world: World) : InputProcessor, Disposable {
 
@@ -16,8 +17,8 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
     return false
   }
 
-  private val buttonsDownSet = mutableSetOf<Int>()
-  private val keysDownSet = mutableSetOf<Int>()
+  private val buttonsDownSet: MutableSet<Int> = CopyOnWriteArraySet()
+  private val keysDownSet: MutableSet<Int> = CopyOnWriteArraySet()
 
   val keysDown: Set<Int> get() = keysDownSet
 
