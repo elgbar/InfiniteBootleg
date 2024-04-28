@@ -27,7 +27,6 @@ import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Com
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
-import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.controlledEntityWithInputEventFamily
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
@@ -73,7 +72,6 @@ object InputSystem :
   private fun WorldEntity.mouseDragged(set: Set<Int>) {
     val update =
       if (Input.Buttons.LEFT in set) {
-        entity.currentlyBreakingComponentOrNull?.reset()
         interpolate(true, ::breakBlocks)
       } else if (Input.Buttons.RIGHT in set) {
         interpolate(true, ::placeBlocks)
