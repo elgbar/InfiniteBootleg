@@ -51,7 +51,7 @@ import java.lang.reflect.InvocationTargetException;
  * Repository</a> for more information.
  *
  * <p>Improved by only refresh the console when it is visible. This must be done by setting the max
- * log entries to a finite number, {@code 10 000} is a good number.
+ * log entries to a finite number, {@code 5 000} is a good number.
  *
  * @author StrongJoshua
  * @author Elgbar

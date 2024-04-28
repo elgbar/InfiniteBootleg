@@ -25,7 +25,7 @@ class CGUIConsole(private val consoleHandler: ConsoleHandler, skin: Skin, useMul
 ) {
 
   init {
-    setMaxEntries(10_000)
+    setMaxEntries(5_000)
   }
 
   override fun printHelp(command: String) {
