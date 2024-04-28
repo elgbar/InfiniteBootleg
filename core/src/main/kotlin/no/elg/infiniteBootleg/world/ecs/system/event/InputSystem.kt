@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.util.FLY_VEL
 import no.elg.infiniteBootleg.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.util.MAX_X_VEL
@@ -21,7 +22,6 @@ import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.g
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
-import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -61,7 +61,10 @@ object InputSystem :
       Input.Buttons.RIGHT -> {
         val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
         if (block.material == Material.CONTAINER) {
-          block.entity?.ownedContainerOrNull?.open()
+          val owner = ContainerOwner.from(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
+          world.worldContainerManager.find(owner).thenApply { container ->
+            container?.open()
+          }
         }
       }
     }

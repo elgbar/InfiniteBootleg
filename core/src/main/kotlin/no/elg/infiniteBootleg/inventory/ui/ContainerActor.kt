@@ -63,8 +63,13 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
     val listener: Event.() -> Unit = { Main.inst().scheduler.executeSync { updateAllSlots() } }
-    registerListener<ContainerEvent.Changed>(true, { it.container == container }, listener)
-    registerListener<InterfaceEvent.Update>(true, filter, listener)
+    registerListener<ContainerEvent.Changed>(true, { it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
+      val serverContainer = this.container
+      Main.inst().scheduler.executeSync {
+        serverContainer.content.copyInto(container.content)
+        listener()
+      }
+    }
     registerListener<InterfaceEvent.Opening>(true, filter, listener)
 
     for (containerSlot in container) {

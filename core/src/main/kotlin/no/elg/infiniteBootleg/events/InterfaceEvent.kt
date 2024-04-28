@@ -26,9 +26,4 @@ sealed interface InterfaceEvent : Event {
    * Fired after an interface is removed
    */
   data class Removed(override val interfaceId: InterfaceId) : InterfaceEvent
-
-  /**
-   * Fired when an interface should be updated
-   */
-  data class Update(override val interfaceId: InterfaceId) : InterfaceEvent
 }

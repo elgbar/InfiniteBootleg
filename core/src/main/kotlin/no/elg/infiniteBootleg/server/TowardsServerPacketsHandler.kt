@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.fromProto
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromProto
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -185,7 +186,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
       ctx.fatal("handleSecretExchange: Failed to find entity with the given uuid")
     }
   } catch (e: Exception) {
-    ctx.fatal("handleSecretExchange: Failed to parse entity")
+    ctx.fatal("handleSecretExchange: ${e::class} thrown when trying to handle secret exchange")
     e.printStackTrace()
   }
 }
@@ -336,7 +337,11 @@ private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breaking
 private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: ContainerUpdate) {
   // Naive and simple re-broadcast
   // TODO check that the player can do this
-  broadcast(clientBoundPacketBuilder(DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
+  val (owner, container) = containerUpdate.worldContainer.fromProto()
+  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
+    container.content.copyInto(serverOwnedContainer.container.content)
+  }
+  broadcast(clientBoundPacketBuilder(DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) // { c -> c != ctx.channel() }
 }
 
 private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {

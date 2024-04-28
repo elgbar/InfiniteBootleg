@@ -5,8 +5,7 @@ import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.fromProto
-import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.fromProto
+import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromProto
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -391,7 +390,6 @@ private fun ServerClient.asyncHandleBreakingBlock(breakingBlock: Packets.Breakin
 
 private fun ServerClient.asyncHandleContainerUpdate(containerUpdate: ContainerUpdate) {
   val containerManager = world?.worldContainerManager as ServerClientWorldContainerManager
-  val worldContainer = containerUpdate.worldContainer
-  val owner = worldContainer.owner.fromProto() ?: error("Cannot update container with no owner")
-  containerManager.updateContainerFromServer(owner, worldContainer.container.fromProto())
+  val ownedContainer = containerUpdate.worldContainer.fromProto()
+  containerManager.updateContainerFromServer(ownedContainer)
 }
