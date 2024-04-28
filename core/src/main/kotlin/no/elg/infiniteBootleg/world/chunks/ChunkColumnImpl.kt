@@ -39,8 +39,8 @@ class ChunkColumnImpl(
     if (initialTopSolid != null && initialTopLight != null) {
       require(initialTopSolid.size == CHUNK_SIZE) { "Chunk column was given initial top solid blocks with wrong size! Expected $CHUNK_SIZE, got ${initialTopSolid.size}" }
       require(initialTopLight.size == CHUNK_SIZE) { "Chunk column was given initial top light blocks with wrong size! Expected $CHUNK_SIZE, got ${initialTopLight.size}" }
-      System.arraycopy(initialTopSolid, 0, topWorldYSolid, 0, CHUNK_SIZE)
-      System.arraycopy(initialTopLight, 0, topWorldYLight, 0, CHUNK_SIZE)
+      initialTopSolid.copyInto(topWorldYSolid, endIndex = CHUNK_SIZE)
+      initialTopSolid.copyInto(topWorldYLight, endIndex = CHUNK_SIZE)
     } else {
       for (localX in 0 until CHUNK_SIZE) {
         val worldX = getWorldX(localX)

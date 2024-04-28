@@ -88,8 +88,6 @@ val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY
 
 val PLAYERS_ENTITY_ARRAY = arrayOf(
   *DYNAMIC_STANDALONE_ENTITY,
-  *INVENTORY_COMPONENTS,
-  GroundedComponent::class,
   NameComponent::class,
   KillableComponent::class,
   PhysicsEventQueueComponent::class
@@ -98,6 +96,7 @@ val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
 val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
   *INVENTORY_COMPONENTS,
+  GroundedComponent::class,
   LocallyControlledComponent::class,
   FollowedByCameraTag::class,
   TextureRegionComponent::class,
