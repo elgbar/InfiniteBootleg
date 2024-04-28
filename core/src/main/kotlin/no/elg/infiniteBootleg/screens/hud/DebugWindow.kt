@@ -365,6 +365,14 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           Settings.savePeriodSeconds = it.toLong()
         }
       }
+      sep()
+      section {
+        toggleableDebugButton(
+          "Log packets",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::logPackets
+        )
+      }
     }
     pack()
   }.also { debugWindows += it }
