@@ -53,6 +53,7 @@ import no.elg.infiniteBootleg.protobuf.interfaceUpdate
 import no.elg.infiniteBootleg.protobuf.moveEntity
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.toComponentsString
@@ -174,16 +175,16 @@ fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInform
   ).build()
 }
 
-fun ServerClient.serverBoundChunkRequestPacket(x: Int, y: Int): Packet {
+fun ServerClient.serverBoundChunkRequestPacket(x: ChunkCoord, y: ChunkCoord): Packet {
   return serverBoundChunkRequestPacket(Vector2i.newBuilder().setX(x).setY(y).build())
 }
 
 private fun ServerClient.serverBoundContentRequest(block: ContentRequestKt.Dsl.() -> Unit): Packet =
   serverBoundPacketBuilder(SB_CONTENT_REQUEST).setContentRequest(contentRequest(block)).build()
 
-fun ServerClient.serverBoundChunkRequestPacket(location: Vector2i): Packet =
+fun ServerClient.serverBoundChunkRequestPacket(chunkPos: Vector2i): Packet =
   serverBoundContentRequest {
-    chunkLocation = location
+    chunkLocation = chunkPos
   }
 
 fun ServerClient.serverBoundEntityRequest(uuid: String): Packet =
