@@ -79,8 +79,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           "Render entity markers",
           "Render entity block markers, a block to connect entities which represent a block as a temporary marker in the block world",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = Settings::debugEntityMarkerBlocks,
-          onToggle = { Settings.debugEntityMarkerBlocks = !Settings.debugEntityMarkerBlocks }
+          property = Settings::debugEntityMarkerBlocks
         )
       }
 
@@ -89,30 +88,26 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           "Render existing air",
           "Render air blocks, which are normally indistinguishable from non-existing blocks, as cute little clouds ",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = Settings::renderAirBlocks,
-          onToggle = { Settings.renderAirBlocks = !Settings.renderAirBlocks }
+          property = Settings::renderAirBlocks
         )
         toggleableDebugButton(
           "Validate families",
           "Whether entity families should be validated. If invalid the entity will not be added to the entity engine",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = Settings::validateEntityFamilies,
-          onToggle = { Settings.validateEntityFamilies = !Settings.validateEntityFamilies }
+          property = Settings::validateEntityFamilies
         )
         toggleableDebugButton(
           "Render top block changes",
           "Render changes to the top block of a chunk column",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = Settings::renderTopBlockChanges,
-          onToggle = { Settings.renderTopBlockChanges = !Settings.renderTopBlockChanges }
+          property = Settings::renderTopBlockChanges
         )
 
         toggleableDebugButton(
           "UI debug",
           "Toggles debugging for scene 2d",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = this@addDebugOverlay::isDebugAll,
-          onToggle = { this@addDebugOverlay.isDebugAll = !this@addDebugOverlay.isDebugAll }
+          property = this@addDebugOverlay::isDebugAll
         )
       }
 
@@ -245,15 +240,13 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           "Render future positions",
           "Render the N future position of spell entities",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = FuturePositionRenderer::enabled,
-          onToggle = { FuturePositionRenderer.enabled = !FuturePositionRenderer.enabled }
+          property = FuturePositionRenderer::enabled
         )
         toggleableDebugButton(
           "Check collisions",
           "Will stop rendering if a point is inside a block",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = FuturePositionRenderer::collisionCheck,
-          onToggle = { FuturePositionRenderer.collisionCheck = !FuturePositionRenderer.collisionCheck }
+          property = FuturePositionRenderer::collisionCheck
         )
 
         floatSpinner(

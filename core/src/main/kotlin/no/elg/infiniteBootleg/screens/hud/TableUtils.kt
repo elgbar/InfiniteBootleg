@@ -24,12 +24,22 @@ import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.visIBSelectBox
 import java.math.BigDecimal
+import kotlin.reflect.KMutableProperty0
 
 fun updateAllValues(onAnyElementChanged: MutableList<() -> Unit>) {
   for (onChange in onAnyElementChanged) {
     onChange()
   }
 }
+
+@Scene2dDsl
+fun KTable.toggleableDebugButton(
+  name: String,
+  description: String? = null,
+  style: String = "debug-menu-button",
+  onAnyElementChanged: MutableList<() -> Unit>,
+  property: KMutableProperty0<Boolean>
+): VisTextButton = toggleableDebugButton(name, description, style, onAnyElementChanged, property::get) { property.set(!property.get()) }
 
 @Scene2dDsl
 fun KTable.toggleableDebugButton(
