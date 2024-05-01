@@ -264,7 +264,7 @@ private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
   val worldY = blockUpdate.pos.y
   if (world.isChunkLoaded(worldXYtoChunkCompactLoc(worldX, worldY))) {
     val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
-    world.setBlock(worldX, worldY, protoBlock, updateTexture = false, prioritize = false, sendUpdatePacket = false)
+    world.setBlock(worldX, worldY, protoBlock, updateTexture = true, prioritize = false, sendUpdatePacket = false)
   } else {
     Main.logger().warn("handleSpawnEntity", "Sever sent block update to unloaded client chunk")
     sendServerBoundPacket(serverBoundChunkRequestPacket(blockUpdate.pos))
