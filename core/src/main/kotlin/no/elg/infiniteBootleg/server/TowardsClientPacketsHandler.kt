@@ -267,6 +267,7 @@ private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
     world.setBlock(worldX, worldY, protoBlock, updateTexture = false, prioritize = false, sendUpdatePacket = false)
   } else {
     Main.logger().warn("handleSpawnEntity", "Sever sent block update to unloaded client chunk")
+    sendServerBoundPacket(serverBoundChunkRequestPacket(blockUpdate.pos))
   }
 }
 
