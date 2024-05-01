@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import com.badlogic.gdx.utils.Disposable
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.netty.channel.ChannelFuture
@@ -19,7 +20,7 @@ class ServerClient(
   val name: String,
   var world: ServerClientWorld? = null,
   var protoEntity: ProtoWorld.Entity? = null
-) {
+) : Disposable {
 
   lateinit var ctx: ChannelHandlerContextWrapper
   var sharedInformation: SharedInformation? = null
@@ -45,6 +46,11 @@ class ServerClient(
    */
   @Suppress("NOTHING_TO_INLINE")
   inline fun sendServerBoundPacket(packet: Packets.Packet): ChannelFuture = ctx.writeAndFlushPacket(packet)
+
+  override fun dispose() {
+    sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client dispoed") }
+    ctx.disconnect()
+  }
 
   companion object {
     /**

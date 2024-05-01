@@ -20,8 +20,6 @@ import no.elg.infiniteBootleg.screens.MainMenuScreen
 import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ServerClient
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.util.FailureWatchdog
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.ClientWorld
@@ -113,7 +111,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
           world?.save()
           world?.dispose()
         } else if (isClient) {
-          serverClient.sendServerBoundPacket { serverBoundClientDisconnectPacket("Client shutdown") }
+          serverClient?.dispose()
         }
         scheduler.shutdown()
       }
