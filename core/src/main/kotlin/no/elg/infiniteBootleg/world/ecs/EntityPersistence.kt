@@ -39,6 +39,7 @@ import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent
@@ -90,38 +91,42 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
   }
 
   return entity {
+    //required
     trySave(this@save.entityTypeComponent)
     trySave(this@save.idComponent)
     trySave(this@save.positionComponent)
     trySave(this@save.worldComponent)
 
     tags = tags {
+      trySave(this@save.authoritativeOnlyOrNull)
+      trySave(this@save.canBeOutOfBoundsComponentOrNull)
       trySave(this@save.flyingComponentOrNull)
       trySave(this@save.followedByCameraComponentOrNull)
       trySave(this@save.gravityAffectedComponentOrNull)
       trySave(this@save.ignorePlaceableCheckComponentOrNull)
       trySave(this@save.leafDecayComponentOrNull)
-      trySave(this@save.canBeOutOfBoundsComponentOrNull)
-      trySave(this@save.authoritativeOnlyOrNull)
     }
 
-    trySave(this@save.box2dOrNull)
-    trySave(this@save.explosiveComponentOrNull)
+    //inventory
     trySave(this@save.containerComponentOrNull)
     trySave(this@save.hotbarComponentOrNull)
+    
+    trySave(this@save.box2dOrNull)
+    trySave(this@save.chunkComponentOrNull)
+    trySave(this@save.doorComponentOrNull)
+    trySave(this@save.explosiveComponentOrNull)
+    trySave(this@save.groundedComponentOrNull)
+    trySave(this@save.inputEventQueueOrNull)
     trySave(this@save.killableComponentOrNull)
+    trySave(this@save.locallyControlledComponentOrNull)
     trySave(this@save.lookDirectionComponentOrNull)
     trySave(this@save.materialComponentOrNull)
     trySave(this@save.nameComponentOrNull)
-    trySave(this@save.textureRegionComponentOrNull)
-    trySave(this@save.velocityComponentOrNull)
-    trySave(this@save.locallyControlledComponentOrNull)
-    trySave(this@save.chunkComponentOrNull)
-    trySave(this@save.doorComponentOrNull)
-    trySave(this@save.groundedComponentOrNull)
     trySave(this@save.occupyingBlocksComponentOrNull)
-    trySave(this@save.inputEventQueueOrNull)
     trySave(this@save.physicsEventQueueOrNull)
+    trySave(this@save.textureRegionComponentOrNull)
+    trySave(this@save.tintedComponentOrNull)
+    trySave(this@save.velocityComponentOrNull)
   }
 }
 
