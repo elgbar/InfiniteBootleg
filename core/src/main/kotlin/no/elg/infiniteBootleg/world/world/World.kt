@@ -227,6 +227,7 @@ abstract class World(
     MathUtils.random.setSeed(seed)
     uuid = generateUUIDFromLong(seed).toString()
     name = worldName
+    @Suppress("LeakingThis")
     val world: World = this
     worldTicker = WorldTicker(world, false)
     worldTime = WorldTime(world)
@@ -391,6 +392,11 @@ abstract class World(
     }
     val worldFolder = worldFolder ?: return
     Main.logger().debug("World") { "Saving world '$name'" }
+
+    if (Main.isServer) {
+      playersEntities.forEach(WorldLoader::saveServerPlayer)
+    }
+
     chunksLock.write {
       val chunkLoader = chunkLoader
       if (chunkLoader is FullChunkLoader) {

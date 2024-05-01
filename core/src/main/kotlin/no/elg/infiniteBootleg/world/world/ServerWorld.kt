@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
+import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer
 import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
 
@@ -68,6 +69,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
   }
 
   private fun onEntityRemove(player: Entity) {
+    WorldLoader.saveServerPlayer(player)
     render.removeClient(player.id)
   }
 }

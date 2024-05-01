@@ -79,7 +79,7 @@ object WorldLoader {
     return createNewServerPlayer()
   }
 
-  private fun saveServerPlayer(player: Entity) {
+  fun saveServerPlayer(player: Entity) {
     val protoPlayer = player.save(toAuthoritative = true, ignoreTransient = true) ?: return
     val fileHandle = getServerPlayerFile(player.world, player.id) ?: return
     try {
