@@ -39,6 +39,7 @@ import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.components.TintedComponent
 import no.elg.infiniteBootleg.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponentOrNull
@@ -107,10 +108,10 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
       trySave(this@save.leafDecayComponentOrNull)
     }
 
-    //inventory
+    // inventory
     trySave(this@save.containerComponentOrNull)
     trySave(this@save.hotbarComponentOrNull)
-    
+
     trySave(this@save.box2dOrNull)
     trySave(this@save.chunkComponentOrNull)
     trySave(this@save.doorComponentOrNull)
@@ -149,31 +150,34 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     WorldComponent.load(this, protoEntity) { world }
 
     protoEntity.tagsOrNull?.let {
+      AuthoritativeOnlyTag.load(this, it)
+      CanBeOutOfBoundsTag.load(this, it)
       FlyingTag.load(this, it)
       FollowedByCameraTag.load(this, it)
       GravityAffectedTag.load(this, it)
       IgnorePlaceableCheckTag.load(this, it)
       LeafDecayTag.load(this, it)
-      CanBeOutOfBoundsTag.load(this, it)
-      AuthoritativeOnlyTag.load(this, it)
     }
 
-    ExplosiveComponent.load(this, protoEntity)
+    // inventory
     ContainerComponent.load(this, protoEntity)
     HotbarComponent.load(this, protoEntity)
+
+    ChunkComponent.load(this, protoEntity) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
+    DoorComponent.load(this, protoEntity)
+    ExplosiveComponent.load(this, protoEntity)
+    GroundedComponent.load(this, protoEntity)
+    InputEventQueueComponent.load(this, protoEntity)
     KillableComponent.load(this, protoEntity)
+    LocallyControlledComponent.load(this, protoEntity)
     LookDirectionComponent.load(this, protoEntity)
     MaterialComponent.load(this, protoEntity)
     NameComponent.load(this, protoEntity)
-    TextureRegionComponent.load(this, protoEntity)
-    VelocityComponent.load(this, protoEntity)
-    LocallyControlledComponent.load(this, protoEntity)
-    ChunkComponent.load(this, protoEntity) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
-    DoorComponent.load(this, protoEntity)
-    GroundedComponent.load(this, protoEntity)
     OccupyingBlocksComponent.load(this, protoEntity)
     PhysicsEventQueueComponent.load(this, protoEntity)
-    InputEventQueueComponent.load(this, protoEntity)
+    TextureRegionComponent.load(this, protoEntity)
+    TintedComponent.load(this, protoEntity)
+    VelocityComponent.load(this, protoEntity)
 
     // Load box2d body last, as it depends on other components
     val futureCompleter: () -> (Entity) -> Unit = {
