@@ -14,7 +14,11 @@ object Settings {
 
   private const val DEFAULT_PORT = 8558
 
-  /** If worlds should be loaded from disk  */
+  /**
+   * If worlds should be loaded from disk
+   *
+   * Use [no.elg.infiniteBootleg.world.world.World.isTransient] to check if the world is transient
+   */
   @JvmField
   var loadWorldFromDisk = true
 

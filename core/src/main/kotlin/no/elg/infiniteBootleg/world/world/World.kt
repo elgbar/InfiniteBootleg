@@ -213,7 +213,11 @@ abstract class World(
   @JvmField
   val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 
-  protected var transientWorld: Boolean = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
+  /**
+   * Whether this world is can be saved to disk
+   */
+  var isTransient: Boolean = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
+    private set
 
   val tick get() = worldTicker.tickId
 
@@ -294,9 +298,9 @@ abstract class World(
   fun initialize() {
     var willDispatchChunksLoadedEvent = false
     val worldFolder = worldFolder
-    if (!transientWorld && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
+    if (!isTransient && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
       if (!Settings.ignoreWorldLock) {
-        transientWorld = true
+        isTransient = true
         Main.logger().warn("World", "World found is already in use. Initializing world as a transient.")
       } else {
         Main.logger().warn("World", "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!")
@@ -304,7 +308,7 @@ abstract class World(
     }
     if (worldFolder == null) {
       Main.logger().log("No world save found")
-    } else if (transientWorld) {
+    } else if (isTransient) {
       Main.logger().log("World is transient, will not load from disk")
     } else {
       Main.logger().log("Loading world from '${worldFolder.file().absolutePath}'")
@@ -320,7 +324,7 @@ abstract class World(
         }
       } else {
         Main.logger().error("Failed to write world lock file! Setting world to transient to be safe")
-        transientWorld = true
+        isTransient = true
       }
     }
 
@@ -382,7 +386,7 @@ abstract class World(
   }
 
   fun save() {
-    if (transientWorld || Main.isNotAuthoritative) {
+    if (isTransient) {
       return
     }
     val worldFolder = worldFolder ?: return
@@ -425,7 +429,7 @@ abstract class World(
      * @return The current folder of the world or `null` if no disk should be used
      */
     get() {
-      if (transientWorld) {
+      if (isTransient) {
         return null
       }
       if (worldFile == null) {
@@ -1147,7 +1151,7 @@ abstract class World(
       }
       chunks.clear()
     }
-    if (Main.isAuthoritative && !transientWorld) {
+    if (Main.isAuthoritative && !isTransient) {
       val worldFolder = worldFolder
       if (worldFolder != null && worldFolder.isDirectory) {
         deleteLockFile(uuid)

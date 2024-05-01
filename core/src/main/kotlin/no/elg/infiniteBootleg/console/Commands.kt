@@ -530,12 +530,15 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
-  @ConsoleDoc(description = "Save the world server side")
+  @ConsoleDoc(description = "Save the world if possible")
   fun save() {
     val world = world ?: return
-    Main.logger().info("World") { "Starting to manually save world '${world.name}'" }
-    world.save()
-    Main.logger().info("World") { "Finish manually saving '${world.name}'" }
+    if (world.isTransient) {
+      logger.error("Cannot save the transient $world")
+    } else {
+      world.save()
+      logger.success("World $world saved")
+    }
   }
 
   @ClientsideOnly

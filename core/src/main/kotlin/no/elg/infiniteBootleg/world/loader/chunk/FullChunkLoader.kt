@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.loader.chunk
 
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -15,7 +14,7 @@ import no.elg.infiniteBootleg.world.world.World
  * Handle saving and loading of chunks.
  *
  *
- * If a chunk is saved to disk then that chunk will be loaded (assuming [Settings.loadWorldFromDisk] is `true`) Otherwise it will be generated with the given [ ]
+ * If a chunk is saved to disk then that chunk will be loaded (assuming [World.isTransient] is `false`) Otherwise it will be generated
  *
  * @author Elg
  */
@@ -38,7 +37,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
 
   //    @GuardedBy("no.elg.infiniteBootleg.world.world.World.chunksLock.writeLock()")
   fun save(chunk: Chunk) {
-    if (Settings.loadWorldFromDisk && chunk.shouldSave()) {
+    if (!world.isTransient && chunk.shouldSave()) {
       // only save if valid and changed
       val fh = getChunkFile(world, chunk.chunkX, chunk.chunkY) ?: return
       chunk.save().thenApply {
@@ -53,7 +52,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
    * @return If a chunk at the given location exists
    */
   private fun existsOnDisk(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
-    if (!Settings.loadWorldFromDisk) {
+    if (world.isTransient) {
       return false
     }
     val chunkFile = getChunkFile(world, chunkX, chunkY)
