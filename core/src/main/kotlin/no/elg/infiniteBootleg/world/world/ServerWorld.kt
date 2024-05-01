@@ -6,13 +6,12 @@ import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.server.broadcastToInView
+import no.elg.infiniteBootleg.server.broadcastToInViewChunk
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.isType
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
@@ -55,15 +54,14 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
   }
 
   private fun onEntityAdd(player: Entity) {
-    render.addClient(player.id, ServerClientChunksInView(player.positionComponent.x.worldToChunk(), player.positionComponent.y.worldToChunk()))
+    val positionComponent = player.positionComponent
+    val chunkX = positionComponent.x.worldToChunk()
+    val chunkY = positionComponent.y.worldToChunk()
+    render.addClient(player.id, ServerClientChunksInView(chunkX, chunkY))
     render.update()
     if (player.shouldSendToClients) {
       Main.inst().scheduler.executeSync {
-        broadcastToInView(
-          clientBoundSpawnEntity(player),
-          player.getComponent(PositionComponent::class.java).blockX,
-          player.getComponent(PositionComponent::class.java).blockY
-        )
+        broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
       }
     }
   }

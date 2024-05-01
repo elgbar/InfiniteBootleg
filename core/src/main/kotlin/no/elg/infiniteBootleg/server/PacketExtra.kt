@@ -108,17 +108,19 @@ fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
  *
  * Can only be used by a server instance
  */
-fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
+fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
   require(Main.isServer) { "This broadcasting methods can only be used by servers" }
   val world = ServerMain.inst().serverWorld
   val renderer = world.render
-  val chunkX = worldX.worldToChunk()
-  val chunkY = worldY.worldToChunk()
   broadcast(packet) { channel ->
     val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
     val viewing = renderer.getClient(sharedInfo.entityUUID) ?: return@broadcast false
     return@broadcast viewing.isInView(chunkX, chunkY) && filter.matches(channel)
   }
+}
+
+fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
+  broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
 }
 
 fun ServerClient.serverBoundPacketBuilder(type: Type): Packet.Builder {

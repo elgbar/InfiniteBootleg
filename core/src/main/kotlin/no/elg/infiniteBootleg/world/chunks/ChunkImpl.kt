@@ -225,7 +225,7 @@ class ChunkImpl(
         }
       } else if (Main.isServerClient && !block.isMarkerBlock()) {
         Main.inst().scheduler.executeAsync {
-          val client = ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundBlockUpdate(worldX, worldY, block) }
+          ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundBlockUpdate(worldX, worldY, block) }
         }
       }
     }
@@ -538,7 +538,9 @@ class ChunkImpl(
           }
         }
         val protoChunk = _build()
-        Main.logger().debug("PB Chunk Save") { TextFormat.printer().shortDebugString(protoChunk) }
+        if (Settings.logPackets && Settings.debug) {
+          Main.logger().debug("PB Chunk Save") { TextFormat.printer().shortDebugString(protoChunk) }
+        }
         future.complete(protoChunk)
       }
     }

@@ -273,9 +273,9 @@ private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
 
 private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   if (chunksLoaded) {
-    Main.logger().debug("handleSpawnEntity") { "Server sent spawn entity packet\n${spawnEntity.entity}" }
+    Main.logger().debug("handleSpawnEntity") { "Server sent spawn entity packet" }
   } else {
-    Main.logger().debug("handleSpawnEntity") { "Server sent spawn entity packet before chunks loaded packet, ignoring it.\n${spawnEntity.entity}" }
+    Main.logger().debug("handleSpawnEntity") { "Server sent spawn entity packet before chunks loaded packet, ignoring it" }
     return
   }
   val world = this.world
