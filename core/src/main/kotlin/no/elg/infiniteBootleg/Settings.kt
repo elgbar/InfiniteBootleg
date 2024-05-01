@@ -117,7 +117,7 @@ object Settings {
   /**
    * How often the world should be saved in seconds
    */
-  var savePeriodSeconds: Long = 15
+  var savePeriodSeconds: Long = 60
     set(value) {
       field = value.coerceAtLeast(1)
       Main.inst().world?.updateSavePeriod()
