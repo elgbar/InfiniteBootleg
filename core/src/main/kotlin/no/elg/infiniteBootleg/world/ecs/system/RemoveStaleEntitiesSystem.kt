@@ -7,10 +7,9 @@ import no.elg.infiniteBootleg.util.isBeingRemoved
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.ToBeDestroyedTag
-import no.elg.infiniteBootleg.world.ecs.toFamily
+import no.elg.infiniteBootleg.world.ecs.staleEntityFamily
 
-object RemoveStaleEntitiesSystem : IteratingSystem(ToBeDestroyedTag::class.toFamily(), UPDATE_PRIORITY_LAST), UniversalSystem {
+object RemoveStaleEntitiesSystem : IteratingSystem(staleEntityFamily, UPDATE_PRIORITY_LAST), UniversalSystem {
 
   private val seenEntities = HashSet<Entity>()
 

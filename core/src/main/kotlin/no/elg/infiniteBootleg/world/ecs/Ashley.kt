@@ -35,6 +35,8 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
+import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent
+import no.elg.infiniteBootleg.world.ecs.components.transients.tags.ToBeDestroyedTag
 import kotlin.reflect.KClass
 
 /**
@@ -72,28 +74,35 @@ val CONTROLLED_STANDALONE_ENTITY = arrayOf(
   InputEventQueueComponent::class
 )
 
-val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
-
-val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerComponent::class).get()
-val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).get()
-
-val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).get()
-val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).get()
-
-val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).get()
-val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).get()
-val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).get()
-
-val fallingStandaloneBlockFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, VelocityComponent::class, OccupyingBlocksComponent::class).get()
-val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class, MaterialComponent::class).get()
-
 val PLAYERS_ENTITY_ARRAY = arrayOf(
   *DYNAMIC_STANDALONE_ENTITY,
   NameComponent::class,
   KillableComponent::class,
   PhysicsEventQueueComponent::class
 )
-val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).get()
+val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
+
+
+/**
+ * Build a family that excludes [ToBeDestroyedTag]. This means that all ex
+ */
+fun Family.Builder.buildAlive(vararg additionalExcludes: KClass<out Component>): Family = exclude(*additionalExcludes, ToBeDestroyedTag::class).get()
+fun KClass<out Component>.toFamily(vararg additionalExcludes: KClass<out Component>): Family = allOf(this).buildAlive(*additionalExcludes)
+
+val entityContainerFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, ContainerComponent::class).buildAlive()
+val blockContainerFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).buildAlive()
+
+val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).buildAlive()
+val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).buildAlive()
+
+val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).buildAlive()
+val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).buildAlive()
+val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).buildAlive()
+
+val fallingStandaloneBlockFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, VelocityComponent::class, OccupyingBlocksComponent::class).buildAlive()
+val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class, MaterialComponent::class).buildAlive()
+
+val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).buildAlive()
 val localPlayerFamily: Family = allOf(
   *PLAYERS_ENTITY_ARRAY,
   *INVENTORY_COMPONENTS,
@@ -103,22 +112,25 @@ val localPlayerFamily: Family = allOf(
   TextureRegionComponent::class,
   InputEventQueueComponent::class,
   PhysicsEventQueueComponent::class
-).get()
+).buildAlive()
 
-val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).get()
-val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).exclude(AuthoritativeOnlyTag::class).get()
-val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).get()
-val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionComponent::class).get()
-val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).get()
-val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).get()
+val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).buildAlive()
+val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).buildAlive(AuthoritativeOnlyTag::class)
+val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).buildAlive()
+val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionComponent::class).buildAlive()
+val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).buildAlive()
+val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).buildAlive()
 
-val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).get()
-val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).get()
+val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCameraTag::class).buildAlive()
+val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).buildAlive()
 
-val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).get()
-val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, PhysicsEventQueueComponent::class).get()
+val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).buildAlive()
+val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, PhysicsEventQueueComponent::class).buildAlive()
 
-fun KClass<out Component>.toFamily(): Family = allOf(this).get()
+val staleEntityFamily: Family = allOf(ToBeDestroyedTag::class).get()
+
+val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionComponent::class, SpellStateComponent::class).buildAlive()
+
 
 // ////////////////////////////////////
 //  Common system update priorities  //

@@ -5,39 +5,25 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
-import ktx.ashley.allOf
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.serverBoundSpellSpawn
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.world.Staff
-import no.elg.infiniteBootleg.world.ecs.INVENTORY_COMPONENTS
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
-import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
 import no.elg.infiniteBootleg.world.ecs.components.transients.LastSpellCastComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
 import no.elg.infiniteBootleg.world.ecs.creation.createSpellEntity
+import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.magic.SpellState.Companion.canCastAgain
 import kotlin.time.TimeSource
 
-object MagicSystem :
-  IteratingSystem(
-    allOf(
-      WorldComponent::class,
-      LocallyControlledComponent::class,
-      *INVENTORY_COMPONENTS,
-      PositionComponent::class
-    ).get(),
-    UPDATE_PRIORITY_DEFAULT
-  ),
-  ClientSystem {
+object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT), ClientSystem {
 
   private val vector = Vector2()
 

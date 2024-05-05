@@ -2,23 +2,19 @@ package no.elg.infiniteBootleg.world.render
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
-import ktx.ashley.allOf
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.util.worldToScreen
-import no.elg.infiniteBootleg.world.ecs.DYNAMIC_STANDALONE_ENTITY
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent
-import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent.Companion.spellStateComponentOrNull
+import no.elg.infiniteBootleg.world.ecs.spellEntityFamily
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TIME_STEP
 
 class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
-  private val entities: ImmutableArray<Entity> =
-    worldRender.world.engine.getEntitiesFor(allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionComponent::class, SpellStateComponent::class).get())
+  private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(spellEntityFamily)
 
   @Suppress("NOTHING_TO_INLINE")
   private inline fun futurePoint(startingPos: Double, startingVel: Double, gravity: Double, n: Double): Double {
