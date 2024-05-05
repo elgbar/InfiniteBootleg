@@ -92,7 +92,7 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
   }
 
   return entity {
-    //required
+    // required
     trySave(this@save.entityTypeComponent)
     trySave(this@save.idComponent)
     trySave(this@save.positionComponent)

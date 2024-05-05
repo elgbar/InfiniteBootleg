@@ -7,9 +7,5 @@ interface SavableComponent<DSL> : Component {
   fun DSL.save()
 }
 
-interface ProtoConvertable<DSL> : Component {
-  fun toProtobuf(): DSL
-}
-
 interface TagSavableComponent : SavableComponent<EntityKt.TagsKt.Dsl>
 interface EntitySavableComponent : SavableComponent<EntityKt.Dsl>

@@ -80,12 +80,18 @@ object WorldLoader {
   }
 
   fun saveServerPlayer(player: Entity) {
-    val protoPlayer = player.save(toAuthoritative = true, ignoreTransient = true) ?: return
-    val fileHandle = getServerPlayerFile(player.world, player.id) ?: return
+    val protoPlayer = player.save(toAuthoritative = true, ignoreTransient = true) ?: run {
+      Main.logger().warn("Failed to create protobuf entity of player ${player.id}")
+      return
+    }
+    val fileHandle = getServerPlayerFile(player.world, player.id) ?: run {
+      Main.logger().warn("Failed to get server player file for ${player.id}")
+      return
+    }
     try {
       fileHandle.writeBytes(protoPlayer.toByteArray(), false)
     } catch (e: Exception) {
-      e.printStackTrace()
+      Main.logger().error("Failed to write player save to disk for ${player.id}", e)
     }
   }
 
