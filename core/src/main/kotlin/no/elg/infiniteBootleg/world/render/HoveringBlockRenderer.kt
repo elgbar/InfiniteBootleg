@@ -28,11 +28,17 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
   private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(selectedMaterialComponentFamily)
 
   override fun render() {
+    val world = worldRender.world
+    if (Main.isServerClient) {
+      ClientMain.inst().serverClient?.breakingBlockCache?.asMap()?.forEach { (blockWorldLoc, rawProgress) ->
+        renderBreakingOverlay(world, blockWorldLoc, rawProgress)
+      }
+    }
+
     if (ClientMain.inst().shouldIgnoreWorldInput()) {
       return
     }
     val mouseLocator = ClientMain.inst().mouseLocator
-    val world = worldRender.world
 
     for (entity in entities) {
       val controls = entity.locallyControlledComponentOrNull ?: continue
@@ -66,14 +72,6 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
             renderPlaceableBlock(world, texture, blockWorldLoc)
           }
       }
-      if (Main.isServerClient) {
-        ClientMain.inst().serverClient?.let {
-          it.breakingBlockCache.asMap()
-            .forEach { (blockWorldLoc, rawProgress) ->
-              renderBreakingOverlay(world, blockWorldLoc, rawProgress)
-            }
-        }
-      }
     }
   }
 
@@ -95,8 +93,8 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       // no need to render a black block
       return
     }
-    val a = overrideAlpha ?: (1f - averageBrightness).coerceAtLeast(0.33f)
-    worldRender.batch.withColor(averageBrightness, averageBrightness, averageBrightness, a) {
+    val alpha = overrideAlpha ?: (1f - averageBrightness).coerceAtLeast(0.33f)
+    worldRender.batch.withColor(averageBrightness, averageBrightness, averageBrightness, alpha) {
       val mouseScreenX = blockWorldX * Block.BLOCK_SIZE
       val mouseScreenY = blockWorldY * Block.BLOCK_SIZE
       val diffFromBlockSizeX = floorMod(mouseScreenX, Block.BLOCK_SIZE).toFloat()
