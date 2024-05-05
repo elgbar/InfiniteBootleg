@@ -197,43 +197,6 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           }
         )
       }
-      // Event tracker
-      section {
-        toggleableDebugButton(
-          "Log events",
-          "Whether to log when anything event related happens",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = EventManager::isLoggingAnyEvents,
-          onToggle = Main.inst().console.exec::trackEvents
-        )
-        toggleableDebugButton(
-          "Log events dispatched",
-          "Whether to log when an event is dispatched",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = EventManager::isLoggingEventsDispatched,
-          onToggle = {
-            EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_DISPATCHED }
-          }
-        )
-        toggleableDebugButton(
-          "Log listeners change",
-          "Whether to log when an event is listener is registered",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = EventManager::isLoggingEventListenersChange,
-          onToggle = {
-            EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENT_LISTENERS_CHANGE }
-          }
-        )
-        toggleableDebugButton(
-          "Log events listened to",
-          "Whether to log when an event is listened to. This is very spammy",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = EventManager::isLoggingEventsListenedTo,
-          onToggle = {
-            EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_LISTENED_TO }
-          }
-        )
-      }
       // Future positions renderers
       section {
         toggleableDebugButton(
@@ -373,13 +336,48 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::logPackets
         )
-      }
-      section {
         toggleableDebugButton(
           "Log persistence",
           "Log files saved to and loaded from disk",
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::logPersistence
+        )
+      }
+      // Event tracker
+      section {
+        toggleableDebugButton(
+          "Log events",
+          "Whether to log when anything event related happens",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = EventManager::isLoggingAnyEvents,
+          onToggle = Main.inst().console.exec::trackEvents
+        )
+        toggleableDebugButton(
+          "Log events dispatched",
+          "Whether to log when an event is dispatched",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = EventManager::isLoggingEventsDispatched,
+          onToggle = {
+            EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_DISPATCHED }
+          }
+        )
+        toggleableDebugButton(
+          "Log listeners change",
+          "Whether to log when an event is listener is registered",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = EventManager::isLoggingEventListenersChange,
+          onToggle = {
+            EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENT_LISTENERS_CHANGE }
+          }
+        )
+        toggleableDebugButton(
+          "Log events listened to",
+          "Whether to log when an event is listened to. This is very spammy",
+          onAnyElementChanged = onAnyElementChanged,
+          booleanGetter = EventManager::isLoggingEventsListenedTo,
+          onToggle = {
+            EventManager.getOrCreateEventsTracker().also { it.log = it.log xor EventsTracker.LOG_EVENTS_LISTENED_TO }
+          }
         )
       }
     }
