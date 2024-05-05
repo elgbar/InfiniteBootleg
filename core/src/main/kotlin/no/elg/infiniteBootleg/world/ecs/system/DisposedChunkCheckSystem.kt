@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
+import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
@@ -27,7 +28,7 @@ object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).g
         if (Settings.debug) {
           Main.logger().debug(
             "DisposedChunkCheckSystem",
-            "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)} (components: ${entity.components.joinToString()})"
+            "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)} (components: ${entity.toComponentsString()})"
           )
         }
         world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED)

@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
@@ -28,10 +29,7 @@ const val ESSENTIALLY_ZERO = 0.001f
 internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, String>>) {
   check(basicRequiredEntityFamily.matches(entity)) { "Finished entity does not match the required entity family" }
   wantedFamilies.forEach { (family: Family, errorStr) ->
-    check(family.matches(entity)) {
-      val currComponents = entity.components.map { c -> c::class.simpleName }
-      "Finished entity does not match $errorStr, current components: $currComponents"
-    }
+    check(family.matches(entity)) { "Finished entity does not match $errorStr, current components: ${entity.toComponentsString()}" }
   }
 }
 
