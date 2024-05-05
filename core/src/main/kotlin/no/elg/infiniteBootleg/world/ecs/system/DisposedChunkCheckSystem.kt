@@ -24,7 +24,8 @@ object DisposedChunkCheckSystem : IteratingSystem(ChunkComponent::class.toFamily
       val loadedChunk = world.getChunk(currentChunk.compactLocation, load = false)
       if (loadedChunk == null || loadedChunk.isDisposed) {
         Main.logger().debug("DisposedChunkCheckSystem") {
-          "Removing entity ${entity.id} as it is referencing the ${stringifyCompactLoc(entity.compactBlockLoc)} which is not loaded in the current world (components: ${entity.toComponentsString()})"
+          val chunkLoc = stringifyCompactLoc(entity.compactBlockLoc)
+          "Removing entity ${entity.id} (components: ${entity.toComponentsString()}) as it is referencing the chunk $chunkLoc; which is not loaded in the current world "
         }
         world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED)
       } else {

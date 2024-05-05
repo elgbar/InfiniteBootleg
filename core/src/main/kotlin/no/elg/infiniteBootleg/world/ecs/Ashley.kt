@@ -82,9 +82,8 @@ val PLAYERS_ENTITY_ARRAY = arrayOf(
 )
 val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
 
-
 /**
- * Build a family that excludes [ToBeDestroyedTag]. This means that all ex
+ * Build a family that excludes [ToBeDestroyedTag]. This means that all entities in the family are not stale
  */
 fun Family.Builder.buildAlive(vararg additionalExcludes: KClass<out Component>): Family = exclude(*additionalExcludes, ToBeDestroyedTag::class).get()
 fun KClass<out Component>.toFamily(vararg additionalExcludes: KClass<out Component>): Family = allOf(this).buildAlive(*additionalExcludes)
@@ -99,7 +98,6 @@ val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffec
 val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).buildAlive()
 val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).buildAlive()
 
-val fallingStandaloneBlockFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, VelocityComponent::class, OccupyingBlocksComponent::class).buildAlive()
 val standaloneGridOccupyingBlocksFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, OccupyingBlocksComponent::class, MaterialComponent::class).buildAlive()
 
 val playerFamily: Family = allOf(*PLAYERS_ENTITY_ARRAY).buildAlive()
@@ -130,7 +128,6 @@ val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, Physi
 val staleEntityFamily: Family = allOf(ToBeDestroyedTag::class).get()
 
 val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionComponent::class, SpellStateComponent::class).buildAlive()
-
 
 // ////////////////////////////////////
 //  Common system update priorities  //
