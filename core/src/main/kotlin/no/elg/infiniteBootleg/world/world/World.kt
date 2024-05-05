@@ -358,7 +358,9 @@ abstract class World(
    * @return Whether this will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
    */
   fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
-    Main.logger().debug("PB World") { TextFormat.printer().shortDebugString(protoWorld) }
+    if (Settings.debug && Settings.logPersistence) {
+      Main.logger().debug("PB World") { TextFormat.printer().shortDebugString(protoWorld) }
+    }
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time

@@ -538,7 +538,7 @@ class ChunkImpl(
           }
         }
         val protoChunk = _build()
-        if (Settings.logPackets && Settings.debug) {
+        if (Settings.debug && Settings.logPersistence) {
           Main.logger().debug("PB Chunk Save") { TextFormat.printer().shortDebugString(protoChunk) }
         }
         future.complete(protoChunk)
@@ -558,7 +558,9 @@ class ChunkImpl(
 
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
     check(initializing) { "Cannot load from proto chunk after chunk has been initialized" }
-    Main.logger().debug("PB Chunk") { TextFormat.printer().shortDebugString(protoChunk) }
+    if (Settings.debug && Settings.logPersistence) {
+      Main.logger().debug("PB Chunk") { TextFormat.printer().shortDebugString(protoChunk) }
+    }
     val chunkPosition = protoChunk.position
     val posErrorMsg = { "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})" }
     check(chunkPosition.x == chunkX, posErrorMsg)

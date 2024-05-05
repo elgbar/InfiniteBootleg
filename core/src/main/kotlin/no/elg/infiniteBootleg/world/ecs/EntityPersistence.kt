@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.ecs
 
 import com.badlogic.ashley.core.Entity
 import com.google.protobuf.TextFormat
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -140,7 +141,9 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
  */
 fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: Entity.() -> Unit = {}): CompletableFuture<Entity> {
   require(chunk == null || this === chunk.world) { "Chunk world does not match entity world" }
-  Main.logger().debug("PB Entity") { TextFormat.printer().shortDebugString(protoEntity) }
+  if (Settings.debug && Settings.logPersistence) {
+    Main.logger().debug("PB Entity") { TextFormat.printer().shortDebugString(protoEntity) }
+  }
   val world = this
   return engine.futureEntity { future ->
     // Required components

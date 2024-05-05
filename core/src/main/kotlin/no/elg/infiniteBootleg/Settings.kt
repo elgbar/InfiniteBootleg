@@ -76,7 +76,15 @@ object Settings {
 
   var renderTopBlockChanges = false
 
+  /**
+   * Log packets between client and server
+   */
   var logPackets = true
+
+  /**
+   * Log files saved to and loaded from disk
+   */
+  var logPersistence = false
 
   var validateEntityFamilies = true
 

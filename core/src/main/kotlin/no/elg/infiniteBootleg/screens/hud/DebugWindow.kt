@@ -369,8 +369,17 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       section {
         toggleableDebugButton(
           "Log packets",
+          "Log packets between client and server",
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::logPackets
+        )
+      }
+      section {
+        toggleableDebugButton(
+          "Log persistence",
+          "Log files saved to and loaded from disk",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::logPersistence
         )
       }
     }
