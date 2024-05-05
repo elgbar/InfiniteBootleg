@@ -115,7 +115,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     )
   }
 
-  @ClientsideOnly
   @ConsoleDoc(description = "Toggle debug")
   fun debug() {
     Settings.debug = !Settings.debug
