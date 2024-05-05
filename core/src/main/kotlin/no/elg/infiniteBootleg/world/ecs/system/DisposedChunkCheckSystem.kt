@@ -2,8 +2,6 @@ package no.elg.infiniteBootleg.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import ktx.ashley.allOf
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
@@ -11,30 +9,27 @@ import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactChunkLoc
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.world.ecs.toFamily
 
-object DisposedChunkCheckSystem : IteratingSystem(allOf(ChunkComponent::class).get(), UPDATE_PRIORITY_BEFORE_EVENTS), UniversalSystem {
+object DisposedChunkCheckSystem : IteratingSystem(ChunkComponent::class.toFamily(), UPDATE_PRIORITY_BEFORE_EVENTS), UniversalSystem {
+
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val world = entity.world
-    val entityChunk = entity.chunk
-    val loadedChunk = world.getChunk(entity.compactChunkLoc, load = false)
-    if (entityChunk.isDisposed) {
+    val chunkComponent = entity.chunkComponent
+    val currentChunk = chunkComponent.chunk
+    if (currentChunk.isDisposed) {
+      val world = currentChunk.world
+      val loadedChunk = world.getChunk(currentChunk.compactLocation, load = false)
       if (loadedChunk == null || loadedChunk.isDisposed) {
-        if (Settings.debug) {
-          Main.logger().debug(
-            "DisposedChunkCheckSystem",
-            "Entity ${entity.id} is out of bounds at ${stringifyCompactLoc(entity.compactBlockLoc)} (components: ${entity.toComponentsString()})"
-          )
+        Main.logger().debug("DisposedChunkCheckSystem") {
+          "Removing entity ${entity.id} as it is referencing the ${stringifyCompactLoc(entity.compactBlockLoc)} which is not loaded in the current world (components: ${entity.toComponentsString()})"
         }
         world.removeEntity(entity, Packets.DespawnEntity.DespawnReason.CHUNK_UNLOADED)
       } else {
         // Replace chunk with a loaded chunk
-        entity.chunkComponent.chunk = loadedChunk
+        chunkComponent.chunk = loadedChunk
       }
     }
   }
