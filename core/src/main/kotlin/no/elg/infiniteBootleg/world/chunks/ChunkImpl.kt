@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions
 import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
+import no.elg.infiniteBootleg.checkChunkCorrupt
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
@@ -35,6 +36,7 @@ import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -562,11 +564,11 @@ class ChunkImpl(
       Main.logger().debug("PB Chunk") { TextFormat.printer().shortDebugString(protoChunk) }
     }
     val chunkPosition = protoChunk.position
-    val posErrorMsg = { "Invalid chunk coordinates given. Expected ($chunkX, $chunkY) but got (${chunkPosition.x}, ${chunkPosition.y})" }
-    check(chunkPosition.x == chunkX, posErrorMsg)
-    check(chunkPosition.y == chunkY, posErrorMsg)
-    check(protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
-      "Invalid number of blocks. expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
+    checkChunkCorrupt(protoChunk, chunkPosition.x == chunkX && chunkPosition.y == chunkY) {
+      "Invalid chunk coordinates given. Expected ${stringifyCompactLoc(chunkX, chunkY)} but got ${stringifyCompactLoc(chunkPosition)}"
+    }
+    checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
+      "Invalid number of blocks. Expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
     }
 
     var index = 0
@@ -574,7 +576,14 @@ class ChunkImpl(
     synchronized(this) {
       for (localY in 0 until Chunk.CHUNK_SIZE) {
         for (localX in 0 until Chunk.CHUNK_SIZE) {
-          check(blocks[localX][localY] == null) { "Double assemble" }
+          checkChunkCorrupt(protoChunk, blocks[localX][localY] == null) {
+            "Double assemble of ${
+              stringifyCompactLoc(
+                localX,
+                localY
+              )
+            } in chunk ${stringifyCompactLoc(chunkPosition)}"
+          }
           val protoBlock = protoBlocks[index++]
           blocks[localX][localY] = Block.fromProto(world, this, localX, localY, protoBlock)
         }

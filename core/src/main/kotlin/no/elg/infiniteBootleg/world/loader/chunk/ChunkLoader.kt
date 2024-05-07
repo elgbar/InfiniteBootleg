@@ -2,10 +2,12 @@ package no.elg.infiniteBootleg.world.loader.chunk
 
 import com.badlogic.gdx.files.FileHandle
 import com.google.protobuf.InvalidProtocolBufferException
+import no.elg.infiniteBootleg.CorruptChunkException
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
+import no.elg.infiniteBootleg.util.deleteOrLogFile
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl
@@ -25,11 +27,18 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
    */
   abstract fun fetchChunk(chunkLoc: ChunkCompactLoc): LoadedChunk
 
-  open fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
+  fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
     val chunkPosition = protoChunk.position
     val chunk = ChunkImpl(world, chunkPosition.x, chunkPosition.y)
-    if (fullyLoadChunk(chunk, protoChunk)) {
-      return chunk
+
+    try {
+      if (fullyLoadChunk(chunk, protoChunk)) {
+        return chunk
+      }
+    } catch (e: CorruptChunkException) {
+      Main.logger().error("Failed to load chunk ${stringifyCompactLoc(chunkPosition)} from file", e)
+      deleteChunkFile(chunkPosition.x, chunkPosition.y)
+      return null
     }
     Main.logger().warn("Failed to load chunk ${stringifyCompactLoc(chunkPosition)} from a proto chunk")
     return null
@@ -60,15 +69,20 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
       return try {
         ProtoWorld.Chunk.parseFrom(bytes)
       } catch (e: InvalidProtocolBufferException) {
-        e.printStackTrace()
+        Main.logger().error("Failed to read chunk ${stringifyCompactLoc(chunkX, chunkY)} from file", e)
+        deleteChunkFile(chunkX, chunkY)
         null
       }
     }
     return null
   }
 
+  private fun deleteChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord) {
+    getChunkFile(world, chunkX, chunkY)?.let(::deleteOrLogFile)
+  }
+
   companion object {
-    @JvmStatic
+
     fun getChunkFile(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): FileHandle? {
       val worldFile = world.worldFolder ?: return null
       return worldFile.child(CHUNK_FOLDER + File.separator + chunkX + File.separator + chunkY)

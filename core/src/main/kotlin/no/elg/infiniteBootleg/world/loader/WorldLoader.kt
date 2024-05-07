@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.util.deleteOrLogFile
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
@@ -21,7 +22,6 @@ import no.elg.infiniteBootleg.world.generator.chunk.FlatChunkGenerator
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
-import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -160,15 +160,6 @@ object WorldLoader {
       return deleteOrLogFile(getWorldLockFile(uuid))
     }
   }
-
-  private fun deleteOrLogFile(file: FileHandle): Boolean =
-    try {
-      Files.delete(file.file().toPath())
-      true
-    } catch (e: Exception) {
-      Main.logger().error("Failed to delete world lock file ${file.path()}", e)
-      false
-    }
 
   fun generatorFromProto(protoWorld: ProtoWorld.World): ChunkGenerator {
     return when (protoWorld.generator) {
