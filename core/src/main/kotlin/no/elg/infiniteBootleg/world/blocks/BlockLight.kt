@@ -86,7 +86,7 @@ class BlockLight(
   fun recalculateLighting(updateId: Int) {
     fun isCancelled() = isCancelled(updateId)
 
-    if (!Settings.renderLight) {
+    if (!Settings.renderLight || chunk.isInvalid) {
       return
     }
 
