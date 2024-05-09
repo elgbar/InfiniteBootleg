@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.server
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
+import no.elg.infiniteBootleg.console.temporallyFilterPacket
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.fromProto
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromProto
@@ -277,16 +278,23 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   // Send chunk packets to client
   val ix = player.positionComponent.blockX.worldToChunk()
   val iy = player.positionComponent.blockY.worldToChunk()
-  for (cx in -Settings.viewDistance..Settings.viewDistance) {
-    for (cy in -Settings.viewDistance..Settings.viewDistance) {
-      val chunk = world.getChunk(ix + cx, iy + cy, true) ?: continue
-      ctx.writePacket(clientBoundUpdateChunkPacket(chunk))
-    }
-    ctx.flush()
-    Main.logger().debug("LOGIN") {
-      val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
-      val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
-      "Sent $sent/$total chunks sent to player ${player.name}"
+  temporallyFilterPacket(Packets.Packet.Type.CB_UPDATE_CHUNK) {
+    for (cx in -Settings.viewDistance..Settings.viewDistance) {
+      for (cy in -Settings.viewDistance..Settings.viewDistance) {
+        val chunk = try {
+          world.getChunk(ix + cx, iy + cy, true) ?: continue
+        } catch (e: IllegalStateException) {
+          Main.logger().warn("LOGIN", "Failed to get chunk at $cx, $cy")
+          continue
+        }
+        ctx.writePacket(clientBoundUpdateChunkPacket(chunk))
+      }
+      ctx.flush()
+      Main.logger().debug("LOGIN") {
+        val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
+        val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
+        "Sent $sent/$total chunks sent to player ${player.name}"
+      }
     }
   }
   ctx.writeAndFlushPacket(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
