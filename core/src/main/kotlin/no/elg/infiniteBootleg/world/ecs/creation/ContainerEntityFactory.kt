@@ -23,8 +23,8 @@ fun Engine.createContainerEntity(
   worldY: WorldCoord,
   material: Material
 ) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(allOf(*BASIC_BLOCK_ENTITY, ContainerComponent::class).get() to "container block")) {
-  this.entity.canBeOutOfBounds = true // leaves can be out of bounds, as they are removed by chunks when it is unloaded
-  this.entity.authoritativeOnly = true
+  entity.canBeOutOfBounds = true // containers can be out of bounds, as they are removed by chunks when it is unloaded
+  entity.authoritativeOnly = true
   entity.safeWith {
     val container = ContainerImpl(entity.nameOrNull ?: "Container")
     val owner = ContainerOwner.from(worldX, worldY)

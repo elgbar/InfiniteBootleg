@@ -54,7 +54,6 @@ inline fun ChunkCoord.chunkToWorld(offset: LocalCoord = 0): WorldCoord = (this s
  * @param this@chunkOffset A coordinate in world view
  * @return The local coordinate given coordinate have in chunk view
  */
-
 @Contract(pure = true)
 inline fun WorldCoord.chunkOffset(): LocalCoord = this - worldToChunk().chunkToWorld()
 

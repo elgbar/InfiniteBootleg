@@ -4,12 +4,15 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.util.chunkOffset
+import no.elg.infiniteBootleg.util.component1
+import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.isWithin
 import no.elg.infiniteBootleg.util.relativeCompact
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
@@ -25,6 +28,7 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
   override fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float) {
     val entity: Entity = entities.random()
     val chunk = entity.chunk
+    val world = entity.world
     if (chunk.isDisposed) {
       return
     }
@@ -44,7 +48,13 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
           // Block is too far away to be connected
           continue
         }
-        val neighborMaterial = entity.world.getMaterial(nextLoc, false)
+        val (worldX, worldY) = nextLoc
+
+        val neighborMaterial = world.actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
+          // Chunk is not loaded, so we don't know if we should despawn this leaf
+          val nextChunk = nullableChunk ?: return
+          nextChunk.getRawBlock(localX, localY).materialOrAir()
+        }
 
         if (neighborMaterial == Material.BIRCH_TRUNK) {
           // If there is a trunk connected to this leaf block, we don't want to despawn it and can return early

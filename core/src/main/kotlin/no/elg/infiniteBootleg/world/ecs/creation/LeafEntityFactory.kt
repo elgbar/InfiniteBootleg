@@ -17,7 +17,7 @@ fun Engine.createLeafEntity(
   worldY: WorldCoord,
   material: Material
 ) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(leafBlockFamily to "leafBlockFamily")) {
-  this.entity.leafDecay = true
-  this.entity.canBeOutOfBounds = true // leaves can be out of bounds, as they are removed by chunks when it is unloaded
-  this.entity.authoritativeOnly = true
+  entity.leafDecay = true
+  entity.canBeOutOfBounds = true // leaves can be out of bounds, as they are removed by chunks when it is unloaded
+  entity.authoritativeOnly = true
 }

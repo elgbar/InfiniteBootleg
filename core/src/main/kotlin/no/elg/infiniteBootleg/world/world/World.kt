@@ -501,11 +501,12 @@ abstract class World(
     return getChunk(compactLoc(chunkX, chunkY), load)
   }
 
-  fun getChunk(chunkLoc: Long): Chunk? {
-    return getChunk(chunkLoc, true)
-  }
-
-  fun getChunk(chunkLoc: Long, load: Boolean): Chunk? {
+  /**
+   * Find a valid chunk and optionally load it if it is not valid/not loaded
+   *
+   * @return A valid chunk
+   */
+  fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
     // This is a long lock, it must appear to be an atomic operation though
     var readChunk: Chunk? = null
     var acquiredLock = false
@@ -718,7 +719,7 @@ abstract class World(
       material.isCollidable && !isAnyEntityAt(worldX, worldY)
     }
 
-  private inline fun <R> actionOnBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R): R {
+  inline fun <R> actionOnBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R): R {
     val chunkX: ChunkCoord = worldX.worldToChunk()
     val chunkY: ChunkCoord = worldY.worldToChunk()
     val chunk: Chunk? = getChunk(chunkX, chunkY, loadChunk)
@@ -728,7 +729,7 @@ abstract class World(
     return action(localX, localY, chunk)
   }
 
-  private inline fun actionOnBlocks(
+  inline fun actionOnBlocks(
     locations: Iterable<WorldCompactLoc>,
     loadChunk: Boolean = true,
     action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> Unit
