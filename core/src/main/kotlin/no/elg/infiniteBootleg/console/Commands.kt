@@ -34,9 +34,13 @@ import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
 import no.elg.infiniteBootleg.util.toAbled
+import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.WorldTime
+import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.components.ClientComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.components.TagComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
@@ -73,6 +77,14 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       logger.error("CMD", "Failed to find world")
       null
     }
+
+  private fun findEntity(nameOrId: String): Entity? {
+    val world = world ?: return null
+    return world.getEntity(nameOrId) ?: world.namedEntities.find { it.nameOrNull == nameOrId } ?: run {
+      logger.error("No entity with UUID or name '$nameOrId'")
+      return null
+    }
+  }
 
   @CmdArgNames("red", "green", "blue", "alpha")
   @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1", paramDescriptions = ["red", "green", "blue", "alpha"])
@@ -466,8 +478,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @CmdArgNames("time of day")
   @ConsoleDoc(description = "Set the current time", paramDescriptions = ["Time of day such as day, noon, dusk, night"])
   fun time(timeOfDay: String) {
-    val time: Float
-    time = try {
+    val time: Float = try {
       // There is a chance this method is selected before  the other time method
       timeOfDay.toFloat()
     } catch (ignored: NumberFormatException) {
@@ -628,7 +639,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val oldOwnedContainer = player.ownedContainerOrNull?.also { player.closeContainer() }
 
     val newContainer: Container = when (invType.lowercase(Locale.getDefault())) {
-//      "creative", "cr" -> CreativeInventory(player)
       "autosort", "as" -> AutoSortedContainer("Auto Sorted Inventory")
       "container", "co" -> ContainerImpl("Inventory")
       else -> {
@@ -680,5 +690,62 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     } else {
       logger.error("Failed to give player $item, not enough space for $notAdded")
     }
+  }
+
+  @CmdArgNames("type")
+  @ConsoleDoc(description = "List entities", paramDescriptions = ["entity type"])
+  fun entities(type: String) {
+    val world = world ?: return
+    val entities = when (type.removeSuffix("Entities").lowercase()) {
+      "valid", "all", "*" -> world.validEntities
+      "players", "player", "p" -> world.playersEntities
+      "controlledPlayer" -> world.controlledPlayerEntities
+      "standalone" -> world.standaloneEntities
+      "validEntitiesToSendToClient" -> world.validEntitiesToSendToClient
+      "named" -> world.namedEntities
+      else -> {
+        logger.error("Unknown entity type '$type', current allowed: players, controlledPlayer, standalone, valid, validEntitiesToSendToClient, named, all, *")
+        return
+      }
+    }
+    Main.logger().success("Found ${entities.size()} entities of type $type")
+    Main.logger().success(entities.joinToString { it.id })
+  }
+
+  @CmdArgNames("entity")
+  @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
+  fun inspect(entityUUID: String) {
+    val entity = findEntity(entityUUID) ?: return
+    logger.log("===${entity.nameOrNull ?: entity.id}===")
+    for (component in entity.components) {
+      logger.log("- ${component::class.simpleName}: $component")
+    }
+  }
+
+  @CmdArgNames("entity", "component")
+  @ConsoleDoc(description = "Inspect a component of an entity", paramDescriptions = ["Entity UUID or name", "The simple name of the component to inspect"])
+  fun inspect(entityUUID: String, componentName: String) {
+    val entity = findEntity(entityUUID) ?: return
+    val searchTerm = componentName.removeSuffix("Component")
+    val component = entity.components.find { it::class.simpleName?.removeSuffix("Component").equals(searchTerm, true) } ?: run {
+      logger.error("No component with name '$componentName' in entity ${entity.id}${entity.nameOrNull?.let { " ($it)" }}")
+      return
+    }
+
+    logger.success("Found component $component in entity $entity")
+    logger.log("===${component::class.simpleName?.toTitleCase()}===")
+
+    fun printInfo(info: String, success: () -> Boolean) {
+      if (success()) {
+        logger.success(" (V) $info")
+      } else {
+        logger.error(" (X) $info")
+      }
+    }
+
+    printInfo("Client only") { component is ClientComponent }
+    printInfo("Authoritative only") { component is AuthoritativeOnlyComponent }
+    printInfo("Tag") { component is TagComponent }
+    logger.log(component.toString())
   }
 }

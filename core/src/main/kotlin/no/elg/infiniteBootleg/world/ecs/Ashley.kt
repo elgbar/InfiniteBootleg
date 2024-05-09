@@ -128,6 +128,7 @@ val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, Physi
 val staleEntityFamily: Family = allOf(ToBeDestroyedTag::class).get()
 
 val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionComponent::class, SpellStateComponent::class).buildAlive()
+val namedEntitiesFamily: Family = allOf(*REQUIRED_COMPONENTS, NameComponent::class).buildAlive()
 
 // ////////////////////////////////////
 //  Common system update priorities  //

@@ -90,6 +90,7 @@ import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
+import no.elg.infiniteBootleg.world.ecs.namedEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.ecs.system.DisposedChunkCheckSystem
@@ -262,6 +263,7 @@ abstract class World(
   val standaloneEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicStandaloneEntityFamily) }
   val validEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamily) }
   val validEntitiesToSendToClient: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient) }
+  val namedEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(namedEntitiesFamily) }
 
   private fun initializeEngine(): ThreadSafeEngine {
     val engine = ThreadSafeEngine()
