@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
 
-class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavableComponent, AuthoritativeOnlyComponent {
+data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
   override fun EntityKt.Dsl.save() {
     ownedContainer = this@ContainerComponent.ownedContainer.asProto()

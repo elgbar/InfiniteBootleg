@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameO
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import java.util.EnumMap
 
-class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarSlot, Int>) : EntitySavableComponent, UniversalSystem {
+data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarSlot, Int>) : EntitySavableComponent, UniversalSystem {
 
   init {
     // Make sure the hotbar is filled with empty slots if there is nothing else there

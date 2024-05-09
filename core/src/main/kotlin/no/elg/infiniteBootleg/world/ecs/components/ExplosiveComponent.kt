@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
-class ExplosiveComponent(
+data class ExplosiveComponent(
   var fuse: Float = FUSE_DURATION_SECONDS,
   val strength: Float = EXPLOSION_STRENGTH.toFloat()
 ) : EntitySavableComponent {

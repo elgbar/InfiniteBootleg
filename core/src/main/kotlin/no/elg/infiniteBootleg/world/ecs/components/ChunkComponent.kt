@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.StatefulEntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 
-class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
+data class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
 
   companion object : StatefulEntityLoadableMapper<ChunkComponent, Chunk>() {
     /**

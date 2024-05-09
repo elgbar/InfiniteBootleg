@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.world.magic.SpellState
 
 // The spell state of a spell entity
-class SpellStateComponent(
+data class SpellStateComponent(
   val state: SpellState,
   val spawnX: WorldCoordNumber,
   val spawnY: WorldCoordNumber,

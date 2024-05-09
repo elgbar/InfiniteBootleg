@@ -7,7 +7,7 @@ import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.world.magic.SpellState
 
 // Mark a spell as the last spell cast by an entity
-class LastSpellCastComponent(val state: SpellState) : Component {
+data class LastSpellCastComponent(val state: SpellState) : Component {
   companion object : Mapper<LastSpellCastComponent>() {
     var Entity.lastSpellCastComponentOrNull: LastSpellCastComponent? by optionalPropertyFor(LastSpellCastComponent.mapper)
     val Entity.lastSpellCastOrNull: SpellState? get() = lastSpellCastComponentOrNull?.state
