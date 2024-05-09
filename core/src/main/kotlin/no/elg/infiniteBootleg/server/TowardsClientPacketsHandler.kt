@@ -283,7 +283,8 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
     Main.logger().warn("handleSpawnEntity", "Failed to find world")
     return
   }
-  val position = spawnEntity.entity.position
+  val protoEntity = spawnEntity.entity
+  val position = protoEntity.position
   val chunkPosX = position.x.worldToChunk()
   val chunkPosY = position.y.worldToChunk()
   val chunk = world.getChunk(chunkPosX, chunkPosY, true)
@@ -291,12 +292,19 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
     Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
     return
   }
-  Main.logger().debug("handleSpawnEntity") { "Spawning a ${spawnEntity.entity.entityType}" }
+  Main.logger().debug("handleSpawnEntity") { "Spawning a ${protoEntity.entityType}" }
 
-  when (spawnEntity.entity.entityType) {
-    PLAYER -> world.load(spawnEntity.entity)
-    FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, spawnEntity.entity)
-    else -> Main.logger().error("Cannot spawn a ${spawnEntity.entity.entityType} yet")
+  when (protoEntity.entityType) {
+    PLAYER -> world.load(protoEntity)
+    FALLING_BLOCK -> world.engine.createFallingBlockStandaloneEntity(world, protoEntity)
+//    BLOCK -> {
+//      val material = protoEntity.materialOrNull?.fromProto() ?: return
+//      val localPosX = position.x.toInt().chunkOffset()
+//      val localPosY = position.y.toInt().chunkOffset()
+//      material.createBlock(world, chunk, localPosX, localPosY, protoEntity)
+//    }
+
+    else -> Main.logger().error("Cannot spawn a ${protoEntity.entityType} yet")
   }
 }
 
