@@ -8,15 +8,19 @@ import no.elg.infiniteBootleg.inventory.container.Container.Companion.close
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.isOpen
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.toggle
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromProto
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 
 data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
@@ -44,7 +48,25 @@ data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavabl
       ownedContainerOrNull?.toggle()
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { ContainerComponent(protoEntity.ownedContainer.fromProto()) }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
+      safeWith {
+        val ownedContainer = protoEntity.ownedContainer.fromProto()
+        val owner = ownedContainer.owner
+        val isValid = when (owner) {
+          is ContainerOwner.EntityOwner -> entity.id == owner.entityId
+          is ContainerOwner.BlockOwner -> entity.compactBlockLoc == owner.loc
+        }
+        if (!isValid) {
+          val newOwner = when (owner) {
+            is ContainerOwner.EntityOwner -> ContainerOwner.EntityOwner(entity.id)
+            is ContainerOwner.BlockOwner -> ContainerOwner.BlockOwner(entity.compactBlockLoc)
+          }
+          Main.logger().error("Invalid owner of container! Got $owner, but expected $ownedContainer")
+          ContainerComponent(OwnedContainer(newOwner, ownedContainer.container))
+        } else {
+          ContainerComponent(ownedContainer)
+        }
+      }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasOwnedContainer()
   }

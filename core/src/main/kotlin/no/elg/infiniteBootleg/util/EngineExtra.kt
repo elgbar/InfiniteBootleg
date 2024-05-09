@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit
  * @throws [CreateComponentException] if the engine was unable to create the component
  * @see [create]
  */
-inline fun <reified T : Component> Entity.safeWith(component: () -> T): T? {
+inline fun <reified T : Component> Entity.safeWith(component: () -> T?): T? {
 //  if (Main.isServer && T::class.isSubclassOf(ClientComponent::class)) return null
-  return component().also { add(it) }
+  return component()?.also { add(it) }
 }
 
 /**
