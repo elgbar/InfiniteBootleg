@@ -1085,7 +1085,7 @@ abstract class World(
         var chunk = chunks[chunkPos]
         if (chunk == null || chunk.isInvalid) {
           chunk = getChunk(chunkPos, loadChunk)
-          if (chunk == null) {
+          if (chunk == null || chunk.isInvalid) {
             y++
             continue
           }
