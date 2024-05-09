@@ -25,7 +25,7 @@ class AuthoritativeOnlyTag : TagSavableComponent, AuthoritativeOnlyComponent {
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.Tags): AuthoritativeOnlyTag = with<AuthoritativeOnlyTag>()
 
-    override fun ProtoWorld.Entity.Tags.checkShouldLoad(): Boolean = hasLeafDecay()
+    override fun ProtoWorld.Entity.Tags.checkShouldLoad(): Boolean = hasAuthoritativeOnly()
   }
 
   override fun EntityKt.TagsKt.Dsl.save() {
