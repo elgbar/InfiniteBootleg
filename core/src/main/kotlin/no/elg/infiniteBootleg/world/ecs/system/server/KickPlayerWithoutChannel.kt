@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.clients
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
-import no.elg.infiniteBootleg.world.ecs.api.restriction.ServerSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ServerSystem
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.playerFamily

@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.protobuf.tagsOrNull
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.api.SavableComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
 import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs.api.restriction
+package no.elg.infiniteBootleg.world.ecs.api.restriction.system
 
 /**
  * A server system handles logic that should only run when the instance is the server instance.

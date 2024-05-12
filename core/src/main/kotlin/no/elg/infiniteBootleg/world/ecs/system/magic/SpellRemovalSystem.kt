@@ -7,7 +7,7 @@ import ktx.ashley.remove
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position

@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.isBeingRemoved
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LAST
-import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.staleEntityFamily
 
 object RemoveStaleEntitiesSystem : IteratingSystem(staleEntityFamily, UPDATE_PRIORITY_LAST), UniversalSystem {

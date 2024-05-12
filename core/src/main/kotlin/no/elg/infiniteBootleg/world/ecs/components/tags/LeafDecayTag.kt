@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ecs.api.TagLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.TagSavableComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 
 class LeafDecayTag : TagSavableComponent, AuthoritativeOnlyComponent {
 

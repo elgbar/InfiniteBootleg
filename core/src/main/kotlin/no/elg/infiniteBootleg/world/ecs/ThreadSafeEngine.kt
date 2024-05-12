@@ -11,10 +11,10 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeSystem
-import no.elg.infiniteBootleg.world.ecs.api.restriction.ClientSystem
-import no.elg.infiniteBootleg.world.ecs.api.restriction.ServerSystem
-import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ClientSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ServerSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
 
 class ThreadSafeEngine : Engine(), Disposable {

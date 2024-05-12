@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 
 data class LocallyControlledComponent(

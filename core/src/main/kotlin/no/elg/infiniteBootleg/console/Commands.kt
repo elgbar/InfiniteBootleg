@@ -38,9 +38,9 @@ import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.WorldTime
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.components.ClientComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.components.TagComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.ClientComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.TagComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent

@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.creation.HOLE_DETECTOR_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_FOOT_USER_DATA
 import no.elg.infiniteBootleg.world.ecs.creation.PLAYERS_LEFT_ARM_USER_DATA

@@ -8,7 +8,7 @@ import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent.Companion.queueEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent

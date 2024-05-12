@@ -5,7 +5,7 @@ import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.server.SharedInformation
-import no.elg.infiniteBootleg.world.ecs.api.restriction.AuthoritativeOnlyComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 
 data class SharedInformationComponent(val sharedInformation: SharedInformation) : AuthoritativeOnlyComponent {
   companion object : Mapper<SharedInformationComponent>() {

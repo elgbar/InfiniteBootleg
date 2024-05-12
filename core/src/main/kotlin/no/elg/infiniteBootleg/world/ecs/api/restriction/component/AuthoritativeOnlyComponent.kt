@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.ecs.api.restriction
+package no.elg.infiniteBootleg.world.ecs.api.restriction.component
 
 import com.badlogic.ashley.core.Component
 

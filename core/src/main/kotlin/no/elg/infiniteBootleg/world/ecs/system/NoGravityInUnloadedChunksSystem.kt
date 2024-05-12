@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EARLY
-import no.elg.infiniteBootleg.world.ecs.api.restriction.UniversalSystem
+import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.tags.InUnloadedChu
 
 // TODO refactor this system to be NoMovementInUnlockedChunksSystem, disabling all movement and setting velocity to 0
 object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY), UniversalSystem {
+
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val isChunkLoaded = world.isChunkLoaded(entity.compactChunkLoc)
