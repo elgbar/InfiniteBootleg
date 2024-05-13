@@ -256,12 +256,12 @@ private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdat
   }
 }
 
-private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord) {
+private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord) {
   val serverWorld = ServerMain.inst().serverWorld
 
   // Only send chunks which the player is allowed to see
-  if (isChunkInView(ctx, worldX, worldY)) {
-    val chunk = serverWorld.getChunk(worldX, worldY, true) ?: return // if no chunk, don't send a chunk update
+  if (isChunkInView(ctx, chunkX, chunkY)) {
+    val chunk = serverWorld.getChunk(chunkX, chunkY, true) ?: return // if no chunk, don't send a chunk update
     ctx.writeAndFlushPacket(clientBoundUpdateChunkPacket(chunk))
   }
 }

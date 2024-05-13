@@ -10,7 +10,7 @@ sealed interface InterfaceEvent : Event {
   /**
    * Fired just before an interface is shown
    */
-  data class Opening(override val interfaceId: InterfaceId) : InterfaceEvent // , val window: IBVisWindow
+  data class Opening(override val interfaceId: InterfaceId) : InterfaceEvent
 
   /**
    * Fired just after an interface is hidden

@@ -48,7 +48,7 @@ class ServerClient(
   inline fun sendServerBoundPacket(packet: Packets.Packet): ChannelFuture = ctx.writeAndFlushPacket(packet)
 
   override fun dispose() {
-    sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client dispoed") }
+    sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client disposed") }
     ctx.disconnect()
   }
 
