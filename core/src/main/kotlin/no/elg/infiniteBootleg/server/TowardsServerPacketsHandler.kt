@@ -64,6 +64,7 @@ import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.s
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
@@ -71,7 +72,6 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import java.security.SecureRandom
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 private val secureRandom = SecureRandom.getInstanceStrong()
@@ -90,15 +90,17 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
 
     SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { contentRequest: Packets.ContentRequest ->
+      // Chunk request
       contentRequest.chunkLocationOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
+      // Entity request
       if (contentRequest.hasEntityUUID()) {
         val entityUUID: String = contentRequest.entityUUID
         val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
-        if (entityUUID !in requestedEntities) {
-          requestedEntities += entityUUID
-          scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID, requestedEntities) }
+        requestedEntities.get(entityUUID) {
+          scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID) }
         }
       }
+      // Container
       contentRequest.containerOwner?.let { owner: ProtoWorld.ContainerOwner ->
         scheduler.executeAsync {
           asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@executeAsync)
@@ -325,16 +327,17 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   Main.logger().log("Player ${player.name} joined")
 }
 
-private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, uuid: String, requestedEntities: ConcurrentHashMap.KeySetView<String, Boolean>) {
+private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, uuid: String) {
   val world = ServerMain.inst().serverWorld
 
-  val entity = world.getEntity(uuid)
-  if (entity != null && entity.shouldSendToClients && isLocInView(ctx, entity.positionComponent.x.toInt(), entity.positionComponent.y.toInt())) {
-    ctx.writeAndFlushPacket(clientBoundSpawnEntity(entity))
-  } else {
+  val entity = world.getEntity(uuid) ?: run {
     ctx.writeAndFlushPacket(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
+    return
   }
-  requestedEntities -= uuid
+  val position = entity.position
+  if (entity.shouldSendToClients && isLocInView(ctx, position.x.toInt(), position.y.toInt())) {
+    ctx.writeAndFlushPacket(clientBoundSpawnEntity(entity))
+  }
 }
 
 private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: BreakingBlock) {

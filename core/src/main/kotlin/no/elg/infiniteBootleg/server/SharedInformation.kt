@@ -1,7 +1,9 @@
 package no.elg.infiniteBootleg.server
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import java.time.Duration
 import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledFuture
 
 /**
@@ -14,7 +16,11 @@ data class SharedInformation(val entityUUID: String, val secret: String) {
 
   private var lastHeartbeat: Instant = Instant.now()
 
-  val requestedEntities = ConcurrentHashMap.newKeySet<String>()
+  val requestedEntities: Cache<String, Unit> by lazy {
+    Caffeine.newBuilder()
+      .expireAfterWrite(Duration.ofSeconds(5))
+      .build()
+  }
 
   var heartbeatTask: ScheduledFuture<*>? = null
     set(value) {
