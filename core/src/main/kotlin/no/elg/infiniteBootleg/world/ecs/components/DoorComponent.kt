@@ -16,6 +16,8 @@ class DoorComponent : EntitySavableComponent {
   val contacts = ObjectContactTracker<Entity>()
   val closed: Boolean get() = contacts.isEmpty
 
+  override fun hudDebug(): String = "contacts ${contacts.size} (closed? $closed)"
+
   companion object : EntityLoadableMapper<DoorComponent>() {
     var Entity.doorComponent by propertyFor(mapper)
     var Entity.doorComponentOrNull by optionalPropertyFor(mapper)

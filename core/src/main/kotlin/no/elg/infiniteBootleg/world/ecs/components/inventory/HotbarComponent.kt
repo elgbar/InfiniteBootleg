@@ -28,6 +28,8 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<Ho
    */
   val selectedIndex: Int get() = hotbarItems.getOrDefault(selected, EMPTY_INDEX)
 
+  override fun hudDebug(): String = selected.name
+
   companion object : EntityLoadableMapper<HotbarComponent>() {
 
     /**

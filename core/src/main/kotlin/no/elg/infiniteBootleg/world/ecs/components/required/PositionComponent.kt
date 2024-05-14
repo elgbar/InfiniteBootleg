@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
@@ -48,6 +49,8 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
       y = this@PositionComponent.y
     }
   }
+
+  override fun hudDebug(): String = stringifyCompactLoc(x, y)
 
   companion object : EntityLoadableMapper<PositionComponent>() {
     val Entity.position: Vector2 get() = positionComponent.toVector2()

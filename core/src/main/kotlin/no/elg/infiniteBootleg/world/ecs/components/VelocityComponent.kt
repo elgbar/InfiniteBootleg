@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.MAX_X_VEL
 import no.elg.infiniteBootleg.util.MAX_Y_VEL
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DVelocityTag.Companion.updateBox2DVelocity
@@ -41,6 +42,8 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
   }
 
   fun toVector2(): Vector2 = Vector2(dx, dy)
+
+  override fun hudDebug(): String = stringifyCompactLoc(dx, dy)
 
   companion object : EntityLoadableMapper<VelocityComponent>() {
 

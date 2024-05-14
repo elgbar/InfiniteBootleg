@@ -19,6 +19,8 @@ data class MaterialComponent(val material: Material) : EntitySavableComponent {
     material = this@MaterialComponent.material.asProto()
   }
 
+  override fun hudDebug(): String = "material $material"
+
   companion object : EntityLoadableMapper<MaterialComponent>() {
     val Entity.material get() = materialComponent.material
     val Entity.materialOrNull get() = materialComponentOrNull?.material

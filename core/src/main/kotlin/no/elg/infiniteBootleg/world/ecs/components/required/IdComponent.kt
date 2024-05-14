@@ -16,6 +16,8 @@ data class IdComponent(val id: String = UUID.randomUUID().toString()) : EntitySa
     uuid = this@IdComponent.id
   }
 
+  override fun hudDebug(): String = id
+
   companion object : EntityLoadableMapper<IdComponent>() {
 
     fun createRandomId(): IdComponent = IdComponent(UUID.randomUUID().toString())

@@ -27,6 +27,8 @@ data class LocallyControlledComponent(
 
   fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool
 
+  override fun hudDebug(): String = "brush size: $brushSize, interactRadius: $interactRadius, instantBreak: $instantBreak"
+
   companion object : EntityLoadableMapper<LocallyControlledComponent>() {
     var Entity.locallyControlledComponent by propertyFor(mapper)
     var Entity.locallyControlledComponentOrNull by optionalPropertyFor(mapper)

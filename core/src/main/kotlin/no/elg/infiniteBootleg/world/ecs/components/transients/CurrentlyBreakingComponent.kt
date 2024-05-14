@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.ecs.components.transients
 
-import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.utils.LongMap
@@ -17,8 +16,9 @@ import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.DebuggableComponent
 
-class CurrentlyBreakingComponent : Component {
+class CurrentlyBreakingComponent : DebuggableComponent {
 
   val breaking: LongMap<CurrentlyBreaking> = LongMap(16, 0.8f)
 
@@ -35,6 +35,8 @@ class CurrentlyBreakingComponent : Component {
       }
     }
   }
+
+  override fun hudDebug(): String = "Currently breaking ${breaking.values().map { "${it.block.hudDebug()} (${it.progressHandler.progress * 100f}%)" }}"
 
   companion object : Mapper<CurrentlyBreakingComponent>() {
     var Entity.currentlyBreakingComponent by propertyFor(CurrentlyBreakingComponent.mapper)

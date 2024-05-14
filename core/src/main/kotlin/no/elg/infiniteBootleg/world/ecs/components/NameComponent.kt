@@ -16,6 +16,8 @@ data class NameComponent(val name: String) : EntitySavableComponent {
     name = this@NameComponent.name
   }
 
+  override fun hudDebug(): String = name
+
   companion object : EntityLoadableMapper<NameComponent>() {
     val Entity.name get() = nameComponent.name
     val Entity.nameOrNull get() = nameComponentOrNull?.name

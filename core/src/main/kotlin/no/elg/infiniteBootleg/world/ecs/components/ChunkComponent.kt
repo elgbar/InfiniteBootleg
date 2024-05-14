@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -17,6 +18,8 @@ import no.elg.infiniteBootleg.world.ecs.api.StatefulEntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 
 data class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
+
+  override fun hudDebug(): String = "chunk ${stringifyCompactLoc(chunk)}"
 
   companion object : StatefulEntityLoadableMapper<ChunkComponent, Chunk>() {
     /**

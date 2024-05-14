@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.HorizontalDirection
 import no.elg.infiniteBootleg.world.VerticalDirection
 import no.elg.infiniteBootleg.world.blocks.Block
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -181,12 +180,12 @@ inline fun Int.decompactShortA(): Short = (this shr SIZE).toShort()
 
 inline fun Int.decompactShortB(): Short = toShort()
 
-inline fun stringifyCompactLoc(x: Int, y: Int): String = "($x,$y)"
+inline fun stringifyCompactLoc(x: Number, y: Number): String = "($x,$y)"
 
 inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
 
 inline fun stringifyCompactLoc(chunk: Chunk): String = stringifyCompactLoc(chunk.compactLocation)
-inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.compactWorldLoc)
+inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.worldX, block.worldY)
 
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 

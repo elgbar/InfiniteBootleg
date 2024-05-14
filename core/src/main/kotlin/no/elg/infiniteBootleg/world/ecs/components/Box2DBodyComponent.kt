@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.FALLING_
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.PLAYER
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.SPELL
 import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Constants
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
@@ -70,6 +71,9 @@ class Box2DBodyComponent(
       entity.world.worldBody.destroyBody(currentBody)
     }
   }
+
+  override fun hudDebug(): String =
+    "type: $type, gravity ${body.gravityScale}, size ${stringifyCompactLoc(box2dWidth, box2dHeight)}, disposed? $disposed, userdata ${internalBody?.userData}"
 
   companion object : LoadableMapper<Box2DBodyComponent, ProtoWorld.Entity, (Entity) -> Unit>() {
     val Entity.box2dBody get() = box2d.body

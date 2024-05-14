@@ -12,6 +12,9 @@ import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 
 data class LookDirectionComponent(var direction: Direction = Direction.WEST) : EntitySavableComponent {
+
+  override fun hudDebug(): String = direction.name
+
   companion object : EntityLoadableMapper<LookDirectionComponent>() {
     var Entity.lookDirectionComponentOrNull by optionalPropertyFor(LookDirectionComponent.mapper)
 

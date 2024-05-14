@@ -16,6 +16,8 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
     entityType = this@EntityTypeComponent.entityType
   }
 
+  override fun hudDebug(): String = entityType.name
+
   companion object : EntityLoadableMapper<EntityTypeComponent>() {
     val Entity.entityTypeComponent by propertyFor(mapper)
     fun Entity.isType(entityType: EntityType) = entityTypeComponent.entityType == entityType

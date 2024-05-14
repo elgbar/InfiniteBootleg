@@ -28,6 +28,8 @@ data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavabl
     ownedContainer = this@ContainerComponent.ownedContainer.asProto()
   }
 
+  override fun hudDebug(): String = "interface: ${ownedContainer.owner.toInterfaceId()}, container: ${ownedContainer.container}"
+
   companion object : EntityLoadableMapper<ContainerComponent>() {
     var Entity.containerComponentOrNull by optionalPropertyFor(mapper)
 

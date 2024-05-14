@@ -16,6 +16,8 @@ data class KillableComponent(val maxHealth: Int, val health: Int) : EntitySavabl
   val killed: Boolean = health <= 0
   val alive: Boolean = health > 0
 
+  override fun hudDebug(): String = "$health/$maxHealth"
+
   override fun EntityKt.Dsl.save() {
     killable = killable {
       health = this@KillableComponent.health

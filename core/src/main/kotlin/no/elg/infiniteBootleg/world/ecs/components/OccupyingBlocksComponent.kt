@@ -18,6 +18,8 @@ class OccupyingBlocksComponent : EntitySavableComponent {
    */
   val occupying: GdxArray<EntityMarkerBlock> = GdxArray(false, 8)
 
+  override fun hudDebug(): String = "occupying ${occupying.map { it.hudDebug() }}"
+
   companion object : EntityLoadableMapper<OccupyingBlocksComponent>() {
     val Entity.occupyingLocations get() = occupyingBlocksComponent.occupying
     val Entity.occupyingLocationsOrNull get() = occupyingBlocksComponentOrNull?.occupying

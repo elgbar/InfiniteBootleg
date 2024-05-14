@@ -41,6 +41,8 @@ class GroundedComponent : EntitySavableComponent, AuthoritativeOnlyComponent {
     contacts.forEach { it.clear() }
   }
 
+  override fun hudDebug(): String = "On Ground? $onGround, canMoveLeft? $canMoveLeft, canMoveRight? $canMoveRight"
+
   companion object : EntityLoadableMapper<GroundedComponent>() {
 
     var Entity.groundedComponent by propertyFor(mapper)
@@ -48,7 +50,7 @@ class GroundedComponent : EntitySavableComponent, AuthoritativeOnlyComponent {
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): GroundedComponent? = safeWith { GroundedComponent() }
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasGrounded()
-    val PROTO_GROUNDED = ProtoWorld.Entity.Grounded.getDefaultInstance()
+    val PROTO_GROUNDED: ProtoWorld.Entity.Grounded = ProtoWorld.Entity.Grounded.getDefaultInstance()
   }
 
   override fun EntityKt.Dsl.save() {

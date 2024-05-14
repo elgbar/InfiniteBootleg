@@ -15,6 +15,9 @@ import no.elg.infiniteBootleg.world.ecs.api.restriction.component.ClientComponen
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
 data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntitySavableComponent, ClientComponent {
+
+  override fun hudDebug(): String = "texture ${texture.name}, rotation allowed? ${texture.rotationAllowed}"
+
   companion object : EntityLoadableMapper<TextureRegionComponent>() {
     var Entity.textureRegionComponent by propertyFor(mapper)
     var Entity.textureRegionComponentOrNull by optionalPropertyFor(mapper)

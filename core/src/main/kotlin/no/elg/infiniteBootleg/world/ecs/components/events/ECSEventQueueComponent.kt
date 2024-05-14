@@ -24,6 +24,8 @@ interface ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent, Pool.Po
     events.clear()
   }
 
+  override fun hudDebug(): String = "Event queue size: ${events.size}"
+
   companion object {
 
     val entitiesCache = ObjectMap<KClass<out ECSEventQueueComponent<out ECSEvent>>, ImmutableArray<Entity>>()

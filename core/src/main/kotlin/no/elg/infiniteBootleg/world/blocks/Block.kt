@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Material.Companion.fromProto
@@ -47,7 +48,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
   val entity: Entity?
 
   override fun hudDebug(): String {
-    return "Block $material"
+    return "Block $material, pos ${stringifyCompactLoc(this)}"
   }
 
   companion object {

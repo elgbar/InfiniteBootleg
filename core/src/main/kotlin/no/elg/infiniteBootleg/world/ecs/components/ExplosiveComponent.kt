@@ -23,6 +23,8 @@ data class ExplosiveComponent(
     }
   }
 
+  override fun hudDebug(): String = "fuse: $fuse, strength: $strength"
+
   companion object : EntityLoadableMapper<ExplosiveComponent>() {
     val Entity.explosiveComponent by propertyFor(ExplosiveComponent.mapper)
     var Entity.explosiveComponentOrNull by optionalPropertyFor(ExplosiveComponent.mapper)

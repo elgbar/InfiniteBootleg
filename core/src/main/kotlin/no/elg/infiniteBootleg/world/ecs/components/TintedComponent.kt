@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.world.ecs.api.restriction.component.ClientComponen
 
 data class TintedComponent(val tint: Color) : EntitySavableComponent, ClientComponent {
 
+  override fun hudDebug(): String = "tint (RRGGBBAA) $tint"
+
   companion object : EntityLoadableMapper<TintedComponent>() {
     var Entity.tintedComponentOrNull by optionalPropertyFor(TintedComponent.mapper)
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasTinted()

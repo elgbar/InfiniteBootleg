@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.world.world.World
 
 data class WorldComponent(val world: World) : EntitySavableComponent {
 
+  override fun hudDebug(): String = world.toString()
+
   companion object : LoadableMapper<WorldComponent, ProtoWorld.Entity, World>() {
     val Entity.world get() = worldComponent.world
     val Entity.clientWorld get() = this.world as? ClientWorld
