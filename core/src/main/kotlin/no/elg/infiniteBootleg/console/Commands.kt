@@ -40,6 +40,7 @@ import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.ClientComponent
+import no.elg.infiniteBootleg.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.TagComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -692,23 +693,17 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
-  @CmdArgNames("type")
-  @ConsoleDoc(description = "List entities", paramDescriptions = ["entity type"])
-  fun entities(type: String) {
+  @CmdArgNames("component")
+  @ConsoleDoc(description = "Find entities by their component name, use * for all", paramDescriptions = ["component name"])
+  fun entities(searchTerm: String) {
     val world = world ?: return
-    val entities = when (type.removeSuffix("Entities").lowercase()) {
-      "valid", "all", "*" -> world.validEntities
-      "players", "player", "p" -> world.playersEntities
-      "controlledPlayer" -> world.controlledPlayerEntities
-      "standalone" -> world.standaloneEntities
-      "validEntitiesToSendToClient" -> world.validEntitiesToSendToClient
-      "named" -> world.namedEntities
-      else -> {
-        logger.error("Unknown entity type '$type', current allowed: players, controlledPlayer, standalone, valid, validEntitiesToSendToClient, named, all, *")
-        return
-      }
+    val entities = if (searchTerm == "*") {
+      world.validEntities.toList()
+    } else {
+      world.validEntities.filter { it.components.any { component -> component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true) } }
     }
-    Main.logger().success("Found ${entities.size()} entities of type $type")
+
+    Main.logger().success("Found ${entities.size} entities")
     Main.logger().success(entities.joinToString { it.id })
   }
 
@@ -716,9 +711,19 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
   fun inspect(entityUUID: String) {
     val entity = findEntity(entityUUID) ?: return
-    logger.log("===${entity.nameOrNull ?: entity.id}===")
-    for (component in entity.components) {
-      logger.log("- ${component::class.simpleName}: $component")
+    logger.log("===[ ${entity.nameOrNull ?: entity.id} ]===")
+    val (tags, nonTags) = entity.components.partition { it is TagComponent }
+    if (nonTags.isNotEmpty()) {
+      logger.log("Components")
+      for (component in nonTags) {
+        logger.log("- ${component::class.simpleName}: ${component.debugString()}")
+      }
+    }
+    if (tags.isNotEmpty()) {
+      logger.log("Tags")
+      for (component in tags) {
+        logger.log("- ${component::class.simpleName}")
+      }
     }
   }
 
@@ -727,25 +732,25 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun inspect(entityUUID: String, componentName: String) {
     val entity = findEntity(entityUUID) ?: return
     val searchTerm = componentName.removeSuffix("Component")
-    val component = entity.components.find { it::class.simpleName?.removeSuffix("Component").equals(searchTerm, true) } ?: run {
+    val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
       logger.error("No component with name '$componentName' in entity ${entity.id}${entity.nameOrNull?.let { " ($it)" }}")
       return
     }
 
-    logger.success("Found component $component in entity $entity")
-    logger.log("===${component::class.simpleName?.toTitleCase()}===")
+    logger.log("===[ ${component::class.simpleName?.toTitleCase()} ]===")
 
     fun printInfo(info: String, success: () -> Boolean) {
       if (success()) {
         logger.success(" (V) $info")
       } else {
-        logger.error(" (X) $info")
+        logger.log(LogLevel.ERROR, " (X) $info")
       }
     }
 
     printInfo("Client only") { component is ClientComponent }
     printInfo("Authoritative only") { component is AuthoritativeOnlyComponent }
     printInfo("Tag") { component is TagComponent }
-    logger.log(component.toString())
+
+    logger.log(component.debugString())
   }
 }
