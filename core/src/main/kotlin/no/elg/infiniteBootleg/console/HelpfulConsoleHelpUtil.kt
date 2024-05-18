@@ -58,7 +58,11 @@ object HelpfulConsoleHelpUtil {
     }
   }
 
-  fun allowedToExecute(method: Method): Boolean = !Main.isServer || !method.isAnnotationPresent(ClientsideOnly::class.java)
+  fun allowedToExecute(method: Method): Boolean {
+    val client = Main.isClient || !method.isAnnotationPresent(ClientsideOnly::class.java)
+    val auth = Main.isAuthoritative || !method.isAnnotationPresent(AuthoritativeOnly::class.java)
+    return client && auth
+  }
 
   private fun StringBuilder.appendCmdSignature(method: Method): StringBuilder {
     val params = method.parameterTypes
