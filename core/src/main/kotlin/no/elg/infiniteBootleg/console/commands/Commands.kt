@@ -10,6 +10,7 @@ import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.console.AuthoritativeOnly
 import no.elg.infiniteBootleg.console.ClientsideOnly
 import no.elg.infiniteBootleg.console.CmdArgNames
 import no.elg.infiniteBootleg.console.ConsoleLogger
@@ -92,6 +93,23 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
 
   private fun entityNameId(entity: Entity) = "${entity.id}${entity.nameOrNull?.let { " ($it)" } ?: ""}"
 
+
+  /////////////////////////////////
+  // AUTHORITATIVE ONLY COMMANDS //
+  /////////////////////////////////
+
+  
+  @AuthoritativeOnly
+  @ConsoleDoc(description = "Save the world if possible")
+  fun save() {
+    val world = world ?: return
+    if (world.isTransient) {
+      logger.error("Cannot save the transient $world")
+    } else {
+      world.save()
+      logger.success("World $world saved")
+    }
+  }
 
   ///////////////////
   // OPEN COMMANDS //
@@ -228,18 +246,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       }
     }
   }
-
-  @ConsoleDoc(description = "Save the world if possible")
-  fun save() {
-    val world = world ?: return
-    if (world.isTransient) {
-      logger.error("Cannot save the transient $world")
-    } else {
-      world.save()
-      logger.success("World $world saved")
-    }
-  }
-
 
   @HiddenCommand
   @CmdArgNames("action")
@@ -382,7 +388,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   //////////////////////////
   // CLIENT SIDE COMMANDS //
   //////////////////////////
-  
+
 
   @ClientsideOnly
   @CmdArgNames("color")
