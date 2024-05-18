@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.console
+package no.elg.infiniteBootleg.console.commands
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
@@ -10,6 +10,9 @@ import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.console.ClientsideOnly
+import no.elg.infiniteBootleg.console.CmdArgNames
+import no.elg.infiniteBootleg.console.ConsoleLogger
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
@@ -88,10 +91,46 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   }
 
   private fun entityNameId(entity: Entity) = "${entity.id}${entity.nameOrNull?.let { " ($it)" } ?: ""}"
-  
-  //
-  // COMMANDS
-  //
+
+
+  ///////////////////
+  // OPEN COMMANDS //
+  ///////////////////
+
+
+  @ConsoleDoc(description = "Toggle debug")
+  fun debug() {
+    Settings.debug = !Settings.debug
+    logger.log(LogLevel.SUCCESS, "Debug is now ${Settings.debug.toAbled()}")
+  }
+
+  @ConsoleDoc(
+    description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of" +
+      " chunks, entity updates and chunks update"
+  )
+  fun pause() {
+    val world = world ?: return
+    val ticker: Ticker = world.worldTicker
+    if (ticker.isPaused) {
+      logger.error("World is already paused")
+    } else {
+      ticker.pause()
+      logger.log(LogLevel.SUCCESS, "World is now paused")
+    }
+  }
+
+  @ConsoleDoc(description = "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks, entity updates and chunks update")
+  fun resume() {
+    val world = world ?: return
+    val ticker: Ticker = world.worldTicker
+    if (ticker.isPaused) {
+      world.worldTicker.resume()
+      world.render.update()
+      logger.log(LogLevel.SUCCESS, "World is now resumed")
+    } else {
+      logger.error("World is not paused")
+    }
+  }
 
   @CmdArgNames("red", "green", "blue", "alpha")
   @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1", paramDescriptions = ["red", "green", "blue", "alpha"])
@@ -101,6 +140,249 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     skylight.set(r, g, b, a)
     logger.success("Sky color changed to $skylight")
   }
+
+
+  @CmdArgNames("scale")
+  @ConsoleDoc(description = "How fast the time flows", paramDescriptions = ["The new scale of time"])
+  fun timescale(scale: Float) {
+    val world = world ?: return
+    val worldTime = world.worldTime
+    val old = worldTime.timeScale
+    worldTime.timeScale = scale
+    logger.success("Changed time scale from % .3f to % .3f", old, scale)
+    sendDuplexPacket(
+      { clientBoundWorldSettings(null, null, scale) }
+    ) { serverBoundWorldSettings(null, null, scale) }
+  }
+
+  @ConsoleDoc(description = "Toggle if time ticks or not")
+  fun toggleTime() {
+    Settings.dayTicking = !Settings.dayTicking
+    logger.success("Time is now " + (if (Settings.dayTicking) "" else "not ") + "ticking")
+    sendDuplexPacket(
+      { clientBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
+    ) { serverBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
+  }
+
+  @CmdArgNames("time of day")
+  @ConsoleDoc(description = "Set the current time", paramDescriptions = ["Time of day such as day, noon, dusk, night"])
+  fun time(timeOfDay: String) {
+    val time: Float = try {
+      // There is a chance this method is selected before  the other time method
+      timeOfDay.toFloat()
+    } catch (ignored: NumberFormatException) {
+      when (timeOfDay.lowercase(Locale.getDefault())) {
+        "dawn" -> WorldTime.DAWN_TIME
+        "day", "sunrise" -> WorldTime.SUNRISE_TIME
+        "midday", "noon" -> WorldTime.MIDDAY_TIME
+        "sunset" -> WorldTime.SUNSET_TIME
+        "dusk" -> WorldTime.DUSK_TIME
+        "midnight", "night" -> WorldTime.MIDNIGHT_TIME
+        "end" -> Int.MAX_VALUE.toFloat()
+        else -> {
+          logger.error("CMD", "Unknown time of day, try sunrise, midday, sunset or midnight")
+          return
+        }
+      }
+    }
+
+    // call the other time function
+    time(time)
+  }
+
+  @CmdArgNames("time")
+  @ConsoleDoc(description = "Set the current time", paramDescriptions = ["The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc"])
+  fun time(time: Float) {
+    val world = world ?: return
+    val worldTime = world.worldTime
+    val old = worldTime.time
+    worldTime.time = time
+    sendDuplexPacket(
+      { clientBoundWorldSettings(null, time, null) }
+    ) { serverBoundWorldSettings(null, time, null) }
+    logger.success("Changed time from % .3f to % .3f", old, time)
+  }
+
+  @HiddenCommand
+  @ConsoleDoc(description = "check dangling entities")
+  fun cde() {
+    val world = world ?: return
+    world.postBox2dRunnable {
+      val worldBox2dWorld = world.worldBody.box2dWorld
+      val bodies = Array<Body>(worldBox2dWorld.bodyCount)
+      worldBox2dWorld.getBodies(bodies)
+      var invalid = 0
+      for (body in bodies) {
+        val userData = body.userData
+        if (userData is Entity) {
+          val id: String = userData.id
+          if (world.containsEntity(id)) {
+            continue
+          }
+          invalid++
+          logger.error("Entity", "Found entity not added to the world! $id")
+        }
+      }
+      if (invalid == 0) {
+        logger.success("No invalid bodies found!")
+      }
+    }
+  }
+
+  @ConsoleDoc(description = "Save the world if possible")
+  fun save() {
+    val world = world ?: return
+    if (world.isTransient) {
+      logger.error("Cannot save the transient $world")
+    } else {
+      world.save()
+      logger.success("World $world saved")
+    }
+  }
+
+
+  @HiddenCommand
+  @CmdArgNames("action")
+  @ConsoleDoc(description = "Do something illegal")
+  fun illegalAction(action: String) {
+    IllegalAction.valueOf(action.trim().uppercase()).handle { "Illegal test action $action" }
+  }
+
+  @ConsoleDoc(description = "Some debug info")
+  fun chunkInfo() {
+    val world = world ?: return
+    Main.logger().log("Debug chunk Info")
+    Main.logger().log("Loaded chunks: ${world.loadedChunks.size}")
+    val loadedChunkPos = world.loadedChunks.items.sorted().joinToString("\n") { "(${it.chunkX}, ${it.chunkY}) in view? ${!world.render.isOutOfView(it)}" }
+    Main.logger().log("Chunk pos: \n$loadedChunkPos")
+  }
+
+  @ConsoleDoc(description = "Toggle whether to track events")
+  fun trackEvents() {
+    val eventTracker = getOrCreateEventsTracker()
+    if (eventTracker.logAnything) {
+      eventTracker.log = LOG_NOTHING
+    } else {
+      eventTracker.log = LOG_EVERYTHING
+    }
+    logger.success("Events are now ${if (eventTracker.logAnything) "" else "not "}tracked")
+  }
+
+  @ConsoleDoc(description = "Toggle whether to track events")
+  fun printTrackedEvents() {
+    val eventTracker = eventsTracker
+    if (eventTracker == null) {
+      logger.error("There is no active event tracker")
+      return
+    }
+    for (recordedEvent in eventTracker.recordedEvents) {
+      logger.log(eventTracker.toString())
+    }
+  }
+
+
+  @CmdArgNames("item")
+  @ConsoleDoc(description = "Give an item to player", paramDescriptions = ["Item to given"])
+  fun give(elementName: String) = give(elementName, 1)
+
+  @CmdArgNames("item", "quantity")
+  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
+  fun give(elementName: String, quantity: Int) {
+    val world = clientWorld ?: return
+    val entities = world.controlledPlayerEntities
+    if (entities.size() == 0) {
+      logger.error("There is no local, controlled, player in this world")
+      return
+    }
+    val player = entities.first()
+    val container = player.containerOrNull ?: run {
+      logger.error("Player has no container")
+      return
+    }
+
+    if (quantity < 1) {
+      logger.error("Quantity must be at least 1")
+      return
+    }
+    val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
+      logger.error("Unknown container element '$elementName'")
+      return
+    }
+
+    val notAdded = container.add(item)
+    if (notAdded.isEmpty()) {
+      logger.success("Gave player $item")
+    } else {
+      logger.error("Failed to give player $item, not enough space for $notAdded")
+    }
+  }
+
+  @CmdArgNames("component")
+  @ConsoleDoc(description = "Find entities by their component name, use * for all", paramDescriptions = ["component name"])
+  fun entities(searchTerm: String) {
+    val world = world ?: return
+    val entities = if (searchTerm == "*") {
+      world.validEntities.toList()
+    } else {
+      world.validEntities.filter { it.components.any { component -> component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true) } }
+    }
+
+    Main.logger().success("Found ${entities.size} entities")
+    Main.logger().success(entities.joinToString { it.id })
+  }
+
+  @CmdArgNames("entity")
+  @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
+  fun inspect(entityUUID: String) {
+    val entity = findEntity(entityUUID) ?: return
+    logger.log("===[ ${entityNameId(entity)} ]===")
+    val (tags, nonTags) = entity.components.partition { it is TagComponent }
+    if (nonTags.isNotEmpty()) {
+      logger.log("Components")
+      for (component in nonTags) {
+        logger.log("- ${component::class.simpleName}: ${component.debugString()}")
+      }
+    }
+    if (tags.isNotEmpty()) {
+      logger.log("Tags")
+      for (component in tags) {
+        logger.log("- ${component::class.simpleName}")
+      }
+    }
+  }
+
+  @CmdArgNames("entity", "component")
+  @ConsoleDoc(description = "Inspect a component of an entity", paramDescriptions = ["Entity UUID or name", "The simple name of the component to inspect"])
+  fun inspect(entityUUID: String, componentName: String) {
+    val entity = findEntity(entityUUID) ?: return
+    val searchTerm = componentName.removeSuffix("Component")
+    val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
+      logger.error("No component with name '$componentName' in entity ${entityNameId(entity)}")
+      return
+    }
+
+    logger.log("===[ ${component::class.simpleName?.toTitleCase()} ]===")
+
+    fun printInfo(info: String, success: () -> Boolean) {
+      if (success()) {
+        logger.success(" (V) $info")
+      } else {
+        logger.log(LogLevel.ERROR, " (X) $info")
+      }
+    }
+
+    printInfo("Client only") { component is ClientComponent }
+    printInfo("Authoritative only") { component is AuthoritativeOnlyComponent }
+    printInfo("Tag") { component is TagComponent }
+
+    logger.log(component.debugString())
+  }
+
+
+  //////////////////////////
+  // CLIENT SIDE COMMANDS //
+  //////////////////////////
+  
 
   @ClientsideOnly
   @CmdArgNames("color")
@@ -134,12 +416,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     )
   }
 
-  @ConsoleDoc(description = "Toggle debug")
-  fun debug() {
-    Settings.debug = !Settings.debug
-    logger.log(LogLevel.SUCCESS, "Debug is now ${Settings.debug.toAbled()}")
-  }
-
   @ClientsideOnly
   @ConsoleDoc(description = "Reload all loaded chunks if unloading is allowed")
   fun reload() {
@@ -166,34 +442,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
         box2DBodyComponent.disableGravity()
       }
       logger.log(LogLevel.SUCCESS, "Player is now ${if (wasFlying) "not " else ""}flying")
-    }
-  }
-
-  @ConsoleDoc(
-    description = "Pauses the world ticker. This includes Box2D world updates, light updates, unloading of" +
-      " chunks, entity updates and chunks update"
-  )
-  fun pause() {
-    val world = world ?: return
-    val ticker: Ticker = world.worldTicker
-    if (ticker.isPaused) {
-      logger.error("World is already paused")
-    } else {
-      ticker.pause()
-      logger.log(LogLevel.SUCCESS, "World is now paused")
-    }
-  }
-
-  @ConsoleDoc(description = "Resumes the world ticker. This includes Box2D world updates, light updates, unloading of chunks, entity updates and chunks update")
-  fun resume() {
-    val world = world ?: return
-    val ticker: Ticker = world.worldTicker
-    if (ticker.isPaused) {
-      world.worldTicker.resume()
-      world.render.update()
-      logger.log(LogLevel.SUCCESS, "World is now resumed")
-    } else {
-      logger.error("World is not paused")
     }
   }
 
@@ -460,104 +708,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
-  @CmdArgNames("scale")
-  @ConsoleDoc(description = "How fast the time flows", paramDescriptions = ["The new scale of time"])
-  fun timescale(scale: Float) {
-    val world = world ?: return
-    val worldTime = world.worldTime
-    val old = worldTime.timeScale
-    worldTime.timeScale = scale
-    logger.success("Changed time scale from % .3f to % .3f", old, scale)
-    sendDuplexPacket(
-      { clientBoundWorldSettings(null, null, scale) }
-    ) { serverBoundWorldSettings(null, null, scale) }
-  }
-
-  @ConsoleDoc(description = "Toggle if time ticks or not")
-  fun toggleTime() {
-    Settings.dayTicking = !Settings.dayTicking
-    logger.success("Time is now " + (if (Settings.dayTicking) "" else "not ") + "ticking")
-    sendDuplexPacket(
-      { clientBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
-    ) { serverBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
-  }
-
-  @CmdArgNames("time of day")
-  @ConsoleDoc(description = "Set the current time", paramDescriptions = ["Time of day such as day, noon, dusk, night"])
-  fun time(timeOfDay: String) {
-    val time: Float = try {
-      // There is a chance this method is selected before  the other time method
-      timeOfDay.toFloat()
-    } catch (ignored: NumberFormatException) {
-      when (timeOfDay.lowercase(Locale.getDefault())) {
-        "dawn" -> WorldTime.DAWN_TIME
-        "day", "sunrise" -> WorldTime.SUNRISE_TIME
-        "midday", "noon" -> WorldTime.MIDDAY_TIME
-        "sunset" -> WorldTime.SUNSET_TIME
-        "dusk" -> WorldTime.DUSK_TIME
-        "midnight", "night" -> WorldTime.MIDNIGHT_TIME
-        "end" -> Int.MAX_VALUE.toFloat()
-        else -> {
-          logger.error("CMD", "Unknown time of day, try sunrise, midday, sunset or midnight")
-          return
-        }
-      }
-    }
-
-    // call the other time function
-    time(time)
-  }
-
-  @CmdArgNames("time")
-  @ConsoleDoc(description = "Set the current time", paramDescriptions = ["The new time as a number with sunrise as 0, noon as 90, dusk as 180 etc"])
-  fun time(time: Float) {
-    val world = world ?: return
-    val worldTime = world.worldTime
-    val old = worldTime.time
-    worldTime.time = time
-    sendDuplexPacket(
-      { clientBoundWorldSettings(null, time, null) }
-    ) { serverBoundWorldSettings(null, time, null) }
-    logger.success("Changed time from % .3f to % .3f", old, time)
-  }
-
-  @HiddenCommand
-  @ConsoleDoc(description = "check dangling entities")
-  fun cde() {
-    val world = world ?: return
-    world.postBox2dRunnable {
-      val worldBox2dWorld = world.worldBody.box2dWorld
-      val bodies = Array<Body>(worldBox2dWorld.bodyCount)
-      worldBox2dWorld.getBodies(bodies)
-      var invalid = 0
-      for (body in bodies) {
-        val userData = body.userData
-        if (userData is Entity) {
-          val id: String = userData.id
-          if (world.containsEntity(id)) {
-            continue
-          }
-          invalid++
-          logger.error("Entity", "Found entity not added to the world! $id")
-        }
-      }
-      if (invalid == 0) {
-        logger.success("No invalid bodies found!")
-      }
-    }
-  }
-
-  @ConsoleDoc(description = "Save the world if possible")
-  fun save() {
-    val world = world ?: return
-    if (world.isTransient) {
-      logger.error("Cannot save the transient $world")
-    } else {
-      world.save()
-      logger.success("World $world saved")
-    }
-  }
-
   @ClientsideOnly
   @ConsoleDoc(description = "Toggle vsync")
   @CmdArgNames("enable")
@@ -593,45 +743,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       .scheduleSync(50L) { ClientMain.inst().screen = MainMenuScreen }
   }
 
-  @HiddenCommand
-  @CmdArgNames("action")
-  @ConsoleDoc(description = "Do something illegal")
-  fun illegalAction(action: String) {
-    IllegalAction.valueOf(action.trim().uppercase()).handle { "Illegal test action $action" }
-  }
-
-  @ConsoleDoc(description = "Some debug info")
-  fun chunkInfo() {
-    val world = world ?: return
-    Main.logger().log("Debug chunk Info")
-    Main.logger().log("Loaded chunks: ${world.loadedChunks.size}")
-    val loadedChunkPos = world.loadedChunks.items.sorted().joinToString("\n") { "(${it.chunkX}, ${it.chunkY}) in view? ${!world.render.isOutOfView(it)}" }
-    Main.logger().log("Chunk pos: \n$loadedChunkPos")
-  }
-
-  @ConsoleDoc(description = "Toggle whether to track events")
-  fun trackEvents() {
-    val eventTracker = getOrCreateEventsTracker()
-    if (eventTracker.logAnything) {
-      eventTracker.log = LOG_NOTHING
-    } else {
-      eventTracker.log = LOG_EVERYTHING
-    }
-    logger.success("Events are now ${if (eventTracker.logAnything) "" else "not "}tracked")
-  }
-
-  @ConsoleDoc(description = "Toggle whether to track events")
-  fun printTrackedEvents() {
-    val eventTracker = eventsTracker
-    if (eventTracker == null) {
-      logger.error("There is no active event tracker")
-      return
-    }
-    for (recordedEvent in eventTracker.recordedEvents) {
-      logger.log(eventTracker.toString())
-    }
-  }
-
   @ConsoleDoc(description = "Switch inventory of player", paramDescriptions = ["The inventory to use, can be 'creative', 'autosort' or 'container'"])
   @ClientsideOnly
   fun inv(invType: String) {
@@ -661,102 +772,5 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val owner = oldOwnedContainer?.owner ?: ContainerOwner.from(player)
     player.containerComponentOrNull = ContainerComponent(OwnedContainer(owner, newContainer))
     logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
-  }
-
-  @CmdArgNames("item")
-  @ConsoleDoc(description = "Give an item to player", paramDescriptions = ["Item to given"])
-  fun give(elementName: String) = give(elementName, 1)
-
-  @CmdArgNames("item", "quantity")
-  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
-  fun give(elementName: String, quantity: Int) {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
-      logger.error("There is no local, controlled, player in this world")
-      return
-    }
-    val player = entities.first()
-    val container = player.containerOrNull ?: run {
-      logger.error("Player has no container")
-      return
-    }
-
-    if (quantity < 1) {
-      logger.error("Quantity must be at least 1")
-      return
-    }
-    val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
-      logger.error("Unknown container element '$elementName'")
-      return
-    }
-
-    val notAdded = container.add(item)
-    if (notAdded.isEmpty()) {
-      logger.success("Gave player $item")
-    } else {
-      logger.error("Failed to give player $item, not enough space for $notAdded")
-    }
-  }
-
-  @CmdArgNames("component")
-  @ConsoleDoc(description = "Find entities by their component name, use * for all", paramDescriptions = ["component name"])
-  fun entities(searchTerm: String) {
-    val world = world ?: return
-    val entities = if (searchTerm == "*") {
-      world.validEntities.toList()
-    } else {
-      world.validEntities.filter { it.components.any { component -> component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true) } }
-    }
-
-    Main.logger().success("Found ${entities.size} entities")
-    Main.logger().success(entities.joinToString { it.id })
-  }
-
-  @CmdArgNames("entity")
-  @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
-  fun inspect(entityUUID: String) {
-    val entity = findEntity(entityUUID) ?: return
-    logger.log("===[ ${entityNameId(entity)} ]===")
-    val (tags, nonTags) = entity.components.partition { it is TagComponent }
-    if (nonTags.isNotEmpty()) {
-      logger.log("Components")
-      for (component in nonTags) {
-        logger.log("- ${component::class.simpleName}: ${component.debugString()}")
-      }
-    }
-    if (tags.isNotEmpty()) {
-      logger.log("Tags")
-      for (component in tags) {
-        logger.log("- ${component::class.simpleName}")
-      }
-    }
-  }
-
-  @CmdArgNames("entity", "component")
-  @ConsoleDoc(description = "Inspect a component of an entity", paramDescriptions = ["Entity UUID or name", "The simple name of the component to inspect"])
-  fun inspect(entityUUID: String, componentName: String) {
-    val entity = findEntity(entityUUID) ?: return
-    val searchTerm = componentName.removeSuffix("Component")
-    val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
-      logger.error("No component with name '$componentName' in entity ${entityNameId(entity)}")
-      return
-    }
-
-    logger.log("===[ ${component::class.simpleName?.toTitleCase()} ]===")
-
-    fun printInfo(info: String, success: () -> Boolean) {
-      if (success()) {
-        logger.success(" (V) $info")
-      } else {
-        logger.log(LogLevel.ERROR, " (X) $info")
-      }
-    }
-
-    printInfo("Client only") { component is ClientComponent }
-    printInfo("Authoritative only") { component is AuthoritativeOnlyComponent }
-    printInfo("Tag") { component is TagComponent }
-
-    logger.log(component.debugString())
   }
 }

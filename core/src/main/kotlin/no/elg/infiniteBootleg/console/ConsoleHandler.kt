@@ -13,6 +13,7 @@ import com.strongjoshua.console.LogLevel
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.console.ConsoleLogger.Companion.DEBUG_PREFIX
+import no.elg.infiniteBootleg.console.commands.Commands
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole
 import no.elg.infiniteBootleg.console.consoles.StdConsole
 import no.elg.infiniteBootleg.main.ClientMain
