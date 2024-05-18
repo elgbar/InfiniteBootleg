@@ -93,12 +93,10 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
 
   private fun entityNameId(entity: Entity) = "${entity.id}${entity.nameOrNull?.let { " ($it)" } ?: ""}"
 
-
-  /////////////////////////////////
+  // ///////////////////////////////
   // AUTHORITATIVE ONLY COMMANDS //
-  /////////////////////////////////
+  // ///////////////////////////////
 
-  
   @AuthoritativeOnly
   @ConsoleDoc(description = "Save the world if possible")
   fun save() {
@@ -111,10 +109,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
-  ///////////////////
+  // /////////////////
   // OPEN COMMANDS //
-  ///////////////////
-
+  // /////////////////
 
   @ConsoleDoc(description = "Toggle debug")
   fun debug() {
@@ -158,7 +155,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     skylight.set(r, g, b, a)
     logger.success("Sky color changed to $skylight")
   }
-
 
   @CmdArgNames("scale")
   @ConsoleDoc(description = "How fast the time flows", paramDescriptions = ["The new scale of time"])
@@ -286,7 +282,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
-
   @CmdArgNames("item")
   @ConsoleDoc(description = "Give an item to player", paramDescriptions = ["Item to given"])
   fun give(elementName: String) = give(elementName, 1)
@@ -384,11 +379,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     logger.log(component.debugString())
   }
 
-
-  //////////////////////////
+  // ////////////////////////
   // CLIENT SIDE COMMANDS //
-  //////////////////////////
-
+  // ////////////////////////
 
   @ClientsideOnly
   @CmdArgNames("color")
