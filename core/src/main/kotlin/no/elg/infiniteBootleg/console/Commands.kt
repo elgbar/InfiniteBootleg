@@ -87,6 +87,12 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
   }
 
+  private fun entityNameId(entity: Entity) = "${entity.id}${entity.nameOrNull?.let { " ($it)" } ?: ""}"
+  
+  //
+  // COMMANDS
+  //
+
   @CmdArgNames("red", "green", "blue", "alpha")
   @ConsoleDoc(description = "Set the color of the sky. Params are expected to be between 0 and 1", paramDescriptions = ["red", "green", "blue", "alpha"])
   fun skyColor(r: Float, g: Float, b: Float, a: Float) {
@@ -711,7 +717,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
   fun inspect(entityUUID: String) {
     val entity = findEntity(entityUUID) ?: return
-    logger.log("===[ ${entity.nameOrNull ?: entity.id} ]===")
+    logger.log("===[ ${entityNameId(entity)} ]===")
     val (tags, nonTags) = entity.components.partition { it is TagComponent }
     if (nonTags.isNotEmpty()) {
       logger.log("Components")
@@ -733,7 +739,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val entity = findEntity(entityUUID) ?: return
     val searchTerm = componentName.removeSuffix("Component")
     val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
-      logger.error("No component with name '$componentName' in entity ${entity.id}${entity.nameOrNull?.let { " ($it)" }}")
+      logger.error("No component with name '$componentName' in entity ${entityNameId(entity)}")
       return
     }
 
