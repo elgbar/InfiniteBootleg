@@ -127,7 +127,7 @@ class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolea
             method.isAccessible = true
             method.invoke(exec, *args.toTypedArray())
           } else {
-            log(LogLevel.ERROR, "This command can only be executed client side")
+            log(LogLevel.ERROR, "You cannot execute this command")
             return true
           }
           true
