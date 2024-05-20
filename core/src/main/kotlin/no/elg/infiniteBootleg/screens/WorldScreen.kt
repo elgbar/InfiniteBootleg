@@ -57,7 +57,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     Main.inst().console.addToInputMultiplexer()
 
     ClientMain.inst().inputMultiplexer.addProcessor(world.input)
-    ClientMain.inst().inputMultiplexer.addProcessor(world.ecsInput)
   }
 
   override fun hide() {

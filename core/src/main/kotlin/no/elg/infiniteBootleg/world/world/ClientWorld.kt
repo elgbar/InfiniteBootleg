@@ -15,12 +15,10 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
 abstract class ClientWorld : World {
   final override val render: ClientWorldRender
   val input: WorldInputHandler
-  val ecsInput: ECSInputListener
 
   init {
     ClientMain.inst().updateStatus(this)
     render = ClientWorldRender(this)
-    ecsInput = ECSInputListener(this)
     input = WorldInputHandler(render)
   }
 
@@ -31,12 +29,11 @@ abstract class ClientWorld : World {
     render.resize(width, height)
   }
 
-  override fun additionalSystems() = setOf(ContinuousInputSystem(ecsInput))
+  override fun additionalSystems() = setOf(ContinuousInputSystem(ECSInputListener(this)))
 
   override fun dispose() {
     super.dispose()
     input.dispose()
-    ecsInput.dispose()
     // Must be done on GL thread
     Gdx.app.postRunnable { render.dispose() }
   }
