@@ -21,6 +21,6 @@ class ContinuousInputSystem(private val ecsInput: ECSInputListener) : EntitySyst
   }
 
   override fun removedFromEngine(engine: Engine?) {
-    ClientMain.inst().inputMultiplexer.removeProcessor(ecsInput)
+    ecsInput.dispose()
   }
 }

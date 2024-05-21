@@ -243,17 +243,19 @@ abstract class World(
     }
 
     chunkColumnListeners.registerListeners()
-
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
-      Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, will try to start world ticker now!" }
-      Main.inst().scheduler.executeSync {
-        addSystems()
-        if (Main.isAuthoritative) {
-          // Add a delay to make sure the light is calculated
-          Main.inst().scheduler.scheduleAsync(200L) {
-            dispatchEvent(WorldLoadedEvent(world))
-          }
+      if (Main.isAuthoritative) {
+        // Add a delay to make sure the light is calculated
+        Main.inst().scheduler.scheduleAsync(200L) {
+          dispatchEvent(WorldLoadedEvent(world))
         }
+      }
+    }
+
+    oneShotListener<WorldLoadedEvent> {
+      Main.inst().scheduler.executeSync {
+        Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
+        addSystems()
       }
     }
   }

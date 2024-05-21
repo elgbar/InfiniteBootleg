@@ -56,7 +56,6 @@ class ThreadSafeEngine : Engine(), Disposable {
     }
 
   override fun addSystem(system: EntitySystem): Unit =
-
     synchronized(engineLock) {
       fun addToSystemConditionally(system: EntitySystem, type: String, cond: () -> Boolean) {
         if (cond()) {
@@ -170,6 +169,7 @@ class ThreadSafeEngine : Engine(), Disposable {
   }
 
   override fun dispose() {
+    removeAllSystems()
     ECSEventQueueComponent.entitiesCache.clear()
   }
 }

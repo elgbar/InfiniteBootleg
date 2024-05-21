@@ -196,7 +196,7 @@ private fun ServerClient.handleLoginSuccess() {
     ctx.fatal("Invalid player client side: Did not a receive an entity to control")
     return
   }
-  val futurePlayer: CompletableFuture<Entity> = world.load(protoPlayerEntity).orTimeout(10, TimeUnit.SECONDS)
+  val futurePlayer: CompletableFuture<Entity> = world.load(protoPlayerEntity).orTimeout(5, TimeUnit.SECONDS)
   ConnectingScreen.info = "Login successful! Waiting for player to be spawned..."
 
   futurePlayer.whenCompleteAsync { player, e ->
