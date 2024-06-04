@@ -142,26 +142,43 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   }
 
   /**
-   * 	@param callback Called for each fixture found in the query AABB. return false to terminate the query.
+   * Query the world for all fixtures that potentially overlap the provided AABB.
+   *
+   * @param callback a user implemented callback class.
+   * @param lowerX the x coordinate of the lower left corner
+   * @param lowerY the y coordinate of the lower left corner
+   * @param upperX the x coordinate of the upper right corner
+   * @param upperY the y coordinate of the upper right corner
+   * @param callback Called for each fixture found in the query AABB. return false to terminate the query.
    */
   fun queryFixtures(
-    worldX: Number,
-    worldY: Number,
-    worldWidth: Number,
-    worldHeight: Number,
+    lowerX: Number,
+    lowerY: Number,
+    upperX: Number,
+    upperY: Number,
     callback: ((Fixture) -> Boolean)
   ) {
     postBox2dRunnable {
-      box2dWorld.QueryAABB(callback, worldX.toFloat(), worldY.toFloat(), worldWidth.toFloat(), worldHeight.toFloat())
+      box2dWorld.QueryAABB(callback, lowerX.toFloat(), lowerY.toFloat(), upperX.toFloat(), upperY.toFloat())
     }
   }
 
+  /**
+   * Query the world for all entities that potentially overlap the provided AABB.
+   *
+   * @param callback a user implemented callback class.
+   * @param lowerX the x coordinate of the lower left corner
+   * @param lowerY the y coordinate of the lower left corner
+   * @param upperX the x coordinate of the upper right corner
+   * @param upperY the y coordinate of the upper right corner
+   * @param callback Called for each entity found in the query AABB
+   */
   fun queryEntities(
-    worldX: Number,
-    worldY: Number,
-    worldWidth: Number,
-    worldHeight: Number,
-    callback: ((Iterable<Entity>) -> Boolean)
+    lowerX: Number,
+    lowerY: Number,
+    upperX: Number,
+    upperY: Number,
+    callback: ((Set<Entity>) -> Unit)
   ) {
     postBox2dRunnable {
       val entities = mutableSetOf<Entity>()
@@ -169,7 +186,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         (it.body.userData as? Entity)?.also { entity -> entities += entity }
         true
       }
-      box2dWorld.QueryAABB(queryCallback, worldX.toFloat(), worldY.toFloat(), worldWidth.toFloat(), worldHeight.toFloat())
+      box2dWorld.QueryAABB(queryCallback, lowerX.toFloat(), lowerY.toFloat(), upperX.toFloat(), upperY.toFloat()) // blocking
       callback(entities)
     }
   }
