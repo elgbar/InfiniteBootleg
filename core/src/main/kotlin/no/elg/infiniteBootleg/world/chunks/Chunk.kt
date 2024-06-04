@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.chunks
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -207,6 +208,11 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   fun save(): CompletableFuture<ProtoWorld.Chunk>
 
   fun saveBlocksOnly(): ProtoWorld.Chunk
+
+  /**
+   * Find all entities in the chunk
+   */
+  fun queryEntities(callback: ((Set<Entity>) -> Unit))
 
   companion object {
     const val CHUNK_SIZE: LocalCoord = 16

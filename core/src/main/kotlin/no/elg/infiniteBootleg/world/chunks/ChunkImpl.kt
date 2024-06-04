@@ -519,7 +519,7 @@ class ChunkImpl(
     Main.inst().scheduler.executeAsync(runnable = ::updateAllBlockLights)
   }
 
-  fun queryEntities(callback: ((Set<Entity>) -> Unit)) =
+  override fun queryEntities(callback: ((Set<Entity>) -> Unit)) =
     world.worldBody.queryEntities(chunkX.chunkToWorld(), chunkY.chunkToWorld(), chunkX.chunkToWorld(Chunk.CHUNK_SIZE), chunkY.chunkToWorld(Chunk.CHUNK_SIZE), callback)
 
   override fun save(): CompletableFuture<ProtoWorld.Chunk> {
