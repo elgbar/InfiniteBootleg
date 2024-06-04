@@ -37,7 +37,7 @@ object EventManager {
    * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
-  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<T>): EventListener<T> {
+  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<out T>): EventListener<out T> {
     val eventListeners: MutableSet<EventListener<out Event>> =
       if (keepStrongReference) {
         strongListeners.getOrPut(T::class) { Collections.newSetFromMap(ConcurrentHashMap()) }
@@ -59,7 +59,11 @@ object EventManager {
    * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
-  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, crossinline filter: (T) -> Boolean, crossinline listener: T.() -> Unit): EventListener<T> =
+  inline fun <reified T : Event> registerListener(
+    keepStrongReference: Boolean = false,
+    crossinline filter: (T) -> Boolean,
+    crossinline listener: T.() -> Unit
+  ): EventListener<out T> =
     registerListener(keepStrongReference) { event ->
       if (filter(event)) {
         listener(event)
@@ -71,7 +75,7 @@ object EventManager {
    *
    * As the listener is only meant to listen to a single event it is not a requirement to have a strong reference to the [listener].
    */
-  inline fun <reified T : Event> oneShotListener(listener: EventListener<T>) {
+  inline fun <reified T : Event> oneShotListener(listener: EventListener<out T>) {
     var handled = false // Prevents the listener from being called multiple times
     val wrappedListener = EventListener<T> {
       if (handled) {
@@ -118,7 +122,7 @@ object EventManager {
   /**
    * Prevent (by removing) the given listener from receiving any more events
    */
-  inline fun <reified T : Event> removeListener(listener: EventListener<T>) {
+  inline fun <reified T : Event> removeListener(listener: EventListener<out T>) {
     val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
     synchronized(eventListeners) {
       eventListeners.remove(listener)
