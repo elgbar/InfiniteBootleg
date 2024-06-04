@@ -35,8 +35,10 @@ import no.elg.infiniteBootleg.server.clientBoundWorldSettings
 import no.elg.infiniteBootleg.server.sendDuplexPacket
 import no.elg.infiniteBootleg.server.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.server.serverBoundWorldSettings
+import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -768,5 +770,21 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val owner = oldOwnedContainer?.owner ?: ContainerOwner.from(player)
     player.containerComponentOrNull = ContainerComponent(OwnedContainer(owner, newContainer))
     logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
+  }
+
+  @ConsoleDoc(description = "Find entities in a chunk", paramDescriptions = ["The x component of the chunk coordinate", "The y component of the chunk coordinate"])
+  @CmdArgNames("chunkX", "chunkY")
+  fun entInChunk(chunkX: ChunkCoord, chunkY: ChunkCoord) {
+    val world = world ?: return
+    val chunk = world.getChunk(chunkX, chunkY, load = true) ?: run {
+      logger.error("Failed to find a chunk at ${stringifyCompactLoc(chunkX, chunkY)}")
+      return
+    }
+    chunk.queryEntities { entities ->
+      entities.forEach { entity ->
+        logger.log(entityNameId(entity))
+      }
+      logger.log("In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}")
+    }
   }
 }
