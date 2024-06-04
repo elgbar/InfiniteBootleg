@@ -17,20 +17,22 @@ import kotlin.math.absoluteValue
  */
 object SelectWorldScreen : StageScreen() {
 
+  fun createSingleplayerWorld(seed: Long, forceTransient: Boolean): SinglePlayerWorld = SinglePlayerWorld(PerlinChunkGenerator(seed), seed, "World_$seed", forceTransient)
+
   override fun create() {
     super.create()
     rootTable {
       visTable(defaultSpacing = true) {
         visTextButton("Load World '${Settings.worldSeed}'") {
           onInteract(stage, Keys.NUM_1, Keys.SPACE) {
-            ClientMain.inst().screen = WorldScreen(SinglePlayerWorld(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong(), "World_${Settings.worldSeed}"))
+            ClientMain.inst().screen = WorldScreen(createSingleplayerWorld(Settings.worldSeed, forceTransient = false))
           }
         }
         row()
         visTextButton("Random New World") {
           onInteract(stage, Keys.NUM_1, Keys.SPACE) {
             val seed = MathUtils.random.nextLong().absoluteValue
-            ClientMain.inst().screen = WorldScreen(SinglePlayerWorld(PerlinChunkGenerator(seed), seed, "World_$seed", forceTransient = true))
+            ClientMain.inst().screen = WorldScreen(createSingleplayerWorld(seed, forceTransient = true))
           }
         }
         row()

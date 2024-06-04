@@ -72,14 +72,14 @@ import java.util.Locale
 @Suppress("unused")
 class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   private val world: World?
-    get() = Main.inst().world ?: kotlin.run {
+    get() = Main.inst().world ?: run {
       logger.error("CMD", "Failed to find the current world")
       null
     }
 
   private val clientWorld: ClientWorld?
-    get() = ClientMain.inst().world ?: kotlin.run {
-      logger.error("CMD", "Failed to find world")
+    get() = ClientMain.inst().world ?: run {
+      logger.error("CMD", "Failed to find the current client world")
       null
     }
 

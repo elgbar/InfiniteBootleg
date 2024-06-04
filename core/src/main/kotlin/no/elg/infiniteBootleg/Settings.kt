@@ -36,7 +36,7 @@ object Settings {
 
   /** Seed of the world loaded  */
   @JvmField
-  var worldSeed = 0
+  var worldSeed: Long = 0
 
   /** If general debug variable. Use this and-ed with your specific debug variable  */
   @JvmField

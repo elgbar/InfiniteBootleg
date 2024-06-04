@@ -149,13 +149,16 @@ import kotlin.system.measureTimeMillis
  * @author Elg
  */
 abstract class World(
-  generator: ChunkGenerator,
+  val generator: ChunkGenerator,
   /**
    * @return The random seed of this world
    */
   val seed: Long,
-  worldName: String,
-  forceTransient: Boolean = false
+  /**
+   * @return The name of the world
+   */
+  val name: String,
+  val forceTransient: Boolean = false
 ) : Disposable, Resizable {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name, forceTransient)
@@ -202,11 +205,6 @@ abstract class World(
   private var worldFile: FileHandle? = null
 
   /**
-   * @return The name of the world
-   */
-  val name: String
-
-  /**
    * Spawn in world coordinates
    */
   var spawn: Long
@@ -227,7 +225,6 @@ abstract class World(
   init {
     MathUtils.random.setSeed(seed)
     uuid = generateUUIDFromLong(seed).toString()
-    name = worldName
     @Suppress("LeakingThis")
     val world: World = this
     worldTicker = WorldTicker(world, false)
