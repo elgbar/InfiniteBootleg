@@ -66,9 +66,13 @@ fun EngineEntity.createPlayerBodyComponent(
     createPlayerFixture(body, body, 0f) { set(playerVertices) }
     createPlayerFixture(body, PLAYERS_FOOT_USER_DATA, Constants.DEFAULT_FIXTURE_FRICTION) {
       setAsBox(
-        PLAYER_WIDTH / 3.5f,
+        /* hx = */
+        PLAYER_WIDTH / 4f,
+        /* hy = */
         ESSENTIALLY_ZERO,
+        /* center = */
         Vector2(0f, -PLAYER_HEIGHT / 2f - ESSENTIALLY_ZERO),
+        /* angle = */
         0f
       )
     }
@@ -302,8 +306,8 @@ private val playerVertices = Array(8) { Vector2() }.also { vertices ->
   vertices[1].set(nearZW, halfHeight)
   vertices[2].set(-halfWidth, -(halfHeight / 2f))
   vertices[3].set(-halfWidth, nearZH)
-  vertices[4].set(-(halfWidth / 2f), -halfHeight + 0.01f)
-  vertices[5].set((halfWidth / 2f), -halfHeight + 0.01f)
+  vertices[4].set(-(halfWidth / 2f), -halfHeight + ESSENTIALLY_ZERO)
+  vertices[5].set((halfWidth / 2f), -halfHeight + ESSENTIALLY_ZERO)
   vertices[6].set(halfWidth, -(halfHeight / 2f))
   vertices[7].set(halfWidth, nearZH)
 }
