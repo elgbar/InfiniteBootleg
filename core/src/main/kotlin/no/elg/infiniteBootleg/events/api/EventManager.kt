@@ -75,7 +75,7 @@ object EventManager {
    *
    * As the listener is only meant to listen to a single event it is not a requirement to have a strong reference to the [listener].
    */
-  inline fun <reified T : Event> oneShotListener(listener: EventListener<out T>) {
+  inline fun <reified T : Event> oneShotListener(listener: EventListener<T>) {
     var handled = false // Prevents the listener from being called multiple times
     val wrappedListener = EventListener<T> {
       if (handled) {
