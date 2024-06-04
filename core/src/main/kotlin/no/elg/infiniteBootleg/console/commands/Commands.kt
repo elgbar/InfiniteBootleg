@@ -226,6 +226,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       val bodies = Array<Body>(worldBox2dWorld.bodyCount)
       worldBox2dWorld.getBodies(bodies)
       var invalid = 0
+      var nullUserData = 0
       for (body in bodies) {
         val userData = body.userData
         if (userData is Entity) {
@@ -235,7 +236,14 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
           }
           invalid++
           logger.error("Entity", "Found entity not added to the world! $id")
+        } else if (userData == null) {
+          nullUserData++
+        } else {
+          logger.warn("Entity", "Found body with non-entity userdata: $userData")
         }
+      }
+      if (nullUserData > 0) {
+        logger.warn("Entity", "Found bodies $nullUserData with null as userdata")
       }
       if (invalid == 0) {
         logger.success("No invalid bodies found!")
@@ -504,10 +512,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of chunk bounds")
   fun debChu() {
     Settings.renderChunkBounds = !Settings.renderChunkBounds
-    logger.log(
-      LogLevel.SUCCESS,
-      "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}"
-    )
+    logger.log(LogLevel.SUCCESS, "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}")
   }
 
   @ClientsideOnly
