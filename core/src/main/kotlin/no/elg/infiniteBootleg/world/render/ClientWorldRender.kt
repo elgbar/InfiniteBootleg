@@ -122,6 +122,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     chunkRenderer.renderMultiple()
     batch.safeUse {
       for (renderer in renderers) {
+        batch.projectionMatrix = camera.combined
         renderer.render()
       }
     }

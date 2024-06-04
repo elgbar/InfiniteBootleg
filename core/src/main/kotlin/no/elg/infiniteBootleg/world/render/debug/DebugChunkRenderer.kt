@@ -68,7 +68,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
           }
         }
         val sr = ClientMain.inst().screenRenderer
-        sr.batch.safeUse {
+        sr.use {
           sr.drawBottom("Debug Chunk outline legend", 5f)
           sr.font.color = WITHIN_CAMERA_COLOR
           sr.drawBottom("  Chunks within the camera boarders", 3f)
