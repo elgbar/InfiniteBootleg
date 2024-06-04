@@ -7,7 +7,6 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
@@ -852,51 +851,6 @@ abstract class World(
    * @return If the given chunk is loaded in memory
    */
   fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = isChunkLoaded(compactLoc(chunkX, chunkY))
-
-  /**
-   * Unload and save all chunks in this world.
-   *
-   *
-   * Must be called on main thread!
-   */
-  fun reload() {
-    Main.inst().scheduler.executeSync {
-      // Reload on render thread to make sure it does not try to load chunks while we're
-      // waiting
-      val wasNotPaused = !worldTicker.isPaused
-      if (wasNotPaused) {
-        worldTicker.pause()
-      }
-
-      chunksLock.write {
-        for (chunk in chunks.values()) {
-          if (chunk != null && !unloadChunk(chunk, force = true, save = false)) {
-            Main.logger().warn("Failed to unload chunk ${stringifyCompactLoc(chunk)}")
-          }
-        }
-        val loadedChunks = chunks.size
-        if (loadedChunks != 0) {
-          Main.logger().warn("Failed to clear chunks during reload, there are $loadedChunks loaded chunks")
-        }
-      }
-      engine.removeAllEntities()
-      postBox2dRunnable {
-        val bodies = GdxArray<Body>(false, worldBody.box2dWorld.bodyCount)
-        worldBody.box2dWorld.getBodies(bodies)
-        if (!bodies.isEmpty) {
-          Main.logger().error("BOX2D", "There existed dangling bodies after reload!")
-        }
-        for (body in bodies) {
-          worldBody.destroyBody(body)
-        }
-      }
-      initialize()
-      if (wasNotPaused) {
-        worldTicker.resume()
-      }
-      Main.logger().log("World", "World reloaded last save")
-    }
-  }
 
   /**
    * @return All currently loaded chunks

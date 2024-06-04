@@ -416,14 +416,6 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   }
 
   @ClientsideOnly
-  @ConsoleDoc(description = "Reload all loaded chunks if unloading is allowed")
-  fun reload() {
-    val world = world ?: return
-    world.reload()
-    logger.log(LogLevel.SUCCESS, "All chunks have been reloaded")
-  }
-
-  @ClientsideOnly
   @ConsoleDoc(description = "Toggle flight for player")
   fun fly() {
     val world = clientWorld ?: return

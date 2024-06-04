@@ -50,7 +50,6 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
       Input.Keys.TAB -> world.controlledPlayerEntities.forEach { it.toggleContainer() }
 
       Input.Keys.F5 -> world.save()
-      Input.Keys.F9 -> world.reload()
       Input.Keys.F12 -> {
         val ticker: Ticker = world.worldTicker
         if (ticker.isPaused) {
