@@ -42,7 +42,7 @@ class ECSInputListener(val world: World) : InputProcessor, Disposable {
   }
 
   override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-    buttonsDownSet += button
+    buttonsDownSet -= button
     // handleEvent(InputEvent.TouchUpEvent(screenX, screenY, pointer, button))
     return false
   }
