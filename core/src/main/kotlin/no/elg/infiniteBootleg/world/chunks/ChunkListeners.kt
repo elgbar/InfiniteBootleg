@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isWithinRadius
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.queryEntities
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
@@ -82,6 +83,20 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       if (eventChunk.isNeighbor(chunk)) {
         chunk.updateAllBlockLights()
         chunk.queueForRendering(false)
+      }
+    }
+
+    /**
+     * Awakens players to allow them to jump in a hole when placing a block
+     */
+    listeners += registerListener { (oldBlock, newBlock): BlockChangedEvent ->
+      val block = oldBlock ?: newBlock
+      if (block?.chunk === chunk) {
+        block.queryEntities {
+          for ((body, _) in it) {
+            body.isAwake = true
+          }
+        }
       }
     }
   }
