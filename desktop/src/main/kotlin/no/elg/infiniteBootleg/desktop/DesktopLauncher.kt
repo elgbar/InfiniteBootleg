@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.util.defaultDisplayHeight
 import no.elg.infiniteBootleg.util.defaultDisplayWidth
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
   val progArgs = ProgramArgs(args)
@@ -32,7 +33,12 @@ fun main(args: Array<String>) {
     config.setForegroundFPS(Settings.foregroundFPS)
     config.setWindowIcon("textures/icon_64.png")
     config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 4, 2)
-    Lwjgl3Application(main, config)
+    try {
+      Lwjgl3Application(main, config)
+    } catch (e: Exception) {
+      Main.logger().error("Uh-oh, unhandled exception caught!", e)
+      exitProcess(1)
+    }
   } else {
     val config = HeadlessApplicationConfiguration()
     config.updatesPerSecond = (if (Settings.tps < 0) DEFAULT_TICKS_PER_SECOND else Settings.tps).toInt()
