@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.Pool
 import ktx.ashley.allOf
 import ktx.collections.getOrPut
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ecs.BASIC_STANDALONE_ENTITY
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -35,6 +36,10 @@ interface ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent, Pool.Po
       event: T,
       noinline filter: (Entity) -> Boolean = { true }
     ) {
+      if (Main.inst().world?.worldTicker?.isPaused ?: true) {
+        Main.logger().debug("ECSEventQueue") { "Dropping queued event as the world ticker is paused" }
+        return
+      }
       val entities = entitiesCache.getOrPut(Q::class) { getEntitiesFor(allOf(*BASIC_STANDALONE_ENTITY, Q::class).get()) }
       entities.asSequence().filter(filter).forEach {
         val ecsEvents = queueMapper.get(it) ?: return@forEach
