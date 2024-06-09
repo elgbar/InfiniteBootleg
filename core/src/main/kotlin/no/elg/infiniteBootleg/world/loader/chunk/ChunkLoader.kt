@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.loader.chunk
 
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.Disposable
 import com.google.protobuf.InvalidProtocolBufferException
 import no.elg.infiniteBootleg.CorruptChunkException
 import no.elg.infiniteBootleg.main.Main
@@ -15,7 +16,7 @@ import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
 
-abstract class ChunkLoader(val generator: ChunkGenerator) {
+abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
 
   abstract val world: World
 
@@ -79,6 +80,12 @@ abstract class ChunkLoader(val generator: ChunkGenerator) {
 
   private fun deleteChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord) {
     getChunkFile(world, chunkX, chunkY)?.let(::deleteOrLogFile)
+  }
+
+  override fun dispose() {
+    if (generator is Disposable) {
+      generator.dispose()
+    }
   }
 
   companion object {

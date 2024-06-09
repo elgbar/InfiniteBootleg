@@ -148,7 +148,7 @@ import kotlin.system.measureTimeMillis
  * @author Elg
  */
 abstract class World(
-  val generator: ChunkGenerator,
+  generator: ChunkGenerator,
   /**
    * @return The random seed of this world
    */
@@ -157,7 +157,7 @@ abstract class World(
    * @return The name of the world
    */
   val name: String,
-  val forceTransient: Boolean = false
+  forceTransient: Boolean = false
 ) : Disposable, Resizable {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name, forceTransient)
@@ -238,7 +238,6 @@ abstract class World(
       AuthoritativeWorldContainerManager(engine)
     }
 
-    chunkColumnListeners.registerListeners()
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
       if (Main.isAuthoritative) {
         // Add a delay to make sure the light is calculated
@@ -1075,9 +1074,11 @@ abstract class World(
   /**
    * Alias to `WorldBody#postBox2dRunnable`
    */
-  fun postBox2dRunnable(runnable: () -> Unit) = worldBody.postBox2dRunnable(runnable)
+  @Suppress("NOTHING_TO_INLINE")
+  inline fun postBox2dRunnable(noinline runnable: () -> Unit) = worldBody.postBox2dRunnable(runnable)
 
-  fun postWorldTickerRunnable(runnable: () -> Unit) = worldTicker.postRunnable(runnable)
+  @Suppress("NOTHING_TO_INLINE")
+  inline fun postWorldTickerRunnable(noinline runnable: () -> Unit) = worldTicker.postRunnable(runnable)
 
   abstract val render: WorldRender
 
@@ -1108,6 +1109,7 @@ abstract class World(
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
 
     chunkColumnListeners.dispose()
+    chunkLoader.dispose()
 
     chunksLock.write {
       for (chunk in chunks.values()) {

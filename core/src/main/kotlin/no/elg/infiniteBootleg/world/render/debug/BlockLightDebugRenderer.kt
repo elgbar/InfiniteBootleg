@@ -91,7 +91,7 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
 
   override fun dispose() {
     shapeRenderer.dispose()
-    EventManager.removeListener(listener)
+    listener.removeListener()
   }
 
   companion object {

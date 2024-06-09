@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.events.api
 
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
 import no.elg.infiniteBootleg.main.Main
 import java.lang.ref.WeakReference
 import java.util.Collections
@@ -19,7 +20,7 @@ object EventManager {
 
   @GuardedBy("itself")
   val strongListeners: MutableMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = ConcurrentHashMap()
-  val oneShotStrongRefs: MutableMap<EventListener<out Event>, EventListener<out Event>> = ConcurrentHashMap()
+  val oneShotStrongRefs: MutableMap<EventListener<out Event>, RegisteredEventListener> = ConcurrentHashMap()
 
   val isLoggingAnyEvents: Boolean get() = eventsTracker?.logAnything ?: false
   val isLoggingEventsDispatched get() = eventsTracker?.logEventsDispatched ?: false
@@ -37,20 +38,23 @@ object EventManager {
    * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
-  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<out T>): EventListener<out T> {
+  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<T>): RegisteredEventListener =
+    registerListener(keepStrongReference, T::class, listener)
+
+  fun <T : Event> registerListener(keepStrongReference: Boolean = false, eventClass: KClass<T>, listener: EventListener<T>): RegisteredEventListener {
     val eventListeners: MutableSet<EventListener<out Event>> =
       if (keepStrongReference) {
-        strongListeners.getOrPut(T::class) { Collections.newSetFromMap(ConcurrentHashMap()) }
+        strongListeners.getOrPut(eventClass) { Collections.newSetFromMap(ConcurrentHashMap()) }
       } else {
         synchronized(weakListeners) {
-          weakListeners.getOrPut(T::class) { Collections.newSetFromMap(WeakHashMap()) }
+          weakListeners.getOrPut(eventClass) { Collections.newSetFromMap(WeakHashMap()) }
         }
       }
     synchronized(eventListeners) {
       eventListeners.add(listener)
-      eventsTracker?.onListenerRegistered(T::class, listener)
+      eventsTracker?.onListenerRegistered(eventClass, listener)
     }
-    return listener
+    return createRegisteredEventListener(listener, eventClass)
   }
 
   /**
@@ -63,8 +67,8 @@ object EventManager {
     keepStrongReference: Boolean = false,
     crossinline filter: (T) -> Boolean,
     crossinline listener: T.() -> Unit
-  ): EventListener<out T> =
-    registerListener(keepStrongReference) { event ->
+  ): RegisteredEventListener =
+    registerListener<T>(keepStrongReference) { event ->
       if (filter(event)) {
         listener(event)
       }
@@ -77,9 +81,9 @@ object EventManager {
    */
   inline fun <reified T : Event> oneShotListener(listener: EventListener<T>) {
     var handled = false // Prevents the listener from being called multiple times
-    val wrappedListener = EventListener<T> {
+    oneShotStrongRefs[listener] = registerListener<T> {
       if (handled) {
-        return@EventListener
+        return@registerListener
       }
       handled = true
 
@@ -87,18 +91,14 @@ object EventManager {
 
       // Remove from another thread to not cause concurrent modification
       Main.inst().scheduler.executeAsync {
-        @Suppress("UNCHECKED_CAST") // Should be same type in practice
-        val storedThis = oneShotStrongRefs.remove(listener) as? EventListener<T>
+        val storedThis = oneShotStrongRefs.remove(listener)
         if (storedThis != null) {
-          removeListener(storedThis)
+          storedThis.removeListener()
         } else {
           Main.logger().error("Could not remove one shot listener $listener")
         }
       }
     }
-
-    oneShotStrongRefs[listener] = wrappedListener
-    registerListener(listener = wrappedListener)
   }
 
   /**
@@ -122,11 +122,12 @@ object EventManager {
   /**
    * Prevent (by removing) the given listener from receiving any more events
    */
-  inline fun <reified T : Event> removeListener(listener: EventListener<out T>) {
-    val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
+  @Deprecated("Use registeredEventListerne")
+  fun <T : Event> removeListener(listener: EventListener<T>, eventClass: KClass<T>) {
+    val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[eventClass] } ?: strongListeners[eventClass] ?: return
     synchronized(eventListeners) {
       eventListeners.remove(listener)
-      eventsTracker?.onListenerUnregistered(T::class, listener)
+      eventsTracker?.onListenerUnregistered(eventClass, listener)
     }
   }
 

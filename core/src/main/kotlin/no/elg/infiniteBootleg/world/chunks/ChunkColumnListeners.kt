@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.gdx.utils.Disposable
-import no.elg.infiniteBootleg.events.api.EventListener
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.main.Main
@@ -14,7 +13,7 @@ class ChunkColumnListeners : Disposable {
    *
    * There might be edge cases which this does not cover. But they should be fixed as they are found :)
    */
-  private val validateChunkTopBlockOnChunkLoad: EventListener<ChunkLoadedEvent> = EventListener { (eventChunk, _): ChunkLoadedEvent ->
+  private val validateChunkTopBlockOnChunkLoad = EventManager.registerListener { (eventChunk, _): ChunkLoadedEvent ->
     val chunkColumn = eventChunk.chunkColumn
     for (localX in 0 until Chunk.CHUNK_SIZE) {
       if (chunkColumn.topBlockHeight(localX).worldToChunk() == eventChunk.chunkY) {
@@ -25,11 +24,7 @@ class ChunkColumnListeners : Disposable {
     }
   }
 
-  fun registerListeners() {
-    EventManager.registerListener(listener = validateChunkTopBlockOnChunkLoad)
-  }
-
   override fun dispose() {
-    EventManager.removeListener(validateChunkTopBlockOnChunkLoad)
+    validateChunkTopBlockOnChunkLoad.removeListener()
   }
 }

@@ -118,7 +118,7 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
 
   override fun dispose() {
     shapeRenderer.dispose()
-    EventManager.removeListener(listener)
+    listener.removeListener()
   }
 
   companion object {
