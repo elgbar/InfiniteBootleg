@@ -52,20 +52,20 @@ break
 	bounds: 199, 1, 16, 16
 break
 	index: 5
-	bounds: 289, 1, 16, 16
+	bounds: 307, 3, 16, 16
 break
 	index: 2
-	bounds: 361, 1, 16, 16
+	bounds: 379, 1, 16, 16
 break
 	index: 7
-	bounds: 491, 67, 16, 16
+	bounds: 491, 49, 16, 16
 break
 	index: 4
-	bounds: 445, 15, 16, 16
+	bounds: 463, 35, 16, 16
 breaking_block
-	bounds: 445, 33, 16, 16
+	bounds: 445, 15, 16, 16
 brick
-	bounds: 253, 1, 16, 16
+	bounds: 271, 1, 16, 16
 container
 	bounds: 69, 19, 32, 32
 dirt_rotatable
@@ -79,17 +79,19 @@ door_open
 glass
 	bounds: 163, 1, 16, 16
 grass-dirt-east
-	bounds: 325, 2, 16, 16
-grass-dirt-south
-	bounds: 307, 3, 16, 16
-grass-dirt-south-dirt-east
-	bounds: 427, 15, 16, 16
-grass-dirt-south-dirt-west
 	bounds: 343, 1, 16, 16
+grass-dirt-south
+	bounds: 427, 15, 16, 16
+grass-dirt-south-dirt-east
+	bounds: 325, 2, 16, 16
+grass-dirt-south-dirt-west
+	bounds: 361, 1, 16, 16
 grass-dirt-south-dirt-west-dirt-east
 	bounds: 109, 1, 16, 16
+grass-dirt-south-dirt-west-dirt-east-dirt-north
+	bounds: 253, 1, 16, 16
 grass-dirt-west
-	bounds: 379, 1, 16, 16
+	bounds: 491, 67, 16, 16
 grass_rotatable
 	bounds: 235, 1, 16, 16
 hand
@@ -119,9 +121,9 @@ player_walking
 	index: 0
 	bounds: 328, 20, 19, 29
 sand_rotatable
-	bounds: 271, 1, 16, 16
+	bounds: 289, 1, 16, 16
 sandstone_rotatable
-	bounds: 491, 49, 16, 16
+	bounds: 445, 33, 16, 16
 spell
 	bounds: 67, 53, 64, 64
 stick
