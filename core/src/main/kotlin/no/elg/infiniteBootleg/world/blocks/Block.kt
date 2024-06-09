@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.api.HUDDebuggable
 import no.elg.infiniteBootleg.api.Savable
 import no.elg.infiniteBootleg.main.Main
@@ -53,9 +54,25 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
 
   companion object {
 
+    /**
+     * Texture size of block
+     */
+    const val BLOCK_SIZE = 16
+
+    /**
+     * Size of block in world coordinates
+     */
+    const val BLOCK_SIZE_WORLD = 1
+
     val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
     val Block.worldX: WorldCoord get() = chunk.getWorldX(localX)
     val Block.worldY: WorldCoord get() = chunk.getWorldY(localY)
+
+    /**
+     * Find all entities in the block
+     */
+    fun Block.queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
+      world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE_WORLD, worldY + BLOCK_SIZE_WORLD, callback)
 
     /**
      * Remove this block by setting it to air
@@ -113,7 +130,5 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
           ordinal = material.ordinal
         }
       }.toBuilder()
-
-    const val BLOCK_SIZE = 16
   }
 }

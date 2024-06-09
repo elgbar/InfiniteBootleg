@@ -112,11 +112,12 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   }
 
   fun removeBlock(block: Block) {
-    chunk.world.postBox2dRunnable {
+    val world = chunk.world
+    world.postBox2dRunnable {
       fixtureMap.get(compactLoc(block.localX, block.localY))?.also { fixture ->
         fixture.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
         fixture.userData = null
-        chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc))
+        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc))
       }
     }
   }

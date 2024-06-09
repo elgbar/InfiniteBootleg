@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.TextFormat
@@ -519,7 +520,7 @@ class ChunkImpl(
     Main.inst().scheduler.executeAsync(runnable = ::updateAllBlockLights)
   }
 
-  override fun queryEntities(callback: ((Set<Entity>) -> Unit)) =
+  override fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
     world.worldBody.queryEntities(chunkX.chunkToWorld(), chunkY.chunkToWorld(), chunkX.chunkToWorld(Chunk.CHUNK_SIZE), chunkY.chunkToWorld(Chunk.CHUNK_SIZE), callback)
 
   override fun save(): CompletableFuture<ProtoWorld.Chunk> {
@@ -531,12 +532,12 @@ class ChunkImpl(
       }
       blocks += this@ChunkImpl.map { it?.save() ?: AIR_BLOCK_PROTO }
       queryEntities { entities ->
-        this.entities += entities.mapNotNull {
-          if (world.playersEntities.contains(it)) {
+        this.entities += entities.mapNotNull { (_, entity) ->
+          if (world.playersEntities.contains(entity)) {
             // do not save players
             null
           } else {
-            it.save(toAuthoritative = true)
+            entity.save(toAuthoritative = true)
           }
         }
         val protoChunk = _build()

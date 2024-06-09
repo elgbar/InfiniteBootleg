@@ -781,7 +781,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       return
     }
     chunk.queryEntities { entities ->
-      entities.forEach { entity ->
+      entities.forEach { (_, entity) ->
         logger.log(entityNameId(entity))
       }
       logger.log("In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}")

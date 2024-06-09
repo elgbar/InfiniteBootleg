@@ -178,12 +178,13 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     lowerY: Number,
     upperX: Number,
     upperY: Number,
-    callback: ((Set<Entity>) -> Unit)
+    callback: ((Set<Pair<Body, Entity>>) -> Unit)
   ) {
     postBox2dRunnable {
-      val entities = mutableSetOf<Entity>()
+      val entities = mutableSetOf<Pair<Body, Entity>>()
       val queryCallback: (Fixture) -> Boolean = {
-        (it.body.userData as? Entity)?.also { entity -> entities += entity }
+        val body = it.body
+        (body.userData as? Entity)?.also { entity -> entities += body to entity }
         true
       }
       box2dWorld.QueryAABB(queryCallback, lowerX.toFloat(), lowerY.toFloat(), upperX.toFloat(), upperY.toFloat()) // blocking

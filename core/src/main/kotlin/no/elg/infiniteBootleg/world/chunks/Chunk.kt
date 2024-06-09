@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.chunks
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -212,9 +213,12 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   /**
    * Find all entities in the chunk
    */
-  fun queryEntities(callback: ((Set<Entity>) -> Unit))
+  fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit))
 
   companion object {
+    /**
+     * Chunks size in blocks
+     */
     const val CHUNK_SIZE: LocalCoord = 16
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.BLOCK_SIZE
     val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
