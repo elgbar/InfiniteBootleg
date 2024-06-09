@@ -30,9 +30,9 @@ class TickerImpl(
    */
   private val tickRareRate: Long
   private val tickerThread: PauseableThread
-  private val tag: String
 
-  /** The ticks per seconds this ticker is using. Defaults to [.DEFAULT_TICKS_PER_SECOND]  */
+  private val tag: String = "$name ticker"
+
   override val tps: Long
   override val secondsDelayBetweenTicks: Float
   private val msDelayBetweenTicks: Long
@@ -42,16 +42,9 @@ class TickerImpl(
   /** How low the tps must reach before displaying a "can't keep up" warning  */
   private val tpsWarnThreshold: Long
 
-  /**
-   * @return How many ticks have passed since start
-   */
   override var tickId: Long = 0
     private set
 
-  /**
-   * @return The current TPS might differ from [.DEFAULT_TICKS_PER_SECOND] but will never be
-   * greater than it
-   */
   override var realTPS: Long = -1
     private set
 
@@ -61,9 +54,6 @@ class TickerImpl(
   /** Ticks accumulated during calculating tps  */
   private var tpsTick: Long = 0
 
-  /**
-   * @return Nanoseconds between each tick
-   */
   override var tpsDelta: Long = 0
     private set
 
@@ -83,7 +73,6 @@ class TickerImpl(
    * will be no delay (note that this will be a lot of spam!)
    */
   init {
-    tag = "$name ticker"
     require(tps > 0) { "TPS must be strictly positive! Was given $tps" }
     this.tps = tps
     msDelayBetweenTicks = ONE_SECOND_MILLIS / tps
@@ -178,11 +167,6 @@ class TickerImpl(
   }
 
   override val isPaused: Boolean
-    /**
-     * @return If this ticker thread is paused
-     * @see .pause
-     * @see .resume
-     */
     get() = isStarted && tickerThread.isPaused
 
   companion object {
