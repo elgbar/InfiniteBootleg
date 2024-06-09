@@ -26,7 +26,7 @@ class GroundedComponent : EntitySavableComponent, AuthoritativeOnlyComponent {
   val contacts = listOf(feetContacts, holeContacts, leftArmContacts, rightArmContacts)
 
   // To fix being stuck on in a 1x1 hole, allow jumping when both arms are in contact
-  val onGround: Boolean get() = feetContacts.isNotEmpty || (holeContacts.isNotEmpty && leftArmContacts.isNotEmpty && rightArmContacts.isNotEmpty)
+  val onGround: Boolean get() = feetContacts.isNotEmpty || (holeContacts.isNotEmpty && (leftArmContacts.isNotEmpty || rightArmContacts.isNotEmpty))
   val canMoveLeft: Boolean get() = onGround || leftArmContacts.isEmpty
   val canMoveRight: Boolean get() = onGround || rightArmContacts.isEmpty
 
