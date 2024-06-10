@@ -5,8 +5,8 @@ plugins {
   id "java"
   id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
   id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.23.3" apply false
-  id "com.github.ben-manes.versions" version "0.50.0" apply false
+  id "com.diffplug.spotless" version "6.25.0" apply false
+  id "com.github.ben-manes.versions" version "0.51.0" apply false
   id "com.google.protobuf" version "0.9.4" apply false
 }
 
@@ -81,8 +81,6 @@ subprojects {
     }
   }
 
-  [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
-
   sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
   sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
 
@@ -121,7 +119,7 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:5.1.0"
-    implementation "com.google.guava:guava:33.1.0-jre"
+    implementation "com.google.guava:guava:33.2.1-jre"
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
     implementation "com.google.protobuf:protobuf-bom:$protobufVersion"
     implementation "com.google.protobuf:protobuf-kotlin:$protobufVersion"
@@ -149,16 +147,21 @@ subprojects {
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testImplementation "io.mockk:mockk:1.13.11"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
-    testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+    testImplementation "org.junit:junit-bom:$junitVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-api"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine"
+    testImplementation "org.junit.vintage:junit-vintage-engine"
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 
   tasks.named("dependencyUpdates").configure {
+    gradleReleaseChannel = "current"
+    checkConstraints = true
     rejectVersionIf {
-      isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+      isNonStable(it.candidate.version)
     }
   }
 }

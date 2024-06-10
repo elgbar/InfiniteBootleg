@@ -88,7 +88,13 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
     }
 
     private fun nullCmp(o1: Any?, o2: Any?): Int {
-      return if (o1 == null) 1 else if (o2 == null) -1 else 0
+      return if (o1 == null) {
+        1
+      } else if (o2 == null) {
+        -1
+      } else {
+        0
+      }
     }
 
     /**
