@@ -148,3 +148,4 @@ tests/
 .idea/
 /textures/gdx-texturepacker.jar
 .kotlin/
+/core/src/main/resources/logs/*

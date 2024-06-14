@@ -4,6 +4,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.main.ClientMain
@@ -12,9 +13,17 @@ import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.util.defaultDisplayHeight
 import no.elg.infiniteBootleg.util.defaultDisplayWidth
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
+import org.fusesource.jansi.AnsiConsole
 import kotlin.system.exitProcess
 
+private val logger = KotlinLogging.logger {}
+
 fun main(args: Array<String>) {
+  AnsiConsole.systemInstall()
+  if (!AnsiConsole.isInstalled()) {
+    logger.warn { "Failed to install jansi" }
+  }
+
   val progArgs = ProgramArgs(args)
   if (Settings.client) {
     val main: Main = ClientMain(false, progArgs)
@@ -33,10 +42,11 @@ fun main(args: Array<String>) {
     config.setForegroundFPS(Settings.foregroundFPS)
     config.setWindowIcon("textures/icon_64.png")
     config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 4, 2)
+
     try {
       Lwjgl3Application(main, config)
     } catch (e: Exception) {
-      Main.logger().error("Uh-oh, unhandled exception caught!", e)
+      logger.error(e) { "Uh-oh, unhandled exception caught!" }
       exitProcess(1)
     }
   } else {
