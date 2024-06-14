@@ -98,6 +98,8 @@ object HelpfulConsoleHelpUtil {
 
   private fun createCmdPrefix(method: Method): StringBuilder = StringBuilder().append(method.name).append(" ")
 
+  private fun methodNameMatchesCommand(command: String?, method: Method): Boolean = command == null || method.name.startsWith(command, ignoreCase = true)
+
   /**
    * @param console The console used
    * @param exec The executor to get the methods from, will look at all superclasses
@@ -109,14 +111,14 @@ object HelpfulConsoleHelpUtil {
     var clazz: Class<*> = exec.javaClass
     while (clazz != Any::class.java) {
       for (method in ClassReflection.getDeclaredMethods(clazz)) {
-        if (method.isPublic && ConsoleUtils.canDisplayCommand(console, method) && method.name.equals(command, ignoreCase = true)) {
+        if (method.isPublic && ConsoleUtils.canDisplayCommand(console, method) && methodNameMatchesCommand(command, method)) {
           methods.add(method)
         }
       }
       clazz = clazz.superclass
     }
     if (methods.isEmpty()) {
-      logger.warn { "Failed to find any relevant methods." }
+      logger.warn { "Failed to find any relevant methods" }
     }
     return methods
   }
