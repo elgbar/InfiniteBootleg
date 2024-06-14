@@ -5,7 +5,7 @@
     <Console name="STDOUT" target="SYSTEM_OUT">
       <PatternLayout
         disableAnsi="false"
-        pattern="%style{%d}{bright_black} %style{%50logger:%-4line}{magenta} %highlight{%-5level [%8t]  %msg}{FATAL=red, ERROR=bright_red, WARN=bright_yellow bold, INFO=white, DEBUG=bright_black, TRACE=black}%n"
+        pattern="%style{%d}{bright_black} %style{%70logger:%-4line}{magenta} %highlight{%-5level [%8t]  %msg}{FATAL=red, ERROR=bright_red, WARN=bright_yellow bold, INFO=white, DEBUG=bright_black, TRACE=black}%n"
       />
     </Console>
 
@@ -18,7 +18,7 @@
         <SizeBasedTriggeringPolicy size="250 MB"/>
       </Policies>
     </RollingRandomAccessFile>
-    <InGameConsole name="InGameConsole"/>
+    <InGameConsole name="InGameConsole" excludeLoggerName="true"/>
   </Appenders>
 
   <Loggers>
