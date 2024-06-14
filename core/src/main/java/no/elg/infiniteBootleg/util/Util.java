@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,25 +31,8 @@ public class Util {
   public static final String FALLBACK_VERSION = DEFAULT_HASH;
   public static final int CIRCLE_DEG = 360;
   public static final String RELATIVE_TIME = "relative";
-  private static DateTimeFormatter ZULU_FORMATTER =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm'Z'");
-
-  /**
-   * Based on <a
-   * href="https://gist.github.com/steen919/8a079f4dadf88d4197bb/d732449eb74321207b4b189a3bcbf47a83c5db65">this
-   * gist</a>
-   *
-   * <p>Converts the given hex color in 0xAARRGGBB format to a {@link Color} that can be used in a
-   * LibGdx application
-   */
-  public static Color convert(String str) {
-    long hex = Long.decode(str);
-    float a = (hex & 0xFF000000L) >> 24;
-    float r = (hex & 0x00FF0000L) >> 16;
-    float g = (hex & 0x0000FF00L) >> 8;
-    float b = (hex & 0x000000FFL);
-    return new Color(r / 255F, g / 255F, b / 255F, a / 255F);
-  }
+  private static final DateTimeFormatter ZULU_FORMATTER =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm'Z'");
 
   /**
    * The key in the map is a pair of the character given before an equal sign (=) or end of string
@@ -68,8 +50,8 @@ public class Util {
    */
   @NotNull
   public static Map<@NotNull Pair<@NotNull String, @NotNull Boolean>, @Nullable String>
-      interpreterArgs(String[] args) {
-    HashMap<Pair<String, Boolean>, String> argsMap = new HashMap<>();
+  interpreterArgs(String[] args) {
+    Map<Pair<String, Boolean>, String> argsMap = new HashMap<>();
 
     for (String arg : args) {
       if (!arg.startsWith("-")) {
@@ -112,12 +94,12 @@ public class Util {
 
   public static String getVersion() {
     String calcHash =
-        "#"
-            + commitCount()
-            + "-"
-            + getLastGitCommitID()
-            + "@"
-            + getLastCommitDate("iso8601-strict");
+      "#"
+        + commitCount()
+        + "-"
+        + getLastGitCommitID()
+        + "@"
+        + getLastCommitDate("iso8601-strict");
     String savedHash;
     try {
       savedHash = Gdx.files.internal(Main.VERSION_FILE).readString();
@@ -184,7 +166,7 @@ public class Util {
   }
 
   @Nullable
-  private static <T> String executeCommand(String... command) {
+  private static String executeCommand(String... command) {
     try {
       ProcessBuilder processBuilder = new ProcessBuilder();
       processBuilder.command(command);

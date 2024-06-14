@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Elg
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "MethodMayBeStatic", "LoggingSimilarMessage"})
 public class ProgramArgs implements Disposable {
 
   private final CancellableThreadScheduler scheduler = new CancellableThreadScheduler(1);
@@ -47,7 +47,7 @@ public class ProgramArgs implements Disposable {
           }
         }
         if (name == null) {
-          logger.info("Failed to find a valid argument with with the alt '" + altKey + "'");
+          logger.info("Failed to find a valid argument with with the alt '{}'", altKey);
           continue;
         }
       }
@@ -56,7 +56,7 @@ public class ProgramArgs implements Disposable {
         Method method = ProgramArgs.class.getDeclaredMethod(name, String.class);
         method.invoke(this, entry.getValue());
       } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-        logger.error("Unknown argument '" + name + "' with value '" + entry.getValue() + "'");
+        logger.error("Unknown argument '{}' with value '{}'", name, entry.getValue());
         System.exit(2);
       }
     }
@@ -81,44 +81,50 @@ public class ProgramArgs implements Disposable {
 
   @Argument(value = "Run commands after init has completed, split commands by ';'", alt = 'c')
   private void run_cmd(String val) {
-    logger.info("Running commands '" + val + "' as initial commands");
+    logger.info("Running commands '{}' as initial commands", val);
 
     scheduler.scheduleAsync(
-        10,
-        () -> {
-          for (String cmd : val.split(";")) {
-            Main.Companion.inst().getConsole().execCommand(cmd);
-          }
-        });
+      10,
+      () -> {
+        for (String cmd : val.split(";")) {
+          Main.Companion.inst().getConsole().execCommand(cmd);
+        }
+      });
   }
 
-  /** Do not render the graphics */
+  /**
+   * Do not render the graphics
+   */
   @Argument(value = "Disable rendering of graphics", alt = 'h')
   private void headless(@Nullable String val) {
     Settings.client = false;
     logger.info("Graphics is disabled");
   }
 
-  /** Do not load the worlds from disk */
+  /**
+   * Do not load the worlds from disk
+   */
   @Argument(value = "Do not save nor load the world to and from disk", alt = 'l')
   private void no_load(@Nullable String val) {
     Settings.loadWorldFromDisk = false;
     if (Settings.ignoreWorldLock) {
       logger.warn(
-          "The world lock have no effect when not loading worlds. The --force-load argument is"
-              + " useless in with the --no-load argument");
+        "The world lock have no effect when not loading worlds. The --force-load argument is"
+          + " useless in with the --no-load argument");
     }
     logger.info("Worlds will not be loaded/saved from/to disk");
   }
 
-  /** Do not load the worlds from disk */
+  /**
+   * Do not load the worlds from disk
+   */
   @Argument(value = "Force load world from disk, even if it is already in use", alt = 'f')
   private void force_load(@Nullable String val) {
     Settings.ignoreWorldLock = true;
     if (!Settings.loadWorldFromDisk) {
       logger.warn(
-          "The world lock have no effect when not loading worlds. The --force-load argument is"
-              + " useless in with the --no-load argument");
+        "The world lock have no effect when not loading worlds. The --force-load argument is"
+          + " useless in with the --no-load argument");
     }
     logger.info("World will be loaded, even if it is already in use");
   }
@@ -132,7 +138,7 @@ public class ProgramArgs implements Disposable {
   private void world_seed(@Nullable String val) {
     if (val == null) {
       logger.error(
-          "The seed must be provided when using world_seed argument.\nExample: --world_seed=test");
+        "The seed must be provided when using world_seed argument.\nExample: --world_seed=test");
 
       return;
     }
@@ -140,14 +146,18 @@ public class ProgramArgs implements Disposable {
     logger.info("World seed set to '{}'", val);
   }
 
-  /** Disable Box2DLights */
+  /**
+   * Disable Box2DLights
+   */
   @Argument(value = "Disable rendering of lights", alt = 'L')
   private void no_lights(@Nullable String val) {
     logger.info("Lights are disabled. To dynamically enable this use command 'lights'");
     Settings.renderLight = false;
   }
 
-  /** Enable debug rendering (ie box2d) */
+  /**
+   * Enable debug rendering (ie box2d)
+   */
   @Argument(value = "Enable debugging, including debug rendering for box2d", alt = 'd')
   private void debug(@Nullable String val) {
     logger.info("Debug is enabled. To disable this at runtime use command 'debug'");
@@ -155,47 +165,47 @@ public class ProgramArgs implements Disposable {
   }
 
   @Argument(
-      value = "The number of secondary threads. Must be an non-negative integer (>= 0)",
-      alt = 't')
+    value = "The number of secondary threads. Must be an non-negative integer (>= 0)",
+    alt = 't')
   public boolean threads(@Nullable String val) {
     if (val == null) {
       logger.error(
-          "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
+        "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
       return false;
     }
     try {
       int threads = Integer.parseInt(val);
       if (threads < 0) {
-        logger.error("Argument must be an integer greater than or equal to 0, got " + val);
+        logger.error("Argument must be an integer greater than or equal to 0, got {}", val);
         return false;
       }
       Settings.schedulerThreads = threads;
       return true;
     } catch (NumberFormatException e) {
-      logger.error("Argument must be an integer greater than or equal to 0, got " + val);
+      logger.error("Argument must be an integer greater than or equal to 0, got {}", val);
       return false;
     }
   }
 
   @Argument(
-      value = "Specify physics updates per seconds. Must be a positive integer (> 0)",
-      alt = 'T')
+    value = "Specify physics updates per seconds. Must be a positive integer (> 0)",
+    alt = 'T')
   public boolean tps(@Nullable String val) {
     if (val == null) {
       logger.error(
-          "Specify the of physics updates per seconds. Must be an integer greater than to 0");
+        "Specify the of physics updates per seconds. Must be an integer greater than to 0");
       return false;
     }
     try {
       int tps = Integer.parseInt(val);
       if (tps <= 0) {
-        logger.error("Argument must be an integer greater than 0, got " + val);
+        logger.error("Argument must be an integer greater than 0, got {}", val);
         return false;
       }
       Settings.tps = tps;
       return true;
     } catch (NumberFormatException e) {
-      logger.error("Argument must be an integer greater than 0, got " + val);
+      logger.error("Argument must be an integer greater than 0, got {}", val);
       return false;
     }
   }
@@ -207,47 +217,47 @@ public class ProgramArgs implements Disposable {
     // find the maximum length of the argument methods
     // @formatter:off
     int maxNameSize =
-        Arrays.stream(ProgramArgs.class.getDeclaredMethods())
-            .filter(m -> m.isAnnotationPresent(Argument.class))
-            .mapToInt(m -> m.getName().length())
-            .max()
-            .orElse(0);
+      Arrays.stream(ProgramArgs.class.getDeclaredMethods())
+        .filter(m -> m.isAnnotationPresent(Argument.class))
+        .mapToInt(m -> m.getName().length())
+        .max()
+        .orElse(0);
 
     List<Method> methods =
-        Arrays.stream(ProgramArgs.class.getDeclaredMethods())
-            .sorted(Comparator.comparing(Method::getName))
-            .toList();
+      Arrays.stream(ProgramArgs.class.getDeclaredMethods())
+        .sorted(Comparator.comparing(Method::getName))
+        .toList();
     // @formatter:on
     for (Method method : methods) {
       Argument arg = method.getAnnotation(Argument.class);
       if (arg != null) {
         String singleFlag = arg.alt() != '\0' ? "-" + arg.alt() : "  ";
         logger.info(
-            MessageFormat.format(" --%-{0}s %s  %s%n", maxNameSize),
-            method.getName().replace('_', '-'),
-            singleFlag,
-            arg.value());
+          MessageFormat.format(" --%-{0}s %s  %s%n", maxNameSize),
+          method.getName().replace('_', '-'),
+          singleFlag,
+          arg.value());
       }
     }
     System.exit(0);
   }
 
   @Argument(
-      value = "Start instance as server, implies --headless, argument is port to start on",
-      alt = 'S')
+    value = "Start instance as server, implies --headless, argument is port to start on",
+    alt = 'S')
   public boolean server(@Nullable String val) {
     Settings.client = false;
     if (val != null) {
       try {
         int port = Integer.parseInt(val);
         if (port < 0 || port >= 65535) {
-          logger.error(
-              "Argument must be an integer greater than or equal to 0 and less than 65535, got {}",
-              val);
+          logger.error("Argument must be an integer greater than or equal to 0 and less than 65535, got {}", val);
           return false;
         }
         Settings.port = port;
-      } catch (NumberFormatException ignore) {
+      } catch (NumberFormatException e) {
+        logger.error("Invalid number for the port", e);
+        return false;
       }
     }
     return true;
