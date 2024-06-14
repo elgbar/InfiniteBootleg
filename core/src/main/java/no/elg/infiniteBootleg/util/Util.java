@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.strongjoshua.console.LogLevel;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,13 +20,18 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Util {
+
+  private static final Logger logger = LoggerFactory.getLogger(Util.class);
 
   public static final String DEFAULT_HASH = "UNKNOWN";
   public static final int DEFAULT_COMMIT_COUNT = 0;
   public static final String FALLBACK_VERSION = DEFAULT_HASH;
   public static final int CIRCLE_DEG = 360;
+  public static final String RELATIVE_TIME = "relative";
   private static DateTimeFormatter ZULU_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm'Z'");
 
@@ -69,7 +73,7 @@ public class Util {
 
     for (String arg : args) {
       if (!arg.startsWith("-")) {
-        Main.Companion.logger().log(LogLevel.ERROR, "Failed to interpret argument " + arg);
+        logger.error("Failed to interpret argument " + arg);
       } else {
         // we only care about the first equals sign, the rest is a part of the value
         int equal = arg.indexOf('=');
@@ -121,7 +125,7 @@ public class Util {
       savedHash = FALLBACK_VERSION;
     }
     if (savedHash.equals(FALLBACK_VERSION) && calcHash.equals(FALLBACK_VERSION)) {
-      Main.Companion.logger().log(LogLevel.ERROR, "Failed to get the current version");
+      logger.error("Failed to get the current version");
       return FALLBACK_VERSION;
     }
     if (!savedHash.equals(calcHash) && !FALLBACK_VERSION.equals(calcHash)) {
@@ -129,7 +133,7 @@ public class Util {
       try {
         versionFile.writeString(calcHash, false);
       } catch (Exception ignore) {
-        Main.Companion.logger().log(LogLevel.ERROR, "Failed to write new version to file");
+        logger.error("Failed to write new version to file");
       }
     }
     return calcHash.equals(FALLBACK_VERSION) ? savedHash : calcHash;
@@ -168,8 +172,8 @@ public class Util {
   @Nullable
   public static String getLastCommitDate(String dateFormat) {
     String date = executeCommand("git", "log", "-1", "--format=%cd", "--date=" + dateFormat);
-    if (date == null) {
-      return null;
+    if (date == null || RELATIVE_TIME.equals(dateFormat)) {
+      return date;
     }
     try {
       ZonedDateTime parse = ZonedDateTime.parse(date).withZoneSameInstant(ZoneOffset.UTC);
