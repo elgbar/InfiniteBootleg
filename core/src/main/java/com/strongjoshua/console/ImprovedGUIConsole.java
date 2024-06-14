@@ -227,7 +227,7 @@ public class ImprovedGUIConsole extends AbstractConsole {
     stage.addActor(consoleWindow);
     stage.setKeyboardFocus(display.root);
 
-    setSizePercent(50, 50);
+    setSizePercent(100, 60);
     setPositionPercent(50, 50);
   }
 
