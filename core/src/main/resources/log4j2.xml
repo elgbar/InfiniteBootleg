@@ -18,7 +18,7 @@
         <SizeBasedTriggeringPolicy size="250 MB"/>
       </Policies>
     </RollingRandomAccessFile>
-    <InGameConsole name="InGameConsole" excludeLoggerName="true"/>
+    <InGameConsole name="InGameConsole"/>
   </Appenders>
 
   <Loggers>

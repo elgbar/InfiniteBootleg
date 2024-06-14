@@ -6,16 +6,18 @@ import com.badlogic.gdx.utils.reflect.Method
 import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.ConsoleUtils
-import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.Main
+
+private val logger = KotlinLogging.logger {}
 
 object HelpfulConsoleHelpUtil {
 
   fun printHelp(console: Console, exec: CommandExecutor, command: String) {
     val methods = getRelevantMethods(console, exec, command)
     if (methods.isEmpty()) {
-      console.log("Command does not exist.")
+      logger.info { "Command does not exist." }
       return
     }
     for (m in methods) {
@@ -38,12 +40,9 @@ object HelpfulConsoleHelpUtil {
       } else {
         sb.appendCmdSignature(m)
       }
-      console.log(sb.toString())
+      logger.info { sb.toString() }
       if (!allowedToExecute(m)) {
-        console.log(
-          "[WARN] Note that you cannot execute command '" + m.name + "'",
-          LogLevel.ERROR
-        )
+        logger.warn { "You are not allowed to execute command '" + m.name + "'" }
       }
     }
   }
@@ -53,7 +52,7 @@ object HelpfulConsoleHelpUtil {
       if (allowedToExecute(method)) {
         val sb = createCmdPrefix(method)
         sb.appendCmdSignature(method)
-        console.log(sb.toString())
+        logger.info { sb.toString() }
       }
     }
   }
@@ -88,11 +87,10 @@ object HelpfulConsoleHelpUtil {
     if (annotation != null) {
       val names: Array<out String> = annotation.getAnnotation(CmdArgNames::class.java).value
       if (names.size != params.size) {
-        Main.logger()
-          .warn(
-            "Command argument names annotation is present on command '${method.name}', " +
-              "but there are too ${if (names.size < params.size) "few" else "many"} names. Expected ${params.size} names found ${names.size}"
-          )
+        logger.warn {
+          "Command argument names annotation is present on command '${method.name}', " +
+            "but there are too ${if (names.size < params.size) "few" else "many"} names. Expected ${params.size} names found ${names.size}"
+        }
       }
     }
     return null
@@ -116,6 +114,9 @@ object HelpfulConsoleHelpUtil {
         }
       }
       clazz = clazz.superclass
+    }
+    if (methods.isEmpty()) {
+      logger.warn { "Failed to find any relevant methods." }
     }
     return methods
   }

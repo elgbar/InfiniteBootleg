@@ -10,6 +10,7 @@ import com.kotcrab.vis.ui.VisUI
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.console.ConsoleLogger.Companion.DEBUG_PREFIX
@@ -20,9 +21,11 @@ import no.elg.infiniteBootleg.main.ClientMain
 import java.io.PrintWriter
 import java.io.StringWriter
 
+private val logger = KotlinLogging.logger {}
+
 class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : ConsoleLogger, Disposable, Resizable {
   private val console: Console
-  val exec: Commands = Commands(this)
+  val exec: Commands = Commands()
   private val consoleReader: SystemConsoleReader
   private var disposed = false
 
@@ -64,34 +67,34 @@ class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Sett
     if (console.isDisabled) {
       return false
     }
-    log(LogLevel.COMMAND, command)
+    logger.info { "> $command" }
     val parts = command.trim().split(" ")
     if (parts.isEmpty()) {
       return false
     }
-    val command = parts.first()
+    val commandPart = parts.first()
     val commandArgs: List<String> = parts.drop(1)
 
     val methods: Array<Method> = ClassReflection.getMethods(exec.javaClass)
     val potentialMethods = methods.asSequence()
-      .filter { method: Method -> HelpfulConsoleHelpUtil.allowedToExecute(method) && method.name.startsWith(command, ignoreCase = true) }
+      .filter { method: Method -> HelpfulConsoleHelpUtil.allowedToExecute(method) && method.name.startsWith(commandPart, ignoreCase = true) }
       .map { method: Method -> HelpfulConsoleHelpUtil.generateCommandSignature(method) }
       .toList()
 
     val possible = IntArray(false, 8)
     for (i in methods.indices) {
       val method = methods[i]
-      if (method.name.equals(command, ignoreCase = true) && ConsoleUtils.canExecuteCommand(console, method)) {
+      if (method.name.equals(commandPart, ignoreCase = true) && ConsoleUtils.canExecuteCommand(console, method)) {
         possible.add(i)
       }
     }
     if (possible.isEmpty) {
-      if (potentialMethods.isEmpty() || command.isBlank()) {
-        log(LogLevel.ERROR, "Unknown command: '$command'")
+      if (potentialMethods.isEmpty() || commandPart.isBlank()) {
+        logger.error { "Unknown command: '$commandPart'" }
       } else {
-        log(LogLevel.ERROR, "Unknown command. Perhaps you meant")
+        logger.error { "Unknown command. Perhaps you meant" }
         for (potentialMethod in potentialMethods) {
-          log(LogLevel.ERROR, potentialMethod)
+          logger.error { potentialMethod }
         }
       }
       return false
@@ -128,7 +131,7 @@ class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Sett
             method.isAccessible = true
             method.invoke(exec, *args.toTypedArray())
           } else {
-            log(LogLevel.ERROR, "You cannot execute this command")
+            logger.error { "You cannot execute this command" }
             return true
           }
           true
@@ -136,24 +139,23 @@ class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Sett
           val sw = StringWriter()
           e.cause?.cause?.printStackTrace(PrintWriter(sw)) ?: e.printStackTrace(PrintWriter(sw))
           if (numArgs > 0) {
-            log(
-              LogLevel.ERROR,
+            logger.error {
               "Failed to execute command ${method.name}(${method.parameterTypes.joinToString(",") { it.simpleName }})' with args ${commandArgs.joinToString(" ")}"
-            )
+            }
           } else {
-            log(LogLevel.ERROR, "Failed to execute command: ${method.name}")
+            logger.error { "Failed to execute command: ${method.name}" }
           }
-          log(LogLevel.ERROR, sw.toString())
+          logger.error { sw.toString() }
           false
         }
       }
     }
     if (potentialMethods.isEmpty()) {
-      log(LogLevel.ERROR, "Bad parameters. Check your code.")
+      logger.error { "Bad parameters. Check your code." }
     } else {
-      log(LogLevel.ERROR, "Unknown parameters. Did you perhaps mean?")
+      logger.error { "Unknown parameters. Did you perhaps mean?" }
       for (method in potentialMethods) {
-        log(LogLevel.ERROR, method)
+        logger.error { method }
       }
     }
     return false
@@ -166,12 +168,10 @@ class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Sett
   @Deprecated("Use standard slf4j logger")
   override fun log(level: LogLevel, msg: String) {
     if (disposed) {
-      println("[POST DISPOSED LOGGING] <" + level.name + "> " + msg)
       return
     }
     if (msg.startsWith(DEBUG_PREFIX)) {
       // Do not log debug messages to in-game console since it will be spammed
-      println(msg)
       return
     }
     try {

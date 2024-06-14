@@ -33,7 +33,7 @@ enum class IllegalAction {
    */
   LOG;
 
-  @Suppress("NOTHING_TO_INLINE") //want inline to get the correct logger
+  @Suppress("NOTHING_TO_INLINE") // want inline to get the correct logger
   inline fun handle(cause: Throwable? = null, noinline message: () -> String) {
     when (this) {
       THROW -> throw Error(message(), cause)

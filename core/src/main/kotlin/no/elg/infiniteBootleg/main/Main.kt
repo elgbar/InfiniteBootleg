@@ -6,7 +6,6 @@ import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.console.ConsoleHandler
-import no.elg.infiniteBootleg.console.ConsoleLogger
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
@@ -15,8 +14,6 @@ import java.io.File
  * @author Elg
  */
 interface Main : ApplicationListener {
-  @Deprecated("Use standard slf4j logger")
-  val consoleLogger: ConsoleLogger
   val console: ConsoleHandler
   val scheduler: CancellableThreadScheduler
   val engine: Engine?
@@ -39,8 +36,6 @@ interface Main : ApplicationListener {
   fun isAuthorizedToChange(entity: Entity): Boolean
 
   companion object {
-    @Deprecated("Use standard slf4j logger")
-    fun logger(): ConsoleLogger = inst().consoleLogger
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun inst(): Main = CommonMain.instField!!
