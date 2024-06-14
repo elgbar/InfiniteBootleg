@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.main
 
 import com.badlogic.gdx.Gdx
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
@@ -11,6 +12,8 @@ import no.elg.infiniteBootleg.server.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -23,10 +26,6 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   override lateinit var renderThreadName: String
 
   init {
-    synchronized(Main.INST_LOCK) {
-      check(Companion::instField.isLateinit) { "A server main instance have already be declared" }
-      instField = this
-    }
     val onShutdown = Runnable {
       broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
       serverWorld.save()
@@ -46,7 +45,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     renderThreadName = Thread.currentThread().name
 
     // TODO load world name from some config
-    val serverWorld1 = ServerWorld(PerlinChunkGenerator(Settings.worldSeed.toLong()), Settings.worldSeed.toLong(), "Server World")
+    val serverWorld1 = ServerWorld(PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World")
     serverWorld = serverWorld1
     serverWorld.initialize()
 
@@ -56,7 +55,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
       .priority(Thread.MAX_PRIORITY)
       .uncaughtExceptionHandler { thread, e ->
         try {
-          console.log("SERVER", "Unhandled exception interruption received on thread $thread", e)
+          logger.error(e) { "Unhandled exception interruption received on thread $thread" }
         } finally {
           Gdx.app.exit()
         }
@@ -65,7 +64,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
         try {
           NettyServer().start()
         } catch (e: InterruptedException) {
-          console.log("SERVER", "Server interruption received", e)
+          logger.warn(e) { "Server interruption received" }
         } finally {
           Gdx.app.exit()
         }
@@ -73,7 +72,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
 
     EventManager.oneShotListener { event: WorldLoadedEvent ->
       if (event.world === serverWorld1) {
-        Main.logger().log("SERVER", "Server world is ready, starting server thread")
+        logger.info { "Server world is ready, starting server thread" }
         serverThread.start()
       }
     }
@@ -87,12 +86,7 @@ class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   }
 
   companion object {
-    private lateinit var instField: ServerMain
-    fun inst(): ServerMain {
-      if (!Settings.client) {
-        return instField
-      }
-      throw IllegalStateException("Cannot get server main as a client")
-    }
+
+    fun inst(): ServerMain = Main.inst() as? ServerMain ?: throw IllegalStateException("Cannot get server main as a client")
   }
 }

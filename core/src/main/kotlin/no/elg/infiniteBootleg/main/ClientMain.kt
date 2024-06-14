@@ -7,14 +7,13 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.GL20
 import com.kotcrab.vis.ui.VisUI
-import no.elg.infiniteBootleg.Settings
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.input.GlobalInputListener
 import no.elg.infiniteBootleg.input.MouseLocator
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.main.Main.Companion.isClient
 import no.elg.infiniteBootleg.main.Main.Companion.isServer
-import no.elg.infiniteBootleg.main.Main.Companion.logger
 import no.elg.infiniteBootleg.screens.AbstractScreen
 import no.elg.infiniteBootleg.screens.MainMenuScreen
 import no.elg.infiniteBootleg.screens.ScreenRenderer
@@ -26,6 +25,8 @@ import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
 import java.awt.Toolkit
+
+private val logger = KotlinLogging.logger {}
 
 class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progArgs) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
@@ -42,7 +43,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
       inputMultiplexer.clear()
       inputMultiplexer.addProcessor(GlobalInputListener)
       Gdx.input.setOnscreenKeyboardVisible(false)
-      Gdx.app.debug("SCREEN", "Loading new screen ${value.javaClass.simpleName}")
+      logger.debug { "Loading new screen ${value.javaClass.simpleName}" }
       updateStatus(world)
 
       (screen as? AbstractScreen)?.tryCreate()
@@ -83,10 +84,6 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
 
   init {
     check(!isServer) { "Cannot create client main as a server!" }
-    synchronized(Main.INST_LOCK) {
-      check(Companion::instField.isLateinit) { "A client main instance have already be declared" }
-      instField = this
-    }
   }
 
   override fun create() {
@@ -95,13 +92,13 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     super.create()
     renderThreadName = Thread.currentThread().name
     Gdx.input.inputProcessor = inputMultiplexer
-    console.log(
+    logger.info {
       """Controls:
   WASD to control the camera
   arrow-keys to control the player
   T to teleport player to current mouse pos
   Apostrophe (') to open console (type help for help)"""
-    )
+    }
     screenRenderer = ScreenRenderer()
     screen = MainMenuScreen
 
@@ -121,7 +118,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   override fun resize(rawWidth: Int, rawHeight: Int) {
     val width = rawWidth.coerceAtLeast(1)
     val height = rawHeight.coerceAtLeast(1)
-    logger().log("Resizing client to $width x $height")
+    logger.debug { "Resizing client to $width x $height" }
     screen.resize(width, height)
     console.resize(width, height)
     screenRenderer.resize(width, height)
@@ -151,7 +148,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   fun updateStatus(world: ClientWorld?) {
     isSingleplayer = world is SinglePlayerWorld
     isMultiplayer = world is ServerClientWorld
-    logger().debug("STATUS", "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer")
+    logger.debug { "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer" }
   }
 
   fun shouldNotIgnoreWorldInput(): Boolean = !shouldIgnoreWorldInput()
@@ -170,12 +167,6 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
     const val CLEAR_COLOR_B = 1f
     const val CLEAR_COLOR_A = 1f
 
-    private lateinit var instField: ClientMain
-    fun inst(): ClientMain {
-      if (Settings.client) {
-        return instField
-      }
-      throw IllegalStateException("Cannot get client main as a server")
-    }
+    fun inst(): ClientMain = Main.inst() as? ClientMain ?: throw IllegalStateException("Cannot get client main as a server")
   }
 }

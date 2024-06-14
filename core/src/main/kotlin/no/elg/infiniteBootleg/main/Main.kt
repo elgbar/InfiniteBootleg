@@ -15,6 +15,7 @@ import java.io.File
  * @author Elg
  */
 interface Main : ApplicationListener {
+  @Deprecated("Use standard slf4j logger")
   val consoleLogger: ConsoleLogger
   val console: ConsoleHandler
   val scheduler: CancellableThreadScheduler
@@ -38,9 +39,11 @@ interface Main : ApplicationListener {
   fun isAuthorizedToChange(entity: Entity): Boolean
 
   companion object {
+    @Deprecated("Use standard slf4j logger")
     fun logger(): ConsoleLogger = inst().consoleLogger
 
-    fun inst(): Main = CommonMain.instField
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun inst(): Main = CommonMain.instField!!
 
     /**
      * @return If this is a client of a server
@@ -87,7 +90,5 @@ interface Main : ApplicationListener {
     private val EXTERNAL_FOLDER = ".infiniteBootleg" + File.separatorChar
     val WORLD_FOLDER = EXTERNAL_FOLDER + "worlds" + File.separatorChar
     const val VERSION_FILE = "version"
-
-    val INST_LOCK = Any()
   }
 }

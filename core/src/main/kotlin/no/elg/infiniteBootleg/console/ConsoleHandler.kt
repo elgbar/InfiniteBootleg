@@ -20,7 +20,7 @@ import no.elg.infiniteBootleg.main.ClientMain
 import java.io.PrintWriter
 import java.io.StringWriter
 
-class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolean = Settings.client) : ConsoleLogger, Disposable, Resizable {
+class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : ConsoleLogger, Disposable, Resizable {
   private val console: Console
   val exec: Commands = Commands(this)
   private val consoleReader: SystemConsoleReader
@@ -29,11 +29,12 @@ class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolea
   init {
     if (inGameConsole) {
       console = CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE)
-      console.setLoggingToSystem(true)
+      console.setLoggingToSystem(false)
     } else {
       console = StdConsole()
+      console.setConsoleStackTrace(true)
+      console.setLoggingToSystem(true)
     }
-    console.setConsoleStackTrace(true)
     console.setCommandExecutor(exec)
 
     consoleReader = SystemConsoleReader(this)
@@ -162,6 +163,7 @@ class ConsoleHandler @JvmOverloads constructor(private val inGameConsole: Boolea
    * Log a message.
    * If the message starts with [DEBUG_PREFIX] it will not be logged to the in-game console
    */
+  @Deprecated("Use standard slf4j logger")
   override fun log(level: LogLevel, msg: String) {
     if (disposed) {
       println("[POST DISPOSED LOGGING] <" + level.name + "> " + msg)

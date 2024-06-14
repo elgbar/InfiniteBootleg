@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration packages="no.elg.infiniteBootleg.logging" status="error">
+
   <Appenders>
     <Console name="STDOUT" target="SYSTEM_OUT">
       <PatternLayout
         disableAnsi="false"
-        pattern="%style{%d}{bright_black} %style{%class{1.1.1.*}:%line}{magenta} %highlight{%-5level [%10t]  %msg}{FATAL=red, ERROR=bright_red, WARN=bright_yellow bold, INFO=white, DEBUG=bright_black, TRACE=black}%n"
+        pattern="%style{%d}{bright_black} %style{%50logger:%-4line}{magenta} %highlight{%-5level [%8t]  %msg}{FATAL=red, ERROR=bright_red, WARN=bright_yellow bold, INFO=white, DEBUG=bright_black, TRACE=black}%n"
       />
     </Console>
 
     <RollingRandomAccessFile name="RollingRandomAccessFile" fileName="logs/current.log"
                              filePattern="logs/$${date:yyyy-MM}/log-%d{yyyy-MM-dd-HH}-%i.log.gz">
       <PatternLayout>
-        <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+        <Pattern>%d %5level %c [%10t] %m%n</Pattern>
       </PatternLayout>
       <Policies>
         <SizeBasedTriggeringPolicy size="250 MB"/>
       </Policies>
     </RollingRandomAccessFile>
+    <InGameConsole name="InGameConsole"/>
   </Appenders>
 
   <Loggers>
+    <Logger name="io.netty" level="info"/>
     <Root level="trace">
       <AppenderRef ref="STDOUT"/>
       <AppenderRef ref="RollingRandomAccessFile"/>
+      <AppenderRef ref="InGameConsole"/>
     </Root>
   </Loggers>
 </Configuration>

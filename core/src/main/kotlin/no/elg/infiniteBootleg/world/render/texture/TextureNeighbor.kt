@@ -1,14 +1,15 @@
 package no.elg.infiniteBootleg.world.render.texture
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.assets.SafeTextureAtlas
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 import java.util.EnumMap
 
 object TextureNeighbor {
+  private val logger = KotlinLogging.logger {}
 
   private val textureNeighbors = mutableMapOf<Material, MutableList<NeighborTexture>>()
 
@@ -33,7 +34,7 @@ object TextureNeighbor {
     for (textureNeighbor in textureNeighbors.values) {
       textureNeighbor.sortByDescending(NeighborTexture::directions)
     }
-    Main.logger().log("Generated ${textureNeighbors.map { it.value.size }.sum()} neighbor textures")
+    logger.info { "Generated ${textureNeighbors.map { it.value.size }.sum()} neighbor textures" }
   }
 
   data class NeighborTexture(
