@@ -35,7 +35,9 @@ interface ConsoleLogger : ApplicationLogger {
    * @param level The level to log at
    * @param msg The message to log
    */
+  @Deprecated("Use standard slf4j logger")
   fun log(level: LogLevel, msg: String)
+
   fun success(msg: String) {
     log(LogLevel.SUCCESS, msg)
   }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.GdxArray
 import ktx.collections.plusAssign
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.FONTS_FOLDER
@@ -14,11 +15,12 @@ import no.elg.infiniteBootleg.assets.InfAssets.Companion.TEXTURES_BLOCK_FILE
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.createTextureRegion
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.ClientMain.Companion.scale
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -102,7 +104,7 @@ class InfAssetsImpl : InfAssets {
     luminanceDebugTexture = createTextureRegion(Color.FIREBRICK, 0.5f)
 
     // Do some dummy work to load textures and constructors
-    Main.logger().debug("Material", "Loaded ${Material.normalMaterials.size} materials")
+    logger.debug { "Loaded ${Material.normalMaterials.size} materials" }
     TextureNeighbor.generateNeighborMap(safeTextureAtlas)
 
     loadInfBootSkin()

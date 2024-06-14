@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.args;
 
 import com.badlogic.gdx.utils.Disposable;
-import com.strongjoshua.console.LogLevel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -10,21 +9,23 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import no.elg.infiniteBootleg.Settings;
-import no.elg.infiniteBootleg.console.ConsoleLogger;
 import no.elg.infiniteBootleg.main.Main;
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler;
 import no.elg.infiniteBootleg.util.Util;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Elg
  */
 @SuppressWarnings("unused")
-public class ProgramArgs implements ConsoleLogger, Disposable {
+public class ProgramArgs implements Disposable {
 
   private final CancellableThreadScheduler scheduler = new CancellableThreadScheduler(1);
+
+  private static final Logger logger = LoggerFactory.getLogger(ProgramArgs.class);
 
   public ProgramArgs(String[] args) {
     Map<Pair<String, Boolean>, String> options = Util.interpreterArgs(args);
@@ -46,7 +47,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
           }
         }
         if (name == null) {
-          log("ProgramArgs", "Failed to find a valid argument with with the alt '" + altKey + "'");
+          logger.info("Failed to find a valid argument with with the alt '" + altKey + "'");
           continue;
         }
       }
@@ -55,16 +56,10 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
         Method method = ProgramArgs.class.getDeclaredMethod(name, String.class);
         method.invoke(this, entry.getValue());
       } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-        error(
-            "ProgramArgs", "Unknown argument '" + name + "' with value '" + entry.getValue() + "'");
+        logger.error("Unknown argument '" + name + "' with value '" + entry.getValue() + "'");
         System.exit(2);
       }
     }
-  }
-
-  @Override
-  public void log(@NotNull LogLevel level, @NotNull String msg) {
-    System.out.println("[" + level + "] " + msg);
   }
 
   @Override
@@ -86,7 +81,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
 
   @Argument(value = "Run commands after init has completed, split commands by ';'", alt = 'c')
   private void run_cmd(String val) {
-    log("Running commands '" + val + "' as initial commands");
+    logger.info("Running commands '" + val + "' as initial commands");
 
     scheduler.scheduleAsync(
         10,
@@ -101,7 +96,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   @Argument(value = "Disable rendering of graphics", alt = 'h')
   private void headless(@Nullable String val) {
     Settings.client = false;
-    log("Graphics is disabled");
+    logger.info("Graphics is disabled");
   }
 
   /** Do not load the worlds from disk */
@@ -109,11 +104,11 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   private void no_load(@Nullable String val) {
     Settings.loadWorldFromDisk = false;
     if (Settings.ignoreWorldLock) {
-      warn(
+      logger.warn(
           "The world lock have no effect when not loading worlds. The --force-load argument is"
               + " useless in with the --no-load argument");
     }
-    log("Worlds will not be loaded/saved from/to disk");
+    logger.info("Worlds will not be loaded/saved from/to disk");
   }
 
   /** Do not load the worlds from disk */
@@ -121,11 +116,11 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   private void force_load(@Nullable String val) {
     Settings.ignoreWorldLock = true;
     if (!Settings.loadWorldFromDisk) {
-      warn(
+      logger.warn(
           "The world lock have no effect when not loading worlds. The --force-load argument is"
               + " useless in with the --no-load argument");
     }
-    log("World will be loaded, even if it is already in use");
+    logger.info("World will be loaded, even if it is already in use");
   }
 
   /**
@@ -136,27 +131,26 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
   @Argument(value = "Set the default world seed. Example: --world_seed=test", alt = 's')
   private void world_seed(@Nullable String val) {
     if (val == null) {
-      log(
-          LogLevel.ERROR,
+      logger.error(
           "The seed must be provided when using world_seed argument.\nExample: --world_seed=test");
 
       return;
     }
     Settings.worldSeed = val.hashCode();
-    logf("World seed set to '%s'", val);
+    logger.info("World seed set to '{}'", val);
   }
 
   /** Disable Box2DLights */
   @Argument(value = "Disable rendering of lights", alt = 'L')
   private void no_lights(@Nullable String val) {
-    log("Lights are disabled. To dynamically enable this use command 'lights'");
+    logger.info("Lights are disabled. To dynamically enable this use command 'lights'");
     Settings.renderLight = false;
   }
 
   /** Enable debug rendering (ie box2d) */
   @Argument(value = "Enable debugging, including debug rendering for box2d", alt = 'd')
   private void debug(@Nullable String val) {
-    log("Debug is enabled. To disable this at runtime use command 'debug'");
+    logger.info("Debug is enabled. To disable this at runtime use command 'debug'");
     Settings.debug = true;
   }
 
@@ -165,21 +159,20 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
       alt = 't')
   public boolean threads(@Nullable String val) {
     if (val == null) {
-      log(
-          LogLevel.ERROR,
+      logger.error(
           "Specify the number of secondary threads. Must be an integer greater than or equal to 0");
       return false;
     }
     try {
       int threads = Integer.parseInt(val);
       if (threads < 0) {
-        log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0, got " + val);
+        logger.error("Argument must be an integer greater than or equal to 0, got " + val);
         return false;
       }
       Settings.schedulerThreads = threads;
       return true;
     } catch (NumberFormatException e) {
-      log(LogLevel.ERROR, "Argument must be an integer greater than or equal to 0, got " + val);
+      logger.error("Argument must be an integer greater than or equal to 0, got " + val);
       return false;
     }
   }
@@ -189,28 +182,27 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
       alt = 'T')
   public boolean tps(@Nullable String val) {
     if (val == null) {
-      log(
-          LogLevel.ERROR,
+      logger.error(
           "Specify the of physics updates per seconds. Must be an integer greater than to 0");
       return false;
     }
     try {
       int tps = Integer.parseInt(val);
       if (tps <= 0) {
-        log(LogLevel.ERROR, "Argument must be an integer greater than 0, got " + val);
+        logger.error("Argument must be an integer greater than 0, got " + val);
         return false;
       }
       Settings.tps = tps;
       return true;
     } catch (NumberFormatException e) {
-      log(LogLevel.ERROR, "Argument must be an integer greater than 0, got " + val);
+      logger.error("Argument must be an integer greater than 0, got " + val);
       return false;
     }
   }
 
   @Argument(value = "Print out available arguments and exit", alt = '?')
   public void help(@Nullable String val) {
-    System.out.println("List of program arguments:");
+    logger.info("List of program arguments:");
 
     // find the maximum length of the argument methods
     // @formatter:off
@@ -230,7 +222,7 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
       Argument arg = method.getAnnotation(Argument.class);
       if (arg != null) {
         String singleFlag = arg.alt() != '\0' ? "-" + arg.alt() : "  ";
-        System.out.printf(
+        logger.info(
             MessageFormat.format(" --%-{0}s %s  %s%n", maxNameSize),
             method.getName().replace('_', '-'),
             singleFlag,
@@ -249,10 +241,9 @@ public class ProgramArgs implements ConsoleLogger, Disposable {
       try {
         int port = Integer.parseInt(val);
         if (port < 0 || port >= 65535) {
-          log(
-              LogLevel.ERROR,
-              "Argument must be an integer greater than or equal to 0 and less than 65535, got "
-                  + val);
+          logger.error(
+              "Argument must be an integer greater than or equal to 0 and less than 65535, got {}",
+              val);
           return false;
         }
         Settings.port = port;
