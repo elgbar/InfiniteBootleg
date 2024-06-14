@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.Pool
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.allOf
 import ktx.collections.getOrPut
 import no.elg.infiniteBootleg.main.Main
@@ -13,6 +14,8 @@ import no.elg.infiniteBootleg.world.ecs.BASIC_STANDALONE_ENTITY
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * The queue of events to be processed by an entity, we cannot map events directly onto entities as multiple events might occur between processing
@@ -37,7 +40,7 @@ interface ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent, Pool.Po
       noinline filter: (Entity) -> Boolean = { true }
     ) {
       if (Main.inst().world?.worldTicker?.isPaused ?: true) {
-        Main.logger().debug("ECSEventQueue") { "Dropping queued event as the world ticker is paused" }
+        KotlinLogging.logger {}.debug { "Dropping queued event as the world ticker is paused" }
         return
       }
       val entities = entitiesCache.getOrPut(Q::class) { getEntitiesFor(allOf(*BASIC_STANDALONE_ENTITY, Q::class).get()) }

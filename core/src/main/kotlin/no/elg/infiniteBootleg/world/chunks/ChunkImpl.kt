@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.TextFormat
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.checkChunkCorrupt
@@ -52,6 +53,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ForkJoinTask
 import java.util.concurrent.atomic.AtomicInteger
 import javax.annotation.concurrent.GuardedBy
+
+private val logger = KotlinLogging.logger {}
 
 class ChunkImpl(
   override val world: World,
@@ -170,7 +173,7 @@ class ChunkImpl(
     sendUpdatePacket: Boolean
   ): Block? {
     if (isDisposed) {
-      handleChangingBlockInDeposedChunk.handle("ChunkImpl") { "Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block" }
+      handleChangingBlockInDeposedChunk.handle { "Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block" }
       return null
     }
     if (block != null) {
@@ -464,7 +467,7 @@ class ChunkImpl(
    */
   override fun getBlock(localX: LocalCoord, localY: LocalCoord): Block {
     if (!isValid) {
-      Main.logger().warn("Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}")
+      logger.warn { "Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}" }
     }
     Preconditions.checkArgument(
       isInsideChunk(localX, localY),
@@ -542,7 +545,7 @@ class ChunkImpl(
         }
         val protoChunk = _build()
         if (Settings.debug && Settings.logPersistence) {
-          Main.logger().debug("PB Chunk Save") { TextFormat.printer().shortDebugString(protoChunk) }
+          logger.debug { TextFormat.printer().shortDebugString(protoChunk) }
         }
         future.complete(protoChunk)
       }
@@ -562,7 +565,7 @@ class ChunkImpl(
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
     check(initializing) { "Cannot load from proto chunk after chunk has been initialized" }
     if (Settings.debug && Settings.logPersistence) {
-      Main.logger().debug("PB Chunk") { TextFormat.printer().shortDebugString(protoChunk) }
+      logger.debug { TextFormat.printer().shortDebugString(protoChunk) }
     }
     val chunkPosition = protoChunk.position
     checkChunkCorrupt(protoChunk, chunkPosition.x == chunkX && chunkPosition.y == chunkY) {

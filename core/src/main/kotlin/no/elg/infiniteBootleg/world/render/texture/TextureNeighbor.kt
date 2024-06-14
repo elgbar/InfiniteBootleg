@@ -34,7 +34,7 @@ object TextureNeighbor {
     for (textureNeighbor in textureNeighbors.values) {
       textureNeighbor.sortByDescending(NeighborTexture::directions)
     }
-    logger.info { "Generated ${textureNeighbors.map { it.value.size }.sum()} neighbor textures" }
+    logger.debug { "Generated ${textureNeighbors.map { it.value.size }.sum()} neighbor textures" }
   }
 
   data class NeighborTexture(

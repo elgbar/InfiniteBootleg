@@ -1,9 +1,11 @@
 package no.elg.infiniteBootleg.events.api
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.Main
 import java.time.ZonedDateTime
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
+private val logger = KotlinLogging.logger {}
 
 /**
  * Capture events
@@ -27,7 +29,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
     val recordedEvent = EventListenedToEvent(event, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventsListenedTo) {
-      Main.logger().info("EVENT TRACKER") { "Event $event listened to $recordedEvent" }
+      logger.info { "Event $event listened to $recordedEvent" }
     }
   }
 
@@ -35,7 +37,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
     val recordedEvent = RecordedEvent(event, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventsDispatched) {
-      Main.logger().info("EVENT TRACKER") { "Event dispatched: $recordedEvent" }
+      logger.info { "Event dispatched: $recordedEvent" }
     }
   }
 
@@ -43,7 +45,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
     val recordedEvent = ListenerEvent("registered", eventClass, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventListenersChange) {
-      Main.logger().info("EVENT TRACKER") { "Listener registered for ${eventClass.simpleName}: $listener" }
+      logger.info { "Listener registered for ${eventClass.simpleName}: $listener" }
     }
   }
 
@@ -51,7 +53,7 @@ class EventsTracker(var log: Int = LOG_NOTHING) {
     val recordedEvent = ListenerEvent("unregistered", eventClass, listener, Thread.currentThread().name, Main.inst().world?.tick, ZonedDateTime.now())
     recorded += recordedEvent
     if (logEventListenersChange) {
-      Main.logger().info("EVENT TRACKER") { "Listener UN-registered for ${eventClass.simpleName}: $listener" }
+      logger.info { "Listener UN-registered for ${eventClass.simpleName}: $listener" }
     }
   }
 

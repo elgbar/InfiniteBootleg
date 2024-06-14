@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.screens.hud
 
 import com.kotcrab.vis.ui.widget.VisSelectBox
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.scene2d.KTable
@@ -13,7 +14,6 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visSlider
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.IBVisWindow
 import no.elg.infiniteBootleg.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.util.setIBDefaults
@@ -33,6 +33,8 @@ import no.elg.infiniteBootleg.world.magic.parts.RingType
 import no.elg.infiniteBootleg.world.magic.parts.WoodRating
 import no.elg.infiniteBootleg.world.magic.parts.WoodType
 import no.elg.infiniteBootleg.world.world.ClientWorld
+
+private val logger = KotlinLogging.logger {}
 
 @Scene2dDsl
 fun KTable.floatSlider(
@@ -159,7 +161,7 @@ fun addStaffCreatorOverlay(world: ClientWorld): IBVisWindow {
           val newStaff = Staff(wood(), gems.mapNotNull { it() }, rings.mapNotNull { it() })
 
           for (player in world.controlledPlayerEntities) {
-            Main.logger().log("Giving player ${player.nameOrNull} a new staff $newStaff")
+            logger.info { "Giving player ${player.nameOrNull} a new staff $newStaff" }
             val container = player.containerOrNull ?: continue
             container += newStaff.toItem()
           }

@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.world.ecs
 
 import com.badlogic.ashley.core.Entity
 import com.google.protobuf.TextFormat
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt.tags
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.entity
@@ -75,6 +75,7 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEnti
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.checkShouldLoad as box2DBodyComponentCheckShouldLoad
+private val logger = KotlinLogging.logger {}
 
 /**
  * Save an entity to a proto entity
@@ -142,7 +143,7 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
 fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: Entity.() -> Unit = {}): CompletableFuture<Entity> {
   require(chunk == null || this === chunk.world) { "Chunk world does not match entity world" }
   if (Settings.debug && Settings.logPersistence) {
-    Main.logger().debug("PB Entity") { TextFormat.printer().shortDebugString(protoEntity) }
+    logger.debug { TextFormat.printer().shortDebugString(protoEntity) }
   }
   val world = this
   return engine.futureEntity { future ->

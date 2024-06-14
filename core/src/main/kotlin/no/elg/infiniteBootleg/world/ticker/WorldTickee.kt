@@ -1,14 +1,17 @@
 package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.LongMap
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.WorldTickedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy
 import kotlin.concurrent.write
+
+private val logger = KotlinLogging.logger {}
 
 internal class WorldTickee(private val world: World) : Ticking {
 
@@ -29,11 +32,11 @@ internal class WorldTickee(private val world: World) : Ticking {
 
         // clean up dead chunks
         if (chunk == null) {
-          Main.logger().warn("Found null chunk when ticking world")
+          logger.warn { "Found null chunk when ticking world" }
           chunkIterator.remove()
           continue
         } else if (chunk.isDisposed) {
-          Main.logger().warn("Found disposed chunk (${chunk.chunkX},${chunk.chunkY}) when ticking world")
+          logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk.chunkX, chunk.chunkY)} when ticking world" }
           chunkIterator.remove()
           continue
         }

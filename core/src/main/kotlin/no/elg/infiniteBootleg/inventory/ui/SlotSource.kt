@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Scaling
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
@@ -16,6 +17,8 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPackets
 import no.elg.infiniteBootleg.server.serverBoundContainerUpdate
 import no.elg.infiniteBootleg.world.blocks.Block
+
+private val logger = KotlinLogging.logger {}
 
 class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndDrop.Source(actor) {
 
@@ -84,7 +87,7 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
 
   private fun sameContainer(container: Container, sourceSlot: InventorySlot, targetSlot: InventorySlot): Boolean {
     if (targetSlot.index == sourceSlot.index) {
-      Main.logger().debug("DAD", "Dragging to same slot, ignoring")
+      logger.debug { "Dragging to same slot, ignoring" }
       return false
     }
 
@@ -124,7 +127,7 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
           val remainingRemaining = sourceContainer.add(remaining)
           if (remainingRemaining.isNotEmpty()) {
             // wtf
-            Main.logger().error("DAD", "Remaining remaining (???): $remainingRemaining")
+            logger.error { "Remaining remaining (???): $remainingRemaining" }
           }
         }
       }

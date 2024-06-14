@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.input.MouseLocator
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
@@ -25,6 +25,7 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
 
+private val logger = KotlinLogging.logger {}
 fun isControlPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) || Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)
 fun isShiftPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)
 fun isAltPressed(): Boolean = Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)
@@ -147,10 +148,10 @@ fun WorldEntity.interpolate(justPressed: Boolean, action: (WorldEntity, blockX: 
 
     val logging = Settings.debug && Gdx.graphics.frameId % 100 == 0L && distance > Int.MAX_VALUE
     if (logging) {
-      Main.logger().log("---START SMOOTH PLACEMENT---")
-      Main.logger().log("(pos) prev: $prevPos, curr $currPos")
-      Main.logger().log("(distance) $distance")
-      Main.logger().log("Doing $iterations iterations of interpolation")
+      logger.info { "---START SMOOTH PLACEMENT---" }
+      logger.info { "(pos) prev: $prevPos, curr $currPos" }
+      logger.info { "(distance) $distance" }
+      logger.info { "Doing $iterations iterations of interpolation" }
     }
     for (i in 1 until iterations + 1) {
       val multiplierX = (distance - i) / distance
@@ -176,13 +177,13 @@ fun WorldEntity.interpolate(justPressed: Boolean, action: (WorldEntity, blockX: 
       val pBy = worldToBlock(pWy)
 
       if (logging) {
-        Main.logger().log("--inter $i mltX: $multiplierX | mltY: $multiplierY, pBx:$pBx | pBy:$pBy | pWx:$pWx | pWy:$pWy")
+        logger.info { "--inter $i mltX: $multiplierX | mltY: $multiplierY, pBx:$pBx | pBy:$pBy | pWx:$pWx | pWy:$pWy" }
       }
       update = update or action(this, pBx, pBy)
     }
 
     if (logging) {
-      Main.logger().log("---END SMOOTH PLACEMENT (update? $update)---")
+      logger.info { "---END SMOOTH PLACEMENT (update? $update)---" }
     }
   }
 

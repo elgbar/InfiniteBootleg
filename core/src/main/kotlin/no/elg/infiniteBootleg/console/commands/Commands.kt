@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.utils.Array
 import com.strongjoshua.console.CommandExecutor
-import com.strongjoshua.console.LogLevel
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.AuthoritativeOnly
 import no.elg.infiniteBootleg.console.ClientsideOnly
 import no.elg.infiniteBootleg.console.CmdArgNames
-import no.elg.infiniteBootleg.console.ConsoleLogger
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
@@ -68,27 +67,29 @@ import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.Locale
 
+private val logger = KotlinLogging.logger {}
+
 /**
  * @author Elg
  */
 @Suppress("unused")
-class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
+class Commands : CommandExecutor() {
   private val world: World?
     get() = Main.inst().world ?: run {
-      logger.error("CMD", "Failed to find the current world")
+      logger.error { "Failed to find the current world" }
       null
     }
 
   private val clientWorld: ClientWorld?
     get() = ClientMain.inst().world ?: run {
-      logger.error("CMD", "Failed to find the current client world")
+      logger.error { "Failed to find the current client world" }
       null
     }
 
   private fun findEntity(nameOrId: String): Entity? {
     val world = world ?: return null
     return world.getEntity(nameOrId) ?: world.namedEntities.find { it.nameOrNull == nameOrId } ?: run {
-      logger.error("No entity with UUID or name '$nameOrId'")
+      logger.error { "No entity with UUID or name '$nameOrId'" }
       return null
     }
   }
@@ -104,10 +105,10 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun save() {
     val world = world ?: return
     if (world.isTransient) {
-      logger.error("Cannot save the transient $world")
+      logger.error { "Cannot save the transient $world" }
     } else {
       world.save()
-      logger.success("World $world saved")
+      logger.info { "World $world saved" }
     }
   }
 
@@ -118,7 +119,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggle debug")
   fun debug() {
     Settings.debug = !Settings.debug
-    logger.log(LogLevel.SUCCESS, "Debug is now ${Settings.debug.toAbled()}")
+    logger.info { "Debug is now ${Settings.debug.toAbled()}" }
   }
 
   @ConsoleDoc(
@@ -129,10 +130,10 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = world ?: return
     val ticker: Ticker = world.worldTicker
     if (ticker.isPaused) {
-      logger.error("World is already paused")
+      logger.error { "World is already paused" }
     } else {
       ticker.pause()
-      logger.log(LogLevel.SUCCESS, "World is now paused")
+      logger.info { "World is now paused" }
     }
   }
 
@@ -143,9 +144,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     if (ticker.isPaused) {
       world.worldTicker.resume()
       world.render.update()
-      logger.log(LogLevel.SUCCESS, "World is now resumed")
+      logger.info { "World is now resumed" }
     } else {
-      logger.error("World is not paused")
+      logger.error { "World is not paused" }
     }
   }
 
@@ -155,7 +156,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = world ?: return
     val skylight = world.worldTime.baseColor
     skylight.set(r, g, b, a)
-    logger.success("Sky color changed to $skylight")
+    logger.info { "Sky color changed to $skylight" }
   }
 
   @CmdArgNames("scale")
@@ -165,7 +166,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val worldTime = world.worldTime
     val old = worldTime.timeScale
     worldTime.timeScale = scale
-    logger.success("Changed time scale from % .3f to % .3f", old, scale)
+    logger.info { "Changed time scale from $old to $scale" }
     sendDuplexPacket(
       { clientBoundWorldSettings(null, null, scale) }
     ) { serverBoundWorldSettings(null, null, scale) }
@@ -174,7 +175,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggle if time ticks or not")
   fun toggleTime() {
     Settings.dayTicking = !Settings.dayTicking
-    logger.success("Time is now " + (if (Settings.dayTicking) "" else "not ") + "ticking")
+    logger.info { "Time is now " + (if (Settings.dayTicking) "" else "not ") + "ticking" }
     sendDuplexPacket(
       { clientBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
     ) { serverBoundWorldSettings(null, null, if (Settings.dayTicking) 1f else 0f) }
@@ -196,7 +197,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
         "midnight", "night" -> WorldTime.MIDNIGHT_TIME
         "end" -> Int.MAX_VALUE.toFloat()
         else -> {
-          logger.error("CMD", "Unknown time of day, try sunrise, midday, sunset or midnight")
+          logger.error { "Unknown time of day, try sunrise, midday, sunset or midnight" }
           return
         }
       }
@@ -216,7 +217,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     sendDuplexPacket(
       { clientBoundWorldSettings(null, time, null) }
     ) { serverBoundWorldSettings(null, time, null) }
-    logger.success("Changed time from % .3f to % .3f", old, time)
+    logger.info { "Changed time from $old to $time" }
   }
 
   @HiddenCommand
@@ -237,18 +238,18 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
             continue
           }
           invalid++
-          logger.error("Entity", "Found entity not added to the world! $id")
+          logger.error { "Found entity not added to the world! $id" }
         } else if (userData == null) {
           nullUserData++
         } else {
-          logger.warn("Entity", "Found body with non-entity userdata: $userData")
+          logger.warn { "Found body with non-entity userdata: $userData" }
         }
       }
       if (nullUserData > 0) {
-        logger.warn("Entity", "Found bodies $nullUserData with null as userdata")
+        logger.warn { "Found bodies $nullUserData with null as userdata" }
       }
       if (invalid == 0) {
-        logger.success("No invalid bodies found!")
+        logger.info { "No invalid bodies found!" }
       }
     }
   }
@@ -263,10 +264,10 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Some debug info")
   fun chunkInfo() {
     val world = world ?: return
-    Main.logger().log("Debug chunk Info")
-    Main.logger().log("Loaded chunks: ${world.loadedChunks.size}")
+    logger.info { "Debug chunk Info" }
+    logger.info { "Loaded chunks: ${world.loadedChunks.size}" }
     val loadedChunkPos = world.loadedChunks.items.sorted().joinToString("\n") { "(${it.chunkX}, ${it.chunkY}) in view? ${!world.render.isOutOfView(it)}" }
-    Main.logger().log("Chunk pos: \n$loadedChunkPos")
+    logger.info { "Chunk pos: \n$loadedChunkPos" }
   }
 
   @ConsoleDoc(description = "Toggle whether to track events")
@@ -277,18 +278,18 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     } else {
       eventTracker.log = LOG_EVERYTHING
     }
-    logger.success("Events are now ${if (eventTracker.logAnything) "" else "not "}tracked")
+    logger.info { "Events are now ${if (eventTracker.logAnything) "" else "not "}tracked" }
   }
 
   @ConsoleDoc(description = "Toggle whether to track events")
   fun printTrackedEvents() {
     val eventTracker = eventsTracker
     if (eventTracker == null) {
-      logger.error("There is no active event tracker")
+      logger.error { "There is no active event tracker" }
       return
     }
     for (recordedEvent in eventTracker.recordedEvents) {
-      logger.log(eventTracker.toString())
+      logger.info { eventTracker.toString() }
     }
   }
 
@@ -302,29 +303,29 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.error("There is no local, controlled, player in this world")
+      logger.error { "There is no local, controlled, player in this world" }
       return
     }
     val player = entities.first()
     val container = player.containerOrNull ?: run {
-      logger.error("Player has no container")
+      logger.error { "Player has no container" }
       return
     }
 
     if (quantity < 1) {
-      logger.error("Quantity must be at least 1")
+      logger.error { "Quantity must be at least 1" }
       return
     }
     val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
-      logger.error("Unknown container element '$elementName'")
+      logger.error { "Unknown container element '$elementName'" }
       return
     }
 
     val notAdded = container.add(item)
     if (notAdded.isEmpty()) {
-      logger.success("Gave player $item")
+      logger.info { "Gave player $item" }
     } else {
-      logger.error("Failed to give player $item, not enough space for $notAdded")
+      logger.error { "Failed to give player $item, not enough space for $notAdded" }
     }
   }
 
@@ -338,26 +339,26 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       world.validEntities.filter { it.components.any { component -> component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true) } }
     }
 
-    Main.logger().success("Found ${entities.size} entities")
-    Main.logger().success(entities.joinToString { it.id })
+    logger.info { "Found ${entities.size} entities" }
+    logger.info { entities.joinToString { it.id } }
   }
 
   @CmdArgNames("entity")
   @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
   fun inspect(entityUUID: String) {
     val entity = findEntity(entityUUID) ?: return
-    logger.log("===[ ${entityNameId(entity)} ]===")
+    logger.info { "===[ ${entityNameId(entity)} ]===" }
     val (tags, nonTags) = entity.components.partition { it is TagComponent }
     if (nonTags.isNotEmpty()) {
-      logger.log("Components")
+      logger.info { "Components" }
       for (component in nonTags) {
-        logger.log("- ${component::class.simpleName}: ${component.debugString()}")
+        logger.info { "- ${component::class.simpleName}: ${component.debugString()}" }
       }
     }
     if (tags.isNotEmpty()) {
-      logger.log("Tags")
+      logger.info { "Tags" }
       for (component in tags) {
-        logger.log("- ${component::class.simpleName}")
+        logger.info { "- ${component::class.simpleName}" }
       }
     }
   }
@@ -368,17 +369,17 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val entity = findEntity(entityUUID) ?: return
     val searchTerm = componentName.removeSuffix("Component")
     val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
-      logger.error("No component with name '$componentName' in entity ${entityNameId(entity)}")
+      logger.error { "No component with name '$componentName' in entity ${entityNameId(entity)}" }
       return
     }
 
-    logger.log("===[ ${component::class.simpleName?.toTitleCase()} ]===")
+    logger.info { "===[ ${component::class.simpleName?.toTitleCase()} ]===" }
 
     fun printInfo(info: String, success: () -> Boolean) {
       if (success()) {
-        logger.success(" (V) $info")
+        logger.info { " (V) $info" }
       } else {
-        logger.log(LogLevel.ERROR, " (X) $info")
+        logger.info { " (X) $info" }
       }
     }
 
@@ -386,7 +387,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     printInfo("Authoritative only") { component is AuthoritativeOnlyComponent }
     printInfo("Tag") { component is TagComponent }
 
-    logger.log(component.debugString())
+    logger.info { component.debugString() }
   }
 
   // ////////////////////////
@@ -402,9 +403,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     try {
       val color = ReflectionUtil.getStaticField(Color::class.java, colorName.uppercase(Locale.getDefault())) as Color
       skylight.set(color)
-      logger.log("Sky color changed to ${colorName.lowercase()} ($color)")
+      logger.info { "Sky color changed to ${colorName.lowercase()} ($color)" }
     } catch (e: Exception) {
-      logger.log(LogLevel.ERROR, "Unknown color '$colorName'")
+      logger.error { "Unknown color '$colorName'" }
     }
   }
 
@@ -419,10 +420,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     for (chunk in world.loadedChunks) {
       chunk.dirty()
     }
-    logger.log(
-      LogLevel.SUCCESS,
+    logger.info {
       "Lighting is now ${Settings.renderLight.toAbled()}"
-    )
+    }
   }
 
   @ClientsideOnly
@@ -431,7 +431,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.log("There is no local, controlled player in this world")
+      logger.info { "There is no local, controlled player in this world" }
     }
     for (entity in entities) {
       val wasFlying: Boolean = entity.flying
@@ -442,7 +442,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       } else {
         box2DBodyComponent.disableGravity()
       }
-      logger.log(LogLevel.SUCCESS, "Player is now ${if (wasFlying) "not " else ""}flying")
+      logger.info { "Player is now ${if (wasFlying) "not " else ""}flying" }
     }
   }
 
@@ -450,10 +450,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of Box2D objects")
   fun debBox() {
     Settings.renderBox2dDebug = !Settings.renderBox2dDebug
-    logger.log(
-      LogLevel.SUCCESS,
+    logger.info {
       "Debug rendering for Box2D is now ${Settings.renderBox2dDebug.toAbled()}"
-    )
+    }
   }
 
   @ClientsideOnly
@@ -462,7 +461,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawBodies = !box2dDebugRenderer.isDrawBodies
-    logger.success("Box2D debug draw Bodies is ${box2dDebugRenderer.isDrawBodies.toAbled()}")
+    logger.info { "Box2D debug draw Bodies is ${box2dDebugRenderer.isDrawBodies.toAbled()}" }
   }
 
   @ClientsideOnly
@@ -471,7 +470,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawJoints = !box2dDebugRenderer.isDrawJoints
-    logger.success("Box2D debug draw Joints is ${box2dDebugRenderer.isDrawJoints.toAbled()}")
+    logger.info { "Box2D debug draw Joints is ${box2dDebugRenderer.isDrawJoints.toAbled()}" }
   }
 
   @ClientsideOnly
@@ -480,7 +479,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawAABBs = !box2dDebugRenderer.isDrawAABBs
-    logger.success("Box2D debug draw AABBs is ${box2dDebugRenderer.isDrawAABBs.toAbled()}")
+    logger.info { "Box2D debug draw AABBs is ${box2dDebugRenderer.isDrawAABBs.toAbled()}" }
   }
 
   @ClientsideOnly
@@ -489,7 +488,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawInactiveBodies = !box2dDebugRenderer.isDrawInactiveBodies
-    logger.success("Box2D debug draw InactiveBodies is ${box2dDebugRenderer.isDrawInactiveBodies.toAbled()}")
+    logger.info { "Box2D debug draw InactiveBodies is ${box2dDebugRenderer.isDrawInactiveBodies.toAbled()}" }
   }
 
   @ClientsideOnly
@@ -498,7 +497,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawVelocities = !box2dDebugRenderer.isDrawVelocities
-    logger.success("Box2D debug draw Velocities is ${box2dDebugRenderer.isDrawVelocities.toAbled()}")
+    logger.info { "Box2D debug draw Velocities is ${box2dDebugRenderer.isDrawVelocities.toAbled()}" }
   }
 
   @ClientsideOnly
@@ -507,40 +506,39 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val box2dDebugRenderer = world.render.box2DDebugRenderer
     box2dDebugRenderer.isDrawContacts = !box2dDebugRenderer.isDrawContacts
-    logger.success("Box2D debug draw Contacts is ${box2dDebugRenderer.isDrawContacts.toAbled()}")
+    logger.info { "Box2D debug draw Contacts is ${box2dDebugRenderer.isDrawContacts.toAbled()}" }
   }
 
   @ClientsideOnly
   @ConsoleDoc(description = "Toggles debug rendering of chunk bounds")
   fun debChu() {
     Settings.renderChunkBounds = !Settings.renderChunkBounds
-    logger.log(LogLevel.SUCCESS, "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}")
+    logger.info { "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}" }
   }
 
   @ClientsideOnly
   @ConsoleDoc(description = "Toggles debug rendering of chunk updates")
   fun debChuUpd() {
     Settings.renderChunkUpdates = !Settings.renderChunkUpdates
-    logger.log(LogLevel.SUCCESS, "Debug rendering of chunk updates is now ${Settings.renderChunkUpdates.toAbled()}")
+    logger.info { "Debug rendering of chunk updates is now ${Settings.renderChunkUpdates.toAbled()}" }
   }
 
   @ClientsideOnly
   @ConsoleDoc(description = "Toggles debug rendering of block light updates")
   fun debLitUpd() {
     Settings.renderBlockLightUpdates = !Settings.renderBlockLightUpdates
-    logger.log(LogLevel.SUCCESS, "Debug rendering of block light updates is now ${Settings.renderBlockLightUpdates.toAbled()}")
+    logger.info { "Debug rendering of block light updates is now ${Settings.renderBlockLightUpdates.toAbled()}" }
   }
 
   @ClientsideOnly
   @ConsoleDoc(description = "Toggles debug rendering of entity lighting")
   fun debEntLit() {
     Settings.debugEntityLight = !Settings.debugEntityLight
-    logger.log(
-      LogLevel.SUCCESS,
+    logger.info {
       "Debug rendering of entity light is now ${Settings.debugEntityLight.toAbled()}"
-    )
+    }
     if (Settings.debugEntityLight) {
-      logger.log(LogLevel.DEFAULT, "A white box is rendered over the block each entity source their brightness from")
+      logger.info { "A white box is rendered over the block each entity source their brightness from" }
     }
   }
 
@@ -548,12 +546,11 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles debug rendering of block lighting")
   fun debBlkLit() {
     Settings.debugBlockLight = !Settings.debugBlockLight
-    logger.log(
-      LogLevel.SUCCESS,
+    logger.info {
       "Debug rendering of block light is now ${Settings.debugBlockLight.toAbled()}"
-    )
+    }
     if (Settings.debugBlockLight) {
-      logger.log(LogLevel.DEFAULT, "A red box is rendered over the luminescent blocks and a yellow box represents the skylight each block source their brightness from")
+      logger.info { "A red box is rendered over the luminescent blocks and a yellow box represents the skylight each block source their brightness from" }
     }
   }
 
@@ -561,10 +558,9 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @ConsoleDoc(description = "Toggles smoothed camera movement when following a player")
   fun lerp() {
     Settings.enableCameraFollowLerp = !Settings.enableCameraFollowLerp
-    logger.log(
-      LogLevel.SUCCESS,
+    logger.info {
       "Camera leap is now " + Settings.enableCameraFollowLerp.toAbled()
-    )
+    }
   }
 
   @CmdArgNames("x", "y")
@@ -574,13 +570,13 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val clientWorld = clientWorld ?: return
     Main.inst().scheduler.executeAsync {
       clientWorld.render.lookAt(worldX, worldY)
-      logger.logf(LogLevel.SUCCESS, "Teleported camera to (% .2f,% .2f)", worldX, worldY)
+      logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
 
       val entities = clientWorld.controlledPlayerEntities
       if (entities.size() > 0) {
         world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
         entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
-        logger.logf(LogLevel.SUCCESS, "Teleported entity to (% .2f,% .2f)", worldX, worldY)
+        logger.info { "Teleported entity to ${stringifyCompactLoc(worldX, worldY)}" }
       }
     }
   }
@@ -591,7 +587,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun hud(modusName: String) {
     val screen = ClientMain.inst().screen
     if (screen !is WorldScreen) {
-      logger.error("Not currently in a world, cannot change hud")
+      logger.error { "Not currently in a world, cannot change hud" }
       return
     }
     val hud: HUDRenderer = screen.hud
@@ -604,7 +600,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       else -> -1
     }
     if (mode < 0) {
-      logger.error("Unknown HUD modus '$modusName'")
+      logger.error { "Unknown HUD modus '$modusName'" }
     } else if (mode == 0) {
       hud.displayNothing()
     } else {
@@ -620,7 +616,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val render = clientWorld.render
     render.camera.zoom = zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
     render.update()
-    logger.success("Zoom level is now ${render.camera.zoom}")
+    logger.info { "Zoom level is now ${render.camera.zoom}" }
   }
 
   @ClientsideOnly
@@ -628,12 +624,11 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun brush() {
     val world = clientWorld ?: return
     val localPlayers = world.controlledPlayerEntities
-    val entities = localPlayers
-    if (entities.size() == 0) {
-      logger.log("There is no local, controlled player in this world")
+    if (localPlayers.size() == 0) {
+      logger.info { "There is no local, controlled player in this world" }
     }
-    for (entity in entities) {
-      logger.success("Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${entity.locallyControlledComponent.brushSize}")
+    for (entity in localPlayers) {
+      logger.info { "Brush size for player ${entity.nameOrNull ?: "Unknown"} is ${entity.locallyControlledComponent.brushSize}" }
     }
   }
 
@@ -644,15 +639,15 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.error("There is no local, controlled player in this world")
+      logger.error { "There is no local, controlled player in this world" }
     }
     if (size < 1) {
-      logger.error("Brush size must be at least 1")
+      logger.error { "Brush size must be at least 1" }
       return
     }
     for (entity in entities) {
       entity.locallyControlledComponent.brushSize = size
-      logger.success("New brush size is now $size")
+      logger.info { "New brush size is now $size" }
     }
   }
 
@@ -663,15 +658,15 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.error("There is no local, controlled player in this world")
+      logger.error { "There is no local, controlled player in this world" }
     }
     if (interactRadius < 1) {
-      logger.error("Interact radius must be at least 1")
+      logger.error { "Interact radius must be at least 1" }
       return
     }
     for (entity in entities) {
       entity.locallyControlledComponent.interactRadius = interactRadius
-      logger.success("New interact radius is now $interactRadius")
+      logger.info { "New interact radius is now $interactRadius" }
     }
   }
 
@@ -682,12 +677,12 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.error("There is no local, controlled player in this world")
+      logger.error { "There is no local, controlled player in this world" }
     }
     for (entity in entities) {
       val locallyControlledComponent = entity.locallyControlledComponent
       locallyControlledComponent.instantBreak = !locallyControlledComponent.instantBreak
-      logger.success("Instant break for ${entity.nameOrNull} is now ${(!locallyControlledComponent.instantBreak).toAbled()}")
+      logger.info { "Instant break for ${entity.nameOrNull} is now ${(!locallyControlledComponent.instantBreak).toAbled()}" }
     }
   }
 
@@ -697,12 +692,12 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.error("There is no local, controlled player in this world")
+      logger.error { "There is no local, controlled player in this world" }
     }
     for (entity in entities) {
       val wasIgnoring: Boolean = entity.ignorePlaceableCheck
       entity.ignorePlaceableCheck = !wasIgnoring
-      logger.success("Place check is now ${wasIgnoring.toAbled()}")
+      logger.info { "Place check is now ${wasIgnoring.toAbled()}" }
     }
   }
 
@@ -711,7 +706,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @CmdArgNames("enable")
   fun vsync(enable: Boolean) {
     Gdx.graphics.setVSync(enable)
-    logger.success("VSync is now ${enable.toAbled()}")
+    logger.info { "VSync is now ${enable.toAbled()}" }
   }
 
   @ClientsideOnly
@@ -719,7 +714,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   @CmdArgNames("fps")
   fun maxFPS(fps: Int) {
     Gdx.graphics.setForegroundFPS(fps)
-    logger.success("Max foreground fps is now $fps")
+    logger.info { "Max foreground fps is now $fps" }
   }
 
   @ClientsideOnly
@@ -747,7 +742,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
-      logger.error("There is no local, controlled, player in this world")
+      logger.error { "There is no local, controlled, player in this world" }
       return
     }
 
@@ -758,7 +753,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
       "autosort", "as" -> AutoSortedContainer("Auto Sorted Inventory")
       "container", "co" -> ContainerImpl("Inventory")
       else -> {
-        logger.error("Unknown storage type '$invType'")
+        logger.error { "Unknown storage type '$invType'" }
         return
       }
     }
@@ -769,7 +764,7 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
     }
     val owner = oldOwnedContainer?.owner ?: ContainerOwner.from(player)
     player.containerComponentOrNull = ContainerComponent(OwnedContainer(owner, newContainer))
-    logger.success("New inventory '${newContainer.name}' is ${newContainer::class.simpleName}")
+    logger.info { "New inventory '${newContainer.name}' is ${newContainer::class.simpleName}" }
   }
 
   @ConsoleDoc(description = "Find entities in a chunk", paramDescriptions = ["The x component of the chunk coordinate", "The y component of the chunk coordinate"])
@@ -777,14 +772,14 @@ class Commands(private val logger: ConsoleLogger) : CommandExecutor() {
   fun entInChunk(chunkX: ChunkCoord, chunkY: ChunkCoord) {
     val world = world ?: return
     val chunk = world.getChunk(chunkX, chunkY, load = true) ?: run {
-      logger.error("Failed to find a chunk at ${stringifyCompactLoc(chunkX, chunkY)}")
+      logger.error { "Failed to find a chunk at ${stringifyCompactLoc(chunkX, chunkY)}" }
       return
     }
     chunk.queryEntities { entities ->
       entities.forEach { (_, entity) ->
-        logger.log(entityNameId(entity))
+        logger.info { entityNameId(entity) }
       }
-      logger.log("In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}")
+      logger.info { "In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}" }
     }
   }
 }

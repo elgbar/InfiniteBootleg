@@ -3,11 +3,11 @@ package no.elg.infiniteBootleg.world.ecs
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -38,6 +38,8 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.world.ecs.components.transients.SpellStateComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.ToBeDestroyedTag
 import kotlin.reflect.KClass
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * The list of components **all** entities are expected to have
@@ -147,7 +149,7 @@ fun ensureUniquenessListener(engine: Engine) {
   val duplicateEntities = engine.getEntitiesFor(idFamily)
   engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { entity ->
     if (duplicateEntities.filter { it.id == entity.id }.size > 1) {
-      Main.logger().warn("Duplicate entity with id '${entity.id}' removed: Components ${entity.toComponentsString()}")
+      logger.warn { "Duplicate entity with id '${entity.id}' removed: Components ${entity.toComponentsString()}" }
       engine.removeEntity(entity)
     }
   }

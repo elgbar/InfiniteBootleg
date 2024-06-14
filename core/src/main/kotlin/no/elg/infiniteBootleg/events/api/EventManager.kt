@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.events.api
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
 import no.elg.infiniteBootleg.main.Main
@@ -9,6 +10,8 @@ import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.concurrent.GuardedBy
 import kotlin.reflect.KClass
+
+private val logger = KotlinLogging.logger {}
 
 object EventManager {
 
@@ -89,14 +92,18 @@ object EventManager {
 
       listener.handle(it)
 
-      // Remove from another thread to not cause concurrent modification
-      Main.inst().scheduler.executeAsync {
-        val storedThis = oneShotStrongRefs.remove(listener)
-        if (storedThis != null) {
-          storedThis.removeListener()
-        } else {
-          Main.logger().error("Could not remove one shot listener $listener")
-        }
+      removeOneShotRef(listener)
+    }
+  }
+
+  fun removeOneShotRef(listener: EventListener<out Event>) {
+    // Remove from another thread to not cause concurrent modification
+    Main.inst().scheduler.executeAsync {
+      val storedThis = oneShotStrongRefs.remove(listener)
+      if (storedThis != null) {
+        storedThis.removeListener()
+      } else {
+        logger.error { "Could not remove one shot listener $listener" }
       }
     }
   }

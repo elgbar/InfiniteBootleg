@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.screens
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
@@ -8,6 +9,8 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hud.DebugWindow
 import no.elg.infiniteBootleg.screens.hud.addDebugOverlay
 import no.elg.infiniteBootleg.world.world.ClientWorld
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -46,7 +49,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     EventManager.oneShotListener { event: WorldLoadedEvent ->
       if (event.world === world) {
         worldFinishedLoading = true
-        Main.logger().log("Finished loading world ${world.name} (${world.uuid}) in ${System.currentTimeMillis() - showed}ms")
+        logger.info { "Finished loading world ${world.name} (${world.uuid}) in ${System.currentTimeMillis() - showed}ms" }
       }
     }
 

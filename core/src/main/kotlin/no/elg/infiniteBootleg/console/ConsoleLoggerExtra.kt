@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.console
 
 import com.google.protobuf.TextFormat
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 
 /**
@@ -25,6 +25,6 @@ fun temporallyFilterPacket(vararg packets: Packets.Packet.Type, block: () -> Uni
 
 fun logPacket(direction: String, packet: Packets.Packet) {
   if (Settings.debug && Settings.logPackets && packet.type !in filterOutPackets) {
-    Main.logger().debug(direction) { TextFormat.printer().shortDebugString(packet) }
+    KotlinLogging.logger(direction).debug { TextFormat.printer().shortDebugString(packet) }
   }
 }

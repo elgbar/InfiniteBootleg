@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import no.elg.infiniteBootleg.main.Main
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toComponentsString
@@ -14,8 +14,9 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.toFamily
 
-object DisposedChunkCheckSystem : IteratingSystem(ChunkComponent::class.toFamily(), UPDATE_PRIORITY_BEFORE_EVENTS), UniversalSystem {
+private val logger = KotlinLogging.logger {}
 
+object DisposedChunkCheckSystem : IteratingSystem(ChunkComponent::class.toFamily(), UPDATE_PRIORITY_BEFORE_EVENTS), UniversalSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val chunkComponent = entity.chunkComponent
     val currentChunk = chunkComponent.chunk
@@ -23,7 +24,7 @@ object DisposedChunkCheckSystem : IteratingSystem(ChunkComponent::class.toFamily
       val world = currentChunk.world
       val loadedChunk = world.getChunk(currentChunk.compactLocation, load = false)
       if (loadedChunk == null || loadedChunk.isDisposed) {
-        Main.logger().debug("DisposedChunkCheckSystem") {
+        logger.debug {
           val chunkLoc = stringifyCompactLoc(entity.compactBlockLoc)
           "Removing entity ${entity.id} (components: ${entity.toComponentsString()}) as it is referencing the chunk $chunkLoc; which is not loaded in the current world "
         }

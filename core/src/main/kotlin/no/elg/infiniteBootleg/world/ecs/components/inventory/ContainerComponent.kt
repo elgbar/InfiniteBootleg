@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.ecs.components.inventory
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.inventory.container.Container
@@ -12,7 +13,6 @@ import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromProto
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
@@ -21,6 +21,8 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
+
+private val logger = KotlinLogging.logger {}
 
 data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavableComponent, AuthoritativeOnlyComponent {
 
@@ -63,7 +65,7 @@ data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavabl
             is ContainerOwner.EntityOwner -> ContainerOwner.EntityOwner(entity.id)
             is ContainerOwner.BlockOwner -> ContainerOwner.BlockOwner(entity.compactBlockLoc)
           }
-          Main.logger().error("Invalid owner of container! Got $owner, but expected $ownedContainer")
+          logger.error { "Invalid owner of container! Got $owner, but expected $ownedContainer" }
           ContainerComponent(OwnedContainer(newOwner, ownedContainer.container))
         } else {
           ContainerComponent(ownedContainer)

@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.world
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -19,6 +20,8 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer
 import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
 
+private val logger = KotlinLogging.logger {}
+
 /**
  * World with extra functionality to handle multiple players
  *
@@ -33,7 +36,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     if (player != null) {
       removeEntity(player, if (kicked) DespawnReason.PLAYER_KICKED else DespawnReason.PLAYER_QUIT)
     } else {
-      Main.logger().warn("SERVER", "Failed to find player $uuid to remove")
+      logger.warn { "Failed to find player $uuid to remove" }
     }
   }
 

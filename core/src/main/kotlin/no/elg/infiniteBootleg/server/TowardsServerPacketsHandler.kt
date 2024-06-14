@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.console.temporallyFilterPacket
@@ -75,6 +76,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 private val secureRandom = SecureRandom.getInstanceStrong()
+private val logger = KotlinLogging.logger {}
 
 val scheduler by lazy { Main.inst().scheduler }
 
@@ -130,7 +132,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
 // ///////////////////
 
 private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: WorldSettings) {
-  Main.logger().log("handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
+  logger.info { "handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
   val world = ServerMain.inst().serverWorld
   var spawn: Long? = null
   var time: Float? = null
@@ -202,11 +204,11 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   }
   val uuid = login.uuid
   val username = login.username
-  Main.logger().debug("LOGIN", "Login request received by $username uuid $uuid")
+  logger.debug { "Login request received by $username uuid $uuid" }
 
   val world = ServerMain.inst().serverWorld
   if (uuid == null) {
-    Main.logger().error("handleLoginPacket", "Given player id was null")
+    logger.error { "Given player id was null" }
     return
   }
 
@@ -228,7 +230,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
       if (ex == null) {
         // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
         ctx.writeAndFlushPacket(clientBoundSecretExchange(sharedInformation))
-        Main.logger().debug("LOGIN", "Secret sent to player ${sharedInformation.entityUUID}, waiting for confirmation")
+        logger.debug { "Secret sent to player ${sharedInformation.entityUUID}, waiting for confirmation" }
       } else {
         ctx.fatal("Failed to spawn player ${sharedInformation.entityUUID} server side.\n  ${ex::class.simpleName}: ${ex.message}")
       }
@@ -236,11 +238,11 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
 }
 
 private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper) {
-  ctx.getSharedInformation()?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
+  ctx.getSharedInformation()?.beat() ?: logger.error { "Failed to beat, because of null shared information" }
 }
 
 private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Disconnect?) {
-  Main.logger().log("Client sent disconnect packet. Reason: ${disconnect?.reason ?: "No reason given"}")
+  logger.info { "Client sent disconnect packet. Reason: ${disconnect?.reason ?: "No reason given"}" }
   ctx.close()
 }
 
@@ -275,7 +277,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     return
   }
 
-  Main.logger().debug("LOGIN", "Client world ready, sending chunks to client ${player.nameComponent}")
+  logger.debug { "Client world ready, sending chunks to client ${player.nameComponent}" }
 
   // Send chunk packets to client
   val ix = player.positionComponent.blockX.worldToChunk()
@@ -286,13 +288,13 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
         val chunk = try {
           world.getChunk(ix + cx, iy + cy, true) ?: continue
         } catch (e: IllegalStateException) {
-          Main.logger().warn("LOGIN", "Failed to get chunk at $cx, $cy")
+          logger.warn { "Failed to get chunk at $cx, $cy" }
           continue
         }
         ctx.writePacket(clientBoundUpdateChunkPacket(chunk))
       }
       ctx.flush()
-      Main.logger().debug("LOGIN") {
+      logger.debug {
         val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
         val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
         "Sent $sent/$total chunks sent to player ${player.name}"
@@ -300,31 +302,31 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     }
   }
   ctx.writeAndFlushPacket(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
-  Main.logger().debug("LOGIN", "Initial chunks sent to player ${player.name}")
+  logger.debug { "Initial chunks sent to player ${player.name}" }
 
   for (entity in world.validEntitiesToSendToClient) {
     if (entity.id == shared.entityUUID) continue // don't send the player to themselves
-    Main.logger().debug("LOGIN") { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
+    logger.debug { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
     ctx.writePacket(clientBoundSpawnEntity(entity))
   }
 
   ctx.flush()
-  Main.logger().debug("LOGIN", "Initial entities sent to player ${player.name}")
+  logger.debug { "Initial entities sent to player ${player.name}" }
 
   ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
 
   shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
-//    Main.logger().log("Sending heartbeat to client")
+//    logger.info { "Sending heartbeat to client" }
     ctx.writeAndFlushPacket(clientBoundHeartbeat())
     if (shared.lostConnection()) {
-      Main.logger().error("Heartbeat", "Client stopped responding, heartbeats not received")
+      logger.error { "Client stopped responding, heartbeats not received" }
       ctx.close()
       ctx.deregister()
       ctx.channel().close()
       ctx.channel().disconnect()
     }
   }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
-  Main.logger().log("Player ${player.name} joined")
+  logger.info { "Player ${player.name} joined" }
 }
 
 private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, uuid: String) {
@@ -365,7 +367,7 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
 private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {
   ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
     if (ownedContainer == null) {
-      Main.logger().warn("asyncHandleContainerRequest", "Failed to find container for $owner")
+      logger.warn { "Failed to find container for $owner" }
     } else {
       ctx.writeAndFlushPacket(clientBoundContainerUpdate(ownedContainer))
     }
@@ -392,12 +394,12 @@ private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
   val serverWorld = ServerMain.inst().serverWorld
   val uuid = ctx.getSharedInformation()?.entityUUID
   if (uuid == null) {
-    Main.logger().error("handleChunkRequest", "Failed to get UUID of requesting entity")
+    logger.error { "Failed to get UUID of requesting entity" }
     return null
   }
   val chunksInView = serverWorld.render.getClient(uuid)
   if (chunksInView == null) {
-    Main.logger().error("handleChunkRequest", "Failed to get chunks in view of entity $uuid")
+    logger.error { "Failed to get chunks in view of entity $uuid" }
     return null
   }
   return chunksInView

@@ -1,14 +1,16 @@
 package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.Gdx
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
-import no.elg.infiniteBootleg.main.Main.Companion.logger
 import org.jetbrains.annotations.Async
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Run (cancellable) tasks on other threads
@@ -45,8 +47,6 @@ class CancellableThreadScheduler(threads: Int) {
    * Post the given runnable as fast as possible
    *
    * @param runnable What to do
-   *
-   * @see Application.postRunnable
    */
   fun executeSync(runnable: Runnable) {
     Gdx.app.postRunnable(caughtRunnable(runnable))
@@ -102,7 +102,7 @@ class CancellableThreadScheduler(threads: Int) {
         try {
           run(runnable)
         } catch (e: Exception) {
-          logger().log("SCHEDULER", "Exception caught on " + currentThreadType(), e)
+          logger.info(e) { "Exception caught on " + currentThreadType() }
         }
       }
   }

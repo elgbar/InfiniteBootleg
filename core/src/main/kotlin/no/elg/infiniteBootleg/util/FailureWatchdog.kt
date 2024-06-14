@@ -1,21 +1,23 @@
 package no.elg.infiniteBootleg.util
 
-import no.elg.infiniteBootleg.main.Main
+import io.github.oshai.kotlinlogging.KotlinLogging
 
-class FailureWatchdog(val failureMessage: String, val illegalAction: IllegalAction = IllegalAction.TO_MAIN_MENU) {
+private val logger = KotlinLogging.logger {}
 
-  var failuresInARow: Int = 0
+class FailureWatchdog(private val failureMessage: String, private val illegalAction: IllegalAction = IllegalAction.TO_MAIN_MENU) {
 
-  inline fun watch(runnable: () -> Unit) {
+  private var failuresInARow: Int = 0
+
+  fun watch(runnable: () -> Unit) {
     try {
       runnable()
       failuresInARow = 0
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       failuresInARow++
       if (failuresInARow >= MAX_FAILURES_IN_A_ROW) {
-        illegalAction.handle("FailureWatchdog", e) { "Failed to $failureMessage $MAX_FAILURES_IN_A_ROW times in a row" }
+        illegalAction.handle(e) { "Failed to $failureMessage $MAX_FAILURES_IN_A_ROW times in a row" }
       } else {
-        Main.logger().warn("Failed to $failureMessage (currently on failure $failuresInARow/$MAX_FAILURES_IN_A_ROW)", e)
+        logger.warn(e) { "Error when watching $failureMessage" }
       }
     }
   }

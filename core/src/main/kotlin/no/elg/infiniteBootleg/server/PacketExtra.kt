@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.Settings
@@ -72,6 +73,7 @@ import no.elg.infiniteBootleg.world.ecs.save
 import java.time.Instant
 import java.util.UUID
 
+private val logger = KotlinLogging.logger {}
 // //////////////////
 // util functions //
 // //////////////////
@@ -92,7 +94,7 @@ internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
   } else {
     this.writeAndFlushPacket(clientBoundDisconnectPlayerPacket(msg))
   }
-  Main.logger().error("IO FATAL", msg)
+  logger.error { msg }
 }
 
 /**

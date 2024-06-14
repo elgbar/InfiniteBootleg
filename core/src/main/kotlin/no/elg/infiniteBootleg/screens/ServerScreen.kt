@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.kotcrab.vis.ui.widget.VisTextField
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.scene2d.actor
 import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.spinner
@@ -11,17 +12,18 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.ClientChannel
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
 import no.elg.infiniteBootleg.util.generateUUIDFromString
 import no.elg.infiniteBootleg.util.onInteract
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
  */
 object ServerScreen : StageScreen() {
+  private val logger = KotlinLogging.logger {}
   override fun create() {
     super.create()
     rootTable {
@@ -71,10 +73,10 @@ object ServerScreen : StageScreen() {
             }
             val thread = Thread({
               try {
-                Main.logger().info("LOGIN") { "Trying to log into the server '${hostField.text}:${portSpinner.value}' with username $username (uuid: $uuid)" }
+                logger.info { "Trying to log into the server '${hostField.text}:${portSpinner.value}' with username $username (uuid: $uuid)" }
                 clientChannel.connect(hostField.text, portSpinner.value, runnable)
               } catch (e: InterruptedException) {
-                Main.logger().log("SERVER", "Server interruption received", e)
+                logger.info(e) { "Server interruption received" }
                 Gdx.app.exit()
               }
             }, "Server")

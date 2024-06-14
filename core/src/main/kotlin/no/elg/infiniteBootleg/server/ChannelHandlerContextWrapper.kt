@@ -23,7 +23,7 @@ class ChannelHandlerContextWrapper(val direction: String, private val handler: C
     if (msg is Packet) {
       logPacket(direction, msg)
     } else {
-      IllegalAction.STACKTRACE.handle("NETTY") {
+      IllegalAction.STACKTRACE.handle {
         "Tried to send a non packet (type: ${msg::class}) toString: $msg"
       }
     }

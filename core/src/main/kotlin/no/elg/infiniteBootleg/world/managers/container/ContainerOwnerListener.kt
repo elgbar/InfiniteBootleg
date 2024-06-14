@@ -6,17 +6,18 @@ import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.utils.Disposable
 import com.google.errorprone.annotations.concurrent.GuardedBy
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentHashMap
 
+private val logger = KotlinLogging.logger {}
 class ContainerOwnerListener(
   private val internalContainers: ConcurrentHashMap<ContainerOwner, OwnedContainer>,
   private val engine: Engine,
@@ -33,12 +34,12 @@ class ContainerOwnerListener(
 
   override fun entityAdded(entity: Entity) {
     val container: Container = entity.containerOrNull ?: run {
-      Main.logger().error("Failed to add a container entity to the list of internal containers!")
+      logger.error { "Failed to add a container entity to the list of internal containers!" }
       return
     }
     val owner = owners.getOrElse(entity) { convertEntityToOwner(entity) }
     val ownedContainer = OwnedContainer(owner, container)
-    Main.logger().debug("ContainerOwnerListener") { "Adding container $ownedContainer" }
+    logger.debug { "Adding container $ownedContainer" }
     internalContainers[owner] = ownedContainer
     EventManager.dispatchEvent(ContainerEvent.Added(ownedContainer))
   }
@@ -46,7 +47,7 @@ class ContainerOwnerListener(
   override fun entityRemoved(entity: Entity) {
     val owner = owners[entity] ?: return
     val ownedContainer = internalContainers.remove(owner) ?: return
-    Main.logger().debug("ContainerOwnerListener") { "Removing container $ownedContainer" }
+    logger.debug { "Removing container $ownedContainer" }
     EventManager.dispatchEvent(ContainerEvent.Removed(ownedContainer))
   }
 

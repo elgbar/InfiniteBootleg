@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.world.loader.chunk
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Disposable
 import com.google.protobuf.InvalidProtocolBufferException
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.CorruptChunkException
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -15,6 +15,8 @@ import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
+
+private val logger = KotlinLogging.logger {}
 
 abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
 
@@ -37,11 +39,11 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
         return chunk
       }
     } catch (e: CorruptChunkException) {
-      Main.logger().error("Failed to load chunk ${stringifyCompactLoc(chunkPosition)} from file", e)
+      logger.error(e) { "Found a corrupt chunk ${stringifyCompactLoc(chunkPosition)}" }
       deleteChunkFile(chunkPosition.x, chunkPosition.y)
       return null
     }
-    Main.logger().warn("Failed to load chunk ${stringifyCompactLoc(chunkPosition)} from a proto chunk")
+    logger.warn { "Failed to load chunk ${stringifyCompactLoc(chunkPosition)} from a proto chunk" }
     return null
   }
 
@@ -50,7 +52,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
     return if (protoChunk != null) {
       loadChunkFromProto(protoChunk)
     } else {
-//      Main.logger().trace("ChunkLoader") { "Chunk ${stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
+      logger.trace { "Chunk ${stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
       null
     }
   }
@@ -70,7 +72,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
       return try {
         ProtoWorld.Chunk.parseFrom(bytes)
       } catch (e: InvalidProtocolBufferException) {
-        Main.logger().error("Failed to read chunk ${stringifyCompactLoc(chunkX, chunkY)} from file", e)
+        logger.error(e) { "Invalid protobuf while reading chunk file" }
         deleteChunkFile(chunkX, chunkY)
         null
       }

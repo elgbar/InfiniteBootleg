@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
@@ -12,8 +13,9 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -41,7 +43,7 @@ class NettyServer {
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-      Main.logger().log("NETTY", "Binding server to port ${Settings.port}")
+      logger.info { "Binding server to port ${Settings.port}" }
 
       // Bind and start to accept incoming connections.
       val channelFuture = b.bind(Settings.port).sync()

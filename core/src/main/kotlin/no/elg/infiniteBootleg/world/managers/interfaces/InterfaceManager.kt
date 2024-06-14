@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.managers.interfaces
 
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Disposable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.actors.isShown
 import no.elg.infiniteBootleg.events.InterfaceEvent
 import no.elg.infiniteBootleg.events.api.EventManager
@@ -11,6 +12,8 @@ import no.elg.infiniteBootleg.util.IBVisWindow
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
+private val logger = KotlinLogging.logger {}
+
 class InterfaceManager : Disposable {
 
   private val interfaces: MutableMap<InterfaceId, IBVisWindow> = ConcurrentHashMap()
@@ -18,10 +21,10 @@ class InterfaceManager : Disposable {
   fun addInterface(interfaceId: InterfaceId, interfaceWindow: IBVisWindow) {
     interfaces.compute(interfaceId) { _, maybeOldWindow ->
       maybeOldWindow?.let { oldWindow ->
-        Main.logger().warn("InterfaceManager", "Duplicate interface id $interfaceId, closing and removing old window")
+        logger.warn { "Duplicate interface id $interfaceId, closing and removing old window" }
         oldWindow.close()
       }
-      Main.logger().debug("InterfaceManager", "Added new interface with id $interfaceId")
+      logger.debug { "Added new interface with id $interfaceId" }
       interfaceWindow
     }.also {
       EventManager.dispatchEvent(InterfaceEvent.Added(interfaceId))
@@ -31,7 +34,7 @@ class InterfaceManager : Disposable {
   fun removeInterface(interfaceId: InterfaceId) {
     interfaces.remove(interfaceId)?.let { removedWindow ->
       removedWindow.close()
-      Main.logger().debug("InterfaceManager", "Removing interface id $interfaceId, closing and removing old window")
+      logger.debug { "Removing interface id $interfaceId, closing and removing old window" }
     }.also {
       EventManager.dispatchEvent(InterfaceEvent.Removed(interfaceId))
     }
@@ -53,7 +56,7 @@ class InterfaceManager : Disposable {
   fun openInterface(interfaceId: InterfaceId, stage: Stage, createIfMissing: () -> IBVisWindow? = { null }) {
     getOrCreate(interfaceId, createIfMissing).thenApply {
       it?.show(stage) ?: run {
-        Main.logger().debug("InterfaceManager", "Failed to open unknown interface with id $interfaceId")
+        logger.debug { "Failed to open unknown interface with id $interfaceId" }
       }
     }
   }
@@ -61,14 +64,14 @@ class InterfaceManager : Disposable {
   fun closeInterface(interfaceId: InterfaceId) {
     // No point in creating a new interface if we are just to close it
     interfaces[interfaceId]?.close() ?: run {
-      Main.logger().debug("InterfaceManager", "Failed to close unknown interface with id $interfaceId")
+      logger.debug { "Failed to close unknown interface with id $interfaceId" }
     }
   }
 
   fun toggleInterface(interfaceId: InterfaceId, stage: Stage, createIfMissing: () -> IBVisWindow? = { null }) {
     getOrCreate(interfaceId, createIfMissing).thenApply {
       it?.toggleShown(stage) ?: run {
-        Main.logger().debug("InterfaceManager", "Failed to toggle unknown interface with id $interfaceId")
+        logger.debug { "Failed to toggle unknown interface with id $interfaceId" }
       }
     }
   }

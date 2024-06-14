@@ -8,11 +8,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.PolygonShape
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
 import ktx.box2d.circle
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.isBeingRemoved
@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.sqrt
 
+private val logger = KotlinLogging.logger {}
 // ////////////
 // CREATION //
 // ////////////
@@ -247,7 +248,7 @@ internal fun createBody2DBodyComponent(
     if (Settings.debug) {
       check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
       checkFamilies(entity, wantedFamilies)
-      Main.logger().debug("BOX2D", "Finishing setting up box2d entity")
+      logger.debug { "Finishing setting up box2d entity" }
     }
   }
 }

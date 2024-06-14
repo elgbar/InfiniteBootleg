@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.Disposable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
 
@@ -14,11 +14,12 @@ import no.elg.infiniteBootleg.world.world.World
  *
  * Multiple tickers are needed due to some ticks will happen less frequently.
  */
-class WorldTicker(private val world: World, tick: Boolean) : Ticker, Disposable {
+class WorldTicker(world: World, tick: Boolean) : Ticker, Disposable {
   private val worldTicker =
     TickerImpl(WorldTickee(world), WORLD_TICKER_TAG_PREFIX + world.name, tick, Settings.tps, TickerImpl.DEFAULT_NAG_DELAY)
   private var serverRendererTicker: ServerRendererTicker? = null
   val box2DTicker: WorldBox2DTicker
+  private val logger = KotlinLogging.logger(WORLD_TICKER_TAG_PREFIX + world.name)
 
   init {
     serverRendererTicker = (world as? ServerWorld)?.let { ServerRendererTicker(it, tick) }
@@ -41,7 +42,7 @@ class WorldTicker(private val world: World, tick: Boolean) : Ticker, Disposable 
         Thread.onSpinWait()
       }
     }
-    Main.logger().info("ticker-${world.name}") { "Started world ticker" }
+    logger.info { "Started world ticker" }
   }
 
   /**

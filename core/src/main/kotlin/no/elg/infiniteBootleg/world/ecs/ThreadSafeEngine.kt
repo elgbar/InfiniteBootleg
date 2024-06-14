@@ -10,12 +10,15 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ServerSystem
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.events.ECSEventQueueComponent
+
+private val logger = KotlinLogging.logger {}
 
 class ThreadSafeEngine : Engine(), Disposable {
 
@@ -59,10 +62,10 @@ class ThreadSafeEngine : Engine(), Disposable {
     synchronized(engineLock) {
       fun addToSystemConditionally(system: EntitySystem, type: String, cond: () -> Boolean) {
         if (cond()) {
-          Main.logger().debug("Engine", "Adding $type system ${system::class.simpleName}")
+          logger.debug { "Adding $type system ${system::class.simpleName}" }
           super.addSystem(system)
         } else {
-          Main.logger().debug("Engine", "Not adding $type system ${system::class.simpleName}")
+          logger.debug { "Not adding $type system ${system::class.simpleName}" }
         }
       }
 
@@ -77,12 +80,12 @@ class ThreadSafeEngine : Engine(), Disposable {
         is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.isAuthoritative }
 
         is UniversalSystem -> {
-          Main.logger().debug("Engine", "Adding universal system ${system::class.simpleName}")
+          logger.debug { "Adding universal system ${system::class.simpleName}" }
           super.addSystem(system)
         }
 
         else -> {
-          Main.logger().warn("Engine", "System ${system::class.simpleName} is not a client or server system, it might be using server/client main and might crash when used")
+          logger.warn { "System ${system::class.simpleName} is not a client or server system, it might be using server/client main and might crash when used" }
           super.addSystem(system)
         }
       }

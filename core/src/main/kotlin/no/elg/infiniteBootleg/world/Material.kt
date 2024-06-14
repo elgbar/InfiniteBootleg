@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.MaterialItem
@@ -29,6 +30,8 @@ import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -164,7 +167,7 @@ enum class Material(
         futureEntity?.thenApply {
           if (block.isDisposed) {
             world.removeEntity(it)
-            Main.logger().warn("MATERIAL", "Block was disposed before entity was fully created")
+            logger.warn { "Block was disposed before entity was fully created" }
           } else {
             block.entity = it
           }

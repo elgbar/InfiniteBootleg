@@ -5,8 +5,8 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ClientSystem
@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.world.ecs.followEntityFamily
 import no.elg.infiniteBootleg.world.ecs.system.FamilyEntitySystem
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import kotlin.math.abs
-
+private val logger = KotlinLogging.logger {}
 object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_DEFAULT), ClientSystem {
 
   private const val CAMERA_LERP = 10f
@@ -30,7 +30,7 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
     if (entities.size() == 1) {
       processEntity(entity, deltaTime)
     } else if (entities.size() > 1) {
-      Main.logger().warn("There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: ${entities.map { it.id }}")
+      logger.warn { "There are multiple entities with ${FollowedByCameraTag::class.simpleName}. There can only be one at a time. Entities: ${entities.map { it.id }}" }
       entities.drop(1).forEach { it.followedByCamera = false }
     }
   }

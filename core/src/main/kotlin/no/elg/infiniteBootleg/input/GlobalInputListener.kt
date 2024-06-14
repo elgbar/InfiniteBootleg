@@ -3,10 +3,13 @@ package no.elg.infiniteBootleg.input
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.WorldScreen
+
+private val logger = KotlinLogging.logger {}
 
 object GlobalInputListener : InputAdapter() {
 
@@ -45,7 +48,7 @@ object GlobalInputListener : InputAdapter() {
 
       Input.Keys.F8 -> {
         Settings.debug = !Settings.debug
-        Main.logger().log("Toggled debug to ${Settings.debug}")
+        logger.info { "Toggled debug to ${Settings.debug}" }
       }
 
       Input.Keys.F7 -> {

@@ -1,15 +1,17 @@
 package no.elg.infiniteBootleg.server
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.Channel
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import java.util.concurrent.ConcurrentHashMap
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -48,7 +50,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
     ctxToWrapper.remove(ctx)
     val client = clients.remove(ctx.channel())
     val playerId = client?.entityUUID ?: "<Unknown>"
-    Main.logger().debug(SERVER_TAG, "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)")
+    logger.debug("client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)")
     if (client != null) {
       val task = client.heartbeatTask
       task?.cancel(false)
@@ -59,7 +61,6 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
   companion object {
     val channels: ChannelGroup = DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
     val clients: MutableMap<Channel, SharedInformation> = ConcurrentHashMap()
-    const val SERVER_TAG = "SERVER"
     var packetsReceived: Long = 0
   }
 }

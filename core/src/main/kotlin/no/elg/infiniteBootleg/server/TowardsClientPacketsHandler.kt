@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
@@ -52,7 +53,6 @@ import no.elg.infiniteBootleg.protobuf.updateChunkOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
-import no.elg.infiniteBootleg.server.ClientBoundHandler.Companion.TAG
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toVector2
@@ -70,6 +70,8 @@ import no.elg.infiniteBootleg.world.managers.container.ServerClientWorldContaine
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Handle packets sent FROM the server THIS client, will quietly drop any packets that are malformed
@@ -122,7 +124,7 @@ private fun ServerClient.setupHeartbeat() {
 }
 
 private fun ServerClient.handleHeartbeat() {
-  sharedInformation?.beat() ?: Main.logger().error("handleHeartbeat", "Failed to beat, because of null shared information")
+  sharedInformation?.beat() ?: logger.error { "Failed to beat, because of null shared information" }
 }
 
 private fun ServerClient.handleDisconnect(disconnect: Disconnect?) {
@@ -133,10 +135,10 @@ private fun ServerClient.handleDisconnect(disconnect: Disconnect?) {
 private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
   val world = this.world
   if (world == null) {
-    Main.logger().warn("handleWorldSettings", "Failed to find world")
+    logger.warn { "Failed to find world" }
     return
   }
-  Main.logger().debug("handleWorldSettings", "spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}")
+  logger.debug { "spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
   if (worldSettings.hasSpawn()) {
     world.spawn = worldSettings.spawn.toCompact()
   }
@@ -154,7 +156,7 @@ private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
   val uuid = secretExchange.entityUUID
   val sharedInformation = SharedInformation(uuid, secretExchange.secret)
   this.sharedInformation = sharedInformation
-  Main.logger().debug("LOGIN", "Secret received from sever sending response")
+  logger.debug { "Secret received from sever sending response" }
   sendServerBoundPacket(serverBoundClientSecretResponse(sharedInformation))
 }
 
@@ -171,7 +173,7 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
     }
 
     ServerLoginStatus.ServerStatus.PROCEED_LOGIN -> {
-      Main.logger().debug("LOGIN", "User accepted by server, logging in...")
+      logger.debug { "User accepted by server, logging in..." }
       ConnectingScreen.info = "Logging in..."
     }
 
@@ -205,21 +207,21 @@ private fun ServerClient.handleLoginSuccess() {
       return@whenCompleteAsync
     } else {
       player.box2d.enableGravity()
-      Main.logger().debug("handleSpawnEntity", "Server sent the entity to control")
+      logger.debug { "Server sent the entity to control" }
 
       Main.inst().scheduler.executeSync {
         started = true
         ClientMain.inst().screen = WorldScreen(world, false)
         dispatchEvent(WorldLoadedEvent(world)) // must be after setting the world screen for the event to be listened to
         setupHeartbeat()
-        Main.logger().debug("LOGIN", "Logged into server successfully")
+        logger.debug { "Logged into server successfully" }
       }
     }
   }
 }
 
 private fun ServerClient.handleStartGame(startGame: StartGame) {
-  Main.logger().debug("LOGIN", "Initialization okay, loading world")
+  logger.debug { "Initialization okay, loading world" }
   scheduler.executeSync {
     val protoWorld = startGame.world
     this.world = ServerClientWorld(protoWorld, this).apply {
@@ -231,14 +233,14 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
       ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
     } else {
       this.protoEntity = startGame.controlling
-      Main.logger().debug("LOGIN", "World loaded, waiting for chunks")
+      logger.debug { "World loaded, waiting for chunks" }
       sendServerBoundPacket(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
     }
   }
 }
 
 private fun ServerClient.handleInitialChunkSent() {
-  Main.logger().debug("CB_INITIAL_CHUNKS_SENT", "Setting chunks as loaded")
+  logger.debug { "Setting chunks as loaded" }
   chunksLoaded = true
   val world = world ?: run {
     ctx.fatal("Failed to find world")
@@ -257,7 +259,7 @@ private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
   }
   val world = this.world
   if (world == null) {
-    Main.logger().warn("handleBlockUpdate", "Failed to find world")
+    logger.warn { "Failed to find world" }
     return
   }
   val worldX = blockUpdate.pos.x
@@ -266,21 +268,21 @@ private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
     val protoBlock = if (blockUpdate.hasBlock()) blockUpdate.block else null
     world.setBlock(worldX, worldY, protoBlock, updateTexture = true, prioritize = false, sendUpdatePacket = false)
   } else {
-    Main.logger().warn("handleSpawnEntity", "Sever sent block update to unloaded client chunk")
+    logger.warn { "Sever sent block update to unloaded client chunk" }
     sendServerBoundPacket(serverBoundChunkRequestPacket(blockUpdate.pos))
   }
 }
 
 private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity) {
   if (chunksLoaded) {
-    Main.logger().debug("handleSpawnEntity") { "Server sent spawn entity packet" }
+    logger.debug { "Server sent spawn entity packet" }
   } else {
-    Main.logger().debug("handleSpawnEntity") { "Server sent spawn entity packet before chunks loaded packet, ignoring it" }
+    logger.debug { "Server sent spawn entity packet before chunks loaded packet, ignoring it" }
     return
   }
   val world = this.world
   if (world == null) {
-    Main.logger().warn("handleSpawnEntity", "Failed to find world")
+    logger.warn { "Failed to find world" }
     return
   }
   val protoEntity = spawnEntity.entity
@@ -289,10 +291,10 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
   val chunkPosY = position.y.worldToChunk()
   val chunk = world.getChunk(chunkPosX, chunkPosY, true)
   if (chunk == null) {
-    Main.logger().warn("handleSpawnEntity", "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY")
+    logger.warn { "Server sent spawn entity in unloaded chunk $chunkPosX, $chunkPosY" }
     return
   }
-  Main.logger().debug("handleSpawnEntity") { "Spawning a ${protoEntity.entityType}" }
+  logger.debug { "Spawning a ${protoEntity.entityType}" }
 
   when (protoEntity.entityType) {
     PLAYER -> world.load(protoEntity)
@@ -304,14 +306,14 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
 //      material.createBlock(world, chunk, localPosX, localPosY, protoEntity)
 //    }
 
-    else -> Main.logger().error("Cannot spawn a ${protoEntity.entityType} yet")
+    else -> logger.error { "Cannot spawn a ${protoEntity.entityType} yet" }
   }
 }
 
 private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
   val entities = updateChunk.chunk.entitiesCount
   if (entities > 0) {
-    Main.logger().warn(TAG, "Got $entities entities in chunk update")
+    logger.warn { "Got $entities entities in chunk update" }
   }
   val world = world
   if (world == null) {
@@ -320,7 +322,7 @@ private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
   }
   val chunk = world.chunkLoader.loadChunkFromProto(updateChunk.chunk)
   if (chunk == null) {
-    Main.logger().warn(TAG, "Failed to load the chunk from proto")
+    logger.warn { "Failed to load the chunk from proto" }
     return
   }
   world.updateChunk(chunk, false)
@@ -332,12 +334,12 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   }
   val world = world
   if (world == null) {
-    Main.logger().warn("handleMoveEntity", "Failed to find world")
+    logger.warn { "Failed to find world" }
     return
   }
   val chunkLoc = worldXYtoChunkCompactLoc(moveEntity.position.x.toInt(), moveEntity.position.y.toInt())
   if (!world.isChunkLoaded(chunkLoc)) {
-    Main.logger().warn("Server sent move entity packet to unloaded chunk")
+    logger.warn { "Server sent move entity packet to unloaded chunk" }
     return
   }
 
@@ -348,7 +350,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   }
   val entity = world.getEntity(uuid)
   if (entity == null) {
-    Main.logger().warn("Cannot move unknown entity '${moveEntity.uuid}'")
+    logger.warn { "Cannot move unknown entity '${moveEntity.uuid}'" }
     sendServerBoundPacket(serverBoundEntityRequest(uuid))
     return
   }
@@ -377,17 +379,17 @@ private val nonWarnDespawnReasons = listOf(DespawnEntity.DespawnReason.UNKNOWN_E
 private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) {
   val world = world
   if (world == null) {
-    Main.logger().error("handleDespawnEntity", "Failed to find world")
+    logger.error { "Failed to find world" }
     return
   }
   val uuid: String = despawnEntity.uuid
   val entity: Entity = world.getEntity(uuid) ?: run {
     if (despawnEntity.despawnReason !in nonWarnDespawnReasons) {
-      Main.logger().warn("handleDespawnEntity", "Failed to despawn unknown entity with uuid '${despawnEntity.uuid}', reason ${despawnEntity.despawnReason}")
+      logger.warn { "Failed to despawn unknown entity with uuid '${despawnEntity.uuid}', reason ${despawnEntity.despawnReason}" }
     }
     return
   }
-  Main.logger().debug("handleDespawnEntity", "Despawning entity ${despawnEntity.uuid} with reason ${despawnEntity.despawnReason}")
+  logger.debug { "Despawning entity ${despawnEntity.uuid} with reason ${despawnEntity.despawnReason}" }
   world.removeEntity(entity)
 }
 

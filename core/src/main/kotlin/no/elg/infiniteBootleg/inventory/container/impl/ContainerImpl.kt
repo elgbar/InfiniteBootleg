@@ -1,14 +1,16 @@
 package no.elg.infiniteBootleg.inventory.container.impl
 
 import com.google.common.base.Preconditions
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.IndexedItem
 import no.elg.infiniteBootleg.items.Item
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.world.ContainerElement
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author kheba
@@ -66,7 +68,7 @@ open class ContainerImpl(
 
   override fun remove(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
-    Main.logger().debug("Container", "Removing $amount of $element")
+    logger.debug { "Removing $amount of $element" }
     var counter = amount
     var i = 0
     val length = content.size

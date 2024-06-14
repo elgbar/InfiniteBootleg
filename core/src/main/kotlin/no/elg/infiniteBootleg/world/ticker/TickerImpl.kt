@@ -2,11 +2,11 @@ package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.PauseableThread
 import com.badlogic.gdx.utils.TimeUtils
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.api.ThreadType
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.checkCorrectThreadType
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.FailureWatchdog
 
 /**
@@ -15,6 +15,12 @@ import no.elg.infiniteBootleg.util.FailureWatchdog
  *
  * The ticker will not update the if [Graphics.getFrameId] is the same as it was last
  * tick (as can be caused by fps lag), and will warn when too many ticks have been skipped.
+ *
+ * @param ticking The ticker to tick
+ * @param name Name of the ticker thread
+ * @param start If the thread should start at once
+ * @param tps Ticks per seconds, must be a strictly positive number
+ * @param nagDelay Minimum seconds between each nag message, If less than or equal to zero there will be no delay (note that this will be a lot of spam!)
  *
  * @author Elg
  */
@@ -32,6 +38,7 @@ class TickerImpl(
   private val tickerThread: PauseableThread
 
   private val tag: String = "$name ticker"
+  private val logger = KotlinLogging.logger(tag)
 
   override val tps: Long
   override val secondsDelayBetweenTicks: Float
@@ -64,14 +71,6 @@ class TickerImpl(
   override var isStarted = false
     private set
 
-  /**
-   * @param ticking The ticker to tick
-   * @param name Name of the ticker thread
-   * @param start If the thread should start at once
-   * @param tps Ticks per seconds, must be a strictly positive number
-   * @param nagDelay Minimum seconds between each nag message, If less than or equal to zero there
-   * will be no delay (note that this will be a lot of spam!)
-   */
   init {
     require(tps > 0) { "TPS must be strictly positive! Was given $tps" }
     this.tps = tps
@@ -81,8 +80,8 @@ class TickerImpl(
     tickRareRate = this.tps
     // Round down ok as realTPS is a long
     tpsWarnThreshold = (TPS_LOSS_PERCENTAGE * tps).toLong()
-    nagDelayTicks = Math.max(0.0, tps * nagDelay).toLong()
-    Main.logger().debug(tag) { "Starting ticking thread for '$name' with tps = $tps (warn when tps <= $tpsWarnThreshold)" }
+    nagDelayTicks = (tps * nagDelay).coerceAtLeast(0.0).toLong()
+    logger.debug { "Starting ticking thread for '$name' with tps = $tps (warn when tps <= $tpsWarnThreshold)" }
     tickerThread = PauseableThread(this)
     tickerThread.name = tag
     tickerThread.isDaemon = true
@@ -124,11 +123,11 @@ class TickerImpl(
       try {
         Thread.sleep(ms)
       } catch (e: InterruptedException) {
-        Main.logger().error(tag, "Ticker interrupted", e)
+        logger.error(e) { "Ticker interrupted" }
       }
     } else if (tickId - lastTickNagged >= nagDelayTicks && tpsWarnThreshold >= realTPS) {
       lastTickNagged = tickId
-      Main.logger().error(tag) {
+      logger.error {
         "Cant keep up a single tick took around ${TimeUtils.nanosToMillis(tpsDelta)} ms, while at max it should take $msDelayBetweenTicks ms $nanoDelayBetweenTicks ns"
       }
     }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.OrderedSet
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.CheckableDisposable
@@ -18,6 +19,8 @@ import no.elg.infiniteBootleg.world.world.World
 import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs
 import com.badlogic.gdx.physics.box2d.World as Box2dWorld
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Wrapper for [com.badlogic.gdx.physics.box2d.World] for asynchronous reasons
@@ -95,7 +98,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
         "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
       }
       if (!body.isActive) {
-        Main.logger().error("BOX2D", "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}")
+        logger.error { "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}" }
       }
       for (it in body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>()) {
         world.engine.removeEntity(it)

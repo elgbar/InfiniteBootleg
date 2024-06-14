@@ -1,10 +1,10 @@
 package no.elg.infiniteBootleg.world.ecs.components.inventory
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.items.Item
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.hotbar
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -15,6 +15,8 @@ import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import java.util.EnumMap
+
+private val logger = KotlinLogging.logger {}
 
 data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarSlot, Int>) : EntitySavableComponent, UniversalSystem {
 
@@ -57,7 +59,7 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<Ho
         val index = hotbarComponentOrNull?.selectedIndex ?: return null
         if (index !in 0 until containerComponent.size) {
           if (index != EMPTY_INDEX) {
-            Main.logger().warn("Invalid index $index for entity ${this.nameOrNull ?: this}")
+            logger.warn { "Invalid index $index for entity ${this.nameOrNull ?: this}" }
           }
           return null
         }

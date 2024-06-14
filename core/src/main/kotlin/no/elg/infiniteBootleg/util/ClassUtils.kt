@@ -2,9 +2,8 @@ package no.elg.infiniteBootleg.util
 
 import kotlin.reflect.KClass
 
-class ClassUtils
-
 inline fun <reified T : Any> sealedSubclassObjectInstances(): List<T> = sealedSubclassObjectInstances(T::class)
+
 fun <T : Any> sealedSubclassObjectInstances(klazz: KClass<out T>): List<T> {
   require(klazz.isSealed) { "$klazz is not sealed" }
   return klazz.sealedSubclasses.also {

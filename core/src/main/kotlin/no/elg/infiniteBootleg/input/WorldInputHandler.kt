@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.input
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.utils.Disposable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.HUDRenderer
@@ -15,6 +16,8 @@ import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MIN_ZOOM
 import no.elg.infiniteBootleg.world.ticker.Ticker
 import no.elg.infiniteBootleg.world.world.ClientWorld
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -54,10 +57,10 @@ class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapt
         val ticker: Ticker = world.worldTicker
         if (ticker.isPaused) {
           ticker.resume()
-          Main.logger().log("World", "Ticker resumed by F12")
+          logger.info { "Ticker resumed by F12" }
         } else {
           ticker.pause()
-          Main.logger().log("World", "Ticker paused by F12")
+          logger.info { "Ticker paused by F12" }
         }
       }
 

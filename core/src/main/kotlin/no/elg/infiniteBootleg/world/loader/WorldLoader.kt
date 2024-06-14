@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.loader
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -23,6 +24,8 @@ import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -52,46 +55,46 @@ object WorldLoader {
       }
       return world.load(protoEntity, configure = serverPlayerConfig).thenApply {
         saveServerPlayer(it)
-        Main.logger().debug("SERVER", "Created persisted player profile for $uuid")
+        logger.debug { "Created persisted player profile for $uuid" }
         it
       }
     }
 
     if (fileHandle != null && fileHandle.exists()) {
-      Main.logger().debug("SERVER", "Trying to load persisted player profile for $uuid")
+      logger.debug { "Trying to load persisted player profile for $uuid" }
       try {
         val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
         return world.load(proto, configure = serverPlayerConfig).handle { entity, ex ->
           if (ex != null) {
-            Main.logger().warn("SERVER", "Failed to load player profile, creating new player", ex)
+            logger.warn(ex) { "Exception when loading world" }
             return@handle createNewServerPlayer().join()
           } else {
-            Main.logger().debug("SERVER", "Loaded persisted player profile for $uuid")
+            logger.debug { "Loaded persisted player profile for $uuid" }
           }
           return@handle entity
         }
       } catch (e: Exception) {
-        Main.logger().warn("SERVER", "Failed to load player profile", e)
+        logger.warn(e) { "Exception when loading world" }
         // fall through
       }
     }
-    Main.logger().debug("SERVER", "Creating fresh player profile for $uuid")
+    logger.debug { "Creating fresh player profile for $uuid" }
     return createNewServerPlayer()
   }
 
   fun saveServerPlayer(player: Entity) {
     val protoPlayer = player.save(toAuthoritative = true, ignoreTransient = true) ?: run {
-      Main.logger().warn("Failed to create protobuf entity of player ${player.id}")
+      logger.warn { "Failed to create protobuf entity of player ${player.id}" }
       return
     }
     val fileHandle = getServerPlayerFile(player.world, player.id) ?: run {
-      Main.logger().warn("Failed to get server player file for ${player.id}")
+      logger.warn { "Failed to get server player file for ${player.id}" }
       return
     }
     try {
       fileHandle.writeBytes(protoPlayer.toByteArray(), false)
     } catch (e: Exception) {
-      Main.logger().error("Failed to write player save to disk for ${player.id}", e)
+      logger.error(e) { "Exception when saving server player file for ${player.id}" }
     }
   }
 
@@ -111,7 +114,7 @@ object WorldLoader {
       val worldLockFile = getWorldLockFile(uuid)
       if (worldLockFile.isDirectory) {
         // Invalid format, allow writing
-        Main.logger().warn("World lock file for $uuid was a directory")
+        logger.warn { "World lock file for $uuid was a directory" }
         return true
       }
       if (!worldLockFile.exists()) {
@@ -123,7 +126,7 @@ object WorldLoader {
       val lockPID = try {
         lockInfo.toLong()
       } catch (e: NumberFormatException) {
-        Main.logger().warn("World lock file for $uuid did not contain a valid pid, read: $lockInfo")
+        logger.warn { "World lock file for $uuid did not contain a valid pid, read: $lockInfo" }
         // Invalid pid, allow writing
         return deleteOrLogFile(worldLockFile)
       }
@@ -134,7 +137,7 @@ object WorldLoader {
       val optionalProcessHandle = ProcessHandle.of(lockPID)
       if (!optionalProcessHandle.map(ProcessHandle::isAlive).orElse(false)) {
         // If there is no process with the read pid, it was probably left from an old instance
-        Main.logger().warn("World lock file for $uuid still existed for a non-existing process (PID $lockPID), an old lock file found")
+        logger.warn { "World lock file for $uuid still existed for a non-existing process (PID $lockPID), an old lock file found" }
         return deleteOrLogFile(worldLockFile)
       }
       return false

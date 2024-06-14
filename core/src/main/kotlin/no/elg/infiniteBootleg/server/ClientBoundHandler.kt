@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import no.elg.infiniteBootleg.main.ClientMain
@@ -7,6 +8,8 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -41,11 +44,7 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   @Deprecated("Deprecated in Java")
   override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
     info = "Exception caught, ${cause.javaClass.simpleName}: ${cause.message}"
-    Main.logger().error(TAG, "Exception in netty IO", cause)
+    logger.error(cause) { "Exception in netty IO" }
     ctx.close()
-  }
-
-  companion object {
-    const val TAG = "CLIENT"
   }
 }

@@ -9,13 +9,13 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.inventory.container.InterfaceId
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.ui.createContainerActor
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.StageScreen
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.IBVisWindow
@@ -33,6 +33,8 @@ import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -58,7 +60,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     get() {
       return (ClientMain.inst().screen as? StageScreen)?.stage.also { stage ->
         if (stage == null) {
-          Main.logger().warn("Could not get stage from screen ${ClientMain.inst().screen}")
+          logger.warn { "Could not get stage from screen ${ClientMain.inst().screen}" }
         }
       }
     }

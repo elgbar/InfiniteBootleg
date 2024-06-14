@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_EARLY
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
@@ -16,6 +16,8 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Compa
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.InUnloadedChunkTag.Companion.isInUnloadedChunk
 
+private val logger = KotlinLogging.logger {}
+
 // TODO refactor this system to be NoMovementInUnlockedChunksSystem, disabling all movement and setting velocity to 0
 object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY), UniversalSystem {
 
@@ -24,20 +26,18 @@ object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFa
     val isChunkLoaded = world.isChunkLoaded(entity.compactChunkLoc)
     if (!entity.isInUnloadedChunk && !isChunkLoaded) {
       if (Settings.debug) {
-        Main.logger().log(
-          "NoGravityInUnloadedChunksSystem",
+        logger.info {
           "Entity ${entity.id} is in unloaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, disabling gravity"
-        )
+        }
       }
       entity.isInUnloadedChunk = true
       entity.box2d.disableGravity()
     } else if (entity.isInUnloadedChunk && isChunkLoaded) {
       entity.isInUnloadedChunk = false
       if (Settings.debug) {
-        Main.logger().log(
-          "NoGravityInUnloadedChunksSystem",
+        logger.info {
           "Entity ${entity.id} is now in a loaded chunk ${stringifyCompactLoc(entity.compactBlockLoc)}, enabling gravity (if not flying)"
-        )
+        }
       }
       if (!entity.flying) {
         entity.box2d.enableGravity()

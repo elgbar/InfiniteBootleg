@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.main.Main
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
@@ -19,6 +19,8 @@ import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.world.world.World
 import java.util.EnumMap
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * A block in the world each block is a part of a chunk which is a part of a world. Each block know
@@ -56,7 +58,7 @@ class BlockImpl(
 
   override fun dispose() {
     if (isDisposed) {
-      Main.logger().warn("Disposed block ${this::class.simpleName} ($worldX, $worldY) twice")
+      logger.warn { "Disposed block ${this::class.simpleName} ($worldX, $worldY) twice" }
     }
     isDisposed = true
     entity?.also {

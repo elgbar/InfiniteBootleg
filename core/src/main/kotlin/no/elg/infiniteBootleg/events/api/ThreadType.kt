@@ -1,9 +1,12 @@
 package no.elg.infiniteBootleg.events.api
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.world.ticker.WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * What kind of thread an event originated from.
@@ -54,7 +57,7 @@ enum class ThreadType {
       } else if ("pool" in threadName.lowercase()) {
         return ASYNC
       }
-      Main.logger().warn("Dispatched event from unknown thread: $threadName")
+      logger.warn { "Dispatched event from unknown thread: $threadName" }
       return UNKNOWN
     }
   }

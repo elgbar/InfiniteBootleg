@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.inventory.container
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.items.Item
@@ -7,7 +8,6 @@ import no.elg.infiniteBootleg.items.Item.Companion.DEFAULT_MAX_STOCK
 import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.items.Item.Companion.fromProto
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ContainerKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
@@ -198,6 +198,7 @@ interface Container : Iterable<IndexedItem> {
   val type: ProtoContainer.Type
 
   companion object : ProtoConverter<Container, ProtoContainer> {
+    private val logger = KotlinLogging.logger {}
 
     fun OwnedContainer.isOpen(): Boolean = ClientMain.inst().world?.render?.interfaceManager?.isOpen(owner.toInterfaceId()) ?: false
 
@@ -217,7 +218,7 @@ interface Container : Iterable<IndexedItem> {
       when (type) {
         ProtoWorld.Container.Type.GENERIC -> ContainerImpl(name, maxSize)
         ProtoWorld.Container.Type.AUTO_SORTED -> AutoSortedContainer(name, maxSize)
-        else -> ContainerImpl(name, maxSize).also { Main.logger().error("Unknown container type $type") }
+        else -> ContainerImpl(name, maxSize).also { logger.error { "Unknown container type $type" } }
       }.apply {
         // note: if an index does not exist in the proto, the slot is implicitly empty
         for (indexedItem in itemsList) {

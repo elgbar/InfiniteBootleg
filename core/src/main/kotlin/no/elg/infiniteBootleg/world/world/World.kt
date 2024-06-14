@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
 import com.google.protobuf.TextFormat
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.Settings
@@ -135,6 +136,8 @@ import kotlin.concurrent.write
 import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
+private val logger = KotlinLogging.logger {}
+
 /**
  * Different kind of views
  *
@@ -249,7 +252,7 @@ abstract class World(
 
     oneShotListener<WorldLoadedEvent> {
       Main.inst().scheduler.executeSync {
-        Main.logger().debug("World") { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
+        logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
       }
     }
@@ -301,17 +304,17 @@ abstract class World(
     if (!isTransient && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
       if (!Settings.ignoreWorldLock) {
         isTransient = true
-        Main.logger().warn("World", "World found is already in use. Initializing world as a transient.")
+        logger.warn { "World found is already in use. Initializing world as a transient." }
       } else {
-        Main.logger().warn("World", "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!")
+        logger.warn { "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!" }
       }
     }
     if (worldFolder == null) {
-      Main.logger().log("No world save found")
+      logger.info { "No world save found" }
     } else if (isTransient) {
-      Main.logger().log("World is transient, will not load from disk")
+      logger.info { "World is transient, will not load from disk" }
     } else {
-      Main.logger().log("Loading world from '${worldFolder.file().absolutePath}'")
+      logger.info { "Loading world from '${worldFolder.file().absolutePath}'" }
       if (writeLockFile(uuid)) {
         val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
         if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
@@ -323,7 +326,7 @@ abstract class World(
           }
         }
       } else {
-        Main.logger().error("Failed to write world lock file! Setting world to transient to be safe")
+        logger.error { "Failed to write world lock file! Setting world to transient to be safe" }
         isTransient = true
       }
     }
@@ -336,9 +339,9 @@ abstract class World(
       Main.inst().scheduler.executeAsync {
         if (Main.isSingleplayer) {
           this.createNewPlayer().thenApply {
-            Main.logger().debug("World", "Spawned new singleplayer player")
+            logger.debug { "Spawned new singleplayer player" }
           }
-          Main.logger().debug("World", "Spawning new singleplayer player")
+          logger.debug { "Spawning new singleplayer player" }
         }
         render.chunkLocationsInView.forEach(::loadChunk)
         dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
@@ -358,7 +361,7 @@ abstract class World(
    */
   fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
     if (Settings.debug && Settings.logPersistence) {
-      Main.logger().debug("PB World") { TextFormat.printer().shortDebugString(protoWorld) }
+      logger.debug { TextFormat.printer().shortDebugString(protoWorld) }
     }
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
@@ -392,7 +395,7 @@ abstract class World(
       return
     }
     val worldFolder = worldFolder ?: return
-    Main.logger().debug("World") { "Saving world '$name'" }
+    logger.debug { "Saving world '$name'" }
 
     if (Main.isServer) {
       playersEntities.forEach(WorldLoader::saveServerPlayer)
@@ -521,11 +524,11 @@ abstract class World(
       }
     }
     if (!acquiredLock) {
-      Main.logger().warn("World") { "Failed to acquire chunks read lock in $acquireTime ms (wanted to read ${stringifyCompactLoc(chunkLoc)})" }
+      logger.warn { "Failed to acquire chunks read lock in $acquireTime ms (wanted to read ${stringifyCompactLoc(chunkLoc)})" }
       return null
     } else {
       if (acquireTime > TRY_LOCK_CHUNKS_DURATION_MS / 2f) {
-        Main.logger().debug("World") { "Acquired chunks read lock in $acquireTime ms" }
+        logger.debug { "Acquired chunks read lock in $acquireTime ms" }
       }
     }
     val finalReadChunk = readChunk
@@ -564,7 +567,7 @@ abstract class World(
    */
   private fun loadChunk(chunkLoc: Long, returnIfLoaded: Boolean = true): Chunk? {
     if (worldTicker.isPaused) {
-      Main.logger().debug("World", "Ticker paused will not load chunk")
+      logger.debug { "Ticker paused will not load chunk" }
       return null
     }
     return chunksLock.write {
@@ -883,7 +886,7 @@ abstract class World(
   fun unloadChunk(chunk: Chunk?, force: Boolean = false, save: Boolean = true): Boolean {
     if (chunk != null && chunk.isNotDisposed && (force || chunk.isAllowedToUnload)) {
       if (chunk.world !== this) {
-        Main.logger().warn("Tried to unload chunk from different world")
+        logger.warn { "Tried to unload chunk from different world" }
         return false
       }
 
@@ -895,7 +898,7 @@ abstract class World(
       }
       chunk.dispose()
       if (removedChunk != null && chunk !== removedChunk) {
-        Main.logger().warn("Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${stringifyCompactLoc(removedChunk)}")
+        logger.warn { "Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${stringifyCompactLoc(removedChunk)}" }
         removedChunk.dispose()
       }
       return true
@@ -1016,7 +1019,7 @@ abstract class World(
     filter: (Block) -> Boolean = { true }
   ): GdxArray<Block> {
     val effectiveRaw: Boolean = if (!raw && !includeAir) {
-      Main.logger().warn("getBlocksAABB", "Will not include air AND air blocks will be created! (raw: false, includeAir: false)")
+      logger.warn { "Will not include air AND air blocks will be created! (raw: false, includeAir: false)" }
       true
     } else {
       raw
@@ -1101,7 +1104,7 @@ abstract class World(
   }
 
   override fun dispose() {
-    Main.logger().info("World") { "Disposing world '$name'" }
+    logger.info { "Disposing world '$name'" }
     clear()
     saveTask?.cancel(false)
     saveTask = null

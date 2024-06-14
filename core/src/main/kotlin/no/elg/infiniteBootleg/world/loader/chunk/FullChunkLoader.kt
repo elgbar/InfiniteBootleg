@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.world.loader.chunk
 
-import no.elg.infiniteBootleg.main.Main
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.component1
@@ -9,6 +9,8 @@ import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.world.World
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Handle saving and loading of chunks.
@@ -31,7 +33,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     if (generated.isValid) {
       return generated
     }
-    Main.logger().warn("Failed to generate chunk ${stringifyCompactLoc(chunkX, chunkY)}")
+    logger.warn { "Failed to generate chunk ${stringifyCompactLoc(chunkX, chunkY)}" }
     return null
   }
 
