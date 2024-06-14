@@ -37,6 +37,9 @@ fun main(args: Array<String>) {
       Settings.ignoreWorldLock -> title += "dangerous! "
       !Settings.loadWorldFromDisk -> title += "transient "
     }
+    if (Settings.debug) {
+      config.enableGLDebugOutput(true, System.err)
+    }
     config.setTitle(title)
     config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 16)
     config.setForegroundFPS(Settings.foregroundFPS)
