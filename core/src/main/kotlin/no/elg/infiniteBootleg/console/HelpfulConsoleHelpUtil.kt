@@ -20,7 +20,7 @@ object HelpfulConsoleHelpUtil {
       logger.info { "Command does not exist." }
       return
     }
-    for (m in methods) {
+    for (m in methods.sortedBy(Method::name)) {
       val sb = createCmdPrefix(m)
       val annotation: Annotation? = m.getDeclaredAnnotation(ConsoleDoc::class.java)
       if (annotation != null) {
@@ -48,7 +48,7 @@ object HelpfulConsoleHelpUtil {
   }
 
   fun printCommands(console: Console, exec: CommandExecutor) {
-    for (method in getRelevantMethods(console, exec, null)) {
+    for (method in getRelevantMethods(console, exec, null).sortedBy(Method::name)) {
       if (allowedToExecute(method)) {
         val sb = createCmdPrefix(method)
         sb.appendCmdSignature(method)
