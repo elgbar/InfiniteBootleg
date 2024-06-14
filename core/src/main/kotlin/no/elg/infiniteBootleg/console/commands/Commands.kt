@@ -670,9 +670,8 @@ class Commands : CommandExecutor() {
     }
   }
 
-  @CmdArgNames("instantBreak")
   @ClientsideOnly
-  @ConsoleDoc(description = "Set the interact radius from the player", paramDescriptions = ["New instant break"])
+  @ConsoleDoc(description = "Set the interact radius from the player")
   fun instantBreak() {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
