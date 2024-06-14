@@ -90,6 +90,7 @@ subprojects {
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]
       freeCompilerArgs.add("-Xjvm-default=all")
+//      allWarningsAsErrors = true
     }
   }
 

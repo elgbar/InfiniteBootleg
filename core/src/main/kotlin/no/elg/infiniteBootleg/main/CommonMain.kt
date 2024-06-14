@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.assets.InfAssetsImpl
-import no.elg.infiniteBootleg.console.ConsoleHandler
+import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler
@@ -25,7 +25,7 @@ private val logger = KotlinLogging.logger {}
 abstract class CommonMain protected constructor(protected val test: Boolean, progArgs: ProgramArgs?) : ApplicationAdapter(), Main {
   override val scheduler: CancellableThreadScheduler = CancellableThreadScheduler(Settings.schedulerThreads)
 
-  override lateinit var console: ConsoleHandler
+  override lateinit var console: InGameConsoleHandler
     protected set
 
   override val assets: InfAssets = InfAssetsImpl()
@@ -36,7 +36,7 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
   }
 
   override fun create() {
-    console = ConsoleHandler()
+    console = InGameConsoleHandler()
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
     Gdx.app.logLevel = if (test || Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     console.alpha = 0.85f

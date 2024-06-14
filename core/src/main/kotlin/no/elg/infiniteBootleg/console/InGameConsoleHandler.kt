@@ -13,7 +13,7 @@ import com.strongjoshua.console.LogLevel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
-import no.elg.infiniteBootleg.console.ConsoleLogger.Companion.DEBUG_PREFIX
+import no.elg.infiniteBootleg.console.InGameConsoleLogger.Companion.DEBUG_PREFIX
 import no.elg.infiniteBootleg.console.commands.Commands
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole
 import no.elg.infiniteBootleg.console.consoles.StdConsole
@@ -23,7 +23,7 @@ import java.io.StringWriter
 
 private val logger = KotlinLogging.logger {}
 
-class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : ConsoleLogger, Disposable, Resizable {
+class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : InGameConsoleLogger, Disposable, Resizable {
   private val console: Console
   val exec: Commands = Commands()
   private val consoleReader: SystemConsoleReader
@@ -162,10 +162,9 @@ class ConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Sett
   }
 
   /**
-   * Log a message.
+   * Log a message to the in game console
    * If the message starts with [DEBUG_PREFIX] it will not be logged to the in-game console
    */
-  @Deprecated("Use standard slf4j logger")
   override fun log(level: LogLevel, msg: String) {
     if (disposed) {
       return

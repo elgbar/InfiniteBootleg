@@ -7,28 +7,15 @@ import no.elg.infiniteBootleg.Settings
 /**
  * @author Elg
  */
-@JvmDefaultWithoutCompatibility
-interface ConsoleLogger : ApplicationLogger {
+interface InGameConsoleLogger : ApplicationLogger {
 
   /**
    * @param level The level to log at
    * @param msg The message to log
    */
-  @Deprecated("Use standard slf4j logger")
   fun log(level: LogLevel, msg: String)
 
-  /**
-   * Log a level with [LogLevel.DEFAULT] loglevel
-   *
-   * @param msg The message to log
-   */
-  fun log(msg: String) {
-    log(LogLevel.DEFAULT, msg)
-  }
-
-  override fun log(tag: String, message: String) {
-    log("[$tag] $message")
-  }
+  override fun log(tag: String, message: String) = log(LogLevel.DEFAULT, "[$tag] $message")
 
   override fun log(tag: String, message: String, exception: Throwable?) {
     log(tag, message)
@@ -51,8 +38,10 @@ interface ConsoleLogger : ApplicationLogger {
   }
 
   override fun debug(tag: String, message: String, exception: Throwable?) {
-    debug(tag, message)
-    exception?.printStackTrace(System.out)
+    if (Settings.debug) {
+      log(LogLevel.DEFAULT, "$DEBUG_PREFIX [$tag] $message")
+      exception?.printStackTrace(System.out)
+    }
   }
 
   companion object {

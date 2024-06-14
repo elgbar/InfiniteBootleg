@@ -5,7 +5,7 @@ import no.elg.infiniteBootleg.main.Main
 import java.util.Scanner
 
 /** Read input from [System.console] or [System. in] if no console exists.  */
-class SystemConsoleReader(private val consoleHandler: ConsoleHandler) : Runnable, Disposable {
+class SystemConsoleReader(private val consoleHandler: InGameConsoleHandler) : Runnable, Disposable {
   private var running = false
   fun start() {
     val thread = Thread(this, "System Console Reader Thread")

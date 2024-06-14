@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.assets.InfAssets
-import no.elg.infiniteBootleg.console.ConsoleHandler
+import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.util.CancellableThreadScheduler
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
@@ -14,7 +14,7 @@ import java.io.File
  * @author Elg
  */
 interface Main : ApplicationListener {
-  val console: ConsoleHandler
+  val console: InGameConsoleHandler
   val scheduler: CancellableThreadScheduler
   val engine: Engine?
   val isNotTest: Boolean
