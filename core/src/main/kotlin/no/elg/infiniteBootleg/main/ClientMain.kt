@@ -118,7 +118,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progA
   override fun resize(rawWidth: Int, rawHeight: Int) {
     val width = rawWidth.coerceAtLeast(1)
     val height = rawHeight.coerceAtLeast(1)
-    logger.debug { "Resizing client to $width x $height" }
+    logger.trace { "Resizing client to $width x $height" }
     screen.resize(width, height)
     console.resize(width, height)
     screenRenderer.resize(width, height)
