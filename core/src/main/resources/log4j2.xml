@@ -9,16 +9,26 @@
       />
     </Console>
 
-    <RollingRandomAccessFile name="RollingRandomAccessFile" fileName="logs/current.log"
-                             filePattern="logs/$${date:yyyy-MM}/log-%d{yyyy-MM-dd-HH}-%i.log.gz">
+    <InGameConsole name="InGameConsole"/>
+
+    <RollingRandomAccessFile name="RollingRandomAccessFile"
+                             fileName="logs/current.log"
+                             filePattern="logs/$${date:yyyy-MM-dd}/log-%d{yyyy-MM-dd-HH-mm}_%i.log.zip"
+    >
       <PatternLayout>
-        <Pattern>%d %5level %c [%10t] %m%n</Pattern>
+        <Pattern>%d pid=%pid %5level %c %-5level [%t] %msg%n</Pattern>
       </PatternLayout>
       <Policies>
         <SizeBasedTriggeringPolicy size="250 MB"/>
+        <OnStartupTriggeringPolicy/>
       </Policies>
+      <DefaultRolloverStrategy>
+        <Delete basePath="${baseDir}" maxDepth="2">
+          <IfFileName glob="*/app-*.log.zip"/>
+          <IfLastModified age="P7D"/>
+        </Delete>
+      </DefaultRolloverStrategy>
     </RollingRandomAccessFile>
-    <InGameConsole name="InGameConsole"/>
   </Appenders>
 
   <Loggers>
