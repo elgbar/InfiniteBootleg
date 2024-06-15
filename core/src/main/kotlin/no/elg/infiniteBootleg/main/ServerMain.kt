@@ -18,7 +18,7 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class ServerMain(test: Boolean, progArgs: ProgramArgs?) : CommonMain(test, progArgs) {
+class ServerMain(test: Boolean, progArgs: ProgramArgs) : CommonMain(test, progArgs) {
 
   lateinit var serverWorld: ServerWorld
     private set

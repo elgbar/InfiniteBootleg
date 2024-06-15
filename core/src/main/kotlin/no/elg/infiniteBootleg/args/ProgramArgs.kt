@@ -20,9 +20,11 @@ class ProgramArgs(args: Array<String>) : Disposable {
 
   init {
     createArguments()
-    val options = interpreterArgs(args)
+    executeArguments(args)
+  }
 
-    for ((key, value) in options) {
+  private fun executeArguments(args: Array<String>) {
+    for ((key, value) in interpreterArgs(args)) {
       val (arg, isDoubleDash) = key
       val programArgument: ProgramArgument =
         if (isDoubleDash) {

@@ -22,7 +22,7 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-abstract class CommonMain protected constructor(protected val test: Boolean, progArgs: ProgramArgs?) : ApplicationAdapter(), Main {
+abstract class CommonMain protected constructor(protected val test: Boolean, progArgs: ProgramArgs) : ApplicationAdapter(), Main {
   override val scheduler: CancellableThreadScheduler = CancellableThreadScheduler(Settings.schedulerThreads)
 
   override lateinit var console: InGameConsoleHandler
@@ -31,7 +31,7 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
   override val assets: InfAssets = InfAssetsImpl()
 
   init {
-    progArgs?.dispose()
+    progArgs.dispose()
     instField = this
   }
 
