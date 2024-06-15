@@ -23,66 +23,6 @@ object Util {
   const val RELATIVE_TIME: String = "relative"
   private val ZULU_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm'Z'")
 
-  /**
-   * The key in the map is a pair of the character given before an equal sign (=) or end of string
-   * and a boolean that is `true` if the key started with two dash (-) as prefix. Values in
-   * the map are `String`s containing the substring from after (not including the first) equal
-   * sign to the end of the string.
-   *
-   * <h2>Example</h2>
-   *
-   *
-   * Given `new String{"--key=value" "--toggle"}` will return `mapOf(new
-   * Pair("key",true) to "value", new Pair("toggle", true), null)`
-   *
-   * @param args The system args to interpret
-   * @return A Map of the interpreted args
-   */
-  @JvmStatic
-  fun interpreterArgs(args: Array<String>): Map<Pair<String, Boolean>, String?> {
-    val argsMap: MutableMap<Pair<String, Boolean>, String?> = HashMap()
-
-    for (arg in args) {
-      if (!arg.startsWith("-")) {
-        logger.error { "Failed to interpret argument $arg" }
-      } else {
-        // we only care about the first equals sign, the rest is a part of the value
-        val equalIndex = arg.indexOf('=')
-        val hasEqualSign = equalIndex != -1
-
-        val isDoubleDash = arg.startsWith("--")
-        val cutoff = if (isDoubleDash) 2 else 1
-
-        val key = if (hasEqualSign) {
-          arg.substring(cutoff, equalIndex)
-        } else {
-          arg.substring(cutoff)
-        }
-
-        val inArgs = mutableListOf<String>()
-        if (isDoubleDash) {
-          inArgs += key
-        } else {
-          // If this is a single dash (ie switch) then each char before the equal is a switch on its own
-          inArgs += key.toCharArray().map(Char::toString)
-        }
-
-        for ((index, inArg) in inArgs.withIndex()) {
-          // if there is no equal sign there is no value
-          var value: String? = null
-          if (hasEqualSign && index >= inArgs.size - 1) {
-            // find the key and value from the index of the first equal sign, but do not include it
-            // in the
-            // key or value
-            value = arg.substring(equalIndex + 1)
-          }
-          argsMap[Pair(inArg, isDoubleDash)] = value
-        }
-      }
-    }
-    return argsMap
-  }
-
   fun getVersion(): String {
     val calcHash = "#${countCommits()}-${getLastGitCommitID()}@${getLastCommitDate("iso8601-strict")}"
     val savedHash = try {
