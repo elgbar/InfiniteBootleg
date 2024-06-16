@@ -35,7 +35,7 @@ val clientSideServerBoundMarker: Marker = MarkerFactory.getMarker("client<-serve
 val serverSideServerBoundMarker: Marker = MarkerFactory.getMarker("server->client").toKotlinLogging()
 
 fun logPacket(directionMarker: Marker, packet: Packets.Packet) {
-  if (Settings.debug && Settings.logPackets && packet.type !in filterOutPackets) {
+  if (Settings.logPackets && packet.type !in filterOutPackets) {
     logger.debug(null as Throwable?, directionMarker) { TextFormat.printer().shortDebugString(packet) }
   }
 }
