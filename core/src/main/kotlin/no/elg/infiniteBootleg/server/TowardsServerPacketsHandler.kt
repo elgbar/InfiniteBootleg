@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.console.serverSideServerBoundMarker
 import no.elg.infiniteBootleg.console.temporallyFilterPacket
@@ -72,6 +71,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
+import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.forEach
 import java.security.SecureRandom
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -285,35 +285,18 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   logger.debug { "Client world ready, sending chunks to client ${player.nameOrNull}" }
 
   // Send chunk packets to client
-  val ix = player.positionComponent.blockX.worldToChunk()
-  val iy = player.positionComponent.blockY.worldToChunk()
+  val chunksInView = chunksInView(ctx) ?: run {
+    ctx.fatal("Failed to find chunks in view, serverside")
+    return
+  }
   temporallyFilterPacket(Packets.Packet.Type.CB_UPDATE_CHUNK) {
-    for (cx in -Settings.viewDistance until Settings.viewDistance) {
-      for (cy in -Settings.viewDistance until Settings.viewDistance) {
-        val chunkX = ix + cx
-        val chunkY = iy + cy
-        if (!isChunkInView(ctx, chunkX, chunkY)) {
-          logger.warn { "Server tried to load initial chunk out side view  $chunkX, $chunkY" }
-          continue
-        }
-        val chunk = try {
-          world.getChunk(chunkX, chunkY, true) ?: continue
-        } catch (e: IllegalStateException) {
-          logger.warn(e) { "Failed to get chunk at $cx, $cy" }
-          continue
-        }
-        ctx.writePacket(clientBoundUpdateChunkPacket(chunk))
-      }
-      ctx.flush()
-      logger.debug {
-        val sent = (cx + Settings.viewDistance + 1) * (Settings.viewDistance * 2 + 1)
-        val total = (Settings.viewDistance + Settings.viewDistance + 1) * (Settings.viewDistance + Settings.viewDistance + 1)
-        "Sent $sent/$total chunks sent to player ${player.name}"
-      }
+    chunksInView.forEach(world) {
+      ctx.writePacket(clientBoundUpdateChunkPacket(it))
     }
+    ctx.flush()
   }
   ctx.writeAndFlushPacket(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
-  logger.debug { "Initial chunks sent to player ${player.name}" }
+  logger.debug { "Initial ${chunksInView.size} chunks sent to player ${player.name}" }
 
   for (entity in world.validEntitiesToSendToClient) {
     if (entity.id == shared.entityUUID) continue // don't send the player to themselves
