@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.logPacket
+import no.elg.infiniteBootleg.console.serverSideServerBoundMarker
 import no.elg.infiniteBootleg.console.temporallyFilterPacket
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.fromProto
@@ -84,7 +85,7 @@ val scheduler by lazy { Main.inst().scheduler }
  * @author Elg
  */
 fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.Packet) {
-  logPacket("server<-client", packet)
+  logPacket(serverSideServerBoundMarker, packet)
   when (packet.type) {
     DX_HEARTBEAT -> handleHeartbeat(ctx)
     DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handleMovePlayer(ctx, it) } }

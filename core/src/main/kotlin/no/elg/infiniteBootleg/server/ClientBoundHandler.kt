@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.server
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
+import no.elg.infiniteBootleg.console.clientSideServerBoundMarker
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
@@ -16,7 +17,7 @@ private val logger = KotlinLogging.logger {}
  */
 class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboundHandler<Packets.Packet>() {
   override fun channelActive(ctx: ChannelHandlerContext) {
-    client.ctx = ChannelHandlerContextWrapper("client->server", ctx)
+    client.ctx = ChannelHandlerContextWrapper(clientSideServerBoundMarker, ctx)
   }
 
   override fun channelInactive(ctx: ChannelHandlerContext) {

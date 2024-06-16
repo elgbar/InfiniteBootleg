@@ -7,6 +7,7 @@ import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
+import no.elg.infiniteBootleg.console.serverSideClientBoundMarker
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import java.util.concurrent.ConcurrentHashMap
@@ -22,7 +23,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
     packetsReceived++
-    val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) { ChannelHandlerContextWrapper("server->client", ctx) }
+    val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) { ChannelHandlerContextWrapper(serverSideClientBoundMarker, ctx) }
     if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
       wrappedCtx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
       return

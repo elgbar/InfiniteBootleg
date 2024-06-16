@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.console.clientSideClientBoundMarker
 import no.elg.infiniteBootleg.console.logPacket
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
@@ -81,7 +82,7 @@ private val logger = KotlinLogging.logger {}
  * @author Elg
  */
 fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
-  logPacket("client<-server", packet)
+  logPacket(clientSideClientBoundMarker, packet)
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()

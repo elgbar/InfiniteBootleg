@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import io.github.oshai.kotlinlogging.Marker
 import io.netty.buffer.ByteBufAllocator
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
@@ -17,7 +18,7 @@ import no.elg.infiniteBootleg.util.IllegalAction
 import java.net.SocketAddress
 
 @Suppress("NOTHING_TO_INLINE", "DEPRECATION")
-class ChannelHandlerContextWrapper(val direction: String, private val handler: ChannelHandlerContext) : ChannelHandlerContext {
+class ChannelHandlerContextWrapper(val direction: Marker, private val handler: ChannelHandlerContext) : ChannelHandlerContext {
 
   private fun logPacketWrite(msg: Any) {
     if (msg is Packet) {
