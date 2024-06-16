@@ -18,7 +18,6 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
   private fun prepareChunks() {
     val chunksInView = worldRender.chunksInView
     chunksToDraw.clear(chunksInView.size)
-    chunksToDraw.ensureCapacity(chunksInView.size)
     val verticalStart = chunksInView.verticalStart
     val verticalEnd = chunksInView.verticalEnd
     for (chunkY in verticalStart until verticalEnd) {

@@ -2,13 +2,9 @@ package no.elg.infiniteBootleg.world.render
 
 /** @author Elg
  */
-class ClientChunksInView : ChunksInView {
-
-  override var horizontalStart = 0
-
-  override var horizontalEnd = 0
-
-  override var verticalStart = 0
-
-  override var verticalEnd = 0
-}
+data class ClientChunksInView(
+  override var horizontalStart: Int = 0,
+  override var horizontalEnd: Int = 0,
+  override var verticalStart: Int = 0,
+  override var verticalEnd: Int = 0
+) : ChunksInView
