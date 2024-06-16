@@ -91,24 +91,7 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handleMovePlayer(ctx, it) } }
     DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
 
-    SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { contentRequest: Packets.ContentRequest ->
-      // Chunk request
-      contentRequest.chunkLocationOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
-      // Entity request
-      if (contentRequest.hasEntityUUID()) {
-        val entityUUID: String = contentRequest.entityUUID
-        val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
-        requestedEntities.get(entityUUID) {
-          scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID) }
-        }
-      }
-      // Container
-      contentRequest.containerOwner?.let { owner: ProtoWorld.ContainerOwner ->
-        scheduler.executeAsync {
-          asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@executeAsync)
-        }
-      }
-    }
+    SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
 
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(ctx, it) } }
     DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(ctx, it) } }
@@ -124,6 +107,25 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
 
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
     else -> ctx.fatal("Server cannot handle packet of type ${packet.type}")
+  }
+}
+
+private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentRequest: Packets.ContentRequest) {
+  // Chunk request
+  contentRequest.chunkLocationOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
+  // Entity request
+  if (contentRequest.hasEntityUUID()) {
+    val entityUUID: String = contentRequest.entityUUID
+    val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
+    requestedEntities.get(entityUUID) {
+      scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID) }
+    }
+  }
+  // Container
+  contentRequest.containerOwner?.let { owner: ProtoWorld.ContainerOwner ->
+    scheduler.executeAsync {
+      asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@executeAsync)
+    }
   }
 }
 
