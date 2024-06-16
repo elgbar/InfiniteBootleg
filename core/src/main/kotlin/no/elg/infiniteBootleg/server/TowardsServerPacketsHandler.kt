@@ -66,7 +66,6 @@ import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.world.loader.WorldLoader
@@ -298,14 +297,22 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   ctx.writeAndFlushPacket(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
   logger.debug { "Initial ${chunksInView.size} chunks sent to player ${player.name}" }
 
-  for (entity in world.validEntitiesToSendToClient) {
-    if (entity.id == shared.entityUUID) continue // don't send the player to themselves
-    logger.debug { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
-    ctx.writePacket(clientBoundSpawnEntity(entity))
+  val validEntitiesToSendToClient = world.validEntitiesToSendToClient
+    .filterNot { it.id == shared.entityUUID } // don't send the player to themselves
+    .filter {
+      val pos = it.position
+      isLocInView(ctx, pos.x.toInt(), pos.y.toInt())
+    }
+  if (validEntitiesToSendToClient.isNotEmpty()) {
+    for (entity in validEntitiesToSendToClient) {
+      logger.debug { "Sending entity ${entity.nameOrNull ?: "<unnamed>"} id ${entity.id} to client. ${entity.toComponentsString()}" }
+      ctx.writePacket(clientBoundSpawnEntity(entity))
+    }
+    ctx.flush()
+    logger.debug { "Initial entities sent to player ${player.name}" }
+  } else {
+    logger.debug { "No entities to send to player ${player.name}" }
   }
-
-  ctx.flush()
-  logger.debug { "Initial entities sent to player ${player.name}" }
 
   ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
 
