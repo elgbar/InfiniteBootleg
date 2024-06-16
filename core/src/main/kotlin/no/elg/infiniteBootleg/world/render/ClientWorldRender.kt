@@ -115,7 +115,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   fun createContainerActor(ownedContainer: OwnedContainer) = world.createContainerActor(ownedContainer, dad, batch)
 
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
-    camera.position.set(worldX.toFloat(), worldY.toFloat(), 0f)
+    camera.position.set(worldX.toFloat() * Block.BLOCK_SIZE, worldY.toFloat() * Block.BLOCK_SIZE, 0f)
     update()
   }
 
