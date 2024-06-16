@@ -224,19 +224,19 @@ private fun ServerClient.handleLoginSuccess() {
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   logger.debug { "Initialization okay, loading world" }
   scheduler.executeSync {
+    if (startGame.controlling.entityType != PLAYER) {
+      ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
+    }
+    this.protoEntity = startGame.controlling
     val protoWorld = startGame.world
     this.world = ServerClientWorld(protoWorld, this).apply {
+      val pos = startGame.controlling.position
+      render.lookAt(pos.x, pos.y) // set position to not request wrong initial chunks
       loadFromProtoWorld(protoWorld)
       worldTicker.start()
     }
-
-    if (startGame.controlling.entityType != PLAYER) {
-      ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
-    } else {
-      this.protoEntity = startGame.controlling
-      logger.debug { "World loaded, waiting for chunks" }
-      sendServerBoundPacket(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
-    }
+    logger.debug { "World loaded, waiting for chunks" }
+    sendServerBoundPacket(serverBoundPacketBuilder(SB_CLIENT_WORLD_LOADED).build())
   }
 }
 

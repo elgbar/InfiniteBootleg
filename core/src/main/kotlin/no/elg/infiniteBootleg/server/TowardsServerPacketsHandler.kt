@@ -52,6 +52,7 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -267,6 +268,8 @@ private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: C
   if (isChunkInView(ctx, chunkX, chunkY)) {
     val chunk = serverWorld.getChunk(chunkX, chunkY, true) ?: return // if no chunk, don't send a chunk update
     ctx.writeAndFlushPacket(clientBoundUpdateChunkPacket(chunk))
+  } else {
+    logger.debug { "Client request chunk out side of its view ${stringifyCompactLoc(chunkX, chunkY)}" }
   }
 }
 
