@@ -38,7 +38,7 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
       }
     }
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): EntityTypeComponent? = safeWith { EntityTypeComponent(protoEntity.entityType) }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): EntityTypeComponent? = safeWith { getType(protoEntity.entityType) }
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = true
   }
