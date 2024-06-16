@@ -59,7 +59,6 @@ import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.inputEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
-import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameComponent
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
@@ -277,18 +276,24 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     return
   }
 
-  logger.debug { "Client world ready, sending chunks to client ${player.nameComponent}" }
+  logger.debug { "Client world ready, sending chunks to client ${player.nameOrNull}" }
 
   // Send chunk packets to client
   val ix = player.positionComponent.blockX.worldToChunk()
   val iy = player.positionComponent.blockY.worldToChunk()
   temporallyFilterPacket(Packets.Packet.Type.CB_UPDATE_CHUNK) {
-    for (cx in -Settings.viewDistance..Settings.viewDistance) {
-      for (cy in -Settings.viewDistance..Settings.viewDistance) {
+    for (cx in -Settings.viewDistance until Settings.viewDistance) {
+      for (cy in -Settings.viewDistance until Settings.viewDistance) {
+        val chunkX = ix + cx
+        val chunkY = iy + cy
+        if (!isChunkInView(ctx, chunkX, chunkY)) {
+          logger.warn { "Server tried to load initial chunk out side view  $chunkX, $chunkY" }
+          continue
+        }
         val chunk = try {
-          world.getChunk(ix + cx, iy + cy, true) ?: continue
+          world.getChunk(chunkX, chunkY, true) ?: continue
         } catch (e: IllegalStateException) {
-          logger.warn { "Failed to get chunk at $cx, $cy" }
+          logger.warn(e) { "Failed to get chunk at $cx, $cy" }
           continue
         }
         ctx.writePacket(clientBoundUpdateChunkPacket(chunk))

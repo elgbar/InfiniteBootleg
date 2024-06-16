@@ -15,11 +15,13 @@ import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.findTextures
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.serverRotatableTextureRegion
+import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.entityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.creation.createBlockEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createContainerEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createDoorBlockEntity
@@ -160,16 +162,17 @@ enum class Material(
     localY: LocalCoord,
     protoEntity: ProtoWorld.Entity? = null
   ): Block {
+    require(!chunk.isDisposed) { "Created block in disposed chunk" }
     return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
       if (Main.isAuthoritative) {
         // Blocks client side should not have any entity in them
         val futureEntity = protoEntity?.let { world.load(it, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
-        futureEntity?.thenApply {
+        futureEntity?.thenApply { entity: Entity ->
           if (block.isDisposed) {
-            world.removeEntity(it)
-            logger.warn { "Block was disposed before entity was fully created" }
+            world.removeEntity(entity)
+            logger.warn { "Block@${stringifyCompactLoc(block)} was disposed before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created" }
           } else {
-            block.entity = it
+            block.entity = entity
           }
         }
       }
