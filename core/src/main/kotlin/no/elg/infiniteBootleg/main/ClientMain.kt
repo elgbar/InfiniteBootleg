@@ -94,8 +94,7 @@ class ClientMain(test: Boolean, progArgs: ProgramArgs) : CommonMain(test, progAr
     Gdx.input.inputProcessor = inputMultiplexer
     logger.info {
       """Controls:
-  WASD to control the camera
-  arrow-keys to control the player
+  WASD to control the player
   T to teleport player to current mouse pos
   Apostrophe (') to open console (type help for help)"""
     }
