@@ -170,7 +170,12 @@ enum class Material(
         futureEntity?.thenApply { entity: Entity ->
           if (block.isDisposed) {
             world.removeEntity(entity)
-            logger.warn { "Block@${stringifyCompactLoc(block)} was disposed before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created" }
+            // This will fire when generating features in the world (i.e., trees next to other trees)
+            logger.debug {
+              "Block@${stringifyCompactLoc(block)} chunk ${stringifyCompactLoc(chunk)} was disposed" +
+                " before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created. " +
+                "Is the chunk disposed? ${chunk.isDisposed}"
+            }
           } else {
             block.entity = entity
           }
@@ -205,7 +210,7 @@ enum class Material(
     /**
      * All materials that can be interacted in a normal fashion by the player
      */
-    val normalMaterials: List<Material> = values().filter(Material::canBeHandled)
+    val normalMaterials: List<Material> = entries.filter(Material::canBeHandled)
 
     override fun Material.asProto(): ProtoWorld.Material =
       material {
