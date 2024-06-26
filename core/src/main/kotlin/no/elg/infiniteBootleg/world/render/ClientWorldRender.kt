@@ -19,7 +19,10 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.screens.StageScreen
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.IBVisWindow
+import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoordNumber
+import no.elg.infiniteBootleg.util.decompactLocX
+import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.blocks.Block
@@ -114,6 +117,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   fun createContainerActor(ownedContainer: OwnedContainer) = world.createContainerActor(ownedContainer, dad, batch)
 
+  fun lookAt(loc: WorldCompactLoc) = lookAt(loc.decompactLocX(), loc.decompactLocY())
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
     camera.position.set(worldX.toFloat() * Block.BLOCK_SIZE, worldY.toFloat() * Block.BLOCK_SIZE, 0f)
     update()

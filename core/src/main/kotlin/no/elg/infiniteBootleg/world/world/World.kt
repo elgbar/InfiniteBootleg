@@ -331,6 +331,7 @@ abstract class World(
       }
     }
 
+    (render as? ClientWorldRender)?.lookAt(spawn)
     worldTicker.start()
 
     if (!willDispatchChunksLoadedEvent) {
