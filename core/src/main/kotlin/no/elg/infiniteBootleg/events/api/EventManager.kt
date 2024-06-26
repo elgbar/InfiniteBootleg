@@ -114,11 +114,11 @@ object EventManager {
    * @param event The event to notify about
    */
   inline fun <reified T : Event> dispatchEvent(event: T) {
+    eventsTracker?.onEventDispatched(event)
     val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
 
     synchronized(eventListeners) {
       val correctListeners = eventListeners.filterIsInstance<EventListener<T>>()
-      eventsTracker?.onEventDispatched(event)
       for (listener in correctListeners) {
         eventsTracker?.onEventListenedTo(event, listener)
         listener.handle(event)
