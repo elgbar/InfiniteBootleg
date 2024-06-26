@@ -5,11 +5,15 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.OrderedMap
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.events.WorldSpawnUpdatedEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.util.worldToChunkX
+import no.elg.infiniteBootleg.util.worldToChunkY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -37,12 +41,14 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     ServerClientChunksInView(chunkX, chunkY)
   }
 
-  // TODO make it update on an "update world spawn event"
-  private fun updateSpawnChunk() {
-    val (newChunkX, newChunkY) = world.spawn.worldToChunk()
+  private val onSpawnChanged = EventManager.registerListener { event: WorldSpawnUpdatedEvent ->
+    val newChunkX = event.newSpawn.worldToChunkX()
+    val newChunkY = event.newSpawn.worldToChunkY()
     if (spawnChunksInView.centerX != newChunkX || spawnChunksInView.centerY != newChunkY) {
-      logger.info { "Updating server spawn chunk to ${stringifyCompactLoc(newChunkX, newChunkY)}" }
       spawnChunksInView.setCenter(newChunkX, newChunkY)
+      logger.debug { "Updating spawn chunks in view, new center and world chunk spawn at ${stringifyCompactLoc(newChunkX, newChunkY)}" }
+    } else {
+      logger.debug { "World spawn updated, but its in the same chunk as before. Will not update spawn chunks in view" }
     }
   }
 
@@ -57,10 +63,12 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     }
   }
 
-  override fun dispose() {}
+  override fun dispose() {
+    onSpawnChanged.removeListener()
+  }
+
   override fun resize(width: Int, height: Int) {}
   override fun update() {
-    updateSpawnChunk() // TODO remove when event is created
     lock.read {
       for (entity in entities) {
         val chunksInView = viewingChunks.get(entity.id)

@@ -36,6 +36,9 @@ inline fun Number.worldToChunk(): ChunkCoord = toInt().worldToChunk()
 
 inline fun WorldCompactLoc.worldToChunk(): ChunkCompactLoc = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
 
+inline fun WorldCompactLoc.worldToChunkX(): ChunkCoord = decompactLocX().worldToChunk()
+inline fun WorldCompactLoc.worldToChunkY(): ChunkCoord = decompactLocY().worldToChunk()
+
 /**
  * Convert a chunk coordinate to world coordinate with an offset within the chunk
  *
