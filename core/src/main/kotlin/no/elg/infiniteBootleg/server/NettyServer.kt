@@ -43,7 +43,7 @@ class NettyServer {
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-      logger.info { "Binding server to port ${Settings.port}" }
+      logger.info { "@|bold Binding server to port|@ @|green,bold ${Settings.port}|@" }
 
       // Bind and start to accept incoming connections.
       val channelFuture = b.bind(Settings.port).sync()
