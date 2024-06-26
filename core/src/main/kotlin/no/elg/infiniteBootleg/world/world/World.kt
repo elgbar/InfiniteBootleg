@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
+import no.elg.infiniteBootleg.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.clear
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.EventManager.oneShotListener
@@ -209,7 +210,14 @@ abstract class World(
   /**
    * Spawn in world coordinates
    */
-  var spawn: Long
+  var spawn: WorldCompactLoc = compactLoc(0, chunkLoader.generator.getHeight(0))
+    set(value) {
+      val old = field
+      if (value != old) {
+        dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
+        field = value
+      }
+    }
 
   @JvmField
   val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
@@ -231,7 +239,6 @@ abstract class World(
     val world: World = this
     worldTicker = WorldTicker(world, false)
     worldTime = WorldTime(world)
-    spawn = compactLoc(0, chunkLoader.generator.getHeight(0))
     engine = initializeEngine()
     worldBody = WorldBody(world)
 
