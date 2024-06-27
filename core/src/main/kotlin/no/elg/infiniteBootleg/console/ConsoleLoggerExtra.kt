@@ -28,11 +28,11 @@ fun temporallyFilterPacket(vararg packets: Packets.Packet.Type, block: () -> Uni
   }
 }
 
+val clientSideServerBoundMarker: Marker = MarkerFactory.getMarker("client->server").toKotlinLogging()
 val clientSideClientBoundMarker: Marker = MarkerFactory.getMarker("client<-server").toKotlinLogging()
-val serverSideClientBoundMarker: Marker = MarkerFactory.getMarker("server->client").toKotlinLogging()
 
-val clientSideServerBoundMarker: Marker = MarkerFactory.getMarker("client<-server").toKotlinLogging()
-val serverSideServerBoundMarker: Marker = MarkerFactory.getMarker("server->client").toKotlinLogging()
+val serverSideClientBoundMarker: Marker = MarkerFactory.getMarker("server->client").toKotlinLogging()
+val serverSideServerBoundMarker: Marker = MarkerFactory.getMarker("server<-client").toKotlinLogging()
 
 fun logPacket(directionMarker: Marker, packet: Packets.Packet) {
   if (Settings.logPackets && packet.type !in filterOutPackets) {
