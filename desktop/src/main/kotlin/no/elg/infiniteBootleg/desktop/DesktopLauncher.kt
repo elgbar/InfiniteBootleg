@@ -42,7 +42,7 @@ fun main(args: Array<String>) {
     }
     config.setTitle(title)
     config.setBackBufferConfig(8, 8, 8, 8, 0, 0, 16)
-    config.setForegroundFPS(Settings.foregroundFPS)
+    config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate.coerceAtMost(Settings.foregroundFPS))
     config.setWindowIcon("textures/icon_64.png")
     config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL32, 4, 2)
 
