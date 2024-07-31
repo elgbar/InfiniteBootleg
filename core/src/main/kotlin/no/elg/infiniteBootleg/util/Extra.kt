@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.graphics.Color
@@ -73,17 +75,17 @@ fun Int.stringSize(): Int {
   return 10 + d
 }
 
-fun Block?.isAir(markerIsAir: Boolean = true): Boolean {
+inline fun Block?.isAir(markerIsAir: Boolean = true): Boolean {
   contract { returns(false) implies (this@isAir != null) }
   return this == null || (markerIsAir && this.isMarkerBlock()) || this.material == Material.AIR
 }
 
-fun Block?.isNotAir(markerIsAir: Boolean = true): Boolean {
+inline fun Block?.isNotAir(markerIsAir: Boolean = true): Boolean {
   contract { returns(true) implies (this@isNotAir != null) }
   return !this.isAir(markerIsAir)
 }
 
-fun Block?.isMarkerBlock(): Boolean = this is EntityMarkerBlock
+inline fun Block?.isMarkerBlock(): Boolean = this is EntityMarkerBlock
 
 /**
  * Do an action on a disposable respire then call [Disposable.dispose] on the resource.

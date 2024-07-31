@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.utils.ObjectSet
 import com.google.common.base.Preconditions
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -50,7 +49,6 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ForkJoinTask
 import java.util.concurrent.atomic.AtomicInteger
 import javax.annotation.concurrent.GuardedBy
 
@@ -68,8 +66,6 @@ class ChunkImpl(
   private val blockLights = Array(Chunk.CHUNK_SIZE) { x -> Array(Chunk.CHUNK_SIZE) { y -> BlockLight(this, x, y) } }
 
   override val chunkBody: ChunkBody = ChunkBody(this)
-
-  private val tasks = ObjectSet<ForkJoinTask<*>>(Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE, 0.99f)
 
   /**
    * if texture/allair needs to be updated
@@ -326,15 +322,13 @@ class ChunkImpl(
     if (Settings.renderLight) {
       Main.inst().scheduler.executeAsync {
         var anyLightRecalucated = false
-        synchronized(tasks) {
-          outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-            for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-              if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
-                continue
-              }
-              blockLights[localX][localY].recalculateLighting(0)
-              anyLightRecalucated = true
+        outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+            if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+              continue
             }
+            blockLights[localX][localY].recalculateLighting(0)
+            anyLightRecalucated = true
           }
         }
         if (anyLightRecalucated) {

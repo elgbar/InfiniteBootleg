@@ -139,6 +139,10 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
+val NEVER_CANCEL: () -> Boolean = { false }
+
+val ACCEPT_EVERY_BLOCK: (Block) -> Boolean = { true }
+
 /**
  * Different kind of views
  *
@@ -993,11 +997,11 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
-    cancel: () -> Boolean = { false },
-    filter: (Block) -> Boolean = { true }
+    cancel: () -> Boolean = NEVER_CANCEL,
+    filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): Array<Block> {
-    Preconditions.checkArgument(width >= 0, "Width must be >= 0, was $width")
-    Preconditions.checkArgument(height >= 0, "Height must be >= 0, was $height")
+    Preconditions.checkArgument(width >= 0, "Width must be >= 0, was %f", width)
+    Preconditions.checkArgument(height >= 0, "Height must be >= 0, was %f", height)
     val worldX = centerWorldX - width
     val worldY = centerWorldY - height
     return getBlocksAABB(worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, cancel, filter)
@@ -1023,8 +1027,8 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
-    cancel: () -> Boolean = { false },
-    filter: (Block) -> Boolean = { true }
+    cancel: () -> Boolean = NEVER_CANCEL,
+    filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): GdxArray<Block> {
     val effectiveRaw: Boolean = if (!raw && !includeAir) {
       logger.warn { "Will not include air AND air blocks will be created! (raw: false, includeAir: false)" }
@@ -1032,8 +1036,8 @@ abstract class World(
     } else {
       raw
     }
-    Preconditions.checkArgument(offsetX >= 0, "offsetX must be >= 0, was $offsetX")
-    Preconditions.checkArgument(offsetY >= 0, "offsetY must be >= 0, was $offsetY")
+    Preconditions.checkArgument(offsetX >= 0, "offsetX must be >= 0, was %f", offsetX)
+    Preconditions.checkArgument(offsetY >= 0, "offsetY must be >= 0, was %f", offsetY)
     val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
     val blocks = Array<Block>(true, capacity)
     var x = MathUtils.floor(worldX)
@@ -1044,7 +1048,7 @@ abstract class World(
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
-        if (cancel.invoke()) {
+        if (cancel !== NEVER_CANCEL && cancel.invoke()) {
           return blocks
         }
         val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
@@ -1064,7 +1068,7 @@ abstract class World(
           y++
           continue
         }
-        if ((includeAir || b.isMarkerBlock() || b.isNotAir()) && filter.invoke(b)) {
+        if ((includeAir || b.isMarkerBlock() || b.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter.invoke(b))) {
           blocks.add(b)
         }
         y++

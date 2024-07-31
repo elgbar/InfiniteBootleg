@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.world.world.NEVER_CANCEL
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
 import kotlin.math.ceil
@@ -84,7 +85,7 @@ class BlockLight(
   }
 
   fun recalculateLighting(updateId: Int) {
-    fun isCancelled() = isCancelled(updateId)
+    val isCancelled = NEVER_CANCEL // isCancelled(updateId)
 
     if (!Settings.renderLight || chunk.isInvalid) {
       return
@@ -140,11 +141,11 @@ class BlockLight(
     }
     // find light sources around this block
 
-    calculateLightFrom(findLuminescentBlocks(worldX, worldY, ::isCancelled))
+    calculateLightFrom(findLuminescentBlocks(worldX, worldY))
     if (isCancelled()) {
       return
     }
-    calculateLightFrom(findSkylightBlocks(worldX, worldY, ::isCancelled))
+    calculateLightFrom(findSkylightBlocks(worldX, worldY))
 
     if (isCancelled()) {
       return
@@ -175,8 +176,8 @@ class BlockLight(
     return updateId != NEVER_CANCEL_UPDATE_ID && diff
   }
 
-  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = { false }): GdxArray<Block> {
-    return chunk
+  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = NEVER_CANCEL): GdxArray<Block> =
+    chunk
       .world
       .getBlocksAABBFromCenter(
         worldX + 0.5f,
@@ -190,7 +191,7 @@ class BlockLight(
       ) { it.material.emitsLight }
   }
 
-  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = { false }): GdxArray<Block> {
+  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = NEVER_CANCEL): GdxArray<Block> {
     val skyblocks = GdxArray<Block>()
     if (cancelled()) {
       return skyblocks
@@ -257,7 +258,7 @@ class BlockLight(
     topWorldX: Float,
     worldYA: Float,
     worldYB: Float,
-    cancelled: () -> Boolean = { false }
+    cancelled: () -> Boolean = NEVER_CANCEL
   ): GdxArray<Block>? {
     val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
