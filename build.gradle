@@ -140,13 +140,13 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.110.Final"
+    implementation "io.netty:netty-all:4.1.112.Final"
     implementation "org.apache.commons:commons-collections4:4.4"
-    implementation "org.apache.commons:commons-lang3:3.14.0"
+    implementation "org.apache.commons:commons-lang3:3.15.0"
     implementation "org.jetbrains:annotations:24.1.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
-    implementation 'io.github.oshai:kotlin-logging-jvm:6.0.9'
+    implementation 'io.github.oshai:kotlin-logging-jvm:7.0.0'
     implementation platform('org.apache.logging.log4j:log4j-bom:2.23.1')
     implementation 'org.apache.logging.log4j:log4j-api'
     implementation 'org.apache.logging.log4j:log4j-core'
@@ -154,8 +154,8 @@ subprojects {
     implementation 'org.fusesource.jansi:jansi:2.4.1'
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.13.11"
-    testImplementation "org.junit:junit-bom:$junitVersion"
+    testImplementation "io.mockk:mockk:1.13.12"
+    testImplementation platform("org.junit:junit-bom:$junitVersion")
     testImplementation "org.junit.jupiter:junit-jupiter-api"
     testImplementation "org.junit.jupiter:junit-jupiter-engine"
     testImplementation "org.junit.vintage:junit-vintage-engine"
@@ -165,11 +165,17 @@ subprojects {
     testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 
+  def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { v -> version.toUpperCase().contains(v) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+  }
+
   tasks.named("dependencyUpdates").configure {
     gradleReleaseChannel = "current"
     checkConstraints = true
     rejectVersionIf {
-      isNonStable(it.candidate.version)
+      isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
   }
 }
@@ -203,10 +209,4 @@ project(":core") {
       }
     }
   }
-}
-
-def isNonStable = { String version ->
-  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
-  def regex = /^[0-9,.v-]+(-r)?$/
-  return !stableKeyword && !(version ==~ regex)
 }
