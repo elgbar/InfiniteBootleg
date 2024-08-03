@@ -189,7 +189,6 @@ class BlockLight(
         includeAir = false,
         cancel = cancelled
       ) { it.material.emitsLight }
-  }
 
   fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = NEVER_CANCEL): GdxArray<Block> {
     val skyblocks = GdxArray<Block>()
