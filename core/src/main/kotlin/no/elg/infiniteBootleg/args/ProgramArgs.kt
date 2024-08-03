@@ -1,10 +1,8 @@
 package no.elg.infiniteBootleg.args
 
-import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main.Companion.inst
-import no.elg.infiniteBootleg.util.CancellableThreadScheduler
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
@@ -12,15 +10,21 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class ProgramArgs(args: Array<String>) : Disposable {
+class ProgramArgs(args: Array<String>) {
   data class ProgramArgument(val desc: String, val alt: Char = DEFAULT_ALT_CHAR, val func: (String?) -> Unit)
 
   private val arguments = mutableMapOf<String, ProgramArgument>()
-  private val scheduler = CancellableThreadScheduler(1)
 
   init {
     createArguments()
     executeArguments(args)
+  }
+
+  private val executeAfterCreate: MutableSet<() -> Unit> = mutableSetOf()
+
+  fun onCreate() {
+    executeAfterCreate.forEach { it.invoke() }
+    executeAfterCreate.clear()
   }
 
   private fun executeArguments(args: Array<String>) {
@@ -52,10 +56,7 @@ class ProgramArgs(args: Array<String>) : Disposable {
         exitProcess(2)
       }
     }
-  }
-
-  override fun dispose() {
-    scheduler.shutdown()
+    arguments.clear()
   }
 
   private fun createArguments() {
@@ -65,7 +66,7 @@ class ProgramArgs(args: Array<String>) : Disposable {
         return@ProgramArgument
       }
       logger.info { "Running commands '$value' as initial commands" }
-      scheduler.scheduleAsync(10) {
+      executeAfterCreate += {
         for (cmd in value.split(";").dropLastWhile { it.isEmpty() }) {
           inst().console.execCommand(cmd)
         }

@@ -22,7 +22,7 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-abstract class CommonMain(progArgs: ProgramArgs) : ApplicationAdapter(), Main {
+abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapter(), Main {
   override val scheduler: CancellableThreadScheduler = CancellableThreadScheduler(Settings.schedulerThreads)
 
   override lateinit var console: InGameConsoleHandler
@@ -31,7 +31,6 @@ abstract class CommonMain(progArgs: ProgramArgs) : ApplicationAdapter(), Main {
   override val assets: InfAssets = InfAssetsImpl()
 
   init {
-    progArgs.dispose()
     instField = this
   }
 
@@ -41,6 +40,7 @@ abstract class CommonMain(progArgs: ProgramArgs) : ApplicationAdapter(), Main {
     Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     console.alpha = 0.85f
     assets.loadAssets()
+    progArgs.onCreate()
     logger.info { "Version ${Util.getVersion()}" }
     Util.getLastCommitDate(Util.RELATIVE_TIME)?.also {
       logger.debug { "Last commit created $it" }
