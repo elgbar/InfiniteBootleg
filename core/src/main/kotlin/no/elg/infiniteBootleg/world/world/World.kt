@@ -12,10 +12,12 @@ import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
+import com.badlogic.gdx.utils.Timer
 import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.Settings
@@ -51,6 +53,7 @@ import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNotAir
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
@@ -128,7 +131,6 @@ import no.elg.infiniteBootleg.world.managers.container.WorldContainerManager
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
-import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.concurrent.GuardedBy
@@ -234,7 +236,11 @@ abstract class World(
 
   val tick get() = worldTicker.tickId
 
-  private var saveTask: ScheduledFuture<*>? = null
+  private var saveTask: Timer.Task? = null
+    set(value) {
+      field?.cancel()
+      field = value
+    }
 
   init {
     MathUtils.random.setSeed(seed)
@@ -255,7 +261,8 @@ abstract class World(
     oneShotListener<InitialChunksOfWorldLoadedEvent> {
       if (Main.isAuthoritative) {
         // Add a delay to make sure the light is calculated
-        Main.inst().scheduler.scheduleAsync(200L) {
+        launchOnAsync {
+          delay(200L)
           dispatchEvent(WorldLoadedEvent(world))
         }
       }
@@ -363,7 +370,6 @@ abstract class World(
   }
 
   fun updateSavePeriod() {
-    saveTask?.cancel(false)
     val savePeriodMs = Settings.savePeriodSeconds * 1000L
     saveTask = Main.inst().scheduler.schedulePeriodicSync(savePeriodMs, savePeriodMs, ::save)
   }
@@ -387,13 +393,13 @@ abstract class World(
     }
 
     return if (Main.isClient && protoWorld.hasPlayer()) {
-      Main.inst().scheduler.executeAsync {
+      launchOnAsync {
         val playerPosition = protoWorld.player.position
         (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
         render.chunkLocationsInView.forEach(::loadChunk)
-        this.load(protoWorld.player).thenApply {
+        this@World.load(protoWorld.player).thenApply {
           it.isTransientEntity = true
-          dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
+          dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
         }
       }
       true
@@ -1118,7 +1124,6 @@ abstract class World(
   override fun dispose() {
     logger.info { "Disposing world '$name'" }
     clear()
-    saveTask?.cancel(false)
     saveTask = null
     worldTicker.dispose()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }

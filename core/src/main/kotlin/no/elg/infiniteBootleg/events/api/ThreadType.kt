@@ -1,8 +1,9 @@
 package no.elg.infiniteBootleg.events.api
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import ktx.async.MainDispatcher
 import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.ASYNC_THREAD_NAME
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.world.ticker.WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX
 
@@ -28,7 +29,7 @@ enum class ThreadType {
   TICKER,
 
   /**
-   * The event was distracted from a short-lived pool thread, this is the only event which can be considered truly async
+   * The event was distracted from the async thread, this is the only event which can be considered truly async
    */
   ASYNC,
 
@@ -47,17 +48,17 @@ enum class ThreadType {
     }
 
     fun currentThreadType(): ThreadType {
-      val threadName = Thread.currentThread().name
-      if (threadName == Main.inst().renderThreadName) {
+      val currentThread = Thread.currentThread()
+      if (currentThread === MainDispatcher.mainThread) {
         return RENDER
-      } else if (threadName.startsWith(BOX2D_TICKER_TAG_PREFIX, false)) {
+      } else if (currentThread.name.startsWith(BOX2D_TICKER_TAG_PREFIX, false)) {
         return PHYSICS
-      } else if (threadName.startsWith(WORLD_TICKER_TAG_PREFIX, false)) {
+      } else if (currentThread.name.startsWith(WORLD_TICKER_TAG_PREFIX, false)) {
         return TICKER
-      } else if ("pool" in threadName.lowercase()) {
+      } else if (ASYNC_THREAD_NAME == currentThread.name) {
         return ASYNC
       }
-      logger.warn { "Dispatched event from unknown thread: $threadName" }
+      logger.error { "Dispatched event from unknown thread: ${currentThread.name}" }
       return UNKNOWN
     }
   }

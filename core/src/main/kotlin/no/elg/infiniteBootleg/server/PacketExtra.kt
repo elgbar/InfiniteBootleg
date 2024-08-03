@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
+import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
@@ -57,6 +58,7 @@ import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -80,7 +82,9 @@ private val logger = KotlinLogging.logger {}
 
 internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
   if (Settings.client) {
-    Main.inst().scheduler.scheduleAsync(50L) {
+    Main.inst().scheduler
+    launchOnAsync {
+      delay(50L)
       close()
     }
     Main.inst().scheduler.executeSync {

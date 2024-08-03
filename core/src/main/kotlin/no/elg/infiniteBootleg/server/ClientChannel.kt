@@ -12,9 +12,10 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder
 import io.netty.handler.codec.protobuf.ProtobufEncoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
-import no.elg.infiniteBootleg.main.Main
+import kotlinx.coroutines.CoroutineScope
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
+import no.elg.infiniteBootleg.util.launchOnMain
 
 /**
  * @author Elg
@@ -24,7 +25,7 @@ class ClientChannel(val client: ServerClient) {
     private set
 
   @Throws(InterruptedException::class)
-  fun connect(host: String, port: Int, onConnect: Runnable?) {
+  fun connect(host: String, port: Int, onConnect: suspend CoroutineScope.() -> Unit) {
     val workerGroup: EventLoopGroup = NioEventLoopGroup()
     try {
       val b = Bootstrap()
@@ -51,9 +52,7 @@ class ClientChannel(val client: ServerClient) {
         info = "${e.javaClass.simpleName}: ${e.message}"
         return
       }
-      if (onConnect != null) {
-        Main.inst().scheduler.executeSync(runnable = onConnect)
-      }
+      launchOnMain(block = onConnect)
       if (::channel.isInitialized) {
         // Wait until the connection is closed
         channel.closeFuture().sync()

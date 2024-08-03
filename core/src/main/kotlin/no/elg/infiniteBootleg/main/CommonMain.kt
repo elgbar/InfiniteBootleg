@@ -7,6 +7,7 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Collections
 import io.github.oshai.kotlinlogging.KotlinLogging
+import ktx.async.KtxAsync
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.assets.InfAssets
@@ -23,7 +24,7 @@ private val logger = KotlinLogging.logger {}
  * @author Elg
  */
 abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapter(), Main {
-  override val scheduler: CancellableThreadScheduler = CancellableThreadScheduler(Settings.schedulerThreads)
+  override val scheduler: CancellableThreadScheduler = CancellableThreadScheduler()
 
   override lateinit var console: InGameConsoleHandler
     protected set
@@ -35,10 +36,12 @@ abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapte
   }
 
   override fun create() {
-    console = InGameConsoleHandler()
+    KtxAsync.initiate()
+    console = InGameConsoleHandler().apply {
+      alpha = 0.85f
+    }
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
     Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
-    console.alpha = 0.85f
     assets.loadAssets()
     progArgs.onCreate()
     logger.info { "Version ${Util.getVersion()}" }

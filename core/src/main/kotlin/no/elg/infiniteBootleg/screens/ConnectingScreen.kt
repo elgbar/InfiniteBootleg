@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.screens
 
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.utils.Timer
 import com.kotcrab.vis.ui.widget.VisLabel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.Channel
@@ -11,7 +12,6 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.fatal
 import no.elg.infiniteBootleg.util.onInteract
-import java.util.concurrent.ScheduledFuture
 
 private val logger = KotlinLogging.logger {}
 
@@ -33,9 +33,9 @@ object ConnectingScreen : StageScreen() {
    * The connection attempt
    */
   private var connectAttempt = 0
-  private var livelinessTest: ScheduledFuture<*>? = null
+  private var livelinessTest: Timer.Task? = null
     set(value) {
-      field?.cancel(false)
+      field?.cancel()
       field = value
     }
 

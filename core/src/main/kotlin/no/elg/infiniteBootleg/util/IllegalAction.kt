@@ -50,7 +50,7 @@ enum class IllegalAction {
           exitProcess(334)
         } else {
           KotlinLogging.logger {}.error(cause, message)
-          Main.inst().scheduler.executeSync { ClientMain.inst().screen = MainMenuScreen }
+          launchOnMain { ClientMain.inst().screen = MainMenuScreen }
         }
       }
     }

@@ -1,55 +1,86 @@
 package no.elg.infiniteBootleg.util
 
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.Timer
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ktx.async.AsyncExecutorDispatcher
+import ktx.async.KtxAsync
+import ktx.async.MainDispatcher
+import ktx.async.interval
+import ktx.async.newSingleThreadAsyncContext
+import ktx.async.schedule
 import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
+import no.elg.infiniteBootleg.main.Main
 import org.jetbrains.annotations.Async
-import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 private val logger = KotlinLogging.logger {}
+
+const val ASYNC_THREAD_NAME = "async"
+val asyncDispatcher: AsyncExecutorDispatcher = newSingleThreadAsyncContext(ASYNC_THREAD_NAME)
 
 /**
  * Run (cancellable) tasks on other threads
  */
-class CancellableThreadScheduler(threads: Int) {
-  private val executor: ScheduledExecutorService
+fun launchOnMain(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) = KtxAsync.launch(MainDispatcher, start = start, block = block)
 
-  init {
-    val coreThreads = if (threads < 1) Runtime.getRuntime().availableProcessors() / 2 else threads
-    executor = ScheduledThreadPoolExecutor(coreThreads, Thread.ofVirtual().name("vpool-", 0).factory()) { runnable: Runnable, _: ThreadPoolExecutor ->
-      Gdx.app.postRunnable(runnable)
-    }
+fun launchOnAsync(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) = KtxAsync.launch(asyncDispatcher, start = start, block = block)
+
+fun launchOnWorldTicker(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+  KtxAsync.launch(WorldTickCoroutineDispatcher, start = start, block = block)
+
+fun launchOnBox2d(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+  KtxAsync.launch(Box2DTickCoroutineDispatcher, start = start, block = block)
+
+object WorldTickCoroutineDispatcher : CoroutineDispatcher() {
+  override fun dispatch(context: CoroutineContext, block: Runnable) {
+    Main.inst().world?.postWorldTickerRunnable { block.run() }
   }
+}
+
+object Box2DTickCoroutineDispatcher : CoroutineDispatcher() {
+  override fun dispatch(context: CoroutineContext, block: Runnable) {
+    Main.inst().world?.postBox2dRunnable { block.run() }
+  }
+}
+
+/**
+ * Run (cancellable) tasks on other threads
+ */
+class CancellableThreadScheduler {
+//  private val executor: ScheduledExecutorService
+
+//  init {
+//    val coreThreads = if (threads < 1) Runtime.getRuntime().availableProcessors() / 2 else threads
+//    executor = ScheduledThreadPoolExecutor(coreThreads, Thread.ofVirtual().name("vpool-", 0).factory()) { runnable: Runnable, _: ThreadPoolExecutor ->
+//      Gdx.app.postRunnable(runnable)
+//    }
+//  }
 
   /**
    * Execute a task as soon as possible
    *
    * @param runnable What to do
    */
+  @Deprecated("Use KtxAsync.launch instead", replaceWith = ReplaceWith("launchOnAsync(block = runnable)"))
   fun executeAsync(runnable: Runnable): ScheduledFuture<*>? {
-    if (isAlwaysSync) {
-      executeSync(runnable)
-      return null
-    }
-    return executor.schedule(caughtRunnable(runnable), 0, TimeUnit.NANOSECONDS)
+    launchOnAsync { caughtRunnable(runnable).invoke() }
+    return null
   }
-
-  /**
-   * @return If all tasks (even those who should be async) should be executed on the main Gdx thread
-   */
-  private val isAlwaysSync: Boolean = threads == 0
 
   /**
    * Post the given runnable as fast as possible
    *
    * @param runnable What to do
    */
-  fun executeSync(runnable: Runnable) {
-    Gdx.app.postRunnable(caughtRunnable(runnable))
+  @Deprecated("Use KtxAsync.launch instead", replaceWith = ReplaceWith("launchOnMain(block = runnable)"))
+  fun executeSync(runnable: () -> Unit) {
+    launchOnMain { runnable() }
   }
 
   /**
@@ -58,11 +89,11 @@ class CancellableThreadScheduler(threads: Int) {
    * @param ms How many milliseconds to wait before running the task
    * @param runnable What to do
    */
-  fun scheduleAsync(ms: Long, runnable: Runnable): ScheduledFuture<*> {
-    return if (isAlwaysSync) {
-      scheduleSync(ms, runnable)
-    } else {
-      executor.schedule(caughtRunnable(runnable), ms, TimeUnit.MILLISECONDS)
+  @Deprecated("Use KtxAsync.launch instead", replaceWith = ReplaceWith("launchOnAsync { delay(ms)\n runnable }", "kotlinx.coroutines.delay"))
+  fun scheduleAsync(ms: Long, runnable: Runnable) {
+    launchOnAsync {
+      delay(ms)
+      runnable.run()
     }
   }
 
@@ -72,32 +103,21 @@ class CancellableThreadScheduler(threads: Int) {
    * @param ms How many milliseconds to wait before running the task
    * @param runnable What to do
    */
-  fun scheduleSync(ms: Long, runnable: Runnable): ScheduledFuture<*> = executor.schedule({ Gdx.app.postRunnable(runnable) }, ms, TimeUnit.MILLISECONDS)
+  @Deprecated("Use schedule instead", replaceWith = ReplaceWith("schedule(ms / 1000f, runnable)", "ktx.async.schedule"))
+  fun scheduleSync(ms: Long, runnable: () -> Unit): Timer.Task = schedule(ms / 1000f, runnable)
 
-  fun schedulePeriodicSync(delayMs: Long, rateMs: Long, runnable: Runnable): ScheduledFuture<*> =
-    executor.scheduleWithFixedDelay(
-      { Gdx.app.postRunnable(runnable) },
-      delayMs,
-      rateMs,
-      TimeUnit.MILLISECONDS
-    )
+  @Deprecated("Use interval instead", replaceWith = ReplaceWith("interval(delayMs / 1000f, rateMs / 1000f, task = runnable)", "ktx.async.schedule"))
+  fun schedulePeriodicSync(delayMs: Long, rateMs: Long, runnable: () -> Unit): Timer.Task = interval(delayMs / 1000f, rateMs / 1000f, task = runnable)
 
   /** Shut down the thread  */
+  @Deprecated("To be removed", level = DeprecationLevel.WARNING)
   fun shutdown() {
-    executor.shutdown()
-    try {
-      if (!executor.awaitTermination(1L, TimeUnit.SECONDS)) {
-        executor.shutdownNow()
-      }
-    } catch (e: InterruptedException) {
-      e.printStackTrace()
-    }
   }
 
   companion object {
-    private fun run(@Async.Execute runnable: Runnable): Unit = runnable.run()
+    inline fun run(@Async.Execute runnable: Runnable): Unit = runnable.run()
 
-    private fun caughtRunnable(@Async.Schedule runnable: Runnable): () -> Unit =
+    fun caughtRunnable(@Async.Schedule runnable: Runnable): () -> Unit =
       {
         try {
           run(runnable)

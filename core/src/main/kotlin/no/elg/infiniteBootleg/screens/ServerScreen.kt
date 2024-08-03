@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.server.serverBoundLoginPacket
 import no.elg.infiniteBootleg.util.generateUUIDFromString
 import no.elg.infiniteBootleg.util.onInteract
+
 private val logger = KotlinLogging.logger {}
 
 /**
@@ -66,15 +67,14 @@ object ServerScreen : StageScreen() {
             val serverClient = ServerClient(username)
             val clientChannel = ClientChannel(serverClient)
             val uuid = generateUUIDFromString(username)
-            val runnable = Runnable {
-              val channel = clientChannel.channel
-              ConnectingScreen.channel = channel
-              channel.writeAndFlush(serverBoundLoginPacket(username, uuid))
-            }
             val thread = Thread({
               try {
                 logger.info { "Trying to log into the server '${hostField.text}:${portSpinner.value}' with username $username (uuid: $uuid)" }
-                clientChannel.connect(hostField.text, portSpinner.value, runnable)
+                clientChannel.connect(hostField.text, portSpinner.value) {
+                  val channel = clientChannel.channel
+                  ConnectingScreen.channel = channel
+                  channel.writeAndFlush(serverBoundLoginPacket(username, uuid))
+                }
               } catch (e: InterruptedException) {
                 logger.info(e) { "Server interruption received" }
                 Gdx.app.exit()
