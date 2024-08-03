@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.OrderedSet
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.FailureWatchdog
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
@@ -221,11 +220,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   }
 
   init {
-    if (Main.inst().isNotTest) {
-      synchronized(BOX2D_LOCK) {
-        box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
-        box2dWorld.setContactListener(contactManager)
-      }
+    synchronized(BOX2D_LOCK) {
+      box2dWorld = Box2dWorld(Vector2(X_WORLD_GRAVITY, Y_WORLD_GRAVITY), true)
+      box2dWorld.setContactListener(contactManager)
     }
   }
 

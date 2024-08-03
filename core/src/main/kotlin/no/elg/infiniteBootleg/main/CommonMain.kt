@@ -38,7 +38,7 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
   override fun create() {
     console = InGameConsoleHandler()
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
-    Gdx.app.logLevel = if (test || Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
+    Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     console.alpha = 0.85f
     assets.loadAssets()
     logger.info { "Version ${Util.getVersion()}" }
@@ -49,7 +49,6 @@ abstract class CommonMain protected constructor(protected val test: Boolean, pro
   }
 
   override val engine: Engine? get() = world?.engine
-  override val isNotTest: Boolean get() = !test
 
   override fun isAuthorizedToChange(entity: Entity): Boolean = isAuthoritative
 

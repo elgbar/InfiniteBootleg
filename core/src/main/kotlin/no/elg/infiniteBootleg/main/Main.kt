@@ -17,7 +17,6 @@ interface Main : ApplicationListener {
   val console: InGameConsoleHandler
   val scheduler: CancellableThreadScheduler
   val engine: Engine?
-  val isNotTest: Boolean
 
   /**
    * Might not return any world if the player is in a menu.

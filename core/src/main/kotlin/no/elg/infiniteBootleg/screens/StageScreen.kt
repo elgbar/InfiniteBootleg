@@ -12,7 +12,6 @@ import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.visTable
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind.EXACTLY_ONCE
 import kotlin.contracts.contract
@@ -33,18 +32,16 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
   }
 
   override fun create() {
-    if (Main.inst().isNotTest) {
-      if (Settings.stageDebug) {
-        stage.isDebugAll = true
-      }
-      if (useRootTable) {
-        stage.actors {
-          rootTable = visTable {
-            defaults().pad(20f)
-            defaults().space(20f)
-            setFillParent(true)
-            setRound(false)
-          }
+    if (Settings.stageDebug) {
+      stage.isDebugAll = true
+    }
+    if (useRootTable) {
+      stage.actors {
+        rootTable = visTable {
+          defaults().pad(20f)
+          defaults().space(20f)
+          setFillParent(true)
+          setRound(false)
         }
       }
     }

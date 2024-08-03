@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.fatal
 import no.elg.infiniteBootleg.util.onInteract
 import java.util.concurrent.ScheduledFuture
+
 private val logger = KotlinLogging.logger {}
 
 /**
@@ -64,17 +65,15 @@ object ConnectingScreen : StageScreen() {
 
   override fun create() {
     super.create()
-    if (Main.inst().isNotTest) {
-      rootTable {
-        visTable(defaultSpacing = true) {
-          addActor(actor(field))
-        }
-        row()
-        visTextButton("Back") {
-          onInteract(stage, Keys.ESCAPE, Keys.BACK) {
-            channel?.close()
-            ClientMain.inst().screen = ServerScreen
-          }
+    rootTable {
+      visTable(defaultSpacing = true) {
+        addActor(actor(field))
+      }
+      row()
+      visTextButton("Back") {
+        onInteract(stage, Keys.ESCAPE, Keys.BACK) {
+          channel?.close()
+          ClientMain.inst().screen = ServerScreen
         }
       }
     }
