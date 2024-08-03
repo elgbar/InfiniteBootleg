@@ -12,7 +12,6 @@
     <InGameConsole name="InGameConsole"/>
 
     <RollingRandomAccessFile name="RollingRandomAccessFile"
-                             fileName="logs/current.log"
                              filePattern="logs/$${date:yyyy-MM-dd}/log-%d{yyyy-MM-dd-HH-mm}_%i.log.zip"
     >
       <PatternLayout>
@@ -22,6 +21,7 @@
         <SizeBasedTriggeringPolicy size="250 MB"/>
         <OnStartupTriggeringPolicy/>
       </Policies>
+      <DirectWriteRolloverStrategy/>
       <DefaultRolloverStrategy>
         <Delete basePath="${baseDir}" maxDepth="2">
           <IfFileName glob="*/app-*.log.zip"/>
