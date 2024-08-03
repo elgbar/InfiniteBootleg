@@ -28,7 +28,7 @@ import java.awt.Toolkit
 
 private val logger = KotlinLogging.logger {}
 
-class ClientMain(test: Boolean, progArgs: ProgramArgs) : CommonMain(test, progArgs) {
+class ClientMain(progArgs: ProgramArgs) : CommonMain(progArgs) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
 
   lateinit var screenRenderer: ScreenRenderer

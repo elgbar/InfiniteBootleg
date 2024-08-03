@@ -37,7 +37,7 @@ class GdxTestRunner : ApplicationListener, Extension {
     @BeforeAll
     fun beforeAll(gdxTestRunner: GdxTestRunner) {
       val conf = HeadlessApplicationConfiguration()
-      HeadlessApplication(ServerMain(true, null), conf)
+      HeadlessApplication(ServerMain(null), conf)
       Gdx.gl = mockk(relaxed = true)
       Gdx.app = mockk(relaxed = true)
       Gdx.graphics = mockk(relaxed = true)

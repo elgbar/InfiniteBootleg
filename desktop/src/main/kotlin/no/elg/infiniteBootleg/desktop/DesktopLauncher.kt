@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 
   val progArgs = ProgramArgs(args)
   if (Settings.client) {
-    val main: Main = ClientMain(false, progArgs)
+    val main: Main = ClientMain(progArgs)
     val config = Lwjgl3ApplicationConfiguration()
     config.disableAudio(true)
     config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
@@ -55,7 +55,7 @@ fun main(args: Array<String>) {
   } else {
     val config = HeadlessApplicationConfiguration()
     config.updatesPerSecond = (if (Settings.tps < 0) DEFAULT_TICKS_PER_SECOND else Settings.tps).toInt()
-    val main: Main = ServerMain(false, progArgs)
+    val main: Main = ServerMain(progArgs)
     HeadlessApplication(main, config)
   }
 }
