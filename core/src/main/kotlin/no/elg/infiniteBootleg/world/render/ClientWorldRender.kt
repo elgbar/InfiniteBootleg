@@ -56,7 +56,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     BlockLightDebugRenderer(this),
     TopBlockChangeRenderer(this),
     FuturePositionRenderer(this),
-    EntityMarkerBlockRenderer(this),
+    EntityMarkerBlockRenderer(this)
   )
 
   private var lastZoom = 0f

@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.checkChunkCorrupt
@@ -36,6 +38,7 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
+import no.elg.infiniteBootleg.util.launchOn8Async
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
@@ -318,7 +321,7 @@ class ChunkImpl(
   }
 
   override fun updateAllBlockLights() {
-    doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
+    launchOnAsync { doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false) }
   }
 
   private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean =
@@ -327,22 +330,22 @@ class ChunkImpl(
       dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     }
 
-  internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
+  internal suspend fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      launchOnAsync {
-        var anyLightRecalucated = false
-        outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-            if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
-              continue
-            }
+      val jobs = mutableListOf<Job>()
+      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+        for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+          if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+            continue
+          }
+          jobs += launchOn8Async {
             blockLights[localX][localY].recalculateLighting(0)
-            anyLightRecalucated = true
           }
         }
-        if (anyLightRecalucated) {
-          queueForRendering(false)
-        }
+      }
+      if (jobs.isNotEmpty()) {
+        queueForRendering(false)
+        jobs.joinAll()
       }
     }
   }
