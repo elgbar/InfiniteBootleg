@@ -85,7 +85,10 @@ inline fun Block?.isNotAir(markerIsAir: Boolean = true): Boolean {
   return !this.isAir(markerIsAir)
 }
 
-inline fun Block?.isMarkerBlock(): Boolean = this is EntityMarkerBlock
+inline fun Block?.isMarkerBlock(): Boolean {
+  contract { returns(true) implies (this@isMarkerBlock is EntityMarkerBlock) }
+  return this is EntityMarkerBlock
+}
 
 /**
  * Do an action on a disposable respire then call [Disposable.dispose] on the resource.

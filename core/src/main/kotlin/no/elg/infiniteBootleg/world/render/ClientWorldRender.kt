@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
+import no.elg.infiniteBootleg.world.render.debug.EntityMarkerBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
@@ -54,7 +55,8 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     DebugChunkRenderer(this),
     BlockLightDebugRenderer(this),
     TopBlockChangeRenderer(this),
-    FuturePositionRenderer(this)
+    FuturePositionRenderer(this),
+    EntityMarkerBlockRenderer(this),
   )
 
   private var lastZoom = 0f

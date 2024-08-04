@@ -2,8 +2,6 @@ package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
-import no.elg.infiniteBootleg.Settings.debugEntityMarkerBlocks
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.EntityRemoveListener
 import no.elg.infiniteBootleg.util.LocalCoord
@@ -55,7 +53,7 @@ class EntityMarkerBlock(
 
   override fun save(): ProtoWorld.Block = AIR_BLOCK_PROTO
 
-  override val texture: RotatableTextureRegion? = if (debugEntityMarkerBlocks) Main.inst().assets.handTexture else null
+  override val texture: RotatableTextureRegion? = null
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
