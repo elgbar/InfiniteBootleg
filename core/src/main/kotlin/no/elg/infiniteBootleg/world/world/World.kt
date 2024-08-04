@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.IntMap
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.badlogic.gdx.utils.Timer
-import com.google.common.base.Preconditions
 import com.google.protobuf.InvalidProtocolBufferException
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -505,7 +504,7 @@ abstract class World(
   }
 
   fun updateChunk(chunk: Chunk, newlyGenerated: Boolean) {
-    Preconditions.checkState(chunk.isValid)
+    check(chunk.isValid) { "Chunk must be valid to be updated" }
     val old: Chunk? = chunksLock.write {
       chunks.put(chunk.compactLocation, chunk)
     }
@@ -972,7 +971,7 @@ abstract class World(
    */
   fun getBlocksWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): ObjectSet<Block> = getBlocksWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
   fun getBlocksWithin(worldX: Float, worldY: Float, radius: Float): ObjectSet<Block> {
-    Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
+    require(radius >= 0) { "Radius should be a non-negative number" }
     val blocks = ObjectSet<Block>()
     for (compact in getLocationsAABBFromCenter(worldX, worldY, radius, radius)) {
       val blockWorldX = compact.decompactLocX()
@@ -1007,8 +1006,8 @@ abstract class World(
     cancel: () -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): Array<Block> {
-    Preconditions.checkArgument(width >= 0, "Width must be >= 0, was %f", width)
-    Preconditions.checkArgument(height >= 0, "Height must be >= 0, was %f", height)
+    require(width >= 0) { "Width must be >= 0, was $width" }
+    require(height >= 0) { "Height must be >= 0, was $height" }
     val worldX = centerWorldX - width
     val worldY = centerWorldY - height
     return getBlocksAABB(worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, cancel, filter)
@@ -1043,8 +1042,8 @@ abstract class World(
     } else {
       raw
     }
-    Preconditions.checkArgument(offsetX >= 0, "offsetX must be >= 0, was %f", offsetX)
-    Preconditions.checkArgument(offsetY >= 0, "offsetY must be >= 0, was %f", offsetY)
+    require(offsetX >= 0) { "offsetX must be >= 0, was $offsetX" }
+    require(offsetY >= 0) { "offsetY must be >= 0, was $offsetY" }
     val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
     val blocks = Array<Block>(true, capacity)
     var x = MathUtils.floor(worldX)
@@ -1055,7 +1054,7 @@ abstract class World(
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
-        if (cancel !== NEVER_CANCEL && cancel.invoke()) {
+        if (cancel !== NEVER_CANCEL && cancel()) {
           return blocks
         }
         val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
@@ -1075,7 +1074,7 @@ abstract class World(
           y++
           continue
         }
-        if ((includeAir || b.isMarkerBlock() || b.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter.invoke(b))) {
+        if ((includeAir || b.isMarkerBlock() || b.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter(b))) {
           blocks.add(b)
         }
         y++
@@ -1199,7 +1198,7 @@ abstract class World(
      * @return Set of blocks within the given radius
      */
     fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
-      Preconditions.checkArgument(radius >= 0, "Radius should be a non-negative number")
+      require(radius >= 0) { "Radius should be a non-negative number" }
       val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
       for (compact in getLocationsAABBFromCenter(worldX, worldY, radius, radius)) {
         if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {

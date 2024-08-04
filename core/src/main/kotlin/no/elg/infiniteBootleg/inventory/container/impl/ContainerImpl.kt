@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.inventory.container.impl
 
-import com.google.common.base.Preconditions
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.api.EventManager
@@ -24,7 +23,7 @@ open class ContainerImpl(
   override val content: Array<Item?> = arrayOfNulls(size)
 
   init {
-    Preconditions.checkArgument(size > 0, "Inventory size must be greater than zero")
+    require(size > 0) { "Inventory size must be greater than zero" }
   }
 
   override fun indexOfFirstEmpty(): Int = content.indexOfFirst { it == null }
@@ -144,19 +143,20 @@ open class ContainerImpl(
   }
 
   override fun get(index: Int): Item? {
-    Preconditions.checkPositionIndex(index, size - 1)
+    require(index in 0 until size) { "Index out of bounds: $index" }
     return content[index]
   }
 
   override fun put(index: Int, item: Item?) {
-    Preconditions.checkPositionIndex(index, size - 1)
+    require(index in 0 until size) { "Index out of bounds: $index" }
     require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
     content[index] = item
     updateContainer()
   }
 
   override fun swap(index1: Int, index2: Int) {
-    Preconditions.checkPositionIndex(index1, size - 1)
+    require(index1 in 0 until size) { "Index out of bounds: $index1" }
+    require(index2 in 0 until size) { "Index out of bounds: $index2" }
     val item1 = content[index1]
     content[index1] = content[index2]
     content[index2] = item1

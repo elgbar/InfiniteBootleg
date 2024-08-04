@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.inventory.container
 
-import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.items.Item
 import java.util.Arrays
@@ -18,8 +17,6 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
    * @param a The array to sort
    */
   fun sort(a: Array<Item?>) {
-    Preconditions.checkNotNull(a)
-
     // finally sort the array using the compiled settings
     Arrays.sort(a, sorter)
   }
@@ -114,8 +111,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
      * @param sorters The comparators used to sort `a`, the first will be the first to compare
      */
     fun compileComparator(reverse: Boolean, vararg sorters: Comparator<Item?>): SortOrder {
-      Preconditions.checkArgument(sorters.isNotEmpty(), "There must be at least one way to sort")
-
+      require(sorters.isNotEmpty()) { "There must be at least one way to sort" }
       // create a  comparator that is using all the comparators
       val comparator = Comparator { ts1: Item?, ts2: Item? ->
         for (loopComp in sorters) {

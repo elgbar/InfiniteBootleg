@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
-import com.google.common.base.Preconditions
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
@@ -473,10 +472,7 @@ class ChunkImpl(
     if (!isValid) {
       logger.warn { "Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}" }
     }
-    Preconditions.checkArgument(
-      isInsideChunk(localX, localY),
-      "Given arguments are not inside this chunk, localX=$localX localY=$localY"
-    )
+    require(isInsideChunk(localX, localY)) { "Given arguments are not inside this chunk, localX=$localX localY=$localY" }
     synchronized(this) {
       return blocks[localX][localY] ?: return setBlock(
         localX,

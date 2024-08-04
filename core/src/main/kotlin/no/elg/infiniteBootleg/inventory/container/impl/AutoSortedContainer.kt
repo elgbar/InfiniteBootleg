@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.inventory.container.impl
 
-import com.google.common.base.Preconditions
 import no.elg.infiniteBootleg.inventory.container.SortOrder
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -24,7 +23,7 @@ class AutoSortedContainer(
   }
 
   override fun put(index: Int, item: Item?) {
-    Preconditions.checkPositionIndex(index, size - 1)
+    require(index in 0 until size) { "Index out of bounds: $index" }
     require(!validOnly || item == null || item.isValid()) { "This container does not allow invalid stacks" }
     content[index] = null
     add(item ?: return)
