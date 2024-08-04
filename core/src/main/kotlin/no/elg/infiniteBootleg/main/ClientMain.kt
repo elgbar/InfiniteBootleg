@@ -109,7 +109,6 @@ class ClientMain(progArgs: ProgramArgs) : CommonMain(progArgs) {
         } else if (isClient) {
           serverClient?.dispose()
         }
-        scheduler.shutdown()
       }
     )
   }

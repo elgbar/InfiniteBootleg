@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.util.INITIAL_BRUSH_SIZE
 import no.elg.infiniteBootleg.util.INITIAL_INSTANT_BREAK
 import no.elg.infiniteBootleg.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.util.ibVisWindowClosed
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.setIBDefaults
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
@@ -165,7 +166,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           { false },
           {
             world.render.chunkColumnsInView.forEach {
-              Main.inst().scheduler.executeAsync {
+              launchOnAsync {
                 for (localX in 0 until Chunk.CHUNK_SIZE) {
                   world.getChunkColumn(it).updateTopBlock(localX)
                 }
@@ -325,7 +326,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1, 0, onAnyElementChanged) { Settings.foregroundFPS = it.toInt() }
         val oneDayInSeconds = 86400f
         floatSpinner("Save every (sec)", Settings::savePeriodSeconds, 1f, oneDayInSeconds, 1f, 0, onAnyElementChanged) {
-          Settings.savePeriodSeconds = it.toLong()
+          Settings.savePeriodSeconds = it
         }
       }
       sep()

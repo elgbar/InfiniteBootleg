@@ -55,6 +55,8 @@ import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
+import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toVector2
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -86,13 +88,13 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
   when (packet.type) {
     // Gameplay related packets
     DX_HEARTBEAT -> if (packet.hasHeartbeat()) handleHeartbeat()
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeAsync { asyncHandleMoveEntity(it) } }
-    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(it) } }
-    CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleSpawnEntity(it) } }
-    CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { scheduler.executeAsync { asyncHandleUpdateChunk(it) } }
-    CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { scheduler.executeAsync { asyncHandleDespawnEntity(it) } }
-    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(it) } }
-    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnAsync { asyncHandleMoveEntity(it) } }
+    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsync { asyncHandleBlockUpdate(it) } }
+    CB_SPAWN_ENTITY -> packet.spawnEntityOrNull?.let { launchOnAsync { asyncHandleSpawnEntity(it) } }
+    CB_UPDATE_CHUNK -> packet.updateChunkOrNull?.let { launchOnAsync { asyncHandleUpdateChunk(it) } }
+    CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { launchOnAsync { asyncHandleDespawnEntity(it) } }
+    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsync { asyncHandleBreakingBlock(it) } }
+    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsync { asyncHandleContainerUpdate(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
@@ -210,7 +212,7 @@ private fun ServerClient.handleLoginSuccess() {
       player.box2d.enableGravity()
       logger.debug { "Server sent the entity to control" }
 
-      Main.inst().scheduler.executeSync {
+      launchOnMain {
         started = true
         ClientMain.inst().screen = WorldScreen(world, false)
         dispatchEvent(WorldLoadedEvent(world)) // must be after setting the world screen for the event to be listened to
@@ -223,13 +225,13 @@ private fun ServerClient.handleLoginSuccess() {
 
 private fun ServerClient.handleStartGame(startGame: StartGame) {
   logger.debug { "Initialization okay, loading world" }
-  scheduler.executeSync {
+  launchOnMain {
     if (startGame.controlling.entityType != PLAYER) {
       ctx.fatal("Can only control a player, got ${startGame.controlling.entityType}")
     }
-    this.protoEntity = startGame.controlling
+    this@handleStartGame.protoEntity = startGame.controlling
     val protoWorld = startGame.world
-    this.world = ServerClientWorld(protoWorld, this).apply {
+    this@handleStartGame.world = ServerClientWorld(protoWorld, this@handleStartGame).apply {
       val pos = startGame.controlling.position
       render.lookAt(pos.x, pos.y) // set position to not request wrong initial chunks
       loadFromProtoWorld(protoWorld)

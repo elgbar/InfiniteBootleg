@@ -9,6 +9,7 @@ import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
+import ktx.async.schedule
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.AuthoritativeOnly
 import no.elg.infiniteBootleg.console.ClientsideOnly
@@ -37,6 +38,7 @@ import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.toTitleCase
@@ -568,7 +570,7 @@ class Commands : CommandExecutor() {
   @ConsoleDoc(description = "Teleport to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
-    Main.inst().scheduler.executeAsync {
+    launchOnAsync {
       clientWorld.render.lookAt(worldX, worldY)
       logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
 
@@ -730,9 +732,7 @@ class Commands : CommandExecutor() {
       world?.save()
     }
     info = "Disconnected"
-    Main.inst()
-      .scheduler
-      .scheduleSync(50L) { ClientMain.inst().screen = MainMenuScreen }
+    schedule(50f / 1000f) { ClientMain.inst().screen = MainMenuScreen }
   }
 
   @ConsoleDoc(description = "Switch inventory of player", paramDescriptions = ["The inventory to use, can be 'creative', 'autosort' or 'container'"])

@@ -4,11 +4,11 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.broadcastToInViewChunk
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.Companion.isType
@@ -63,7 +63,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     render.addClient(player.id, ServerClientChunksInView(chunkX, chunkY))
     render.update()
     if (player.shouldSendToClients) {
-      Main.inst().scheduler.executeSync {
+      launchOnMain {
         broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
       }
     }

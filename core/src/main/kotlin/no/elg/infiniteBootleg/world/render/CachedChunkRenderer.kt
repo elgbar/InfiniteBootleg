@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.OrderedMap
 import ktx.collections.component1
 import ktx.collections.component2
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 
@@ -26,7 +26,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
       for (chunkX in horizontalStart until horizontalEnd) {
         val chunk = worldRender.world.getChunk(chunkX, chunkY, false)
         if (chunk == null) {
-          Main.inst().scheduler.executeAsync { worldRender.world.loadChunk(chunkX, chunkY) }
+          launchOnAsync { worldRender.world.loadChunk(chunkX, chunkY) }
           continue
         }
         chunk.view()

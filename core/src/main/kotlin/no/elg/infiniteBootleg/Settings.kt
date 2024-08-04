@@ -117,9 +117,9 @@ object Settings {
   /**
    * How often the world should be saved in seconds
    */
-  var savePeriodSeconds: Long = 60
+  var savePeriodSeconds: Float = 60f
     set(value) {
-      field = value.coerceAtLeast(1)
+      field = value.coerceAtLeast(1f)
       Main.inst().world?.updateSavePeriod()
     }
 }

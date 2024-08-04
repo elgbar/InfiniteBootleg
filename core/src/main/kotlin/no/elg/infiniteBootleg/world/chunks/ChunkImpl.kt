@@ -36,6 +36,8 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
+import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Material
@@ -169,7 +171,15 @@ class ChunkImpl(
     sendUpdatePacket: Boolean
   ): Block? {
     if (isDisposed) {
-      handleChangingBlockInDeposedChunk.handle { "Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block" }
+      handleChangingBlockInDeposedChunk.handle {
+        "Changed block in disposed chunk ${
+          stringifyChunkToWorld(
+            this,
+            localX,
+            localY
+          )
+        }, block: $block"
+      }
       return null
     }
     if (block != null) {
@@ -205,7 +215,7 @@ class ChunkImpl(
       if (block != null) {
         chunkBody.addBlock(block, null)
       }
-      Main.inst().scheduler.executeAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
+      launchOnAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
     }
 
     dispatchEvent(BlockChangedEvent(currBlock, block))
@@ -221,12 +231,12 @@ class ChunkImpl(
     val worldY = getWorldY(localY)
     if (sendUpdatePacket && isValid && !bothAirish) {
       if (Main.isServer) {
-        Main.inst().scheduler.executeAsync {
+        launchOnAsync {
           val packet = clientBoundBlockUpdate(worldX, worldY, block)
           broadcastToInView(packet, worldX, worldY)
         }
       } else if (Main.isServerClient && !block.isMarkerBlock()) {
-        Main.inst().scheduler.executeAsync {
+        launchOnAsync {
           ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundBlockUpdate(worldX, worldY, block) }
         }
       }
@@ -320,7 +330,7 @@ class ChunkImpl(
 
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      Main.inst().scheduler.executeAsync {
+      launchOnAsync {
         var anyLightRecalucated = false
         outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
           for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
@@ -468,7 +478,13 @@ class ChunkImpl(
       "Given arguments are not inside this chunk, localX=$localX localY=$localY"
     )
     synchronized(this) {
-      return blocks[localX][localY] ?: return setBlock(localX, localY, Material.AIR, updateTexture = false, sendUpdatePacket = false) ?: error("Failed to create air block!")
+      return blocks[localX][localY] ?: return setBlock(
+        localX,
+        localY,
+        Material.AIR,
+        updateTexture = false,
+        sendUpdatePacket = false
+      ) ?: error("Failed to create air block!")
     }
   }
 
@@ -483,7 +499,7 @@ class ChunkImpl(
     chunkListeners.dispose()
     synchronized(fboLock) {
       fbo?.also {
-        Main.inst().scheduler.executeSync { it.dispose() }
+        launchOnMain { it.dispose() }
         fbo = null
       }
       fboRegion = null
@@ -514,11 +530,17 @@ class ChunkImpl(
     dirty()
     chunkBody.update()
     chunkListeners.registerListeners()
-    Main.inst().scheduler.executeAsync(runnable = ::updateAllBlockLights)
+    launchOnAsync { updateAllBlockLights() }
   }
 
   override fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
-    world.worldBody.queryEntities(chunkX.chunkToWorld(), chunkY.chunkToWorld(), chunkX.chunkToWorld(Chunk.CHUNK_SIZE), chunkY.chunkToWorld(Chunk.CHUNK_SIZE), callback)
+    world.worldBody.queryEntities(
+      chunkX.chunkToWorld(),
+      chunkY.chunkToWorld(),
+      chunkX.chunkToWorld(Chunk.CHUNK_SIZE),
+      chunkY.chunkToWorld(Chunk.CHUNK_SIZE),
+      callback
+    )
 
   override fun save(): CompletableFuture<ProtoWorld.Chunk> {
     val future = CompletableFuture<ProtoWorld.Chunk>()
@@ -563,7 +585,11 @@ class ChunkImpl(
     }
     val chunkPosition = protoChunk.position
     checkChunkCorrupt(protoChunk, chunkPosition.x == chunkX && chunkPosition.y == chunkY) {
-      "Invalid chunk coordinates given. Expected ${stringifyCompactLoc(chunkX, chunkY)} but got ${stringifyCompactLoc(chunkPosition)}"
+      "Invalid chunk coordinates given. Expected ${stringifyCompactLoc(chunkX, chunkY)} but got ${
+        stringifyCompactLoc(
+          chunkPosition
+        )
+      }"
     }
     checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
       "Invalid number of blocks. Expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"

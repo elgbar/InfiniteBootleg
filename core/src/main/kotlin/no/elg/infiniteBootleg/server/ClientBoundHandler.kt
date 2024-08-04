@@ -5,10 +5,10 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import no.elg.infiniteBootleg.console.clientSideServerBoundMarker
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
+import no.elg.infiniteBootleg.util.launchOnMain
 
 private val logger = KotlinLogging.logger {}
 
@@ -21,7 +21,7 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   }
 
   override fun channelInactive(ctx: ChannelHandlerContext) {
-    Main.inst().scheduler.executeSync {
+    launchOnMain {
       val serverClient = ClientMain.inst().serverClient
       if (serverClient != null) {
         val sharedInformation = serverClient.sharedInformation

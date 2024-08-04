@@ -18,6 +18,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
+import ktx.async.interval
 import ktx.collections.GdxArray
 import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.Settings
@@ -54,6 +55,7 @@ import no.elg.infiniteBootleg.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
@@ -269,7 +271,7 @@ abstract class World(
     }
 
     oneShotListener<WorldLoadedEvent> {
-      Main.inst().scheduler.executeSync {
+      launchOnMain {
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
       }
@@ -355,23 +357,22 @@ abstract class World(
     if (!willDispatchChunksLoadedEvent) {
       render.update()
 
-      Main.inst().scheduler.executeAsync {
+      launchOnAsync {
         if (Main.isSingleplayer) {
-          this.createNewPlayer().thenApply {
+          this@World.createNewPlayer().thenApply {
             logger.debug { "Spawned new singleplayer player" }
           }
           logger.debug { "Spawning new singleplayer player" }
         }
         render.chunkLocationsInView.forEach(::loadChunk)
-        dispatchEvent(InitialChunksOfWorldLoadedEvent(this))
+        dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
       }
     }
     updateSavePeriod()
   }
 
   fun updateSavePeriod() {
-    val savePeriodMs = Settings.savePeriodSeconds * 1000L
-    saveTask = Main.inst().scheduler.schedulePeriodicSync(savePeriodMs, savePeriodMs, ::save)
+    saveTask = interval(Settings.savePeriodSeconds, Settings.savePeriodSeconds, task = ::save)
   }
 
   /**

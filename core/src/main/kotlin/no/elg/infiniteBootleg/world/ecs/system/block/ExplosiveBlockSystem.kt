@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.hasNot
 import ktx.ashley.remove
 import ktx.collections.gdxSetOf
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.distCubed
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -36,7 +36,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
       val worldX = positionComponent.blockX
       val worldY = positionComponent.blockY
       val world = entity.world
-      Main.inst().scheduler.executeAsync { explosiveComponent.explode(world, worldX, worldY) }
+      launchOnAsync { explosiveComponent.explode(world, worldX, worldY) }
     }
   }
 

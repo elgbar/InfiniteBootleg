@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.api.HUDDebuggable
 import no.elg.infiniteBootleg.api.Savable
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
@@ -14,6 +13,7 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
@@ -79,7 +79,13 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      */
     fun Block.remove(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) {
       if (chunk.getRawBlock(localX, localY) === this) {
-        chunk.removeBlock(localX, localY, updateTexture = updateTexture, prioritize = prioritize, sendUpdatePacket = sendUpdatePacket)
+        chunk.removeBlock(
+          localX,
+          localY,
+          updateTexture = updateTexture,
+          prioritize = prioritize,
+          sendUpdatePacket = sendUpdatePacket
+        )
       }
     }
 
@@ -87,7 +93,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      * Remove this block by setting it to air, done asynchronous
      */
     fun Block.removeAsync(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true, postRemove: () -> Unit = {}) {
-      Main.inst().scheduler.executeAsync {
+      launchOnAsync {
         remove(updateTexture, prioritize, sendUpdatePacket)
         postRemove()
       }

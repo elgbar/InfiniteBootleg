@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.chunks
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.worldToChunk
 
 class ChunkColumnListeners : Disposable {
@@ -17,7 +17,7 @@ class ChunkColumnListeners : Disposable {
     val chunkColumn = eventChunk.chunkColumn
     for (localX in 0 until Chunk.CHUNK_SIZE) {
       if (chunkColumn.topBlockHeight(localX).worldToChunk() == eventChunk.chunkY) {
-        Main.inst().scheduler.executeAsync {
+        launchOnAsync {
           chunkColumn.updateTopBlock(localX)
         }
       }

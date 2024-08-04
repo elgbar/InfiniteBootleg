@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.console
 
 import com.badlogic.gdx.utils.Disposable
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.launchOnMain
 import java.io.Console
 import java.util.Scanner
 
@@ -25,7 +25,7 @@ class SystemConsoleReader(private val consoleHandler: InGameConsoleHandler) : Ru
         var read: String?
         try {
           read = openScanner.nextLine()
-          Main.inst().scheduler.executeSync { consoleHandler.execCommand(read) }
+          launchOnMain { consoleHandler.execCommand(read) }
         } catch (e: Exception) {
           dispose()
         }

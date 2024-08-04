@@ -21,13 +21,13 @@ import ktx.scene2d.vis.visTextTooltip
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.InterfaceEvent
-import no.elg.infiniteBootleg.events.api.Event
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.IBVisWindow
 import no.elg.infiniteBootleg.util.ibVisWindowClosed
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.withColor
@@ -62,15 +62,14 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     }
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
-    val listener: Event.() -> Unit = { Main.inst().scheduler.executeSync { updateAllSlots() } }
     registerListener<ContainerEvent.Changed>(true, { it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
       val serverContainer = this.container
-      Main.inst().scheduler.executeSync {
+      launchOnMain {
         serverContainer.content.copyInto(container.content)
-        listener()
+        updateAllSlots()
       }
     }
-    registerListener<InterfaceEvent.Opening>(true, filter, listener)
+    registerListener<InterfaceEvent.Opening>(true, filter) { launchOnMain { updateAllSlots() } }
 
     for (containerSlot in container) {
       visImageButton {
@@ -107,7 +106,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     }
     pack()
     centerWindow()
-    Main.inst().scheduler.executeSync {
+    launchOnMain {
       updateAllSlots()
       centerWindow()
     }

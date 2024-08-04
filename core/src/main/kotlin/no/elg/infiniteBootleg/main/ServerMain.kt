@@ -31,7 +31,6 @@ class ServerMain(progArgs: ProgramArgs) : CommonMain(progArgs) {
       serverWorld.save()
       serverWorld.dispose()
       dispose()
-      scheduler.shutdown() // make sure scheduler threads are dead
     }
     Runtime.getRuntime().addShutdownHook(Thread(onShutdown))
   }

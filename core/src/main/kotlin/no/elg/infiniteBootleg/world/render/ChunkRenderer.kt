@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.isMarkerBlock
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -35,7 +36,8 @@ import javax.annotation.concurrent.GuardedBy
 class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable {
 
   private val batch: SpriteBatch = SpriteBatch().also {
-    it.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
+    it.projectionMatrix =
+      Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
   }
 
   // use linked list for fast adding to end and beginning
@@ -64,11 +66,11 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
    * being rendered
    */
   fun queueRendering(chunk: Chunk, prioritize: Boolean) {
-    Main.inst().scheduler.executeAsync {
+    launchOnAsync {
       synchronized(QUEUE_LOCK) {
         val chunkIndex = renderQueue.indexOf(chunk)
         if (chunk === curr) {
-          return@executeAsync
+          return@launchOnAsync
         }
         // Place the chunk at the front of the queue
         if (prioritize && chunkIndex > 0) {
@@ -189,7 +191,18 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     if (rotation == 0 || !texture.rotationAllowed) {
       batch.draw(texture.textureRegion, dx.toFloat(), dy.toFloat(), BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
     } else {
-      batch.draw(texture.textureRegion, dx.toFloat(), dy.toFloat(), BLOCK_SIZE / 2f, BLOCK_SIZE / 2f, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat(), 1f, 1f, rotation.toFloat())
+      batch.draw(
+        texture.textureRegion,
+        dx.toFloat(),
+        dy.toFloat(),
+        BLOCK_SIZE / 2f,
+        BLOCK_SIZE / 2f,
+        BLOCK_SIZE.toFloat(),
+        BLOCK_SIZE.toFloat(),
+        1f,
+        1f,
+        rotation.toFloat()
+      )
     }
   }
 

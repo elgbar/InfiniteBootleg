@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.events.api
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.util.launchOnAsync
 import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.WeakHashMap
@@ -98,7 +98,7 @@ object EventManager {
 
   fun removeOneShotRef(listener: EventListener<out Event>) {
     // Remove from another thread to not cause concurrent modification
-    Main.inst().scheduler.executeAsync {
+    launchOnAsync {
       val storedThis = oneShotStrongRefs.remove(listener)
       if (storedThis != null) {
         storedThis.removeListener()
@@ -115,7 +115,8 @@ object EventManager {
    */
   inline fun <reified T : Event> dispatchEvent(event: T) {
     eventsTracker?.onEventDispatched(event)
-    val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
+    val eventListeners: MutableSet<EventListener<out Event>> =
+      synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
 
     synchronized(eventListeners) {
       val correctListeners = eventListeners.filterIsInstance<EventListener<T>>()
@@ -131,7 +132,8 @@ object EventManager {
    */
   @Deprecated("Use registeredEventListerne")
   fun <T : Event> removeListener(listener: EventListener<T>, eventClass: KClass<T>) {
-    val eventListeners: MutableSet<EventListener<out Event>> = synchronized(weakListeners) { weakListeners[eventClass] } ?: strongListeners[eventClass] ?: return
+    val eventListeners: MutableSet<EventListener<out Event>> =
+      synchronized(weakListeners) { weakListeners[eventClass] } ?: strongListeners[eventClass] ?: return
     synchronized(eventListeners) {
       eventListeners.remove(listener)
       eventsTracker?.onListenerUnregistered(eventClass, listener)

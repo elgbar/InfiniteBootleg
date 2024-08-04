@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.assets.InfAssetsImpl
 import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
-import no.elg.infiniteBootleg.util.CancellableThreadScheduler
 import no.elg.infiniteBootleg.util.Util
 
 private val logger = KotlinLogging.logger {}
@@ -24,8 +23,6 @@ private val logger = KotlinLogging.logger {}
  * @author Elg
  */
 abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapter(), Main {
-  override val scheduler: CancellableThreadScheduler = CancellableThreadScheduler()
-
   override lateinit var console: InGameConsoleHandler
     protected set
 
@@ -57,7 +54,6 @@ abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapte
 
   override fun dispose() {
     console.dispose()
-    scheduler.shutdown()
   }
 
   companion object {

@@ -59,6 +59,7 @@ import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -82,17 +83,16 @@ private val logger = KotlinLogging.logger {}
 
 internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
   if (Settings.client) {
-    Main.inst().scheduler
     launchOnAsync {
       delay(50L)
       close()
     }
-    Main.inst().scheduler.executeSync {
+    launchOnMain {
       ConnectingScreen.info = msg
       ClientMain.inst().screen = ConnectingScreen
       val serverClient = ClientMain.inst().serverClient
       if (serverClient?.sharedInformation != null) {
-        this.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
+        this@fatal.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
       }
     }
   } else {

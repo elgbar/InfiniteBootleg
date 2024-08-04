@@ -51,6 +51,8 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toComponentsString
@@ -78,8 +80,6 @@ import java.util.concurrent.TimeUnit
 private val secureRandom = SecureRandom.getInstanceStrong()
 private val logger = KotlinLogging.logger {}
 
-val scheduler by lazy { Main.inst().scheduler }
-
 /**
  * Handle packets sent TO the server FROM a client, will quietly drop any packets that are malformed
  * @author Elg
@@ -88,22 +88,22 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
   logPacket(serverSideServerBoundMarker, packet)
   when (packet.type) {
     DX_HEARTBEAT -> handleHeartbeat(ctx)
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { scheduler.executeSync { handleMovePlayer(ctx, it) } }
-    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { scheduler.executeAsync { asyncHandleBlockUpdate(ctx, it) } }
+    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnMain { handleMovePlayer(ctx, it) } }
+    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsync { asyncHandleBlockUpdate(ctx, it) } }
 
     SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
 
-    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { scheduler.executeAsync { asyncHandleBreakingBlock(ctx, it) } }
-    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { scheduler.executeAsync { asyncHandleContainerUpdate(ctx, it) } }
+    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsync { asyncHandleBreakingBlock(ctx, it) } }
+    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsync { asyncHandleContainerUpdate(ctx, it) } }
 
-    SB_LOGIN -> packet.loginOrNull?.let { scheduler.executeSync { handleLoginPacket(ctx, it) } }
-    SB_CLIENT_WORLD_LOADED -> scheduler.executeAsync { asyncHandleClientsWorldLoaded(ctx) }
-    DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { scheduler.executeSync { handleSecretExchange(ctx, it) } }
+    SB_LOGIN -> packet.loginOrNull?.let { launchOnMain { handleLoginPacket(ctx, it) } }
+    SB_CLIENT_WORLD_LOADED -> launchOnAsync { asyncHandleClientsWorldLoaded(ctx) }
+    DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { launchOnMain { handleSecretExchange(ctx, it) } }
 
-    DX_DISCONNECT -> scheduler.executeSync { handleDisconnect(ctx, packet.disconnectOrNull) }
-    DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { scheduler.executeSync { handleWorldSettings(ctx, it) } }
+    DX_DISCONNECT -> launchOnMain { handleDisconnect(ctx, packet.disconnectOrNull) }
+    DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { launchOnMain { handleWorldSettings(ctx, it) } }
 
-    SB_CAST_SPELL -> scheduler.executeAsync { asyncHandleCastSpell(ctx) }
+    SB_CAST_SPELL -> launchOnAsync { asyncHandleCastSpell(ctx) }
 
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
     else -> ctx.fatal("Server cannot handle packet of type ${packet.type}")
@@ -112,19 +112,19 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
 
 private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentRequest: Packets.ContentRequest) {
   // Chunk request
-  contentRequest.chunkLocationOrNull?.let { scheduler.executeAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
+  contentRequest.chunkLocationOrNull?.let { launchOnAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
   // Entity request
   if (contentRequest.hasEntityUUID()) {
     val entityUUID: String = contentRequest.entityUUID
     val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
     requestedEntities.get(entityUUID) {
-      scheduler.executeAsync { asyncHandleEntityRequest(ctx, entityUUID) }
+      launchOnAsync { asyncHandleEntityRequest(ctx, entityUUID) }
     }
   }
   // Container
   contentRequest.containerOwner?.let { owner: ProtoWorld.ContainerOwner ->
-    scheduler.executeAsync {
-      asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@executeAsync)
+    launchOnAsync {
+      asyncHandleContainerRequest(ctx, owner.fromProto() ?: return@launchOnAsync)
     }
   }
 }

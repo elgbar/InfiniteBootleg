@@ -7,8 +7,8 @@ import ktx.actors.isShown
 import no.elg.infiniteBootleg.events.InterfaceEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.InterfaceId
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.IBVisWindow
+import no.elg.infiniteBootleg.util.launchOnMain
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
@@ -46,7 +46,7 @@ class InterfaceManager : Disposable {
 
   private fun getOrCreate(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow?): CompletableFuture<IBVisWindow?> =
     CompletableFuture<IBVisWindow?>().also { future ->
-      Main.inst().scheduler.executeSync {
+      launchOnMain {
         synchronized(interfaces) {
           interfaces[interfaceId] ?: createIfMissing()
         }.also { future.complete(it) }

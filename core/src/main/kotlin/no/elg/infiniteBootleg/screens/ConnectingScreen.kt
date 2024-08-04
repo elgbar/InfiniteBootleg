@@ -5,11 +5,11 @@ import com.badlogic.gdx.utils.Timer
 import com.kotcrab.vis.ui.widget.VisLabel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.Channel
+import ktx.async.schedule
 import ktx.scene2d.actor
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.server.fatal
 import no.elg.infiniteBootleg.util.onInteract
 
@@ -42,13 +42,14 @@ object ConnectingScreen : StageScreen() {
   fun startLivelinessTest() {
     val attempt = connectAttempt
     // note the delay must be more than 50ms
-    livelinessTest = Main.inst().scheduler.scheduleSync(5000L) {
+    livelinessTest = schedule(5f) {
       if (channel == null) {
         logger.error { "Liveliness test is too early, connection not yet established" }
       } else if (ClientMain.inst().screen is ConnectingScreen && connectAttempt == attempt) {
         // We are still trying to connect after 5 seconds
         ClientMain.inst().serverClient?.ctx?.fatal("Failed to connect, server stopped responding")
       }
+      livelinessTest = null
     }
   }
 

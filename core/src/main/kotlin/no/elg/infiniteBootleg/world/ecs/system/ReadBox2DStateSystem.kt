@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacke
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundMoveEntity
 import no.elg.infiniteBootleg.server.serverBoundMoveEntityPacket
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
@@ -41,7 +42,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
       if (Main.isServerClient) {
         ClientMain.inst().serverClient?.let { serverClient ->
           if (serverClient.uuid == entity.id) {
-            Main.inst().scheduler.executeAsync {
+            launchOnAsync {
               serverClient.sendServerBoundPacket { serverBoundMoveEntityPacket(entity) }
             }
           }
