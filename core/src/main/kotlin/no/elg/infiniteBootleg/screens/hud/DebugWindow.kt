@@ -160,7 +160,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         )
         toggleableDebugButton(
           "Recalculate topblock lights",
-          "Recalulate all lights in the world and re-render the chunks",
+          "Recalulate the top most block in the world",
           "toggle-menu-button",
           onAnyElementChanged,
           { false },

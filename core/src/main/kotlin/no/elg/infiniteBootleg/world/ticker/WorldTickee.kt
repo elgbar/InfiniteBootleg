@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.ticker
 
 import com.badlogic.gdx.utils.LongMap
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.WorldTickedEvent
@@ -8,7 +9,6 @@ import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
-import javax.annotation.concurrent.GuardedBy
 import kotlin.concurrent.write
 
 private val logger = KotlinLogging.logger {}

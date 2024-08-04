@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
 import com.badlogic.gdx.physics.box2d.ChainShape
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.LongMap
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import no.elg.infiniteBootleg.api.Updatable
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.compactLoc
@@ -19,7 +20,6 @@ import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent.Companion.queuePhysicsEvent
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.world.World
-import javax.annotation.concurrent.GuardedBy
 
 /**
  * @author Elg

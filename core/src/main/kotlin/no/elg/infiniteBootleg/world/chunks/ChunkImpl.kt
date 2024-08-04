@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
@@ -51,7 +52,6 @@ import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicInteger
-import javax.annotation.concurrent.GuardedBy
 
 private val logger = KotlinLogging.logger {}
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.IntMap
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.badlogic.gdx.utils.Timer
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.InvalidProtocolBufferException
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -134,7 +135,6 @@ import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import javax.annotation.concurrent.GuardedBy
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.math.abs
@@ -1116,7 +1116,8 @@ abstract class World(
     return uuid == world.uuid
   }
 
-  override fun resize(width: Int, height: Int) {}
+  override fun resize(width: Int, height: Int) = Unit
+
   override fun toString(): String {
     return "World{name='$name', uuid=$uuid}"
   }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
@@ -28,7 +29,6 @@ import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import org.apache.commons.collections4.list.SetUniqueList
 import java.util.LinkedList
-import javax.annotation.concurrent.GuardedBy
 
 /**
  * @author Elg

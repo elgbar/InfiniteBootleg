@@ -78,6 +78,8 @@ sealed interface Item {
    */
   override fun equals(other: Any?): Boolean
 
+  override fun hashCode(): Int
+
   companion object : ProtoConverter<Item, ProtoWorld.Container.Item> {
     const val DEFAULT_MAX_STOCK = 65_536u
 

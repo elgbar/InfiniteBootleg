@@ -1,9 +1,12 @@
 package no.elg.infiniteBootleg.console
 
 import com.badlogic.gdx.utils.Disposable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.util.launchOnMain
 import java.io.Console
 import java.util.Scanner
+
+private val logger = KotlinLogging.logger {}
 
 /** Read input from [System.console] or [System. in] if no console exists.  */
 class SystemConsoleReader(private val consoleHandler: InGameConsoleHandler) : Runnable, Disposable {
@@ -27,6 +30,7 @@ class SystemConsoleReader(private val consoleHandler: InGameConsoleHandler) : Ru
           read = openScanner.nextLine()
           launchOnMain { consoleHandler.execCommand(read) }
         } catch (e: Exception) {
+          logger.error(e) { "Console reader closed due to exception" }
           dispose()
         }
       }

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.events.api
 
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
@@ -8,7 +9,6 @@ import java.lang.ref.WeakReference
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentHashMap
-import javax.annotation.concurrent.GuardedBy
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}

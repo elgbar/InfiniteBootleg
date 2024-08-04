@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.OrderedSet
+import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.util.CheckableDisposable
@@ -15,7 +16,6 @@ import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TIME_STEP
 import no.elg.infiniteBootleg.world.world.World
-import javax.annotation.concurrent.GuardedBy
 import kotlin.math.abs
 import com.badlogic.gdx.physics.box2d.World as Box2dWorld
 

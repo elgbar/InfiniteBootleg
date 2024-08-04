@@ -123,7 +123,6 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:5.1.0"
-    implementation "com.google.guava:guava:33.2.1-jre"
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
     implementation "com.google.protobuf:protobuf-bom:$protobufVersion"
     implementation "com.google.protobuf:protobuf-kotlin:$protobufVersion"

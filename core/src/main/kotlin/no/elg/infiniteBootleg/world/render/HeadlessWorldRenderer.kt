@@ -67,7 +67,7 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     onSpawnChanged.removeListener()
   }
 
-  override fun resize(width: Int, height: Int) {}
+  override fun resize(width: Int, height: Int) = Unit
   override fun update() {
     lock.read {
       for (entity in entities) {
