@@ -49,16 +49,17 @@ enum class ThreadType {
 
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()
+      val threadName = currentThread.name
       if (currentThread === MainDispatcher.mainThread) {
         return RENDER
-      } else if (currentThread.name.startsWith(BOX2D_TICKER_TAG_PREFIX, false)) {
+      } else if (threadName.startsWith(BOX2D_TICKER_TAG_PREFIX, false)) {
         return PHYSICS
-      } else if (currentThread.name.startsWith(WORLD_TICKER_TAG_PREFIX, false)) {
+      } else if (threadName.startsWith(WORLD_TICKER_TAG_PREFIX, false)) {
         return TICKER
-      } else if (ASYNC_THREAD_NAME == currentThread.name) {
+      } else if (ASYNC_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false)) {
         return ASYNC
       }
-      logger.error { "Dispatched event from unknown thread: ${currentThread.name}" }
+      logger.error { "Dispatched event from unknown thread: $threadName" }
       return UNKNOWN
     }
   }
