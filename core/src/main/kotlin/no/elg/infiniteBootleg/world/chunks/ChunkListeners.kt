@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isWithinRadius
-import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.queryEntities
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 
@@ -40,7 +39,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
             lightLocs.clear()
           }
         }
-        launchOnAsync { chunk.doUpdateLightMultipleSources(lights, checkDistance = true) }
+        chunk.doUpdateLightMultipleSources(lights, checkDistance = true)
       }
     }
 
@@ -72,7 +71,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
      */
     listeners += registerListener { event: ChunkColumnUpdatedEvent ->
       if (event.flag and BLOCKS_LIGHT_FLAG != 0) {
-        launchOnAsync { chunk.doUpdateLightMultipleSources(event.calculatedDiffColumn, checkDistance = true) }
+        chunk.doUpdateLightMultipleSources(event.calculatedDiffColumn, checkDistance = true)
       }
     }
 

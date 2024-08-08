@@ -12,6 +12,7 @@ import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.yield
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.checkChunkCorrupt
@@ -55,6 +56,7 @@ import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.cancellation.CancellationException
 
 private val logger = KotlinLogging.logger {}
 
@@ -128,6 +130,12 @@ class ChunkImpl(
   private var fbo: FrameBuffer? = null
 
   private val chunkListeners by lazy { ChunkListeners(this) }
+
+  private var lightJob: Job? = null
+    set(value) {
+      field?.cancel(CancellationException("New light job started"))
+      field = value
+    }
 
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   override fun setBlock(
@@ -321,7 +329,7 @@ class ChunkImpl(
   }
 
   override fun updateAllBlockLights() {
-    launchOnAsync { doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false) }
+    doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
   }
 
   private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean =
@@ -330,7 +338,11 @@ class ChunkImpl(
       dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     }
 
-  internal suspend fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
+  internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
+    lightJob = launchOnAsync { doUpdateLightMultipleSources0(sources, checkDistance) }
+  }
+
+  private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
       val jobs = mutableListOf<Job>()
       outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
@@ -339,8 +351,9 @@ class ChunkImpl(
             continue
           }
           jobs += launchOn8Async {
-            blockLights[localX][localY].recalculateLighting(0)
+            blockLights[localX][localY].recalculateLighting()
           }
+          yield()
         }
       }
       if (jobs.isNotEmpty()) {

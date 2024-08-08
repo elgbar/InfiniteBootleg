@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.gdx.math.Vector2
+import kotlinx.coroutines.yield
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
@@ -84,9 +85,7 @@ class BlockLight(
     }
   }
 
-  fun recalculateLighting(updateId: Int) {
-    val isCancelled = NEVER_CANCEL // isCancelled(updateId)
-
+  suspend fun recalculateLighting() {
     if (!Settings.renderLight || chunk.isInvalid) {
       return
     }
@@ -103,6 +102,7 @@ class BlockLight(
       lightMap = SKYLIGHT_LIGHT_MAP
       return
     }
+    yield()
 
     var isLitNext = false
     val tmpLightMap = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
@@ -129,27 +129,17 @@ class BlockLight(
 
     fun calculateLightFrom(neighbors: GdxArray<Block>) {
       for (neighbor in neighbors) {
-        if (isCancelled()) {
-          return
-        }
         calculateLightFrom(neighbor)
       }
     }
 
-    if (isCancelled()) {
-      return
-    }
+    yield()
     // find light sources around this block
 
     calculateLightFrom(findLuminescentBlocks(worldX, worldY))
-    if (isCancelled()) {
-      return
-    }
+    yield()
     calculateLightFrom(findSkylightBlocks(worldX, worldY))
-
-    if (isCancelled()) {
-      return
-    }
+    yield()
 
     isSkylight = false
     isLit = isLitNext
@@ -169,11 +159,6 @@ class BlockLight(
     if (Settings.renderBlockLightUpdates) {
       EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY))
     }
-  }
-
-  private fun isCancelled(updateId: Int): Boolean {
-    val diff = updateId != chunkImpl.currentUpdateId.get()
-    return updateId != NEVER_CANCEL_UPDATE_ID && diff
   }
 
   fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = NEVER_CANCEL): GdxArray<Block> =
