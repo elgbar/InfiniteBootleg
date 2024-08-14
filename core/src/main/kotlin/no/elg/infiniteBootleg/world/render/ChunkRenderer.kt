@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.isMarkerBlock
-import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -27,7 +27,6 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLO
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import org.apache.commons.collections4.list.SetUniqueList
 import java.util.LinkedList
 
 /**
@@ -42,7 +41,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   // use linked list for fast adding to end and beginning
   @GuardedBy("QUEUE_LOCK")
-  private val renderQueue: SetUniqueList<Chunk> = SetUniqueList.setUniqueList(LinkedList())
+  private val renderQueue: MutableList<Chunk> = LinkedList()
 
   // current rendering chunk
   @GuardedBy("QUEUE_LOCK")
@@ -62,26 +61,26 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
    * Queue rendering of a chunk. If the chunk is already in the queue to be rendered and `prioritize` is `true` then the chunk will be moved to the front of the queue
    *
    * @param chunk The chunk to render
-   * @param prioritize If the chunk should be placed at the front of the queue
-   * being rendered
+   * @param prioritize If the chunk should be placed at the front of the queue being rendered
    */
   fun queueRendering(chunk: Chunk, prioritize: Boolean) {
-    launchOnAsync {
+    launchOnMultithreadedAsync {
       synchronized(QUEUE_LOCK) {
-        val chunkIndex = renderQueue.indexOf(chunk)
         if (chunk === curr) {
-          return@launchOnAsync
+          return@launchOnMultithreadedAsync
         }
+        val chunkIndex = renderQueue.indexOf(chunk)
         // Place the chunk at the front of the queue
-        if (prioritize && chunkIndex > 0) {
-          renderQueue.removeAt(chunkIndex)
-          renderQueue.add(0, chunk)
-        } else {
-          if (prioritize) {
-            renderQueue.add(0, chunk)
-          } else {
-            renderQueue.add(chunk)
+
+        if (prioritize) {
+          if (chunkIndex > 0) {
+            // Chunk is in the queue, so we must remove it first
+            renderQueue.removeAt(chunkIndex)
           }
+          renderQueue.addFirst(chunk)
+        } else if (chunkIndex == CHUNK_NOT_IN_QUEUE_INDEX) {
+          // Only add if not already in queue to avoid duplicates
+          renderQueue.addLast(chunk)
         }
       }
     }

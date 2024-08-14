@@ -26,7 +26,7 @@ fun launchOnAsync(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend
 /**
  * Run tasks which
  */
-fun launchOnMultithreadedAsync(start: CoroutineStart = CoroutineStart.LAZY, block: suspend CoroutineScope.() -> Unit) =
+fun launchOnMultithreadedAsync(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Dispatchers.Default, start = start, block = block)
 
 fun launchOnWorldTicker(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =

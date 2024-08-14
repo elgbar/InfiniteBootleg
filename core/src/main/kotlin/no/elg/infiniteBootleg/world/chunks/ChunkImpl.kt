@@ -10,15 +10,17 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
-import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
+import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -65,8 +67,6 @@ class ChunkImpl(
   override val chunkY: ChunkCoord
 ) : Chunk {
 
-  val currentUpdateId = AtomicInteger()
-
   override val blocks: Array<Array<Block?>> = Array(Chunk.CHUNK_SIZE) { arrayOfNulls(Chunk.CHUNK_SIZE) }
   private val blockLights = Array(Chunk.CHUNK_SIZE) { x -> Array(Chunk.CHUNK_SIZE) { y -> BlockLight(this, x, y) } }
 
@@ -101,8 +101,7 @@ class ChunkImpl(
   private var allowUnload: Boolean = true
 
   /**
-   * If the chunk is still being initialized, meaning not all blocks are in [.blocks] and
-   * [tickingBlocks] does not contain all blocks it should
+   * If the chunk is still being initialized, meaning not all blocks are in [blocks]
    */
   @Volatile
   private var initializing: Boolean = true
@@ -134,7 +133,7 @@ class ChunkImpl(
   private var lightJob: Job? = null
     set(value) {
       synchronized(this) {
-        field?.cancel(java.util.concurrent.CancellationException("New light job started"))
+        field?.cancel()
         field = value
       }
     }
@@ -340,27 +339,46 @@ class ChunkImpl(
       dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     }
 
+  val a = AtomicInteger(0)
+
+//  private val lightUpdateScope = CoroutineScope()
+
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
-    lightJob = launchOnAsync { doUpdateLightMultipleSources0(sources, checkDistance) }
+//    lightUpdateScope.cancel("New light job started")
+//    lightUpdateScope.coroutineContext.job.cancel()
+    if (isValid && world.isLoaded) {
+//      val s = stacktrace()
+      launchOnMultithreadedAsync {
+//        val lightId = a.incrementAndGet()
+//        logger.info { "ID $lightId : Starting updating light of ${stringifyCompactLoc(this@ChunkImpl)}" }
+//        logger.info { "ID $lightId : $s" }
+        doUpdateLightMultipleSources0(sources, checkDistance)
+//      yield()
+//        logger.info { "ID $lightId : Finished updating light of ${stringifyCompactLoc(this@ChunkImpl)}" }
+      }
+    }
   }
 
   private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      val jobs = mutableListOf<Job>()
-      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-        for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-          if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
-            continue
+      coroutineScope {
+        var didDoSomeWork = false
+        outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+            if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+              continue
+            }
+            withContext(CoroutineName("LightUpdate ${stringifyChunkToWorld(this@ChunkImpl, localX, localY)}")) {
+              blockLights[localX][localY].recalculateLighting(this)
+              didDoSomeWork = true
+            }
           }
-          jobs += launchOnMultithreadedAsync {
-            blockLights[localX][localY].recalculateLighting()
-          }
-          yield()
         }
-      }
-      if (jobs.isNotEmpty()) {
-        queueForRendering(false)
-        jobs.joinAll()
+        ensureActive()
+        if (didDoSomeWork) {
+          ensureActive()
+          queueForRendering(false)
+        }
       }
     }
   }
@@ -544,7 +562,7 @@ class ChunkImpl(
     dirty()
     chunkBody.update()
     chunkListeners.registerListeners()
-    launchOnAsync { updateAllBlockLights() }
+    updateAllBlockLights()
   }
 
   override fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =

@@ -243,6 +243,9 @@ abstract class World(
       field = value
     }
 
+  var isLoaded: Boolean = false
+    private set
+
   init {
     MathUtils.random.setSeed(seed)
     uuid = generateUUIDFromLong(seed).toString()
@@ -273,6 +276,10 @@ abstract class World(
       launchOnMain {
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
+        isLoaded = true
+        chunksLock.read {
+          chunks.values().forEach(Chunk::updateAllBlockLights)
+        }
       }
     }
   }

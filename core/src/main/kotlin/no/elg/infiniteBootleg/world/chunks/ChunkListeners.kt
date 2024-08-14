@@ -82,7 +82,6 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
     listeners += registerListener { (eventChunk, _): ChunkLoadedEvent ->
       if (eventChunk.isNeighbor(chunk)) {
         chunk.updateAllBlockLights()
-        chunk.queueForRendering(false)
       }
     }
 

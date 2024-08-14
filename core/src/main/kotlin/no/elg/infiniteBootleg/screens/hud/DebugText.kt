@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
@@ -98,9 +97,8 @@ object DebugText {
       val modified = pc.shouldSave()
       val allowUnloading = pc.isAllowedToUnload
       val skychunk = cc.isChunkAboveTopBlock(chunkY)
-      val upId = if (pc is ChunkImpl) pc.currentUpdateId.get() else -1
-      val format = "chunk (% 4d,% 4d) [top % 4d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|light id% 3d|modified?%-5b"
-      sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, skychunk, upId, modified))
+      val format = "chunk (% 4d,% 4d) [top % 4d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|modified?%-5b"
+      sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, skychunk, modified))
     }
   }
 
