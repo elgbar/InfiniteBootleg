@@ -10,11 +10,11 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.distCubed
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.world.NEVER_CANCEL
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
@@ -66,8 +66,6 @@ class BlockLight(
         field = value
       }
     }
-
-  private val chunkImpl = chunk as ChunkImpl
 
   init {
     isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, chunk.chunkY.chunkToWorld(localY), BLOCKS_LIGHT_FLAG)
@@ -157,7 +155,8 @@ class BlockLight(
       averageBrightness = 0f
     }
     if (Settings.renderBlockLightUpdates) {
-      EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY))
+      yield()
+      launchOnAsync { EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY)) }
     }
   }
 

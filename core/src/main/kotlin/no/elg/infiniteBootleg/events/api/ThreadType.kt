@@ -47,6 +47,9 @@ enum class ThreadType {
       }
     }
 
+    fun isThreadNameAsync(threadName: String): Boolean =
+      ASYNC_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false) || threadName.startsWith("async", false)
+
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()
       val threadName = currentThread.name
@@ -56,7 +59,7 @@ enum class ThreadType {
         return PHYSICS
       } else if (threadName.startsWith(WORLD_TICKER_TAG_PREFIX, false)) {
         return TICKER
-      } else if (ASYNC_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false)) {
+      } else if (isThreadNameAsync(threadName)) {
         return ASYNC
       }
       logger.error { "Dispatched event from unknown thread: $threadName" }

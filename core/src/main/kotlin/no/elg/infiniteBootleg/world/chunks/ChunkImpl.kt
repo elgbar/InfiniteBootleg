@@ -39,9 +39,9 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
-import no.elg.infiniteBootleg.util.launchOn8Async
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
+import no.elg.infiniteBootleg.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Material
@@ -130,10 +130,13 @@ class ChunkImpl(
 
   private val chunkListeners by lazy { ChunkListeners(this) }
 
+  @field:Volatile
   private var lightJob: Job? = null
     set(value) {
-      field?.cancel(CancellationException("New light job started"))
-      field = value
+      synchronized(this) {
+        field?.cancel(java.util.concurrent.CancellationException("New light job started"))
+        field = value
+      }
     }
 
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
@@ -349,7 +352,7 @@ class ChunkImpl(
           if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
             continue
           }
-          jobs += launchOn8Async {
+          jobs += launchOnMultithreadedAsync {
             blockLights[localX][localY].recalculateLighting()
           }
           yield()
