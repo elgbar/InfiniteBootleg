@@ -122,7 +122,7 @@ class ChunkColumnImpl(
   // Extracting into an inlined function to allow usage of contract
   private inline fun isValidTopBlock(block: Block?, specialRule: (block: Block) -> Boolean): Boolean {
     contract { returns(true) implies (block != null) }
-    return block.isNotAir() && specialRule(block)
+    return block.isNotAir(markerIsAir = false) && specialRule(block)
   }
 
   private fun updateTopBlock(top: WorldCoordArray, localX: LocalCoord, worldYHint: WorldCoord, rule: (block: Block) -> Boolean) {
