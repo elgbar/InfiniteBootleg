@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg
+package no.elg.infiniteBootleg.exceptions
 
 import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
