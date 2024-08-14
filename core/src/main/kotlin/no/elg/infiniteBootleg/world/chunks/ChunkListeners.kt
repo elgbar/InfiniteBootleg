@@ -20,7 +20,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
 
   private val listeners: MutableSet<RegisteredEventListener> = mutableSetOf()
 
-  private val lightLocs: MutableList<WorldCompactLoc> = mutableListOf()
+  private val lightLocs: MutableSet<WorldCompactLoc> = mutableSetOf()
 
   fun registerListeners() {
     require(listeners.isEmpty()) { "Listeners cannot be done twice" }
@@ -71,7 +71,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
      */
     listeners += registerListener { event: ChunkColumnUpdatedEvent ->
       if (event.flag and BLOCKS_LIGHT_FLAG != 0) {
-        chunk.doUpdateLightMultipleSources(event.calculatedDiffColumn, checkDistance = true)
+        synchronized(lightLocs) {
+          lightLocs.addAll(event.calculatedDiffColumn.toSet())
+        }
       }
     }
 
