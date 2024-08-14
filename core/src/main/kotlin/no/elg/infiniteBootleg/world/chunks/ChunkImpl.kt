@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.TextFormat
@@ -39,6 +38,7 @@ import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
+import no.elg.infiniteBootleg.util.dst2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.launchOnAsync
@@ -333,11 +333,12 @@ class ChunkImpl(
     doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
   }
 
-  private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean =
-    sources.none { (srcX: WorldCoord, srcY: WorldCoord) ->
-      val dstFromChange2blk = Vector2.dst2(worldX.toFloat(), worldY.toFloat(), srcX.toFloat(), srcY.toFloat())
-      dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
+  private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean {
+    return sources.none { (srcX: WorldCoord, srcY: WorldCoord) ->
+      val dstFromChange2blk = dst2(worldX, worldY, srcX, srcY)
+      dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
     }
+  }
 
   val a = AtomicInteger(0)
 

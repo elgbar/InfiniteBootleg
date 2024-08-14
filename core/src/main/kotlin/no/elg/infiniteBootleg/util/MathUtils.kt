@@ -10,3 +10,9 @@ typealias Radians = Float
 
 inline fun Radians.toDegrees(): Degrees = this * RADIANS_TO_DEGREES
 inline fun Degrees.toRadians(): Radians = this * DEGREES_TO_RADIANS
+
+fun dst2(x1: Int, y1: Int, x2: Int, y2: Int): Int {
+  val xd = x2 - x1
+  val yd = y2 - y1
+  return xd * xd + yd * yd
+}
