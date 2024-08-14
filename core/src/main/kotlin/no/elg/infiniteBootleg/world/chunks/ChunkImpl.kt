@@ -57,7 +57,6 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.atomic.AtomicInteger
 
 private val logger = KotlinLogging.logger {}
 
@@ -340,22 +339,10 @@ class ChunkImpl(
     }
   }
 
-  val a = AtomicInteger(0)
-
-//  private val lightUpdateScope = CoroutineScope()
-
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
-//    lightUpdateScope.cancel("New light job started")
-//    lightUpdateScope.coroutineContext.job.cancel()
     if (isValid && world.isLoaded) {
-//      val s = stacktrace()
       launchOnMultithreadedAsync {
-//        val lightId = a.incrementAndGet()
-//        logger.info { "ID $lightId : Starting updating light of ${stringifyCompactLoc(this@ChunkImpl)}" }
-//        logger.info { "ID $lightId : $s" }
         doUpdateLightMultipleSources0(sources, checkDistance)
-//      yield()
-//        logger.info { "ID $lightId : Finished updating light of ${stringifyCompactLoc(this@ChunkImpl)}" }
       }
     }
   }
@@ -439,16 +426,7 @@ class ChunkImpl(
     this.allowUnload = allowUnload
   }
 
-  override val isAllowedToUnload: Boolean
-    get() {
-//      if (Settings.client) {
-//              var player = ClientMain.inst().getPlayer();
-//              if (player != null && equals(player.getChunk())) {
-//                return false;
-//              }
-//      }
-      return allowUnload
-    }
+  override val isAllowedToUnload: Boolean get() = allowUnload
   override val chunkColumn: ChunkColumn
     get() = world.getChunkColumn(chunkX)
 

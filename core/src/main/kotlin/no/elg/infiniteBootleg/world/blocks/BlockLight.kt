@@ -8,7 +8,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
@@ -23,10 +22,8 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
-import no.elg.infiniteBootleg.world.world.NEVER_CANCEL
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -46,30 +43,18 @@ class BlockLight(
    * It denotes that this is a fully lit block, and thus light can be skipped rendered on it.
    */
   var isSkylight: Boolean
-    get() {
-      executeJob()
-      return field
-    }
     private set
 
   /**
    * If this block have any light shining onto it. If not then it should be rendered as a black square
    */
   var isLit: Boolean
-    get() {
-      executeJob()
-      return field
-    }
     private set
 
   /**
    * The average brightness of the block
    */
   var averageBrightness: Float
-    get() {
-      executeJob()
-      return field
-    }
     private set
 
   /**
@@ -80,7 +65,6 @@ class BlockLight(
   var lightMap: Array<FloatArray> = NO_LIGHTS_LIGHT_MAP
     get() {
       synchronized(this) {
-        executeJob()
         return field
       }
     }
@@ -106,7 +90,6 @@ class BlockLight(
     }
   }
 
-  val a = AtomicInteger(0)
   private var job: Job? = null
     set(value) {
       synchronized(this) {
@@ -115,27 +98,13 @@ class BlockLight(
       }
     }
 
-  private fun executeJob() {
-//    val j = synchronized(this) {
-//      job?.also { job = null } ?: return
-//    }
-//    if (j.start() == true) {
-//      runBlocking { j.join() }
-//    }
-  }
-
   fun recalculateLighting(scope: CoroutineScope) =
     with(scope) {
-//      val lightId = a.incrementAndGet()
-//      logger.info { "ID $lightId : BL light of ${stringifyChunkToWorld(chunk, localX, localY)}" }
-
       job = launch(start = CoroutineStart.DEFAULT) {
         recalculateLighting0()
         ensureActive()
         chunk.queueForRendering(prioritize = false)
-//        logger.info { "ID $lightId : BL updating light of ${stringifyChunkToWorld(chunk, localX, localY)}" }
       }
-      chunk.dirty()
     }
 
   private suspend fun CoroutineScope.recalculateLighting0() {
@@ -155,7 +124,7 @@ class BlockLight(
       lightMap = SKYLIGHT_LIGHT_MAP
       return
     }
-    yield()
+    ensureActive()
 
     var isLitNext = false
     val tmpLightMap = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
@@ -163,6 +132,7 @@ class BlockLight(
     fun calculateLightFrom(neighbor: Block) {
       isLitNext = true
       for (dx in 0 until LIGHT_RESOLUTION) {
+        ensureActive()
         for (dy in 0 until LIGHT_RESOLUTION) {
           // Calculate distance for each light cell
           val cellX = worldX + centerOfSubcell(dx)
@@ -189,7 +159,7 @@ class BlockLight(
     // find light sources around this block
     coroutineScope {
       launch { calculateLightFrom(findLuminescentBlocks(worldX, worldY)) }
-      launch { calculateLightFrom(findSkylightBlocks(worldX, worldY)) }
+      launch { calculateLightFrom(findSkylightBlocks(worldX, worldY, this)) }
     }
     ensureActive()
 
@@ -214,7 +184,7 @@ class BlockLight(
     }
   }
 
-  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = NEVER_CANCEL): GdxArray<Block> =
+  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Block> =
     chunk.world.getBlocksAABBFromCenter(
       worldX + 0.5f,
       worldY + 0.5f,
@@ -222,17 +192,14 @@ class BlockLight(
       LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA,
       raw = true,
       loadChunk = false,
-      includeAir = false,
-      cancel = cancelled
+      includeAir = false
     ) { it.material.emitsLight }
 
-  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, cancelled: () -> Boolean = NEVER_CANCEL): GdxArray<Block> {
+  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, scope: CoroutineScope? = null): GdxArray<Block> {
     val skyblocks = GdxArray<Block>()
-    if (cancelled()) {
-      return skyblocks
-    }
     // Since we're not creating air blocks above, we will instead just load
     for (offsetWorldX: LocalCoord in -floor(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()) {
+      scope?.ensureActive()
       val topWorldX: WorldCoord = worldX + offsetWorldX
       val topWorldY: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
 
@@ -266,8 +233,7 @@ class BlockLight(
         worldY.toFloat(),
         topWorldX.toFloat(),
         topWorldY.toFloat(),
-        topWorldYLR.toFloat(),
-        cancelled
+        topWorldYLR.toFloat()
       ) ?: continue
       skyblocks.addAll(findSkylightBlockColumn)
     }
@@ -294,8 +260,7 @@ class BlockLight(
     worldY: Float,
     topWorldX: Float,
     worldYA: Float,
-    worldYB: Float,
-    cancelled: () -> Boolean = NEVER_CANCEL
+    worldYB: Float
   ): GdxArray<Block>? {
     val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
@@ -306,7 +271,7 @@ class BlockLight(
       // thus no skylight can reach this block
       return null
     }
-    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true, cancel = cancelled) {
+    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true) {
       skylightBlockFilter(worldX, worldY, it)
     }
   }
