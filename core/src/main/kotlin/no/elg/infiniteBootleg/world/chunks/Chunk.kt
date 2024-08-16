@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CheckableDisposable
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
@@ -68,7 +69,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   val chunkY: ChunkCoord
 
-  val compactLocation: Long
+  val compactLocation: ChunkCompactLoc
 
   val worldX: WorldCoord
 

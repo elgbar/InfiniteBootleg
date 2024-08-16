@@ -25,6 +25,7 @@ import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacke
 import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCompactLocArray
@@ -420,7 +421,7 @@ class ChunkImpl(
     get() = world.getChunkColumn(chunkX)
 
   @get:Contract(pure = true)
-  override val compactLocation: Long
+  override val compactLocation: ChunkCompactLoc
     get() = compactLoc(chunkX, chunkY)
 
   /**
