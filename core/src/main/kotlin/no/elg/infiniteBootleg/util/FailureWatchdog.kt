@@ -2,13 +2,11 @@ package no.elg.infiniteBootleg.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 
-private val logger = KotlinLogging.logger {}
+class FailureWatchdog(val failureMessage: String, val illegalAction: IllegalAction = IllegalAction.TO_MAIN_MENU) {
 
-class FailureWatchdog(private val failureMessage: String, private val illegalAction: IllegalAction = IllegalAction.TO_MAIN_MENU) {
+  var failuresInARow: Int = 0
 
-  private var failuresInARow: Int = 0
-
-  fun watch(runnable: () -> Unit) {
+  inline fun watch(crossinline runnable: () -> Unit) {
     try {
       runnable()
       failuresInARow = 0
@@ -23,6 +21,7 @@ class FailureWatchdog(private val failureMessage: String, private val illegalAct
   }
 
   companion object {
+    val logger = KotlinLogging.logger {} // logger must be here to avoid conflicting logger
     const val MAX_FAILURES_IN_A_ROW = 5
   }
 }
