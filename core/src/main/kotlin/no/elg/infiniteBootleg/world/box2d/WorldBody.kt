@@ -37,7 +37,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * @return The underlying box2d world
    */
   @GuardedBy("BOX2D_LOCK")
-  lateinit var box2dWorld: Box2dWorld
+  val box2dWorld: Box2dWorld
 
   @field:Volatile
   private var disposed = false
