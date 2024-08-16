@@ -475,7 +475,12 @@ abstract class World(
     }
 
   fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn {
+    val fastColumn = chunkColumns[chunkX]
+    if (fastColumn != null) {
+      return fastColumn
+    }
     synchronized(chunkColumns) {
+      // The column might have been updated while we've been waiting for the lock
       val column = chunkColumns[chunkX]
       if (column == null) {
         val newCol: ChunkColumn = ChunkColumnImpl(this, chunkX, null, null)
