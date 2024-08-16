@@ -78,7 +78,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      * Remove this block by setting it to air
      */
     fun Block.remove(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) {
-      if (chunk.getRawBlock(localX, localY) === this) {
+      if (chunk.isValid && chunk.getRawBlock(localX, localY) === this) {
         chunk.removeBlock(
           localX,
           localY,
