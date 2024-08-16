@@ -227,5 +227,10 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
       contract { returns(true) implies (this@isValid != null) }
       return this != null && this.isValid
     }
+
+    fun Chunk?.isInvalid(): Boolean {
+      contract { returns(false) implies (this@isInvalid != null) }
+      return this == null || this.isInvalid
+    }
   }
 }

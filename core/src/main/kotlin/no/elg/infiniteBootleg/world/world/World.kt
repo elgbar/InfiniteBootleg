@@ -74,6 +74,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.isInvalid
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
@@ -1010,6 +1011,7 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
+    chunkCache: LongMap<Chunk>? = null,
     cancel: () -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): Array<Block> {
@@ -1017,7 +1019,7 @@ abstract class World(
     require(height >= 0) { "Height must be >= 0, was $height" }
     val worldX = centerWorldX - width
     val worldY = centerWorldY - height
-    return getBlocksAABB(worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, cancel, filter)
+    return getBlocksAABB(worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, chunkCache, cancel, filter)
   }
 
   /**
@@ -1040,6 +1042,7 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
+    chunkCache: LongMap<Chunk>? = null,
     cancel: () -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): GdxArray<Block> {
@@ -1057,7 +1060,7 @@ abstract class World(
     val startY = MathUtils.floor(worldY)
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
-    val chunks = LongMap<Chunk>()
+    val chunks = chunkCache ?: LongMap<Chunk>() // LongMap<Chunk>()
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
@@ -1065,10 +1068,10 @@ abstract class World(
           return blocks
         }
         val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
-        var chunk = chunks[chunkPos]
-        if (chunk == null || chunk.isInvalid) {
+        var chunk: Chunk? = chunks[chunkPos]
+        if (chunk.isInvalid()) {
           chunk = getChunk(chunkPos, loadChunk)
-          if (chunk == null || chunk.isInvalid) {
+          if (chunk.isInvalid()) {
             y++
             continue
           }
