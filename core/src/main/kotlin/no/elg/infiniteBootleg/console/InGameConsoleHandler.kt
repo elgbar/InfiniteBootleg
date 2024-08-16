@@ -20,6 +20,8 @@ import no.elg.infiniteBootleg.console.consoles.StdConsole
 import no.elg.infiniteBootleg.main.ClientMain
 import java.io.PrintWriter
 import java.io.StringWriter
+import kotlin.reflect.KParameter.Kind
+import kotlin.reflect.full.memberFunctions
 
 private val logger = KotlinLogging.logger {}
 
@@ -78,7 +80,7 @@ class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean 
     val methods: Array<Method> = ClassReflection.getMethods(exec.javaClass)
     val potentialMethods = methods.asSequence()
       .filter { method: Method -> HelpfulConsoleHelpUtil.allowedToExecute(method) && method.name.startsWith(commandPart, ignoreCase = true) }
-      .map { method: Method -> HelpfulConsoleHelpUtil.generateCommandSignature(method) }
+      .mapNotNull { method: Method -> HelpfulConsoleHelpUtil.generateCommandSignature(method) }
       .toList()
 
     val possible = IntArray(false, 8)
@@ -101,6 +103,25 @@ class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean 
     }
     val size = possible.size
     val numArgs = commandArgs.size
+    if (numArgs == 0) {
+      try {
+        // Try to execute with default params if no args are given
+        val filter = exec.javaClass.kotlin.memberFunctions.filter {
+          it.name.startsWith(commandPart, ignoreCase = true) && // Find the function with the same name
+            it.parameters.filter { it.kind == Kind.VALUE }.all { it.isOptional && !it.isVararg } // All parameters must be optional and not vararg
+        }
+        if (filter.size == 1) {
+          val f = filter.first()
+          // Call the function with all default parameters (i.e., they are omitted) and the instance as the first parameter
+          f.callBy(mapOf(f.parameters[0] to exec))
+        } else {
+          logger.error { "Multiple functions with the same name found, will not execute defauklt" }
+        }
+        return true
+      } catch (e: Exception) {
+        logger.debug(e) { "Error executing function with all default parameters" }
+      }
+    }
     for (argNr in 0 until size) {
       val method = methods[possible[argNr]]
       val params: Array<Class<*>> = method.parameterTypes
@@ -125,6 +146,7 @@ class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean 
           } catch (e: Exception) {
             // Error occurred trying to parse parameter, continue
             // to next function
+            logger.debug(e) { "Error parsing parameter" }
             continue
           }
           if (HelpfulConsoleHelpUtil.allowedToExecute(method)) {
@@ -134,19 +156,21 @@ class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean 
             logger.error { "You cannot execute this command" }
             return true
           }
-          true
+          return true
         } catch (e: ReflectionException) {
-          val sw = StringWriter()
-          e.cause?.cause?.printStackTrace(PrintWriter(sw)) ?: e.printStackTrace(PrintWriter(sw))
-          if (numArgs > 0) {
+          if (argNr > 0) {
             logger.error {
-              "Failed to execute command ${method.name}(${method.parameterTypes.joinToString(",") { it.simpleName }})' with args ${commandArgs.joinToString(" ")}"
+              "Failed to execute command ${method.name}(${method.parameterTypes.joinToString(",") { it.simpleName }})' with args ${commandArgs.take(argNr).joinToString(" ")}"
             }
           } else {
             logger.error { "Failed to execute command: ${method.name}" }
           }
-          logger.error { sw.toString() }
-          false
+          logger.error {
+            val pw = PrintWriter(StringWriter())
+            e.cause?.cause?.printStackTrace(pw) ?: e.printStackTrace(pw)
+            pw.toString()
+          }
+          return false
         }
       }
     }
