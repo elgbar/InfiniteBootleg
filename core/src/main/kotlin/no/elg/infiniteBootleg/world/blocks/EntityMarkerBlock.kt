@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.EntityRemoveListener
 import no.elg.infiniteBootleg.util.LocalCoord
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -26,19 +27,31 @@ class EntityMarkerBlock(
   private var removeEntityListener: EntityListener?
 
   init {
-    removeEntityListener = EntityRemoveListener { if (it === entity) removeEntityMarker() }.also {
+    removeEntityListener = EntityRemoveListener { if (it === entity) removeEntityMarker(async = false) }.also {
       world.engine.addEntityListener(it)
     }
   }
 
-  fun removeEntityMarker() {
-    remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
+  fun removeEntityMarker(async: Boolean, chunk: Chunk? = null) {
+    fun remove() {
+      if (chunk != null) {
+        chunk.removeBlock(localX, localY, updateTexture = false, prioritize = false, sendUpdatePacket = false)
+      } else {
+        remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
+      }
+    }
+    if (async) {
+      launchOnAsync {
+        remove()
+      }
+    } else {
+      remove()
+    }
   }
 
   override val material: Material = entity.material
 
   override var isDisposed: Boolean = false
-    private set
 
   override fun dispose() {
     isDisposed = true
