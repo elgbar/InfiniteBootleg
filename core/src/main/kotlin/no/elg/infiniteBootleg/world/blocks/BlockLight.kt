@@ -100,8 +100,8 @@ class BlockLight(
       }
     }
 
-  fun recalculateLighting(scope: CoroutineScope) =
-    with(scope) {
+  suspend fun recalculateLighting() =
+    coroutineScope {
       job = launch(start = CoroutineStart.DEFAULT) {
         recalculateLighting0()
         ensureActive()
@@ -227,7 +227,7 @@ class BlockLight(
       if (offsetY <= MIN_Y_OFFSET) {
         // Too little offset to bother with columns of skylight (or the block is above left and right)
         // add one to get the air block above the top-block
-        val block = chunk.world.getBlock(topWorldX, topWorldY, false) ?: continue
+        val block = chunk.world.getBlock(topWorldX, topWorldY, loadChunk = false) ?: continue
         if (skylightBlockFilter(worldX.toFloat(), worldY.toFloat(), block)) {
           skyblocks.add(block)
         }

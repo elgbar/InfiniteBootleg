@@ -9,11 +9,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withContext
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
@@ -78,7 +74,6 @@ class ChunkImpl(
    * */
   @Volatile
   override var isDirty = true
-    private set
 
   /**
    * if this chunk should be prioritized to be updated
@@ -349,24 +344,18 @@ class ChunkImpl(
 
   private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      coroutineScope {
-        var didDoSomeWork = false
-        outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-            if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
-              continue
-            }
-            withContext(CoroutineName("LightUpdate ${stringifyChunkToWorld(this@ChunkImpl, localX, localY)}")) {
-              blockLights[localX][localY].recalculateLighting(this)
-              didDoSomeWork = true
-            }
+      var didDoSomeWork = false
+      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
+        for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+          if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+            continue
           }
+          blockLights[localX][localY].recalculateLighting()
+          didDoSomeWork = true
         }
-        ensureActive()
-        if (didDoSomeWork) {
-          ensureActive()
-          queueForRendering(false)
-        }
+      }
+      if (didDoSomeWork) {
+        queueForRendering(false)
       }
     }
   }
@@ -612,12 +601,7 @@ class ChunkImpl(
       for (localY in 0 until Chunk.CHUNK_SIZE) {
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           checkChunkCorrupt(protoChunk, blocks[localX][localY] == null) {
-            "Double assemble of ${
-              stringifyCompactLoc(
-                localX,
-                localY
-              )
-            } in chunk ${stringifyCompactLoc(chunkPosition)}"
+            "Double assemble of ${stringifyCompactLoc(localX, localY)} in chunk ${stringifyCompactLoc(chunkPosition)}"
           }
           val protoBlock = protoBlocks[index++]
           blocks[localX][localY] = Block.fromProto(world, this, localX, localY, protoBlock)
