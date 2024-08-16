@@ -477,15 +477,7 @@ class ChunkImpl(
       logger.warn { "Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}" }
     }
     require(isInsideChunk(localX, localY)) { "Given arguments are not inside this chunk, localX=$localX localY=$localY" }
-    synchronized(this) {
-      return blocks[localX][localY] ?: return setBlock(
-        localX,
-        localY,
-        Material.AIR,
-        updateTexture = false,
-        sendUpdatePacket = false
-      ) ?: error("Failed to create air block!")
-    }
+    return getRawBlock(localX, localY) ?: setBlock(localX, localY, Material.AIR, updateTexture = false, sendUpdatePacket = false) ?: error("Failed to create air block!")
   }
 
   @Synchronized
