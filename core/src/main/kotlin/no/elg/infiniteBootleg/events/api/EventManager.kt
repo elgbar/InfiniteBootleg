@@ -118,12 +118,12 @@ object EventManager {
     val eventListeners: MutableSet<EventListener<out Event>> =
       synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
 
-    synchronized(eventListeners) {
-      val correctListeners = eventListeners.filterIsInstance<EventListener<T>>()
-      for (listener in correctListeners) {
-        eventsTracker?.onEventListenedTo(event, listener)
-        listener.handle(event)
-      }
+    val correctListeners = synchronized(eventListeners) {
+      eventListeners.filterIsInstance<EventListener<T>>()
+    }
+    for (listener in correctListeners) {
+      eventsTracker?.onEventListenedTo(event, listener)
+      listener.handle(event)
     }
   }
 
