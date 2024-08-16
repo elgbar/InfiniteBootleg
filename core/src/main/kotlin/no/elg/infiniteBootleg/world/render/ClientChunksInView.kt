@@ -1,10 +1,12 @@
 package no.elg.infiniteBootleg.world.render
 
+import no.elg.infiniteBootleg.util.ChunkCoord
+
 /** @author Elg
  */
 data class ClientChunksInView(
-  override var horizontalStart: Int = 0,
-  override var horizontalEnd: Int = 0,
-  override var verticalStart: Int = 0,
-  override var verticalEnd: Int = 0
+  override var horizontalStart: ChunkCoord = 0,
+  override var horizontalEnd: ChunkCoord = 0,
+  override var verticalStart: ChunkCoord = 0,
+  override var verticalEnd: ChunkCoord = 0
 ) : ChunksInView

@@ -9,6 +9,8 @@ import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import ktx.async.schedule
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.AuthoritativeOnly
@@ -38,13 +40,17 @@ import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
+import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ContainerElement
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.WorldTime
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
@@ -779,6 +785,23 @@ class Commands : CommandExecutor() {
         logger.info { entityNameId(entity) }
       }
       logger.info { "In total ${entities.size} entities were found in chunk ${stringifyCompactLoc(chunkX, chunkY)}" }
+    }
+  }
+
+  @ClientsideOnly
+  fun sandTest(delayMillis: Long = 50) {
+    val world = clientWorld ?: return
+    val dx = 2
+    val dy = 1
+    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(CHUNK_SIZE) until (horizontalEnd - dx).chunkToWorld(0) }
+    val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
+    launchOnMain {
+      for (x in chunkXs) {
+        coroutineScope {
+          launchOnAsync { world.setBlock(x, y, Material.SAND, prioritize = true) }
+        }
+        delay(delayMillis)
+      }
     }
   }
 }
