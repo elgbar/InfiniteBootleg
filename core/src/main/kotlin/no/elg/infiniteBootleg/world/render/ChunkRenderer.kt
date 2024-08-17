@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.google.errorprone.annotations.concurrent.GuardedBy
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap
 import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.chunksToRenderEachFrame
@@ -30,7 +31,6 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLO
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import java.util.LinkedList
 
 /**
  * @author Elg
@@ -44,7 +44,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   // use linked list for fast adding to end and beginning
   @GuardedBy("QUEUE_LOCK")
-  private val renderQueue: MutableList<Chunk> = LinkedList()
+  private val renderQueue: Long2ObjectLinkedOpenHashMap<Chunk> = Long2ObjectLinkedOpenHashMap<Chunk>()
 
   // current rendering chunk
   @GuardedBy("QUEUE_LOCK")
@@ -68,22 +68,15 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
    */
   fun queueRendering(chunk: Chunk, prioritize: Boolean) {
     launchOnMultithreadedAsync {
+      val pos = chunk.compactLocation
       synchronized(QUEUE_LOCK) {
         if (chunk === curr) {
           return@launchOnMultithreadedAsync
         }
-        val chunkIndex = renderQueue.indexOf(chunk)
-        // Place the chunk at the front of the queue
-
         if (prioritize) {
-          if (chunkIndex > 0) {
-            // Chunk is in the queue, so we must remove it first
-            renderQueue.removeAt(chunkIndex)
-          }
-          renderQueue.addFirst(chunk)
-        } else if (chunkIndex == CHUNK_NOT_IN_QUEUE_INDEX) {
-          // Only add if not already in queue to avoid duplicates
-          renderQueue.addLast(chunk)
+          renderQueue.putAndMoveToFirst(pos, chunk)
+        } else {
+          renderQueue.putIfAbsent(pos, chunk)
         }
       }
       dispatchEvent(ChunkAddedToChunkRendererEvent(chunk, prioritize))
@@ -110,7 +103,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           // nothing to render
           return
         }
-        chunk = renderQueue.removeAt(0)
+        chunk = renderQueue.removeFirst()
         aboveGround = chunk.chunkColumn.isChunkAboveTopBlock(chunk.chunkY, TOP_MOST_FLAG)
       } while ((chunk.isAllAir && aboveGround) || !chunk.isNotDisposed || worldRender.isOutOfView(chunk))
       curr = chunk
