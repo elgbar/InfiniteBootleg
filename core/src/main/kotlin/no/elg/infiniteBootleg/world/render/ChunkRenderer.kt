@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.Settings.chunksToRenderEachFrame
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
@@ -90,7 +91,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     render()
     if (Gdx.graphics.framesPerSecond > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
       // only render more chunks when the computer isn't struggling with the rendering
-      for (i in 0 until EXTRA_CHUNKS_TO_RENDER_EACH_FRAME) {
+      for (i in 0 until chunksToRenderEachFrame) {
         render()
       }
     }
@@ -263,7 +264,6 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     /** How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks  */
     const val FPS_FAST_CHUNK_RENDER_THRESHOLD = 10
 
-    const val EXTRA_CHUNKS_TO_RENDER_EACH_FRAME = 4
     const val LIGHT_RESOLUTION = 2
 
     const val LIGHT_SUBBLOCK_SIZE = BLOCK_SIZE / LIGHT_RESOLUTION.toFloat()

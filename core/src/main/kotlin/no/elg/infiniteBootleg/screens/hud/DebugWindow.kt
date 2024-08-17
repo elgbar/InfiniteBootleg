@@ -273,6 +273,16 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           clientWorld.render.camera.zoom = it
           clientWorld.render.update()
         }
+        intSpinner(
+          name = "Max chunk to render each frame",
+          srcValueGetter = Settings::chunksToRenderEachFrame,
+          min = 1,
+          max = Int.MAX_VALUE,
+          step = 1,
+          decimals = 0,
+          onAnyElementChanged = onAnyElementChanged,
+          onChange = Settings::chunksToRenderEachFrame::set
+        )
       }
       sep()
 
