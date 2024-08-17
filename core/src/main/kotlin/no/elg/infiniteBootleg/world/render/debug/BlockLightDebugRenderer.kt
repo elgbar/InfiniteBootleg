@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
@@ -27,7 +27,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
-class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
+class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000).also {
     it.color = BLOCK_LIGHT_UPDATE_COLOR
@@ -43,14 +43,15 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Rend
   private val skylightDebugTexture by lazy { Main.inst().assets.skylightDebugTexture.textureRegion }
   private val luminanceDebugTexture by lazy { Main.inst().assets.luminanceDebugTexture.textureRegion }
 
+  override val isActive: Boolean
+    get() = Settings.renderLight && (Settings.debugBlockLight || Settings.renderBlockLightUpdates)
+
   override fun render() {
-    if (Settings.renderLight) {
-      if (Settings.debugBlockLight) {
-        renderLightSrc()
-      }
-      if (Settings.renderBlockLightUpdates) {
-        renderLightUpdates()
-      }
+    if (Settings.debugBlockLight) {
+      renderLightSrc()
+    }
+    if (Settings.renderBlockLightUpdates) {
+      renderLightUpdates()
     }
   }
 

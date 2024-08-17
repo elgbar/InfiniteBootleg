@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.util.ProgressHandler
@@ -25,12 +25,15 @@ import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer.Companion.TEXTURE_SIZE
 import java.util.concurrent.ConcurrentHashMap
 
-class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
+class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 
   private val newlyUpdatedChunks = ConcurrentHashMap<Long, ChunkColumnUpdate>()
+
+  override val isActive: Boolean
+    get() = Settings.renderTopBlockChanges && newlyUpdatedChunks.isNotEmpty()
 
   data class ChunkColumnUpdate(
     val progress: ProgressHandler,
@@ -78,40 +81,38 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Rende
   }
 
   override fun render() {
-    if (Settings.renderTopBlockChanges && newlyUpdatedChunks.isNotEmpty()) {
-      Gdx.gl.glEnable(GL30.GL_BLEND)
-      shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
-        for ((progressHandler, index, worldX, worldNewY, worldOldY, flagSetting, diff) in newlyUpdatedChunks.values) {
-          val progress = progressHandler.updateAndGetProgress(Gdx.graphics.deltaTime)
-          if (progressHandler.isDone()) {
-            newlyUpdatedChunks.remove(index)
-            continue
-          }
-
-          fun renderBlock(color: Color, worldX: Float, worldY: Float) {
-            shapeRenderer.color.set(color)
-            shapeRenderer.color.a = progress
-            shapeRenderer.rect(
-              worldX * TEXTURE_SIZE + flagSetting.offsetX,
-              worldY * TEXTURE_SIZE + flagSetting.offsetY,
-              flagSetting.width,
-              flagSetting.height
-            )
-          }
-
-          val color = Color(flagSetting.oldColor)
-          val size = diff.size.toFloat()
-          for ((i, pos) in diff.withIndex()) {
-            val (x, y) = pos
-            val colorProgress = i / size
-            color.blend(flagSetting.oldColor, flagSetting.newColor, colorProgress)
-            renderBlock(color, x.toFloat(), y.toFloat())
-          }
-
-          // Rendering the changed block twice will highlight the changes
-          renderBlock(flagSetting.newColor, worldX, worldNewY)
-          renderBlock(flagSetting.oldColor, worldX, worldOldY)
+    Gdx.gl.glEnable(GL30.GL_BLEND)
+    shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
+      for ((progressHandler, index, worldX, worldNewY, worldOldY, flagSetting, diff) in newlyUpdatedChunks.values) {
+        val progress = progressHandler.updateAndGetProgress(Gdx.graphics.deltaTime)
+        if (progressHandler.isDone()) {
+          newlyUpdatedChunks.remove(index)
+          continue
         }
+
+        fun renderBlock(color: Color, worldX: Float, worldY: Float) {
+          shapeRenderer.color.set(color)
+          shapeRenderer.color.a = progress
+          shapeRenderer.rect(
+            worldX * TEXTURE_SIZE + flagSetting.offsetX,
+            worldY * TEXTURE_SIZE + flagSetting.offsetY,
+            flagSetting.width,
+            flagSetting.height
+          )
+        }
+
+        val color = Color(flagSetting.oldColor)
+        val size = diff.size.toFloat()
+        for ((i, pos) in diff.withIndex()) {
+          val (x, y) = pos
+          val colorProgress = i / size
+          color.blend(flagSetting.oldColor, flagSetting.newColor, colorProgress)
+          renderBlock(color, x.toFloat(), y.toFloat())
+        }
+
+        // Rendering the changed block twice will highlight the changes
+        renderBlock(flagSetting.newColor, worldX, worldNewY)
+        renderBlock(flagSetting.oldColor, worldX, worldOldY)
       }
     }
   }

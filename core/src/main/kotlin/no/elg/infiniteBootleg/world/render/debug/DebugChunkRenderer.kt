@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.ClientMain
@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 
-class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer, Disposable {
+class DebugChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 
@@ -28,55 +28,56 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : Renderer,
     newlyUpdatedChunks.put(e.chunk.compactLocation, ProgressHandler(0.25f))
   }
 
-  override fun render() {
-    if (Settings.renderChunkUpdates || Settings.renderChunkBounds) {
-      val chunksInView = worldRender.chunksInView
-      val yEnd = chunksInView.verticalEnd
-      val xEnd = chunksInView.horizontalEnd
-      val textureSize = Chunk.CHUNK_TEXTURE_SIZE
+  override val isActive: Boolean
+    get() = Settings.renderChunkUpdates || Settings.renderChunkBounds
 
-      if (Settings.renderChunkUpdates) {
-        shapeRenderer.color = CHUNK_UPDATE_COLOR
-        Gdx.gl.glEnable(GL30.GL_BLEND)
-        shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
-          for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
-            for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
-              val compactLoc = compactLoc(x, y)
-              val updatedChunk = newlyUpdatedChunks.get(compactLoc) ?: continue
-              shapeRenderer.color.a = updatedChunk.updateAndGetProgress(Gdx.graphics.deltaTime)
-              if (updatedChunk.isDone()) {
-                newlyUpdatedChunks.remove(compactLoc)
-                continue
-              }
-              shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
+  override fun render() {
+    val chunksInView = worldRender.chunksInView
+    val yEnd = chunksInView.verticalEnd
+    val xEnd = chunksInView.horizontalEnd
+    val textureSize = Chunk.CHUNK_TEXTURE_SIZE
+
+    if (Settings.renderChunkUpdates) {
+      shapeRenderer.color = CHUNK_UPDATE_COLOR
+      Gdx.gl.glEnable(GL30.GL_BLEND)
+      shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
+        for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
+          for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
+            val compactLoc = compactLoc(x, y)
+            val updatedChunk = newlyUpdatedChunks.get(compactLoc) ?: continue
+            shapeRenderer.color.a = updatedChunk.updateAndGetProgress(Gdx.graphics.deltaTime)
+            if (updatedChunk.isDone()) {
+              newlyUpdatedChunks.remove(compactLoc)
+              continue
             }
+            shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
           }
         }
       }
-      if (Settings.renderChunkBounds) {
-        shapeRenderer.safeUse(ShapeRenderer.ShapeType.Line, camera.combined) {
-          for (y in chunksInView.verticalStart until yEnd) {
-            for (x in chunksInView.horizontalStart until xEnd) {
-              val canNotSeeChunk = y == (chunksInView.verticalEnd - 1) || x == chunksInView.horizontalStart || x == (chunksInView.horizontalEnd - 1)
-              shapeRenderer.color = if (canNotSeeChunk) {
-                OUTSIDE_CAMERA_COLOR
-              } else {
-                WITHIN_CAMERA_COLOR
-              }
-              shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
+    }
+    if (Settings.renderChunkBounds) {
+      shapeRenderer.safeUse(ShapeRenderer.ShapeType.Line, camera.combined) {
+        for (y in chunksInView.verticalStart until yEnd) {
+          for (x in chunksInView.horizontalStart until xEnd) {
+            val canNotSeeChunk = y == (chunksInView.verticalEnd - 1) || x == chunksInView.horizontalStart || x == (chunksInView.horizontalEnd - 1)
+            shapeRenderer.color = if (canNotSeeChunk) {
+              OUTSIDE_CAMERA_COLOR
+            } else {
+              WITHIN_CAMERA_COLOR
             }
+            shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
           }
         }
-        val sr = ClientMain.inst().screenRenderer
-        sr.use {
-          sr.drawBottom("Debug Chunk outline legend", 5f)
-          sr.font.color = WITHIN_CAMERA_COLOR
-          sr.drawBottom("  Chunks within the camera boarders", 3f)
-          sr.font.color = OUTSIDE_CAMERA_COLOR
-          sr.drawBottom("  Chunks outside camera boarders, only physics active", 1f)
-        }
-        sr.resetFontColor()
       }
+      val sr = ClientMain.inst().screenRenderer
+      sr.use {
+        sr.drawBottom("Debug Chunk outline legend", 5f)
+        sr.font.color = WITHIN_CAMERA_COLOR
+        sr.drawBottom("  Chunks within the camera boarders", 3f)
+        sr.font.color = OUTSIDE_CAMERA_COLOR
+        sr.drawBottom("  Chunks outside camera boarders, only physics active", 1f)
+      }
+      sr.resetFontColor()
     }
   }
 
