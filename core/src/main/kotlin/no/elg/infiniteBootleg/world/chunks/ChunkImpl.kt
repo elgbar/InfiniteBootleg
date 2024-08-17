@@ -225,7 +225,7 @@ class ChunkImpl(
     }
 
     val event = BlockChangedEvent(currBlock, block) // create event here to get the correct thread type
-    launchOnAsync { dispatchEvent(event) }
+    launchOnMultithreadedAsync { dispatchEvent(event) }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
         val originWorldX = getWorldX(localX)
