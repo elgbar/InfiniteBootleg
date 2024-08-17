@@ -475,9 +475,14 @@ abstract class World(
     }
 
   fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn {
-    val fastColumn = chunkColumns[chunkX]
-    if (fastColumn != null) {
-      return fastColumn
+    try {
+      // Fast path, though this is not thread safe so we must validate the result
+      val fastColumn = chunkColumns.get(chunkX)
+      if (fastColumn != null && fastColumn.chunkX == chunkX) {
+        return fastColumn
+      }
+    } catch (ignore: Exception) {
+      // ignore, we try safe path if anything happens
     }
     synchronized(chunkColumns) {
       // The column might have been updated while we've been waiting for the lock
