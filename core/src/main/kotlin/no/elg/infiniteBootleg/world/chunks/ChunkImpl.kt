@@ -178,13 +178,7 @@ class ChunkImpl(
   ): Block? {
     if (isDisposed) {
       handleChangingBlockInDeposedChunk.handle {
-        "Changed block in disposed chunk ${
-          stringifyChunkToWorld(
-            this,
-            localX,
-            localY
-          )
-        }, block: $block"
+        "Changed block in disposed chunk ${stringifyChunkToWorld(this, localX, localY)}, block: $block"
       }
       return null
     }

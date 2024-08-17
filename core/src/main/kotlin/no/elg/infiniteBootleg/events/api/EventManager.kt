@@ -115,11 +115,12 @@ object EventManager {
    */
   inline fun <reified T : Event> dispatchEvent(event: T) {
     eventsTracker?.onEventDispatched(event)
-    val eventListeners: MutableSet<EventListener<out Event>> =
+    val eventListeners: Set<EventListener<out Event>> =
       synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
 
-    val correctListeners = synchronized(eventListeners) {
-      eventListeners.filterIsInstance<EventListener<T>>()
+    @Suppress("UNCHECKED_CAST")
+    val correctListeners: Set<EventListener<T>> = synchronized(eventListeners) {
+      HashSet<EventListener<T>>(eventListeners as Set<EventListener<T>>) // Copy to prevent concurrent modification exception
     }
     for (listener in correctListeners) {
       eventsTracker?.onEventListenedTo(event, listener)
