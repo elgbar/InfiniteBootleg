@@ -20,10 +20,10 @@ abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(
   }
 
   final override fun processEntity(entity: Entity, deltaTime: Float) {
-    queueMapper.get(entity)?.also {
-      val events = it.events
-      while (events.isNotEmpty()) {
-        handleEvent(entity, deltaTime, events.poll())
+    queueMapper.get(entity)?.events?.also { events ->
+      while (true) {
+        val event: T = events.poll() ?: return
+        handleEvent(entity, deltaTime, event)
       }
     }
   }
