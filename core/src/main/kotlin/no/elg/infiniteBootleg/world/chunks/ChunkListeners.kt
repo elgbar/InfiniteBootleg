@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.gdx.utils.Disposable
+import ktx.collections.GdxLongArray
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.events.WorldTickedEvent
@@ -8,7 +9,6 @@ import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
-import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.isNeighbor
@@ -20,7 +20,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
 
   private val listeners: MutableSet<RegisteredEventListener> = mutableSetOf()
 
-  private val lightLocs: MutableSet<WorldCompactLoc> = mutableSetOf()
+  private val lightLocs: GdxLongArray = GdxLongArray(false, 16)
 
   fun registerListeners() {
     require(listeners.isEmpty()) { "Listeners cannot be done twice" }
@@ -35,8 +35,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
             // No need to update lights, do a fast return
             return@registerListener
           }
-          lightLocs.toLongArray().also {
+          lightLocs.items.copyOf().also {
             lightLocs.clear()
+            lightLocs.shrink()
           }
         }
         chunk.doUpdateLightMultipleSources(lights, checkDistance = true)
@@ -50,7 +51,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       if (chunk.isNeighbor(eventChunk) || chunk == eventChunk) {
         val compactLoc = compactChunkToWorld(eventChunk, originLocalX, originLocalY)
         synchronized(lightLocs) {
-          lightLocs += compactLoc
+          lightLocs.add(compactLoc)
         }
       }
     }
@@ -66,13 +67,15 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       }
     }
 
+    val chunkLookRange = (chunk.chunkX - 2)..(chunk.chunkX + 2)
     /**
      * Update chunk light when a chunk column is updated
      */
     listeners += registerListener { event: ChunkColumnUpdatedEvent ->
-      if (event.flag and BLOCKS_LIGHT_FLAG != 0) {
+      if (event.chunkX in chunkLookRange && (event.flag and BLOCKS_LIGHT_FLAG != 0)) {
+        val lights: WorldCompactLocArray = event.calculatedDiffColumn
         synchronized(lightLocs) {
-          lightLocs.addAll(event.calculatedDiffColumn.toSet())
+          lightLocs.addAll(lights, 0, lights.size)
         }
       }
     }
