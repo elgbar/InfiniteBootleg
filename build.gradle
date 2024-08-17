@@ -91,7 +91,6 @@ subprojects {
       languageVersion = KotlinVersion.KOTLIN_2_1
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]
-      freeCompilerArgs.add("-Xjvm-default=all")
       freeCompilerArgs.add("-Xdebug")
 //      allWarningsAsErrors = true
     }

@@ -36,7 +36,7 @@ object UpdateGridBlockSystem :
     val halfBox2dWidth = entity.box2d.halfBox2dWidth
     val halfBox2dHeight = entity.box2d.halfBox2dHeight
 
-    //Note: raw must be false to properly update the lights while lights are falling
+    // Note: raw must be false to properly update the lights while lights are falling
     val currentOccupations =
       world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true, chunkCache)
     val occupyingLocations = entity.occupyingLocations

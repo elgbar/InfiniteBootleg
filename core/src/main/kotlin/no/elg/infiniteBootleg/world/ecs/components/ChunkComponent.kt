@@ -27,8 +27,8 @@ data class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
      */
     val Entity.chunk get() = chunkComponent.chunk
     val Entity.chunkOrNull get() = chunkComponentOrNull?.chunk
-    val Entity.chunkComponent by propertyFor(ChunkComponent.mapper)
-    var Entity.chunkComponentOrNull by optionalPropertyFor(ChunkComponent.mapper)
+    val Entity.chunkComponent by propertyFor(mapper)
+    var Entity.chunkComponentOrNull by optionalPropertyFor(mapper)
     val Entity.block: Block
       get() {
         val (worldX, worldY) = this.position

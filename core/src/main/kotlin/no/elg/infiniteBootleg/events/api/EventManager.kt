@@ -16,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 object EventManager {
 
   /**
-   * The inner set is in reality a [WeakHashMap]
+   * The inner set is in reality a `Collections.newSetFromMap(WeakHashMap())`
    */
   @GuardedBy("itself")
   val weakListeners: WeakHashMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()

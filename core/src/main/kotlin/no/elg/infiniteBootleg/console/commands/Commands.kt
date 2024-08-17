@@ -793,7 +793,7 @@ class Commands : CommandExecutor() {
     val world = clientWorld ?: return
     val dx = 2
     val dy = 1
-    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(CHUNK_SIZE) until (horizontalEnd - dx).chunkToWorld(0) }
+    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
     val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
     launchOnMain {
       for (x in chunkXs) {

@@ -24,8 +24,8 @@ enum class Direction(val dx: Int, val dy: Int) {
     return "Direction[$name]{dx=$dx, dy=$dy}"
   }
 
-  val horizontalDirection = HorizontalDirection.of(dx)
-  val verticalDirection = VerticalDirection.of(dy)
+  val horizontalDirection: HorizontalDirection = HorizontalDirection.of(dx)
+  val verticalDirection: VerticalDirection = VerticalDirection.of(dy)
 
   fun toProtoVector2i(): ProtoWorld.Vector2i =
     vector2i {
