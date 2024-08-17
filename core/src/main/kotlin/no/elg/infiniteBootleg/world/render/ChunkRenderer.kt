@@ -13,6 +13,8 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.chunksToRenderEachFrame
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkAddedToChunkRendererEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.LocalCoord
@@ -84,6 +86,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           renderQueue.addLast(chunk)
         }
       }
+      dispatchEvent(ChunkAddedToChunkRendererEvent(chunk, prioritize))
     }
   }
 

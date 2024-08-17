@@ -33,6 +33,7 @@ import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsIn
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
+import no.elg.infiniteBootleg.world.render.debug.DebugChunkAddedToChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.EntityMarkerBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
@@ -54,6 +55,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     HoveringBlockRenderer(this),
     EntityRenderer(this),
     DebugChunkRenderer(this),
+    DebugChunkAddedToChunkRenderer(this),
     BlockLightDebugRenderer(this),
     TopBlockChangeRenderer(this),
     FuturePositionRenderer(this),
