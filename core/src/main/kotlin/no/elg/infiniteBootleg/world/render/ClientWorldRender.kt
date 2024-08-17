@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
+import no.elg.infiniteBootleg.api.render.OverlayRenderer.Companion.isInactive
 import no.elg.infiniteBootleg.inventory.container.InterfaceId
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.ui.createContainerActor
@@ -47,7 +48,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   private val viewBound: Rectangle = Rectangle()
   private val box2dDebugM4 = Matrix4()
-  private val renderers: List<Renderer> = listOf(
+  private val renderers: Array<Renderer> = arrayOf(
     CachedChunkRenderer(this),
     AirBlockRenderer(this),
     HoveringBlockRenderer(this),
@@ -130,6 +131,11 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     chunkRenderer.renderMultiple()
     batch.safeUse {
       for (renderer in renderers) {
+        if (renderer.isInactive) continue
+        if (!batch.isDrawing) {
+          logger.warn { "Batch was not drawing when rendering, starting batch" }
+          batch.begin()
+        }
         batch.projectionMatrix = camera.combined
         renderer.render()
       }

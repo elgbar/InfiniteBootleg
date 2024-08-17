@@ -54,10 +54,12 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
 
   override fun render() {
     prepareChunks()
+    worldRender.batch.disableBlending()
     for ((chunk, textureRegion) in chunksToDraw.entries()) {
       val dx = chunk.chunkX * Chunk.CHUNK_TEXTURE_SIZE
       val dy = chunk.chunkY * Chunk.CHUNK_TEXTURE_SIZE
       worldRender.batch.draw(textureRegion, dx.toFloat(), dy.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
     }
+    worldRender.batch.enableBlending()
   }
 }
