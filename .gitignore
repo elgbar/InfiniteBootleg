@@ -146,6 +146,6 @@ version
 tests/
 
 .idea/
-/textures/gdx-texturepacker.jar
+/textures/*.jar
 .kotlin/
 /core/src/main/resources/logs/*
