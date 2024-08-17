@@ -213,7 +213,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           property = FuturePositionRenderer::collisionCheck
         )
 
-        floatSpinner(
+        intSpinner(
           name = "Number of steps",
           srcValueGetter = FuturePositionRenderer::numberOfStepsToSee,
           min = 1f,
@@ -221,7 +221,7 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           step = 8f,
           decimals = 0,
           onAnyElementChanged = onAnyElementChanged,
-          onChange = { FuturePositionRenderer.numberOfStepsToSee = it.toInt() }
+          onChange = FuturePositionRenderer::numberOfStepsToSee::set
         )
       }
 
@@ -254,14 +254,14 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onToggle = Main.inst().console.exec::instantBreak
         )
         floatSpinner(
-          "Brush size",
-          brushSizeGetter,
-          1f,
-          64f,
-          0.25f,
-          2,
-          onAnyElementChanged,
-          Main.inst().console.exec::brush
+          name = "Brush size",
+          srcValueGetter = brushSizeGetter,
+          min = 1f,
+          max = 64f,
+          step = 0.25f,
+          decimals = 2,
+          onAnyElementChanged = onAnyElementChanged,
+          onChange = Main.inst().console.exec::brush
         )
         floatSpinner("Reach radius", reachRadiusGetter, 1f, 512f, 1f, 0, onAnyElementChanged, Main.inst().console.exec::interactRadius)
       }
@@ -323,11 +323,9 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
       sep()
       section {
         toggleableDebugButton("Vsync", onAnyElementChanged = onAnyElementChanged, booleanGetter = Settings::vsync, onToggle = { Settings.vsync = !Settings.vsync })
-        floatSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1, 0, onAnyElementChanged) { Settings.foregroundFPS = it.toInt() }
+        intSpinner("Max FPS", Settings::foregroundFPS, 0, 512, 1, 0, onAnyElementChanged, Settings::foregroundFPS::set)
         val oneDayInSeconds = 86400f
-        floatSpinner("Save every (sec)", Settings::savePeriodSeconds, 1f, oneDayInSeconds, 1f, 0, onAnyElementChanged) {
-          Settings.savePeriodSeconds = it
-        }
+        floatSpinner("Save every (sec)", Settings::savePeriodSeconds, 1f, oneDayInSeconds, 1f, 0, onAnyElementChanged, Settings::savePeriodSeconds::set)
       }
       sep()
       section {

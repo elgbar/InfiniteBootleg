@@ -11,10 +11,12 @@ import ktx.collections.toGdxArray
 import ktx.scene2d.KTable
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
+import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.separator
 import ktx.scene2d.vis.spinner
 import ktx.scene2d.vis.visLabel
+import ktx.scene2d.vis.visSlider
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import ktx.scene2d.vis.visTextTooltip
@@ -70,6 +72,18 @@ fun KTable.toggleableDebugButton(
       tooltipLabel.setText(tooltipText())
     }
   }
+
+@Scene2dDsl
+fun KTable.intSpinner(
+  name: String,
+  srcValueGetter: () -> Number,
+  min: Number,
+  max: Number,
+  step: Number,
+  decimals: Int,
+  onAnyElementChanged: MutableList<() -> Unit>,
+  onChange: (Int) -> Unit
+) = floatSpinner(name, srcValueGetter, min, max, step, decimals, onAnyElementChanged) { onChange(it.toInt()) }
 
 @Scene2dDsl
 fun KTable.floatSpinner(
@@ -150,6 +164,35 @@ fun KVisTable.aSeparator(cols: Int = this.columns) {
     separator {
       it.fillX()
       it.colspan(cols)
+    }
+  }
+}
+
+@Scene2dDsl
+fun KTable.floatSlider(
+  name: String,
+  srcValueGetter: () -> Number,
+  min: Number,
+  max: Number,
+  step: Number,
+  onAnyElementChanged: MutableList<() -> Unit>,
+  onChange: (Float) -> Unit
+) {
+  horizontalGroup {
+    it.fillX()
+    space(5f)
+    visLabel(name)
+    visSlider(min.toFloat(), max.toFloat(), step.toFloat()) {
+      this.name = name
+      setValue(srcValueGetter().toFloat())
+
+      onAnyElementChanged += {
+        setValue(srcValueGetter().toFloat())
+      }
+      onChange {
+        onChange(this.value)
+        updateAllValues(onAnyElementChanged)
+      }
     }
   }
 }

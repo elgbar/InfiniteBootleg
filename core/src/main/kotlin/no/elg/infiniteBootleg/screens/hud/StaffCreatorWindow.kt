@@ -4,14 +4,10 @@ import com.kotcrab.vis.ui.widget.VisSelectBox
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.actors.onChange
 import ktx.actors.onClick
-import ktx.scene2d.KTable
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actor
-import ktx.scene2d.horizontalGroup
 import ktx.scene2d.vis.KVisTable
 import ktx.scene2d.vis.visCheckBox
-import ktx.scene2d.vis.visLabel
-import ktx.scene2d.vis.visSlider
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.util.IBVisWindow
@@ -35,35 +31,6 @@ import no.elg.infiniteBootleg.world.magic.parts.WoodType
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 private val logger = KotlinLogging.logger {}
-
-@Scene2dDsl
-fun KTable.floatSlider(
-  name: String,
-  srcValueGetter: () -> Float,
-  min: Float,
-  max: Float,
-  step: Float,
-  onAnyElementChanged: MutableList<() -> Unit>,
-  onChange: (Float) -> Unit
-) {
-  horizontalGroup {
-    it.fillX()
-    space(5f)
-    visLabel(name)
-    visSlider(min, max, step) {
-      this.name = name
-      setValue(srcValueGetter())
-
-      onAnyElementChanged += {
-        setValue(srcValueGetter())
-      }
-      onChange {
-        onChange(this.value)
-        updateAllValues(onAnyElementChanged)
-      }
-    }
-  }
-}
 
 @Scene2dDsl
 inline fun <reified TYPE : Any, reified RATING : Enum<RATING>, RESULT> KVisTable.addSelector(
