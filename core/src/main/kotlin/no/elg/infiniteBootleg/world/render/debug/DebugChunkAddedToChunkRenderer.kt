@@ -6,11 +6,14 @@ import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.LongMap
+import com.google.errorprone.annotations.concurrent.GuardedBy
+import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkAddedToChunkRendererEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.safeUse
@@ -22,12 +25,24 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 
-  private val newlyUpdatedChunks = LongMap<ToUpdateChunk>()
+  @GuardedBy("itself")
+  private val newlyUpdatedChunks = Long2ByteOpenHashMap().also { it.defaultReturnValue(NOT_QUEUED) }
 
-  private val listener = EventManager.registerListener { e: ChunkAddedToChunkRendererEvent ->
+  private val listenerAddedToChunkRenderer = EventManager.registerListener { e: ChunkAddedToChunkRendererEvent ->
     if (isActive) {
-      newlyUpdatedChunks.put(e.chunk.compactLocation, ToUpdateChunk(ProgressHandler(0.1f), e.prioritized))
+      synchronized(newlyUpdatedChunks) {
+        newlyUpdatedChunks.put(e.chunkLoc, if (e.prioritized) PRIORITIZED else NOT_PRIORITIZED)
+      }
     }
+  }
+
+  private val listenerTextureChanged = EventManager.registerListener { e: ChunkTextureChangedEvent ->
+    // Remove event when not active
+    synchronized(newlyUpdatedChunks) { newlyUpdatedChunks.remove(e.chunkLoc) }
+  }
+  private val listenerTextureChangeRejected = EventManager.registerListener { e: ChunkTextureChangeRejectedEvent ->
+    // Remove event when not active
+    synchronized(newlyUpdatedChunks) { newlyUpdatedChunks.remove(e.chunkLoc) }
   }
 
   override val isActive: Boolean
@@ -46,14 +61,9 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
           val compactLoc = compactLoc(x, y)
 
           shapeRenderer.color = CHUNK_WILL_UPDATE_PRIORITY_COLOR
-          val (updatedChunk, prioritized) = newlyUpdatedChunks.get(compactLoc) ?: continue
+          val prioritization = newlyUpdatedChunks.get(compactLoc) // Get should be safe since we are not removing any elements
 
-          shapeRenderer.color.a = updatedChunk.updateAndGetProgress(delta)
-          if (updatedChunk.isDone()) {
-            newlyUpdatedChunks.remove(compactLoc)
-            continue
-          }
-          if (prioritized) {
+          if (prioritization == PRIORITIZED) {
             shapeRenderer.color = CHUNK_WILL_UPDATE_PRIORITY_COLOR
             shapeRenderer.rect(
               /* x = */
@@ -65,7 +75,7 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
               /* height = */
               CHUNK_TEXTURE_SIZE_HALF - 1f
             )
-          } else {
+          } else if (prioritization == NOT_PRIORITIZED) {
             shapeRenderer.color = CHUNK_WILL_UPDATE_COLOR
             shapeRenderer.rect(
               /* x = */
@@ -85,10 +95,16 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
 
   override fun dispose() {
     shapeRenderer.dispose()
-    listener.removeListener()
+    listenerAddedToChunkRenderer.removeListener()
+    listenerTextureChanged.removeListener()
+    listenerTextureChangeRejected.removeListener()
   }
 
   companion object {
+
+    private const val PRIORITIZED = 2.toByte()
+    private const val NOT_PRIORITIZED = 1.toByte()
+    private const val NOT_QUEUED = 0.toByte()
 
     data class ToUpdateChunk(val progress: ProgressHandler, val prioritized: Boolean)
 

@@ -25,7 +25,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRe
   private val newlyUpdatedChunks = LongMap<ProgressHandler>()
 
   private val listener = EventManager.registerListener { e: ChunkTextureChangedEvent ->
-    newlyUpdatedChunks.put(e.chunk.compactLocation, ProgressHandler(0.25f))
+    newlyUpdatedChunks.put(e.chunkLoc, ProgressHandler(0.25f))
   }
 
   override val isActive: Boolean

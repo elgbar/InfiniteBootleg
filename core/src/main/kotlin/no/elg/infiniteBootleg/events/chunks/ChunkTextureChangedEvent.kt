@@ -1,5 +1,5 @@
 package no.elg.infiniteBootleg.events.chunks
 
-import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 
-class ChunkTextureChangedEvent(override val chunk: Chunk) : ChunkEvent
+class ChunkTextureChangedEvent(override val chunkLoc: ChunkCompactLoc) : ChunkPositionEvent

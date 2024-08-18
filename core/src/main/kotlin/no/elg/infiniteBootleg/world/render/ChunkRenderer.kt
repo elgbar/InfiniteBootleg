@@ -13,9 +13,12 @@ import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.chunksToRenderEachFrame
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkAddedToChunkRendererEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_ABOVE_TOP_BLOCK_REASON
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_INVALID_REASON
+import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_OUT_OF_VIEW_REASON
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.LocalCoord
@@ -79,7 +82,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           renderQueue.putIfAbsent(pos, chunk)
         }
       }
-      dispatchEvent(ChunkAddedToChunkRendererEvent(chunk, prioritize))
+      dispatchEvent(ChunkAddedToChunkRendererEvent(chunk.compactLocation, prioritize))
     }
   }
 
@@ -94,23 +97,38 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   }
 
   override fun render() {
+    // fast return if there is nothing to render
+    if (renderQueue.isEmpty()) {
+      return
+    }
     // get the first valid chunk to render
-    var chunk: Chunk
-    var aboveGround: Boolean
-    synchronized(QUEUE_LOCK) {
+    val chunk: Chunk = synchronized(QUEUE_LOCK) {
       do {
         if (renderQueue.isEmpty()) {
           // nothing to render
           return
         }
-        chunk = renderQueue.removeFirst()
-        aboveGround = chunk.chunkColumn.isChunkAboveTopBlock(chunk.chunkY, TOP_MOST_FLAG)
-      } while ((chunk.isAllAir && aboveGround) || !chunk.isNotDisposed || worldRender.isOutOfView(chunk))
-      curr = chunk
+        val candidateChunk: Chunk = renderQueue.removeFirst()
+        if (candidateChunk.isInvalid) {
+          dispatchEvent(ChunkTextureChangeRejectedEvent(candidateChunk.compactLocation, CHUNK_INVALID_REASON))
+          continue
+        }
+        if (worldRender.isOutOfView(candidateChunk)) {
+          dispatchEvent(ChunkTextureChangeRejectedEvent(candidateChunk.compactLocation, CHUNK_OUT_OF_VIEW_REASON))
+          continue
+        }
+        if (candidateChunk.isAllAir && candidateChunk.chunkColumn.isChunkAboveTopBlock(candidateChunk.chunkY, TOP_MOST_FLAG)) {
+          dispatchEvent(ChunkTextureChangeRejectedEvent(candidateChunk.compactLocation, CHUNK_ABOVE_TOP_BLOCK_REASON))
+          continue
+        }
+        curr = candidateChunk
+        return@synchronized candidateChunk
+      } while (true)
+      error("Should never reach here")
     }
     doRenderChunk(chunk)
     if (Settings.renderChunkUpdates) {
-      EventManager.dispatchEvent(ChunkTextureChangedEvent(chunk))
+      dispatchEvent(ChunkTextureChangedEvent(chunk.compactLocation))
     }
     curr = null
   }

@@ -1,5 +1,5 @@
 package no.elg.infiniteBootleg.events.chunks
 
-import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 
-class ChunkAddedToChunkRendererEvent(override val chunk: Chunk, val prioritized: Boolean) : ChunkEvent
+class ChunkAddedToChunkRendererEvent(override val chunkLoc: ChunkCompactLoc, val prioritized: Boolean) : ChunkPositionEvent
