@@ -82,12 +82,12 @@ interface ChunkColumn {
       /**
        * Indicate that the returned top block must block light
        */
-      const val BLOCKS_LIGHT_FLAG: ChunkColumnFeatureFlag = 1 shl 0
+      const val BLOCKS_LIGHT_FLAG: ChunkColumnFeatureFlag = 1
 
       /**
        * Indicate that the returned top block must be solid
        */
-      const val SOLID_FLAG: ChunkColumnFeatureFlag = 1 shl 1
+      const val SOLID_FLAG: ChunkColumnFeatureFlag = 2
 
       /**
        * The absolute top-most block, contains all flags

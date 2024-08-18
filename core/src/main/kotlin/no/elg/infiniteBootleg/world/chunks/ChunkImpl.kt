@@ -313,10 +313,8 @@ class ChunkImpl(
    * Queue this chunk to be rendered
    */
   override fun queueForRendering(prioritize: Boolean) {
-    val render = world.render
-    if (render is ClientWorldRender) {
-      render.chunkRenderer.queueRendering(this, prioritize)
-    }
+    val render = world.render as? ClientWorldRender ?: return
+    render.chunkRenderer.queueRendering(this, prioritize)
   }
 
   override fun updateAllBlockLights() {
