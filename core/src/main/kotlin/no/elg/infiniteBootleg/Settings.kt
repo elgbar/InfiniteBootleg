@@ -76,6 +76,11 @@ object Settings {
   var renderTopBlockChanges = false
 
   /**
+   * Make sure entities have unique uuid when added to the engine
+   */
+  var enableUniquenessEntityIdCheck = true
+
+  /**
    * Log packets between client and server
    */
   var logPackets = true

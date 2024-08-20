@@ -8,6 +8,7 @@ import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -147,10 +148,13 @@ const val UPDATE_PRIORITY_LAST = 2_000
 fun ensureUniquenessListener(engine: Engine) {
   val idFamily = IdComponent::class.toFamily()
   val duplicateEntities = engine.getEntitiesFor(idFamily)
-  engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { entity ->
-    if (duplicateEntities.filter { it.id == entity.id }.size > 1) {
-      logger.warn { "Duplicate entity with id '${entity.id}' removed: Components ${entity.toComponentsString()}" }
-      engine.removeEntity(entity)
+  engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { newlyAddedEntity ->
+    if (Settings.debug &&
+      Settings.enableUniquenessEntityIdCheck &&
+      duplicateEntities.any { existingEntity -> existingEntity !== newlyAddedEntity && existingEntity.id == newlyAddedEntity.id }
+    ) {
+      logger.warn { "Duplicate entity with id '${newlyAddedEntity.id}' removed: Components ${newlyAddedEntity.toComponentsString()}" }
+      engine.removeEntity(newlyAddedEntity)
     }
   }
 }
