@@ -23,7 +23,7 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent> {
   companion object : EntityLoadableMapper<PhysicsEventQueueComponent>() {
     var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
     fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = { true }) {
-      queueEvent(PhysicsEventQueueComponent.mapper, event, filter)
+      queueEvent(mapper, event, filter)
     }
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): PhysicsEventQueueComponent = with<PhysicsEventQueueComponent>()

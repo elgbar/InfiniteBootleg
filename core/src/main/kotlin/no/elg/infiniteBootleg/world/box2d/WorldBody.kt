@@ -70,8 +70,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    *
    * Must not be under any locks of any kind (other than [BOX2D_LOCK]) when called
    *
-   * @param def
-   * The definition of the body to create
+   * @param def The definition of the body to create
    */
   fun createBody(def: BodyDef, callback: (Body) -> Unit) {
     postBox2dRunnable {

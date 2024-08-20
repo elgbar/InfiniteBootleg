@@ -15,8 +15,6 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
 
-private val logger = KotlinLogging.logger {}
-
 /**
  * The queue of events to be processed by an entity, we cannot map events directly onto entities as multiple events might occur between processing
  */
@@ -39,7 +37,7 @@ interface ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent, Pool.Po
       event: T,
       noinline filter: (Entity) -> Boolean = { true }
     ) {
-      if (Main.inst().world?.worldTicker?.isPaused ?: true) {
+      if (Main.inst().world?.worldTicker?.isPaused != false) {
         KotlinLogging.logger {}.debug { "Dropping queued event as the world ticker is paused" }
         return
       }

@@ -11,9 +11,7 @@ import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 
 class ContactManager(val engine: Engine) : ContactListener {
 
-  private fun Contact.containsEntityFixture(entity: Entity): Boolean {
-    return fixtureA.body.userData === entity || fixtureB.body.userData === entity
-  }
+  private fun Contact.containsEntityFixture(entity: Entity): Boolean = fixtureA.body.userData === entity || fixtureB.body.userData === entity
 
   private fun queuePhysicsEvent(event: PhysicsEvent, contact: Contact) {
     engine.queuePhysicsEvent(event) { contact.containsEntityFixture(it) }

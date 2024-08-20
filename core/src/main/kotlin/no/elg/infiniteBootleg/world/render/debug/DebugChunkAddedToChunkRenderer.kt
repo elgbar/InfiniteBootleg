@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkAddedToChunkRendererEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
-import no.elg.infiniteBootleg.util.ProgressHandler
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
@@ -54,13 +53,11 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
     val xEnd = chunksInView.horizontalEnd
 
     Gdx.gl.glEnable(GL30.GL_BLEND)
-    val delta = Gdx.graphics.deltaTime
     shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
       for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
         for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
           val compactLoc = compactLoc(x, y)
 
-          shapeRenderer.color = CHUNK_WILL_UPDATE_PRIORITY_COLOR
           val prioritization = newlyUpdatedChunks.get(compactLoc) // Get should be safe since we are not removing any elements
 
           if (prioritization == PRIORITIZED) {
@@ -105,8 +102,6 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
     private const val PRIORITIZED = 2.toByte()
     private const val NOT_PRIORITIZED = 1.toByte()
     private const val NOT_QUEUED = 0.toByte()
-
-    data class ToUpdateChunk(val progress: ProgressHandler, val prioritized: Boolean)
 
     val CHUNK_WILL_UPDATE_PRIORITY_COLOR: Color = Color.YELLOW
     val CHUNK_WILL_UPDATE_COLOR: Color = Color.RED
