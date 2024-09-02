@@ -340,18 +340,13 @@ class ChunkImpl(
 
   private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      var didDoSomeWork = false
       outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
         for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
           if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
             continue
           }
           blockLights[localX][localY].recalculateLighting()
-          didDoSomeWork = true
         }
-      }
-      if (didDoSomeWork) {
-        queueForRendering(false)
       }
     }
   }
