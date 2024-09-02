@@ -36,6 +36,7 @@ import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkAddedToChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.EntityMarkerBlockRenderer
+import no.elg.infiniteBootleg.world.render.debug.LeafDecayDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.TopBlockChangeRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
@@ -58,6 +59,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     DebugChunkAddedToChunkRenderer(this),
     BlockLightDebugRenderer(this),
     TopBlockChangeRenderer(this),
+    LeafDecayDebugRenderer(this),
     FuturePositionRenderer(this),
     EntityMarkerBlockRenderer(this)
   )

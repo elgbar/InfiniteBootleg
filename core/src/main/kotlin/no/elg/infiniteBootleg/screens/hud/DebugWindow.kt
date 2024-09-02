@@ -198,6 +198,15 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           }
         )
       }
+      section {
+        toggleableDebugButton(
+          "Render leaf decay",
+          "Render each block checked for leaf decay",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::renderLeafDecay
+        )
+      }
+      sep()
       // Future positions renderers
       section {
         toggleableDebugButton(

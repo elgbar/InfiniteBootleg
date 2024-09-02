@@ -71,6 +71,8 @@ object Settings {
 
   var renderBlockLightUpdates = false
 
+  var renderLeafDecay = false
+
   var renderAirBlocks = false
 
   var renderTopBlockChanges = false

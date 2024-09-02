@@ -3,12 +3,15 @@ package no.elg.infiniteBootleg.world.ecs.system.block
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import ktx.collections.GdxLongArray
+import no.elg.infiniteBootleg.events.LeafDecayCheckEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.isWithin
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.relativeCompact
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
@@ -33,6 +36,9 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
       return
     }
     val srcLoc = entity.compactBlockLoc
+    launchOnAsync {
+      dispatchEvent(LeafDecayCheckEvent(srcLoc))
+    }
 
     val stack = GdxLongArray(false, 16)
     val seen = GdxLongArray()
@@ -67,6 +73,6 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
     }
 
     // If no trunks were found, remove the leaf block
-    entity.chunk.removeBlock(srcLoc.decompactLocX().chunkOffset(), srcLoc.decompactLocY().chunkOffset())
+    chunk.removeBlock(srcLoc.decompactLocX().chunkOffset(), srcLoc.decompactLocY().chunkOffset())
   }
 }
