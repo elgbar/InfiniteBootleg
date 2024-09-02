@@ -18,6 +18,7 @@ import no.elg.infiniteBootleg.console.ClientsideOnly
 import no.elg.infiniteBootleg.console.CmdArgNames
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.getOrCreateEventsTracker
+import no.elg.infiniteBootleg.events.api.EventStatistics
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_EVERYTHING
 import no.elg.infiniteBootleg.events.api.EventsTracker.Companion.LOG_NOTHING
 import no.elg.infiniteBootleg.inventory.container.Container
@@ -803,5 +804,14 @@ class Commands : CommandExecutor() {
         delay(delayMillis)
       }
     }
+  }
+
+  fun eventStats() {
+    logger.info { EventStatistics.createRapport() }
+  }
+
+  fun clearEventStats() {
+    EventStatistics.clear()
+    logger.info { "Cleared event stats by command" }
   }
 }

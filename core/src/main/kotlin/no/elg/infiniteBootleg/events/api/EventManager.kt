@@ -113,8 +113,7 @@ object EventManager {
    *
    * @param event The event to notify about
    */
-  inline fun <reified T : Event> dispatchEvent(event: T) {
-    eventsTracker?.onEventDispatched(event)
+  inline fun <reified T : Event> dispatchEvent(event: T, reason: String? = null) {
     val eventListeners: Set<EventListener<out Event>> =
       synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
 
@@ -126,6 +125,8 @@ object EventManager {
       eventsTracker?.onEventListenedTo(event, listener)
       listener.handle(event)
     }
+    EventStatistics.reportDispatch(event, reason)
+    eventsTracker?.onEventDispatched(event)
   }
 
   /**
@@ -150,5 +151,6 @@ object EventManager {
     }
     strongListeners.clear()
     oneShotStrongRefs.clear()
+    EventStatistics.clear()
   }
 }

@@ -95,6 +95,14 @@ interface ChunkColumn {
       const val TOP_MOST_FLAG: ChunkColumnFeatureFlag = BLOCKS_LIGHT_FLAG or SOLID_FLAG
 
       val chunkColumnFeatureFlags = listOf(BLOCKS_LIGHT_FLAG, SOLID_FLAG)
+
+      fun featureFlagToString(flag: ChunkColumnFeatureFlag): String =
+        when (flag) {
+          BLOCKS_LIGHT_FLAG -> "BLOCKS_LIGHT_FLAG"
+          SOLID_FLAG -> "SOLID_FLAG"
+          TOP_MOST_FLAG -> "TOP_MOST_FLAG"
+          else -> "Unknown flag"
+        }
     }
   }
 }

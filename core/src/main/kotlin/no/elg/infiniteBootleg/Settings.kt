@@ -97,6 +97,8 @@ object Settings {
 
   var enableCameraFollowLerp = true
 
+  var enableEventStatistics = true
+
   @JvmField
   var port = DEFAULT_PORT
 
