@@ -131,6 +131,7 @@ class BlockLight(
     var isLitNext = false
     val tmpLightMap = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
     val chunkCache = LongMap<Chunk>()
+    chunkCache.put(chunk.compactLocation, chunk)
 
     fun calculateLightFrom(neighbor: Block) {
       isLitNext = true
