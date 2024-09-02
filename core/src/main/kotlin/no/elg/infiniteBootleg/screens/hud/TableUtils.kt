@@ -26,6 +26,8 @@ import no.elg.infiniteBootleg.util.toAbled
 import no.elg.infiniteBootleg.util.toTitleCase
 import no.elg.infiniteBootleg.util.visIBSelectBox
 import java.math.BigDecimal
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KMutableProperty0
 
 fun updateAllValues(onAnyElementChanged: MutableList<() -> Unit>) {
@@ -154,6 +156,7 @@ fun <T> KWidget<*>.genericSelector(
 
 @Scene2dDsl
 fun KVisTable.section(theRow: KTable.() -> Unit) {
+  contract { callsInPlace(theRow, InvocationKind.EXACTLY_ONCE) }
   theRow()
   row()
 }
