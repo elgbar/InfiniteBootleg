@@ -16,6 +16,14 @@ import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.m
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
+/**
+ * An adapter block to represent an entity in the chunk world.
+ *
+ * This type of block should be set with [EntityMarkerBlock.replaceBlock] and should not be created directly.
+ *
+ * The block will be automatically removed if the entity is deleted or the entity is no longer in this world block
+ * @see no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
+ */
 class EntityMarkerBlock(
   override val chunk: Chunk,
   override val world: World,

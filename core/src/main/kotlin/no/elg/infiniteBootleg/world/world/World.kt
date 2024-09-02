@@ -552,7 +552,7 @@ abstract class World(
         if (acquiredLock) {
           readChunk = chunks[chunkLoc]
         }
-      } catch (ignore: InterruptedException) {
+      } catch (_: InterruptedException) {
       } finally {
         if (acquiredLock) {
           chunksLock.readLock().unlock()
@@ -563,8 +563,10 @@ abstract class World(
       logger.warn { "Failed to acquire chunks read lock in $acquireTime ms (wanted to read ${stringifyCompactLoc(chunkLoc)})" }
       return null
     } else {
-      if (acquireTime > TRY_LOCK_CHUNKS_DURATION_MS / 2f) {
-        logger.debug { "Acquired chunks read lock in $acquireTime ms" }
+      if (acquireTime >= TRY_LOCK_CHUNKS_DURATION_MS) {
+        logger.debug { "Acquired chunk in $acquireTime ms. Max lock time is $TRY_LOCK_CHUNKS_DURATION_MS ms" }
+      } else if (acquireTime > TRY_LOCK_CHUNKS_DURATION_MS / 2L) {
+        logger.trace { "Acquired chunk in $acquireTime ms out of max $TRY_LOCK_CHUNKS_DURATION_MS ms" }
       }
     }
     val finalReadChunk = readChunk
@@ -1070,7 +1072,7 @@ abstract class World(
     val startY = MathUtils.floor(worldY)
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
-    val chunks = chunkCache ?: LongMap<Chunk>() // LongMap<Chunk>()
+    val chunks = chunkCache ?: LongMap<Chunk>()
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
