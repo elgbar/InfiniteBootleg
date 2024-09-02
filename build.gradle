@@ -92,6 +92,7 @@ subprojects {
       progressiveMode = true
       optIn = ["kotlin.contracts.ExperimentalContracts"]
       freeCompilerArgs.add("-Xdebug")
+      freeCompilerArgs.add("-Xwhen-guards") // https://github.com/Kotlin/KEEP/blob/guards/proposals/guards.md
 //      allWarningsAsErrors = true
     }
   }
