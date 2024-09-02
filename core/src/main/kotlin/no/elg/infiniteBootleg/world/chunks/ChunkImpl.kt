@@ -218,8 +218,10 @@ class ChunkImpl(
       launchOnAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
     }
 
-    val event = BlockChangedEvent(currBlock, block) // create event here to get the correct thread type
-    launchOnMultithreadedAsync { dispatchEvent(event) }
+    if (!initializing && !bothAirish) {
+      val event = BlockChangedEvent(currBlock, block) // create event here to get the correct thread type
+      launchOnMultithreadedAsync { dispatchEvent(event) }
+    }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
         val originWorldX = getWorldX(localX)
