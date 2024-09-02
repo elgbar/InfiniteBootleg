@@ -2,6 +2,7 @@
   <configuration default="false" name="C Run" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncherKt" />
     <module name="InfiniteBootleg.desktop.main" />
+    <option name="VM_PARAMETERS" value="-XX:+UseZGC -XX:+ZGenerational -XX:+UseStringDeduplication" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
