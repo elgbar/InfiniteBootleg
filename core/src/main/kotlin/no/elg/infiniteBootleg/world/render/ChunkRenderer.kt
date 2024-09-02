@@ -8,7 +8,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.google.errorprone.annotations.concurrent.GuardedBy
+import it.unimi.dsi.fastutil.longs.Long2LongLinkedOpenHashMap
+import it.unimi.dsi.fastutil.longs.Long2LongSortedMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
+import it.unimi.dsi.fastutil.objects.ObjectSortedSet
 import ktx.graphics.use
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.chunksToRenderEachFrame
@@ -21,6 +25,8 @@ import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Comp
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_OUT_OF_VIEW_REASON
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.screens.hud.DebugText.pos
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
@@ -35,6 +41,8 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP
 import no.elg.infiniteBootleg.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
+typealias SystemTimeMillis = Long
+
 /**
  * @author Elg
  */
@@ -45,9 +53,15 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       Matrix4().setToOrtho2D(0f, 0f, Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
   }
 
-  // use linked list for fast adding to end and beginning
+  // long = SystemTimeMillis
+  // map:  ChunkCompactLoc -> SystemTimeMillis
   @GuardedBy("QUEUE_LOCK")
-  private val renderQueue: Long2ObjectLinkedOpenHashMap<Chunk> = Long2ObjectLinkedOpenHashMap<Chunk>()
+  private val chunkLocToTimeAdded: Long2LongSortedMap = Long2LongLinkedOpenHashMap()
+
+  // When the chunk was added to the queue
+  // map: SystemTimeMillis -> Chunk[]
+  @GuardedBy("QUEUE_LOCK")
+  private val renderTimeAdded: Long2ObjectLinkedOpenHashMap<ObjectLinkedOpenHashSet<Chunk>> = Long2ObjectLinkedOpenHashMap()
 
   // current rendering chunk
   @GuardedBy("QUEUE_LOCK")
@@ -63,6 +77,18 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       it.SetFrequency(1f)
     }
 
+  private fun nextChunk(): Chunk {
+    return synchronized(QUEUE_LOCK) {
+      val (time: SystemTimeMillis, chunkTimeBucket: ObjectSortedSet<Chunk>) = renderTimeAdded.firstEntry() ?: error("No chunks in the queue")
+      val chunk = chunkTimeBucket.removeFirst()
+      if (chunkTimeBucket.isEmpty()) {
+        renderTimeAdded.remove(time)
+      }
+      chunkLocToTimeAdded.remove(chunk.compactLocation)
+      chunk
+    }
+  }
+
   /**
    * Queue rendering of a chunk. If the chunk is already in the queue to be rendered and `prioritize` is `true` then the chunk will be moved to the front of the queue
    *
@@ -71,15 +97,29 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
    */
   fun queueRendering(chunk: Chunk, prioritize: Boolean) {
     launchOnMultithreadedAsync {
-      val pos = chunk.compactLocation
+      val pos: ChunkCompactLoc = chunk.compactLocation
       synchronized(QUEUE_LOCK) {
         if (chunk === curr) {
           return@launchOnMultithreadedAsync
         }
-        if (prioritize) {
-          renderQueue.putAndMoveToFirst(pos, chunk)
-        } else {
-          renderQueue.putIfAbsent(pos, chunk)
+
+        // Time used to prioritize the chunk, a chunk added a while a go should be prioritized over a chunk added just now with prioritize = true to not get stale chunk textures
+        val newTime: SystemTimeMillis = System.currentTimeMillis() + if (prioritize) -PRIORITIZATION_ADVANTAGE_ADD_TIME else 0
+        val existingTime: SystemTimeMillis = chunkLocToTimeAdded[pos]
+
+        // Remove existing chunk from time bucket when the new time is less than the existing time to push it forward in the queue
+        if (existingTime != NOT_IN_COLLECTION && newTime < existingTime) {
+          val chunks = renderTimeAdded[existingTime] ?: error("Chunk $chunk is in the queue but not in the renderTimeAdded map")
+          chunks.remove(chunk)
+          if (chunks.isEmpty()) {
+            renderTimeAdded.remove(existingTime)
+          }
+        }
+        // Add the chunk to the queue
+        if (existingTime == NOT_IN_COLLECTION || newTime < existingTime) {
+          chunkLocToTimeAdded[pos] = newTime
+          val timeSet = renderTimeAdded.computeIfAbsent(newTime) { ObjectLinkedOpenHashSet() }
+          timeSet.addAndMoveToLast(chunk)
         }
       }
       dispatchEvent(ChunkAddedToChunkRendererEvent(chunk.compactLocation, prioritize))
@@ -98,17 +138,17 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   override fun render() {
     // fast return if there is nothing to render
-    if (renderQueue.isEmpty()) {
+    if (chunkLocToTimeAdded.isEmpty()) {
       return
     }
     // get the first valid chunk to render
     val chunk: Chunk = synchronized(QUEUE_LOCK) {
       do {
-        if (renderQueue.isEmpty()) {
+        if (chunkLocToTimeAdded.isEmpty()) {
           // nothing to render
           return
         }
-        val candidateChunk: Chunk = renderQueue.removeFirst()
+        val candidateChunk: Chunk = nextChunk()
         if (candidateChunk.isInvalid) {
           dispatchEvent(ChunkTextureChangeRejectedEvent(candidateChunk.compactLocation, CHUNK_INVALID_REASON))
           continue
@@ -271,7 +311,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   override fun dispose() {
     batch.dispose()
-    synchronized(QUEUE_LOCK) { renderQueue.clear() }
+    synchronized(QUEUE_LOCK) { chunkLocToTimeAdded.clear() }
   }
 
   companion object {
@@ -289,5 +329,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     private const val CHUNK_NOT_IN_QUEUE_INDEX = -1
 
     private val QUEUE_LOCK = Any()
+
+    private const val PRIORITIZATION_ADVANTAGE_ADD_TIME = 1000L
+    private const val NOT_IN_COLLECTION = 0L
   }
 }
