@@ -136,12 +136,12 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     batch.safeUse {
       for (renderer in renderers) {
         if (renderer.isInactive) continue
-        if (!batch.isDrawing) {
-          logger.warn { "Batch was not drawing when rendering, starting batch" }
-          batch.begin()
-        }
         batch.projectionMatrix = camera.combined
         renderer.render()
+        if (!batch.isDrawing) {
+          logger.warn { "Batch is no longer drawing after ${renderer::class}, restarting the batch" }
+          batch.begin()
+        }
       }
     }
     if (Settings.renderBox2dDebug) {

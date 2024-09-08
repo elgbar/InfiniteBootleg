@@ -39,6 +39,9 @@ private val logger = KotlinLogging.logger {}
  * @author Elg
  */
 enum class Material(
+  /**
+   * How hard it is to break this material
+   */
   val hardness: Float,
   val textureName: String? = null,
   /**
