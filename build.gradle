@@ -93,6 +93,7 @@ subprojects {
       optIn = ["kotlin.contracts.ExperimentalContracts"]
       freeCompilerArgs.add("-Xdebug")
       freeCompilerArgs.add("-Xwhen-guards") // https://github.com/Kotlin/KEEP/blob/guards/proposals/guards.md
+      freeCompilerArgs.add("-Xnon-local-break-continue") // https://github.com/Kotlin/KEEP/blob/guards/proposals/break-continue-in-inline-lambdas.md
 //      allWarningsAsErrors = true
     }
   }
@@ -142,16 +143,17 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation "io.netty:netty-all:4.1.112.Final"
+    implementation platform(platform("io.netty:netty-bom:4.1.114.Final"))
+    implementation "io.netty:netty-all"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.17.0"
-    implementation "org.jetbrains:annotations:24.1.0"
+    implementation "org.jetbrains:annotations:25.0.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation "it.unimi.dsi:fastutil:8.5.14"
 
     implementation 'io.github.oshai:kotlin-logging-jvm:7.0.0'
-    implementation platform('org.apache.logging.log4j:log4j-bom:2.23.1')
+    implementation platform('org.apache.logging.log4j:log4j-bom:2.24.1')
     implementation 'org.apache.logging.log4j:log4j-api'
     implementation 'org.apache.logging.log4j:log4j-core'
     implementation 'org.apache.logging.log4j:log4j-slf4j2-impl'
