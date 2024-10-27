@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.exceptions
 
-import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.util.singleLinePrinter
 import kotlin.contracts.contract
 
 class CorruptChunkException(message: String) : RuntimeException(message)
@@ -12,6 +12,6 @@ inline fun checkChunkCorrupt(protoChunk: ProtoWorld.Chunk, value: Boolean, lazyM
   }
   if (!value) {
     val message = lazyMessage()
-    throw CorruptChunkException(message.toString() + ". Proto chunk: ${TextFormat.printer().shortDebugString(protoChunk)}")
+    throw CorruptChunkException(message.toString() + ". Proto chunk: ${singleLinePrinter.printToString(protoChunk)}")
   }
 }

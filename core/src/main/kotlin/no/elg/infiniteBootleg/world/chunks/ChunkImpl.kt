@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
-import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Job
 import no.elg.infiniteBootleg.Settings
@@ -41,6 +40,7 @@ import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.launchOnMultithreadedAsync
+import no.elg.infiniteBootleg.util.singleLinePrinter
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.Material
@@ -544,7 +544,7 @@ class ChunkImpl(
         }
         val protoChunk = _build()
         if (Settings.debug && Settings.logPersistence) {
-          logger.debug { TextFormat.printer().shortDebugString(protoChunk) }
+          logger.debug { singleLinePrinter.printToString(protoChunk) }
         }
         future.complete(protoChunk)
       }
@@ -564,7 +564,7 @@ class ChunkImpl(
   override fun load(protoChunk: ProtoWorld.Chunk): Boolean {
     check(initializing) { "Cannot load from proto chunk after chunk has been initialized" }
     if (Settings.debug && Settings.logPersistence) {
-      logger.debug { TextFormat.printer().shortDebugString(protoChunk) }
+      logger.debug { singleLinePrinter.printToString(protoChunk) }
     }
     val chunkPosition = protoChunk.position
     checkChunkCorrupt(protoChunk, chunkPosition.x == chunkX && chunkPosition.y == chunkY) {

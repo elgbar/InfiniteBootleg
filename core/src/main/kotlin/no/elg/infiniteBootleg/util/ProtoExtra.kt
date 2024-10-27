@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.util
 
 import com.badlogic.gdx.math.Vector2
+import com.google.protobuf.TextFormat
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.protobuf.vector2i
@@ -18,3 +19,5 @@ fun Long.toVector2i(): Vector2i =
     x = this@toVector2i.decompactLocX()
     y = this@toVector2i.decompactLocY()
   }
+
+val singleLinePrinter: TextFormat.Printer by lazy { TextFormat.printer().emittingSingleLine(true) }

@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.ObjectSet
 import com.badlogic.gdx.utils.Timer
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.InvalidProtocolBufferException
-import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import ktx.async.interval
@@ -57,6 +56,7 @@ import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.removeEntityAsync
+import no.elg.infiniteBootleg.util.singleLinePrinter
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toVector2i
@@ -387,7 +387,7 @@ abstract class World(
    */
   fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
     if (Settings.debug && Settings.logPersistence) {
-      logger.debug { TextFormat.printer().shortDebugString(protoWorld) }
+      logger.debug { singleLinePrinter.printToString(protoWorld) }
     }
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale

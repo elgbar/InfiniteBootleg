@@ -1,11 +1,11 @@
 package no.elg.infiniteBootleg.console
 
-import com.google.protobuf.TextFormat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.Marker
 import io.github.oshai.kotlinlogging.slf4j.toKotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.util.singleLinePrinter
 import org.slf4j.MarkerFactory
 
 private val logger = KotlinLogging.logger {}
@@ -36,6 +36,6 @@ val serverSideServerBoundMarker: Marker = MarkerFactory.getMarker("server<-clien
 
 fun logPacket(directionMarker: Marker, packet: Packets.Packet) {
   if (Settings.logPackets && packet.type !in filterOutPackets) {
-    logger.debug(null as Throwable?, directionMarker) { TextFormat.printer().shortDebugString(packet) }
+    logger.debug(null as Throwable?, directionMarker) { singleLinePrinter.printToString(packet) }
   }
 }
