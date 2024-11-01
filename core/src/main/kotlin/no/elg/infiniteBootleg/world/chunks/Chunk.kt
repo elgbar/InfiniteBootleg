@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -90,7 +90,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    *
    * @return The texture of this chunk
    */
-  val textureRegion: TextureRegion?
+  val texture: Texture?
 
   /**
    * @return The backing [FrameBuffer] which holds the texture of this chunk. Will be null if
@@ -166,7 +166,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    *
    * @return If this chunk has a texture generated
    */
-  fun hasTextureRegion(): Boolean
+  fun hasTexture(): Boolean
   fun queueForRendering(prioritize: Boolean)
 
   /** Update the light of the chunk  */

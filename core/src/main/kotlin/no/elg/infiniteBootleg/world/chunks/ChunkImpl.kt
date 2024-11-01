@@ -3,12 +3,10 @@ package no.elg.infiniteBootleg.world.chunks
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Job
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
@@ -112,26 +110,11 @@ class ChunkImpl(
    */
   @Volatile
   override var lastViewedTick: Long = 0
-    private set
 
-  private val fboLock = Any()
-
-  @GuardedBy("fboLock")
-  private var fboRegion: TextureRegion? = null
-
-  @GuardedBy("fboLock")
+  @GuardedBy("chunkBody")
   private var fbo: FrameBuffer? = null
 
   private val chunkListeners by lazy { ChunkListeners(this) }
-
-  @field:Volatile
-  private var lightJob: Job? = null
-    set(value) {
-      synchronized(this) {
-        field?.cancel()
-        field = value
-      }
-    }
 
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   override fun setBlock(
@@ -262,23 +245,21 @@ class ChunkImpl(
     this.prioritize = this.prioritize or prioritize
   }
 
-  override val textureRegion: TextureRegion?
+  override val texture: Texture?
     get() {
-      synchronized(fboLock) {
+      synchronized(chunkBody) {
         if (isDirty) {
           updateIfDirty()
         }
-        return fboRegion
+        return fbo?.colorBufferTexture
       }
     }
 
-  override fun hasTextureRegion(): Boolean {
-    synchronized(fboLock) { return fboRegion != null }
-  }
+  override fun hasTexture(): Boolean = fbo != null
 
   /**
    * Force update of texture and recalculate internal variables This is usually called when the
-   * dirty flag of the chunk is set and either [isAllAir] or [textureRegion]
+   * dirty flag of the chunk is set and either [isAllAir] or [texture]
    * called.
    */
   private fun updateIfDirty() {
@@ -360,15 +341,12 @@ class ChunkImpl(
       if (isDisposed) {
         return null
       }
-      synchronized(fboLock) {
+      synchronized(chunkBody) {
         if (fbo != null) {
           return fbo
         }
         val fbo = FrameBuffer(Pixmap.Format.RGBA8888, Chunk.CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, false)
         fbo.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        val fboRegion = TextureRegion(fbo.colorBufferTexture)
-        fboRegion.flip(false, true)
-        this.fboRegion = fboRegion
         this.fbo = fbo
         return fbo
       }
@@ -480,12 +458,11 @@ class ChunkImpl(
     allowUnload = false
     chunkBody.dispose()
     chunkListeners.dispose()
-    synchronized(fboLock) {
+    synchronized(chunkBody) {
       fbo?.also {
         launchOnMain { it.dispose() }
         fbo = null
       }
-      fboRegion = null
     }
     for (blockArr in blocks) {
       for (block in blockArr) {

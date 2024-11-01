@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.render
 
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.OrderedMap
 import ktx.collections.component1
@@ -11,7 +12,9 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 
 class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
-  private val chunksToDraw: OrderedMap<Chunk, TextureRegion> = OrderedMap<Chunk, TextureRegion>().apply {
+  val batch get() = worldRender.batch
+
+  private val chunksToDraw: OrderedMap<Chunk, Texture> = OrderedMap<Chunk, Texture>().apply {
     orderedKeys().ordered = false
   }
 
@@ -42,7 +45,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
         }
 
         // get texture here to update last viewed in chunk
-        val textureRegion = chunk.textureRegion
+        val textureRegion = chunk.texture
         if (textureRegion == null) {
           chunk.queueForRendering(true)
           continue
@@ -52,14 +55,23 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
     }
   }
 
+  val region = TextureRegion()
+
   override fun render() {
     prepareChunks()
-    worldRender.batch.disableBlending()
-    for ((chunk, textureRegion) in chunksToDraw.entries()) {
+    batch.disableBlending()
+    for ((chunk, texture) in chunksToDraw.entries()) {
+      if (region.texture == null) {
+        region.setRegion(texture)
+        region.flip(false, true)
+      } else {
+        region.texture = texture
+      }
       val dx = chunk.chunkX * Chunk.CHUNK_TEXTURE_SIZE
       val dy = chunk.chunkY * Chunk.CHUNK_TEXTURE_SIZE
-      worldRender.batch.draw(textureRegion, dx.toFloat(), dy.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
+      batch.draw(region, dx.toFloat(), dy.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.CHUNK_TEXTURE_SIZE.toFloat())
     }
-    worldRender.batch.enableBlending()
+    region.texture = null
+    batch.enableBlending()
   }
 }
