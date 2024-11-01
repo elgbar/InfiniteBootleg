@@ -6,10 +6,11 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
 import no.elg.infiniteBootleg.events.WorldTickedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.World
-import kotlin.concurrent.write
+import kotlin.concurrent.read
 
 private val logger = KotlinLogging.logger {}
 
@@ -25,7 +26,8 @@ internal class WorldTickee(private val world: World) : Ticking {
 
     // tick all chunks and blocks in chunks
     val tick = world.worldTicker.tickId
-    world.chunksLock.write {
+
+    world.chunksLock.read {
       chunkIterator.reset()
       while (chunkIterator.hasNext()) {
         val chunk: Chunk? = chunkIterator.next().value
@@ -42,7 +44,9 @@ internal class WorldTickee(private val world: World) : Ticking {
         }
         if (chunk.isAllowedToUnload && world.render.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime) {
           chunkIterator.remove()
-          world.unloadChunk(chunk, force = false, save = true)
+          launchOnAsync {
+            world.unloadChunk(chunk, force = false, save = true)
+          }
           continue
         }
       }
