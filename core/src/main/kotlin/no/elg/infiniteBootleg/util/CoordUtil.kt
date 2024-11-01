@@ -59,6 +59,12 @@ inline fun ChunkCoord.chunkToWorld(offset: LocalCoord = 0): WorldCoord = (this s
 @Contract(pure = true)
 inline fun WorldCoord.chunkOffset(): LocalCoord = this - worldToChunk().chunkToWorld()
 
+@Contract(pure = true)
+inline fun WorldCompactLoc.chunkOffsetX(): LocalCoord = this.decompactLocX().chunkOffset()
+
+@Contract(pure = true)
+inline fun WorldCompactLoc.chunkOffsetY(): LocalCoord = this.decompactLocY().chunkOffset()
+
 /**
  * @param localX The chunk local x coordinate
  * @param localY The chunk local y coordinate

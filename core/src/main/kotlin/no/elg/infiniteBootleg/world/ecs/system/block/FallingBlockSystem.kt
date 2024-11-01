@@ -2,6 +2,10 @@ package no.elg.infiniteBootleg.world.ecs.system.block
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import no.elg.infiniteBootleg.util.chunkOffset
+import no.elg.infiniteBootleg.util.chunkOffsetX
+import no.elg.infiniteBootleg.util.chunkOffsetY
+import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.relativeCompact
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Direction
@@ -10,6 +14,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LATE
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -27,9 +32,14 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
     val world = entity.world
     val pos = entity.positionComponent
     val locBelow = relativeCompact(pos.blockX, pos.blockY, Direction.SOUTH)
-
-    if (world.isChunkLoaded(locBelow.worldToChunk()) && world.isAirBlock(locBelow)) {
-      val block = world.getRawBlock(pos.blockX, pos.blockY, false) ?: return
+    val chunk = entity.chunk
+    val isAirBelow = if (locBelow.worldToChunk() == chunk.compactLocation) {
+      chunk.getRawBlock(locBelow.chunkOffsetX(), locBelow.chunkOffsetY()).isAir()
+    } else {
+      world.isAirBlock(locBelow)
+    }
+    if (isAirBelow) {
+      val block = chunk.getRawBlock(pos.blockX.chunkOffset(), pos.blockY.chunkOffset()) ?: return
       entity.gravityAffected = false // Prevent the block to fall multiple times
       world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material) {
         it.occupyingLocations.add(EntityMarkerBlock.replaceBlock(block, it))
