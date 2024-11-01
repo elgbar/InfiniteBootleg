@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.world.World
 
 /**
  * An adapter block to represent an entity in the chunk world.
@@ -26,18 +25,16 @@ import no.elg.infiniteBootleg.world.world.World
  */
 class EntityMarkerBlock(
   override val chunk: Chunk,
-  override val world: World,
   override val localX: LocalCoord,
   override val localY: LocalCoord,
   override val entity: Entity
 ) : Block {
 
-  private var removeEntityListener: EntityListener?
+  private var removeEntityListener: EntityListener? =
+    EntityRemoveListener { if (it === entity) removeEntityMarker(async = false) }
 
   init {
-    removeEntityListener = EntityRemoveListener { if (it === entity) removeEntityMarker(async = false) }.also {
-      world.engine.addEntityListener(it)
-    }
+    removeEntityListener?.also { world.engine.addEntityListener(it) }
   }
 
   fun removeEntityMarker(async: Boolean, chunk: Chunk? = null) {
@@ -48,6 +45,7 @@ class EntityMarkerBlock(
         remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
       }
     }
+
     if (async) {
       launchOnAsync {
         remove()
@@ -57,13 +55,9 @@ class EntityMarkerBlock(
     }
   }
 
-  override val material: Material = entity.material
-
-  override var isDisposed: Boolean = false
+  override val material: Material get() = entity.material
 
   override fun dispose() {
-    isDisposed = true
-
     removeEntityListener?.also {
       world.postBox2dRunnable {
         world.engine.removeEntityListener(it)
@@ -74,7 +68,7 @@ class EntityMarkerBlock(
 
   override fun save(): ProtoWorld.Block = AIR_BLOCK_PROTO
 
-  override val texture: RotatableTextureRegion? = null
+  override val texture: RotatableTextureRegion? get() = null
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -85,7 +79,6 @@ class EntityMarkerBlock(
     if (localX != other.localX) return false
     if (localY != other.localY) return false
     if (entity != other.entity) return false
-    if (isDisposed != other.isDisposed) return false
 
     return true
   }
@@ -110,7 +103,7 @@ class EntityMarkerBlock(
      * @return the new block
      */
     fun replaceBlock(block: Block, entity: Entity): EntityMarkerBlock {
-      return EntityMarkerBlock(block.chunk, block.world, block.localX, block.localY, entity).let { emb ->
+      return EntityMarkerBlock(block.chunk, block.localX, block.localY, entity).let { emb ->
         emb.world.setBlock(emb) as? EntityMarkerBlock ?: error("Failed to set marker block at ${emb.worldX}, ${emb.worldY} was given a ${emb::class}")
       }
     }

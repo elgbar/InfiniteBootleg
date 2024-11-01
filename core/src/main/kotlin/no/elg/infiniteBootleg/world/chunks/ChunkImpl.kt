@@ -466,9 +466,7 @@ class ChunkImpl(
     }
     for (blockArr in blocks) {
       for (block in blockArr) {
-        if (block != null && !block.isDisposed) {
-          block.dispose()
-        }
+        block?.dispose()
       }
     }
   }

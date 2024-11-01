@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.ashley.core.Entity
-import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
@@ -17,10 +16,7 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
-import no.elg.infiniteBootleg.world.world.World
 import java.util.EnumMap
-
-private val logger = KotlinLogging.logger {}
 
 /**
  * A block in the world each block is a part of a chunk which is a part of a world. Each block know
@@ -29,16 +25,12 @@ private val logger = KotlinLogging.logger {}
  * @author Elg
  */
 class BlockImpl(
-  override val world: World,
   override val chunk: Chunk,
   override val localX: LocalCoord,
   override val localY: LocalCoord,
   override val material: Material,
   override var entity: Entity? = null
 ) : Block {
-
-  override var isDisposed: Boolean = false
-    private set
 
   override fun save(): ProtoWorld.Block =
     block {
@@ -57,12 +49,9 @@ class BlockImpl(
     }
 
   override fun dispose() {
-    if (isDisposed) {
-      logger.warn { "Disposed block ${this::class.simpleName} ($worldX, $worldY) twice" }
-    }
-    isDisposed = true
     entity?.also {
       world.removeEntity(it, Packets.DespawnEntity.DespawnReason.NATURAL)
+      entity = null
     }
   }
 

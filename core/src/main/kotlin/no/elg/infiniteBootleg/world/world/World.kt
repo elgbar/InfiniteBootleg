@@ -9,10 +9,8 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.IntMap
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
-import com.badlogic.gdx.utils.Timer
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -48,7 +46,6 @@ import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.decompactLocX
 import no.elg.infiniteBootleg.util.decompactLocY
-import no.elg.infiniteBootleg.util.generateUUIDFromLong
 import no.elg.infiniteBootleg.util.isAir
 import no.elg.infiniteBootleg.util.isBlockInsideRadius
 import no.elg.infiniteBootleg.util.isMarkerBlock
@@ -65,6 +62,7 @@ import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.WorldMetadata
 import no.elg.infiniteBootleg.world.WorldTime
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
@@ -76,9 +74,7 @@ import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.isInvalid
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn
-import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl
-import no.elg.infiniteBootleg.world.chunks.ChunkColumnImpl.Companion.fromProtobuf
-import no.elg.infiniteBootleg.world.chunks.ChunkColumnListeners
+import no.elg.infiniteBootleg.world.chunks.ChunkColumnsManager
 import no.elg.infiniteBootleg.world.ecs.ThreadSafeEngine
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamilyToSendToClient
@@ -123,7 +119,6 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.loader.WorldLoader.canWriteToWorld
 import no.elg.infiniteBootleg.world.loader.WorldLoader.deleteLockFile
 import no.elg.infiniteBootleg.world.loader.WorldLoader.generatorFromProto
-import no.elg.infiniteBootleg.world.loader.WorldLoader.getWorldFolder
 import no.elg.infiniteBootleg.world.loader.WorldLoader.writeLockFile
 import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.FullChunkLoader
@@ -164,28 +159,17 @@ abstract class World(
   /**
    * @return The random seed of this world
    */
-  val seed: Long,
+  seed: Long,
   /**
    * @return The name of the world
    */
-  val name: String,
+  name: String,
   forceTransient: Boolean = false
 ) : Disposable, Resizable {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name, forceTransient)
 
-  /**
-   * @return Unique identification of this world
-   */
-  val uuid: String
-
   val worldTicker: WorldTicker
-
-  val chunkLoader: ChunkLoader = if (this is ServerClientWorld) {
-    ServerClientChunkLoader(this, generator)
-  } else {
-    FullChunkLoader(this, generator)
-  }
 
   val worldContainerManager: WorldContainerManager
 
@@ -199,6 +183,12 @@ abstract class World(
    */
   val engine: ThreadSafeEngine
 
+  val chunkLoader: ChunkLoader = if (this is ServerClientWorld) {
+    ServerClientChunkLoader(this, generator)
+  } else {
+    FullChunkLoader(this, generator)
+  }
+
   /**
    * must be accessed under [chunksLock]
    */
@@ -206,51 +196,48 @@ abstract class World(
   @GuardedBy("chunksLock")
   val chunks = LongMap<Chunk>()
 
-  /**
-   * Must be accessed under `synchronized(chunkColumns)`
-   */
-  protected val chunkColumns = IntMap<ChunkColumn>()
-  private val chunkColumnListeners = ChunkColumnListeners()
-
-  @Volatile
-  private var worldFile: FileHandle? = null
+  @JvmField
+  val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
+  val chunkColumnsManager: ChunkColumnsManager = ChunkColumnsManager(this)
 
   /**
    * Spawn in world coordinates
    */
-  var spawn: WorldCompactLoc = compactLoc(0, chunkLoader.generator.getHeight(0))
+  var spawn: WorldCompactLoc
+    get() = metadata.spawn
     set(value) {
-      val old = field
+      val old = metadata.spawn
       if (value != old) {
         dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
-        field = value
+        metadata.spawn = value
       }
     }
-
-  @JvmField
-  val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 
   /**
    * Whether this world is can be saved to disk
    */
-  var isTransient: Boolean = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
-    private set
+  val isTransient: Boolean get() = metadata.isTransient
+
+  /**
+   * @return Unique identification of this world
+   */
+  val uuid: String get() = metadata.uuid
+  val isLoaded: Boolean get() = metadata.isLoaded
+  val name: String get() = metadata.name
+  val seed: Long get() = metadata.seed
+  val worldFolder: FileHandle? get() = metadata.worldFolder
+
+  private val metadata: WorldMetadata = WorldMetadata(
+    name = name,
+    seed = seed,
+    spawn = compactLoc(0, chunkLoader.generator.getHeight(0)),
+    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
+  )
 
   val tick get() = worldTicker.tickId
 
-  private var saveTask: Timer.Task? = null
-    set(value) {
-      field?.cancel()
-      field = value
-    }
-
-  var isLoaded: Boolean = false
-    private set
-
   init {
     MathUtils.random.setSeed(seed)
-    uuid = generateUUIDFromLong(seed).toString()
-    @Suppress("LeakingThis")
     val world: World = this
     worldTicker = WorldTicker(world, false)
     worldTime = WorldTime(world)
@@ -277,7 +264,7 @@ abstract class World(
       launchOnMain {
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
-        isLoaded = true
+        metadata.isLoaded = true
         chunksLock.read {
           chunks.values().forEach(Chunk::updateAllBlockLights)
         }
@@ -285,12 +272,12 @@ abstract class World(
     }
   }
 
-  val playersEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(playerFamily) }
-  val controlledPlayerEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(localPlayerFamily) }
-  val standaloneEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicStandaloneEntityFamily) }
-  val validEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamily) }
-  val validEntitiesToSendToClient: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient) }
-  val namedEntities: ImmutableArray<Entity> by lazy { engine.getEntitiesFor(namedEntitiesFamily) }
+  val playersEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(playerFamily)
+  val controlledPlayerEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(localPlayerFamily)
+  val standaloneEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicStandaloneEntityFamily)
+  val validEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamily)
+  val validEntitiesToSendToClient: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
+  val namedEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(namedEntitiesFamily)
 
   private fun initializeEngine(): ThreadSafeEngine {
     val engine = ThreadSafeEngine()
@@ -330,7 +317,7 @@ abstract class World(
     val worldFolder = worldFolder
     if (!isTransient && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
       if (!Settings.ignoreWorldLock) {
-        isTransient = true
+        metadata.isTransient = true
         logger.warn { "World found is already in use. Initializing world as a transient." }
       } else {
         logger.warn { "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!" }
@@ -354,7 +341,7 @@ abstract class World(
         }
       } else {
         logger.error { "Failed to write world lock file! Setting world to transient to be safe" }
-        isTransient = true
+        metadata.isTransient = true
       }
     }
 
@@ -379,7 +366,7 @@ abstract class World(
   }
 
   fun updateSavePeriod() {
-    saveTask = interval(Settings.savePeriodSeconds, Settings.savePeriodSeconds, task = ::save)
+    metadata.saveTask = interval(Settings.savePeriodSeconds, Settings.savePeriodSeconds, task = ::save)
   }
 
   /**
@@ -392,13 +379,7 @@ abstract class World(
     spawn = protoWorld.spawn.toCompact()
     worldTime.timeScale = protoWorld.timeScale
     worldTime.time = protoWorld.time
-    synchronized(chunkColumns) {
-      for (protoCC in protoWorld.chunkColumnsList) {
-        val chunkColumn = fromProtobuf(this, protoCC)
-        val chunkX = protoCC.chunkX
-        chunkColumns.put(chunkX, chunkColumn)
-      }
-    }
+    chunkColumnsManager.fromProtobuf(protoWorld.chunkColumnsList)
 
     return if (Main.isClient && protoWorld.hasPlayer()) {
       launchOnAsync {
@@ -421,7 +402,7 @@ abstract class World(
       return
     }
     val worldFolder = worldFolder ?: return
-    logger.debug { "Saving world '$name'" }
+    logger.debug { "Saving world '${metadata.name}'" }
 
     if (Main.isServer) {
       playersEntities.forEach(WorldLoader::saveServerPlayer)
@@ -446,13 +427,13 @@ abstract class World(
 
   fun toProtobuf(): ProtoWorld.World =
     world {
-      name = this@World.name
-      seed = this@World.seed
+      name = metadata.name
+      seed = metadata.seed
       time = this@World.worldTime.time
       timeScale = this@World.worldTime.timeScale
       spawn = this@World.spawn.toVector2i()
       generator = ChunkGenerator.getGeneratorType(chunkLoader.generator)
-      chunkColumns += synchronized(chunkColumns) { this@World.chunkColumns.map { it.value.toProtobuf() } }
+      chunkColumns += chunkColumnsManager.toProtobuf()
       if (Main.isSingleplayer) {
         controlledPlayerEntities.firstOrNull()?.save(toAuthoritative = true, ignoreTransient = true)?.also {
           player = it
@@ -460,41 +441,7 @@ abstract class World(
       }
     }
 
-  val worldFolder: FileHandle?
-    /**
-     * @return The current folder of the world or `null` if no disk should be used
-     */
-    get() {
-      if (isTransient) {
-        return null
-      }
-      if (worldFile == null) {
-        worldFile = getWorldFolder(uuid)
-      }
-      return worldFile
-    }
-
-  fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn {
-    try {
-      // Fast path, though this is not thread safe so we must validate the result
-      val fastColumn = chunkColumns.get(chunkX)
-      if (fastColumn != null && fastColumn.chunkX == chunkX) {
-        return fastColumn
-      }
-    } catch (ignore: Exception) {
-      // ignore, we try safe path if anything happens
-    }
-    synchronized(chunkColumns) {
-      // The column might have been updated while we've been waiting for the lock
-      val column = chunkColumns[chunkX]
-      if (column == null) {
-        val newCol: ChunkColumn = ChunkColumnImpl(this, chunkX, null, null)
-        chunkColumns.put(chunkX, newCol)
-        return newCol
-      }
-      return column
-    }
-  }
+  fun getChunkColumn(chunkX: ChunkCoord): ChunkColumn = chunkColumnsManager.getChunkColumn(chunkX)
 
   /**
    * @param features What kind of top block to return
@@ -1147,12 +1094,12 @@ abstract class World(
   override fun dispose() {
     logger.info { "Disposing world '$name'" }
     clear()
-    saveTask = null
     worldTicker.dispose()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
 
-    chunkColumnListeners.dispose()
+    chunkColumnsManager.dispose()
     chunkLoader.dispose()
+    metadata.dispose()
 
     chunksLock.write {
       for (chunk in chunks.values()) {

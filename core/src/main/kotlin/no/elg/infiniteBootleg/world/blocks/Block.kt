@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
 import no.elg.infiniteBootleg.protobuf.material
+import no.elg.infiniteBootleg.protobuf.world
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
@@ -29,11 +30,6 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
   val chunk: Chunk
 
   /**
-   * @return World this block exists in
-   */
-  val world: World
-
-  /**
    * @return The offset/local position of this block within its chunk
    */
   val localX: LocalCoord
@@ -47,6 +43,10 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
    * Connected blocks to ashley engine
    */
   val entity: Entity?
+
+  val world: World get() = chunk.world
+
+  override val isDisposed: Boolean get() = chunk.getRawBlock(localX, localY) !== this
 
   override fun hudDebug(): String {
     return "Block $material, pos ${stringifyCompactLoc(this)}"

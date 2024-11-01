@@ -166,7 +166,7 @@ enum class Material(
     protoEntity: ProtoWorld.Entity? = null
   ): Block {
     require(!chunk.isDisposed) { "Created block in disposed chunk" }
-    return BlockImpl(world, chunk, localX, localY, this, null).also { block ->
+    return BlockImpl(chunk, localX, localY, this).also { block ->
       if (Main.isAuthoritative) {
         // Blocks client side should not have any entity in them
         val futureEntity = protoEntity?.let { world.load(it, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
