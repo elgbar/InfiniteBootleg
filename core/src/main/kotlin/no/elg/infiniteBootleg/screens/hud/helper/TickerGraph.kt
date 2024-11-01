@@ -20,7 +20,7 @@ class TickerGraph(val ticker: Ticker, val startIndex: (width: Int) -> Int, val e
   }
 
   fun draw() {
-    if (ticker.isPaused) {
+    if (ticker.isPaused || !update) {
       return
     }
     this.acc += ticker.tpsDelta.toFloat()

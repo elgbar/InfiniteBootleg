@@ -5,10 +5,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import ktx.graphics.use
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.hud.helper.TickerGraph
 import no.elg.infiniteBootleg.world.world.ClientWorld
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 @Suppress("NOTHING_TO_INLINE")
 object DebugGraph : Resizable {
@@ -55,33 +59,30 @@ object DebugGraph : Resizable {
     val updateTps = tps?.update ?: false
     val updatePps = pps?.update ?: false
 
-    val updateAny = updateFps || updateTps || updatePps
-
-    if (updateAny) {
-      begin()
-    }
-    if (updateFps) {
-      drawFps()
-    }
-
-    tps?.draw()
-    pps?.draw()
-
-    if (updateAny) {
-      end()
+    if (updateFps || updateTps || updatePps) {
+      use {
+        if (updateFps) {
+          drawFps()
+        }
+        tps?.draw()
+        pps?.draw()
+      }
     }
     sr.batch.draw(fbo.colorBufferTexture, 0f, 0f)
   }
 
-  private inline fun begin() {
-    fbo.begin()
-    // https://www.khronos.org/opengl/wiki/Scissor_Test
-    Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST)
-  }
-
-  private inline fun end() {
-    Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
-    fbo.end()
+  @OptIn(ExperimentalContracts::class)
+  private fun use(block: (FrameBuffer) -> Unit) {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+    fbo.use {
+      // https://www.khronos.org/opengl/wiki/Scissor_Test
+      Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST)
+      try {
+        block(it)
+      } finally {
+        Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST)
+      }
+    }
   }
 
   private inline fun drawFps() {
