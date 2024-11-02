@@ -86,7 +86,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.ToBeDestroyedTag.Companion.toBeDestroyed
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
@@ -129,10 +128,11 @@ import no.elg.infiniteBootleg.world.managers.container.WorldContainerManager
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.locks.StampedLock
+import kotlin.contracts.contract
 import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
@@ -189,15 +189,88 @@ abstract class World(
     FullChunkLoader(this, generator)
   }
 
+  var chunkReads = AtomicInteger(0)
+  var chunkWrites = AtomicInteger(0)
+
   /**
    * must be accessed under [chunksLock]
    */
   @get:GuardedBy("chunksLock")
   @GuardedBy("chunksLock")
-  val chunks = LongMap<Chunk>()
+  private val chunks = LongMap<Chunk>()
 
-  @JvmField
-  val chunksLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
+  private val chunksLock: StampedLock = StampedLock() // StampedLock?
+
+  fun createChunkIterator(): LongMap.Entries<Chunk> = LongMap.Entries(chunks)
+
+  fun readChunks(onFailure: (() -> Unit)? = null, action: (chunks: LongMap<Chunk>) -> Unit): Unit = readChunks<Unit>(onFailure ?: { }, action)
+
+  fun <R> readChunks(onFailure: () -> R, action: (chunks: LongMap<Chunk>) -> R): R {
+    contract { callsInPlace(action, kotlin.contracts.InvocationKind.AT_MOST_ONCE) }
+    chunkReads.incrementAndGet()
+    val stamp = chunksLock.tryReadLock(1, TimeUnit.SECONDS)
+    return if (stamp != 0L) {
+      try {
+        action(chunks)
+      } finally {
+        chunksLock.unlock(stamp)
+      }
+    } else {
+      logger.warn { "Failed to acquire chunks read lock" }
+      onFailure.invoke()
+    }
+  }
+
+  private fun <R> writeChunks(onFailure: (() -> R?)? = null, action: (chunks: LongMap<Chunk>) -> R): R? {
+    contract { callsInPlace(action, kotlin.contracts.InvocationKind.AT_MOST_ONCE) }
+    chunkWrites.incrementAndGet()
+    val stamp = chunksLock.tryWriteLock(1, TimeUnit.SECONDS)
+    return if (stamp != 0L) {
+      try {
+        action(chunks)
+      } finally {
+        chunksLock.unlock(stamp)
+      }
+    } else {
+      logger.warn { "Failed to acquire chunks write lock" }
+      onFailure?.invoke()
+    }
+  }
+
+  fun <R> readChunks(timeoutMillis: Long, onFailure: (() -> R?)? = null, onSuccess: (chunks: LongMap<Chunk>) -> R?): R? {
+    contract { callsInPlace(onSuccess, kotlin.contracts.InvocationKind.AT_MOST_ONCE) }
+    chunkReads.incrementAndGet()
+    // This is a long lock, it must appear to be an atomic operation though
+    var result: R? = null
+    var acquiredLock: Long = 0L
+    var lockAcquired: Boolean = false
+    val acquireTime = measureTimeMillis {
+      acquiredLock = chunksLock.tryReadLock(timeoutMillis, TimeUnit.MILLISECONDS)
+      lockAcquired = acquiredLock != 0L
+      try {
+        if (lockAcquired) {
+          result = onSuccess(chunks)
+        }
+      } catch (_: InterruptedException) {
+      } finally {
+        if (lockAcquired) {
+          chunksLock.unlock(acquiredLock)
+        }
+      }
+    }
+    if (lockAcquired) {
+      if (acquireTime >= timeoutMillis) {
+        logger.debug { "Acquired chunk in $acquireTime ms. Max lock time is $timeoutMillis ms" }
+      } else if (acquireTime > timeoutMillis / 2L) {
+        logger.trace { "Acquired chunk in $acquireTime ms out of max $timeoutMillis ms" }
+      }
+    } else {
+      logger.warn { "Failed to acquire chunks read lock in $acquireTime ms" }
+      result = onFailure?.invoke()
+    }
+    return result
+  }
+
   val chunkColumnsManager: ChunkColumnsManager = ChunkColumnsManager(this)
 
   /**
@@ -265,7 +338,7 @@ abstract class World(
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
         metadata.isLoaded = true
-        chunksLock.read {
+        readChunks { chunks ->
           chunks.values().forEach(Chunk::updateAllBlockLights)
         }
       }
@@ -408,21 +481,21 @@ abstract class World(
       playersEntities.forEach(WorldLoader::saveServerPlayer)
     }
 
-    chunksLock.write {
+    readChunks { chunks ->
       val chunkLoader = chunkLoader
       if (chunkLoader is FullChunkLoader) {
         for (chunk in chunks.values()) {
           chunkLoader.save(chunk)
         }
       }
-
-      val builder = toProtobuf()
-      val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
-      if (worldInfoFile.exists()) {
-        worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"))
-      }
-      worldInfoFile.writeBytes(builder.toByteArray(), false)
     }
+
+    val builder = toProtobuf()
+    val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
+    if (worldInfoFile.exists()) {
+      worldInfoFile.moveTo(worldFolder.child(WorldLoader.WORLD_INFO_PATH + ".old"))
+    }
+    worldInfoFile.writeBytes(builder.toByteArray(), false)
   }
 
   fun toProtobuf(): ProtoWorld.World =
@@ -468,21 +541,51 @@ abstract class World(
     return getChunk(chunkX, chunkY, load)
   }
 
-  fun updateChunk(chunk: Chunk, newlyGenerated: Boolean) {
+  /**
+   * @param chunk The chunk to update to
+   * @param newlyGenerated Whether the chunk is newly generated, used for chunk dispatch events
+   * @param expectedChunk The expected chunk to be updated, if the chunk is not the expected chunk it will not be updated. If the current chunk is `null` it will be updated regardless
+   *
+   * @return The currently active chunk, might be different from the argument [chunk]
+   */
+  fun updateChunk(chunk: Chunk, newlyGenerated: Boolean, expectedChunk: Chunk? = null): Chunk {
     check(chunk.isValid) { "Chunk must be valid to be updated" }
-    val old: Chunk? = chunksLock.write {
-      chunks.put(chunk.compactLocation, chunk)
+    var chunkToDispose: Chunk? = null
+    val toReturn: Chunk? = writeChunks<Chunk> { chunks ->
+      val current: Chunk? = chunks[chunk.compactLocation]
+      return@writeChunks if (current != null && expectedChunk != null && current !== expectedChunk) {
+        logger.warn { "Unexpected chunk when updating chunk, will not update chunk. Given chunk will be disposed" }
+        chunkToDispose = chunk
+        current
+      } else {
+        val old = chunks.put(chunk.compactLocation, chunk)
+        chunkToDispose = old
+        chunk
+      }
     }
-    if (old != null) {
-      old.dispose()
+
+    if (toReturn == null) {
+      logger.warn { "Failed to write chunk" }
+      throw IllegalStateException("Failed to write chunk")
+    }
+    chunkToDispose?.dispose()
+
+    if (chunkToDispose === chunk) {
+      logger.warn { "Unexpected chunk when updating chunk, will not write chunk. Given chunk will be disposed" }
+    } else if (chunkToDispose != null) {
+      logger.trace { "Swapping chunk at ${toReturn.compactLocation}" }
     } else {
-      dispatchEvent(ChunkLoadedEvent(chunk, newlyGenerated))
+      // No old chunk to dispose, so this is a new chunk
+      dispatchEvent(ChunkLoadedEvent(toReturn, newlyGenerated))
     }
+    return toReturn
   }
 
   fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? {
     return getChunk(compactLoc(chunkX, chunkY), load)
   }
+
+  private val threadLocalChunksView = ThreadLocal.withInitial<LongMap<Chunk>> { LongMap() }
 
   /**
    * Find a valid chunk and optionally load it if it is not valid/not loaded
@@ -490,41 +593,21 @@ abstract class World(
    * @return A valid chunk
    */
   fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
+    val localChunks = threadLocalChunksView.get()
+    val localChunk: Chunk? = localChunks[chunkLoc]
+    if (localChunk != null && localChunk.isValid) {
+      return localChunk
+    }
     // This is a long lock, it must appear to be an atomic operation though
-    var readChunk: Chunk? = null
-    var acquiredLock = false
-    val acquireTime = measureTimeMillis {
-      try {
-        acquiredLock = chunksLock.readLock().tryLock(TRY_LOCK_CHUNKS_DURATION_MS, TimeUnit.MILLISECONDS)
-        if (acquiredLock) {
-          readChunk = chunks[chunkLoc]
-        }
-      } catch (_: InterruptedException) {
-      } finally {
-        if (acquiredLock) {
-          chunksLock.readLock().unlock()
-        }
-      }
-    }
-    if (!acquiredLock) {
-      logger.warn { "Failed to acquire chunks read lock in $acquireTime ms (wanted to read ${stringifyCompactLoc(chunkLoc)})" }
-      return null
-    } else {
-      if (acquireTime >= TRY_LOCK_CHUNKS_DURATION_MS) {
-        logger.debug { "Acquired chunk in $acquireTime ms. Max lock time is $TRY_LOCK_CHUNKS_DURATION_MS ms" }
-      } else if (acquireTime > TRY_LOCK_CHUNKS_DURATION_MS / 2L) {
-        logger.trace { "Acquired chunk in $acquireTime ms out of max $TRY_LOCK_CHUNKS_DURATION_MS ms" }
-      }
-    }
-    val finalReadChunk = readChunk
-    return if (finalReadChunk == null || finalReadChunk.isInvalid) {
+    val readChunk = readChunks(TRY_LOCK_CHUNKS_DURATION_MS) { chunks -> chunks[chunkLoc] }
+    return if (readChunk == null || readChunk.isDisposed) {
       if (!load) {
         null
       } else {
-        loadChunk(chunkLoc, true)
+        localChunks.put(chunkLoc, loadChunk(chunkLoc, true))
       }
     } else {
-      finalReadChunk
+      localChunks.put(chunkLoc, readChunk)
     }
   }
 
@@ -555,30 +638,27 @@ abstract class World(
       logger.debug { "Ticker paused will not load chunk" }
       return null
     }
-    return chunksLock.write {
-      if (returnIfLoaded) {
-        val current: Chunk? = chunks[chunkLoc]
-        if (current != null) {
-          if (current.isValid) {
-            return@write current
-          } else if (current.isNotDisposed) {
-            // If the current chunk is not valid, but not disposed either, so it should be loading
-            // We don't want to load a new chunk when the current one is finishing its loading
-            return@write null
-          }
+    if (returnIfLoaded) {
+      val current = readChunks<Chunk?>({ null }) { chunks -> chunks[chunkLoc] }
+      if (current != null) {
+        if (current.isValid) {
+          return current
+        } else if (current.isNotDisposed) {
+          // If the current chunk is not valid, but not disposed either, so it should be loading
+          // We don't want to load a new chunk when the current one is finishing its loading
+          return null
         }
       }
+    }
 
-      val loadedChunk = chunkLoader.fetchChunk(chunkLoc)
-      val chunk = loadedChunk.chunk
-      return@write if (chunk == null) {
-        // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
-        // date, and the loading should be re-tried
-        null
-      } else {
-        updateChunk(chunk, loadedChunk.isNewlyGenerated)
-        chunk
-      }
+    val loadedChunk = chunkLoader.fetchChunk(chunkLoc)
+    val chunk = loadedChunk.chunk
+    return if (chunk == null) {
+      // If we failed to load the old chunk assume the loaded chunk (if any) is corrupt, out of
+      // date, and the loading should be re-tried
+      null
+    } else {
+      updateChunk(chunk, loadedChunk.isNewlyGenerated)
     }
   }
 
@@ -840,13 +920,13 @@ abstract class World(
   fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = isChunkLoaded(compactLoc(chunkX, chunkY))
 
   /**
-   * @return All currently loaded chunks
+   * @return Copy of currently loaded chunks
    */
-  val loadedChunks: Array<Chunk>
+  val loadedChunks: GdxArray<Chunk>
     get() {
-      return chunksLock.read {
-        val loadedChunks = Array<Chunk>(true, chunks.size, Chunk::class.java)
-        for (chunk in chunks.values()) {
+      return readChunks<GdxArray<Chunk>>({ GdxArray<Chunk>(0) }) {
+        val loadedChunks = Array<Chunk>(true, it.size, Chunk::class.java)
+        for (chunk in it.values()) {
           if (chunk != null && chunk.isNotDisposed) {
             loadedChunks.add(chunk)
           }
@@ -875,12 +955,13 @@ abstract class World(
         return false
       }
 
-      val removedChunk: Chunk? = chunksLock.write {
-        if (save && chunkLoader is FullChunkLoader) {
-          chunkLoader.save(chunk)
-        }
+      val removedChunk: Chunk? = writeChunks { chunks ->
         chunks.remove(chunk.compactLocation)
       }
+      if (save && chunkLoader is FullChunkLoader) {
+        chunkLoader.save(chunk)
+      }
+      logger.trace { "Unloaded chunk ${stringifyCompactLoc(chunk)}" }
       chunk.dispose()
       if (removedChunk != null && chunk !== removedChunk) {
         logger.warn { "Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${stringifyCompactLoc(removedChunk)}" }
@@ -937,6 +1018,7 @@ abstract class World(
    * @return Set of blocks within the given radius
    */
   fun getBlocksWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): ObjectSet<Block> = getBlocksWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+
   fun getBlocksWithin(worldX: Float, worldY: Float, radius: Float): ObjectSet<Block> {
     require(radius >= 0) { "Radius should be a non-negative number" }
     val blocks = ObjectSet<Block>()
@@ -1101,12 +1183,12 @@ abstract class World(
     chunkLoader.dispose()
     metadata.dispose()
 
-    chunksLock.write {
-      for (chunk in chunks.values()) {
+    val saveTasks = writeChunks { chunks ->
+      chunks.values().map { chunk ->
         chunk.dispose()
-      }
-      chunks.clear()
-    }
+        chunk.save()
+      }.also { chunks.clear() }
+    } ?: emptyList()
     if (Main.isAuthoritative && !isTransient) {
       val worldFolder = worldFolder
       if (worldFolder != null && worldFolder.isDirectory) {
@@ -1114,6 +1196,9 @@ abstract class World(
       }
     }
     engine.dispose()
+    logger.debug { "Waiting for chunks in '$name' to be saved world" }
+    CompletableFuture.allOf(*saveTasks.toTypedArray()).join()
+    logger.debug { "Chunks have been saved for chunks in '$name'" }
   }
 
   companion object {

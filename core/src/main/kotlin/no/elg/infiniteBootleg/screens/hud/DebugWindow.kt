@@ -22,7 +22,6 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.
 import no.elg.infiniteBootleg.world.render.FuturePositionRenderer
 import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MAX_ZOOM
 import no.elg.infiniteBootleg.world.world.ClientWorld
-import kotlin.concurrent.read
 
 class DebugWindow(
   private val stage: Stage,
@@ -153,8 +152,8 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onAnyElementChanged,
           { false },
           {
-            world.chunksLock.read {
-              world.chunks.values().forEach(Chunk::updateAllBlockLights)
+            world.readChunks {
+              it.values().forEach(Chunk::updateAllBlockLights)
             }
           }
         )
@@ -181,8 +180,8 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onAnyElementChanged,
           { false },
           {
-            world.chunksLock.read {
-              world.chunks.values().forEach { it.queueForRendering(false) }
+            world.readChunks {
+              it.values().forEach { it.queueForRendering(false) }
             }
           }
         )
