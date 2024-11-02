@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
+import com.badlogic.ashley.core.ThreadSafeEntity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
@@ -28,7 +29,7 @@ class ThreadSafeEngine : Engine(), Disposable {
   @GuardedBy("entityFamilyCache")
   private val entityFamilyCache = ObjectMap<Family, ImmutableArray<Entity>>()
 
-  override fun createEntity(): Entity = super.createEntity()
+  override fun createEntity(): Entity = ThreadSafeEntity()
 
   override fun <T : Component> createComponent(componentType: Class<T>): T {
     return super.createComponent(componentType)
