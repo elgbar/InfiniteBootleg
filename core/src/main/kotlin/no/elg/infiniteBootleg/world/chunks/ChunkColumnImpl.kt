@@ -173,14 +173,14 @@ class ChunkColumnImpl(
 
     val currentTopChunkY = currTopWorldY.worldToChunk()
 
-    for (nextChunkY in MAX_CHUNKS_TO_LOOK_UPWARDS downTo 0) {
+    for (nextChunkY in MAX_CHUNKS_TO_LOOK downTo 0) {
       val nextChunk = getChunk(nextChunkY + currentTopChunkY)
       if (testChunk(nextChunk, top, localX, currTopWorldY, rule)) {
         return
       }
     }
 
-    for (nextChunkY in 0..Int.MAX_VALUE) {
+    for (nextChunkY in 0..MAX_CHUNKS_TO_LOOK) {
       val nextChunk = getChunk(currentTopChunkY - nextChunkY)
       if (testChunk(nextChunk, top, localX, currTopWorldY, rule)) {
         return
@@ -196,7 +196,7 @@ class ChunkColumnImpl(
     }
 
   companion object {
-    const val MAX_CHUNKS_TO_LOOK_UPWARDS = CHUNK_SIZE
+    const val MAX_CHUNKS_TO_LOOK = CHUNK_SIZE
     fun fromProtobuf(world: World, protoCC: ProtoWorld.ChunkColumn): ChunkColumn =
       ChunkColumnImpl(world, protoCC.chunkX, protoCC.topSolidBlocksList.toIntArray(), protoCC.topTransparentBlocksList.toIntArray())
   }
