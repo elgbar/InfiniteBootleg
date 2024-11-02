@@ -38,7 +38,7 @@ class ChunkColumnsManager(val world: World) : Disposable {
       if (fastColumn != null && fastColumn.chunkX == chunkX) {
         return fastColumn
       }
-    } catch (ignore: Exception) {
+    } catch (_: Exception) {
       // ignore, we try safe path if anything happens
     }
     synchronized(chunkColumns) {
