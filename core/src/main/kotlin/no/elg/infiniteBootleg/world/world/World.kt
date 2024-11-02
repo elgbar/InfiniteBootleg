@@ -599,7 +599,7 @@ abstract class World(
       if (!load) {
         null
       } else {
-        localChunks.put(chunkLoc, loadChunk(chunkLoc, true))
+        localChunks.put(chunkLoc, loadChunk(chunkLoc, false))
       }
     } else {
       localChunks.put(chunkLoc, readChunk)
