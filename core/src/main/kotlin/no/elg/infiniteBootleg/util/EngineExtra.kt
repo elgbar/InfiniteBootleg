@@ -47,7 +47,7 @@ inline fun Engine.futureEntity(configure: EngineEntity.(whenReady: CompletableFu
   val configurationFuture = CompletableFuture<Unit>().orTimeout(1, TimeUnit.SECONDS).exceptionally {
     throw IllegalStateException("Failed to complete future entity init", it)
   }
-  val addedToEngineFuture = CompletableFuture<Entity>().orTimeout(20, TimeUnit.SECONDS).exceptionally {
+  val addedToEngineFuture = CompletableFuture<Entity>().orTimeout(2, TimeUnit.SECONDS).exceptionally {
     throw IllegalStateException("Failed to add entity to engine", it)
   }
 
@@ -60,5 +60,3 @@ inline fun Engine.futureEntity(configure: EngineEntity.(whenReady: CompletableFu
   }
   return addedToEngineFuture
 }
-
-fun Engine.removeEntityAsync(entity: Entity) = entity.world.postBox2dRunnable { this.removeEntity(entity) }

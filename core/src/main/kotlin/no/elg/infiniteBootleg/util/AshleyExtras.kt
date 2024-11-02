@@ -5,7 +5,9 @@ import com.badlogic.ashley.core.EntityListener
 import ktx.math.component1
 import ktx.math.component2
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
 import no.elg.infiniteBootleg.world.world.World
 
@@ -62,3 +64,5 @@ fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY:
 fun Entity.toComponentsString() = "${components.map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}"
 
 val Entity.isBeingRemoved: Boolean get() = isRemoving || isScheduledForRemoval
+
+fun Entity.removeSelf(reason: DespawnReason = DespawnReason.UNKNOWN_REASON) = this.world.removeEntity(this, reason)

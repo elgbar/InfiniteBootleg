@@ -9,6 +9,7 @@ import ktx.ashley.exclude
 import ktx.ashley.onEntityAdded
 import ktx.ashley.onEntityRemoved
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.util.removeSelf
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -154,7 +155,7 @@ fun ensureUniquenessListener(engine: Engine) {
       duplicateEntities.any { existingEntity -> existingEntity !== newlyAddedEntity && existingEntity.id == newlyAddedEntity.id }
     ) {
       logger.warn { "Duplicate entity with id '${newlyAddedEntity.id}' removed: Components ${newlyAddedEntity.toComponentsString()}" }
-      engine.removeEntity(newlyAddedEntity)
+      newlyAddedEntity.removeSelf()
     }
   }
 }

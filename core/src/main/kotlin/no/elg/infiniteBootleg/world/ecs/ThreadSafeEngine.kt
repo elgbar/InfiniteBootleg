@@ -9,6 +9,7 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
+import com.badlogic.gdx.utils.OrderedSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.Main
@@ -38,9 +39,15 @@ class ThreadSafeEngine : Engine(), Disposable {
       super.addEntity(entity)
     }
 
+  @Deprecated("Use World.removeEntity instead")
   override fun removeEntity(entity: Entity): Unit =
     synchronized(engineLock) {
       super.removeEntity(entity)
+    }
+
+  fun removeAllEntities(iterator: OrderedSet.OrderedSetIterator<Entity>): Unit =
+    synchronized(engineLock) {
+      iterator.forEach(::removeEntityInternal)
     }
 
   override fun removeAllEntities(family: Family): Unit =

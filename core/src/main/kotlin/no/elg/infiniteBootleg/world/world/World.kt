@@ -52,7 +52,6 @@ import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
-import no.elg.infiniteBootleg.util.removeEntityAsync
 import no.elg.infiniteBootleg.util.singleLinePrinter
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
@@ -994,8 +993,7 @@ abstract class World(
   @JvmOverloads
   fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
     despawnEntity(entity, reason)
-    entity.toBeDestroyed = true
-    engine.removeEntityAsync(entity)
+    worldBody.removeEntity(entity)
   }
 
   fun getPlayer(uuid: String): Entity? {

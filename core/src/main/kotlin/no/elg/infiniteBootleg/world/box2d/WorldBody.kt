@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.OrderedSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.FailureWatchdog
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
@@ -44,10 +45,13 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
 
   private val chunksToUpdate = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
   private val updatingChunks = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
+  private val updatingChunksIterator = OrderedSet.OrderedSetIterator(updatingChunks)
+
+  private val entitiesToRemove = OrderedSet<Entity>().also { it.orderedItems().ordered = false }
+  private val removingEntities = OrderedSet<Entity>().also { it.orderedItems().ordered = false }
+  private val removingEntitiesIterator: OrderedSet.OrderedSetIterator<Entity> = OrderedSet.OrderedSetIterator(removingEntities)
 
   private val postRunnable = PostRunnableHandler()
-
-  private val updatingChunksIterator = OrderedSet.OrderedSetIterator(updatingChunks)
 
   private val contactManager = ContactManager(world.engine)
 
@@ -62,6 +66,15 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   internal fun updateChunk(chunkBody: ChunkBody) {
     synchronized(chunksToUpdate) {
       chunksToUpdate.add(chunkBody)
+    }
+  }
+
+  /**
+   * Thread safe and fastest way to remove an entity from the world
+   */
+  internal fun removeEntity(entity: Entity) {
+    synchronized(entitiesToRemove) {
+      entitiesToRemove.add(entity)
     }
   }
 
@@ -98,9 +111,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       if (!body.isActive) {
         logger.error { "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}" }
       }
-      for (it in body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>()) {
-        world.engine.removeEntity(it)
-      }
+      body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>().forEach { world.removeEntity(it, DespawnReason.CHUNK_UNLOADED) }
       box2dWorld.destroyBody(body)
     }
   }
@@ -121,8 +132,14 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       updatingChunks.addAll(chunksToUpdate)
       chunksToUpdate.clear()
     }
-
     updatingChunksIterator.reset()
+
+    synchronized(entitiesToRemove) {
+      removingEntities.clear()
+      removingEntities.addAll(entitiesToRemove)
+      entitiesToRemove.clear()
+    }
+    removingEntitiesIterator.reset()
 
     synchronized(BOX2D_LOCK) {
       box2dWatchdog.watch {
@@ -134,6 +151,9 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       }
 
       postRunnable.executeRunnables()
+
+      world.engine.removeAllEntities(removingEntitiesIterator)
+
       for (chunkBody in updatingChunksIterator) {
         if (chunkBody.shouldCreateBody()) {
           createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
