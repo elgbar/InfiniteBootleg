@@ -33,10 +33,13 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
     val pos = entity.positionComponent
     val locBelow = relativeCompact(pos.blockX, pos.blockY, Direction.SOUTH)
     val chunk = entity.chunk
+    if (chunk.isInvalid) {
+      return
+    }
     val isAirBelow = if (locBelow.worldToChunk() == chunk.compactLocation) {
       chunk.getRawBlock(locBelow.chunkOffsetX(), locBelow.chunkOffsetY()).isAir()
     } else {
-      world.isAirBlock(locBelow)
+      world.isAirBlock(locBelow, loadChunk = false)
     }
     if (isAirBelow) {
       val block = chunk.getRawBlock(pos.blockX.chunkOffset(), pos.blockY.chunkOffset()) ?: return
