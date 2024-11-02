@@ -200,6 +200,9 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    */
   fun setAllowUnload(allowUnload: Boolean)
 
+  /**
+   * @return If this chunk has been modified and should be saved
+   */
   fun shouldSave(): Boolean
 
   /** Mark chunk as dirty  */
