@@ -57,6 +57,8 @@ class HUDRenderer : Renderer, Resizable {
         nl()
         lights(builder, world, mouseBlockX, mouseBlockY)
         nl()
+        builder.append("Chunk reads: ${world.chunkReads}, Chunk writes: ${world.chunkWrites}")
+        nl()
         ents(builder, world, main.mouseLocator.mouseBlockX, main.mouseLocator.mouseBlockY)
       }
       if (builder.isNotEmpty()) {
