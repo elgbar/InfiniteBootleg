@@ -242,22 +242,18 @@ abstract class World(
     // This is a long lock, it must appear to be an atomic operation though
     var result: R? = null
     var acquiredLock: Long = 0L
-    var lockAcquired: Boolean = false
     val acquireTime = measureTimeMillis {
       acquiredLock = chunksLock.tryReadLock(timeoutMillis, TimeUnit.MILLISECONDS)
-      lockAcquired = acquiredLock != 0L
-      try {
-        if (lockAcquired) {
+      if (acquiredLock != 0L) {
+        try {
           result = onSuccess(chunks)
-        }
-      } catch (_: InterruptedException) {
-      } finally {
-        if (lockAcquired) {
+        } catch (_: InterruptedException) {
+        } finally {
           chunksLock.unlock(acquiredLock)
         }
       }
     }
-    if (lockAcquired) {
+    if (acquiredLock != 0L) {
       if (acquireTime >= timeoutMillis) {
         logger.debug { "Acquired chunk in $acquireTime ms. Max lock time is $timeoutMillis ms" }
       } else if (acquireTime > timeoutMillis / 2L) {
