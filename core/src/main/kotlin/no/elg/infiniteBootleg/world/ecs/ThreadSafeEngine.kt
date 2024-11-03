@@ -48,7 +48,7 @@ class ThreadSafeEngine : Engine(), Disposable {
 
   fun removeAllEntities(iterator: OrderedSet.OrderedSetIterator<Entity>): Unit =
     synchronized(engineLock) {
-      iterator.forEach(::removeEntityInternal)
+      iterator.forEach(::removeEntity)
     }
 
   override fun removeAllEntities(family: Family): Unit =
