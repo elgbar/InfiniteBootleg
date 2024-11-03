@@ -147,12 +147,11 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       }
 
       ashleyWatchdog.watch {
+        world.engine.removeAllEntities(removingEntitiesIterator)
         world.engine.update(BOX2D_TIME_STEP)
       }
 
       postRunnable.executeRunnables()
-
-      world.engine.removeAllEntities(removingEntitiesIterator)
 
       for (chunkBody in updatingChunksIterator) {
         if (chunkBody.shouldCreateBody()) {
