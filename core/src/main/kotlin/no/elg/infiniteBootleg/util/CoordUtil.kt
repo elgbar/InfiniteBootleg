@@ -156,14 +156,14 @@ inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): Chu
 inline fun compactLoc(x: Int, y: Int): Long = x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
 
 /**
- * @param this@decompactLocX A long created by [.compactLoc]
+ * @param this@decompactLocX A long created by [compactLoc]
  * @return The x coordinate of the compacted location
  */
 
 inline fun Long.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
 
 /**
- * @param this@decompactLocY A long created by [.compactLoc]
+ * @param this@decompactLocY A long created by [compactLoc]
  * @return The y coordinate of the compacted location
  */
 
@@ -177,13 +177,13 @@ inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCo
   compactLoc(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
 
 /**
- * @param this@decompactShortA A long created by [.compactLoc]
+ * @param this@decompactShortA A long created by [compactLoc]
  * @return The x coordinate of the compacted location
  */
 inline fun Int.decompactShortA(): Short = (this shr SIZE).toShort()
 
 /**
- * @param this@decompactShortB A long created by [.compactLoc]
+ * @param this@decompactShortB A long created by [compactLoc]
  * @return The y coordinate of the compacted location
  */
 

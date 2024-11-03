@@ -172,7 +172,7 @@ interface Container : Iterable<IndexedItem> {
 
   /**
    * Overwrite a the given `Item` at `index`. If the given tile validate is `null`
-   * it is the same as calling [.remove].
+   * it is the same as calling [remove].
    *
    * @param index The index to place the `Item` at
    * @param Item The Item to put at `index`

@@ -16,10 +16,10 @@ class WorldTime(val world: World) {
   /**
    * Calculate how bright the sky should be. During the night the value will always be `0`,
    * during twilight (ie from `360` to `360-`[WorldTime.TWILIGHT_DEGREES] and
-   * `180+`[WorldTime.TWILIGHT_DEGREES] to `180-`[ ][WorldTime.TWILIGHT_DEGREES]) the light will change. During daytime the value will always be 1
+   * `180+`[WorldTime.TWILIGHT_DEGREES] to `180-`[WorldTime.TWILIGHT_DEGREES]) the light will change. During daytime the value will always be 1
    *
    *
-   * The time used will be the current world time ie [.getTime]
+   * The time used will be the current world time ie [getTime]
    *
    * @return A brightness value between 0 and 1 (both inclusive)
    */
@@ -29,7 +29,7 @@ class WorldTime(val world: World) {
   /**
    * Calculate how bright the sky should be. During the night the value will always be `0`,
    * during twilight (ie from `360` to `360-`[WorldTime.TWILIGHT_DEGREES] and
-   * `180+`[WorldTime.TWILIGHT_DEGREES] to `180-`[ ][WorldTime.TWILIGHT_DEGREES]) the light will change. During daytime the value will always be 1
+   * `180+`[WorldTime.TWILIGHT_DEGREES] to `180-`[WorldTime.TWILIGHT_DEGREES]) the light will change. During daytime the value will always be 1
    *
    * @param time The time to calculate
    * @return A brightness value between 0 and 1 (both inclusive)

@@ -15,13 +15,13 @@ class FailureWatchdog(val failureMessage: String, val illegalAction: IllegalActi
       if (failuresInARow >= MAX_FAILURES_IN_A_ROW) {
         illegalAction.handle(e) { "Failed to $failureMessage $MAX_FAILURES_IN_A_ROW times in a row" }
       } else {
-        logger.warn(e) { "Error when watching $failureMessage" }
+        watchdogLogger.warn(e) { "Error when watching $failureMessage" }
       }
     }
   }
 
   companion object {
-    val logger = KotlinLogging.logger {} // logger must be here to avoid conflicting logger
+    val watchdogLogger = KotlinLogging.logger {} // logger must be here to avoid conflicting logger
     const val MAX_FAILURES_IN_A_ROW = 5
   }
 }

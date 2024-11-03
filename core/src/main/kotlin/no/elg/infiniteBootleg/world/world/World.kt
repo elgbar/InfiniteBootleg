@@ -244,20 +244,20 @@ abstract class World(
     var acquiredLock: Long = 0L
     val acquireTime = measureTimeMillis {
       acquiredLock = chunksLock.tryReadLock(timeoutMillis, TimeUnit.MILLISECONDS)
-      if (acquiredLock != 0L) {
-        try {
+    }
+    if (acquiredLock != 0L) {
+      try {
           result = onSuccess(chunks)
         } catch (_: InterruptedException) {
         } finally {
           chunksLock.unlock(acquiredLock)
         }
       }
-    }
     if (acquiredLock != 0L) {
       if (acquireTime >= timeoutMillis) {
-        logger.debug { "Acquired chunk in $acquireTime ms. Max lock time is $timeoutMillis ms" }
+        logger.debug { "Acquired read lock in $acquireTime ms. Max lock time is $timeoutMillis ms" }
       } else if (acquireTime > timeoutMillis / 2L) {
-        logger.trace { "Acquired chunk in $acquireTime ms out of max $timeoutMillis ms" }
+        logger.trace { "Acquired chunk read lock in $acquireTime ms out of max $timeoutMillis ms" }
       }
     } else {
       logger.warn { "Failed to acquire chunks read lock in $acquireTime ms" }
@@ -576,9 +576,7 @@ abstract class World(
     return toReturn
   }
 
-  fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? {
-    return getChunk(compactLoc(chunkX, chunkY), load)
-  }
+  fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? = getChunk(compactLoc(chunkX, chunkY), load)
 
   private val threadLocalChunksView = ThreadLocal.withInitial<LongMap<Chunk>> { LongMap() }
 

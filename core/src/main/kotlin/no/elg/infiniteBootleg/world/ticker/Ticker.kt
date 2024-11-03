@@ -39,7 +39,7 @@ interface Ticker : PostRunnable {
   fun stop()
 
   /**
-   * Temporarily stops this ticker, can be resumed with [.resume]
+   * Temporarily stops this ticker, can be resumed with [resume]
    *
    * @see isPaused
    * @see resume
@@ -47,7 +47,7 @@ interface Ticker : PostRunnable {
   fun pause()
 
   /**
-   * Resume the ticking thread if it [.isPaused]
+   * Resume the ticking thread if it [isPaused]
    *
    * @see isPaused
    * @see pause

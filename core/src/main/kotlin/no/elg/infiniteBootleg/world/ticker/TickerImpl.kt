@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.events.api.ThreadType.Companion.currentThreadType
 import no.elg.infiniteBootleg.util.FailureWatchdog
 
 /**
- * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default it will call it every [ ][.msDelayBetweenTicks].
+ * A helper class that calls a [Ticking]'s [Ticking.tick] and [Ticking.tickRare] method periodically. By default it will call it every [msDelayBetweenTicks].
  *
  *
  * The ticker will not update the if [Graphics.getFrameId] is the same as it was last
@@ -146,20 +146,20 @@ class TickerImpl(
   }
 
   /**
-   * Temporarily stops this ticker, can be resumed with [.resume]
+   * Temporarily stops this ticker, can be resumed with [resume]
    *
-   * @see .isPaused
-   * @see .resume
+   * @see isPaused
+   * @see resume
    */
   override fun pause() {
     tickerThread.onPause()
   }
 
   /**
-   * Resume the ticking thread if it [.isPaused]
+   * Resume the ticking thread if it [isPaused]
    *
-   * @see .isPaused
-   * @see .pause
+   * @see isPaused
+   * @see pause
    */
   override fun resume() {
     tickerThread.onResume()

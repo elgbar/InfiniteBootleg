@@ -33,7 +33,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   val blocks: Array<Array<Block?>>
 
   /**
-   * Might cause a call to [.updateIfDirty] if the chunk is marked as dirty
+   * Might cause a call to [updateIfDirty] if the chunk is marked as dirty
    *
    * @return If all blocks in this chunk is air
    */
@@ -50,7 +50,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   val isValid: Boolean
 
   /**
-   * @return negated [.isValid]
+   * @return negated [isValid]
    */
   val isInvalid: Boolean
 
