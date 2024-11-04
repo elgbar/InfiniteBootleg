@@ -21,7 +21,7 @@ internal class WorldTickee(private val world: World) : Ticking {
 
   @Synchronized
   override fun tick() {
-    val chunkUnloadTime = world.worldTicker.tps * 5
+    val chunkUnloadTime = world.worldTicker.tps * CHUNK_UNLOAD_SECONDS
 
     // tick all chunks and blocks in chunks
     val tick = world.worldTicker.tickId
@@ -53,5 +53,9 @@ internal class WorldTickee(private val world: World) : Ticking {
   override fun tickRare() {
     val time = world.worldTime
     time.time += world.worldTicker.secondsDelayBetweenTicks * time.timeScale
+  }
+
+  companion object {
+    private const val CHUNK_UNLOAD_SECONDS = 30L
   }
 }
