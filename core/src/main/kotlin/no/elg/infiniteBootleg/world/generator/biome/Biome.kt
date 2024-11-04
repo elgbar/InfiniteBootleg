@@ -67,7 +67,7 @@ enum class Biome @SafeVarargs constructor(
     val blocks = chunk.blocks[localX]
     for (dy in 0 until localY) {
       val mat = materialAt(noise, height, chunk.worldX + localX, chunk.worldY + dy)
-      blocks[dy] = mat.createBlock(chunk.world, chunk, localX, dy)
+      blocks[dy] = mat.createBlock(chunk.world, chunk, localX, dy, tryRevalidateChunk = false)
     }
   }
 

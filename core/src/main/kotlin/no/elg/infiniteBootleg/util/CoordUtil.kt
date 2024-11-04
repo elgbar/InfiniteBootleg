@@ -195,6 +195,7 @@ inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(c
 
 inline fun stringifyCompactLoc(chunk: Chunk): String = stringifyCompactLoc(chunk.compactLocation)
 inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.worldX, block.worldY)
+inline fun stringifyCompactLocWithChunk(block: Block): String = "${stringifyCompactLoc(block.worldX, block.worldY)} in chunk ${stringifyCompactLoc(block.chunk)}"
 
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 

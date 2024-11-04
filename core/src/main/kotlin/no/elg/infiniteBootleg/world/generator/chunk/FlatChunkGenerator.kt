@@ -16,9 +16,10 @@ class FlatChunkGenerator : ChunkGenerator {
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk =
     ChunkImpl(world, chunkX, chunkY).also { chunk ->
       if (chunkY < 0) {
-        for (x in 0 until Chunk.CHUNK_SIZE) {
-          for (y in 0 until Chunk.CHUNK_SIZE) {
-            chunk.setBlock(x, y, Material.STONE, updateTexture = false, prioritize = false, sendUpdatePacket = false)
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in 0 until Chunk.CHUNK_SIZE) {
+            val block = Material.STONE.createBlock(world, chunk, localX, localY, tryRevalidateChunk = false)
+            chunk.setBlock(localX, localY, block, updateTexture = false, prioritize = false, sendUpdatePacket = false)
           }
         }
       }

@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.findTextures
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.serverRotatableTextureRegion
-import no.elg.infiniteBootleg.util.stringifyCompactLoc
+import no.elg.infiniteBootleg.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -156,6 +156,7 @@ enum class Material(
    * @param chunk
    * @param localX Relative x in the chunk
    * @param localY Relative y in the chunk
+   * @param tryRevalidateChunk If the chunk is disposed, should it be fetched from the world?
    * @return A block of this type
    */
   fun createBlock(
@@ -163,21 +164,24 @@ enum class Material(
     chunk: Chunk,
     localX: LocalCoord,
     localY: LocalCoord,
-    protoEntity: ProtoWorld.Entity? = null
+    protoEntity: ProtoWorld.Entity? = null,
+    tryRevalidateChunk: Boolean = true
   ): Block {
-    require(!chunk.isDisposed) { "Created block in disposed chunk" }
-    return BlockImpl(chunk, localX, localY, this).also { block ->
+    val validChunk = if (chunk.isDisposed && tryRevalidateChunk) world.getChunk(chunk.compactLocation) else chunk
+    requireNotNull(validChunk) { "No valid chunk found" }
+    require(validChunk.isNotDisposed) { "Chunk has been disposed" }
+    return BlockImpl(validChunk, localX, localY, this).also { block ->
       if (Main.isAuthoritative) {
         // Blocks client side should not have any entity in them
-        val futureEntity = protoEntity?.let { world.load(it, chunk) } ?: createNew?.invoke(world, chunk, chunk.worldX + localX, chunk.worldY + localY, this)
+        val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, validChunk, validChunk.worldX + localX, validChunk.worldY + localY, this)
         futureEntity?.thenApply { entity: Entity ->
-          if (block.isDisposed) {
+          if (block.isDisposed || validChunk.isDisposed) {
             world.removeEntity(entity)
             // This will fire when generating features in the world (i.e., trees next to other trees)
             logger.debug {
-              "Block@${stringifyCompactLoc(block)} chunk ${stringifyCompactLoc(chunk)} was disposed" +
+              "Block@${stringifyCompactLocWithChunk(block)} was disposed" +
                 " before entity (type ${entity.entityTypeComponent.hudDebug()}) was fully created. " +
-                "Is the chunk disposed? ${chunk.isDisposed}"
+                "Is the chunk disposed? ${validChunk.isDisposed}, block disposed? ${block.isDisposed}"
             }
           } else {
             block.entity = entity

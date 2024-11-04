@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
-import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.isValid
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
 import no.elg.infiniteBootleg.world.world.World
@@ -150,7 +150,7 @@ class ChunkColumnImpl(
     if (worldYHint > currTopWorldY) {
       // The hint is above the current top block. Check if it is valid
       val hintChunk = getLoadedChunkFromWorldY(worldYHint)
-      if (hintChunk.isValid()) {
+      if (hintChunk.valid()) {
         // its loaded at least
         val localYHint = worldYHint.chunkOffset()
         val hintBlock = hintChunk.getRawBlock(localX, localYHint)

@@ -228,13 +228,13 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
     const val CHUNK_TEXTURE_SIZE_HALF = CHUNK_TEXTURE_SIZE / 2
     val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
 
-    fun Chunk?.isValid(): Boolean {
-      contract { returns(true) implies (this@isValid != null) }
+    fun Chunk?.valid(): Boolean {
+      contract { returns(true) implies (this@valid != null) }
       return this != null && this.isValid
     }
 
-    fun Chunk?.isInvalid(): Boolean {
-      contract { returns(false) implies (this@isInvalid != null) }
+    fun Chunk?.invalid(): Boolean {
+      contract { returns(false) implies (this@invalid != null) }
       return this == null || this.isInvalid
     }
   }

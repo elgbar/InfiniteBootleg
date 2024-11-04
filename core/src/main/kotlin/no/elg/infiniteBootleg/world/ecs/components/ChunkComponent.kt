@@ -4,36 +4,54 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import ktx.math.component1
-import ktx.math.component2
 import no.elg.infiniteBootleg.protobuf.EntityKt
+import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.util.chunkOffset
+import no.elg.infiniteBootleg.util.removeSelf
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
-import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.invalid
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.StatefulEntityLoadableMapper
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 
 data class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
+
+  /**
+   * Validate the chunk and return if the chunk is valid.
+   *
+   * If there is no longer a valid chunk at the current location, the entity will be removed
+   */
+  fun validateChunk(entity: Entity): Boolean {
+    if (chunk.invalid()) {
+      val newChunk = chunk.world.getChunk(chunk.compactLocation, load = false)
+      if (newChunk.valid()) {
+        chunk = newChunk
+        return true
+      } else {
+        entity.removeSelf(DespawnReason.CHUNK_UNLOADED)
+        return false
+      }
+    }
+    return true
+  }
 
   override fun hudDebug(): String = "chunk ${stringifyCompactLoc(chunk)}"
 
   companion object : StatefulEntityLoadableMapper<ChunkComponent, Chunk>() {
+
     /**
-     * Chunk might be disposed, make sure to check it when calling this
+     * Get the chunk of this entity or null if the chunk is invalid
      */
-    val Entity.chunk get() = chunkComponent.chunk
-    val Entity.chunkOrNull get() = chunkComponentOrNull?.chunk
+    val Entity.chunkOrNull: Chunk?
+      get() {
+        val comp = chunkComponentOrNull ?: return null
+        comp.validateChunk(this)
+        return comp.chunk
+      }
     val Entity.chunkComponent by propertyFor(mapper)
     var Entity.chunkComponentOrNull by optionalPropertyFor(mapper)
-    val Entity.block: Block
-      get() {
-        val (worldX, worldY) = this.position
-        return chunk.getBlock(worldX.toInt().chunkOffset(), worldY.toInt().chunkOffset())
-      }
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity, state: Chunk): ChunkComponent? = safeWith { ChunkComponent(state) }
     override fun ProtoWorld.Entity.checkShouldLoad(state: () -> Chunk): Boolean = hasChunk()

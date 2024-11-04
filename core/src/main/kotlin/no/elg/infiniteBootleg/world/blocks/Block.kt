@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
 import no.elg.infiniteBootleg.protobuf.material
-import no.elg.infiniteBootleg.protobuf.world
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
@@ -46,6 +45,8 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
 
   val world: World get() = chunk.world
 
+  val valid: Boolean get() = chunk.isValid && !isDisposed
+
   override val isDisposed: Boolean get() = chunk.getRawBlock(localX, localY) !== this
 
   override fun hudDebug(): String {
@@ -69,6 +70,11 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
     val Block.worldY: WorldCoord get() = chunk.getWorldY(localY)
 
     /**
+     * Get the chunk of this block or the current valid chunk, which might be different from the chunk of this block or null if there is no longer a valid chunk for this block
+     */
+    val Block.validChunk: Chunk? get() = chunk.takeIf(Chunk::isValid) ?: world.getChunk(chunk.compactLocation, load = false)
+
+    /**
      * Find all entities in the block
      */
     fun Block.queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
@@ -78,8 +84,9 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      * Remove this block by setting it to air
      */
     fun Block.remove(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) {
-      if (chunk.isValid && chunk.getRawBlock(localX, localY) === this) {
-        chunk.removeBlock(
+      val validChunk = this.validChunk ?: return
+      if (validChunk.isValid && validChunk.getRawBlock(localX, localY) === this) {
+        validChunk.removeBlock(
           localX,
           localY,
           updateTexture = updateTexture,
