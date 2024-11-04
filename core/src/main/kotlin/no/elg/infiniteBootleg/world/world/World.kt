@@ -593,14 +593,19 @@ abstract class World(
     }
     // This is a long lock, it must appear to be an atomic operation though
     val readChunk = readChunks(TRY_LOCK_CHUNKS_DURATION_MS) { chunks -> chunks[chunkLoc] }
-    return if (readChunk == null || readChunk.isDisposed) {
+    val finalChunk = if (readChunk == null || readChunk.isDisposed) {
       if (!load) {
         null
       } else {
-        localChunks.put(chunkLoc, loadChunk(chunkLoc, false))
+        loadChunk(chunkLoc)
       }
     } else {
-      localChunks.put(chunkLoc, readChunk)
+      readChunk
+    }
+    return if (finalChunk.valid()) {
+      localChunks.put(chunkLoc, finalChunk)
+    } else {
+      null
     }
   }
 
