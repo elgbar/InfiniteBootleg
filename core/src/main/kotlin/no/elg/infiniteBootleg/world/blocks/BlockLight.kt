@@ -30,6 +30,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sign
 
 private val logger = KotlinLogging.logger {}
 
@@ -109,6 +110,29 @@ class BlockLight(
       }
     }
 
+  fun calculateLightFrom(neighbor: Block, worldX: WorldCoord, worldY: WorldCoord, tmpLightMap: Array<FloatArray>) {
+    // Written to hopefully be auto-vectorized by the JVM
+    for (dx in 0 until LIGHT_RESOLUTION) {
+      for (dy in 0 until LIGHT_RESOLUTION) {
+        // Calculate distance for each light cell
+        val cellX = worldX + centerOfSubcell(dx)
+        val cellY = worldY + centerOfSubcell(dy)
+        val nx = neighbor.worldX + 0.5
+        val ny = neighbor.worldY + 0.5
+        val distCubed1 = distCubed(cellX, cellY, nx, ny)
+        val f = LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS
+        val distCubed = distCubed1 / f
+        val negSignum = -sign(distCubed)
+        val intensity = 1 + (negSignum * distCubed)
+
+        val old: Float = tmpLightMap[dx][dy]
+        if (old < intensity) {
+          tmpLightMap[dx][dy] = intensity.toFloat()
+        }
+      }
+    }
+  }
+
   private suspend fun CoroutineScope.recalculateLighting0() {
     if (!Settings.renderLight || chunk.isInvalid) {
       return
@@ -133,30 +157,10 @@ class BlockLight(
     val chunkCache = LongMap<Chunk>()
     chunkCache.put(chunk.compactLocation, chunk)
 
-    fun calculateLightFrom(neighbor: Block) {
-      isLitNext = true
-      for (dx in 0 until LIGHT_RESOLUTION) {
-        ensureActive()
-        for (dy in 0 until LIGHT_RESOLUTION) {
-          // Calculate distance for each light cell
-          val cellX = worldX + centerOfSubcell(dx)
-          val cellY = worldY + centerOfSubcell(dy)
-          val nx = neighbor.worldX + 0.5
-          val ny = neighbor.worldY + 0.5
-          val distCubed = distCubed(cellX, cellY, nx, ny) / (LIGHT_SOURCE_LOOK_BLOCKS * LIGHT_SOURCE_LOOK_BLOCKS)
-          val intensity = if (distCubed > 0) 1 - distCubed.toFloat() else 1 + distCubed.toFloat()
-
-          val old: Float = tmpLightMap[dx][dy]
-          if (old < intensity) {
-            tmpLightMap[dx][dy] = intensity
-          }
-        }
-      }
-    }
-
     fun calculateLightFrom(neighbors: GdxArray<Block>) {
       for (neighbor in neighbors) {
-        calculateLightFrom(neighbor)
+        isLitNext = true
+        calculateLightFrom(neighbor, worldX, worldY, tmpLightMap)
       }
     }
 

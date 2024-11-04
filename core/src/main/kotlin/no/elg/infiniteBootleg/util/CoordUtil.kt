@@ -256,8 +256,8 @@ typealias LocalCompactLocGdxArray = GdxLongArray
 typealias WorldCompactLocGdxArray = GdxLongArray
 typealias ChunkCompactLocGdxArray = GdxLongArray
 
-fun relativeCompact(x: Int, y: Int, dir: Direction): Long = compactLoc(x + dir.dx, y + dir.dy)
+inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long = compactLoc(x + dir.dx, y + dir.dy)
 
-fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
+inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
 
-fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
+inline fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
