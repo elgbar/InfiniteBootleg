@@ -328,7 +328,7 @@ private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
     logger.warn { "Failed to load the chunk from proto" }
     return
   }
-  world.updateChunk(chunk, false)
+  world.updateChunk(chunk, newlyGenerated = false)
 }
 
 private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {

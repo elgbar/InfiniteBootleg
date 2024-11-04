@@ -543,7 +543,7 @@ abstract class World(
    *
    * @return The currently active chunk, might be different from the argument [chunk]
    */
-  fun updateChunk(chunk: Chunk, newlyGenerated: Boolean, expectedChunk: Chunk? = null): Chunk {
+  fun updateChunk(chunk: Chunk, expectedChunk: Chunk? = null, newlyGenerated: Boolean): Chunk {
     check(chunk.isValid) { "Chunk must be valid to be updated" }
     var chunkToDispose: Chunk? = null
     val toReturn: Chunk? = writeChunks<Chunk> { chunks ->
@@ -620,32 +620,28 @@ abstract class World(
    * @return The loaded chunk
    */
   fun loadChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
-    return loadChunk(compactLoc(chunkX, chunkY), true)
+    return loadChunk(compactLoc(chunkX, chunkY))
   }
 
   /**
    * Load a chunk into memory, either from disk or generate the chunk from its position
    *
    * @param chunkLoc       The location of the chunk (in Chunk coordinate-view)
-   * @param returnIfLoaded Whether to check if there is a loaded and valid chunk at the given
-   * `chunkLocation` and thus not reload the chunk
+   *
    * @return The loaded chunk
    */
-  private fun loadChunk(chunkLoc: Long, returnIfLoaded: Boolean = true): Chunk? {
+  private fun loadChunk(chunkLoc: Long): Chunk? {
     if (worldTicker.isPaused) {
-      logger.debug { "Ticker paused will not load chunk" }
       return null
     }
-    if (returnIfLoaded) {
-      val current = readChunks<Chunk?>({ null }) { chunks -> chunks[chunkLoc] }
-      if (current != null) {
-        if (current.isValid) {
+    val current = readChunks<Chunk?>({ null }) { chunks -> chunks[chunkLoc] }
+    if (current != null) {
+      if (current.isValid) {
           return current
         } else if (current.isNotDisposed) {
           // If the current chunk is not valid, but not disposed either, so it should be loading
           // We don't want to load a new chunk when the current one is finishing its loading
-          return null
-        }
+        return null
       }
     }
 
@@ -656,7 +652,7 @@ abstract class World(
       // date, and the loading should be re-tried
       null
     } else {
-      updateChunk(chunk, loadedChunk.isNewlyGenerated)
+      updateChunk(chunk, current, loadedChunk.isNewlyGenerated)
     }
   }
 
