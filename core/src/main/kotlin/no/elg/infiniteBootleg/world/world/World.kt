@@ -1099,6 +1099,7 @@ abstract class World(
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
     val chunks = chunkCache ?: LongMap<Chunk>()
+    val invalidChunks = LongMap<Chunk>()
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
@@ -1107,10 +1108,16 @@ abstract class World(
         }
         val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
         var chunk: Chunk? = chunks[chunkPos]
-        if (chunk.isInvalid()) {
-          chunk = getChunk(chunkPos, loadChunk)
-          if (chunk.isInvalid()) {
+        if (chunk.invalid()) {
+          if (invalidChunks.containsKey(chunkPos)) {
             y++
+            // No point in checking this chunk again
+            continue
+          }
+          chunk = getChunk(chunkPos, loadChunk)
+          if (chunk.invalid()) {
+            y++
+            invalidChunks.put(chunkPos, chunk)
             continue
           }
           chunks.put(chunkPos, chunk)
