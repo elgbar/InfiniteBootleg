@@ -1,13 +1,14 @@
 package no.elg.infiniteBootleg.world.ticker
 
-import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Array.ArrayIterator
 import ktx.collections.GdxArray
+import no.elg.infiniteBootleg.util.IllegalAction
 
-class PostRunnableHandler : PostRunnable {
+class PostRunnableHandler() : PostRunnable {
 
   private val runnables = GdxArray<Runnable>()
   private val executedRunnables = GdxArray<Runnable>()
-  private val executedRunnablesIterator = Array.ArrayIterator(executedRunnables)
+  private val executedRunnablesIterator = ArrayIterator(executedRunnables)
 
   override fun postRunnable(runnable: () -> Unit) {
     synchronized(runnables) {
@@ -27,7 +28,11 @@ class PostRunnableHandler : PostRunnable {
     }
     executedRunnablesIterator.reset()
     for (runnable in executedRunnablesIterator) {
-      runnable.run()
+      try {
+        runnable.run()
+      } catch (e: Exception) {
+        IllegalAction.LOG.handle(e) { "Failed to run task" }
+      }
     }
   }
 }
