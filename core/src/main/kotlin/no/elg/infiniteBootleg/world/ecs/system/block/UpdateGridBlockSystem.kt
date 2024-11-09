@@ -2,12 +2,13 @@ package no.elg.infiniteBootleg.world.ecs.system.block
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.utils.LongMap
+import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.plusAssign
 import ktx.collections.removeAll
+import no.elg.infiniteBootleg.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.world.Material
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.validChunkOrLoad
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
-import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -16,19 +17,14 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.standaloneGridOccupyingBlocksFamily
 
+private val logger = KotlinLogging.logger {}
+
 /**
  * Sets a marker block in the world to indicate that an entity is occupying that block
  */
 object UpdateGridBlockSystem :
   IteratingSystem(standaloneGridOccupyingBlocksFamily, UPDATE_PRIORITY_DEFAULT),
   UniversalSystem {
-
-  val chunkCache = LongMap<Chunk>()
-
-  override fun update(deltaTime: Float) {
-    chunkCache.clear()
-    super.update(deltaTime)
-  }
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
@@ -38,16 +34,25 @@ object UpdateGridBlockSystem :
 
     // Note: raw must be false to properly update the lights while lights are falling
     val currentOccupations =
-      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true, chunkCache)
-    val occupyingLocations = entity.occupyingLocations
-    occupyingLocations.filter { it !in currentOccupations }.forEach {
-      it.removeEntityMarker(true, chunkCache[it.chunk.compactLocation])
-    }
-    occupyingLocations.removeAll { it !in currentOccupations }
+      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true)
 
-    for (currentOccupation in currentOccupations) {
-      if ((currentOccupation !is EntityMarkerBlock || currentOccupation.entity != entity) && currentOccupation.material == Material.AIR) {
-        occupyingLocations += EntityMarkerBlock.replaceBlock(currentOccupation, entity)
+    // Remove markers that are no longer occupied
+    val noLongerOccupied = entity.occupyingLocations.filter { it !in currentOccupations }
+    entity.occupyingLocations.removeAll(noLongerOccupied)
+    noLongerOccupied.forEach(EntityMarkerBlock::removeEntityMarker)
+
+    val newOccupation = currentOccupations.filter { it !in entity.occupyingLocations }
+    for (newOccupation in newOccupation) {
+      val validChunk = newOccupation.validChunkOrLoad ?: run {
+        logger.error { "Failed to get valid chunk for block ${stringifyCompactLocWithChunk(newOccupation)}" }
+        continue
+      }
+      if ((newOccupation !is EntityMarkerBlock || newOccupation.entity != entity) && newOccupation.material == Material.AIR) {
+        val occupiedBlock = EntityMarkerBlock.replaceBlock(validChunk, newOccupation.localX, newOccupation.localY, entity) ?: run {
+          logger.error { "Failed to replace marker block ${stringifyCompactLocWithChunk(newOccupation)}" }
+          continue
+        }
+        entity.occupyingLocations += occupiedBlock
       }
     }
   }
