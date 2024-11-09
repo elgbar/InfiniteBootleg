@@ -12,7 +12,8 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 
 class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
-  val batch get() = worldRender.batch
+  private val batch get() = worldRender.batch
+  private val region = TextureRegion()
 
   private val chunksToDraw: OrderedMap<Chunk, Texture> = OrderedMap<Chunk, Texture>().apply {
     orderedKeys().ordered = false
@@ -54,8 +55,6 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
       }
     }
   }
-
-  val region = TextureRegion()
 
   override fun render() {
     prepareChunks()
