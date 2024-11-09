@@ -71,7 +71,8 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.WorldBody
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.isInvalid
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.invalid
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.world.chunks.ChunkColumnsManager
 import no.elg.infiniteBootleg.world.ecs.ThreadSafeEngine
@@ -247,12 +248,12 @@ abstract class World(
     }
     if (acquiredLock != 0L) {
       try {
-          result = onSuccess(chunks)
-        } catch (_: InterruptedException) {
-        } finally {
-          chunksLock.unlock(acquiredLock)
-        }
+        result = onSuccess(chunks)
+      } catch (_: InterruptedException) {
+      } finally {
+        chunksLock.unlock(acquiredLock)
       }
+    }
     if (acquiredLock != 0L) {
       if (acquireTime >= timeoutMillis) {
         logger.debug { "Acquired read lock in $acquireTime ms. Max lock time is $timeoutMillis ms" }
@@ -637,10 +638,10 @@ abstract class World(
     val current = readChunks<Chunk?>({ null }) { chunks -> chunks[chunkLoc] }
     if (current != null) {
       if (current.isValid) {
-          return current
-        } else if (current.isNotDisposed) {
-          // If the current chunk is not valid, but not disposed either, so it should be loading
-          // We don't want to load a new chunk when the current one is finishing its loading
+        return current
+      } else if (current.isNotDisposed) {
+        // If the current chunk is not valid, but not disposed either, so it should be loading
+        // We don't want to load a new chunk when the current one is finishing its loading
         return null
       }
     }
