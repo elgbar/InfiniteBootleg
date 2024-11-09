@@ -5,13 +5,14 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Fixture
-import com.badlogic.gdx.utils.OrderedSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.api.Ticking
+import no.elg.infiniteBootleg.events.api.ThreadType
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.FailureWatchdog
+import no.elg.infiniteBootleg.util.isBeingRemoved
 import no.elg.infiniteBootleg.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ticker.PostRunnableHandler
@@ -43,15 +44,8 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   @field:Volatile
   private var disposed = false
 
-  private val chunksToUpdate = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
-  private val updatingChunks = OrderedSet<ChunkBody>().also { it.orderedItems().ordered = false }
-  private val updatingChunksIterator = OrderedSet.OrderedSetIterator(updatingChunks)
-
-  private val entitiesToRemove = OrderedSet<Entity>().also { it.orderedItems().ordered = false }
-  private val removingEntities = OrderedSet<Entity>().also { it.orderedItems().ordered = false }
-  private val removingEntitiesIterator: OrderedSet.OrderedSetIterator<Entity> = OrderedSet.OrderedSetIterator(removingEntities)
-
   private val postRunnable = PostRunnableHandler()
+  private val postRunnableRemoveEntity = PostRunnableHandler()
 
   private val contactManager = ContactManager(world.engine)
 
@@ -64,8 +58,10 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   fun postBox2dRunnable(runnable: () -> Unit) = postRunnable.postRunnable(runnable)
 
   internal fun updateChunk(chunkBody: ChunkBody) {
-    synchronized(chunksToUpdate) {
-      chunksToUpdate.add(chunkBody)
+    postRunnable.postRunnable {
+      if (chunkBody.shouldCreateBody()) {
+        createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
+      }
     }
   }
 
@@ -73,9 +69,15 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
    * Thread safe and fastest way to remove an entity from the world
    */
   internal fun removeEntity(entity: Entity) {
-    synchronized(entitiesToRemove) {
-      entitiesToRemove.add(entity)
+    if (entity.isBeingRemoved) {
+      return
     }
+    if (ThreadType.isCurrentThreadType(ThreadType.PHYSICS)) {
+      // OK to remove at once since this is the only thread we can remove entities from
+      world.engine.removeEntity(entity)
+      return
+    }
+    postRunnable.postRunnable { world.engine.removeEntity(entity) }
   }
 
   /**
@@ -126,38 +128,16 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     if (disposed) {
       return
     }
-
-    synchronized(chunksToUpdate) {
-      updatingChunks.clear()
-      updatingChunks.addAll(chunksToUpdate)
-      chunksToUpdate.clear()
-    }
-    updatingChunksIterator.reset()
-
-    synchronized(entitiesToRemove) {
-      removingEntities.clear()
-      removingEntities.addAll(entitiesToRemove)
-      entitiesToRemove.clear()
-    }
-    removingEntitiesIterator.reset()
-
     synchronized(BOX2D_LOCK) {
       box2dWatchdog.watch {
         box2dWorld.step(BOX2D_TIME_STEP, 10, 10)
       }
 
       ashleyWatchdog.watch {
-        world.engine.removeAllEntities(removingEntitiesIterator)
         world.engine.update(BOX2D_TIME_STEP)
       }
 
       postRunnable.executeRunnables()
-
-      for (chunkBody in updatingChunksIterator) {
-        if (chunkBody.shouldCreateBody()) {
-          createBodyNow(chunkBody.bodyDef, chunkBody::onBodyCreated)
-        }
-      }
     }
   }
 
