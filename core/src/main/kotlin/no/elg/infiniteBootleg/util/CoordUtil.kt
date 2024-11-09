@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.lang.Short.SIZE
@@ -193,6 +194,7 @@ inline fun stringifyCompactLoc(x: Number, y: Number): String = "($x,$y)"
 
 inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
 
+inline fun stringifyCompactLoc(posComp: PositionComponent): String = stringifyCompactLoc(posComp.blockX, posComp.blockY)
 inline fun stringifyCompactLoc(chunk: Chunk): String = stringifyCompactLoc(chunk.compactLocation)
 inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.worldX, block.worldY)
 inline fun stringifyCompactLocWithChunk(block: Block): String = "${stringifyCompactLoc(block.worldX, block.worldY)} in chunk ${stringifyCompactLoc(block.chunk)}"

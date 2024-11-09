@@ -18,7 +18,7 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunk
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunkOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.leafBlockFamily
@@ -30,11 +30,9 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
 
   override fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float) {
     val entity: Entity = entities.random()
-    val chunk = entity.chunk
+    val chunk = entity.chunkOrNull ?: return
     val world = entity.world
-    if (chunk.isDisposed) {
-      return
-    }
+
     val srcLoc = entity.compactBlockLoc
     launchOnAsync {
       dispatchEvent(LeafDecayCheckEvent(srcLoc))

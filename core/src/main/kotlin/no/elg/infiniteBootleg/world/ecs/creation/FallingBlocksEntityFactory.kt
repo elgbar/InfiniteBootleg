@@ -6,6 +6,7 @@ import ktx.ashley.with
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.futureEntity
+import no.elg.infiniteBootleg.util.removeSelf
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -32,6 +33,9 @@ fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoW
   )
 }
 
+/**
+ * @param onReady will be called when the entity is ready to be used, if it returns false the entity will be removed
+ */
 fun Engine.createFallingBlockStandaloneEntity(
   world: World,
   worldX: Float,
@@ -40,7 +44,7 @@ fun Engine.createFallingBlockStandaloneEntity(
   dy: Float,
   material: Material,
   id: String? = null,
-  onReady: (Entity) -> Unit = {}
+  onReady: (Entity) -> Boolean = { true }
 ) {
   futureEntity { future ->
     withRequiredComponents(ProtoWorld.Entity.EntityType.FALLING_BLOCK, world, worldX, worldY, id)
@@ -54,7 +58,9 @@ fun Engine.createFallingBlockStandaloneEntity(
     safeWith { MaterialComponent(material) }
     with<OccupyingBlocksComponent>()
     createFallingBlockBodyComponent(world, worldX, worldY, dx, dy) {
-      onReady(it)
+      if (!onReady(it)) {
+        it.removeSelf()
+      }
       future.complete(Unit)
     }
   }

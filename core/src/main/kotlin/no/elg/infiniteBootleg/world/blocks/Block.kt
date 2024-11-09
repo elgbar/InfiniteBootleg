@@ -73,6 +73,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      * Get the chunk of this block or the current valid chunk, which might be different from the chunk of this block or null if there is no longer a valid chunk for this block
      */
     val Block.validChunk: Chunk? get() = chunk.takeIf(Chunk::isValid) ?: world.getChunk(chunk.compactLocation, load = false)
+    val Block.validChunkOrLoad: Chunk? get() = chunk.takeIf(Chunk::isValid) ?: world.getChunk(chunk.compactLocation, load = true)
 
     /**
      * Find all entities in the block
@@ -85,10 +86,10 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      */
     fun Block.remove(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) {
       val validChunk = this.validChunk ?: return
-      if (validChunk.isValid && validChunk.getRawBlock(localX, localY) === this) {
+      if (validChunk.getRawBlock(localX, localY) === this) {
         validChunk.removeBlock(
-          localX,
-          localY,
+          localX = localX,
+          localY = localY,
           updateTexture = updateTexture,
           prioritize = prioritize,
           sendUpdatePacket = sendUpdatePacket

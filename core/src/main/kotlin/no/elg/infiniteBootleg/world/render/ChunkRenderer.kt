@@ -111,7 +111,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
         if (existingTime != NOT_IN_COLLECTION && newTime < existingTime) {
           val chunks = renderTimeAdded[existingTime] ?: error("Chunk $chunk is in the queue but not in the renderTimeAdded map")
           chunks.remove(chunk)
-          if (chunks.isEmpty()) {
+          if (chunks.isEmpty) {
             renderTimeAdded.remove(existingTime)
           }
         }

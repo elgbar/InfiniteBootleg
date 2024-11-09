@@ -23,7 +23,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   private val lightLocs: GdxLongArray = GdxLongArray(false, 16)
 
   fun registerListeners() {
-    require(listeners.isEmpty()) { "Listeners cannot be done twice" }
+    require(listeners.isEmpty()) { "Listeners cannot be registered twice" }
 
     /**
      * Actually update the light of the chunk based on lights that have been queued by [registerLightChangeForNearbyChunks]
