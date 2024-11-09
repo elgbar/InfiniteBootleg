@@ -70,7 +70,10 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
         )
         toggleableDebugButton(
           "Render chunk updates",
-          "Flash a chunk when a chunks texture changes",
+          """Flash a chunk when a chunks texture changes
+            |* Yellow - Chunk is prioritized for rendering
+            |* Red    - Chunk is not prioritized for rendering
+          """.trimMargin(),
           onAnyElementChanged = onAnyElementChanged,
           booleanGetter = Settings::renderChunkUpdates,
           onToggle = Main.inst().console.exec::debChuUpd
