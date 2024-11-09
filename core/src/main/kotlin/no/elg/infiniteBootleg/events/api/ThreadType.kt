@@ -40,14 +40,15 @@ enum class ThreadType {
 
   companion object {
 
+    fun isCurrentThreadType(expected: ThreadType): Boolean = currentThreadType() == expected
+
     fun checkCorrectThreadType(expected: ThreadType, message: () -> String = { "Expected event to be dispatched from $expected but was dispatched from ${currentThreadType()}" }) {
-      val current = currentThreadType()
-      if (current != expected) {
+      if (!isCurrentThreadType(expected)) {
         throw CalledFromWrongThreadTypeException(message())
       }
     }
 
-    fun isThreadNameAsync(threadName: String): Boolean =
+    private fun isThreadNameAsync(threadName: String): Boolean =
       ASYNC_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false) || threadName.startsWith("async", false)
 
     fun currentThreadType(): ThreadType {
