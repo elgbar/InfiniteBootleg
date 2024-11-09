@@ -1198,7 +1198,7 @@ abstract class World(
     }
     engine.dispose()
     logger.debug { "Waiting for chunks in '$name' to be saved world" }
-    CompletableFuture.allOf(*saveTasks.toTypedArray()).join()
+    CompletableFuture.allOf(*saveTasks.toTypedArray()).get(1, TimeUnit.SECONDS)
     logger.debug { "Chunks have been saved for chunks in '$name'" }
   }
 
