@@ -47,8 +47,11 @@ data class ChunkComponent(var chunk: Chunk) : EntitySavableComponent {
     val Entity.chunkOrNull: Chunk?
       get() {
         val comp = chunkComponentOrNull ?: return null
-        comp.validateChunk(this)
-        return comp.chunk
+        return if (comp.validateChunk(this)) {
+          comp.chunk
+        } else {
+          null
+        }
       }
     val Entity.chunkComponent by propertyFor(mapper)
     var Entity.chunkComponentOrNull by optionalPropertyFor(mapper)
