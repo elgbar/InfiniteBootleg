@@ -114,17 +114,19 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     val blocks = chunk.blocks
     val worldChunkY = chunkY.chunkToWorld()
     val localX = worldX.chunkOffset()
+    val worldXd = worldX.toDouble()
     for (localY in 0 until Chunk.CHUNK_SIZE) {
       val worldY = worldChunkY + localY
+      val worldYd = worldY.toDouble()
 
       // calculate the size of the worm
-      val wormSize = 1 + abs(noise.noise(worldX.toDouble(), worldY.toDouble(), 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY))
-      val caveNoise = noise2.GetNoise(worldX.toDouble(), worldY.toDouble()) / wormSize
+      val wormSize = 1 + abs(noise.noise(worldXd, worldYd, 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY))
+      val caveNoise = noise2.GetNoise(worldXd, worldYd) / wormSize
       val diffToSurface = (genHeight - worldY).toDouble()
       val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
 
-      val cheese = noiseCheeseCave.getNoise(worldX.toDouble(), worldY.toDouble(), wormSize)
-      val greatHall = noiseGreatHall.getNoise(worldX.toDouble(), worldY.toDouble(), wormSize)
+      val cheese = noiseCheeseCave.getNoise(worldXd, worldYd, wormSize)
+      val greatHall = noiseGreatHall.getNoise(worldXd, worldYd, wormSize)
       if (caveNoise > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier ||
         cheese > CHEESE_CAVE_CREATION_THRESHOLD / depthModifier ||
         greatHall > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier

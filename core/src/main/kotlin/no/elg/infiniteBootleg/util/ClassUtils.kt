@@ -5,9 +5,11 @@ import kotlin.reflect.KClass
 inline fun <reified T : Any> sealedSubclassObjectInstances(): List<T> = sealedSubclassObjectInstances(T::class)
 
 fun <T : Any> sealedSubclassObjectInstances(klazz: KClass<out T>): List<T> {
-  require(klazz.isSealed) { "$klazz is not sealed" }
   return klazz.sealedSubclasses.also {
-    if (it.isEmpty()) error("Sealed $klazz has no sealed subclasses")
+    if (it.isEmpty()) {
+      require(klazz.isSealed) { "$klazz is not sealed" }
+      error("Sealed $klazz has no sealed subclasses")
+    }
   }.flatMap {
     val objectInstance = it.objectInstance
     if (objectInstance == null) {
