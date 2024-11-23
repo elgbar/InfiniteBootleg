@@ -12,7 +12,7 @@
     <InGameConsole name="InGameConsole"/>
 
     <RollingRandomAccessFile name="RollingRandomAccessFile"
-                             filePattern="logs/$${date:yyyy-MM-dd}/log-%d{yyyy-MM-dd-HH-mm}_%i.log.zip"
+                             filePattern="${sys:user.home}/.infiniteBootleg/logs/$${date:yyyy-MM-dd}/log-%d{yyyy-MM-dd-HH-mm}_%i.log.zip"
     >
       <PatternLayout>
         <Pattern>%d pid=%pid %5level %c %-5level [%t] %msg%n</Pattern>
