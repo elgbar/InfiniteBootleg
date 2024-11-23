@@ -1089,19 +1089,18 @@ abstract class World(
     }
     require(offsetX >= 0) { "offsetX must be >= 0, was $offsetX" }
     require(offsetY >= 0) { "offsetY must be >= 0, was $offsetY" }
-    val capacity = MathUtils.floorPositive(abs(offsetX)) * MathUtils.floorPositive(abs(offsetY))
-    val blocks = Array<Block>(true, capacity)
+    var blocks: Array<Block>? = null
     var x = MathUtils.floor(worldX)
     val startY = MathUtils.floor(worldY)
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
     val chunks = chunkCache ?: LongMap<Chunk>()
-    val invalidChunks = LongMap<Chunk>()
+    val invalidChunks = LongMap<Chunk>(4, 0.95f)
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
         if (cancel !== NEVER_CANCEL && cancel()) {
-          return blocks
+          return blocks ?: EMPTY_BLOCKS_ARRAY
         }
         val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
         var chunk: Chunk? = chunks[chunkPos]
@@ -1127,13 +1126,15 @@ abstract class World(
           continue
         }
         if ((includeAir || b.isMarkerBlock() || b.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter(b))) {
-          blocks.add(b)
+          val nnBlocks = blocks ?: Array<Block>(false, 1).also { array -> blocks = array }
+          nnBlocks.add(b)
         }
         y++
       }
       x++
     }
-    return blocks
+    logger.trace { "Found ${blocks?.size} blocks in AABB, backing array size is ${blocks?.items?.size}" }
+    return blocks ?: EMPTY_BLOCKS_ARRAY
   }
 
   /**
@@ -1209,6 +1210,12 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2f
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW = LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
+
+    val EMPTY_BLOCKS_ARRAY = Array<Block>(false, 0)
+      get() {
+        require(field.items.isEmpty()) { "Expected EMPTY_BLOCKS_ARRAY to be an empty array, but got ${field.size} elements" }
+        return field
+      }
 
     fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): WorldCompactLocArray =
       getLocationsAABBFromCenter(
