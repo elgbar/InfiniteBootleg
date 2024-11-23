@@ -95,7 +95,6 @@ import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.namedEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
-import no.elg.infiniteBootleg.world.ecs.system.DisposedChunkCheckSystem
 import no.elg.infiniteBootleg.world.ecs.system.MagicSystem
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
 import no.elg.infiniteBootleg.world.ecs.system.MineBlockSystem
@@ -366,7 +365,6 @@ abstract class World(
     engine.addSystem(FallingBlockSystem)
     engine.addSystem(ExplosiveBlockSystem)
     engine.addSystem(LeavesDecaySystem)
-    engine.addSystem(DisposedChunkCheckSystem)
     engine.addSystem(MineBlockSystem)
     engine.addSystem(NoGravityInUnloadedChunksSystem)
     engine.addSystem(FollowEntitySystem)
@@ -545,7 +543,7 @@ abstract class World(
    * @return The currently active chunk, might be different from the argument [chunk]
    */
   fun updateChunk(chunk: Chunk, expectedChunk: Chunk? = null, newlyGenerated: Boolean): Chunk {
-    check(chunk.isValid) { "Chunk must be valid to be updated" }
+    require(chunk.isValid) { "Chunk must be valid to be updated" }
     var chunkToDispose: Chunk? = null
     val toReturn: Chunk? = writeChunks<Chunk> { chunks ->
       val current: Chunk? = chunks[chunk.compactLocation]
@@ -1094,7 +1092,7 @@ abstract class World(
     val startY = MathUtils.floor(worldY)
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
-    val chunks = chunkCache ?: LongMap<Chunk>()
+    val chunks = chunkCache ?: LongMap<Chunk>(8, 0.9f)
     val invalidChunks = LongMap<Chunk>(4, 0.95f)
     while (x <= maxX) {
       var y = startY
@@ -1133,7 +1131,6 @@ abstract class World(
       }
       x++
     }
-    logger.trace { "Found ${blocks?.size} blocks in AABB, backing array size is ${blocks?.items?.size}" }
     return blocks ?: EMPTY_BLOCKS_ARRAY
   }
 

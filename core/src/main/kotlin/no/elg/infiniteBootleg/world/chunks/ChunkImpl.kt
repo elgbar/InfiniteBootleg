@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
@@ -82,7 +84,6 @@ class ChunkImpl(
   /**
    * If the chunk has been modified since loaded
    */
-  @Volatile
   private var modified: Boolean = false
 
   /**
@@ -90,7 +91,6 @@ class ChunkImpl(
    * Sometimes we do not want to unload specific chunks, for example if there is a player in that chunk
    *  or it is the spawn chunk
    */
-  @Volatile
   private var allowUnload: Boolean = true
 
   /**
@@ -115,6 +115,9 @@ class ChunkImpl(
   private var fbo: FrameBuffer? = null
 
   private val chunkListeners by lazy { ChunkListeners(this) }
+
+  @Volatile
+  var recalculateLightJob: Job? = null
 
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   override fun setBlock(
@@ -313,8 +316,11 @@ class ChunkImpl(
 
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (isValid && world.isLoaded) {
-      launchOnMultithreadedAsync {
-        doUpdateLightMultipleSources0(sources, checkDistance)
+      synchronized(this) {
+        recalculateLightJob?.cancel()
+        recalculateLightJob = launchOnMultithreadedAsync {
+          doUpdateLightMultipleSources0(sources, checkDistance)
+        }
       }
     }
   }
@@ -329,6 +335,7 @@ class ChunkImpl(
           blockLights[localX][localY].recalculateLighting()
         }
       }
+      queueForRendering(prioritize = false)
     }
   }
 
@@ -392,23 +399,12 @@ class ChunkImpl(
   override val compactLocation: ChunkCompactLoc
     get() = compactLoc(chunkX, chunkY)
 
-  /**
-   * @return Location of this chunk in world coordinates
-   */
   override val worldX: WorldCoord
     get() = chunkX.chunkToWorld()
 
-  /**
-   * This is the same as doing `CoordUtil.chunkToWorld(getLocation())`
-   *
-   * @return Location of this chunk in world coordinates
-   */
   override val worldY: WorldCoord
     get() = chunkY.chunkToWorld()
 
-  /**
-   * @return If the chunk has been modified since creation
-   */
   override fun shouldSave(): Boolean = modified
 
   override fun iterator(): Iterator<Block?> {
@@ -436,17 +432,19 @@ class ChunkImpl(
     }
   }
 
-  /**
-   * @param localX The local x ie a value between 0 and [Chunk.CHUNK_SIZE]
-   * @param localY The local y ie a value between 0 and [Chunk.CHUNK_SIZE]
-   * @return The block instance of the given coordinates, a new air block will be created if there is no existing block
-   */
   override fun getBlock(localX: LocalCoord, localY: LocalCoord): Block {
     if (!isValid) {
       logger.warn { "Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}" }
     }
     require(isInsideChunk(localX, localY)) { "Given arguments are not inside this chunk, localX=$localX localY=$localY" }
     return getRawBlock(localX, localY) ?: setBlock(localX, localY, Material.AIR, updateTexture = false, sendUpdatePacket = false) ?: error("Failed to create air block!")
+  }
+
+  override fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? {
+    if (compactLocation == compactLoc(worldX, worldY)) {
+      return getBlock(worldX.chunkOffset(), worldY.chunkOffset())
+    }
+    return world.getBlock(worldX, worldY, loadChunk)
   }
 
   @Synchronized
@@ -488,7 +486,10 @@ class ChunkImpl(
     dirty()
     chunkBody.update()
     chunkListeners.registerListeners()
-    updateAllBlockLights()
+    launchOnAsync {
+      delay(200L)
+      updateAllBlockLights()
+    }
   }
 
   override fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =

@@ -62,8 +62,7 @@ class ChunkColumnImpl(
     return max
   }
 
-  override fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag): Block? =
-    getWorldBlock(localX, topBlockHeight(localX, features))
+  override fun topBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag): Block? = getWorldBlock(localX, topBlockHeight(localX, features))
 
   override fun isChunkAboveTopBlock(chunkY: ChunkCoord, features: ChunkColumnFeatureFlag): Boolean {
     val maxWorldY = chunkY.chunkToWorld(CHUNK_SIZE - 1)

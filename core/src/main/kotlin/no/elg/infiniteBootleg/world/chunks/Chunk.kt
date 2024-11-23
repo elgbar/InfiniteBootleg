@@ -191,7 +191,25 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block?
 
+  /**
+   * @param localX The local x ie a value between 0 and [Chunk.CHUNK_SIZE]
+   * @param localY The local y ie a value between 0 and [Chunk.CHUNK_SIZE]
+   * @return The block instance of the given coordinates, a new air block will be created if there is no existing block
+   */
   fun getBlock(localX: LocalCoord, localY: LocalCoord): Block
+
+  /**
+   * An optimized version of [no.elg.infiniteBootleg.world.world.World.getBlock] that first checks if the block is in this chunk
+   *
+   * Note an air block will be created if the chunk is loaded and there is no other block at the
+   * given location
+   *
+   * @param worldX    The x coordinate from world view
+   * @param worldY    The y coordinate from world view
+   * @param loadChunk If the chunk should be loaded if it is not already loaded
+   * @return The block at the given x and y
+   */
+  fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block?
 
   /**
    * If `isAllowingUnloading` is `false` this chunk cannot be unloaded
@@ -201,7 +219,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   fun setAllowUnload(allowUnload: Boolean)
 
   /**
-   * @return If this chunk has been modified and should be saved
+   * @return If the chunk has been modified since creation
    */
   fun shouldSave(): Boolean
 
