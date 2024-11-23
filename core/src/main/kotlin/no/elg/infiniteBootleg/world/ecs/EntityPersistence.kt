@@ -168,7 +168,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     ContainerComponent.load(this, protoEntity)
     HotbarComponent.load(this, protoEntity)
 
-    ChunkComponent.load(this, protoEntity) { chunk ?: throw IllegalStateException("Chunk component without chunk") }
+    ChunkComponent.load(this, protoEntity) { world }
     DoorComponent.load(this, protoEntity)
     ExplosiveComponent.load(this, protoEntity)
     GroundedComponent.load(this, protoEntity)

@@ -75,7 +75,7 @@ fun Engine.createBlockEntity(
   additionalConfiguration: EngineEntity.() -> Unit = {}
 ) = futureEntity { future ->
   withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
-  safeWith { ChunkComponent(chunk) }
+  safeWith { ChunkComponent(chunk.compactLocation) }
   safeWith { MaterialComponent(material) }
   additionalConfiguration()
   checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))

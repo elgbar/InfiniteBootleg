@@ -215,11 +215,14 @@ message Entity {
     float interactRadius = 3;
   }
 
-  message Tinted{
+  message Tinted {
     int32 rgba8888 = 1;
   }
 
-  message ChunkBased {}
+  message ChunkBased {
+    int64 chunkLoc = 1;
+  }
+
   message OccupyingBlocks {}
   message Grounded {}
   message Door {}

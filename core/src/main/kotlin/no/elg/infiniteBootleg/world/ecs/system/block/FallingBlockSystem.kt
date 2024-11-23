@@ -17,14 +17,12 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.validChunk
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
-import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LATE
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunkOrNull
-import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.materialOrNull
+import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.getChunkOrNull
+import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingLocations
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.gravityAffectedBlockFamily
@@ -36,37 +34,35 @@ private val logger = KotlinLogging.logger {}
  */
 object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_LATE), AuthoritativeSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val material = entity.materialOrNull ?: return
-    val world = entity.world
+    val chunk = entity.getChunkOrNull() ?: return
+    val material = entity.material
     val pos = entity.positionComponent
+    val world = chunk.world
     val locBelow = relativeCompact(pos.blockX, pos.blockY, Direction.SOUTH)
-    val chunk = entity.chunkOrNull ?: return
-    if (chunk.valid()) {
-      val isAirBelow = if (locBelow.worldToChunk() == chunk.compactLocation) {
-        chunk.getRawBlock(locBelow.chunkOffsetX(), locBelow.chunkOffsetY()).isAir()
-      } else {
-        world.isAirBlock(locBelow, loadChunk = false)
+    val isAirBelow = if (locBelow.worldToChunk() == chunk.compactLocation) {
+      chunk.getRawBlock(locBelow.chunkOffsetX(), locBelow.chunkOffsetY()).isAir()
+    } else {
+      world.isAirBlock(locBelow, loadChunk = false)
+    }
+    if (isAirBelow) {
+      val block = chunk.getRawBlock(pos.blockX.chunkOffset(), pos.blockY.chunkOffset()) ?: run {
+        logger.warn { "Failed to get block at ${stringifyCompactLoc(pos)}" }
+        return
       }
-      if (isAirBelow) {
-        val block = chunk.getRawBlock(pos.blockX.chunkOffset(), pos.blockY.chunkOffset()) ?: run {
-          logger.warn { "Failed to get block at ${stringifyCompactLoc(pos)}" }
-          return
+      entity.gravityAffected = false // Prevent the block to fall multiple times
+      world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material) { fallingEntity ->
+        val validChunk = block.validChunk ?: run {
+          logger.error { "Failed to get valid chunk for block ${stringifyCompactLocWithChunk(block)}" }
+          entity.gravityAffected = true // If we failed to fall, we want it to fall in the future
+          return@createFallingBlockStandaloneEntity false
         }
-        entity.gravityAffected = false // Prevent the block to fall multiple times
-        world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material) { fallingEntity ->
-          val validChunk = block.validChunk ?: run {
-            logger.error { "Failed to get valid chunk for block ${stringifyCompactLocWithChunk(block)}" }
-            entity.gravityAffected = true // If we failed to fall, we want it to fall in the future
-            return@createFallingBlockStandaloneEntity false
-          }
-          val replacedBlock = EntityMarkerBlock.replaceBlock(validChunk, block.localX, block.localY, fallingEntity) ?: run {
-            logger.error { "Failed to get replace block ${stringifyCompactLocWithChunk(block)} with EMB" }
-            entity.gravityAffected = true
-            return@createFallingBlockStandaloneEntity false
-          }
-          fallingEntity.occupyingLocations += replacedBlock
-          true
+        val replacedBlock = EntityMarkerBlock.replaceBlock(validChunk, block.localX, block.localY, fallingEntity) ?: run {
+          logger.error { "Failed to get replace block ${stringifyCompactLocWithChunk(block)} with EMB" }
+          entity.gravityAffected = true
+          return@createFallingBlockStandaloneEntity false
         }
+        fallingEntity.occupyingLocations += replacedBlock
+        true
       }
     }
   }
