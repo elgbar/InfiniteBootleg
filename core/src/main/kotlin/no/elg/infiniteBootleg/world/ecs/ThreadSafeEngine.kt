@@ -28,7 +28,7 @@ class ThreadSafeEngine : Engine(), Disposable {
   @GuardedBy("entityFamilyCache")
   private val entityFamilyCache = ObjectMap<Family, ImmutableArray<Entity>>()
 
-  override fun createEntity(): Entity = super.createEntity() // ThreadSafeEntity()
+  override fun createEntity(): Entity = super.createEntity()
 
   override fun <T : Component> createComponent(componentType: Class<T>): T {
     return super.createComponent(componentType)
