@@ -1,14 +1,12 @@
 package no.elg.infiniteBootleg.world.blocks
 
 import com.badlogic.gdx.utils.LongMap
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
 import ktx.collections.GdxArray
+import ktx.collections.isNotEmpty
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
@@ -23,6 +21,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.world.world.World.Companion.EMPTY_BLOCKS_ARRAY
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
@@ -31,8 +30,6 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
-
-private val logger = KotlinLogging.logger {}
 
 class BlockLight(
   val chunk: Chunk,
@@ -89,26 +86,9 @@ class BlockLight(
     lightMap = if (isSkylight) {
       SKYLIGHT_LIGHT_MAP
     } else {
-      Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
+      NO_LIGHTS_LIGHT_MAP
     }
   }
-
-  private var job: Job? = null
-    set(value) {
-      synchronized(this) {
-        field?.cancel()
-        field = value
-      }
-    }
-
-  suspend fun recalculateLighting() =
-    coroutineScope {
-      job = launch(start = CoroutineStart.DEFAULT) {
-        recalculateLighting0()
-        ensureActive()
-        chunk.queueForRendering(prioritize = false)
-      }
-    }
 
   fun calculateLightFrom(neighbor: Block, worldX: WorldCoord, worldY: WorldCoord, tmpLightMap: Array<FloatArray>) {
     // Written to hopefully be auto-vectorized by the JVM
@@ -133,62 +113,78 @@ class BlockLight(
     }
   }
 
-  private suspend fun CoroutineScope.recalculateLighting0() {
+  internal suspend fun recalculateLighting() {
     if (!Settings.renderLight || chunk.isInvalid) {
       return
     }
+    coroutineScope {
+      val chunkColumn = chunk.chunkColumn
+      val worldX = chunk.chunkX.chunkToWorld(localX)
+      val worldY = chunk.chunkY.chunkToWorld(localY)
 
-    val chunkColumn = chunk.chunkColumn
-    val worldX = chunk.chunkX.chunkToWorld(localX)
-    val worldY = chunk.chunkY.chunkToWorld(localY)
+      if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
+        // This block is a skylight, its always lit fully
+        isLit = true
+        isSkylight = true
+        averageBrightness = 1f
+        lightMap = SKYLIGHT_LIGHT_MAP
+        return@coroutineScope
+      }
+      ensureActive()
 
-    if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
-      // This block is a skylight, its always lit fully
-      isLit = true
-      isSkylight = true
-      averageBrightness = 1f
-      lightMap = SKYLIGHT_LIGHT_MAP
-      return
-    }
-    ensureActive()
+      var isLitNext = false
+      val tmpLightMap: kotlin.Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
+      val chunkCache = LongMap<Chunk>(8, 0.9f)
+      chunkCache.put(chunk.compactLocation, chunk)
 
-    var isLitNext = false
-    val tmpLightMap = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
-    val chunkCache = LongMap<Chunk>()
-    chunkCache.put(chunk.compactLocation, chunk)
+      // find light sources around this block
+      val lightBlocks = coroutineScope {
+        val deferredBlockLights = async { findLuminescentBlocks(worldX, worldY, chunkCache) }
+        val deferredSkyLights = async { findSkylightBlocks(worldX, worldY, this, chunkCache) }
+        val blockLights = deferredBlockLights.await()
+        val skyLights = deferredSkyLights.await()
 
-    fun calculateLightFrom(neighbors: GdxArray<Block>) {
-      for (neighbor in neighbors) {
+        if (blockLights.isEmpty && skyLights.isEmpty) {
+          EMPTY_BLOCKS_ARRAY
+        } else if (blockLights.isEmpty) {
+          skyLights
+        } else if (skyLights.isEmpty) {
+          blockLights
+        } else {
+          blockLights.forEach { block ->
+            if (block !in skyLights) {
+              skyLights.add(block)
+            }
+          }
+          skyLights
+        }
+      }
+      ensureActive()
+      for (neighbor in lightBlocks) {
         isLitNext = true
         calculateLightFrom(neighbor, worldX, worldY, tmpLightMap)
       }
-    }
-
-    // find light sources around this block
-    coroutineScope {
-      launch { calculateLightFrom(findLuminescentBlocks(worldX, worldY, chunkCache)) }
-      launch { calculateLightFrom(findSkylightBlocks(worldX, worldY, this, chunkCache)) }
-    }
-    ensureActive()
-
-    isSkylight = false
-    isLit = isLitNext
-    if (isLitNext) {
-      lightMap = tmpLightMap
-      var total = 0f
-      for (x in 0 until LIGHT_RESOLUTION) {
-        for (y in 0 until LIGHT_RESOLUTION) {
-          total += lightMap[x][y]
-        }
-      }
-      averageBrightness = (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION))
-    } else {
-      lightMap = NO_LIGHTS_LIGHT_MAP
-      averageBrightness = 0f
-    }
-    if (Settings.renderBlockLightUpdates) {
       ensureActive()
-      launchOnAsync { EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY)) }
+
+      isSkylight = false
+      isLit = isLitNext
+      if (isLitNext) {
+        lightMap = tmpLightMap
+        var total = 0f
+        for (x in 0 until LIGHT_RESOLUTION) {
+          for (y in 0 until LIGHT_RESOLUTION) {
+            total += lightMap[x][y]
+          }
+        }
+        averageBrightness = (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION))
+      } else {
+        lightMap = NO_LIGHTS_LIGHT_MAP
+        averageBrightness = 0f
+      }
+      if (Settings.renderBlockLightUpdates) {
+        ensureActive()
+        launchOnAsync { EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY)) }
+      }
     }
   }
 
@@ -206,7 +202,7 @@ class BlockLight(
     )
 
   fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, scope: CoroutineScope? = null, chunkCache: LongMap<Chunk>? = null): GdxArray<Block> {
-    val skyblocks = GdxArray<Block>()
+    var skyblocks: GdxArray<Block>? = null
     // Since we're not creating air blocks above, we will instead just load
     for (offsetWorldX: LocalCoord in -floor(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()) {
       scope?.ensureActive()
@@ -232,9 +228,10 @@ class BlockLight(
       if (offsetY <= MIN_Y_OFFSET) {
         // Too little offset to bother with columns of skylight (or the block is above left and right)
         // add one to get the air block above the top-block
-        val block = chunk.world.getBlock(topWorldX, topWorldY, loadChunk = false) ?: continue
+        val block = chunk.getBlock(topWorldX, topWorldY, loadChunk = false) ?: continue
         if (skylightBlockFilter(worldX.toFloat(), worldY.toFloat(), block)) {
-          skyblocks.add(block)
+          val nnBlocks = skyblocks ?: GdxArray<Block>(false, 1).also { array -> skyblocks = array }
+          nnBlocks.add(block)
         }
         continue
       }
@@ -245,10 +242,16 @@ class BlockLight(
         topWorldY.toFloat(),
         topWorldYLR.toFloat(),
         chunkCache
-      ) ?: continue
-      skyblocks.addAll(findSkylightBlockColumn)
+      )
+      if (findSkylightBlockColumn.isNotEmpty()) {
+        if (skyblocks == null) {
+          skyblocks = findSkylightBlockColumn
+        } else {
+          skyblocks.addAll(findSkylightBlockColumn)
+        }
+      }
     }
-    return skyblocks
+    return skyblocks ?: EMPTY_BLOCKS_ARRAY
   }
 
   /**
@@ -271,7 +274,7 @@ class BlockLight(
     worldYA: Float,
     worldYB: Float,
     chunkCache: LongMap<Chunk>?
-  ): GdxArray<Block>? {
+  ): GdxArray<Block> {
     val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val columnHeight = worldYTop - worldYBtm
@@ -279,7 +282,7 @@ class BlockLight(
       // The bottom world y-coordinate is below (or at) the top world y-coordinate!
       // This means the worldY coordinate is too far away from the potential skylight column
       // thus no skylight can reach this block
-      return null
+      return EMPTY_BLOCKS_ARRAY
     }
     return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true, chunkCache) { it ->
       skylightBlockFilter(worldX, worldY, it)
