@@ -3,19 +3,19 @@ package no.elg.infiniteBootleg.world.blocks
 import com.badlogic.gdx.utils.LongMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import ktx.collections.GdxArray
 import ktx.collections.isNotEmpty
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
-import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.distCubed
 import no.elg.infiniteBootleg.util.dst2
-import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
@@ -42,19 +42,19 @@ class BlockLight(
    *
    * It denotes that this is a fully lit block, and thus light can be skipped rendered on it.
    */
-  var isSkylight: Boolean
+  var isSkylight: Boolean = false
     private set
 
   /**
    * If this block have any light shining onto it. If not then it should be rendered as a black square
    */
-  var isLit: Boolean
+  var isLit: Boolean = false
     private set
 
   /**
    * The average brightness of the block
    */
-  var averageBrightness: Float
+  var averageBrightness: Float = 0f
     private set
 
   /**
@@ -63,30 +63,13 @@ class BlockLight(
    * Do not modify
    */
   var lightMap: Array<FloatArray> = NO_LIGHTS_LIGHT_MAP
-    get() {
-      synchronized(this) {
-        return field
-      }
-    }
-    private set(value) {
-      synchronized(this) {
-        field = value
-      }
-    }
+    private set
 
   init {
-    isSkylight = chunk.chunkColumn.isBlockAboveTopBlock(localX, chunk.chunkY.chunkToWorld(localY), BLOCKS_LIGHT_FLAG)
-    isLit = isSkylight
-    averageBrightness = if (isSkylight) {
-      1f
+    if (isAboveTopBlock()) {
+      setToSkyLight(false)
     } else {
-      0f
-    }
-
-    lightMap = if (isSkylight) {
-      SKYLIGHT_LIGHT_MAP
-    } else {
-      NO_LIGHTS_LIGHT_MAP
+      setToNoLight(false)
     }
   }
 
@@ -113,78 +96,92 @@ class BlockLight(
     }
   }
 
+  private fun isAboveTopBlock(worldY: WorldCoord = chunk.chunkY.chunkToWorld(localY)): Boolean = chunk.chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)
+
+  private fun setToSkyLight(publishEvent: Boolean) {
+    isLit = true
+    isSkylight = true
+    averageBrightness = 1f
+    lightMap = SKYLIGHT_LIGHT_MAP
+    if (publishEvent) {
+      dispatchLightChangeEvent()
+    }
+  }
+
+  private fun setToNoLight(publishEvent: Boolean) {
+    isLit = false
+    isSkylight = false
+    averageBrightness = 0f
+    lightMap = NO_LIGHTS_LIGHT_MAP
+    if (publishEvent) {
+      dispatchLightChangeEvent()
+    }
+  }
+
+  private val event by lazy { BlockLightChangedEvent(chunk, localX, localY) }
+
+  private fun dispatchLightChangeEvent() {
+    if (Settings.renderBlockLightUpdates) {
+      dispatchEventAsync(event)
+    }
+  }
+
   internal suspend fun recalculateLighting() {
     if (!Settings.renderLight || chunk.isInvalid) {
       return
     }
+    val worldX = chunk.chunkX.chunkToWorld(localX)
+    val worldY = chunk.chunkY.chunkToWorld(localY)
+
+    if (isAboveTopBlock(worldY)) {
+      // This block is a skylight, its always lit fully
+      setToSkyLight(publishEvent = true)
+      return
+    }
     coroutineScope {
-      val chunkColumn = chunk.chunkColumn
-      val worldX = chunk.chunkX.chunkToWorld(localX)
-      val worldY = chunk.chunkY.chunkToWorld(localY)
-
-      if (chunkColumn.isBlockAboveTopBlock(localX, worldY, BLOCKS_LIGHT_FLAG)) {
-        // This block is a skylight, its always lit fully
-        isLit = true
-        isSkylight = true
-        averageBrightness = 1f
-        lightMap = SKYLIGHT_LIGHT_MAP
-        return@coroutineScope
-      }
-      ensureActive()
-
-      var isLitNext = false
-      val tmpLightMap: kotlin.Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
       val chunkCache = LongMap<Chunk>(8, 0.9f)
       chunkCache.put(chunk.compactLocation, chunk)
 
       // find light sources around this block
-      val lightBlocks = coroutineScope {
-        val deferredBlockLights = async { findLuminescentBlocks(worldX, worldY, chunkCache) }
-        val deferredSkyLights = async { findSkylightBlocks(worldX, worldY, this, chunkCache) }
-        val blockLights = deferredBlockLights.await()
-        val skyLights = deferredSkyLights.await()
+      val (blockLights, skyLights) = listOf(
+        async { findLuminescentBlocks(worldX, worldY, chunkCache) },
+        async { findSkylightBlocks(worldX, worldY, this, chunkCache) }
+      ).awaitAll()
+      ensureActive()
 
-        if (blockLights.isEmpty && skyLights.isEmpty) {
-          EMPTY_BLOCKS_ARRAY
-        } else if (blockLights.isEmpty) {
-          skyLights
-        } else if (skyLights.isEmpty) {
-          blockLights
-        } else {
-          blockLights.forEach { block ->
-            if (block !in skyLights) {
-              skyLights.add(block)
-            }
+      val lightBlocks = if (blockLights.isEmpty && skyLights.isEmpty) {
+        setToNoLight(publishEvent = true)
+        return@coroutineScope
+      } else if (blockLights.isEmpty) {
+        skyLights
+      } else if (skyLights.isEmpty) {
+        blockLights
+      } else {
+        skyLights.ensureCapacity(blockLights.size)
+        for (block in blockLights) {
+          if (block !in skyLights) {
+            skyLights.add(block)
           }
-          skyLights
         }
+        skyLights
       }
       ensureActive()
+      val tmpLightMap: Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
       for (neighbor in lightBlocks) {
-        isLitNext = true
         calculateLightFrom(neighbor, worldX, worldY, tmpLightMap)
       }
       ensureActive()
-
       isSkylight = false
-      isLit = isLitNext
-      if (isLitNext) {
-        lightMap = tmpLightMap
-        var total = 0f
-        for (x in 0 until LIGHT_RESOLUTION) {
-          for (y in 0 until LIGHT_RESOLUTION) {
-            total += lightMap[x][y]
-          }
+      isLit = true
+      lightMap = tmpLightMap
+      var total = 0f
+      for (x in 0 until LIGHT_RESOLUTION) {
+        for (y in 0 until LIGHT_RESOLUTION) {
+          total += lightMap[x][y]
         }
-        averageBrightness = (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION))
-      } else {
-        lightMap = NO_LIGHTS_LIGHT_MAP
-        averageBrightness = 0f
       }
-      if (Settings.renderBlockLightUpdates) {
-        ensureActive()
-        launchOnAsync { EventManager.dispatchEvent(BlockLightChangedEvent(chunk, localX, localY)) }
-      }
+      averageBrightness = (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION))
+      dispatchLightChangeEvent()
     }
   }
 
