@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
 import no.elg.infiniteBootleg.main.ClientMain
@@ -205,8 +206,7 @@ class ChunkImpl(
     }
 
     if (!initializing && !bothAirish) {
-      val event = BlockChangedEvent(currBlock, block) // create event here to get the correct thread type
-      launchOnMultithreadedAsync { dispatchEvent(event) }
+      dispatchEventAsync(BlockChangedEvent(currBlock, block))
     }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {

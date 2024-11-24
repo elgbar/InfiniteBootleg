@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.async.MainDispatcher
 import no.elg.infiniteBootleg.exceptions.CalledFromWrongThreadTypeException
 import no.elg.infiniteBootleg.util.ASYNC_THREAD_NAME
+import no.elg.infiniteBootleg.util.EVENTS_THREAD_NAME
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker.Companion.BOX2D_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.world.ticker.WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX
 
@@ -49,7 +50,10 @@ enum class ThreadType {
     }
 
     private fun isThreadNameAsync(threadName: String): Boolean =
-      ASYNC_THREAD_NAME == threadName || threadName.startsWith("DefaultDispatcher", false) || threadName.startsWith("async", false)
+      ASYNC_THREAD_NAME == threadName ||
+        EVENTS_THREAD_NAME == threadName ||
+        threadName.startsWith("DefaultDispatcher", false) ||
+        threadName.startsWith(ASYNC_THREAD_NAME, false)
 
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()

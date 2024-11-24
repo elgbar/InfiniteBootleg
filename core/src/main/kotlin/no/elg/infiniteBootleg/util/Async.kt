@@ -13,7 +13,9 @@ import no.elg.infiniteBootleg.main.Main
 import kotlin.coroutines.CoroutineContext
 
 const val ASYNC_THREAD_NAME = "async"
+const val EVENTS_THREAD_NAME = "events"
 val singleThreadAsyncDispatcher: AsyncExecutorDispatcher = newSingleThreadAsyncContext(ASYNC_THREAD_NAME)
+val singleThreadEventDispatcher: AsyncExecutorDispatcher = newSingleThreadAsyncContext(EVENTS_THREAD_NAME)
 
 /**
  * Run (cancellable) tasks on other threads
@@ -22,6 +24,12 @@ fun launchOnMain(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend 
 
 fun launchOnAsync(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(singleThreadAsyncDispatcher, start = start, block = block)
+
+/**
+ * Launch task on the event thread
+ */
+fun launchOnEvents(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+  KtxAsync.launch(singleThreadEventDispatcher, start = start, block = block)
 
 /**
  * Run tasks which

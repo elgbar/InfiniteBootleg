@@ -97,9 +97,9 @@ class ChunkColumnImpl(
 
     if (expectedOldTopWorldY != newWorldY) {
       if (currentTops === topWorldYLight) {
-        EventManager.dispatchEvent(ChunkColumnUpdatedEvent(chunkX, localX, newWorldY, oldTop, BLOCKS_LIGHT_FLAG))
+        EventManager.dispatchEventAsync(ChunkColumnUpdatedEvent(chunkX, localX, newWorldY, oldTop, BLOCKS_LIGHT_FLAG))
       } else if (currentTops === topWorldYSolid) {
-        EventManager.dispatchEvent(ChunkColumnUpdatedEvent(chunkX, localX, newWorldY, oldTop, SOLID_FLAG))
+        EventManager.dispatchEventAsync(ChunkColumnUpdatedEvent(chunkX, localX, newWorldY, oldTop, SOLID_FLAG))
       }
     }
   }
@@ -151,7 +151,7 @@ class ChunkColumnImpl(
       // The hint is above the current top block. Check if it is valid
       val hintChunk = getLoadedChunkFromWorldY(worldYHint)
       if (hintChunk.valid()) {
-        // its loaded at least
+        // it's loaded at least
         val localYHint = worldYHint.chunkOffset()
         val hintBlock = hintChunk.getRawBlock(localX, localYHint)
         if (isValidTopBlock(hintBlock, rule)) {
