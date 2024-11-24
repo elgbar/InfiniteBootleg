@@ -57,15 +57,21 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
           }
         }
       },
-
-      /*
-       * Update the texture of this chunk if a blocks changes either in this chunk or in a neighbor chunk
-       */
       registerListener { (oldBlock, newBlock): BlockChangedEvent ->
+        // Note: there are two events registered in the same listener
         val block = oldBlock ?: newBlock ?: return@registerListener
-        if (block.chunk == chunk) return@registerListener
-        if (chunk.isWithinRadius(block, 1f)) {
-          chunk.queueForRendering(false)
+        if (block.chunk === chunk) {
+          // Awakens players to allow them to jump in a hole when placing a block
+          block.queryEntities {
+            for ((body, _) in it) {
+              body.isAwake = true
+            }
+          }
+        } else {
+          // Update the texture of this chunk if a blocks changes either in this chunk or in a neighbor chunk
+          if (chunk.isWithinRadius(block, 1f)) {
+            chunk.queueForRendering(false)
+          }
         }
       },
       /*
@@ -87,20 +93,6 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       registerListener { (eventChunk, _): ChunkLoadedEvent ->
         if (eventChunk.isNeighbor(chunk)) {
           chunk.updateAllBlockLights()
-        }
-      },
-
-      /*
-       * Awakens players to allow them to jump in a hole when placing a block
-       */
-      registerListener { (oldBlock, newBlock): BlockChangedEvent ->
-        val block = oldBlock ?: newBlock
-        if (block?.chunk === chunk) {
-          block.queryEntities {
-            for ((body, _) in it) {
-              body.isAwake = true
-            }
-          }
         }
       }
     )
