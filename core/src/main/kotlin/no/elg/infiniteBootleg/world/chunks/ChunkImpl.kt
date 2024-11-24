@@ -8,7 +8,9 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
@@ -327,15 +329,21 @@ class ChunkImpl(
 
   private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-        for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
-          if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
-            continue
+      var anyRecalculated = false
+      coroutineScope {
+        for (localX in 0 until Chunk.CHUNK_SIZE) {
+          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+            if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+              continue
+            }
+            launch { blockLights[localX][localY].recalculateLighting() }
+            anyRecalculated = true
           }
-          blockLights[localX][localY].recalculateLighting()
         }
       }
-      queueForRendering(prioritize = false)
+      if (anyRecalculated) {
+        queueForRendering(prioritize = false)
+      }
     }
   }
 
