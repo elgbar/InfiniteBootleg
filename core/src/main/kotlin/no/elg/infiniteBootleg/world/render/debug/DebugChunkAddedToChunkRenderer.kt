@@ -32,6 +32,8 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
       synchronized(newlyUpdatedChunks) {
         newlyUpdatedChunks.put(e.chunkLoc, if (e.prioritized) PRIORITIZED else NOT_PRIORITIZED)
       }
+    } else {
+      newlyUpdatedChunks.clear()
     }
   }
 
