@@ -42,7 +42,7 @@ object FallingBlockContactService {
             return
           }
           deltaY++
-          blockUp = world.getBlock(newX, newY + deltaY, true)
+          blockUp = block.chunk.getBlock(newX, newY + deltaY, true)
         } while (blockUp.isNotAir(true))
 
         // Only place the block if there is actual free space above
