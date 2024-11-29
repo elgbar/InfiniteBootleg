@@ -126,32 +126,42 @@ class BlockLight(
     }
   }
 
-  internal suspend fun recalculateLighting() {
+  /**
+   * @return If any changes was made to the lighting
+   */
+  internal suspend fun recalculateLighting(): Boolean {
     if (!Settings.renderLight || chunk.isInvalid) {
-      return
+      return false
     }
     val worldX = chunk.chunkX.chunkToWorld(localX)
     val worldY = chunk.chunkY.chunkToWorld(localY)
 
     if (isAboveTopBlock(worldY)) {
+      if (isSkylight) {
+        return false
+      }
       // This block is a skylight, its always lit fully
       setToSkyLight(publishEvent = true)
-      return
+      return true
     }
-    coroutineScope {
+    return coroutineScope {
       val chunkCache = LongMap<Chunk>(8, 0.9f)
       chunkCache.put(chunk.compactLocation, chunk)
 
       // find light sources around this block
-      val (blockLights, skyLights) = listOf(
+      val deferredBlocks = listOf(
         async { findLuminescentBlocks(worldX, worldY, chunkCache) },
         async { findSkylightBlocks(worldX, worldY, this, chunkCache) }
-      ).awaitAll()
+      )
+      val (blockLights, skyLights) = deferredBlocks.awaitAll()
       ensureActive()
 
       val lightBlocks = if (blockLights.isEmpty && skyLights.isEmpty) {
-        setToNoLight(publishEvent = true)
-        return@coroutineScope
+        if (isLit) {
+          setToNoLight(publishEvent = true)
+          return@coroutineScope true
+        }
+        return@coroutineScope false
       } else if (blockLights.isEmpty) {
         skyLights
       } else if (skyLights.isEmpty) {
@@ -182,6 +192,7 @@ class BlockLight(
       }
       averageBrightness = (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION))
       dispatchLightChangeEvent()
+      return@coroutineScope true
     }
   }
 
