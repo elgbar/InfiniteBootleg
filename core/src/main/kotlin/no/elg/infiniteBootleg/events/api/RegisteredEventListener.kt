@@ -1,13 +1,11 @@
 package no.elg.infiniteBootleg.events.api
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
+import no.elg.infiniteBootleg.events.api.EventManager.oneShotStrongRefs
 import no.elg.infiniteBootleg.events.api.EventManager.strongListeners
 import no.elg.infiniteBootleg.events.api.EventManager.weakListeners
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
 import kotlin.reflect.KClass
-
-private val logger = KotlinLogging.logger {}
 
 /**
  * A registered event listener, primarily intended to make it possible to remove listeners without knowing what type of event it represents
@@ -23,14 +21,10 @@ class RegisteredEventListener private constructor(
    * Removes the listener
    */
   fun removeListener() {
-    val eventListeners = synchronized(weakListeners) { weakListeners[eventClass] } ?: strongListeners[eventClass] ?: return
-    synchronized(eventListeners) {
-      if (eventListeners.remove(listener)) {
-        eventsTracker?.onListenerUnregistered(eventClass, listener)
-      } else {
-        logger.warn { "Failed to remove listener (type $eventClass) $listener" }
-      }
-    }
+    strongListeners.getIfPresent(eventClass)?.invalidate(listener)
+    weakListeners.getIfPresent(eventClass)?.invalidate(listener)
+    oneShotStrongRefs.invalidate(listener)
+    eventsTracker?.onListenerUnregistered(eventClass, listener)
   }
 
   companion object {

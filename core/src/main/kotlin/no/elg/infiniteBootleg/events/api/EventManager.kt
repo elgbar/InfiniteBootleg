@@ -1,29 +1,25 @@
 package no.elg.infiniteBootleg.events.api
 
-import com.google.errorprone.annotations.concurrent.GuardedBy
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
 import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.launchOnEvents
+import java.lang.Boolean.TRUE
 import java.lang.ref.WeakReference
-import java.util.Collections
-import java.util.WeakHashMap
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
 
 object EventManager {
 
-  /**
-   * The inner set is in reality a `Collections.newSetFromMap(WeakHashMap())`
-   */
-  @GuardedBy("itself")
-  val weakListeners: WeakHashMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = WeakHashMap()
+  val weakListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().weakKeys().build()
+  val strongListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().build()
 
-  @GuardedBy("itself")
-  val strongListeners: MutableMap<KClass<out Event>, MutableSet<EventListener<out Event>>> = ConcurrentHashMap()
-  val oneShotStrongRefs: MutableMap<EventListener<out Event>, RegisteredEventListener> = ConcurrentHashMap()
+  val oneShotStrongRefs: Cache<EventListener<out Event>, RegisteredEventListener> = Caffeine.newBuilder().build()
 
   val isLoggingAnyEvents: Boolean get() = eventsTracker?.logAnything ?: false
   val isLoggingEventsDispatched get() = eventsTracker?.logEventsDispatched ?: false
@@ -45,18 +41,15 @@ object EventManager {
     registerListener(keepStrongReference, T::class, listener)
 
   fun <T : Event> registerListener(keepStrongReference: Boolean = false, eventClass: KClass<T>, listener: EventListener<T>): RegisteredEventListener {
-    val eventListeners: MutableSet<EventListener<out Event>> =
+    val eventListeners: Cache<EventListener<out Event>, Boolean> =
       if (keepStrongReference) {
-        strongListeners.getOrPut(eventClass) { Collections.newSetFromMap(ConcurrentHashMap()) }
+        strongListeners.get(eventClass) { Caffeine.newBuilder().build() }
       } else {
-        synchronized(weakListeners) {
-          weakListeners.getOrPut(eventClass) { Collections.newSetFromMap(WeakHashMap()) }
-        }
+        weakListeners.get(eventClass) { Caffeine.newBuilder().weakKeys().build<EventListener<out Event>, Boolean>() }
       }
-    synchronized(eventListeners) {
-      eventListeners.add(listener)
-      eventsTracker?.onListenerRegistered(eventClass, listener)
-    }
+
+    eventListeners.put(listener, TRUE)
+    eventsTracker?.onListenerRegistered(eventClass, listener)
     return createRegisteredEventListener(listener, eventClass)
   }
 
@@ -84,22 +77,25 @@ object EventManager {
    */
   inline fun <reified T : Event> oneShotListener(listener: EventListener<T>) {
     var handled = false // Prevents the listener from being called multiple times
-    oneShotStrongRefs[listener] = registerListener<T> {
-      if (handled) {
-        return@registerListener
+    oneShotStrongRefs.put(
+      listener,
+      registerListener<T> {
+        if (handled) {
+          return@registerListener
+        }
+        handled = true
+
+        listener.handle(it)
+
+        removeOneShotRef(listener)
       }
-      handled = true
-
-      listener.handle(it)
-
-      removeOneShotRef(listener)
-    }
+    )
   }
 
   fun removeOneShotRef(listener: EventListener<out Event>) {
     // Remove from another thread to not cause concurrent modification
     launchOnAsync {
-      val storedThis = oneShotStrongRefs.remove(listener)
+      val storedThis = oneShotStrongRefs.getIfPresent(listener)
       if (storedThis != null) {
         storedThis.removeListener()
       } else {
@@ -113,15 +109,22 @@ object EventManager {
    *
    * @param event The event to notify about
    */
-  inline fun <reified T : Event> dispatchEvent(event: T, reason: String? = null) {
-    val eventListeners: Set<EventListener<out Event>> =
-      synchronized(weakListeners) { weakListeners[T::class] } ?: strongListeners[T::class] ?: return
+  inline fun <reified T : AsyncEvent> dispatchEventAsync(event: T, reason: String? = null) {
+    launchOnEvents { dispatchEvent(T::class, event, reason) }
+  }
 
-    @Suppress("UNCHECKED_CAST")
-    val correctListeners: Set<EventListener<T>> = synchronized(eventListeners) {
-      HashSet<EventListener<T>>(eventListeners as Set<EventListener<T>>) // Copy to prevent concurrent modification exception
-    }
-    for (listener in correctListeners) {
+  /**
+   * Notify listeners of the given event
+   *
+   * @param event The event to notify about
+   *
+   * @see dispatchEventAsync
+   */
+  inline fun <reified T : Event> dispatchEvent(event: T, reason: String? = null) = dispatchEvent(T::class, event, reason)
+
+  // impl note: Not inline to make it easier to track during profiling/debugging
+  fun <T : Event> dispatchEvent(eventClass: KClass<T>, event: T, reason: String? = null) {
+    forEachListener<T>(eventClass) { listener ->
       eventsTracker?.onEventListenedTo(event, listener)
       listener.handle(event)
     }
@@ -129,28 +132,19 @@ object EventManager {
     eventsTracker?.onEventDispatched(event)
   }
 
-  /**
-   * Prevent (by removing) the given listener from receiving any more events
-   */
-  @Deprecated("Use registeredEventListerne")
-  fun <T : Event> removeListener(listener: EventListener<T>, eventClass: KClass<T>) {
-    val eventListeners: MutableSet<EventListener<out Event>> =
-      synchronized(weakListeners) { weakListeners[eventClass] } ?: strongListeners[eventClass] ?: return
-    synchronized(eventListeners) {
-      eventListeners.remove(listener)
-      eventsTracker?.onListenerUnregistered(eventClass, listener)
-    }
+  @Suppress("UNCHECKED_CAST")
+  private fun <T : Event> forEachListener(eventClass: KClass<T>, action: (EventListener<T>) -> Unit) {
+    weakListeners.getIfPresent(eventClass)?.asMap()?.keys?.forEach { action(it as EventListener<T>) }
+    strongListeners.getIfPresent(eventClass)?.asMap()?.keys?.forEach { action(it as EventListener<T>) }
   }
 
   /**
    * Remove all listeners registered
    */
   fun clear() {
-    synchronized(weakListeners) {
-      weakListeners.clear()
-    }
-    strongListeners.clear()
-    oneShotStrongRefs.clear()
+    weakListeners.invalidateAll()
+    strongListeners.invalidateAll()
+    oneShotStrongRefs.invalidateAll()
     EventStatistics.clear()
   }
 }
