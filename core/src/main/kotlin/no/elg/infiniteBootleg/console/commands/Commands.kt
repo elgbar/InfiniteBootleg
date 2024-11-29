@@ -620,10 +620,24 @@ class Commands : CommandExecutor() {
   @CmdArgNames("zoom level")
   @ClientsideOnly
   @ConsoleDoc(description = "Change the zoom level of the world camera", paramDescriptions = ["The new zoom level must be between $MIN_ZOOM and $MAX_ZOOM"])
-  fun zoom(zoom: Float) {
+  fun zoom(zoom: Float) = zoom(zoom, true)
+
+  @CmdArgNames("zoom level", "limit")
+  @ClientsideOnly
+  @ConsoleDoc(
+    description = "Change the zoom level of the world camera",
+    paramDescriptions = ["The new zoom level must be between $MIN_ZOOM and $MAX_ZOOM (if limited)", "Whether to limit the zoom level"]
+  )
+  fun zoom(zoom: Float, limit: Boolean) {
     val clientWorld = clientWorld ?: return
     val render = clientWorld.render
-    render.camera.zoom = zoom.coerceIn(MIN_ZOOM, MAX_ZOOM)
+    render.camera.zoom = zoom.let {
+      if (limit) {
+        it.coerceIn(MIN_ZOOM, MAX_ZOOM)
+      } else {
+        it
+      }
+    }
     render.update()
     logger.info { "Zoom level is now ${render.camera.zoom}" }
   }
