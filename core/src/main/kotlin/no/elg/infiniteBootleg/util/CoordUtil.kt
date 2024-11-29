@@ -118,13 +118,13 @@ inline fun Block.isNextTo(chunk: Chunk): Boolean = this.chunk.isCardinalNeighbor
  * @return The closest point in this chunk to the given block
  */
 fun Chunk.closestPointTo(block: Block): LocalCompactLoc {
-  val dirToBlock = this.directionTo(block.chunk)
-  val closestPointLocalX = when (dirToBlock.horizontalDirection) {
+  val other = block.chunk
+  val closestPointLocalX = when (horizontalDirectionTo(other)) {
     HorizontalDirection.WESTWARD -> 0
     HorizontalDirection.HORIZONTALLY_ALIGNED -> block.localX
     HorizontalDirection.EASTWARD -> CHUNK_SIZE
   }
-  val closestPointLocalY = when (dirToBlock.verticalDirection) {
+  val closestPointLocalY = when (verticalDirectionTo(other)) {
     VerticalDirection.NORTHWARD -> CHUNK_SIZE
     VerticalDirection.VERTICALLY_ALIGNED -> block.localY
     VerticalDirection.SOUTHWARD -> 0

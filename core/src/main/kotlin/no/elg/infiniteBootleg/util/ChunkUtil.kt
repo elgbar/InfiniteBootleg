@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.util
 
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.HorizontalDirection
+import no.elg.infiniteBootleg.world.VerticalDirection
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import kotlin.math.abs
 
@@ -20,8 +22,8 @@ fun Chunk.isNeighbor(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
   }
 }
 
-fun Chunk.directionTo(other: Chunk): Direction = directionTo(other.chunkX, other.chunkY)
+inline fun Chunk.directionTo(other: Chunk): Direction = directionTo(other.chunkX, other.chunkY)
 
-fun Chunk.directionTo(chunkX: ChunkCoord, chunkY: ChunkCoord): Direction {
-  return Direction.direction(this.chunkX, this.chunkY, chunkX, chunkY)
-}
+inline fun Chunk.verticalDirectionTo(other: Chunk): VerticalDirection = Direction.getVerticalDirection(this.chunkY, other.chunkY)
+inline fun Chunk.horizontalDirectionTo(other: Chunk): HorizontalDirection = Direction.getHorizontalDirection(this.chunkY, other.chunkY)
+inline fun Chunk.directionTo(chunkX: ChunkCoord, chunkY: ChunkCoord): Direction = Direction.direction(this.chunkX, this.chunkY, chunkX, chunkY)

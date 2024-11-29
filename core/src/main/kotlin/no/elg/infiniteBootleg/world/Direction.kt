@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.LongMap
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2i
 import no.elg.infiniteBootleg.util.compactLoc
-import kotlin.math.sign
+import no.elg.infiniteBootleg.world.Direction.entries
 
 /**
  * @author Elg
@@ -46,10 +46,46 @@ enum class Direction(val dx: Int, val dy: Int) {
       }
     }
 
+    inline fun diff(from: Int, to: Int): Int =
+      if (to > from) {
+        -1
+      } else if (to < from) {
+        1
+      } else {
+        0
+      }
+
+    inline fun getVerticalDirection(fromY: Int, toY: Int): VerticalDirection = VerticalDirection.of(diff(toY, fromY))
+    inline fun getHorizontalDirection(fromX: Int, toX: Int): HorizontalDirection = HorizontalDirection.of(diff(toX, fromX))
+
     fun direction(fromX: Int, fromY: Int, toX: Int, toY: Int): Direction {
-      val diffX = sign((toX - fromX).toFloat()).toInt()
-      val diffY = sign((toY - fromY).toFloat()).toInt()
-      return directionMap[compactLoc(diffX, diffY)]
+      val diffX = diff(toX, fromX)
+      val diffY = diff(toY, fromY)
+      return if (diffX == EASTWARD) {
+        if (diffY == NORTHWARD) {
+          NORTH_EAST
+        } else if (diffY == SOUTHWARD) {
+          SOUTH_EAST
+        } else {
+          EAST
+        }
+      } else if (diffX == WESTWARD) {
+        if (diffY == NORTHWARD) {
+          NORTH_WEST
+        } else if (diffY == SOUTHWARD) {
+          SOUTH_WEST
+        } else {
+          WEST
+        }
+      } else {
+        if (diffY == NORTHWARD) {
+          NORTH
+        } else if (diffY == SOUTHWARD) {
+          SOUTH
+        } else {
+          CENTER
+        }
+      }
     }
 
     fun valueOf(dx: Int, dy: Int): Direction = directionMap[compactLoc(dx, dy)] ?: throw IllegalArgumentException("No direction with dx=$dx and dy=$dy")
