@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.util.compactChunkToWorld
 import no.elg.infiniteBootleg.util.isNeighbor
 import no.elg.infiniteBootleg.util.isWithinRadius
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.queryEntities
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.invalid
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
@@ -31,6 +32,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * Actually update the light of the chunk based on lights that have been queued by [registerLightChangeForNearbyChunks]
        */
       registerListener { event: WorldTickedEvent ->
+        if (chunk.invalid()) return@registerListener
         if (event.world == chunk.world) {
           val lights: WorldCompactLocArray = synchronized(lightLocs) {
             if (lightLocs.isEmpty) {
@@ -50,6 +52,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * Register a location to be updated when the world ticks
        */
       registerListener { (eventChunk, originLocalX, originLocalY): ChunkLightChangedEvent ->
+        if (chunk.invalid()) return@registerListener
         if (chunk.isNeighbor(eventChunk) || chunk == eventChunk) {
           val compactLoc = compactChunkToWorld(eventChunk, originLocalX, originLocalY)
           synchronized(lightLocs) {
@@ -58,6 +61,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
         }
       },
       registerListener { (oldBlock, newBlock): BlockChangedEvent ->
+        if (chunk.invalid()) return@registerListener
         // Note: there are two events registered in the same listener
         val block = oldBlock ?: newBlock ?: return@registerListener
         if (block.chunk === chunk) {
@@ -78,7 +82,8 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * Update chunk light when a chunk column is updated
        */
       registerListener { event: ChunkColumnUpdatedEvent ->
-        if (event.chunkX in chunkLookRange && (event.flag and BLOCKS_LIGHT_FLAG != 0)) {
+        if (chunk.invalid()) return@registerListener
+        if ((event.flag and BLOCKS_LIGHT_FLAG != 0) && event.chunkX in chunkLookRange) {
           val lights: WorldCompactLocArray = event.calculatedDiffColumn
           synchronized(lightLocs) {
             lightLocs.addAll(lights, 0, lights.size)
@@ -91,6 +96,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * affect this chunk or the blocks that change the texture of this chunk
        */
       registerListener { (eventChunk, _): ChunkLoadedEvent ->
+        if (chunk.invalid()) return@registerListener
         if (eventChunk.isNeighbor(chunk)) {
           chunk.updateAllBlockLights()
         }
