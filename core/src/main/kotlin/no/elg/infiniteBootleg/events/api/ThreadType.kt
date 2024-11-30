@@ -53,7 +53,8 @@ enum class ThreadType {
       ASYNC_THREAD_NAME == threadName ||
         EVENTS_THREAD_NAME == threadName ||
         threadName.startsWith("DefaultDispatcher", false) ||
-        threadName.startsWith(ASYNC_THREAD_NAME, false)
+        threadName.startsWith(ASYNC_THREAD_NAME, false) ||
+        threadName.startsWith(EVENTS_THREAD_NAME, false)
 
     fun currentThreadType(): ThreadType {
       val currentThread = Thread.currentThread()
