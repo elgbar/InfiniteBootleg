@@ -10,13 +10,14 @@ import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnEvents
 import java.lang.Boolean.TRUE
 import java.lang.ref.WeakReference
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
 
 object EventManager {
 
-  val weakListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().weakKeys().build()
+  val weakListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().build()
   val strongListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().build()
 
   val oneShotStrongRefs: Cache<EventListener<out Event>, RegisteredEventListener> = Caffeine.newBuilder().build()
@@ -28,6 +29,15 @@ object EventManager {
 
   var eventsTracker: EventsTracker? = if (Settings.debug) EventsTracker() else null
     private set
+
+  val activeListeners = AtomicLong(0) // active number of listeners
+  val activeOneTimeRefListeners = AtomicLong(0)
+  val registeredWeakListeners = AtomicLong(0)
+  val registeredStrongListeners = AtomicLong(0)
+
+  val unregisteredListeners = AtomicLong(0)
+  val dispatchedEvents = AtomicLong(0)
+  val listenerListenedToEvent = AtomicLong(0)
 
   fun getOrCreateEventsTracker(): EventsTracker = eventsTracker ?: EventsTracker().also { eventsTracker = it }
 
@@ -41,10 +51,13 @@ object EventManager {
     registerListener(keepStrongReference, T::class, listener)
 
   fun <T : Event> registerListener(keepStrongReference: Boolean = false, eventClass: KClass<T>, listener: EventListener<T>): RegisteredEventListener {
+    activeListeners.incrementAndGet()
     val eventListeners: Cache<EventListener<out Event>, Boolean> =
       if (keepStrongReference) {
-        strongListeners.get(eventClass) { Caffeine.newBuilder().build() }
+        registeredStrongListeners.incrementAndGet()
+        strongListeners.get(eventClass) { Caffeine.newBuilder().build<EventListener<out Event>, Boolean>() }
       } else {
+        registeredWeakListeners.incrementAndGet()
         weakListeners.get(eventClass) { Caffeine.newBuilder().weakKeys().build<EventListener<out Event>, Boolean>() }
       }
 
@@ -77,6 +90,7 @@ object EventManager {
    */
   inline fun <reified T : Event> oneShotListener(listener: EventListener<T>) {
     var handled = false // Prevents the listener from being called multiple times
+    activeOneTimeRefListeners.incrementAndGet()
     oneShotStrongRefs.put(
       listener,
       registerListener<T> {
@@ -98,6 +112,7 @@ object EventManager {
       val storedThis = oneShotStrongRefs.getIfPresent(listener)
       if (storedThis != null) {
         storedThis.removeListener()
+        activeOneTimeRefListeners.decrementAndGet()
       } else {
         logger.error { "Could not remove one shot listener $listener" }
       }
@@ -124,7 +139,9 @@ object EventManager {
 
   // impl note: Not inline to make it easier to track during profiling/debugging
   fun <T : Event> dispatchEvent(eventClass: KClass<T>, event: T, reason: String? = null) {
+    dispatchedEvents.incrementAndGet()
     forEachListener<T>(eventClass) { listener ->
+      listenerListenedToEvent.incrementAndGet()
       eventsTracker?.onEventListenedTo(event, listener)
       listener.handle(event)
     }

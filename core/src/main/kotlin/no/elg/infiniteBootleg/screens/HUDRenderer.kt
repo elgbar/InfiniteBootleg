@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.screens.hud.CurrentBlockHUDRenderer
 import no.elg.infiniteBootleg.screens.hud.DebugGraph
 import no.elg.infiniteBootleg.screens.hud.DebugGraph.render
 import no.elg.infiniteBootleg.screens.hud.DebugText.chunk
+import no.elg.infiniteBootleg.screens.hud.DebugText.counters
 import no.elg.infiniteBootleg.screens.hud.DebugText.ents
 import no.elg.infiniteBootleg.screens.hud.DebugText.fpsString
 import no.elg.infiniteBootleg.screens.hud.DebugText.lights
@@ -53,11 +54,11 @@ class HUDRenderer : Renderer, Resizable {
         nl()
         pos(builder, controlled)
         nl()
-        time(builder, world)
-        nl()
         lights(builder, world, mouseBlockX, mouseBlockY)
         nl()
-        builder.append("Chunk reads: ${world.chunkReads}, Chunk writes: ${world.chunkWrites}")
+        time(builder, world)
+        nl()
+        counters(builder, world)
         nl()
         ents(builder, world, main.mouseLocator.mouseBlockX, main.mouseLocator.mouseBlockY)
       }

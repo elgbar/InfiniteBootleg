@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.screens.hud
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
@@ -11,8 +12,10 @@ import no.elg.infiniteBootleg.util.fastIntFormat
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.NO_LIGHTS_LIGHT_MAP
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
@@ -21,7 +24,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
-import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import java.text.DecimalFormat
 
@@ -59,8 +62,8 @@ object DebugText {
     val usingSkyArr = blockLight?.lightMap === SKYLIGHT_LIGHT_MAP
     val usingNoLigArr = blockLight?.lightMap === NO_LIGHTS_LIGHT_MAP
     val avg = blockLight?.averageBrightness ?: 0.0f
-    val sub = blockLight?.lightMap?.getOrNull(rawX)?.getOrNull(rawY) ?: 0.0
-    val format = " lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] %1.3f"
+    val sub = blockLight?.lightMap?.get(lightMapIndex(rawX, rawY)) ?: 0.0
+    val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] %1.3f"
     sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, sub))
   }
 
@@ -167,6 +170,14 @@ object DebugText {
         holding
       )
     )
+  }
+
+  fun counters(builder: StringBuilder, world: ClientWorld) {
+    builder.append("Chunk reads/writes: ").append(world.chunkReads.get()).append(" / ").append(world.chunkWrites.get())
+      .append(" | active listeners: ").append(EventManager.activeListeners.get()).append(", removed ").append(EventManager.unregisteredListeners.get())
+      .append(", str/weak/1sh: ").append(EventManager.registeredStrongListeners.get()).append(" / ").append(EventManager.registeredWeakListeners.get())
+      .append(" / ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ").append(EventManager.dispatchedEvents.get()).append(" listened to: ")
+      .append(EventManager.listenerListenedToEvent.get()).append(" | Chunk Rdr Q: ").append(ChunkRenderer.chunksInRenderQueue)
   }
 
   fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {

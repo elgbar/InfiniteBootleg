@@ -25,7 +25,6 @@ import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Comp
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_OUT_OF_VIEW_REASON
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.screens.hud.DebugText.pos
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
@@ -77,14 +76,18 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       it.SetFrequency(1f)
     }
 
-  private fun nextChunk(): Chunk {
+  private fun nextChunk(): Chunk? {
     return synchronized(QUEUE_LOCK) {
-      val (time: SystemTimeMillis, chunkTimeBucket: ObjectSortedSet<Chunk>) = renderTimeAdded.firstEntry() ?: error("No chunks in the queue")
+      val (time: SystemTimeMillis, chunkTimeBucket: ObjectSortedSet<Chunk>) = renderTimeAdded.firstEntry() ?: let {
+        chunksInRenderQueue = 0
+        return null
+      }
       val chunk = chunkTimeBucket.removeFirst()
       if (chunkTimeBucket.isEmpty()) {
         renderTimeAdded.remove(time)
       }
       chunkLocToTimeAdded.remove(chunk.compactLocation)
+      chunksInRenderQueue = chunkLocToTimeAdded.size
       chunk
     }
   }
@@ -122,6 +125,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           timeSet.addAndMoveToLast(chunk)
         }
       }
+      chunksInRenderQueue = chunkLocToTimeAdded.size
       dispatchEvent(ChunkAddedToChunkRendererEvent(chunk.compactLocation, prioritize))
     }
   }
@@ -135,12 +139,14 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   override fun render() {
     // fast return if there is nothing to render
     if (chunkLocToTimeAdded.isEmpty()) {
+      chunksInRenderQueue = 0
       return
     }
     // get the first valid chunk to render
     val chunk: Chunk = synchronized(QUEUE_LOCK) {
       do {
         if (chunkLocToTimeAdded.isEmpty()) {
+          chunksInRenderQueue = 0
           // nothing to render
           return
         }
