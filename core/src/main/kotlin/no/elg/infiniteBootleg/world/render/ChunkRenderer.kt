@@ -127,12 +127,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   }
 
   fun renderMultiple() {
-    render()
-    if (Gdx.graphics.framesPerSecond > FPS_FAST_CHUNK_RENDER_THRESHOLD) {
-      // only render more chunks when the computer isn't struggling with the rendering
-      for (i in 0 until chunksToRenderEachFrame) {
-        render()
-      }
+    repeat(chunksToRenderEachFrame) {
+      render()
     }
   }
 
@@ -318,19 +314,17 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     /** How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks  */
     const val FPS_FAST_CHUNK_RENDER_THRESHOLD = 10
 
-    const val LIGHT_RESOLUTION = 2
-
     const val LIGHT_SUBBLOCK_SIZE = BLOCK_SIZE / LIGHT_RESOLUTION.toFloat()
 
     const val CAVE_CLEAR_COLOR_R = 0.408824f
     const val CAVE_CLEAR_COLOR_G = 0.202941f
     const val CAVE_CLEAR_COLOR_B = 0.055882f
 
-    private const val CHUNK_NOT_IN_QUEUE_INDEX = -1
-
     private val QUEUE_LOCK = Any()
 
     private const val PRIORITIZATION_ADVANTAGE_ADD_TIME = 1000L
     private const val NOT_IN_COLLECTION = 0L
+
+    var chunksInRenderQueue: Int = 0
   }
 }
