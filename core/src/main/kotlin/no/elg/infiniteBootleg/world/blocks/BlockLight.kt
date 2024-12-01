@@ -18,9 +18,9 @@ import no.elg.infiniteBootleg.util.distCubed
 import no.elg.infiniteBootleg.util.dst2
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
-import no.elg.infiniteBootleg.world.render.ChunkRenderer.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.world.World.Companion.EMPTY_BLOCKS_ARRAY
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
@@ -58,11 +58,15 @@ class BlockLight(
     private set
 
   /**
-   * Brightness, in the range `0..1`, of each sub-cells.
+   * Brightness, in the range `0f..1f`, of each sub-cells.
+   *
+   * ## Layout
+   *
+   * The array is a 2D array with the size of [LIGHT_RESOLUTION] x [LIGHT_RESOLUTION], stored in row-major order.
    *
    * Do not modify
    */
-  var lightMap: Array<FloatArray> = NO_LIGHTS_LIGHT_MAP
+  var lightMap: FloatArray = NO_LIGHTS_LIGHT_MAP
     private set
 
   init {
@@ -73,7 +77,13 @@ class BlockLight(
     }
   }
 
-  fun calculateLightFrom(neighbor: Block, worldX: WorldCoord, worldY: WorldCoord, tmpLightMap: Array<FloatArray>) {
+  fun calculateLightFrom(
+    neighbor: Block,
+    worldX: WorldCoord,
+    worldY: WorldCoord,
+    tmpLightMap: FloatArray,
+    firstTime: Boolean
+  ) {
     // Written to hopefully be auto-vectorized by the JVM
     for (dx in 0 until LIGHT_RESOLUTION) {
       for (dy in 0 until LIGHT_RESOLUTION) {
@@ -88,9 +98,8 @@ class BlockLight(
         val negSignum = -sign(distCubed)
         val intensity = 1 + (negSignum * distCubed)
 
-        val old: Float = tmpLightMap[dx][dy]
-        if (old < intensity) {
-          tmpLightMap[dx][dy] = intensity.toFloat()
+        if (firstTime || tmpLightMap[lightMapIndex(dx, dy)] < intensity) {
+          tmpLightMap[lightMapIndex(dx, dy)] = intensity.toFloat()
         }
       }
     }
@@ -176,21 +185,18 @@ class BlockLight(
         skyLights
       }
       ensureActive()
-      val tmpLightMap: Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) }
+      val tmpLightMap = FloatArray(LIGHT_RESOLUTION_SQUARE) { 0f }
+      var firstTime = true
       for (neighbor in lightBlocks) {
-        calculateLightFrom(neighbor, worldX, worldY, tmpLightMap)
+        calculateLightFrom(neighbor, worldX, worldY, tmpLightMap, firstTime)
+        firstTime = false
       }
       ensureActive()
       isSkylight = false
       isLit = true
       lightMap = tmpLightMap
-      var total = 0f
-      for (x in 0 until LIGHT_RESOLUTION) {
-        for (y in 0 until LIGHT_RESOLUTION) {
-          total += lightMap[x][y]
-        }
-      }
-      averageBrightness = (total / (LIGHT_RESOLUTION * LIGHT_RESOLUTION))
+      val total = tmpLightMap.sum()
+      averageBrightness = total / LIGHT_RESOLUTION_SQUARE
       dispatchLightChangeEvent()
       return@coroutineScope true
     }
@@ -314,10 +320,15 @@ class BlockLight(
   }
 
   companion object {
+    const val LIGHT_RESOLUTION = 2
+    const val LIGHT_RESOLUTION_SQUARE = LIGHT_RESOLUTION * LIGHT_RESOLUTION
+
     val EMITS_LIGHT_FILTER = { block: Block -> block.material.emitsLight }
 
-    val SKYLIGHT_LIGHT_MAP: Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) { 1f } }
-    val NO_LIGHTS_LIGHT_MAP: Array<FloatArray> = Array(LIGHT_RESOLUTION) { FloatArray(LIGHT_RESOLUTION) { 0f } }
+    val SKYLIGHT_LIGHT_MAP: FloatArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { 1f }
+    val NO_LIGHTS_LIGHT_MAP: FloatArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { 0f }
+
+    inline fun lightMapIndex(dx: Int, dy: Int): Int = dx * LIGHT_RESOLUTION + dy
 
     const val MIN_Y_OFFSET = 1
 

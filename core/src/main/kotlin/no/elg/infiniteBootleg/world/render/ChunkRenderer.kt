@@ -34,6 +34,8 @@ import no.elg.infiniteBootleg.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
@@ -264,7 +266,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   private fun drawShadedBlock(
     textureRegion: RotatableTextureRegion,
-    lights: Array<FloatArray>,
+    lights: FloatArray,
     dx: Int,
     dy: Int,
     rotation: Int
@@ -281,7 +283,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       val regionsLength = regions.size
       while (rx < regionsLength) {
         val region = regions[rx]
-        val lightIntensity = lights[rx][ry]
+        val lightIntensity = lights[lightMapIndex(rx, ry)]
         batch.setColor(lightIntensity, lightIntensity, lightIntensity, 1f)
         if (textureRegion.rotationAllowed || rotation == 0) {
           batch.draw(
