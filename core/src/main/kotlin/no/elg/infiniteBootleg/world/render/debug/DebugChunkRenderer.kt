@@ -63,7 +63,11 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRe
             shapeRenderer.color = if (canNotSeeChunk) {
               OUTSIDE_CAMERA_COLOR
             } else {
-              WITHIN_CAMERA_COLOR
+              if (worldRender.world.isChunkLoaded(x, y)) {
+                WITHIN_CAMERA_COLOR
+              } else {
+                NOT_LOADED_COLOR
+              }
             }
             shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
           }
@@ -71,9 +75,11 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRe
       }
       val sr = ClientMain.inst().screenRenderer
       sr.use {
-        sr.drawBottom("Debug Chunk outline legend", 5f)
+        sr.drawBottom("Debug Chunk outline legend", 7f)
         sr.font.color = WITHIN_CAMERA_COLOR
-        sr.drawBottom("  Chunks within the camera boarders", 3f)
+        sr.drawBottom("  Loaded chunks within the camera boarders", 5f)
+        sr.font.color = NOT_LOADED_COLOR
+        sr.drawBottom("  Unloaded chunks within the camera boarders", 3f)
         sr.font.color = OUTSIDE_CAMERA_COLOR
         sr.drawBottom("  Chunks outside camera boarders, only physics active", 1f)
       }
@@ -88,7 +94,8 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRe
 
   companion object {
     val WITHIN_CAMERA_COLOR: Color = Color.TEAL
-    val OUTSIDE_CAMERA_COLOR: Color = Color.FIREBRICK
+    val OUTSIDE_CAMERA_COLOR: Color = Color.ORANGE
+    val NOT_LOADED_COLOR: Color = Color.FIREBRICK
     val CHUNK_UPDATE_COLOR: Color = Color.GREEN
   }
 }
