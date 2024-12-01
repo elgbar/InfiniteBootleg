@@ -52,7 +52,7 @@ enum class Direction(val dx: Int, val dy: Int) {
       } else if (to < from) {
         1
       } else {
-        0
+        ALIGNED
       }
 
     inline fun getVerticalDirection(fromY: Int, toY: Int): VerticalDirection = VerticalDirection.of(diff(toY, fromY))

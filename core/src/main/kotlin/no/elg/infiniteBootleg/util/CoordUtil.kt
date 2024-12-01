@@ -114,26 +114,18 @@ inline fun Chunk.isCardinalNeighbor(chunk: Chunk) = abs(chunk.chunkX - this.chun
  */
 inline fun Block.isNextTo(chunk: Chunk): Boolean = this.chunk.isCardinalNeighbor(chunk) && isInnerEdgeOfChunk(localX, localY)
 
-/**
- * @return The closest point in this chunk to the given block
- */
-fun Chunk.closestPointTo(block: Block): LocalCompactLoc {
+fun Chunk.shortestDistanceSquared(block: Block): Float {
   val other = block.chunk
-  val closestPointLocalX = when (horizontalDirectionTo(other)) {
+  val localX = when (horizontalDirectionTo(other)) {
     HorizontalDirection.WESTWARD -> 0
     HorizontalDirection.HORIZONTALLY_ALIGNED -> block.localX
     HorizontalDirection.EASTWARD -> CHUNK_SIZE
   }
-  val closestPointLocalY = when (verticalDirectionTo(other)) {
+  val localY = when (verticalDirectionTo(other)) {
     VerticalDirection.NORTHWARD -> CHUNK_SIZE
     VerticalDirection.VERTICALLY_ALIGNED -> block.localY
     VerticalDirection.SOUTHWARD -> 0
   }
-  return compactLoc(closestPointLocalX, closestPointLocalY)
-}
-
-fun Chunk.shortestDistanceSquared(block: Block): Float {
-  val (localX, localY) = closestPointTo(block)
   return Vector2.dst2(getWorldX(localX) + 0.5f, getWorldY(localY) + 0.5f, block.worldX + 0.5f, block.worldY + 0.5f)
 }
 
@@ -173,6 +165,9 @@ inline fun Long.decompactLocY(): Int = toInt()
 inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
 
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl SIZE or (b.toInt() and 0xffff)
+
+inline fun compactChunkToWorld(chunkPos: ChunkCompactLoc, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
+  compactLoc(chunkPos.decompactLocX().chunkToWorld(localX), chunkPos.decompactLocY().chunkToWorld(localY))
 
 inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
   compactLoc(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))

@@ -14,6 +14,11 @@ fun Chunk.isNeighbor(other: Chunk): Boolean = isNeighbor(other.chunkX, other.chu
 /**
  * Check if this chunk is a neighbor of the given chunk, this chunk is not a neighbor of itself
  */
+fun Chunk.isNeighbor(other: ChunkCompactLoc): Boolean = isNeighbor(other.decompactLocX(), other.decompactLocY())
+
+/**
+ * Check if this chunk is a neighbor of the given chunk, this chunk is not a neighbor of itself
+ */
 fun Chunk.isNeighbor(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
   return if (chunkX == this.chunkX && chunkY == this.chunkY) {
     false
