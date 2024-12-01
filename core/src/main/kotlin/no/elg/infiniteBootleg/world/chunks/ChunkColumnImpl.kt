@@ -125,13 +125,13 @@ class ChunkColumnImpl(
   }
 
   private fun testChunk(
-    nextChunk: Chunk?,
+    nextChunk: Chunk,
     top: WorldCoordArray,
     localX: LocalCoord,
     expectedCurrentTopWorldY: WorldCoord,
     rule: (block: Block) -> Boolean
   ): Boolean {
-    if (nextChunk != null && nextChunk.isValid && !nextChunk.isAllAir) {
+    if (nextChunk.isValid && !nextChunk.isAllAir) {
       for (nextLocalY in CHUNK_SIZE - 1 downTo 0) {
         val nextBlock = nextChunk.getRawBlock(localX, nextLocalY)
         if (isValidTopBlock(nextBlock, rule)) {
@@ -174,14 +174,16 @@ class ChunkColumnImpl(
     val currentTopChunkY = currTopWorldY.worldToChunk()
 
     for (nextChunkY in MAX_CHUNKS_TO_LOOK downTo 0) {
-      val nextChunk = getChunk(nextChunkY + currentTopChunkY)
+      // Find the top-most loaded chunk in this column, do not load chunks for improved performance
+      val nextChunk = getChunk(nextChunkY + currentTopChunkY, load = false) ?: continue
       if (testChunk(nextChunk, top, localX, currTopWorldY, rule)) {
         return
       }
     }
 
     for (nextChunkY in 0..MAX_CHUNKS_TO_LOOK) {
-      val nextChunk = getChunk(currentTopChunkY - nextChunkY)
+      // If the chunk is not loaded we can safely assume no other chunks above are loaded
+      val nextChunk = getChunk(currentTopChunkY - nextChunkY, load = false) ?: break
       if (testChunk(nextChunk, top, localX, currTopWorldY, rule)) {
         return
       }
