@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.render
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.OrderedMap
+import com.badlogic.gdx.utils.OrderedMap.OrderedMapEntries
 import ktx.collections.component1
 import ktx.collections.component2
 import no.elg.infiniteBootleg.api.Renderer
@@ -18,6 +19,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
   private val chunksToDraw: OrderedMap<Chunk, Texture> = OrderedMap<Chunk, Texture>().apply {
     orderedKeys().ordered = false
   }
+  val chunksToDrawIterator = OrderedMapEntries(chunksToDraw)
 
   private fun prepareChunks() {
     val chunksInView = worldRender.chunksInView
@@ -59,7 +61,8 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
   override fun render() {
     prepareChunks()
     batch.disableBlending()
-    for ((chunk, texture) in chunksToDraw.entries()) {
+    chunksToDrawIterator.reset()
+    for ((chunk, texture) in chunksToDrawIterator) {
       if (region.texture == null) {
         region.setRegion(texture)
         region.flip(false, true)
