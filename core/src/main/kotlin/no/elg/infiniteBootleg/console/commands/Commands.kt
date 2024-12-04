@@ -620,7 +620,7 @@ class Commands : CommandExecutor() {
   @CmdArgNames("zoom level")
   @ClientsideOnly
   @ConsoleDoc(description = "Change the zoom level of the world camera", paramDescriptions = ["The new zoom level must be between $MIN_ZOOM and $MAX_ZOOM"])
-  fun zoom(zoom: Float) = zoom(zoom, true)
+  fun zoom(zoom: Float) = zoom(zoom, limit = false)
 
   @CmdArgNames("zoom level", "limit")
   @ClientsideOnly
