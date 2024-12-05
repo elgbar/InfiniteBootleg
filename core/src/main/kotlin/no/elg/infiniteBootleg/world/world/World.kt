@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.ObjectSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import kotlinx.coroutines.delay
 import ktx.async.interval
 import ktx.collections.GdxArray
@@ -127,6 +129,7 @@ import no.elg.infiniteBootleg.world.managers.container.WorldContainerManager
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
+import java.lang.ref.WeakReference
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
@@ -577,7 +580,10 @@ abstract class World(
 
   fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? = getChunk(compactLoc(chunkX, chunkY), load)
 
-  private val threadLocalChunksView = ThreadLocal.withInitial<LongMap<Chunk>> { LongMap() }
+  private val threadLocalChunksView = ThreadLocal.withInitial<Long2ObjectMap<WeakReference<Chunk>>> {
+    CHUNK_THREAD_LOCAL.incrementAndGet()
+    Long2ObjectOpenHashMap(32)
+  }
 
   /**
    * Find a valid chunk and optionally load it if it is not valid/not loaded
@@ -586,9 +592,13 @@ abstract class World(
    */
   fun getChunk(chunkLoc: Long, load: Boolean = true): Chunk? {
     val localChunks = threadLocalChunksView.get()
-    val localChunk: Chunk? = localChunks[chunkLoc]
-    if (localChunk != null && localChunk.isValid) {
-      return localChunk
+    val localChunk: Chunk? = localChunks.get(chunkLoc)?.get()
+    if (localChunk != null) {
+      if (localChunk.isValid) {
+        return localChunk
+      } else {
+        localChunks.remove(chunkLoc)
+      }
     }
     // This is a long lock, it must appear to be an atomic operation though
     val readChunk = readChunks(TRY_LOCK_CHUNKS_DURATION_MS) { chunks -> chunks[chunkLoc] }
@@ -596,13 +606,16 @@ abstract class World(
       if (!load) {
         null
       } else {
+        IllegalAction.STACKTRACE.handle { "Loading chunk! ${stringifyCompactLoc(chunkLoc)}" }
         loadChunk(chunkLoc)
       }
     } else {
       readChunk
     }
     return if (finalChunk.valid()) {
-      localChunks.put(chunkLoc, finalChunk)
+      CHUNK_ADDED_THREAD_LOCAL.incrementAndGet()
+      localChunks.put(chunkLoc, WeakReference(finalChunk))
+      finalChunk
     } else {
       null
     }
@@ -1208,7 +1221,11 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW = LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
 
-    val EMPTY_BLOCKS_ARRAY = Array<Block>(false, 0)
+    val CHUNK_THREAD_LOCAL = AtomicInteger(0)
+    val CHUNK_REMOVED_THREAD_LOCAL = AtomicInteger(0)
+    val CHUNK_ADDED_THREAD_LOCAL = AtomicInteger(0)
+
+    val EMPTY_BLOCKS_ARRAY = GdxArray<Block>(false, 0)
       get() {
         require(field.items.isEmpty()) { "Expected EMPTY_BLOCKS_ARRAY to be an empty array, but got ${field.size} elements" }
         return field

@@ -26,6 +26,7 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.FlyingTag.Companion.flyi
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.world.world.ClientWorld
+import no.elg.infiniteBootleg.world.world.World
 import java.text.DecimalFormat
 
 object DebugText {
@@ -177,7 +178,10 @@ object DebugText {
       .append(" | active listeners: ").append(EventManager.activeListeners.get()).append(", removed ").append(EventManager.unregisteredListeners.get())
       .append(", str/weak/1sh: ").append(EventManager.registeredStrongListeners.get()).append(" / ").append(EventManager.registeredWeakListeners.get())
       .append(" / ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ").append(EventManager.dispatchedEvents.get()).append(" listened to: ")
-      .append(EventManager.listenerListenedToEvent.get()).append(" | Chunk Rdr Q: ").append(ChunkRenderer.chunksInRenderQueue)
+      .append(EventManager.listenerListenedToEvent.get())
+      .appendLine()
+      .append(" > Chunk Rdr Q: ").append(ChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")
+      .append((World.CHUNK_ADDED_THREAD_LOCAL.get() - World.CHUNK_REMOVED_THREAD_LOCAL.get()) / World.CHUNK_THREAD_LOCAL.get())
   }
 
   fun ents(sb: StringBuilder, world: ClientWorld, mouseWorldX: WorldCoord, mouseWorldY: WorldCoord) {
