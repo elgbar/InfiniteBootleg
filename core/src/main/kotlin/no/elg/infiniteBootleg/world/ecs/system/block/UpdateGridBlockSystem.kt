@@ -33,8 +33,9 @@ object UpdateGridBlockSystem :
     val halfBox2dHeight = entity.box2d.halfBox2dHeight
 
     // Note: raw must be false to properly update the lights while lights are falling
+    // Note 2: loadChunk must be false as the entity should then be handled as out of bounds
     val currentOccupations =
-      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = true, includeAir = true)
+      world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = false, includeAir = true)
 
     // Remove markers that are no longer occupied
     val noLongerOccupied = entity.occupyingLocations.filter { it !in currentOccupations }
