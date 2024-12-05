@@ -155,8 +155,8 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onAnyElementChanged,
           { false },
           {
-            world.readChunks {
-              it.values().forEach(Chunk::updateAllBlockLights)
+            world.readChunks { readableChunks ->
+              readableChunks.values().forEach(Chunk::updateAllBlockLights)
             }
           }
         )
@@ -183,8 +183,8 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onAnyElementChanged,
           { false },
           {
-            world.readChunks {
-              it.values().forEach { it.queueForRendering(false) }
+            world.readChunks { readableChunks ->
+              readableChunks.values().forEach { it.queueForRendering(false) }
             }
           }
         )

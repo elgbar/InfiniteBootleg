@@ -66,6 +66,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   // current rendering chunk
   @GuardedBy("QUEUE_LOCK")
+  @Volatile
   private var curr: Chunk? = null
     set(value) = synchronized(QUEUE_LOCK) {
       field = value
@@ -116,7 +117,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
         if (existingTime != NOT_IN_COLLECTION && newTime < existingTime) {
           val chunks = renderTimeAdded[existingTime] ?: error("Chunk $chunk is in the queue but not in the renderTimeAdded map")
           chunks.remove(chunk)
-          if (chunks.isEmpty) {
+          if (chunks.isEmpty()) {
             renderTimeAdded.remove(existingTime)
           }
         }
@@ -152,7 +153,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           // nothing to render
           return
         }
-        val candidateChunk: Chunk = nextChunk()
+        val candidateChunk: Chunk = nextChunk() ?: return
         if (candidateChunk.isInvalid) {
           dispatchEvent(ChunkTextureChangeRejectedEvent(candidateChunk.compactLocation, CHUNK_INVALID_REASON))
           continue
@@ -182,18 +183,17 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     val chunkColumn = chunk.chunkColumn
 
     // this is the main render function
-    val blocks = chunk.blocks
-    fbo.use {
-      batch.safeUse {
+    fbo.use { _ ->
+      batch.safeUse { _ ->
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           val topBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {
-            val block = blocks[localX][localY]
+            val block = chunk.getRawBlock(localX, localY)
             val material = block.materialOrAir()
-            var texture: RotatableTextureRegion
-            var secondaryTexture: RotatableTextureRegion?
+            val texture: RotatableTextureRegion
+            val secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunk.chunkY.chunkToWorld(localY)
             if (material.invisibleBlock || block.isMarkerBlock()) {

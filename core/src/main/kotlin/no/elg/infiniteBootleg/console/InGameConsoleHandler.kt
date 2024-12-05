@@ -111,11 +111,11 @@ class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean 
             it.parameters.filter { it.kind == Kind.VALUE }.all { it.isOptional && !it.isVararg } // All parameters must be optional and not vararg
         }
         if (filter.size == 1) {
-          val f = filter.first()
+          val func = filter.first()
           // Call the function with all default parameters (i.e., they are omitted) and the instance as the first parameter
-          f.callBy(mapOf(f.parameters[0] to exec))
+          func.callBy(mapOf(func.parameters[0] to exec))
         } else {
-          logger.error { "Multiple functions with the same name found, will not execute defauklt" }
+          logger.error { "Multiple functions with the same name found, will not execute default" }
         }
         return true
       } catch (e: Exception) {

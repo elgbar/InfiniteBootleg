@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
-import no.elg.infiniteBootleg.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
 import no.elg.infiniteBootleg.main.ClientMain
@@ -51,12 +50,14 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight
 import no.elg.infiniteBootleg.world.box2d.ChunkBody
+import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
@@ -66,8 +67,10 @@ class ChunkImpl(
   override val chunkY: ChunkCoord
 ) : Chunk {
 
-  override val blocks: Array<Array<Block?>> = Array(Chunk.CHUNK_SIZE) { arrayOfNulls(Chunk.CHUNK_SIZE) }
-  private val blockLights = Array(Chunk.CHUNK_SIZE) { x -> Array(Chunk.CHUNK_SIZE) { y -> BlockLight(this, x, y) } }
+  val blocks: Array<Array<Block?>> = Array(CHUNK_SIZE) { arrayOfNulls(CHUNK_SIZE) }
+
+  /**Single 1d array stored in a row major order*/
+  private val blockLights = Array(CHUNK_SIZE * CHUNK_SIZE) { i -> BlockLight(this, i / CHUNK_SIZE, i % CHUNK_SIZE) }
 
   override val chunkBody: ChunkBody = ChunkBody(this)
 
@@ -99,19 +102,15 @@ class ChunkImpl(
   /**
    * If the chunk is still being initialized, meaning not all blocks are in [blocks]
    */
-  @Volatile
   private var initializing: Boolean = true
 
-  @Volatile
   private var allAir: Boolean = false
 
-  @Volatile
   private var disposed: Boolean = false
 
   /**
    * @return The last tick this chunk's texture was pulled
    */
-  @Volatile
   override var lastViewedTick: Long = 0
 
   @GuardedBy("chunkBody")
@@ -177,7 +176,7 @@ class ChunkImpl(
       require(block.chunk === this) { "The chunk of the block is not this chunk. block chunk: ${block.chunk}, this: $this" }
     }
     val bothAirish: Boolean
-    val currBlock = synchronized(this) {
+    val currBlock = synchronized(blocks) {
       val currBlock = getRawBlock(localX, localY)
       if (currBlock === block) {
         return currBlock
@@ -202,19 +201,19 @@ class ChunkImpl(
         chunkBody.removeBlock(currBlock)
       }
       if (block != null) {
-        chunkBody.addBlock(block, null)
+        chunkBody.addBlock(block)
       }
       launchOnAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
     }
 
     if (!initializing && !bothAirish) {
-      dispatchEventAsync(BlockChangedEvent(currBlock, block))
+      dispatchEvent(BlockChangedEvent(currBlock, block))
     }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
         val originWorldX = getWorldX(localX)
         val originWorldY = getWorldY(localY)
-        dispatchEvent(ChunkLightChangedEvent(this, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
+        dispatchEvent(ChunkLightChangedEvent(compactLocation, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
       }
     }
     currBlock?.dispose()
@@ -272,7 +271,7 @@ class ChunkImpl(
       return
     }
     var wasPrioritize: Boolean
-    synchronized(this) {
+    synchronized(blocks) {
       if (!isDirty || initializing) {
         return
       }
@@ -282,8 +281,8 @@ class ChunkImpl(
 
       // test if all the blocks in this chunk has the material air
       allAir = true
-      outer@ for (localX in 0 until Chunk.CHUNK_SIZE) {
-        for (localY in 0 until Chunk.CHUNK_SIZE) {
+      outer@ for (localX in 0 until CHUNK_SIZE) {
+        for (localY in 0 until CHUNK_SIZE) {
           val b = blocks[localX][localY]
           if (b != null && b.material !== Material.AIR) {
             allAir = false
@@ -310,15 +309,18 @@ class ChunkImpl(
   }
 
   private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean {
-    return sources.none { (srcX: WorldCoord, srcY: WorldCoord) ->
+    for ((srcX: WorldCoord, srcY: WorldCoord) in sources) {
       val dstFromChange2blk = dst2(worldX, worldY, srcX, srcY)
-      dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
+      if (dstFromChange2blk <= World.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW) {
+        return false
+      }
     }
+    return true
   }
 
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (isValid && world.isLoaded) {
-      synchronized(this) {
+      synchronized(this) { // TODO synchronize on something else
         recalculateLightJob?.cancel()
         recalculateLightJob = launchOnMultithreadedAsync {
           doUpdateLightMultipleSources0(sources, checkDistance)
@@ -329,19 +331,23 @@ class ChunkImpl(
 
   private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (Settings.renderLight) {
-      var anyRecalculated = false
+      val anyRecalculated = AtomicBoolean(false)
       coroutineScope {
-        for (localX in 0 until Chunk.CHUNK_SIZE) {
-          for (localY in Chunk.CHUNK_SIZE - 1 downTo 0) {
+        for (localX in 0 until CHUNK_SIZE) {
+          for (localY in CHUNK_SIZE - 1 downTo 0) {
             if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
               continue
             }
-            launch { blockLights[localX][localY].recalculateLighting() }
-            anyRecalculated = true
+            launch {
+              val recalculated = getBlockLight(localX, localY).recalculateLighting()
+              if (recalculated) {
+                anyRecalculated.compareAndSet(false, true)
+              }
+            }
           }
         }
       }
-      if (anyRecalculated) {
+      if (anyRecalculated.get()) {
         queueForRendering(prioritize = false)
       }
     }
@@ -368,7 +374,7 @@ class ChunkImpl(
     }
 
   override fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight {
-    return blockLights[localX][localY]
+    return blockLights[blockMapIndex(localX, localY)]
   }
 
   override fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block? {
@@ -404,8 +410,7 @@ class ChunkImpl(
     get() = world.getChunkColumn(chunkX)
 
   @get:Contract(pure = true)
-  override val compactLocation: ChunkCompactLoc
-    get() = compactLoc(chunkX, chunkY)
+  override val compactLocation: ChunkCompactLoc = compactLoc(chunkX, chunkY)
 
   override val worldX: WorldCoord
     get() = chunkX.chunkToWorld()
@@ -420,15 +425,15 @@ class ChunkImpl(
       var x = 0
       var y = 0
       override fun hasNext(): Boolean {
-        return y < Chunk.CHUNK_SIZE - 1 || x < Chunk.CHUNK_SIZE
+        return y < CHUNK_SIZE - 1 || x < CHUNK_SIZE
       }
 
       override fun next(): Block? {
-        if (x == Chunk.CHUNK_SIZE) {
+        if (x == CHUNK_SIZE) {
           x = 0
           y++
         }
-        if (y >= Chunk.CHUNK_SIZE) {
+        if (y >= CHUNK_SIZE) {
           throw NoSuchElementException()
         }
         return getRawBlock(x++, y)
@@ -504,8 +509,8 @@ class ChunkImpl(
     world.worldBody.queryEntities(
       chunkX.chunkToWorld(),
       chunkY.chunkToWorld(),
-      chunkX.chunkToWorld(Chunk.CHUNK_SIZE),
-      chunkY.chunkToWorld(Chunk.CHUNK_SIZE),
+      chunkX.chunkToWorld(CHUNK_SIZE),
+      chunkY.chunkToWorld(CHUNK_SIZE),
       callback
     )
 
@@ -558,15 +563,15 @@ class ChunkImpl(
         )
       }"
     }
-    checkChunkCorrupt(protoChunk, protoChunk.blocksCount == Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE) {
-      "Invalid number of blocks. Expected ${Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
+    checkChunkCorrupt(protoChunk, protoChunk.blocksCount == CHUNK_SIZE * CHUNK_SIZE) {
+      "Invalid number of blocks. Expected ${CHUNK_SIZE * CHUNK_SIZE}, but got ${protoChunk.blocksCount}"
     }
 
     var index = 0
     val protoBlocks = protoChunk.blocksList
-    synchronized(this) {
-      for (localY in 0 until Chunk.CHUNK_SIZE) {
-        for (localX in 0 until Chunk.CHUNK_SIZE) {
+    synchronized(blocks) {
+      for (localY in 0 until CHUNK_SIZE) {
+        for (localX in 0 until CHUNK_SIZE) {
           checkChunkCorrupt(protoChunk, blocks[localX][localY] == null) {
             "Double assemble of ${stringifyCompactLoc(localX, localY)} in chunk ${stringifyCompactLoc(chunkPosition)}"
           }
@@ -617,6 +622,8 @@ class ChunkImpl(
   companion object {
     val AIR_BLOCK_PROTO = Block.save(Material.AIR).build()
     val NOT_CHECKING_DISTANCE = WorldCompactLocArray(0)
+
+    private fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * CHUNK_SIZE + localY
 
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
       return blockA.materialOrAir() === Material.AIR && blockB.materialOrAir() === Material.AIR

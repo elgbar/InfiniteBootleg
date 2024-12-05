@@ -4,7 +4,7 @@ import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.generator.noise.PerlinNoise
 import kotlin.math.abs
@@ -59,7 +59,7 @@ enum class Biome @SafeVarargs constructor(
 
   fun fillUpTo(
     noise: PerlinNoise,
-    chunk: Chunk,
+    chunk: ChunkImpl,
     localX: LocalCoord,
     localY: LocalCoord,
     height: Int

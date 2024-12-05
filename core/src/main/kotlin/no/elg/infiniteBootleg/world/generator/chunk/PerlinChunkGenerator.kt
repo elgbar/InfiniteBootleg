@@ -111,7 +111,6 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
   }
 
   private fun generateCaves(chunk: Chunk, chunkY: ChunkCoord, genHeight: Int, worldX: WorldCoord) {
-    val blocks = chunk.blocks
     val worldChunkY = chunkY.chunkToWorld()
     val localX = worldX.chunkOffset()
     val worldXd = worldX.toDouble()
@@ -131,7 +130,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
         cheese > CHEESE_CAVE_CREATION_THRESHOLD / depthModifier ||
         greatHall > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier
       ) {
-        blocks[localX][localY] = null
+        chunk.removeBlock(localX, localY, updateTexture = false, sendUpdatePacket = false)
       }
     }
   }

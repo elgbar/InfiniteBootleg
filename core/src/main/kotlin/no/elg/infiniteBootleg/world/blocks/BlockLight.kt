@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import com.badlogic.gdx.utils.LongMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -24,6 +23,7 @@ import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLO
 import no.elg.infiniteBootleg.world.world.World.Companion.EMPTY_BLOCKS_ARRAY
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
+import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -66,6 +66,7 @@ class BlockLight(
    *
    * Do not modify
    */
+  @field:Volatile
   var lightMap: FloatArray = NO_LIGHTS_LIGHT_MAP
     private set
 
@@ -154,13 +155,10 @@ class BlockLight(
       return true
     }
     return coroutineScope {
-      val chunkCache = LongMap<Chunk>(8, 0.9f)
-      chunkCache.put(chunk.compactLocation, chunk)
-
       // find light sources around this block
       val deferredBlocks = listOf(
-        async { findLuminescentBlocks(worldX, worldY, chunkCache) },
-        async { findSkylightBlocks(worldX, worldY, this, chunkCache) }
+        async { findLuminescentBlocks(worldX, worldY) },
+        async { findSkylightBlocks(worldX, worldY, this) }
       )
       val (blockLights, skyLights) = deferredBlocks.awaitAll()
       ensureActive()
@@ -202,23 +200,22 @@ class BlockLight(
     }
   }
 
-  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord, chunkCache: LongMap<Chunk>? = null): GdxArray<Block> =
+  fun findLuminescentBlocks(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Block> =
     chunk.world.getBlocksAABBFromCenter(
       worldX + 0.5f,
       worldY + 0.5f,
-      LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA,
-      LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA,
+      LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F,
+      LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F,
       raw = true,
       loadChunk = false,
       includeAir = false,
-      chunkCache = chunkCache,
       filter = EMITS_LIGHT_FILTER
     )
 
-  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, scope: CoroutineScope? = null, chunkCache: LongMap<Chunk>? = null): GdxArray<Block> {
+  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, scope: CoroutineScope? = null): GdxArray<Block> {
     var skyblocks: GdxArray<Block>? = null
     // Since we're not creating air blocks above, we will instead just load
-    for (offsetWorldX: LocalCoord in -floor(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()..ceil(LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA).toInt()) {
+    for (offsetWorldX: LocalCoord in -LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA..LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
       scope?.ensureActive()
       val topWorldX: WorldCoord = worldX + offsetWorldX
       val topWorldY: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
@@ -254,8 +251,7 @@ class BlockLight(
         worldY.toFloat(),
         topWorldX.toFloat(),
         topWorldY.toFloat(),
-        topWorldYLR.toFloat(),
-        chunkCache
+        topWorldYLR.toFloat()
       )
       if (findSkylightBlockColumn.isNotEmpty()) {
         if (skyblocks == null) {
@@ -286,8 +282,7 @@ class BlockLight(
     worldY: Float,
     topWorldX: Float,
     worldYA: Float,
-    worldYB: Float,
-    chunkCache: LongMap<Chunk>?
+    worldYB: Float
   ): GdxArray<Block> {
     val worldYTop = min(max(worldYA, worldYB), worldY + LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
     val worldYBtm = max(min(worldYA, worldYB), worldY - LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA)
@@ -298,7 +293,7 @@ class BlockLight(
       // thus no skylight can reach this block
       return EMPTY_BLOCKS_ARRAY
     }
-    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true, chunkCache) { it ->
+    return chunk.world.getBlocksAABB(topWorldX, worldYBtm, 0f, columnHeight, raw = false, loadChunk = false, includeAir = true) { it ->
       skylightBlockFilter(worldX, worldY, it)
     }
   }

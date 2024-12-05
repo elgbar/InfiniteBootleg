@@ -28,11 +28,6 @@ import kotlin.math.ln
 interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   /**
-   * @return The backing array of the chunk, might contain null elements
-   */
-  val blocks: Array<Array<Block?>>
-
-  /**
    * Might cause a call to [updateIfDirty] if the chunk is marked as dirty
    *
    * @return If all blocks in this chunk is air

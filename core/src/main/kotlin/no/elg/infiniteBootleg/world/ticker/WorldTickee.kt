@@ -36,12 +36,15 @@ internal class WorldTickee(private val world: World) : Ticking {
           logger.warn { "Found null chunk when ticking world" }
           continue
         } else if (chunk.isDisposed) {
-          logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk.chunkX, chunk.chunkY)} when ticking world" }
+          logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk)} when ticking world" }
+          launchOnAsync {
+            world.unloadChunk(chunk, force = true)
+          }
           continue
         }
         if (chunk.isAllowedToUnload && world.render.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime) {
           launchOnAsync {
-            world.unloadChunk(chunk, force = false, save = true)
+            world.unloadChunk(chunk)
           }
           continue
         }

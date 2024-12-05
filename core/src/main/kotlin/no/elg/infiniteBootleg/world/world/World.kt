@@ -7,7 +7,6 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
@@ -202,13 +201,13 @@ abstract class World(
   @GuardedBy("chunksLock")
   private val chunks = LongMap<Chunk>()
 
-  private val chunksLock: StampedLock = StampedLock() // StampedLock?
+  private val chunksLock: StampedLock = StampedLock()
 
   fun createChunkIterator(): LongMap.Entries<Chunk> = LongMap.Entries(chunks)
 
-  fun readChunks(onFailure: (() -> Unit)? = null, action: (chunks: LongMap<Chunk>) -> Unit): Unit = readChunks<Unit>(onFailure ?: { }, action)
+  fun readChunks(onFailure: (() -> Unit)? = null, action: (readableChunks: LongMap<Chunk>) -> Unit): Unit = readChunks<Unit>(onFailure ?: { }, action)
 
-  fun <R> readChunks(onFailure: () -> R, action: (chunks: LongMap<Chunk>) -> R): R {
+  fun <R> readChunks(onFailure: () -> R, action: (readableChunks: LongMap<Chunk>) -> R): R {
     contract { callsInPlace(action, kotlin.contracts.InvocationKind.AT_MOST_ONCE) }
     chunkReads.incrementAndGet()
     val stamp = chunksLock.tryReadLock(1, TimeUnit.SECONDS)
@@ -224,7 +223,7 @@ abstract class World(
     }
   }
 
-  private fun <R> writeChunks(onFailure: (() -> R?)? = null, action: (chunks: LongMap<Chunk>) -> R): R? {
+  private fun <R> writeChunks(onFailure: (() -> R?)? = null, action: (writableChunks: LongMap<Chunk>) -> R): R? {
     contract { callsInPlace(action, kotlin.contracts.InvocationKind.AT_MOST_ONCE) }
     chunkWrites.incrementAndGet()
     val stamp = chunksLock.tryWriteLock(1, TimeUnit.SECONDS)
@@ -240,7 +239,7 @@ abstract class World(
     }
   }
 
-  fun <R> readChunks(timeoutMillis: Long, onFailure: (() -> R?)? = null, onSuccess: (chunks: LongMap<Chunk>) -> R?): R? {
+  fun <R> readChunks(timeoutMillis: Long, onFailure: (() -> R?)? = null, onSuccess: (readableChunks: LongMap<Chunk>) -> R?): R? {
     contract { callsInPlace(onSuccess, kotlin.contracts.InvocationKind.AT_MOST_ONCE) }
     chunkReads.incrementAndGet()
     // This is a long lock, it must appear to be an atomic operation though
@@ -337,8 +336,8 @@ abstract class World(
         logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
         addSystems()
         metadata.isLoaded = true
-        readChunks { chunks ->
-          chunks.values().forEach(Chunk::updateAllBlockLights)
+        readChunks { readableChunks ->
+          readableChunks.values().forEach(Chunk::updateAllBlockLights)
         }
       }
     }
@@ -479,10 +478,10 @@ abstract class World(
       playersEntities.forEach(WorldLoader::saveServerPlayer)
     }
 
-    readChunks { chunks ->
+    readChunks { readableChunks ->
       val chunkLoader = chunkLoader
       if (chunkLoader is FullChunkLoader) {
-        for (chunk in chunks.values()) {
+        for (chunk in readableChunks.values()) {
           chunkLoader.save(chunk)
         }
       }
@@ -549,14 +548,14 @@ abstract class World(
   fun updateChunk(chunk: Chunk, expectedChunk: Chunk? = null, newlyGenerated: Boolean): Chunk {
     require(chunk.isValid) { "Chunk must be valid to be updated" }
     var chunkToDispose: Chunk? = null
-    val toReturn: Chunk? = writeChunks<Chunk> { chunks ->
-      val current: Chunk? = chunks[chunk.compactLocation]
+    val toReturn: Chunk? = writeChunks<Chunk> { writableChunks ->
+      val current: Chunk? = writableChunks[chunk.compactLocation]
       return@writeChunks if (current != null && expectedChunk != null && current !== expectedChunk) {
         logger.warn { "Unexpected chunk when updating chunk, will not update chunk. Given chunk will be disposed" }
         chunkToDispose = chunk
         current
       } else {
-        val old = chunks.put(chunk.compactLocation, chunk)
+        val old = writableChunks.put(chunk.compactLocation, chunk)
         chunkToDispose = old
         chunk
       }
@@ -602,12 +601,11 @@ abstract class World(
       }
     }
     // This is a long lock, it must appear to be an atomic operation though
-    val readChunk = readChunks(TRY_LOCK_CHUNKS_DURATION_MS) { chunks -> chunks[chunkLoc] }
+    val readChunk = readChunks(TRY_LOCK_CHUNKS_DURATION_MS) { readableChunks -> readableChunks[chunkLoc] }
     val finalChunk = if (readChunk == null || readChunk.isDisposed) {
       if (!load) {
         null
       } else {
-        IllegalAction.STACKTRACE.handle { "Loading chunk! ${stringifyCompactLoc(chunkLoc)}" }
         loadChunk(chunkLoc)
       }
     } else {
@@ -647,7 +645,7 @@ abstract class World(
     if (worldTicker.isPaused) {
       return null
     }
-    val current = readChunks<Chunk?>({ null }) { chunks -> chunks[chunkLoc] }
+    val current = readChunks<Chunk?>({ null }) { readableChunks -> readableChunks[chunkLoc] }
     if (current != null) {
       if (current.isValid) {
         return current
@@ -844,8 +842,8 @@ abstract class World(
     return removed
   }
 
-  fun getEntities(worldX: WorldCoord, worldY: WorldCoord): Array<Entity> {
-    val foundEntities = Array<Entity>(false, 4)
+  fun getEntities(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Entity> {
+    val foundEntities = GdxArray<Entity>(false, 0)
     for (entity in standaloneEntities) {
       val (x, y) = entity.getComponent(PositionComponent::class.java)
       val size = entity.getComponent(Box2DBodyComponent::class.java)
@@ -931,9 +929,9 @@ abstract class World(
    */
   val loadedChunks: GdxArray<Chunk>
     get() {
-      return readChunks<GdxArray<Chunk>>({ GdxArray<Chunk>(0) }) {
-        val loadedChunks = Array<Chunk>(true, it.size, Chunk::class.java)
-        for (chunk in it.values()) {
+      return readChunks<GdxArray<Chunk>>({ GdxArray<Chunk>(0) }) { readableChunks ->
+        val loadedChunks = GdxArray<Chunk>(true, readableChunks.size, Chunk::class.java)
+        for (chunk in readableChunks.values()) {
           if (chunk != null && chunk.isNotDisposed) {
             loadedChunks.add(chunk)
           }
@@ -956,20 +954,20 @@ abstract class World(
    * @return If the unloading was successful
    */
   fun unloadChunk(chunk: Chunk?, force: Boolean = false, save: Boolean = true): Boolean {
-    if (chunk != null && chunk.isNotDisposed && (force || chunk.isAllowedToUnload)) {
+    if (chunk != null && (force || chunk.isAllowedToUnload)) {
       if (chunk.world !== this) {
         logger.warn { "Tried to unload chunk from different world" }
         return false
       }
 
-      val removedChunk: Chunk? = writeChunks { chunks ->
-        chunks.remove(chunk.compactLocation)
+      val removedChunk: Chunk? = writeChunks { writableChunks ->
+        writableChunks.remove(chunk.compactLocation)
       }
       if (save && chunkLoader is FullChunkLoader) {
         chunkLoader.save(chunk)
       }
-      logger.trace { "Unloaded chunk ${stringifyCompactLoc(chunk)}" }
       chunk.dispose()
+      logger.trace { "Unloaded chunk ${stringifyCompactLoc(chunk)}" }
       if (removedChunk != null && chunk !== removedChunk) {
         logger.warn { "Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${stringifyCompactLoc(removedChunk)}" }
         removedChunk.dispose()
@@ -1058,15 +1056,14 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
-    chunkCache: LongMap<Chunk>? = null,
     cancel: () -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
-  ): Array<Block> {
+  ): GdxArray<Block> {
     require(width >= 0) { "Width must be >= 0, was $width" }
     require(height >= 0) { "Height must be >= 0, was $height" }
     val worldX = centerWorldX - width
     val worldY = centerWorldY - height
-    return getBlocksAABB(worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, chunkCache, cancel, filter)
+    return getBlocksAABB(worldX, worldY, width * 2f, height * 2f, raw, loadChunk, includeAir, cancel, filter)
   }
 
   /**
@@ -1089,7 +1086,6 @@ abstract class World(
     raw: Boolean,
     loadChunk: Boolean,
     includeAir: Boolean,
-    chunkCache: LongMap<Chunk>? = null,
     cancel: () -> Boolean = NEVER_CANCEL,
     filter: (Block) -> Boolean = ACCEPT_EVERY_BLOCK
   ): GdxArray<Block> {
@@ -1101,13 +1097,12 @@ abstract class World(
     }
     require(offsetX >= 0) { "offsetX must be >= 0, was $offsetX" }
     require(offsetY >= 0) { "offsetY must be >= 0, was $offsetY" }
-    var blocks: Array<Block>? = null
+    var blocks: GdxArray<Block>? = null
     var x = MathUtils.floor(worldX)
     val startY = MathUtils.floor(worldY)
     val maxX = worldX + offsetX
     val maxY = worldY + offsetY
-    val chunks = chunkCache ?: LongMap<Chunk>(8, 0.9f)
-    val invalidChunks = LongMap<Chunk>(4, 0.95f)
+    val invalidChunks = LongMap<Chunk>(0, 0.95f)
     while (x <= maxX) {
       var y = startY
       while (y <= maxY) {
@@ -1115,31 +1110,31 @@ abstract class World(
           return blocks ?: EMPTY_BLOCKS_ARRAY
         }
         val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
-        var chunk: Chunk? = chunks[chunkPos]
+        if (invalidChunks.containsKey(chunkPos)) {
+          y++
+          // No point in checking this chunk again
+          continue
+        }
+        val chunk: Chunk? = getChunk(chunkPos, loadChunk)
         if (chunk.invalid()) {
-          if (invalidChunks.containsKey(chunkPos)) {
-            y++
-            // No point in checking this chunk again
-            continue
-          }
-          chunk = getChunk(chunkPos, loadChunk)
-          if (chunk.invalid()) {
-            y++
-            invalidChunks.put(chunkPos, chunk)
-            continue
-          }
-          chunks.put(chunkPos, chunk)
+          y++
+          invalidChunks.put(chunkPos, chunk)
+          continue
         }
         val localX = x.chunkOffset()
         val localY = y.chunkOffset()
-        val b = if (effectiveRaw) chunk.getRawBlock(localX, localY) else chunk.getBlock(localX, localY)
-        if (b == null) {
+        val block = if (effectiveRaw) {
+          chunk.getRawBlock(localX, localY)
+        } else {
+          chunk.getBlock(localX, localY)
+        }
+        if (block == null) {
           y++
           continue
         }
-        if ((includeAir || b.isMarkerBlock() || b.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter(b))) {
-          val nnBlocks = blocks ?: Array<Block>(false, 1).also { array -> blocks = array }
-          nnBlocks.add(b)
+        if ((includeAir || block.isMarkerBlock() || block.isNotAir(markerIsAir = false)) && (filter === ACCEPT_EVERY_BLOCK || filter(block))) {
+          val nnBlocks = blocks ?: GdxArray<Block>(false, 1).also { array -> blocks = array }
+          nnBlocks.add(block)
         }
         y++
       }
@@ -1196,11 +1191,11 @@ abstract class World(
     chunkLoader.dispose()
     metadata.dispose()
 
-    val saveTasks = writeChunks { chunks ->
-      chunks.values().map { chunk ->
+    val saveTasks = writeChunks { writableChunks ->
+      writableChunks.values().map { chunk ->
         chunk.dispose()
         chunk.save()
-      }.also { chunks.clear() }
+      }.also { writableChunks.clear() }
     } ?: emptyList()
     if (Main.isAuthoritative && !isTransient) {
       val worldFolder = worldFolder
@@ -1217,8 +1212,9 @@ abstract class World(
   companion object {
     const val BLOCK_SIZE = 1f
     const val HALF_BLOCK_SIZE = BLOCK_SIZE / 2f
-    const val LIGHT_SOURCE_LOOK_BLOCKS = 10f
-    const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2f
+    const val LIGHT_SOURCE_LOOK_BLOCKS = 10
+    const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2
+    const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F: Float = LIGHT_SOURCE_LOOK_BLOCKS + 2f
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW = LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
 
