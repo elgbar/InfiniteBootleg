@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.events.api.EventManager.clear
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.events.api.EventManager.oneShotListener
 import no.elg.infiniteBootleg.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.main.Main
@@ -573,7 +574,7 @@ abstract class World(
       logger.trace { "Swapping chunk at ${toReturn.compactLocation}" }
     } else {
       // No old chunk to dispose, so this is a new chunk
-      dispatchEvent(ChunkLoadedEvent(toReturn, newlyGenerated))
+      dispatchEventAsync(ChunkLoadedEvent(toReturn, newlyGenerated))
     }
     return toReturn
   }
