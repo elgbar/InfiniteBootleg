@@ -178,7 +178,8 @@ class ChunkImpl(
     val bothAirish: Boolean
     val currBlock = synchronized(blocks) {
       val currBlock = getRawBlock(localX, localY)
-      if (currBlock === block) {
+      if (currBlock == block) {
+        block?.dispose()
         return currBlock
       }
       // accounts for both being null also ofc
