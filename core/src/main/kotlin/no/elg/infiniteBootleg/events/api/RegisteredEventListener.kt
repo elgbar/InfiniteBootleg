@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.events.api
 import no.elg.infiniteBootleg.events.api.EventManager.activeListeners
 import no.elg.infiniteBootleg.events.api.EventManager.eventsTracker
 import no.elg.infiniteBootleg.events.api.EventManager.oneShotStrongRefs
-import no.elg.infiniteBootleg.events.api.EventManager.strongListeners
 import no.elg.infiniteBootleg.events.api.EventManager.unregisteredListeners
 import no.elg.infiniteBootleg.events.api.EventManager.weakListeners
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
@@ -25,7 +24,6 @@ class RegisteredEventListener private constructor(
   fun removeListener() {
     unregisteredListeners.incrementAndGet()
     activeListeners.decrementAndGet()
-    strongListeners.getIfPresent(eventClass)?.invalidate(listener)
     weakListeners.getIfPresent(eventClass)?.invalidate(listener)
     oneShotStrongRefs.invalidate(listener)
     eventsTracker?.onListenerUnregistered(eventClass, listener)

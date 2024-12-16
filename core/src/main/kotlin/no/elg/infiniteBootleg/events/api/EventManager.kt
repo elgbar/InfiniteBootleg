@@ -5,11 +5,11 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener.Companion.createRegisteredEventListener
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnEvents
 import java.lang.Boolean.TRUE
-import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.KClass
 
@@ -18,7 +18,6 @@ private val logger = KotlinLogging.logger {}
 object EventManager {
 
   val weakListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().build()
-  val strongListeners: Cache<KClass<out Event>, Cache<EventListener<out Event>, Boolean>> = Caffeine.newBuilder().build()
 
   val oneShotStrongRefs: Cache<EventListener<out Event>, RegisteredEventListener> = Caffeine.newBuilder().build()
 
@@ -33,7 +32,6 @@ object EventManager {
   val activeListeners = AtomicLong(0) // active number of listeners
   val activeOneTimeRefListeners = AtomicLong(0)
   val registeredWeakListeners = AtomicLong(0)
-  val registeredStrongListeners = AtomicLong(0)
 
   val unregisteredListeners = AtomicLong(0)
   val dispatchedEvents = AtomicLong(0)
@@ -44,21 +42,22 @@ object EventManager {
   /**
    * React to events [dispatchEvent]-ed by someone else.
    *
-   * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
+   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
-  inline fun <reified T : Event> registerListener(keepStrongReference: Boolean = false, listener: EventListener<T>): RegisteredEventListener =
-    registerListener(keepStrongReference, T::class, listener)
+  inline fun <reified T : Event> registerListener(listener: EventListener<T>): RegisteredEventListener = registerListener(T::class, listener)
 
-  fun <T : Event> registerListener(keepStrongReference: Boolean = false, eventClass: KClass<T>, listener: EventListener<T>): RegisteredEventListener {
+  /**
+   * React to events [dispatchEvent]-ed by someone else.
+   *
+   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
+   * This is to automatically un-register listeners which no longer can react to events.
+   */
+  fun <T : Event> registerListener(eventClass: KClass<T>, listener: EventListener<T>): RegisteredEventListener {
     activeListeners.incrementAndGet()
     val eventListeners: Cache<EventListener<out Event>, Boolean> =
-      if (keepStrongReference) {
-        registeredStrongListeners.incrementAndGet()
-        strongListeners.get(eventClass) { Caffeine.newBuilder().build<EventListener<out Event>, Boolean>() }
-      } else {
+      weakListeners.get(eventClass) { Caffeine.newBuilder().weakKeys().build<EventListener<out Event>, Boolean>() }.also {
         registeredWeakListeners.incrementAndGet()
-        weakListeners.get(eventClass) { Caffeine.newBuilder().weakKeys().build<EventListener<out Event>, Boolean>() }
       }
 
     eventListeners.put(listener, TRUE)
@@ -69,15 +68,11 @@ object EventManager {
   /**
    * React to events [dispatchEvent]-ed by someone else.
    *
-   * Note that the listeners are stored as [WeakReference]s, unless [keepStrongReference] is `true`, which mean that they might be garbage-collected if they are not stored as (store) references somewhere.
+   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
-  inline fun <reified T : Event> registerListener(
-    keepStrongReference: Boolean = false,
-    crossinline filter: (T) -> Boolean,
-    crossinline listener: T.() -> Unit
-  ): RegisteredEventListener =
-    registerListener<T>(keepStrongReference) { event ->
+  inline fun <reified T : Event> registerListener(crossinline filter: (T) -> Boolean, crossinline listener: T.() -> Unit): RegisteredEventListener =
+    registerListener<T> { event ->
       if (filter(event)) {
         listener(event)
       }
@@ -140,19 +135,20 @@ object EventManager {
   // impl note: Not inline to make it easier to track during profiling/debugging
   fun <T : Event> dispatchEvent(eventClass: KClass<T>, event: T, reason: String? = null) {
     dispatchedEvents.incrementAndGet()
-    forEachListener<T>(eventClass) { listener ->
-      listenerListenedToEvent.incrementAndGet()
-      eventsTracker?.onEventListenedTo(event, listener)
-      listener.handle(event)
+
+    weakListeners.getIfPresent(eventClass)?.asMap()?.keys?.forEach {
+      try {
+        @Suppress("UNCHECKED_CAST")
+        val listener = it as EventListener<T>
+        listenerListenedToEvent.incrementAndGet()
+        eventsTracker?.onEventListenedTo(event, listener)
+        listener.handle(event)
+      } catch (e: Exception) {
+        logger.error(e) { "Failed to dispatch event $event to listener $it" }
+      }
     }
     EventStatistics.reportDispatch(event, reason)
     eventsTracker?.onEventDispatched(event)
-  }
-
-  @Suppress("UNCHECKED_CAST")
-  private fun <T : Event> forEachListener(eventClass: KClass<T>, action: (EventListener<T>) -> Unit) {
-    weakListeners.getIfPresent(eventClass)?.asMap()?.keys?.forEach { action(it as EventListener<T>) }
-    strongListeners.getIfPresent(eventClass)?.asMap()?.keys?.forEach { action(it as EventListener<T>) }
   }
 
   /**
@@ -160,7 +156,6 @@ object EventManager {
    */
   fun clear() {
     weakListeners.invalidateAll()
-    strongListeners.invalidateAll()
     oneShotStrongRefs.invalidateAll()
     EventStatistics.clear()
   }

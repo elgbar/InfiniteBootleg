@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.world.blocks
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -25,8 +24,6 @@ import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOC
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F
 import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
-import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
@@ -158,7 +155,7 @@ class BlockLight(
       // find light sources around this block
       val deferredBlocks = listOf(
         async { findLuminescentBlocks(worldX, worldY) },
-        async { findSkylightBlocks(worldX, worldY, this) }
+        async { findSkylightBlocks(worldX, worldY) }
       )
       val (blockLights, skyLights) = deferredBlocks.awaitAll()
       ensureActive()
@@ -212,11 +209,10 @@ class BlockLight(
       filter = EMITS_LIGHT_FILTER
     )
 
-  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord, scope: CoroutineScope? = null): GdxArray<Block> {
+  fun findSkylightBlocks(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Block> {
     var skyblocks: GdxArray<Block>? = null
     // Since we're not creating air blocks above, we will instead just load
     for (offsetWorldX: LocalCoord in -LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA..LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA) {
-      scope?.ensureActive()
       val topWorldX: WorldCoord = worldX + offsetWorldX
       val topWorldY: WorldCoord = chunk.world.getTopBlockWorldY(topWorldX, BLOCKS_LIGHT_FLAG) + 1
 

@@ -23,6 +23,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.events.ContainerEvent
 import no.elg.infiniteBootleg.events.InterfaceEvent
 import no.elg.infiniteBootleg.events.api.EventManager.registerListener
+import no.elg.infiniteBootleg.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.main.Main
@@ -37,6 +38,7 @@ import no.elg.infiniteBootleg.world.world.ClientWorld
 @Scene2dDsl
 fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop: DragAndDrop, batch: Batch): IBVisWindow {
   val (owner, container) = ownedContainer
+  val events: Array<RegisteredEventListener>
   return ibVisWindowClosed(container.name, owner.toInterfaceId()) {
     isMovable = true
     isResizable = false
@@ -63,20 +65,22 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     }
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
-    registerListener<ContainerEvent.Changed>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
-      val serverContainer = this.container
-      launchOnMain {
-        serverContainer.content.copyInto(container.content)
-        updateAllSlots()
+    events = arrayOf(
+      registerListener<ContainerEvent.Changed>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
+        val serverContainer = this.container
+        launchOnMain {
+          serverContainer.content.copyInto(container.content)
+          updateAllSlots()
+        }
+      },
+      registerListener<InterfaceEvent.Opening>(filter) {
+        launchOnMain {
+          delay(1) // to make sure the window is fully initialized
+          updateAllSlots()
+          centerWindow()
+        }
       }
-    }
-    registerListener<InterfaceEvent.Opening>(filter) {
-      launchOnMain {
-        delay(1) // to make sure the window is fully initialized
-        updateAllSlots()
-        centerWindow()
-      }
-    }
+    )
 
     for (containerSlot in container) {
       visImageButton {

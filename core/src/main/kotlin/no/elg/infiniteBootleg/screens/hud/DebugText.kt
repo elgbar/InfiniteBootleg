@@ -176,7 +176,7 @@ object DebugText {
   fun counters(builder: StringBuilder, world: ClientWorld) {
     builder.append("Chunk reads/writes: ").append(world.chunkReads.get()).append(" / ").append(world.chunkWrites.get())
       .append(" | active listeners: ").append(EventManager.activeListeners.get()).append(", removed ").append(EventManager.unregisteredListeners.get())
-      .append(", str/weak/1sh: ").append(EventManager.registeredStrongListeners.get()).append(" / ").append(EventManager.registeredWeakListeners.get())
+      .append(", weak/1sh: ").append(" / ").append(EventManager.registeredWeakListeners.get())
       .append(" / ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ").append(EventManager.dispatchedEvents.get()).append(" listened to: ")
       .append(EventManager.listenerListenedToEvent.get())
       .appendLine()
