@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import kotlinx.coroutines.delay
 import ktx.assets.disposeSafely
 import ktx.graphics.use
 import ktx.scene2d.Scene2dDsl
@@ -51,7 +52,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     val updateFunctions: MutableList<() -> Unit> = mutableListOf()
 
     fun updateAllSlots() {
-      updateFunctions.forEach { it() }
+      updateFunctions.forEach(Function0<Unit>::invoke)
       invalidateHierarchy()
       if (Settings.debug) {
         titleLabel.setText("${container.name} ${owner.toInterfaceId()}")
@@ -62,14 +63,20 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     }
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
-    registerListener<ContainerEvent.Changed>(true, { it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
+    registerListener<ContainerEvent.Changed>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
       val serverContainer = this.container
       launchOnMain {
         serverContainer.content.copyInto(container.content)
         updateAllSlots()
       }
     }
-    registerListener<InterfaceEvent.Opening>(true, filter) { launchOnMain { updateAllSlots() } }
+    registerListener<InterfaceEvent.Opening>(filter) {
+      launchOnMain {
+        delay(1) // to make sure the window is fully initialized
+        updateAllSlots()
+        centerWindow()
+      }
+    }
 
     for (containerSlot in container) {
       visImageButton {
@@ -103,12 +110,6 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
         pack()
       }
       if ((containerSlot.index + 1) % 10 == 0) row()
-    }
-    pack()
-    centerWindow()
-    launchOnMain {
-      updateAllSlots()
-      centerWindow()
     }
   }
 }
