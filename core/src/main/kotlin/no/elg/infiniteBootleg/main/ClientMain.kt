@@ -68,8 +68,7 @@ class ClientMain(progArgs: ProgramArgs) : CommonMain(progArgs) {
   override lateinit var renderThreadName: String
     private set
 
-  var mouseLocator: MouseLocator = MouseLocator()
-    private set
+  val mouseLocator: MouseLocator = MouseLocator()
 
   /**
    * @return Either the world we're connected to or the singleplayer world, whichever is more

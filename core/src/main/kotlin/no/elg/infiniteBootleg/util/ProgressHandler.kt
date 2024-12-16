@@ -9,7 +9,7 @@ data class ProgressHandler(
   private val end: Float = 0f
 ) {
 
-  private var timeToTarget = durationSeconds
+  private var timeToTarget: Float = durationSeconds
 
   fun updateAndGetProgress(delta: Float): Float {
     update(delta)
