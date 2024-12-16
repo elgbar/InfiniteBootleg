@@ -345,7 +345,7 @@ class ChunkImpl(
               continue
             }
             launch {
-              //TODO allow canceling of individual blocks
+              // TODO allow canceling of individual blocks
               val recalculated = getBlockLight(localX, localY).recalculateLighting()
               if (recalculated) {
                 anyRecalculated.compareAndSet(false, true)

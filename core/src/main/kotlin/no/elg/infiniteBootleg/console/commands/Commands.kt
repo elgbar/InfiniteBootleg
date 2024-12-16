@@ -423,11 +423,14 @@ class Commands : CommandExecutor() {
   fun lights() {
     Settings.renderLight = !Settings.renderLight
     val world = world ?: return
-    if (Settings.renderLight) {
-      world.render.update()
-    }
-    for (chunk in world.loadedChunks) {
-      chunk.dirty()
+
+    world.readChunks { readableChunks ->
+      readableChunks.values().forEach {
+        if (Settings.renderLight) {
+          it.updateAllBlockLights()
+        }
+        it.dirty()
+      }
     }
     logger.info {
       "Lighting is now ${Settings.renderLight.toAbled()}"
