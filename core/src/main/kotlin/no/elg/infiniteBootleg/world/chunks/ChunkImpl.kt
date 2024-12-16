@@ -322,7 +322,12 @@ class ChunkImpl(
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (isValid && world.isLoaded) {
       synchronized(this) { // TODO synchronize on something else
-        recalculateLightJob?.cancel()
+        if (!checkDistance) {
+          // Safe to cancel when doing a full update
+          // Note to self, DO NOT CANCEL when updating from sources,
+          // as it might cancel updates to blocks that will not be updated in the next update
+          recalculateLightJob?.cancel()
+        }
         recalculateLightJob = launchOnMultithreadedAsync {
           doUpdateLightMultipleSources0(sources, checkDistance)
         }
@@ -340,6 +345,7 @@ class ChunkImpl(
               continue
             }
             launch {
+              //TODO allow canceling of individual blocks
               val recalculated = getBlockLight(localX, localY).recalculateLighting()
               if (recalculated) {
                 anyRecalculated.compareAndSet(false, true)
