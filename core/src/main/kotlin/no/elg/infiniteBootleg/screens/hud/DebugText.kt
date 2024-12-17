@@ -62,8 +62,8 @@ object DebugText {
     val skylight = blockLight?.isSkylight ?: "maybe"
     val usingSkyArr = blockLight?.lightMap === SKYLIGHT_LIGHT_MAP
     val usingNoLigArr = blockLight?.lightMap === NO_LIGHTS_LIGHT_MAP
-    val avg = blockLight?.averageBrightness ?: 0.0f
-    val sub = blockLight?.lightMap?.get(lightMapIndex(rawX, rawY)) ?: 0.0
+    val avg = blockLight?.averageBrightness ?: Float.NaN
+    val sub = blockLight?.lightMap?.get(lightMapIndex(rawX, rawY)) ?: Float.NaN
     val format = "lit? %-5s (using no light arr? %-5s) sky? %-5s (using sky arr? %-5s) avg brt %1.3f sub-cell[%1d, %1d] %1.3f"
     sb.append(String.format(format, isLit, usingNoLigArr, skylight, usingSkyArr, avg, rawX, rawY, sub))
   }

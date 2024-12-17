@@ -36,6 +36,7 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.lightMapIndex
+import no.elg.infiniteBootleg.world.blocks.BrightnessArray
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
@@ -266,7 +267,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   private fun drawShadedBlock(
     textureRegion: RotatableTextureRegion,
-    lights: FloatArray,
+    lights: BrightnessArray,
     dx: Int,
     dy: Int,
     rotation: Int
@@ -319,8 +320,6 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   }
 
   companion object {
-    /** How many [Graphics.getFramesPerSecond] should there be when rendering multiple chunks  */
-    const val FPS_FAST_CHUNK_RENDER_THRESHOLD = 10
 
     const val LIGHT_SUBBLOCK_SIZE = BLOCK_SIZE / LIGHT_RESOLUTION.toFloat()
 

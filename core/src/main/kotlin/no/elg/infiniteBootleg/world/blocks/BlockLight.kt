@@ -28,6 +28,14 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
 
+/**
+ * How bright a block is
+ *
+ * The range is from [BlockLight.Companion.COMPLETE_DARKNESS] to [BlockLight.Companion.FULL_BRIGHTNESS]
+ */
+typealias Brightness = Float
+typealias BrightnessArray = FloatArray
+
 class BlockLight(
   val chunk: Chunk,
   val localX: LocalCoord,
@@ -51,7 +59,7 @@ class BlockLight(
   /**
    * The average brightness of the block
    */
-  var averageBrightness: Float = 0f
+  var averageBrightness: Brightness = COMPLETE_DARKNESS
     private set
 
   /**
@@ -64,8 +72,10 @@ class BlockLight(
    * Do not modify
    */
   @field:Volatile
-  var lightMap: FloatArray = NO_LIGHTS_LIGHT_MAP
+  var lightMap: BrightnessArray = NO_LIGHTS_LIGHT_MAP
     private set
+
+  private val event by lazy { BlockLightChangedEvent(chunk, localX, localY) }
 
   init {
     if (isAboveTopBlock()) {
@@ -108,7 +118,7 @@ class BlockLight(
   private fun setToSkyLight(publishEvent: Boolean) {
     isLit = true
     isSkylight = true
-    averageBrightness = 1f
+    averageBrightness = FULL_BRIGHTNESS
     lightMap = SKYLIGHT_LIGHT_MAP
     if (publishEvent) {
       dispatchLightChangeEvent()
@@ -118,14 +128,12 @@ class BlockLight(
   private fun setToNoLight(publishEvent: Boolean) {
     isLit = false
     isSkylight = false
-    averageBrightness = 0f
+    averageBrightness = COMPLETE_DARKNESS
     lightMap = NO_LIGHTS_LIGHT_MAP
     if (publishEvent) {
       dispatchLightChangeEvent()
     }
   }
-
-  private val event by lazy { BlockLightChangedEvent(chunk, localX, localY) }
 
   private fun dispatchLightChangeEvent() {
     if (Settings.renderBlockLightUpdates) {
@@ -180,7 +188,7 @@ class BlockLight(
         skyLights
       }
       ensureActive()
-      val tmpLightMap = FloatArray(LIGHT_RESOLUTION_SQUARE) { 0f }
+      val tmpLightMap: BrightnessArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
       var firstTime = true
       for (neighbor in lightBlocks) {
         calculateLightFrom(neighbor, worldX, worldY, tmpLightMap, firstTime)
@@ -234,11 +242,10 @@ class BlockLight(
 
       if (offsetY <= MIN_Y_OFFSET) {
         // Too little offset to bother with columns of skylight (or the block is above left and right)
-        // add one to get the air block above the top-block
         val block = chunk.getBlock(topWorldX, topWorldY, loadChunk = false) ?: continue
         if (skylightBlockFilter(worldX.toFloat(), worldY.toFloat(), block)) {
-          val nnBlocks = skyblocks ?: GdxArray<Block>(false, 1).also { array -> skyblocks = array }
-          nnBlocks.add(block)
+          val actualSkyblocks = skyblocks ?: GdxArray<Block>(false, 1).also { array -> skyblocks = array }
+          actualSkyblocks.add(block)
         }
         continue
       }
@@ -311,13 +318,28 @@ class BlockLight(
   }
 
   companion object {
+
+    /**
+     * Lower inclusive bound for brightness
+     *
+     * `0f`
+     */
+    const val COMPLETE_DARKNESS: Brightness = 0f
+
+    /**
+     * Upper inclusive bound for brightness
+     *
+     * `1f`
+     */
+    const val FULL_BRIGHTNESS: Brightness = 1f
+
     const val LIGHT_RESOLUTION = 2
     const val LIGHT_RESOLUTION_SQUARE = LIGHT_RESOLUTION * LIGHT_RESOLUTION
 
     val EMITS_LIGHT_FILTER = { block: Block -> block.material.emitsLight }
 
-    val SKYLIGHT_LIGHT_MAP: FloatArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { 1f }
-    val NO_LIGHTS_LIGHT_MAP: FloatArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { 0f }
+    val SKYLIGHT_LIGHT_MAP: BrightnessArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { FULL_BRIGHTNESS }
+    val NO_LIGHTS_LIGHT_MAP: BrightnessArray = FloatArray(LIGHT_RESOLUTION_SQUARE) { COMPLETE_DARKNESS }
 
     inline fun lightMapIndex(dx: Int, dy: Int): Int = dx * LIGHT_RESOLUTION + dy
 
