@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.world.render
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.main.ClientMain
@@ -15,6 +16,8 @@ import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.placeableBlocks
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.COMPLETE_DARKNESS
+import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.FULL_BRIGHTNESS
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
@@ -88,10 +91,15 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
 
   private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldLoc: WorldCompactLoc, overrideAlpha: Float? = null) {
     val (blockWorldX, blockWorldY) = blockWorldLoc
-    val averageBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: 1f
-    if (averageBrightness == 0f) {
-      // no need to render a black block
-      return
+    val averageBrightness = if (Settings.renderLight) {
+      val blockBrightness = world.getBlockLight(blockWorldX, blockWorldY)?.averageBrightness ?: FULL_BRIGHTNESS
+      if (blockBrightness == COMPLETE_DARKNESS) {
+        // no need to render a black block
+        return
+      }
+      blockBrightness
+    } else {
+      FULL_BRIGHTNESS
     }
     val alpha = overrideAlpha ?: (1f - averageBrightness).coerceAtLeast(0.33f)
     worldRender.batch.withColor(averageBrightness, averageBrightness, averageBrightness, alpha) {
