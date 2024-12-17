@@ -7,14 +7,17 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D
+import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.util.toDegrees
 import no.elg.infiniteBootleg.util.worldToScreen
+import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
@@ -28,8 +31,11 @@ import no.elg.infiniteBootleg.world.ecs.components.TintedComponent.Companion.tin
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
+import no.elg.infiniteBootleg.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
+import no.elg.infiniteBootleg.world.magic.SpellState.Companion.canNotCastAgain
+import no.elg.infiniteBootleg.world.magic.SpellState.Companion.timeToCast
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -39,6 +45,12 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(drawableEntitiesFamily)
 
   private val layout = GlyphLayout()
+  private val lightVector: Vector2 = Vector2()
+
+  private val shapeRenderer: ShapeRenderer = ShapeRenderer().also {
+    it.color = Color.GREEN
+    it.setAutoShapeType(true)
+  }
 
   private val batch: Batch
     get() = worldRender.batch
@@ -48,10 +60,9 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   private fun Entity.currentTexture(): TextureRegion {
     val lookDirectionOrNull = lookDirectionComponentOrNull
     val velocityOrNull = velocityOrNull
-    val texture: TextureRegion =
-      if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
-        if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
-          Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
+    val texture: TextureRegion = if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
+      if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
+        Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
         } else if (abs(velocityOrNull.x) > EFFECTIVE_ZERO && groundedComponentOrNull?.onGround == true) {
           Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer).textureRegion
         } else {
@@ -64,12 +75,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     texture.flip(shouldFlipX, false)
     return texture
   }
-
-  private fun Entity.holdingTexture(): TextureRegion? {
-    return selectedItem?.element?.textureRegion?.textureRegionOrNull
-  }
-
-  private val lightVector: Vector2 = Vector2()
 
   private fun setupEntityLight(centerPos: Vector2, box2d: Box2DBodyComponent) {
     val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
@@ -102,20 +107,12 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
     } else {
       draw(
-        texture,
-        screenX,
-        screenY,
-        box2d.worldWidth / 2f,
-        box2d.worldHeight / 2f,
-        box2d.worldWidth,
-        box2d.worldHeight,
-        1f,
-        1f,
-        box2d.body.angle.toDegrees()
+        texture, screenX, screenY, box2d.worldWidth / 2f, box2d.worldHeight / 2f, box2d.worldWidth, box2d.worldHeight, 1f, 1f, box2d.body.angle.toDegrees()
       )
     }
   }
 
+  @Suppress("GDXKotlinFlushInsideLoop")
   override fun render() {
     globalAnimationTimer += Gdx.graphics.deltaTime
     for (entity in entities) {
@@ -149,10 +146,32 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
 
       batch.drawBox2d(box2d, entity.currentTexture(), screenX, screenY)
-      entity.holdingTexture()?.also { holding ->
+
+      val holding = entity.selectedItem?.element
+      if (holding != null) {
         val size = Block.BLOCK_SIZE / 2f
-        val ratio = holding.regionWidth.toFloat() / holding.regionHeight.toFloat()
-        batch.draw(holding, screenX, screenY, size, size * ratio)
+        val holdingTexture = holding.textureRegion?.textureRegionOrNull
+        if (holdingTexture != null) {
+          val ratio = holdingTexture.regionWidth.toFloat() / holdingTexture.regionHeight.toFloat()
+          batch.draw(holdingTexture, screenX, screenY, size, size * ratio)
+        }
+
+        if (holding is Staff) {
+          val lastSpellCaste = entity.lastSpellCastOrNull
+          if (lastSpellCaste.canNotCastAgain()) {
+            batch.end() // End the batch to draw the shape renderer
+            shapeRenderer.safeUse(ShapeRenderer.ShapeType.Line, batch.projectionMatrix) {
+              val width = size
+              val height = size / 2f
+              val x = size + screenX + 1 // place to the right of the held item, +1 to avoid overlap
+              shapeRenderer.rect(x, screenY, width, height)
+              shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
+              val percent = 1 - lastSpellCaste.timeToCast() / lastSpellCaste.castDelay
+              shapeRenderer.rect(x, screenY, width * percent.toFloat(), height)
+            }
+            batch.begin()
+          }
+        }
       }
 
       // Draw ignoring the light from here on out

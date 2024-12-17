@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.magic
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.world.Staff
+import kotlin.contracts.contract
 import kotlin.time.Duration
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -47,7 +48,20 @@ interface SpellState {
   val castMark: TimeMark
 
   companion object {
-    fun SpellState?.canCastAgain(): Boolean = this == null || castMark.hasPassedNow()
+    fun SpellState?.canCastAgain(): Boolean {
+      contract { returns(false) implies (this@canCastAgain != null) }
+      return this == null || castMark.hasPassedNow()
+    }
+
+    fun SpellState?.canNotCastAgain(): Boolean {
+      contract { returns(true) implies (this@canNotCastAgain != null) }
+      return this != null && !castMark.hasPassedNow()
+    }
+
+    /**
+     * @return How long until the spell can be cast again
+     */
+    fun SpellState.timeToCast(): Duration = castMark.elapsedNow().times(-1)
   }
 }
 
