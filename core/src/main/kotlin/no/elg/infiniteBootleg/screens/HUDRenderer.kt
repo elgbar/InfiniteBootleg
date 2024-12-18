@@ -45,21 +45,21 @@ class HUDRenderer : Renderer, Resizable {
         val mouseBlockX = main.mouseLocator.mouseBlockX
         val mouseBlockY = main.mouseLocator.mouseBlockY
         val controlled = world.controlledPlayerEntities
-        nl()
+        builder.appendLine()
         pointing(builder, world, mouseBlockX, mouseBlockY)
-        nl()
+        builder.appendLine()
         chunk(builder, world, mouseBlockX, mouseBlockY)
-        nl()
+        builder.appendLine()
         viewChunk(builder, world)
-        nl()
+        builder.appendLine()
         pos(builder, controlled)
-        nl()
+        builder.appendLine()
         lights(builder, world, mouseBlockX, mouseBlockY)
-        nl()
+        builder.appendLine()
         time(builder, world)
-        nl()
+        builder.appendLine()
         counters(builder, world)
-        nl()
+        builder.appendLine()
         ents(builder, world, main.mouseLocator.mouseBlockX, main.mouseLocator.mouseBlockY)
       }
       if (builder.isNotEmpty()) {
@@ -75,8 +75,6 @@ class HUDRenderer : Renderer, Resizable {
   }
 
   private fun reset() = builder.setLength(0)
-
-  private fun nl() = builder.append('\n')
 
   fun hasMode(mode: Int): Boolean = modus and mode > 0
 
