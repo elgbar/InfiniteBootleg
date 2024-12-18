@@ -75,7 +75,7 @@ class BlockLight(
   var lightMap: BrightnessArray = NO_LIGHTS_LIGHT_MAP
     private set
 
-  private val event by lazy { BlockLightChangedEvent(chunk, localX, localY) }
+  private val event = BlockLightChangedEvent(chunk, localX, localY)
 
   init {
     if (isAboveTopBlock()) {

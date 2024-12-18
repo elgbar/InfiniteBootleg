@@ -807,6 +807,22 @@ class Commands : CommandExecutor() {
   }
 
   @ClientsideOnly
+  fun torchTest(delayMillis: Long = 50) {
+    val world = clientWorld ?: return
+    val dx = 2
+    val dy = 1
+    val chunkXs = world.render.chunksInView.run { (horizontalStart + dx).chunkToWorld(0) until (horizontalEnd - dx).chunkToWorld(CHUNK_SIZE) }
+    val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
+    launchOnMain {
+      for (x in chunkXs) {
+        launchOnAsync { world.setBlock(x, y + 8, Material.SAND, prioritize = true) }
+        delay(delayMillis)
+        launchOnAsync { world.setBlock(x, y, Material.TORCH, prioritize = true) }
+      }
+    }
+  }
+
+  @ClientsideOnly
   fun sandTest(delayMillis: Long = 50) {
     val world = clientWorld ?: return
     val dx = 2
