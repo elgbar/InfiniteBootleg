@@ -12,7 +12,7 @@ data class LastSpellCastComponent(val state: SpellState) : DebuggableComponent {
   override fun hudDebug(): String = "last state: $state"
 
   companion object : Mapper<LastSpellCastComponent>() {
-    var Entity.lastSpellCastComponentOrNull: LastSpellCastComponent? by optionalPropertyFor(LastSpellCastComponent.mapper)
+    var Entity.lastSpellCastComponentOrNull: LastSpellCastComponent? by optionalPropertyFor(mapper)
     val Entity.lastSpellCastOrNull: SpellState? get() = lastSpellCastComponentOrNull?.state
   }
 }

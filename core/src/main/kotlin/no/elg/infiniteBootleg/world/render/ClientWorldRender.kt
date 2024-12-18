@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.world.render
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
@@ -133,12 +134,14 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   override fun render() {
     batch.projectionMatrix = camera.combined
     chunkRenderer.renderMultiple()
-    batch.safeUse {
+    batch.safeUse(camera.combined) {
       for (renderer in renderers) {
         if (renderer.isInactive) continue
         if (batch.projectionMatrix != camera.combined) {
+          @Suppress("GDXKotlinFlushInsideLoop")
           batch.projectionMatrix = camera.combined
         }
+        batch.color = Color.WHITE
         renderer.render()
         if (!batch.isDrawing) {
           logger.warn { "Batch is no longer drawing after ${renderer::class}, restarting the batch" }

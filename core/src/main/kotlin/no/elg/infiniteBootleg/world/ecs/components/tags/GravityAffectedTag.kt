@@ -15,7 +15,7 @@ class GravityAffectedTag : TagSavableComponent, AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<GravityAffectedTag>() {
     var Entity.gravityAffected by tagFor<GravityAffectedTag>()
-    var Entity.gravityAffectedComponentOrNull by optionalPropertyFor(GravityAffectedTag.mapper)
+    var Entity.gravityAffectedComponentOrNull by optionalPropertyFor(mapper)
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity.Tags) = with<GravityAffectedTag>()
 
     override fun ProtoWorld.Entity.Tags.checkShouldLoad(): Boolean = hasGravityAffected()

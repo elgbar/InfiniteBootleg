@@ -77,28 +77,33 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   }
 
   private fun setupEntityLight(centerPos: Vector2, box2d: Box2DBodyComponent) {
-    val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
-    val blockY = centerPos.y.roundToInt()
-    val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
-    if (blockY > topX) {
-      lightVector.set(worldToScreen(blockX), worldToScreen(topX + 1))
-      batch.color = Color.WHITE
-    } else {
-      val blockLight = world.getBlockLight(blockX, blockY, false)
-      if (blockLight != null) {
-        if (blockLight.isSkylight) {
-          batch.color = Color.WHITE
-        } else if (blockLight.isLit) {
-          val v = blockLight.averageBrightness
-          batch.setColor(v, v, v, 1f)
-        } else {
-          batch.color = Color.BLACK
-        }
-        lightVector.set(worldToScreen(blockX), worldToScreen(blockY))
-      } else {
-        lightVector.setZero()
+    if (Settings.renderLight) {
+      val blockX = (centerPos.x - box2d.halfBox2dWidth / 2).roundToInt()
+      val blockY = centerPos.y.roundToInt()
+      val topX = world.getTopBlockWorldY(blockX, BLOCKS_LIGHT_FLAG)
+      if (blockY > topX) {
+        lightVector.set(worldToScreen(blockX), worldToScreen(topX + 1))
         batch.color = Color.WHITE
+      } else {
+        val blockLight = world.getBlockLight(blockX, blockY, false)
+        if (blockLight != null) {
+          if (blockLight.isSkylight) {
+            batch.color = Color.WHITE
+          } else if (blockLight.isLit) {
+            val v = blockLight.averageBrightness
+            batch.setColor(v, v, v, 1f)
+          } else {
+            batch.color = Color.BLACK
+          }
+          lightVector.set(worldToScreen(blockX), worldToScreen(blockY))
+        } else {
+          lightVector.setZero()
+          batch.color = Color.WHITE
+        }
       }
+    } else {
+      lightVector.setZero()
+      batch.color = Color.WHITE
     }
   }
 
@@ -130,12 +135,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val worldX = centerPos.x - box2d.halfBox2dWidth
       val worldY = centerPos.y - box2d.halfBox2dHeight
 
-      if (Settings.renderLight) {
-        setupEntityLight(centerPos, box2d)
-      } else {
-        lightVector.setZero()
-        batch.color = Color.WHITE
-      }
+      setupEntityLight(centerPos, box2d)
 
       val screenX = worldToScreen(worldX)
       val screenY = worldToScreen(worldY)
