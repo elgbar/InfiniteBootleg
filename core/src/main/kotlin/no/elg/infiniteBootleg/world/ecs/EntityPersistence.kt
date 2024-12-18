@@ -14,8 +14,6 @@ import no.elg.infiniteBootleg.world.ecs.api.SavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.chunkComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent.Companion.doorComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
@@ -116,7 +114,6 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
     trySave(this@save.hotbarComponentOrNull)
 
     trySave(this@save.box2dOrNull)
-    trySave(this@save.chunkComponentOrNull)
     trySave(this@save.doorComponentOrNull)
     trySave(this@save.explosiveComponentOrNull)
     trySave(this@save.groundedComponentOrNull)
@@ -168,7 +165,6 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     ContainerComponent.load(this, protoEntity)
     HotbarComponent.load(this, protoEntity)
 
-    ChunkComponent.load(this, protoEntity) { world }
     DoorComponent.load(this, protoEntity)
     ExplosiveComponent.load(this, protoEntity)
     GroundedComponent.load(this, protoEntity)

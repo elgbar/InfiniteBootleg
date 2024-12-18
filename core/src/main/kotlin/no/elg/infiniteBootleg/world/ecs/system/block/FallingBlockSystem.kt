@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.plusAssign
+import no.elg.infiniteBootleg.screens.hud.DebugText.pos
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkOffsetX
 import no.elg.infiniteBootleg.util.chunkOffsetY
@@ -19,9 +20,9 @@ import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_LATE
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.AuthoritativeSystem
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent.Companion.getChunkOrNull
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingLocations
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.getChunkOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
@@ -34,7 +35,10 @@ private val logger = KotlinLogging.logger {}
  */
 object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_LATE), AuthoritativeSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
-    val chunk = entity.getChunkOrNull() ?: return
+    val chunk = entity.getChunkOrNull() ?: run {
+      logger.error { "Failed to get chunk of block at ${stringifyCompactLoc(entity.positionComponent)}" }
+      return
+    }
     val material = entity.material
     val pos = entity.positionComponent
     val world = chunk.world

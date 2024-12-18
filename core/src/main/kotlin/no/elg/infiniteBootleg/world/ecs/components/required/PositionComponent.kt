@@ -14,9 +14,11 @@ import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.worldToBlock
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
@@ -74,6 +76,13 @@ data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponen
         setVelocity(0f, 0f)
       }
     }
+
+    /**
+     * Get the chunk of this entity or null if the chunk is invalid
+     *
+     * @param load If the chunk should be loaded, default is **false** This is different from the default behavior of [no.elg.infiniteBootleg.world.world.World.getChunk]
+     */
+    fun Entity.getChunkOrNull(load: Boolean = false): Chunk? = world.getChunk(compactChunkLoc, load)
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) = safeWith { PositionComponent(protoEntity.position.x, protoEntity.position.y) }
 

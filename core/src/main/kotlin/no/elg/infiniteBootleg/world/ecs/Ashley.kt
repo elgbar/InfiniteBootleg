@@ -13,7 +13,6 @@ import no.elg.infiniteBootleg.util.removeSelf
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.ExplosiveComponent
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent
@@ -63,8 +62,7 @@ val BASIC_STANDALONE_ENTITY = arrayOf(
 
 val BASIC_BLOCK_ENTITY = arrayOf(
   *REQUIRED_COMPONENTS,
-  MaterialComponent::class,
-  ChunkComponent::class
+  MaterialComponent::class
 )
 
 val DYNAMIC_STANDALONE_ENTITY = arrayOf(

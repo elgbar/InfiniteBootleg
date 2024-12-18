@@ -15,7 +15,6 @@ import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
-import no.elg.infiniteBootleg.world.ecs.components.ChunkComponent
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
@@ -75,7 +74,6 @@ fun Engine.createBlockEntity(
   additionalConfiguration: EngineEntity.() -> Unit = {}
 ) = futureEntity { future ->
   withRequiredComponents(ProtoWorld.Entity.EntityType.BLOCK, world, worldX, worldY)
-  safeWith { ChunkComponent(chunk.compactLocation) }
   safeWith { MaterialComponent(material) }
   additionalConfiguration()
   checkFamilies(entity, arrayOf(blockEntityFamily to "blockEntityFamily", *wantedFamilies))
