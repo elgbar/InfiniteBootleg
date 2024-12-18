@@ -77,11 +77,13 @@ object DebugText {
     val rawX = ClientMain.inst().mouseLocator.mouseWorldX
     val rawY = ClientMain.inst().mouseLocator.mouseWorldY
     val exists = block != null
-    val ent = block?.entity?.let { " ${ent(it)}" } ?: ""
     val blockDebug = block?.let { " ${it.hudDebug()}" } ?: ""
 
-    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s%s%s"
-    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug, ent))
+    val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s%s"
+    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug))
+
+    val blockEntity = block?.entity?.let(::ent) ?: "N/A"
+    sb.appendLine().append("Block entity: $blockEntity")
   }
 
   fun chunk(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
