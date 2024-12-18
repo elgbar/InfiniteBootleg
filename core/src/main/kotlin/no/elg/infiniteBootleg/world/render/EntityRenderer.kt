@@ -63,14 +63,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val texture: TextureRegion = if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
       if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
         Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
-        } else if (abs(velocityOrNull.x) > EFFECTIVE_ZERO && groundedComponentOrNull?.onGround == true) {
-          Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer).textureRegion
-        } else {
-          textureRegionComponent.texture.textureRegion
-        }
+      } else if (abs(velocityOrNull.x) > EFFECTIVE_ZERO && groundedComponentOrNull?.onGround == true) {
+        Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer).textureRegion
       } else {
         textureRegionComponent.texture.textureRegion
       }
+    } else {
+      textureRegionComponent.texture.textureRegion
+    }
     val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
     texture.flip(shouldFlipX, false)
     return texture
@@ -174,22 +174,19 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         }
       }
 
-      // Draw ignoring the light from here on out
-      batch.color = Color.WHITE
+      entity.nameOrNull?.let { name ->
+        val font = Main.inst().assets.font10pt
+        layout.setText(font, name, batch.color, 0f, Align.center, false)
+        font.draw(batch, layout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
+      }
 
       if (Settings.debugEntityLight) {
+        batch.color = Color.WHITE // Make sure we can see the debug light
         val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
         val offset = Block.BLOCK_SIZE / 2f - size / 2f
         batch.draw(Main.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
       }
-
-      entity.nameOrNull?.let { name ->
-        val font = Main.inst().assets.font10pt
-        layout.setText(font, name, Color.WHITE, 0f, Align.center, false)
-        font.draw(batch, layout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
-      }
     }
-    batch.color = Color.WHITE
   }
 
   companion object {
