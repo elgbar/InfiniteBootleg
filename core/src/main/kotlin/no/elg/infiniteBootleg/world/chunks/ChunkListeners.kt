@@ -60,6 +60,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
         if (event.world == chunk.world) {
           val sources = lightLocs
           synchronized(sources) {
+            if (sources.isEmpty()) return@registerListenerConditionally
             chunk.doUpdateLightMultipleSources(sources.toLongArray(), checkDistance = true)
             sources.clear()
           }
