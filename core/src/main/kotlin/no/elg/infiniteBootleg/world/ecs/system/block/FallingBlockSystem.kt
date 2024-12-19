@@ -36,7 +36,7 @@ private val logger = KotlinLogging.logger {}
 object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_PRIORITY_LATE), AuthoritativeSystem {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val chunk = entity.getChunkOrNull() ?: run {
-      logger.error { "Failed to get chunk of block at ${stringifyCompactLoc(entity.positionComponent)}" }
+      logger.debug { "Failed to get chunk of block at ${stringifyCompactLoc(entity.positionComponent)}" }
       return
     }
     val material = entity.material
