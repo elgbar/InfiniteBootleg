@@ -119,7 +119,9 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   @Suppress("GDXKotlinFlushInsideLoop")
   override fun render() {
-    globalAnimationTimer += Gdx.graphics.deltaTime
+    if (!world.worldTicker.isPaused) {
+      globalAnimationTimer += Gdx.graphics.deltaTime
+    }
     for (entity in entities) {
       val box2d: Box2DBodyComponent = entity.box2d
 
