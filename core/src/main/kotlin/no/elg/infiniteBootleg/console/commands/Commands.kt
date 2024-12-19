@@ -74,6 +74,7 @@ import no.elg.infiniteBootleg.world.render.WorldRender.Companion.MIN_ZOOM
 import no.elg.infiniteBootleg.world.ticker.Ticker
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.World
+import no.elg.infiniteBootleg.world.world.World.Companion.LIGHT_SOURCE_LOOK_BLOCKS
 import java.util.Locale
 
 private val logger = KotlinLogging.logger {}
@@ -815,9 +816,11 @@ class Commands : CommandExecutor() {
     val y = (world.render.chunksInView.verticalEnd - dy).chunkToWorld(0)
     launchOnMain {
       for (x in chunkXs) {
-        launchOnAsync { world.setBlock(x, y + 8, Material.SAND, prioritize = true) }
+        launchOnAsync {
+          world.setBlock(x, y + LIGHT_SOURCE_LOOK_BLOCKS, Material.SAND, prioritize = true)
+          world.setBlock(x, y, Material.TORCH, prioritize = true)
+        }
         delay(delayMillis)
-        launchOnAsync { world.setBlock(x, y, Material.TORCH, prioritize = true) }
       }
     }
   }
