@@ -32,7 +32,7 @@ interface ChunkColumn {
    *
    * @see FeatureFlag
    */
-  fun topBlockHeight(localX: LocalCoord, features: ChunkColumnFeatureFlag = TOP_MOST_FLAG): Int
+  fun topBlockHeight(localX: LocalCoord, features: ChunkColumnFeatureFlag = TOP_MOST_FLAG): WorldCoord
 
   /**
    * @param features What kind of top block to return
@@ -53,7 +53,7 @@ interface ChunkColumn {
    * @param worldYHint Hint what could be the next topmost block
    * Recalculate the top block of a given local x
    */
-  fun updateTopBlock(localX: LocalCoord, worldYHint: Int)
+  fun updateTopBlock(localX: LocalCoord, worldYHint: WorldCoord)
 
   /**
    * @param features What kind of top block to return

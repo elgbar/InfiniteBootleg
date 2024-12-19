@@ -32,10 +32,12 @@ import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.util.safeUse
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE_F
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.HALF_BLOCK_SIZE_F
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.LIGHT_RESOLUTION
 import no.elg.infiniteBootleg.world.blocks.BlockLight.Companion.lightMapIndex
+import no.elg.infiniteBootleg.world.blocks.Brightness
 import no.elg.infiniteBootleg.world.blocks.BrightnessArray
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
@@ -182,6 +184,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   private fun doRenderChunk(chunk: Chunk) {
     val fbo = chunk.frameBuffer ?: return
     val chunkColumn = chunk.chunkColumn
+    val assets = Main.inst().assets
 
     // this is the main render function
     fbo.use { _ ->
@@ -189,7 +192,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         for (localX in 0 until Chunk.CHUNK_SIZE) {
-          val topBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
+          val topLightBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {
             val block = chunk.getRawBlock(localX, localY)
             val material = block.materialOrAir()
@@ -197,19 +200,27 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
             val secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunk.chunkY.chunkToWorld(localY)
-            if (material.invisibleBlock || block.isMarkerBlock()) {
-              texture = if (topBlockHeight > worldY) Main.inst().assets.caveTexture else Main.inst().assets.skyTexture
+            val dx = localX * BLOCK_SIZE_F
+            val dy = localY * BLOCK_SIZE_F
+
+            val isMarker = block.isMarkerBlock()
+            if (material.invisibleBlock || isMarker) {
+              if (isMarker && topLightBlockHeight == worldY) {
+                // Draw half the texture as sky and lower half as cave.
+                // This will remove visual artifact when a marker block is falling and updating the top light block height
+                drawHalfwayTexture(assets.caveTexture, assets.skyTexture, dx, dy)
+                continue
+              }
+              texture = if (topLightBlockHeight > worldY) assets.caveTexture else assets.skyTexture
               secondaryTexture = null
             } else {
               texture = block?.texture ?: continue
               secondaryTexture = if (material.hasTransparentTexture) {
-                if (topBlockHeight > worldY) Main.inst().assets.caveTexture else Main.inst().assets.skyTexture
+                if (topLightBlockHeight > worldY) assets.caveTexture else assets.skyTexture
               } else {
                 null
               }
             }
-            val dx = localX * BLOCK_SIZE
-            val dy = localY * BLOCK_SIZE
             val rotation = calculateRotation(chunk, localX, localY)
 
             batch.color = Color.WHITE
@@ -246,18 +257,23 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     return (noise * cardinalDirections).toInt() * cardinalDirectionDegrees
   }
 
-  private fun drawRotatedTexture(texture: RotatableTextureRegion, dx: Int, dy: Int, rotation: Int) {
+  private fun drawHalfwayTexture(lowerHalf: RotatableTextureRegion, upperHalf: RotatableTextureRegion, dx: Float, dy: Float) {
+    batch.draw(upperHalf.textureRegion, dx, dy + HALF_BLOCK_SIZE_F, BLOCK_SIZE_F, HALF_BLOCK_SIZE_F)
+    batch.draw(lowerHalf.textureRegion, dx, dy, BLOCK_SIZE_F, HALF_BLOCK_SIZE_F)
+  }
+
+  private fun drawRotatedTexture(texture: RotatableTextureRegion, dx: Float, dy: Float, rotation: Int) {
     if (rotation == 0 || !texture.rotationAllowed) {
-      batch.draw(texture.textureRegion, dx.toFloat(), dy.toFloat(), BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+      batch.draw(texture.textureRegion, dx, dy, BLOCK_SIZE_F, BLOCK_SIZE_F)
     } else {
       batch.draw(
         texture.textureRegion,
-        dx.toFloat(),
-        dy.toFloat(),
-        BLOCK_SIZE / 2f,
-        BLOCK_SIZE / 2f,
-        BLOCK_SIZE.toFloat(),
-        BLOCK_SIZE.toFloat(),
+        dx,
+        dy,
+        HALF_BLOCK_SIZE_F,
+        HALF_BLOCK_SIZE_F,
+        BLOCK_SIZE_F,
+        BLOCK_SIZE_F,
         1f,
         1f,
         rotation.toFloat()
@@ -268,8 +284,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   private fun drawShadedBlock(
     textureRegion: RotatableTextureRegion,
     lights: BrightnessArray,
-    dx: Int,
-    dy: Int,
+    dx: Float,
+    dy: Float,
     rotation: Int
   ) {
     val texture = textureRegion.textureRegion
@@ -284,15 +300,15 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       val regionsLength = regions.size
       while (rx < regionsLength) {
         val region = regions[rx]
-        val lightIntensity = lights[lightMapIndex(rx, ry)]
-        batch.setColor(lightIntensity, lightIntensity, lightIntensity, 1f)
+        val brightness: Brightness = lights[lightMapIndex(rx, ry)]
+        batch.setColor(brightness, brightness, brightness, 1f)
         if (textureRegion.rotationAllowed || rotation == 0) {
           batch.draw(
             region,
             dx + rx * LIGHT_SUBBLOCK_SIZE,
             dy + ry * LIGHT_SUBBLOCK_SIZE,
-            LIGHT_SUBBLOCK_SIZE / 2,
-            LIGHT_SUBBLOCK_SIZE / 2,
+            HALF_LIGHT_SUBBLOCK_SIZE,
+            HALF_LIGHT_SUBBLOCK_SIZE,
             LIGHT_SUBBLOCK_SIZE,
             LIGHT_SUBBLOCK_SIZE,
             1f,
@@ -321,7 +337,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   companion object {
 
-    const val LIGHT_SUBBLOCK_SIZE = BLOCK_SIZE / LIGHT_RESOLUTION.toFloat()
+    const val LIGHT_SUBBLOCK_SIZE = BLOCK_SIZE_F / LIGHT_RESOLUTION
+    const val HALF_LIGHT_SUBBLOCK_SIZE = LIGHT_SUBBLOCK_SIZE * 0.5f
 
     const val CAVE_CLEAR_COLOR_R = 0.408824f
     const val CAVE_CLEAR_COLOR_G = 0.202941f

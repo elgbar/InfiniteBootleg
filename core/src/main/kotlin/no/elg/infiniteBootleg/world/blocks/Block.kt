@@ -60,6 +60,9 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      */
     const val BLOCK_SIZE = 16
 
+    const val BLOCK_SIZE_F = BLOCK_SIZE.toFloat()
+    const val HALF_BLOCK_SIZE_F = BLOCK_SIZE_F * 0.5f
+
     /**
      * Size of block in world coordinates
      */
