@@ -40,7 +40,6 @@ object UpdateGridBlockSystem :
     // Remove markers that are no longer occupied
     val noLongerOccupied = entity.occupyingLocations.filter { it !in currentOccupations }
     entity.occupyingLocations.removeAll(noLongerOccupied)
-    noLongerOccupied.forEach(EntityMarkerBlock::removeEntityMarker)
 
     val newOccupation = currentOccupations.filter { it !in entity.occupyingLocations }
     for (newOccupation in newOccupation) {
@@ -56,5 +55,7 @@ object UpdateGridBlockSystem :
         entity.occupyingLocations += occupiedBlock
       }
     }
+    // Remove markers after setting new markers to avoid a gap where there is no marker at all
+    noLongerOccupied.forEach(EntityMarkerBlock::removeEntityMarker)
   }
 }
