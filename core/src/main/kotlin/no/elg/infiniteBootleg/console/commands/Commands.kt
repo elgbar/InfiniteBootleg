@@ -582,15 +582,31 @@ class Commands : CommandExecutor() {
   fun tp(worldX: Float, worldY: Float) {
     val clientWorld = clientWorld ?: return
     launchOnAsync {
-      clientWorld.render.lookAt(worldX, worldY)
-      logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
-
       val entities = clientWorld.controlledPlayerEntities
       if (entities.size() > 0) {
         world?.loadChunk(worldX.worldToChunk(), worldY.worldToChunk())
+        clientWorld.render.lookAt(worldX, worldY) // Do not lerp when teleporting
         entities.forEach { it.teleport(worldX, worldY, killVelocity = true) }
         logger.info { "Teleported entity to ${stringifyCompactLoc(worldX, worldY)}" }
       }
+    }
+  }
+
+  @ClientsideOnly
+  @ConsoleDoc(description = "Teleport the camera to the pointer location")
+  fun lookAt() {
+    val mouseLocator = ClientMain.inst().mouseLocator
+    lookAt(mouseLocator.mouseWorldX, mouseLocator.mouseWorldY)
+  }
+
+  @CmdArgNames("x", "y")
+  @ClientsideOnly
+  @ConsoleDoc(description = "Teleport the camera to given world coordinate", paramDescriptions = ["World x coordinate", "World y coordinate"])
+  fun lookAt(worldX: Float, worldY: Float) {
+    val clientWorld = clientWorld ?: return
+    launchOnAsync {
+      clientWorld.render.lookAt(worldX, worldY)
+      logger.info { "Teleported camera to ${stringifyCompactLoc(worldX, worldY)}" }
     }
   }
 
