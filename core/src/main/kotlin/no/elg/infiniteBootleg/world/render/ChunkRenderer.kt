@@ -191,6 +191,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
       batch.safeUse { _ ->
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        batch.color = Color.WHITE
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           val topLightBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {
@@ -221,24 +222,35 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
                 null
               }
             }
-            val rotation = calculateRotation(chunk, localX, localY)
 
-            batch.color = Color.WHITE
             val blockLight = chunk.getBlockLight(localX, localY)
-            if (Settings.renderLight && blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
-              if (secondaryTexture != null) {
-                // If the block is emitting light there is no point in drawing it shaded
-                if (material.emitsLight) {
-                  drawRotatedTexture(secondaryTexture, dx, dy, rotation)
+            if (Settings.renderLight) {
+              if (blockLight.isLit && (!blockLight.isSkylight || texture.rotationAllowed)) {
+                val rotation = calculateRotation(chunk, localX, localY)
+                if (secondaryTexture != null) {
+                  // Optimization: If the block is emitting light there is no point in drawing it shaded
+                  if (material.emitsLight) {
+                    drawRotatedTexture(secondaryTexture, dx, dy, rotation)
+                  } else {
+                    drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation)
+                  }
+                }
+                drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
+              } else {
+                if (blockLight.isLit) {
+                  val rotation = calculateRotation(chunk, localX, localY)
+                  if (secondaryTexture != null) {
+                    drawRotatedTexture(secondaryTexture, dx, dy, rotation)
+                  }
+                  drawRotatedTexture(texture, dx, dy, rotation)
                 } else {
-                  drawShadedBlock(secondaryTexture, blockLight.lightMap, dx, dy, rotation)
+                  // Optimization: If the draw anything if the block is not lit or in the sky, the background is already cleared to black
+                  continue
                 }
               }
-              drawShadedBlock(texture, blockLight.lightMap, dx, dy, rotation)
             } else {
-              if (Settings.renderLight && !blockLight.isSkylight) {
-                batch.color = Color.BLACK
-              }
+              // No light, no problem
+              val rotation = calculateRotation(chunk, localX, localY)
               if (secondaryTexture != null) {
                 drawRotatedTexture(secondaryTexture, dx, dy, rotation)
               }
@@ -263,7 +275,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   }
 
   private fun drawRotatedTexture(texture: RotatableTextureRegion, dx: Float, dy: Float, rotation: Int) {
-    if (rotation == 0 || !texture.rotationAllowed) {
+    if (rotation == NO_ROTATION || !texture.rotationAllowed) {
       batch.draw(texture.textureRegion, dx, dy, BLOCK_SIZE_F, BLOCK_SIZE_F)
     } else {
       batch.draw(
@@ -343,6 +355,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     const val CAVE_CLEAR_COLOR_R = 0.408824f
     const val CAVE_CLEAR_COLOR_G = 0.202941f
     const val CAVE_CLEAR_COLOR_B = 0.055882f
+
+    const val NO_ROTATION = 0
 
     private val QUEUE_LOCK = Any()
 
