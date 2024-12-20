@@ -46,6 +46,10 @@ class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean 
     consoleReader.start()
   }
 
+  var openConsoleKey: Int
+    get() = if (inGameConsole) console.displayKeyID else Int.MIN_VALUE
+    set(value) = if (inGameConsole) console.displayKeyID = value else Unit
+
   var alpha: Float
     get() = if (inGameConsole) console.window.color.a else 1f
     set(a) {
