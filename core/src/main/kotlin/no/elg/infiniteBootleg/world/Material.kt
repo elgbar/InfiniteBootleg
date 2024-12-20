@@ -69,7 +69,7 @@ enum class Material(
    * @return If this material can be handled by the player, otherwise this is a meta material
    */
   val canBeHandled: Boolean = true,
-  private val createNew: ((world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material) -> CompletableFuture<Entity>)? = null
+  private val createNew: ((World, WorldCoord, WorldCoord, Material) -> CompletableFuture<Entity>)? = null
 ) : ContainerElement {
   AIR(
     hardness = 0f,
@@ -90,14 +90,14 @@ enum class Material(
   TNT(
     hardness = 0.5f,
     hasTransparentTexture = false,
-    createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
+    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createBlockEntity(world, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
         safeWith { ExplosiveComponent() }
       }
     }
   ),
-  SAND(hardness = 0.75f, hasTransparentTexture = false, createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-    world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
+  SAND(hardness = 0.75f, hasTransparentTexture = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+    world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
   }),
   TORCH(
     hardness = 0.1f,
@@ -105,8 +105,8 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     emitsLight = true,
-    createNew = { world: World, chunk: Chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createGravityAffectedBlockEntity(world, chunk, worldX, worldY, material)
+    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
     }
   ),
   GLASS(hardness = 0.1f, hasTransparentTexture = true, blocksLight = false),
@@ -116,8 +116,8 @@ enum class Material(
     isCollidable = false,
     blocksLight = false,
     invisibleBlock = true,
-    createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createDoorBlockEntity(world, chunk, worldX, worldY, material)
+    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createDoorBlockEntity(world, worldX, worldY, material)
     }
   ),
   BIRCH_TRUNK(hardness = 1.25f, hasTransparentTexture = true, isCollidable = false, blocksLight = false),
@@ -126,16 +126,16 @@ enum class Material(
     hasTransparentTexture = true,
     isCollidable = false,
     blocksLight = false,
-    createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-      world.engine.createLeafEntity(world, chunk, worldX, worldY, material)
+    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createLeafEntity(world, worldX, worldY, material)
     }
   ),
   SANDSTONE(
     hardness = 1f,
     hasTransparentTexture = false
   ),
-  CONTAINER(hardness = 1f, hasTransparentTexture = false, isCollidable = false, createNew = { world: World, chunk, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-    world.engine.createContainerEntity(world, chunk, worldX, worldY, material)
+  CONTAINER(hardness = 1f, hasTransparentTexture = false, isCollidable = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+    world.engine.createContainerEntity(world, worldX, worldY, material)
   });
 
   override var textureRegion: RotatableTextureRegion? = null
@@ -173,7 +173,7 @@ enum class Material(
     return BlockImpl(validChunk, localX, localY, this).also { block ->
       if (Main.isAuthoritative) {
         // Blocks client side should not have any entity in them
-        val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, validChunk, validChunk.worldX + localX, validChunk.worldY + localY, this)
+        val futureEntity = protoEntity?.let { world.load(it, validChunk) } ?: createNew?.invoke(world, validChunk.worldX + localX, validChunk.worldY + localY, this)
         futureEntity?.thenApply { entity: Entity ->
           if (block.isDisposed || validChunk.isDisposed) {
             world.removeEntity(entity)

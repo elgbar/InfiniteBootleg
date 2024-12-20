@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.removeSelf
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.world.ecs.components.PhysicsEventQueueComponent
@@ -66,13 +65,8 @@ fun Engine.createFallingBlockStandaloneEntity(
   }
 }
 
-fun Engine.createGravityAffectedBlockEntity(
-  world: World,
-  chunk: Chunk,
-  worldX: WorldCoord,
-  worldY: WorldCoord,
-  material: Material
-) = createBlockEntity(world, chunk, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
-  this.entity.gravityAffected = true
-  this.entity.authoritativeOnly = true
-}
+fun Engine.createGravityAffectedBlockEntity(world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material) =
+  createBlockEntity(world, worldX, worldY, material, arrayOf(gravityAffectedBlockFamily to "gravityAffectedBlockFamily")) {
+    this.entity.gravityAffected = true
+    this.entity.authoritativeOnly = true
+  }

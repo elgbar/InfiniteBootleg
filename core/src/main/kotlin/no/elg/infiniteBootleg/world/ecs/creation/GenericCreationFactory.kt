@@ -8,11 +8,11 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
@@ -35,8 +35,8 @@ internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, St
 fun EngineEntity.withRequiredComponents(
   entityType: ProtoWorld.Entity.EntityType,
   world: World,
-  worldX: Number,
-  worldY: Number,
+  worldX: WorldCoordNumber,
+  worldY: WorldCoordNumber,
   id: String? = null
 ) {
   safeWith { EntityTypeComponent.getType(entityType) }
@@ -48,8 +48,8 @@ fun EngineEntity.withRequiredComponents(
 fun EntityKt.Dsl.withRequiredComponents(
   entityType: ProtoWorld.Entity.EntityType,
   world: World,
-  worldX: Number,
-  worldY: Number,
+  worldX: WorldCoordNumber,
+  worldY: WorldCoordNumber,
   id: String? = null
 ) {
   this.entityType = entityType
@@ -66,7 +66,6 @@ fun EntityKt.Dsl.withRequiredComponents(
  */
 fun Engine.createBlockEntity(
   world: World,
-  chunk: Chunk,
   worldX: WorldCoord,
   worldY: WorldCoord,
   material: Material,
