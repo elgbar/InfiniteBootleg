@@ -54,6 +54,7 @@ open class StageScreen(val useRootTable: Boolean = true) : AbstractScreen(false)
 
   override fun show() {
     ClientMain.inst().inputMultiplexer.addProcessor(stage)
+    Gdx.graphics.isContinuousRendering = false
   }
 
   override fun resize(width: Int, height: Int) {

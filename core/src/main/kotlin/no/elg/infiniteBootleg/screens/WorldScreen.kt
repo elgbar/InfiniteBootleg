@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.screens
 
+import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.assets.disposeSafely
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
@@ -44,6 +45,8 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     super.show()
     require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
 //    EventManager.clear()
+
+    Gdx.graphics.isContinuousRendering = true
 
     val showed = System.currentTimeMillis()
     EventManager.oneShotListener { event: WorldLoadedEvent ->
