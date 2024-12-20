@@ -46,6 +46,6 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
       .mapTo(mutableSetOf()) { it.block.compactWorldLoc }
 
     breakingComponent.sendCurrentProgress()
-    world.removeBlocks(justDone, prioritize = true)
+    world.removeBlocks(justDone, giveTo = entity, prioritize = true)
   }
 }

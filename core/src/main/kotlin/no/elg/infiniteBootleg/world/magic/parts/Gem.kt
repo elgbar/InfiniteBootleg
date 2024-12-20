@@ -43,6 +43,6 @@ data object Diamond : GemType {
     val pos = spellEntity.positionComponent
 
     val breakableBlocks = spellEntity.breakableLocs(world, pos.blockX, pos.blockY, breakRadius.toFloat(), state.spellRange.toFloat()).asIterable()
-    world.removeBlocks(breakableBlocks)
+    world.removeBlocks(breakableBlocks, state.caster)
   }
 }

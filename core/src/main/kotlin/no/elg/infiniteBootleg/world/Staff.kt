@@ -24,7 +24,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
 
   fun createSpellState(entity: Entity): MutableSpellState {
     val state = MutableSpellState(
-      holder = entity,
+      caster = entity,
       staff = this,
       // FIXME placeholder
       spellRange = 32.0,

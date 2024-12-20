@@ -9,9 +9,9 @@ import kotlin.time.TimeSource
 
 interface SpellState {
   /**
-   * The entity that holds this staff (and is casting the spell)
+   * The entity cast the spell, and was holding the [staff]
    */
-  val holder: Entity
+  val caster: Entity
 
   /**
    * The staff used to cast this spell
@@ -66,7 +66,7 @@ interface SpellState {
 }
 
 data class MutableSpellState(
-  override val holder: Entity,
+  override val caster: Entity,
   override val staff: Staff,
   override var spellRange: Double,
   override var spellVelocity: Double,

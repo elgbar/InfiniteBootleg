@@ -54,6 +54,7 @@ import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
+import no.elg.infiniteBootleg.util.partitionCount
 import no.elg.infiniteBootleg.util.singleLinePrinter
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.util.toCompact
@@ -83,6 +84,7 @@ import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamilyToSendToClient
 import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
@@ -830,16 +832,36 @@ abstract class World(
   }
 
   @JvmName("removeLocs")
-  fun removeBlocks(blocks: Iterable<WorldCompactLoc>, prioritize: Boolean = false): Set<Block> {
+  fun removeBlocks(blocks: Iterable<WorldCompactLoc>, giveTo: Entity? = null, prioritize: Boolean = false): Set<Block> {
     val removed = mutableSetOf<Block>()
     val blockChunks = actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks
-      chunk.removeBlock(localX, localY, updateTexture = false)?.also { removed += it }
+      chunk.getRawBlock(localX, localY)?.also { oldBlock ->
+        removed += oldBlock
+        chunk.removeBlock(localX, localY, updateTexture = false)
+      }
     }
     for (chunk in blockChunks) {
       chunk.updateTexture(prioritize)
     }
+    giveBlocks(removed, giveTo)
     return removed
+  }
+
+  private fun giveBlocks(blocks: Collection<Block>, giveTo: Entity?) {
+    if (blocks.isNotEmpty()) {
+      val container = giveTo?.containerOrNull
+      if (container != null) {
+        val items = blocks.partitionCount { it.material }.map { (mat, count) -> mat.toItem(stock = count.toUInt()) }
+        logger.debug { "Will give $items to $giveTo" }
+        val notAdded = container.add(items)
+        if (notAdded.isNotEmpty()) {
+          logger.debug { "Failed to add items when removing block, not enough space for $notAdded" }
+        }
+      } else if (giveTo != null) {
+        logger.debug { "Cannot give items to $giveTo" }
+      }
+    }
   }
 
   fun getEntities(worldX: WorldCoord, worldY: WorldCoord): GdxArray<Entity> {

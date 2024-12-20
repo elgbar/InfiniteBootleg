@@ -190,3 +190,20 @@ fun Color.blend(from: Color, to: Color, progress: Float): Color =
     from.b * progress + to.b * (1f - progress),
     from.a * progress + to.a * (1f - progress)
   )
+
+fun <K, T> Iterable<T>.partitionMap(toKey: (T) -> K): Map<K, List<T>> =
+  buildMap<K, MutableList<T>> {
+    for (item: T in this@partitionMap) {
+      val list = this@buildMap.getOrPut(toKey(item)) { mutableListOf() }
+      list += item
+    }
+  }
+
+fun <K, T> Iterable<T>.partitionCount(toKey: (T) -> K): Map<K, Int> =
+  buildMap<K, Int> {
+    for (item: T in this@partitionCount) {
+      val key = toKey(item)
+      val current = this@buildMap.getOrDefault(key, 0)
+      this@buildMap.put(key, current + 1)
+    }
+  }
