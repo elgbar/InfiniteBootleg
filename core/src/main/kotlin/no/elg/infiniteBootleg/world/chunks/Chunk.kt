@@ -136,7 +136,6 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    * @param updateTexture If the texture of this chunk should be updated
    * @param prioritize If `updateTexture` is `true` then if this chunk be prioritized in the rendering order
    * @param sendUpdatePacket If an update should be sent when in multiplayer
-   * @return The removed block, might be `null` if there was no block at the given position
    */
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   fun removeBlock(
@@ -145,7 +144,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
     updateTexture: Boolean = true,
     prioritize: Boolean = false,
     sendUpdatePacket: Boolean = true
-  ): Block?
+  )
 
   /**
    * Force update of this chunk's texture and invariants
