@@ -4,20 +4,33 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.actors.isShown
+import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.InterfaceEvent
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.InterfaceId
+import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.util.IBVisWindow
 import no.elg.infiniteBootleg.util.launchOnMain
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
+import no.elg.infiniteBootleg.world.world.ClientWorld
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
 
-class InterfaceManager : Disposable {
+class InterfaceManager(private val world: ClientWorld) : Disposable {
 
   private val interfaces: MutableMap<InterfaceId, IBVisWindow> = ConcurrentHashMap()
 
+  // Make sure the interface close when block is changed/removed
+  private val containerDestroyedEvent = EventManager.registerListener<BlockChangedEvent> {
+    val block = it.oldOrNewBlock ?: return@registerListener
+    if (block.world === world) {
+      val interfaceId = ContainerOwner.toInterfaceId(block)
+      removeInterface(interfaceId)
+    }
+  }
   fun addInterface(interfaceId: InterfaceId, interfaceWindow: IBVisWindow) {
     interfaces.compute(interfaceId) { _, maybeOldWindow ->
       maybeOldWindow?.let { oldWindow ->
@@ -81,5 +94,6 @@ class InterfaceManager : Disposable {
   override fun dispose() {
     interfaces.values.forEach(IBVisWindow::dispose)
     interfaces.clear()
+    containerDestroyedEvent.removeListener()
   }
 }

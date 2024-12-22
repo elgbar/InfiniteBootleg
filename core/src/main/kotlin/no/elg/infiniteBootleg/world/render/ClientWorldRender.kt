@@ -89,7 +89,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   private val dad: DragAndDrop = DragAndDrop()
 
-  val interfaceManager = InterfaceManager()
+  val interfaceManager = InterfaceManager(world)
 
   fun openInterface(interfaceId: InterfaceId, createIfMissing: () -> IBVisWindow? = { null }) {
     interfaceManager.openInterface(interfaceId, maybeStage ?: return, createIfMissing)
