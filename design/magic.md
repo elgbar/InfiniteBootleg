@@ -29,7 +29,7 @@ All staff are made from wood, but can be made from different kind of wood.
 | Red wood    | 1         | 0          | 200%        | 150 ms             | Will start fires, at random | The wood crackles and smokes                          |
 | driftwood   | 1         | 3          | 25%         | 300 ms             | Works while under water     | Even when dried, drops of water forms around its base |
 | Wisted wood | 2         | 1          | 100%        | 100 ms             | N/A                         | The wood is twisted to fit two gems                   |
-| Trekant     | 3         | 2          | 100%        | 50 ms              | N/A                         | The wood is twisted to fit three gems                 |
+| Trekant     | 3         | 2          | 100%        | 100 ms             | N/A                         | The wood is twisted to fit three gems                 |
 
 ### Wood rating
 
@@ -38,19 +38,19 @@ When crafting to a staff the drying will stop.
 
 The drying rate is also affected by the wood type. Some wood types will dry faster than others.
 
-| Wood rating | Absolute power | Relative power increase | Drying duration (real time) | Drying duration total | Description                                                                   |
-|-------------|----------------|-------------------------|-----------------------------|-----------------------|-------------------------------------------------------------------------------|
-| Freshly cut | 30%            | N/A                     | 0 seconds                   | 0 seconds             | This wood is still green, it will not be very powerful                        |
-| Dried       | 50%            | +20%                    | 1 hour                      | 1 hour                | This wood has been left to dry for a while, it will be more powerful          |
-| Aged        | 70%            | +20%                    | 2 hours                     | 3 hours               | This wood has been left to dry for a long time, it will be very powerful      |
-| Ancient     | 90%            | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful |
-| Petrified   | 100%           | +10%                    | 10 hours                    | 18 hours              | This wood has been left to dry for a very very long time, it will be powerful |
+| Wood rating | Absolute power | Relative power increase | Drying duration (real time) | Drying duration total | Description                                                                                         |
+|-------------|----------------|-------------------------|-----------------------------|-----------------------|-----------------------------------------------------------------------------------------------------|
+| Freshly cut | 30%            | N/A                     | 0 seconds                   | 0 seconds             | This wood is still green, it will not be very powerful                                              |
+| Dried       | 50%            | +20%                    | 1 hour                      | 1 hour                | This wood has been left to dry for a while, it will be more powerful                                |
+| Aged        | 70%            | +20%                    | 2 hours                     | 3 hours               | This wood has been left to dry for a long time, it will be powerful                                 |
+| Ancient     | 90%            | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful                       |
+| Petrified   | 100%           | +10%                    | 10 hours                    | 18 hours              | This wood has been left to dry for a extremely long time, there is no point in drying it any longer |
 
 ## Gems
 
 ---
 
-Each gem will produce a different spell. The power of the spell is determined by the quality of the gem (flaw rating).
+Each gem will produce a different spell. The power of the spell is determined by the quality of the gem (flaw rating). Gems have names after precious stones
 
 ### Types of gems
 
@@ -75,45 +75,47 @@ Note that the flaw rating will only affect the power of the gem, not the whole s
 | Chipped     | 70%            | -15%                                   | Someone hit this on with a hammer!                        |
 | Cracked     | 50%            | -20%                                   | Not bad, not great                                        |
 | Fractured   | 25%            | -25%                                   | At least its not broken                                   |
-| Ruined      | 0%             | -25%                                   | This is useless                                           |
+| Ruined      | 1%             | -24%                                   | This is useless                                           |
 
 ## Rings
 
 ---
 
-Rings can be used to modify the spell. Each ring will have a different effect on the spell.
+Rings can be used to modify the spell-entity and/or the holder of the staff.
+Each ring will have a different effect on the spell.
+Rings are named after elements of the periodic table, and should somewhat relate to what they are used for in the real world.
 
 ### Special rings
 
 Some rings will have a special effect on the spell, these will not have a flaw rating.
 
-| Special Ring type | Effect                                     |
-|-------------------|--------------------------------------------|
-| palantir          | visualize where the spell will land/travel |
-| gravity           | the spell will be affected by gravity      |
+| Special Ring type | Effect                                                                        | Name Reason                               |
+|-------------------|-------------------------------------------------------------------------------|-------------------------------------------|
+| Scandium          | visualize where the spell will land/travel                                    | Name like it "scans" the surrounding area |
+| Lead              | the spell will be affected by gravity                                         | Is known to be heavy                      |
+| Phosphorus        | Adds a cone of light to each spell and will a halo of light around the player | Used in flares                            |
 
 ### Normal rings
 
 To give some meat here is the boring list of all the "normal" rings
 
-| Ring type | Effect                                                                        |
-|-----------|-------------------------------------------------------------------------------|
-| Opal      | Gem power                                                                     |
-| Emerald   | spell range                                                                   |
-| Ruby      | incarnation speed (decreases delay between each cast)                         |
-| Sapphire  | spell speed                                                                   |
-| Aeromir   | Allow the player to move faster                                               |
-| Lys       | Adds a cone of light to each spell and will a halo of light around the player |
+| Ring type  | Effect                                                                        | Name Reason           |
+|------------|-------------------------------------------------------------------------------|-----------------------|
+| Iron       | Increases gem power                                                           | Iron symbolises power |
+| Aluminium  | Increases spell range                                                         | Lightweight material  |
+| Copper     | Increases incarnation speed (decreases delay between each cast)               |                       |
+| Tin        | Increases spell speed (Speed of spell-entity)                                 |                       |
+| Titanium   | Increases player movement speed                                               | Lightweight material  |
 
-| Flaw rating       | +Effect% | Relative increase | Description                                                     |
-|-------------------|----------|-------------------|-----------------------------------------------------------------|
-| Flawless          | 160%     | 10%               | I didn't know this perfection of existed anymore!               |
-| Minorly scratched | 150%     | 5%                | A small few surface scratches shouldn't be too much of an issue |
-| Majorly scratched | 145%     | 5%                | A large few surface scratches, might be an issue                |
-| Minorly chipped   | 140%     | 5%                | Someone got a matching small piece of this                      |
-| Majorly chipped   | 135%     | 10%               | Someone got a matching big piece of this                        |
-| Large fragment    | 125%     | 10%               | Almost whole, just missing most of it                           |
-| Small fragment    | 115%     | 5%                | More than the pieces                                            |
-| Some pieces       | 110%     | 5%                | Pieces, nothing more                                            |
-| Small pieces      | 105%     | 4%                | At least its not _just_ dust                                    |
-| Dust              | 101%     | 1%                | This is almost useless                                          |
+| Flaw rating    | +Effect% | Relative increase | Description                                                     |
+|----------------|----------|-------------------|-----------------------------------------------------------------|
+| Flawless       | 160%     | 10%               | I didn't know this perfection of existed anymore!               |
+| Minor scratch  | 150%     | 5%                | A small few surface scratches shouldn't be too much of an issue |
+| Major scratch  | 145%     | 5%                | A large few surface scratches, might be an issue                |
+| Minor chip     | 140%     | 5%                | Someone got a matching small piece of this                      |
+| Major chip     | 135%     | 10%               | Someone got a matching big piece of this                        |
+| Large fragment | 125%     | 10%               | Almost whole, just missing most of it                           |
+| Small fragment | 115%     | 5%                | More than the pieces                                            |
+| Some pieces    | 110%     | 5%                | Pieces, nothing more                                            |
+| Small pieces   | 105%     | 4%                | At least its not _just_ dust                                    |
+| Dust           | 101%     | 1%                | This is almost useless                                          |

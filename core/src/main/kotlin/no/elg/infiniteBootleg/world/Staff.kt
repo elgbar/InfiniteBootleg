@@ -72,8 +72,8 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
     fun ProtoElement.Staff.fromProto(): Staff =
       Staff(
         wood = Wood.fromProto(wood),
-        gems = (listOf(primaryGem) + secondaryGemsList).map(Gem::fromProto),
-        rings = ringsList.map(Ring::fromProto)
+        gems = (listOf(primaryGem) + secondaryGemsList).mapNotNull(Gem::fromProto),
+        rings = ringsList.mapNotNull(Ring::fromProto)
       )
 
     fun Staff.toProto(): ProtoElement.Staff =

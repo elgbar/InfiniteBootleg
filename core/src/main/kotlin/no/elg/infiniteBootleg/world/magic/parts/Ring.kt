@@ -1,11 +1,18 @@
 package no.elg.infiniteBootleg.world.magic.parts
 
 import com.badlogic.ashley.core.Entity
+import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dOrNull
+import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.world.magic.Equippable
 import no.elg.infiniteBootleg.world.magic.MagicEffectsWithRating
 import no.elg.infiniteBootleg.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.world.magic.Named
+import kotlin.collections.plusAssign
+
+private val logger = KotlinLogging.logger {}
 
 enum class RingRating(val effectPercent: Double) {
   FLAWLESS(1.6),
@@ -23,16 +30,20 @@ enum class RingRating(val effectPercent: Double) {
 sealed interface RingType<in R : RingRating?> : Named, Equippable, MagicEffectsWithRating<R> {
   companion object {
 
-    fun valueOf(displayName: String): RingType<RingRating?> {
+    fun valueOf(serializedName: String): RingType<RingRating?>? {
       @Suppress("UNCHECKED_CAST")
-      return when (displayName) {
+      return when (serializedName) {
         GravityRing.serializedName -> GravityRing
-        OpalRing.serializedName -> OpalRing
-        EmeraldRing.serializedName -> EmeraldRing
-        RubyRing.serializedName -> RubyRing
-        SapphireRing.serializedName -> SapphireRing
-        else -> throw IllegalArgumentException("Unknown ring type $displayName")
-      } as RingType<RingRating?>
+        PowerRing.serializedName -> PowerRing
+        SpellRangeRing.serializedName -> SpellRangeRing
+        IncarnationSpeedRing.serializedName -> IncarnationSpeedRing
+        SpellSpeedRing.serializedName -> SpellSpeedRing
+        SpellLightRing.serializedName -> SpellLightRing
+        else -> {
+          logger.error { "Failed to parse ring type '$serializedName', it will be absent" }
+          null
+        }
+      } as RingType<RingRating?>?
     }
   }
 }
@@ -46,7 +57,7 @@ sealed interface RatedRingType : Named, RingType<RingRating>
 // }
 
 data object GravityRing : RatelessRingType {
-  override val displayName: String = "Gravity"
+  override val displayName: String = "Lead"
   override val serializedName: String = "Gravity"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating?) {
@@ -54,36 +65,36 @@ data object GravityRing : RatelessRingType {
   }
 }
 
-data object OpalRing : RatedRingType {
-  override val displayName: String = "Power opal"
-  override val serializedName: String = "Opal"
+data object PowerRing : RatedRingType {
+  override val displayName: String = "Iron power"
+  override val serializedName: String = "Power"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.gemPower *= rating.effectPercent
   }
 }
 
-data object EmeraldRing : RatedRingType {
-  override val displayName: String = "Range emerald"
-  override val serializedName: String = "Emerald"
+data object SpellRangeRing : RatedRingType {
+  override val displayName: String = "Aluminium range"
+  override val serializedName: String = "SpellRange"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.spellRange *= rating.effectPercent
   }
 }
 
-data object RubyRing : RatedRingType {
-  override val displayName: String = "Incarnation ruby"
-  override val serializedName: String = "Ruby"
+data object IncarnationSpeedRing : RatedRingType {
+  override val displayName: String = "Incarnation Copper"
+  override val serializedName: String = "IncarnationSpeed"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.castDelay /= rating.effectPercent
   }
 }
 
-data object SapphireRing : RatedRingType {
-  override val displayName: String = "Speed sapphire"
-  override val serializedName: String = "Sapphire"
+data object SpellSpeedRing : RatedRingType {
+  override val displayName: String = "Tin Speed"
+  override val serializedName: String = "SpellSpeed"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
     state.spellVelocity *= rating.effectPercent

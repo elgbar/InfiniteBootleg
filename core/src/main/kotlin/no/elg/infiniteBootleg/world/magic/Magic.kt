@@ -48,9 +48,7 @@ data class Gem(val type: GemType, val rating: GemRating) : MagicEffects, Equippa
     }
 
   companion object {
-    fun fromProto(proto: ProtoElement.Staff.Gem): Gem {
-      return Gem(GemType.valueOf(proto.type), GemRating.valueOf(proto.rating))
-    }
+    fun fromProto(proto: ProtoElement.Staff.Gem): Gem? = GemType.valueOf(proto.type)?.let { gemType -> Gem(gemType, GemRating.valueOf(proto.rating)) }
   }
 }
 
@@ -67,11 +65,12 @@ data class Ring(val type: RingType<RingRating?>, val rating: RingRating?) : Magi
     }
 
   companion object {
-    fun fromProto(proto: ProtoElement.Staff.Ring): Ring {
-      return Ring(
-        RingType.valueOf(proto.type),
-        if (proto.hasRating()) RingRating.valueOf(proto.rating) else null
-      )
-    }
+    fun fromProto(proto: ProtoElement.Staff.Ring): Ring? =
+      RingType.valueOf(proto.type)?.let { ringType ->
+        Ring(
+          ringType,
+          if (proto.hasRating()) RingRating.valueOf(proto.rating) else null
+        )
+      }
   }
 }
