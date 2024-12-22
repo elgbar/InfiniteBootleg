@@ -12,6 +12,10 @@ import no.elg.infiniteBootleg.world.blocks.Block
  */
 data class BlockChangedEvent(val oldBlock: Block?, val newBlock: Block?) : ReasonedEvent, AsyncEvent(ThreadType.TICKER, ThreadType.ASYNC, ThreadType.PHYSICS) {
 
+  val oldOrNewBlock get() = oldBlock ?: newBlock
+  val chunk get() = oldOrNewBlock?.chunk
+  val world get() = oldOrNewBlock?.world
+
   override val reason: String
     get() = "Block changed from ${oldBlock?.material} to ${newBlock?.material}"
 }

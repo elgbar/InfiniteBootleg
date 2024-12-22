@@ -36,9 +36,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
     require(listeners == null) { "Listeners cannot be registered twice" }
 
     listeners = arrayOf(
-      registerListenerConditionally { (oldBlock, newBlock): BlockChangedEvent ->
+      registerListenerConditionally { event: BlockChangedEvent ->
         // Note: there are two events registered in the same listener
-        val block = oldBlock ?: newBlock ?: return@registerListenerConditionally
+        val block = event.oldOrNewBlock ?: return@registerListenerConditionally
         if (block.chunk === chunk) {
           // Awakens players to allow them to jump in a hole when placing a block
           block.queryEntities {

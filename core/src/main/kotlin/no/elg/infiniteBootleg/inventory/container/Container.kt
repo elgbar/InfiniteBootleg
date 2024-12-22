@@ -118,9 +118,18 @@ interface Container : Iterable<IndexedItem> {
    *
    * @param amount How many to remove
    * @param element What element to remove
-   * @return How many elements that were not removed
+   * @return How many elements that were not removed, i.e., `0u` means everything was removed
    */
   fun remove(element: ContainerElement, amount: UInt): UInt
+
+  /**
+   * Remove `amount` of the given item's element type
+   *
+   * @param amount How many to remove
+   * @param item What item's element to remove
+   * @return How many elements that were not removed, i.e., `0u` means everything was removed
+   */
+  fun remove(item: Item, amount: UInt): UInt
 
   /**
    * Remove element stacks in the container that match the given element

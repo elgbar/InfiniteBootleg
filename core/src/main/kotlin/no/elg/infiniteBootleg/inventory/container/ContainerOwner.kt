@@ -7,6 +7,9 @@ import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.blocks.Block
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
+import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.ecs.api.OptionalProtoConverter
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.World
@@ -48,6 +51,11 @@ sealed interface ContainerOwner {
   companion object : OptionalProtoConverter<ContainerOwner, ProtoContainerOwner> {
     fun from(entity: Entity): ContainerOwner = EntityOwner(entity.id)
     fun from(worldX: WorldCoord, worldY: WorldCoord): ContainerOwner = BlockOwner(compactLoc(worldX, worldY))
+    fun from(block: Block): ContainerOwner = BlockOwner(compactLoc(block.worldX, block.worldY))
+
+    fun toInterfaceId(entity: Entity): InterfaceId = from(entity).toInterfaceId()
+    fun toInterfaceId(worldX: WorldCoord, worldY: WorldCoord): InterfaceId = from(worldX, worldY).toInterfaceId()
+    fun toInterfaceId(block: Block): InterfaceId = from(block).toInterfaceId()
 
     /**
      * Check if the owner is valid in the current world
