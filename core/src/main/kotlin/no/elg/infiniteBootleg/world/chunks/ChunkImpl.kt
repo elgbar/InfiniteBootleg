@@ -14,8 +14,9 @@ import kotlinx.coroutines.launch
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.Settings.handleChangingBlockInDeposedChunk
 import no.elg.infiniteBootleg.events.BlockChangedEvent
-import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
+import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
+import no.elg.infiniteBootleg.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
@@ -210,13 +211,13 @@ class ChunkImpl(
     }
 
     if (!initializing && !bothAirish) {
-      dispatchEvent(BlockChangedEvent(currBlock, block))
+      EventManager.dispatchEvent(BlockChangedEvent(currBlock, block))
     }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
         val originWorldX = getWorldX(localX)
         val originWorldY = getWorldY(localY)
-        dispatchEvent(ChunkLightChangedEvent(compactLocation, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
+        EventManager.dispatchEvent(ChunkLightChangedEvent(compactLocation, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
       }
     }
     currBlock?.dispose()
@@ -474,6 +475,7 @@ class ChunkImpl(
     if (isDisposed) {
       return
     }
+    EventManager.dispatchEvent(ChunkUnloadedEvent(this))
     disposed = true
     allowUnload = false
     chunkBody.dispose()
