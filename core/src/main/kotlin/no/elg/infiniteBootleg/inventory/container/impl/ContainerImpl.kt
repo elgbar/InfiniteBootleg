@@ -65,6 +65,8 @@ open class ContainerImpl(
     updateContainer()
   }
 
+  override fun remove(element: Item, amount: UInt): UInt = remove(element.element, amount)
+
   override fun remove(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
     logger.debug { "Removing $amount of $element" }

@@ -7,10 +7,13 @@ import no.elg.infiniteBootleg.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.util.breakableLocs
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.world.Tool
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent
 import no.elg.infiniteBootleg.world.ecs.components.transients.CurrentlyBreakingComponent.Companion.currentlyBreakingComponentOrNull
@@ -46,6 +49,16 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
       .mapTo(mutableSetOf()) { it.block.compactWorldLoc }
 
     breakingComponent.sendCurrentProgress()
-    world.removeBlocks(justDone, giveTo = entity, prioritize = true)
+
+    val heldStaff = entity.selectedItem?.element as? Tool
+    val size = justDone.size
+    val leftOver = heldStaff?.let { entity.containerOrNull?.remove(it, size.toUInt()) } ?: 0u
+    val validJustDone = if (leftOver == 0u) {
+      justDone
+    } else {
+      // Just take the number the pickaxe can mine, not more
+      justDone.take(size - leftOver.toInt())
+    }
+    world.removeBlocks(validJustDone, giveTo = entity, prioritize = true)
   }
 }

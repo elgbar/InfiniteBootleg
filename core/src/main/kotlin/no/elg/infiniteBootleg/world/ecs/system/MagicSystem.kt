@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrZero
+import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.clientWorld
@@ -32,7 +33,8 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
       return
     }
     val world = entity.clientWorld ?: return
-    val heldStaff = entity.selectedItem?.element as? Staff ?: return
+    val selectedItem = entity.selectedItem
+    val heldStaff = selectedItem?.element as? Staff ?: return
     val existingSpellState = entity.lastSpellCastOrNull
     val doCastNow = Gdx.input.isButtonPressed(Input.Buttons.LEFT)
     if (existingSpellState.canCastAgain() && doCastNow) {
@@ -49,6 +51,7 @@ object MagicSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFAULT)
         .sub(position.x, position.y)
         .nor()
 
+      entity.containerOrNull?.remove(selectedItem, 1u)
       world.engine.createSpellEntity(
         world,
         position.x,
