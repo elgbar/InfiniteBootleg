@@ -112,13 +112,11 @@ data object SpellSpeedRing : RatedRingType {
 //  }
 // }
 //
-// data object LysRing : RatedRingType {
-//  override val displayName: String = "Lys"
-//
-//  override fun onEquip(entity: Entity) {
-//    //TODO
-//  }
-//  override fun onUnEquip(entity: Entity) {
-//    //TODO
-//  }
-// }
+data object SpellLightRing : RatedRingType {
+  override val displayName: String = "Phosphorus Ring"
+  override val serializedName: String = "SpellLight"
+
+  override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
+    state.entityModifications += { spell: Entity -> spell.safeWith { MaterialComponent(Material.TORCH) } }
+  }
+}
