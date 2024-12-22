@@ -7,6 +7,7 @@ import ktx.actors.isShown
 import no.elg.infiniteBootleg.events.BlockChangedEvent
 import no.elg.infiniteBootleg.events.InterfaceEvent
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.InterfaceId
 import no.elg.infiniteBootleg.protobuf.block
@@ -31,6 +32,15 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
       removeInterface(interfaceId)
     }
   }
+
+  private val containerChunkUnloadedEvent = EventManager.registerListener<ChunkUnloadedEvent> {
+    if (it.chunk.world === world) {
+      it.chunk.asSequence()
+        .mapNotNull { it?.entity?.ownedContainerOrNull }
+        .forEach { removeInterface(it.owner.toInterfaceId()) }
+    }
+  }
+
   fun addInterface(interfaceId: InterfaceId, interfaceWindow: IBVisWindow) {
     interfaces.compute(interfaceId) { _, maybeOldWindow ->
       maybeOldWindow?.let { oldWindow ->
@@ -95,5 +105,6 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
     interfaces.values.forEach(IBVisWindow::dispose)
     interfaces.clear()
     containerDestroyedEvent.removeListener()
+    containerChunkUnloadedEvent.removeListener()
   }
 }
