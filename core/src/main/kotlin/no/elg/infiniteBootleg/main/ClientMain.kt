@@ -153,7 +153,8 @@ class ClientMain(progArgs: ProgramArgs) : CommonMain(progArgs) {
   fun shouldIgnoreWorldInput(): Boolean {
     val debugMenuVisible = worldScreen?.isDebugMenuVisible ?: false
     val consoleVisible = console.isVisible
-    return consoleVisible || debugMenuVisible
+    val containerVisible = world?.render?.interfaceManager?.areAnyOpen() ?: false
+    return consoleVisible || debugMenuVisible || containerVisible
   }
 
   companion object {
