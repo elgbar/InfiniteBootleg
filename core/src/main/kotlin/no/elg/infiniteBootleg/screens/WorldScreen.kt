@@ -9,6 +9,9 @@ import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.hud.DebugWindow
 import no.elg.infiniteBootleg.screens.hud.addDebugOverlay
+import no.elg.infiniteBootleg.screens.hud.addStaffCreatorOverlay
+import no.elg.infiniteBootleg.util.IBVisWindow
+import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 private val logger = KotlinLogging.logger {}
@@ -23,7 +26,10 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
 
   private var worldFinishedLoading = false
 
-  private lateinit var debugMenu: DebugWindow
+  lateinit var debugMenu: DebugWindow
+    private set
+  lateinit var staffMenu: IBVisWindow
+    private set
 
   override fun render(delta: Float) {
     if (worldFinishedLoading) {
@@ -44,8 +50,6 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
   override fun show() {
     super.show()
     require(!worldFinishedLoading) { "Same world screen can not be shown twice!" }
-//    EventManager.clear()
-
     Gdx.graphics.isContinuousRendering = true
 
     val showed = System.currentTimeMillis()
@@ -79,12 +83,9 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
 
   val isDebugMenuVisible: Boolean get() = ::debugMenu.isInitialized && debugMenu.isDebugMenuVisible
 
-  fun toggleDebugMenu() {
-    debugMenu.toggleDebugMenu()
-  }
-
   override fun create() {
     super.create()
-    debugMenu = stage.addDebugOverlay(world)
+    staffMenu = addStaffCreatorOverlay(world)
+    debugMenu = stage.addDebugOverlay(world, staffMenu)
   }
 }

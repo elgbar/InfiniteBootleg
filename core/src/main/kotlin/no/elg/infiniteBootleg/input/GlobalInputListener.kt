@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.WorldScreen
@@ -21,7 +20,8 @@ object GlobalInputListener : InputAdapter() {
       Input.Keys.ESCAPE -> {
         val screen = ClientMain.inst().screen
         if (screen is WorldScreen && screen.isDebugMenuVisible) {
-          screen.toggleDebugMenu()
+          screen.debugMenu.close()
+          screen.staffMenu.close()
         }
         if (Main.inst().console.isVisible) {
           Main.inst().console.isVisible = false
@@ -47,15 +47,19 @@ object GlobalInputListener : InputAdapter() {
       }
 
       Input.Keys.F8 -> {
-        Settings.debug = !Settings.debug
-        logger.info { "Toggled debug to ${Settings.debug}" }
+        if (Main.isClient) {
+          val screen = ClientMain.inst().screen
+          if (screen is WorldScreen) {
+            screen.staffMenu.toggleShown(screen.stage)
+          }
+        }
       }
 
       Input.Keys.F7 -> {
         if (Main.isClient) {
           val screen = ClientMain.inst().screen
           if (screen is WorldScreen) {
-            screen.toggleDebugMenu()
+            screen.debugMenu.toggleShown()
           }
         }
       }

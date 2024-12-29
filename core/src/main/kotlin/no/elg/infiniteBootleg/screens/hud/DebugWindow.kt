@@ -32,18 +32,22 @@ class DebugWindow(
 
   val isDebugMenuVisible: Boolean get() = debugWindows.any { it.isShown() }
 
-  fun toggleDebugMenu() {
+  fun toggleShown() {
     if (!isDebugMenuVisible) {
       updateAllValues(onAnyElementChanged)
     }
     debugMenu.toggleShown(stage, true)
   }
+
+  fun close() {
+    debugMenu.close()
+  }
 }
 
-fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
+fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWindow {
   val debugWindows = mutableListOf<IBVisWindow>()
   val onAnyElementChanged: MutableList<() -> Unit> = mutableListOf()
-  val staffCreator = addStaffCreatorOverlay(world).also { debugWindows += it }
+  debugWindows += staffMenu
   val debugMenu = world.ibVisWindowClosed("Debug Menu") {
     closeOnEscape()
 
@@ -195,8 +199,8 @@ fun Stage.addDebugOverlay(world: ClientWorld): DebugWindow {
           onAnyElementChanged,
           { false },
           {
-            staffCreator.show(this@addDebugOverlay, true)
-            staffCreator.toFront()
+            staffMenu.show(this@addDebugOverlay, true)
+            staffMenu.toFront()
           }
         )
       }
