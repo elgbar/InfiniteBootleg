@@ -114,25 +114,6 @@ class ProgramArgs(args: Array<String>) {
       Settings.debug = true
     }
 
-    arguments["threads"] = ProgramArgument(desc = "The number of secondary threads. Must be an non-negative integer (>= 0)", alt = 't') { value ->
-      if (value == null) {
-        logger.error { "Specify the number of secondary threads. Must be an integer greater than or equal to 0" }
-        return@ProgramArgument
-      }
-      try {
-        val threads = value.toInt()
-        if (threads < 0) {
-          logger.error { "Argument must be an integer greater than or equal to 0, got '$value'" }
-          return@ProgramArgument
-        }
-        Settings.schedulerThreads = threads
-        return@ProgramArgument
-      } catch (e: NumberFormatException) {
-        logger.error { "Argument must be an integer greater than or equal to 0, got '$value'" }
-        return@ProgramArgument
-      }
-    }
-
     arguments["tps"] = ProgramArgument(desc = "Specify physics updates per seconds. Must be a positive integer (> 0)", alt = 'T') { value ->
       if (value == null) {
         logger.error { "Specify the of physics updates per seconds. Must be an integer greater than to 0" }
