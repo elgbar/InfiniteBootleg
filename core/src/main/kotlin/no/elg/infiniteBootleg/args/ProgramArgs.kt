@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.args
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.Main.Companion.inst
+import no.elg.infiniteBootleg.util.asWorldSeed
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
@@ -14,13 +15,12 @@ class ProgramArgs(args: Array<String>) {
   data class ProgramArgument(val desc: String, val alt: Char = DEFAULT_ALT_CHAR, val func: (String?) -> Unit)
 
   private val arguments = mutableMapOf<String, ProgramArgument>()
+  private val executeAfterCreate: MutableSet<() -> Unit> = mutableSetOf()
 
   init {
     createArguments()
     executeArguments(args)
   }
-
-  private val executeAfterCreate: MutableSet<() -> Unit> = mutableSetOf()
 
   fun onCreate() {
     executeAfterCreate.forEach { it.invoke() }
@@ -66,8 +66,8 @@ class ProgramArgs(args: Array<String>) {
         return@ProgramArgument
       }
       logger.info { "Running commands '$value' as initial commands" }
-      executeAfterCreate += {
-        for (cmd in value.split(";").dropLastWhile { it.isEmpty() }) {
+      for (cmd in value.split(";").dropLastWhile { it.isEmpty() }) {
+        executeAfterCreate.add {
           inst().console.execCommand(cmd)
         }
       }
@@ -100,7 +100,7 @@ class ProgramArgs(args: Array<String>) {
         logger.error { "Example: --world_seed=test" }
         return@ProgramArgument
       }
-      Settings.worldSeed = value.hashCode().toLong()
+      Settings.worldSeed = value.asWorldSeed()
       logger.info { "World seed set to '$value'" }
     }
 
