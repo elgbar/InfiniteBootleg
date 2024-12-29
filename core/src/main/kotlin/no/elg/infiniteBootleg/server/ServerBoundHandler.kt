@@ -29,12 +29,12 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
       return
     }
     if (packet.type != Packets.Packet.Type.SB_LOGIN) {
-      val expectedSecret = clients[ctx.channel()]
-      if (expectedSecret == null) {
+      val sharedInformation = clients[ctx.channel()]
+      if (sharedInformation == null) {
         wrappedCtx.fatal("Unknown client")
         return
       }
-      if (expectedSecret.secret != packet.secret) {
+      if (sharedInformation.secret != packet.secret) {
         wrappedCtx.fatal("Invalid secret given")
         return
       }
@@ -53,8 +53,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
     val playerId = client?.entityUUID ?: "<Unknown>"
     logger.debug { "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)" }
     if (client != null) {
-      val task = client.heartbeatTask
-      task?.cancel(false)
+      client.heartbeatTask?.cancel(false)
       ServerMain.inst().serverWorld.disconnectPlayer(client.entityUUID, false)
     }
   }

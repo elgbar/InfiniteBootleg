@@ -148,10 +148,14 @@ fun ensureUniquenessListener(engine: Engine) {
   val idFamily = IdComponent::class.toFamily()
   val duplicateEntities = engine.getEntitiesFor(idFamily)
   engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { newlyAddedEntity ->
+    val newlyAddedId = newlyAddedEntity.id
     if (Settings.enableUniquenessEntityIdCheck &&
-      duplicateEntities.any { existingEntity -> existingEntity !== newlyAddedEntity && existingEntity.id == newlyAddedEntity.id }
+      duplicateEntities.any { existingEntity -> existingEntity !== newlyAddedEntity && existingEntity.id == newlyAddedId }
     ) {
-      logger.warn { "Duplicate entity with id '${newlyAddedEntity.id}' removed: Components ${newlyAddedEntity.toComponentsString()}" }
+      logger.warn {
+        val componentsString = newlyAddedEntity.toComponentsString()
+        "Duplicate entity with id '$newlyAddedId' removed: Components $componentsString"
+      }
       newlyAddedEntity.removeSelf()
     }
   }

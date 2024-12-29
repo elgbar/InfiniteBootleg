@@ -117,6 +117,7 @@ data object SpellLightRing : RatedRingType {
   override val serializedName: String = "SpellLight"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
+    // fixme Drops torhces sometimes
     state.entityModifications += { spell: Entity -> spell.safeWith { MaterialComponent(Material.TORCH) } }
   }
 }

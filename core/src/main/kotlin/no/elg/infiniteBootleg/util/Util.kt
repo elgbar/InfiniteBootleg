@@ -38,8 +38,8 @@ object Util {
       val versionFile = Gdx.files.absolute(Main.VERSION_FILE)
       try {
         versionFile.writeString(calcHash, false)
-      } catch (ignore: Exception) {
-        logger.error { "Failed to write new version to file" }
+      } catch (e: Exception) {
+        logger.error(e) { "Failed to write new version to file" }
       }
     }
     return if (calcHash == FALLBACK_VERSION) savedHash else calcHash

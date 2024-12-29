@@ -643,7 +643,7 @@ abstract class World(
    *
    * @return The loaded chunk
    */
-  private fun loadChunk(chunkLoc: Long): Chunk? {
+  private fun loadChunk(chunkLoc: ChunkCompactLoc): Chunk? {
     if (worldTicker.isPaused) {
       return null
     }
