@@ -188,13 +188,13 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
     // this is the main render function
     fbo.use { _ ->
+      Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
       batch.safeUse { _ ->
-        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        batch.color = Color.WHITE
         for (localX in 0 until Chunk.CHUNK_SIZE) {
           val topLightBlockHeight = chunkColumn.topBlockHeight(localX, BLOCKS_LIGHT_FLAG)
           for (localY in 0 until Chunk.CHUNK_SIZE) {
+            batch.color = Color.WHITE
             val block = chunk.getRawBlock(localX, localY)
             val material = block.materialOrAir()
             val texture: RotatableTextureRegion
