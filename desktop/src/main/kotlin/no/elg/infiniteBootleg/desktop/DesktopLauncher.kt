@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.util.defaultDisplayHeight
 import no.elg.infiniteBootleg.util.defaultDisplayWidth
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import org.fusesource.jansi.AnsiConsole
+import java.time.Instant
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
@@ -26,7 +27,7 @@ fun main(args: Array<String>) {
 
   val progArgs = ProgramArgs(args)
   if (Settings.client) {
-    val main: Main = ClientMain(progArgs)
+    val main: Main = ClientMain(progArgs, Instant.now())
     val config = Lwjgl3ApplicationConfiguration()
     config.disableAudio(true)
     config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)

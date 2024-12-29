@@ -207,3 +207,8 @@ fun <K, T> Iterable<T>.partitionCount(toKey: (T) -> K): Map<K, Int> =
       this@buildMap.put(key, current + 1)
     }
   }
+
+/**
+ * @return A string of the time between [start] and [end] in the format `<duration in seconds>.<millis part of duration>s`, e.g. `1.234s`
+ */
+fun diffTimePretty(start: Instant, end: Instant = Instant.now()): String = Duration.between(start, end).run { "${toSeconds()}.${toMillisPart()}s" }
