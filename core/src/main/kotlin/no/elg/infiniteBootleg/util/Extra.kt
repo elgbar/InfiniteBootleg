@@ -14,6 +14,8 @@ import ktx.graphics.begin
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.EntityMarkerBlock
+import java.time.Duration
+import java.time.Instant
 import java.util.UUID
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -28,6 +30,11 @@ fun fromUUIDOrNull(string: String?): UUID? {
 
 private val namespace = UUID.fromString("1aeeb167-a72e-45d3-8b75-8a144e56ca54")
 private val uuidv5Generator = Generators.nameBasedGenerator(namespace)
+
+/**
+ * Uniform handling of string to seed (i.e., long) conversion.
+ */
+fun String.asWorldSeed(): Long = hashCode().toLong()
 
 fun generateUUIDFromString(string: String): UUID = uuidv5Generator.generate(string)
 

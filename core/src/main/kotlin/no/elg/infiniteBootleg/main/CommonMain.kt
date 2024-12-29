@@ -40,12 +40,12 @@ abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapte
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
     Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     assets.loadAssets()
-    progArgs.onCreate()
     logger.info { "Version ${Util.getVersion()}" }
     Util.getLastCommitDate(Util.RELATIVE_TIME)?.also {
       logger.debug { "Last commit created $it" }
     }
     logger.info { "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options" }
+    progArgs.onCreate()
   }
 
   override val engine: Engine? get() = world?.engine

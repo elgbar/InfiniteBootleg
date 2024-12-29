@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.screens.hud.aSeparator
 import no.elg.infiniteBootleg.screens.hud.section
+import no.elg.infiniteBootleg.util.asWorldSeed
 import no.elg.infiniteBootleg.util.onInteract
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
@@ -22,7 +23,10 @@ import no.elg.infiniteBootleg.world.world.SinglePlayerWorld
  */
 object SelectWorldScreen : StageScreen() {
 
-  fun createSingleplayerWorld(seed: Long, forceTransient: Boolean): SinglePlayerWorld = SinglePlayerWorld(PerlinChunkGenerator(seed), seed, "World_$seed", forceTransient)
+  fun loadSingleplayerWorld(seed: Long, forceTransient: Boolean) {
+    val world = SinglePlayerWorld(PerlinChunkGenerator(seed), seed, "World_$seed", forceTransient)
+    ClientMain.inst().screen = WorldScreen(world)
+  }
 
   override fun create() {
     super.create()
@@ -31,7 +35,7 @@ object SelectWorldScreen : StageScreen() {
         section {
           visTextButton("Load World '${Settings.worldSeed}'") {
             onChange {
-              ClientMain.inst().screen = WorldScreen(createSingleplayerWorld(Settings.worldSeed, forceTransient = false))
+              loadSingleplayerWorld(Settings.worldSeed, forceTransient = false)
             }
           }
         }
@@ -51,7 +55,7 @@ object SelectWorldScreen : StageScreen() {
         section {
           visTextButton("Random New World") {
             onChange {
-              ClientMain.inst().screen = WorldScreen(createSingleplayerWorld(seedTextField.text.hashCode().toLong(), forceTransient = true))
+              loadSingleplayerWorld(seedTextField.text.asWorldSeed(), forceTransient = false)
             }
           }
         }

@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.screens.ConnectingScreen.info
 import no.elg.infiniteBootleg.screens.HUDRenderer
 import no.elg.infiniteBootleg.screens.MainMenuScreen
+import no.elg.infiniteBootleg.screens.SelectWorldScreen.loadSingleplayerWorld
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.server.clientBoundWorldSettings
@@ -41,6 +42,7 @@ import no.elg.infiniteBootleg.server.serverBoundWorldSettings
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.IllegalAction
 import no.elg.infiniteBootleg.util.ReflectionUtil
+import no.elg.infiniteBootleg.util.asWorldSeed
 import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
@@ -856,6 +858,15 @@ class Commands : CommandExecutor() {
         delay(delayMillis)
       }
     }
+  }
+
+  @ConsoleDoc(
+    description = "Load the given world, if loading as ",
+    paramDescriptions = ["Load a single player world from the given seed", "Whether to force the world to be transient"]
+  )
+  @CmdArgNames("worldSeed", "forceTransient")
+  fun loadWorld(worldSeed: String, transient: Boolean = false) {
+    loadSingleplayerWorld(worldSeed.asWorldSeed(), forceTransient = transient)
   }
 
   fun eventStats() {

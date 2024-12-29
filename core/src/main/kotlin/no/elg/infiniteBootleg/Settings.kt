@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.IllegalAction
+import no.elg.infiniteBootleg.util.asWorldSeed
 import no.elg.infiniteBootleg.world.ticker.TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 import java.awt.GraphicsEnvironment
 
@@ -36,7 +37,7 @@ object Settings {
 
   /** Seed of the world loaded  */
   @JvmField
-  var worldSeed: Long = 0
+  var worldSeed: Long = "0".asWorldSeed()
 
   /** If general debug variable. Use this and-ed with your specific debug variable  */
   @JvmField
