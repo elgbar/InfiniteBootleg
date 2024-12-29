@@ -20,7 +20,6 @@ import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.util.FailureWatchdog
-import no.elg.infiniteBootleg.util.diffTimePretty
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
@@ -30,7 +29,7 @@ import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
-class ClientMain(progArgs: ProgramArgs, private val startTime: Instant) : CommonMain(progArgs) {
+class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArgs, startTime) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
 
   lateinit var screenRenderer: ScreenRenderer
@@ -101,11 +100,6 @@ class ClientMain(progArgs: ProgramArgs, private val startTime: Instant) : Common
     screenRenderer = ScreenRenderer()
     screen = MainMenuScreen
     super.create()
-    logger.info {
-      val processStartupTime = ProcessHandle.current().info().startInstant().map(::diffTimePretty).orElseGet { "???" }
-      val userStartupTime = diffTimePretty(startTime)
-      "Started in $userStartupTime (process: $processStartupTime)"
-    }
 
     Runtime.getRuntime().addShutdownHook(
       Thread {

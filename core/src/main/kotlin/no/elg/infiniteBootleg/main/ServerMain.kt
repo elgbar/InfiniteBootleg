@@ -12,13 +12,14 @@ import no.elg.infiniteBootleg.server.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
+import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
  */
-class ServerMain(progArgs: ProgramArgs) : CommonMain(progArgs) {
+class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArgs, startTime) {
 
   lateinit var serverWorld: ServerWorld
     private set

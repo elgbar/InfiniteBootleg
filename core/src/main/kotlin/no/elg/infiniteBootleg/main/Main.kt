@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
+import java.time.Instant
 
 /**
  * @author Elg
@@ -24,6 +25,7 @@ interface Main : ApplicationListener {
   val world: World?
   val renderThreadName: String
   val assets: InfAssets
+  val startTime: Instant
 
   /**
    * If we are allowed to make changes or move a given entity

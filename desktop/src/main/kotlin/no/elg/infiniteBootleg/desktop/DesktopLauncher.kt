@@ -20,6 +20,7 @@ import kotlin.system.exitProcess
 private val logger = KotlinLogging.logger {}
 
 fun main(args: Array<String>) {
+  val startTime = Instant.now()
   AnsiConsole.systemInstall()
   if (!AnsiConsole.isInstalled()) {
     logger.warn { "Failed to install jansi" }
@@ -27,7 +28,7 @@ fun main(args: Array<String>) {
 
   val progArgs = ProgramArgs(args)
   if (Settings.client) {
-    val main: Main = ClientMain(progArgs, Instant.now())
+    val main: Main = ClientMain(progArgs, startTime)
     val config = Lwjgl3ApplicationConfiguration()
     config.disableAudio(true)
     config.setWindowedMode(defaultDisplayWidth / 2, defaultDisplayHeight / 2)
@@ -56,7 +57,7 @@ fun main(args: Array<String>) {
   } else {
     val config = HeadlessApplicationConfiguration()
     config.updatesPerSecond = (if (Settings.tps < 0) DEFAULT_TICKS_PER_SECOND else Settings.tps).toInt()
-    val main: Main = ServerMain(progArgs)
+    val main: Main = ServerMain(progArgs, startTime)
     HeadlessApplication(main, config)
   }
 }

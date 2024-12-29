@@ -16,13 +16,15 @@ import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.util.Util
+import no.elg.infiniteBootleg.util.diffTimePretty
+import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
  */
-abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapter(), Main {
+abstract class CommonMain(private val progArgs: ProgramArgs, override val startTime: Instant) : ApplicationAdapter(), Main {
   override lateinit var console: InGameConsoleHandler
     protected set
 
@@ -46,6 +48,12 @@ abstract class CommonMain(private val progArgs: ProgramArgs) : ApplicationAdapte
     }
     logger.info { "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options" }
     progArgs.onCreate()
+
+    logger.info {
+      val processStartupTime = ProcessHandle.current().info().startInstant().map(::diffTimePretty).orElseGet { "???" }
+      val userStartupTime = diffTimePretty(startTime)
+      "Create in $userStartupTime (process: $processStartupTime)"
+    }
   }
 
   override val engine: Engine? get() = world?.engine

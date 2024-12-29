@@ -13,7 +13,9 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.util.diffTimePretty
 
 private val logger = KotlinLogging.logger {}
 
@@ -43,7 +45,7 @@ class NettyServer {
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-      logger.info { "@|bold Binding server to port|@ @|green,bold ${Settings.port}|@" }
+      logger.info { "Binding server to port @|bold,green ${Settings.port}|@@|white . Server was ready in |@@|bold ${diffTimePretty(Main.inst().startTime)}|@" }
 
       // Bind and start to accept incoming connections.
       val channelFuture = b.bind(Settings.port).sync()
