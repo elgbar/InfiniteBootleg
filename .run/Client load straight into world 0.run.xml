@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="B Run" type="Application" factoryName="Application" singleton="true">
+  <configuration default="false" name="Client load straight into world 0" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncherKt" />
     <module name="InfiniteBootleg.desktop.main" />
-    <option name="VM_PARAMETERS" value="-XX:+UseZGC -XX:+UseStringDeduplication -XX:+UseCompressedClassPointers -XX:+UseCompressedOops" />
+    <option name="PROGRAM_PARAMETERS" value="--run_cmd=&quot;loadworld 0 false&quot;" />
+    <option name="VM_PARAMETERS" value="-XX:+UseZGC -XX:+UseStringDeduplication " />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
@@ -14,7 +15,6 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" />
       </ENTRIES>
     </extension>
-    <RunnerSettings />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
