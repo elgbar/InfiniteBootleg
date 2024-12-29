@@ -66,7 +66,10 @@ allprojects {
         ])
     }
   }
-  tasks.classes.dependsOn spotlessApply
+
+  tasks.withType(JavaExec).configureEach {
+    setIgnoreExitValue(true)
+  }
 }
 
 subprojects {
@@ -85,6 +88,7 @@ subprojects {
 
   sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
   sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
+  tasks.classes.dependsOn spotlessApply
 
   tasks.withType(KotlinCompilationTask).configureEach {
     compilerOptions {
