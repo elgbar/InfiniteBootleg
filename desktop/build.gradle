@@ -1,22 +1,5 @@
-project.ext.mainClassName = "no.elg.infiniteBootleg.desktop.DesktopLauncher"
+project.ext.mainClassName = "no.elg.infiniteBootleg.desktop.DesktopLauncherKt"
 project.ext.assetsDir = new File("../core/src/main/resources")
-
-task run(dependsOn: classes, type: JavaExec) {
-  mainClass = project.mainClassName
-  classpath = sourceSets.main.runtimeClasspath
-  standardInput = System.in
-  workingDir = project.assetsDir
-  ignoreExitValue = true
-}
-
-task debug(dependsOn: classes, type: JavaExec) {
-  mainClass = project.mainClassName
-  classpath = sourceSets.main.runtimeClasspath
-  standardInput = System.in
-  workingDir = project.assetsDir
-  ignoreExitValue = true
-  debug = true
-}
 
 tasks.register('dist', Jar) {
   dependsOn classes
@@ -25,6 +8,8 @@ tasks.register('dist', Jar) {
     attributes 'Main-Class': project.mainClassName
   }
   archiveBaseName = appName + "-desktop"
+  archiveVersion = ""
+
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   dependsOn configurations.runtimeClasspath
   from {

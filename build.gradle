@@ -73,7 +73,6 @@ allprojects {
 }
 
 subprojects {
-
   apply plugin: "idea"
   apply plugin: "kotlin"
   apply plugin: "org.jetbrains.kotlin.jvm"
@@ -86,8 +85,6 @@ subprojects {
     }
   }
 
-  sourceSets.main.java.srcDirs = ["src/main/java", "src/main/kotlin"]
-  sourceSets.test.java.srcDirs = ["src/test/java", "src/test/kotlin"]
   tasks.classes.dependsOn spotlessApply
 
   tasks.withType(KotlinCompilationTask).configureEach {
@@ -193,7 +190,6 @@ subprojects {
 }
 
 project(":desktop") {
-
   dependencies {
     implementation project(":core")
     implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
