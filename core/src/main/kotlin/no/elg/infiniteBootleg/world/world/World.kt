@@ -1206,28 +1206,28 @@ abstract class World(
   override fun dispose() {
     logger.info { "Disposing world '$name'" }
     clear()
-    worldTicker.dispose()
-    synchronized(BOX2D_LOCK) { worldBody.dispose() }
-
-    chunkColumnsManager.dispose()
-    chunkLoader.dispose()
-    metadata.dispose()
 
     val saveTasks = writeChunks { writableChunks ->
       writableChunks.values().map { chunk ->
-        chunk.dispose()
-        chunk.save()
+        chunk.save().thenRun { chunk.dispose() }
       }.also { writableChunks.clear() }
     } ?: emptyList()
+    logger.debug { "Waiting for ${saveTasks.size} chunks in '$name' to be saved world" }
+    CompletableFuture.allOf(*saveTasks.toTypedArray()).get(100, TimeUnit.SECONDS)
+
     if (Main.isAuthoritative && !isTransient) {
       val worldFolder = worldFolder
       if (worldFolder != null && worldFolder.isDirectory) {
         deleteLockFile(uuid)
       }
     }
+
+    worldTicker.dispose()
+    synchronized(BOX2D_LOCK) { worldBody.dispose() }
+    chunkColumnsManager.dispose()
+    chunkLoader.dispose()
+    metadata.dispose()
     engine.dispose()
-    logger.debug { "Waiting for chunks in '$name' to be saved world" }
-    CompletableFuture.allOf(*saveTasks.toTypedArray()).get(1, TimeUnit.SECONDS)
     logger.debug { "Chunks have been saved for chunks in '$name'" }
   }
 
