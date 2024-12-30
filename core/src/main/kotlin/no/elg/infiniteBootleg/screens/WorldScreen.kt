@@ -11,7 +11,6 @@ import no.elg.infiniteBootleg.screens.hud.DebugWindow
 import no.elg.infiniteBootleg.screens.hud.addDebugOverlay
 import no.elg.infiniteBootleg.screens.hud.addStaffCreatorOverlay
 import no.elg.infiniteBootleg.util.IBVisWindow
-import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.world.ClientWorld
 
 private val logger = KotlinLogging.logger {}

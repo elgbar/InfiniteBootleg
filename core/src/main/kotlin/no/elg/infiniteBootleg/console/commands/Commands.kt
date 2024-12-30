@@ -861,12 +861,28 @@ class Commands : CommandExecutor() {
   }
 
   @ConsoleDoc(
-    description = "Load the given world, if loading as ",
+    description = "Load the given world, this will load a non-transient world",
+    paramDescriptions = ["Load a single player world from the given seed"]
+  )
+  @CmdArgNames("worldSeed")
+  @ClientsideOnly
+  fun loadWorld(worldSeed: String) = loadWorld(worldSeed, false)
+
+  @ConsoleDoc(
+    description = "Load the given world",
     paramDescriptions = ["Load a single player world from the given seed", "Whether to force the world to be transient"]
   )
   @CmdArgNames("worldSeed", "forceTransient")
-  fun loadWorld(worldSeed: String, transient: Boolean = false) {
-    loadSingleplayerWorld(worldSeed.asWorldSeed(), forceTransient = transient)
+  @ClientsideOnly
+  fun loadWorld(worldSeed: String, forceTransient: Boolean) {
+    val seed = worldSeed.asWorldSeed()
+    if (world?.seed == seed) {
+      logger.error { "Already in the world '$worldSeed' (long: $seed)" }
+      return
+    }
+
+    ClientMain.inst().screen = MainMenuScreen
+    loadSingleplayerWorld(worldSeed.asWorldSeed(), forceTransient = forceTransient)
   }
 
   fun eventStats() {
