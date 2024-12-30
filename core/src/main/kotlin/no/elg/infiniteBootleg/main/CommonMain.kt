@@ -30,12 +30,16 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
 
   override val assets: InfAssets = InfAssetsImpl()
 
+  final override lateinit var renderThreadName: String
+    private set
+
   init {
     instField = this
   }
 
   override fun create() {
     KtxAsync.initiate()
+    renderThreadName = Thread.currentThread().name
     console = InGameConsoleHandler().apply {
       alpha = 0.85f
     }
@@ -47,13 +51,24 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
       logger.debug { "Last commit created $it" }
     }
     logger.info { "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options" }
-    progArgs.onCreate()
-
     logger.info {
       val processStartupTime = ProcessHandle.current().info().startInstant().map(::diffTimePretty).orElseGet { "???" }
       val userStartupTime = diffTimePretty(startTime)
       "Create in $userStartupTime (process: $processStartupTime)"
     }
+    Runtime.getRuntime().addShutdownHook(
+      Thread {
+        if (isAuthoritative) {
+          val activeWorld = world
+          activeWorld?.save()
+          activeWorld?.dispose()
+        }
+      }
+    )
+  }
+
+  protected fun afterCreate() {
+    progArgs.onCreate()
   }
 
   override val engine: Engine? get() = world?.engine

@@ -11,7 +11,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.input.GlobalInputListener
 import no.elg.infiniteBootleg.input.MouseLocator
-import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.main.Main.Companion.isClient
 import no.elg.infiniteBootleg.main.Main.Companion.isServer
 import no.elg.infiniteBootleg.screens.AbstractScreen
@@ -66,9 +65,6 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
 
   override fun isAuthorizedToChange(entity: Entity): Boolean = super.isAuthorizedToChange(entity) || entity.id == serverClient?.uuid
 
-  override lateinit var renderThreadName: String
-    private set
-
   val mouseLocator: MouseLocator = MouseLocator()
 
   /**
@@ -88,8 +84,8 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
 
   override fun create() {
     VisUI.load(if (scale > 1) VisUI.SkinScale.X2 else VisUI.SkinScale.X1)
+    super.create()
     // must load VisUI first
-    renderThreadName = Thread.currentThread().name
     Gdx.input.inputProcessor = inputMultiplexer
     logger.info {
       """Controls:
@@ -99,18 +95,15 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
     }
     screenRenderer = ScreenRenderer()
     screen = MainMenuScreen
-    super.create()
 
     Runtime.getRuntime().addShutdownHook(
       Thread {
-        if (isAuthoritative) {
-          world?.save()
-          world?.dispose()
-        } else if (isClient) {
+        if (isClient) {
           serverClient?.dispose()
         }
       }
     )
+    afterCreate()
   }
 
   override fun resize(rawWidth: Int, rawHeight: Int) {

@@ -24,8 +24,6 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
   lateinit var serverWorld: ServerWorld
     private set
 
-  override lateinit var renderThreadName: String
-
   init {
     val onShutdown = Runnable {
       broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
@@ -42,7 +40,6 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
 
   override fun create() {
     super.create()
-    renderThreadName = Thread.currentThread().name
 
     // TODO load world name from some config
     val serverWorld1 = ServerWorld(PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World")
