@@ -8,7 +8,7 @@ plugins {
   id "com.diffplug.spotless" version "6.25.0" apply false
   id "com.github.ben-manes.versions" version "0.51.0" apply false
   id "com.google.protobuf" version "0.9.4" apply false
-  id "dev.reformator.stacktracedecoroutinator" version "2.4.6" apply false
+  id "dev.reformator.stacktracedecoroutinator" version "2.4.8" apply false
 }
 
 tasks.named("wrapper") {
@@ -146,25 +146,25 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation platform(platform("io.netty:netty-bom:4.1.114.Final"))
+    implementation platform(platform("io.netty:netty-bom:4.1.116.Final"))
     implementation "io.netty:netty-all"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.17.0"
     implementation "org.jetbrains:annotations:26.0.1"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation "it.unimi.dsi:fastutil:8.5.15"
 
-    implementation 'io.github.oshai:kotlin-logging-jvm:7.0.0'
-    implementation platform('org.apache.logging.log4j:log4j-bom:2.24.1')
+    implementation 'io.github.oshai:kotlin-logging-jvm:7.0.3'
+    implementation platform('org.apache.logging.log4j:log4j-bom:2.24.3')
     implementation 'org.apache.logging.log4j:log4j-api'
     implementation 'org.apache.logging.log4j:log4j-core'
     implementation 'org.apache.logging.log4j:log4j-slf4j2-impl'
     implementation 'org.fusesource.jansi:jansi:2.4.1'
 
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.13.13"
-    testImplementation platform("org.junit:junit-bom:$junitVersion")
+    testImplementation "io.mockk:mockk:1.13.16"
+    testImplementation platform("org.junit:junit-bom:5.11.4")
     testImplementation "org.junit.jupiter:junit-jupiter-api"
     testImplementation "org.junit.jupiter:junit-jupiter-engine"
     testImplementation "org.junit.vintage:junit-vintage-engine"
