@@ -34,6 +34,7 @@ import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsIn
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.world.render.debug.AirBlockRenderer
 import no.elg.infiniteBootleg.world.render.debug.BlockLightDebugRenderer
+import no.elg.infiniteBootleg.world.render.debug.ClosestBlockToChunkDebugRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkAddedToChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.world.render.debug.EntityMarkerBlockRenderer
@@ -62,7 +63,8 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     TopBlockChangeRenderer(this),
     LeafDecayDebugRenderer(this),
     FuturePositionRenderer(this),
-    EntityMarkerBlockRenderer(this)
+    EntityMarkerBlockRenderer(this),
+    ClosestBlockToChunkDebugRenderer(this)
   )
 
   private var lastZoom = 0f

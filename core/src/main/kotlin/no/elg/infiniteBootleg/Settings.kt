@@ -75,6 +75,8 @@ object Settings {
 
   var renderTopBlockChanges = false
 
+  var renderClosestBlockToPlayerChunk = false
+
   /**
    * Make sure entities have unique uuid when added to the engine
    */

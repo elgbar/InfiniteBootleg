@@ -51,6 +51,8 @@ inline fun WorldCompactLoc.worldToChunkY(): ChunkCoord = decompactLocY().worldTo
 @Contract(pure = true)
 inline fun ChunkCoord.chunkToWorld(offset: LocalCoord = 0): WorldCoord = (this shl Chunk.CHUNK_SIZE_SHIFT) + offset
 
+inline fun ChunkCompactLoc.chunkToWorld(localCoords: LocalCompactLoc): WorldCompactLoc = compactChunkToWorld(this, localCoords.decompactLocX(), localCoords.decompactLocY())
+
 /**
  * Calculate the offset the given world coordinate have in its chunk
  *
@@ -114,7 +116,7 @@ inline fun Chunk.isCardinalNeighbor(chunk: Chunk) = abs(chunk.chunkX - this.chun
  */
 inline fun Block.isNextTo(chunk: Chunk): Boolean = this.chunk.isCardinalNeighbor(chunk) && isInnerEdgeOfChunk(localX, localY)
 
-fun Chunk.shortestDistanceSquared(block: Block): Float {
+fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
   val other = block.chunk
   val localX = when (horizontalDirectionTo(other)) {
     HorizontalDirection.WESTWARD -> 0
@@ -126,6 +128,11 @@ fun Chunk.shortestDistanceSquared(block: Block): Float {
     VerticalDirection.VERTICALLY_ALIGNED -> block.localY
     VerticalDirection.SOUTHWARD -> 0
   }
+  return compactLoc(localX, localY)
+}
+
+fun Chunk.shortestDistanceSquared(block: Block): Float {
+  val (localX, localY) = closestBlockTo(block)
   return Vector2.dst2(getWorldX(localX) + 0.5f, getWorldY(localY) + 0.5f, block.worldX + 0.5f, block.worldY + 0.5f)
 }
 

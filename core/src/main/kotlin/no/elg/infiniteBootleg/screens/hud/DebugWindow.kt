@@ -93,7 +93,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
       section {
         toggleableDebugButton(
           "Render existing air",
-          "Render air blocks, which are normally indistinguishable from non-existing blocks, as cute little clouds ",
+          "Render air blocks, which are normally indistinguishable from non-existing blocks, as cute little clouds",
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderAirBlocks
         )
@@ -211,6 +211,14 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderLeafDecay
         )
+        toggleableDebugButton(
+          "Render closest block to chunk",
+          "Render which block in the current players chunk is closes to the block pointed at",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::renderClosestBlockToPlayerChunk
+        )
+
+        // ROOM for two more buttons
       }
       sep()
       // Future positions renderers
