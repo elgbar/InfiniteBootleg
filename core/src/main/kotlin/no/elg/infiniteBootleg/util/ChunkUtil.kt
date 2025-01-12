@@ -30,5 +30,5 @@ fun Chunk.isNeighbor(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
 inline fun Chunk.directionTo(other: Chunk): Direction = directionTo(other.chunkX, other.chunkY)
 
 inline fun Chunk.verticalDirectionTo(other: Chunk): VerticalDirection = Direction.getVerticalDirection(this.chunkY, other.chunkY)
-inline fun Chunk.horizontalDirectionTo(other: Chunk): HorizontalDirection = Direction.getHorizontalDirection(this.chunkY, other.chunkY)
+inline fun Chunk.horizontalDirectionTo(other: Chunk): HorizontalDirection = Direction.getHorizontalDirection(this.chunkX, other.chunkX)
 inline fun Chunk.directionTo(chunkX: ChunkCoord, chunkY: ChunkCoord): Direction = Direction.direction(this.chunkX, this.chunkY, chunkX, chunkY)

@@ -121,10 +121,10 @@ fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
   val localX = when (horizontalDirectionTo(other)) {
     HorizontalDirection.WESTWARD -> 0
     HorizontalDirection.HORIZONTALLY_ALIGNED -> block.localX
-    HorizontalDirection.EASTWARD -> CHUNK_SIZE
+    HorizontalDirection.EASTWARD -> CHUNK_SIZE - 1
   }
   val localY = when (verticalDirectionTo(other)) {
-    VerticalDirection.NORTHWARD -> CHUNK_SIZE
+    VerticalDirection.NORTHWARD -> CHUNK_SIZE - 1
     VerticalDirection.VERTICALLY_ALIGNED -> block.localY
     VerticalDirection.SOUTHWARD -> 0
   }
