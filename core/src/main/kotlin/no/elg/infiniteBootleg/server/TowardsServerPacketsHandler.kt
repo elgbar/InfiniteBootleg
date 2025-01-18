@@ -207,7 +207,10 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   }
   val username = login.username
   val entityId = generateUUIDFromString(username).toString()
-
+  if (username.isBlank()) {
+    ctx.fatal("Blank usernames are not allowed")
+    return
+  }
   logger.debug { "Login request received by user '$username', entityId '$entityId'" }
 
   val world = ServerMain.inst().serverWorld
