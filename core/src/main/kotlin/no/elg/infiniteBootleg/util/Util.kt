@@ -23,7 +23,7 @@ object Util {
   const val RELATIVE_TIME: String = "relative"
   private val ZULU_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm'Z'")
 
-  fun getVersion(): String {
+  val version: String by lazy {
     val calcHash = "#${countCommits()}-${getLastGitCommitID()}@${getLastCommitDate("iso8601-strict")}"
     val savedHash = try {
       Gdx.files.internal(Main.VERSION_FILE).readString()
@@ -32,7 +32,7 @@ object Util {
     }
     if (savedHash == FALLBACK_VERSION && calcHash == FALLBACK_VERSION) {
       logger.error { "Failed to get the current version" }
-      return FALLBACK_VERSION
+      return@lazy FALLBACK_VERSION
     }
     if (savedHash != calcHash && FALLBACK_VERSION != calcHash) {
       val versionFile = Gdx.files.absolute(Main.VERSION_FILE)
@@ -42,7 +42,11 @@ object Util {
         logger.error(e) { "Failed to write new version to file" }
       }
     }
-    return if (calcHash == FALLBACK_VERSION) savedHash else calcHash
+    if (calcHash == FALLBACK_VERSION) {
+      savedHash
+    } else {
+      calcHash
+    }
   }
 
   private fun getLastGitCommitID(): String {

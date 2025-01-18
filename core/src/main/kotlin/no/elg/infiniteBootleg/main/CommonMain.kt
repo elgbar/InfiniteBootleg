@@ -46,7 +46,7 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
     Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
     assets.loadAssets()
-    logger.info { "Version ${Util.getVersion()}" }
+    logger.info { "Version ${Util.version}" }
     Util.getLastCommitDate(Util.RELATIVE_TIME)?.also {
       logger.debug { "Last commit created $it" }
     }

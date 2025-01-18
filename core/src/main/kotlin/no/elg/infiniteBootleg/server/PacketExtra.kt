@@ -163,8 +163,7 @@ fun serverBoundLoginPacket(name: String, uuid: UUID): Packet {
     .setLogin(
       Packets.Login.newBuilder()
         .setUsername(name)
-        .setUuid(uuid.toString())
-        .setVersion(Util.getVersion())
+        .setVersion(Util.version)
     ).build()
 }
 

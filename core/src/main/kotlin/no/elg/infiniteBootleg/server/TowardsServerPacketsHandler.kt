@@ -200,7 +200,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
 }
 
 private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.Login) {
-  val version = Util.getVersion()
+  val version = Util.version
   if (login.version != version) {
     ctx.fatal("Version mismatch! Client: '${login.version}' Server: '$version'")
     return
