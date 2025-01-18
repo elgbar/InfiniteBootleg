@@ -69,13 +69,11 @@ import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.world.ecs.save
 import java.time.Instant
-import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 // //////////////////
@@ -156,7 +154,7 @@ fun entityMovePacket(entity: Entity): MoveEntity {
 // server bound //
 // ////////////////
 
-fun serverBoundLoginPacket(name: String, uuid: UUID): Packet {
+fun serverBoundLoginPacket(name: String): Packet {
   return Packet.newBuilder()
     .setDirection(SERVER)
     .setType(SB_LOGIN)

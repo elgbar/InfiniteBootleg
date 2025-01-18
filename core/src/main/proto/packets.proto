@@ -182,10 +182,9 @@ message InterfaceUpdate {
 //////////////////
 
 message Login {
-  string uuid = 1;
-  string username = 2;
+  string username = 1;
   //client version
-  string version = 3;
+  string version = 2;
 }
 
 //Request something from the server

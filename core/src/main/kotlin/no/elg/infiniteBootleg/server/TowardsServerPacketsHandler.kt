@@ -205,17 +205,14 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
     ctx.fatal("Version mismatch! Client: '${login.version}' Server: '$version'")
     return
   }
-  val uuid = login.uuid
   val username = login.username
-  logger.debug { "Login request received by $username uuid $uuid" }
+  val entityId = generateUUIDFromString(username).toString()
+
+  logger.debug { "Login request received by user '$username', entityId '$entityId'" }
 
   val world = ServerMain.inst().serverWorld
-  if (uuid == null) {
-    logger.error { "Given player id was null" }
-    return
-  }
 
-  if (world.hasPlayer(uuid)) {
+  if (world.hasPlayer(entityId)) {
     ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
     ctx.close()
     return
@@ -224,18 +221,18 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
 
   val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
-  val sharedInformation = SharedInformation(uuid, secret.toString())
+  val sharedInformation = SharedInformation(entityId, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
-  WorldLoader.spawnServerPlayer(world, uuid, username, sharedInformation)
+  WorldLoader.spawnServerPlayer(world, entityId, username, sharedInformation)
     .orTimeout(10, TimeUnit.SECONDS)
     .whenComplete { _, ex ->
       if (ex == null) {
         // Exchange the UUID and secret, which will be used to verify the sender, kinda like a bearer bond.
         ctx.writeAndFlushPacket(clientBoundSecretExchange(sharedInformation))
-        logger.debug { "Secret sent to player ${sharedInformation.entityUUID}, waiting for confirmation" }
+        logger.debug { "Secret sent to player ${sharedInformation.entityId}, waiting for confirmation" }
       } else {
-        ctx.fatal("Failed to spawn player ${sharedInformation.entityUUID} server side.\n  ${ex::class.simpleName}: ${ex.message}")
+        ctx.fatal("Failed to spawn player ${sharedInformation.entityId} server side.\n  ${ex::class.simpleName}: ${ex.message}")
       }
     }
 }
