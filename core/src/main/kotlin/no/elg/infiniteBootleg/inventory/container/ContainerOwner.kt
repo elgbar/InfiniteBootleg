@@ -6,6 +6,7 @@ import no.elg.infiniteBootleg.protobuf.containerOwner
 import no.elg.infiniteBootleg.util.WorldCompactLoc
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.compactLoc
+import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
@@ -64,7 +65,7 @@ sealed interface ContainerOwner {
 
     override fun ProtoContainerOwner.fromProto(): ContainerOwner? =
       when (this.ownerCase) {
-        ProtoContainerOwner.OwnerCase.ENTITYOWNER -> EntityOwner(this.entityOwner)
+        ProtoContainerOwner.OwnerCase.ENTITYOWNER -> EntityOwner(this.entityOwner.id)
         ProtoContainerOwner.OwnerCase.WORLDOWNER -> BlockOwner(this.worldOwner)
         else -> null
       }
@@ -72,7 +73,7 @@ sealed interface ContainerOwner {
     override fun ContainerOwner.asProto(): ProtoContainerOwner =
       containerOwner {
         when (this@asProto) {
-          is EntityOwner -> entityOwner = entityId
+          is EntityOwner -> entityOwner = entityId.toProtoEntityRef()
           is BlockOwner -> worldOwner = loc
         }
       }

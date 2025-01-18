@@ -61,6 +61,7 @@ import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.toComponentsString
+import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Material.AIR
@@ -144,7 +145,7 @@ fun clientBoundPacketBuilder(type: Type): Packet.Builder {
 
 fun entityMovePacket(entity: Entity): MoveEntity {
   return moveEntity {
-    uuid = entity.id
+    ref = entity.toProtoEntityRef()
     position = entity.positionComponent.toProtoVector2f()
     velocity = entity.velocityComponent.toProtoVector2f()
     entity.lookDirectionComponentOrNull?.direction?.toProtoVector2i()?.let { lookDirection = it }
@@ -179,7 +180,7 @@ fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInform
   return serverBoundPacketBuilder(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(sharedInformation.secret)
-      .setEntityUUID(sharedInformation.entityUUID)
+      .setRef(sharedInformation.entityId.toProtoEntityRef())
   ).build()
 }
 
@@ -195,9 +196,9 @@ fun ServerClient.serverBoundChunkRequestPacket(chunkPos: Vector2i): Packet =
     chunkLocation = chunkPos
   }
 
-fun ServerClient.serverBoundEntityRequest(uuid: String): Packet =
+fun ServerClient.serverBoundEntityRequest(entityId: String): Packet =
   serverBoundContentRequest {
-    entityUUID = uuid
+    entityRef = entityId.toProtoEntityRef()
   }
 
 fun ServerClient.serverBoundContainerRequest(owner: ProtoWorld.ContainerOwner): Packet =
@@ -267,14 +268,14 @@ fun clientBoundSpawnEntity(entity: Entity): Packet {
   return clientBoundPacketBuilder(CB_SPAWN_ENTITY).setSpawnEntity(
     SpawnEntity.newBuilder()
       .setEntity(entity.save(toAuthoritative = false, ignoreTransient = true))
-      .setUuid(entity.id)
+      .setRef(entity.toProtoEntityRef())
   ).build()
 }
 
-fun clientBoundDespawnEntity(uuid: String, reason: DespawnReason): Packet {
+fun clientBoundDespawnEntity(entityId: String, reason: DespawnReason): Packet {
   return clientBoundPacketBuilder(CB_DESPAWN_ENTITY).setDespawnEntity(
     DespawnEntity.newBuilder()
-      .setUuid(uuid)
+      .setRef(entityId.toProtoEntityRef())
       .setDespawnReason(reason)
   ).build()
 }
@@ -308,7 +309,7 @@ fun clientBoundSecretExchange(sharedInformation: SharedInformation): Packet {
   return clientBoundPacketBuilder(DX_SECRET_EXCHANGE).setSecretExchange(
     SecretExchange.newBuilder()
       .setSecret(sharedInformation.secret)
-      .setEntityUUID(sharedInformation.entityUUID)
+      .setRef(sharedInformation.entityId.toProtoEntityRef())
   ).build()
 }
 

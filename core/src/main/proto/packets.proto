@@ -81,7 +81,7 @@ message UpdateBlock {
 
 message MoveEntity {
   //Id of entity to move
-  string uuid = 1;
+  .persistence.EntityRef ref = 1;
   .persistence.Vector2f velocity = 2;
   .persistence.Vector2f position = 3;
   optional .persistence.Vector2i lookDirection = 4;
@@ -92,7 +92,7 @@ message Disconnect {
 }
 
 message SecretExchange{
-  string entityUUID = 1;
+  .persistence.EntityRef ref = 1;
   string secret = 2;
 }
 
@@ -146,7 +146,7 @@ message ServerLoginStatus {
 
 message SpawnEntity {
   .persistence.Entity entity = 1;
-  string uuid = 2;
+  .persistence.EntityRef ref = 2;
 }
 
 message DespawnEntity {
@@ -159,7 +159,7 @@ message DespawnEntity {
     PLAYER_KICKED = 5; // players only
     NATURAL = 6; //Something natural happened, i.e., a falling block hit ground
   }
-  string uuid = 1;
+  .persistence.EntityRef ref = 1;
   DespawnReason despawnReason = 2;
 }
 

@@ -94,7 +94,7 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
     maxHealth = DEFAULT_MAX_HEALTH
   }
   ownedContainer = ownedContainer {
-    owner = containerOwner { entityOwner = id }
+    owner = containerOwner { entityOwner = this@addCommonPlayerComponentsProto.ref }
     container = container {
       maxSize = 40
       name = "Inventory"

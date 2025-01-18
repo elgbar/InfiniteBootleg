@@ -156,8 +156,12 @@ private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
 // Login packets, in order of receiving
 
 private fun ServerClient.handleSecretExchange(secretExchange: SecretExchange) {
-  val uuid = secretExchange.entityUUID
-  val sharedInformation = SharedInformation(uuid, secretExchange.secret)
+  val id = secretExchange.ref.id
+  if (id.isEmpty() || secretExchange.secret.isEmpty()) {
+    ctx.fatal("Entity id nor secret can be empty")
+    return
+  }
+  val sharedInformation = SharedInformation(id, secretExchange.secret)
   this.sharedInformation = sharedInformation
   logger.debug { "Secret received from sever sending response" }
   sendServerBoundPacket(serverBoundClientSecretResponse(sharedInformation))
@@ -346,15 +350,15 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     return
   }
 
-  val uuid = moveEntity.uuid
-  if (uuid == null) {
-    ctx.fatal("UUID cannot be parsed '${moveEntity.uuid}'")
+  val id = moveEntity.ref.id
+  if (id == null) {
+    ctx.fatal("Entity ref cannot be parsed")
     return
   }
-  val entity = world.getEntity(uuid)
+  val entity = world.getEntity(id)
   if (entity == null) {
-    logger.warn { "Cannot move unknown entity '${moveEntity.uuid}'" }
-    sendServerBoundPacket(serverBoundEntityRequest(uuid))
+    logger.warn { "Cannot move unknown entity '$id'" }
+    sendServerBoundPacket(serverBoundEntityRequest(id))
     return
   }
   if (Main.inst().isAuthorizedToChange(entity)) {
@@ -385,14 +389,14 @@ private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) 
     logger.error { "Failed to find world" }
     return
   }
-  val uuid: String = despawnEntity.uuid
-  val entity: Entity = world.getEntity(uuid) ?: run {
+  val id: String = despawnEntity.ref.id
+  val entity: Entity = world.getEntity(id) ?: run {
     if (despawnEntity.despawnReason !in nonWarnDespawnReasons) {
-      logger.warn { "Failed to despawn unknown entity with uuid '${despawnEntity.uuid}', reason ${despawnEntity.despawnReason}" }
+      logger.warn { "Failed to despawn unknown entity with id '$id', reason ${despawnEntity.despawnReason}" }
     }
     return
   }
-  logger.debug { "Despawning entity ${despawnEntity.uuid} with reason ${despawnEntity.despawnReason}" }
+  logger.debug { "Despawning entity $id with reason ${despawnEntity.despawnReason}" }
   world.removeEntity(entity)
 }
 

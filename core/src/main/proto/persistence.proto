@@ -117,18 +117,24 @@ message Container {
 message ContainerOwner {
   oneof owner {
     sint64 worldOwner = 1;
-    string entityOwner = 2;
+    EntityRef entityOwner = 2;
   }
 }
+
 message OwnedContainer {
   Container container = 1;
   ContainerOwner owner = 2;
 }
 
+
+message EntityRef {
+  string id = 1;
+}
+
 message Entity {
   EntityType entityType = 1;
   Vector2f position = 2;
-  string uuid = 3;
+  EntityRef ref = 3;
   string worldUUID = 4;
   optional Tags tags = 5;
   optional string name = 6;

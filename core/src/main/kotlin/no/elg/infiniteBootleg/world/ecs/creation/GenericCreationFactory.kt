@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.toComponentsString
+import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.ecs.basicRequiredEntityFamily
 import no.elg.infiniteBootleg.world.ecs.blockEntityFamily
@@ -53,7 +54,7 @@ fun EntityKt.Dsl.withRequiredComponents(
   id: String? = null
 ) {
   this.entityType = entityType
-  uuid = id ?: UUID.randomUUID().toString()
+  ref = (id ?: UUID.randomUUID().toString()).toProtoEntityRef()
   worldUUID = world.uuid
   position = vector2f {
     x = worldX.toFloat()

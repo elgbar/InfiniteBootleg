@@ -28,7 +28,7 @@ fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoW
     fallingBlock.velocity.x,
     fallingBlock.velocity.y,
     material,
-    fallingBlock.uuid
+    fallingBlock.ref.id
   )
 }
 

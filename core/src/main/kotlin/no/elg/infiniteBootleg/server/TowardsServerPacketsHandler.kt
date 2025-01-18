@@ -51,6 +51,7 @@ import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIO
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.generateUUIDFromString
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
@@ -114,11 +115,11 @@ private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentReque
   // Chunk request
   contentRequest.chunkLocationOrNull?.let { launchOnAsync { asyncHandleChunkRequest(ctx, it.x, it.y) } }
   // Entity request
-  if (contentRequest.hasEntityUUID()) {
-    val entityUUID: String = contentRequest.entityUUID
+  if (contentRequest.hasEntityRef()) {
+    val entityId: String = contentRequest.entityRef.id
     val requestedEntities = ctx.getSharedInformation()?.requestedEntities ?: return
-    requestedEntities.get(entityUUID) {
-      launchOnAsync { asyncHandleEntityRequest(ctx, entityUUID) }
+    requestedEntities.get(entityId) {
+      launchOnAsync { asyncHandleEntityRequest(ctx, entityId) }
     }
   }
   // Container
@@ -162,7 +163,7 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Move
     ctx.fatal("No server side player found!")
     return
   }
-  if (player.id != moveEntity.uuid) {
+  if (player.id != moveEntity.ref.id) {
     ctx.fatal("Client tried to update someone else")
     return
   }
@@ -181,12 +182,12 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
   }
 
   try {
-    val uuid = secretExchange.entityUUID
-    if (uuid != shared.entityUUID || secretExchange.secret != shared.secret) {
+    val id = secretExchange.ref.id
+    if (id != shared.entityId || secretExchange.secret != shared.secret) {
       ctx.fatal("Wrong shared information returned by client")
       return
     }
-    val player = Main.inst().world?.getEntity(shared.entityUUID)
+    val player = Main.inst().world?.getEntity(shared.entityId)
     if (player != null) {
       ctx.writeAndFlushPacket(clientBoundStartGamePacket(player))
     } else {
