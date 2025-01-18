@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledFuture
  *
  * @author Elg
  */
-data class SharedInformation(val entityUUID: String, val secret: String) {
+data class SharedInformation(val entityId: String, val secret: String) {
 
   private var lastHeartbeat: Instant = Instant.now()
 

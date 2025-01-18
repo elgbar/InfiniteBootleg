@@ -37,7 +37,7 @@ class ServerClient(
       .build()
   }
 
-  val uuid get() = sharedInformation?.entityUUID ?: error("Cannot access uuid of entity before it is given by the server")
+  val entityId get() = sharedInformation?.entityId ?: error("Cannot access uuid of entity before it is given by the server")
 
   /**
    * Sends a packet from the client to the server

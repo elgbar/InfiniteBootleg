@@ -296,7 +296,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   logger.debug { "Initial ${chunksInView.size} chunks sent to player ${player.name}" }
 
   val validEntitiesToSendToClient = world.validEntitiesToSendToClient
-    .filterNot { it.id == shared.entityUUID } // don't send the player to themselves
+    .filterNot { it.id == shared.entityId } // don't send the player to themselves
     .filter {
       val pos = it.position
       isLocInView(ctx, pos.x.toInt(), pos.y.toInt())
@@ -328,11 +328,11 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
   logger.info { "Player ${player.name} joined" }
 }
 
-private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, uuid: String) {
+private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId: String) {
   val world = ServerMain.inst().serverWorld
 
-  val entity = world.getEntity(uuid) ?: run {
-    ctx.writeAndFlushPacket(clientBoundDespawnEntity(uuid, UNKNOWN_ENTITY))
+  val entity = world.getEntity(entityId) ?: run {
+    ctx.writeAndFlushPacket(clientBoundDespawnEntity(entityId, UNKNOWN_ENTITY))
     return
   }
   val position = entity.position
@@ -382,7 +382,7 @@ private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformati
 }
 
 private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
-  val uuid = getSharedInformation()?.entityUUID ?: return null
+  val uuid = getSharedInformation()?.entityId ?: return null
   return ServerMain.inst().serverWorld.getEntity(uuid)
 }
 
@@ -391,7 +391,7 @@ private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
  */
 private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
   val serverWorld = ServerMain.inst().serverWorld
-  val uuid = ctx.getSharedInformation()?.entityUUID
+  val uuid = ctx.getSharedInformation()?.entityId
   if (uuid == null) {
     logger.error { "Failed to get UUID of requesting entity" }
     return null

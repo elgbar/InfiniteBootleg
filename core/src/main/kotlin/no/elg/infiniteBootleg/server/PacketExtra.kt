@@ -119,7 +119,7 @@ fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoor
   val renderer = world.render
   broadcast(packet) { channel ->
     val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
-    val viewing = renderer.getClient(sharedInfo.entityUUID) ?: return@broadcast false
+    val viewing = renderer.getClient(sharedInfo.entityId) ?: return@broadcast false
     return@broadcast viewing.isInView(chunkX, chunkY) && filter.matches(channel)
   }
 }

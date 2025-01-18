@@ -17,7 +17,7 @@ object KickPlayerWithoutChannel : IteratingSystem(playerFamily, UPDATE_PRIORITY_
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val uuid = entity.id
-    if (clients.values.none { it.entityUUID == uuid }) {
+    if (clients.values.none { it.entityId == uuid }) {
       logger.warn { "Found an unknown player $uuid (name: ${entity.nameOrNull}), disconnecting" }
       ServerMain.inst().serverWorld.disconnectPlayer(uuid, false)
     }

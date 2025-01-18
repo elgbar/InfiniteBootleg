@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.world.ecs.api.restriction.component.AuthoritativeO
 
 data class SharedInformationComponent(val sharedInformation: SharedInformation) : AuthoritativeOnlyComponent {
 
-  override fun hudDebug(): String = "entityUUID: ${sharedInformation.entityUUID}"
+  override fun hudDebug(): String = "entityUUID: ${sharedInformation.entityId}"
 
   companion object : Mapper<SharedInformationComponent>() {
     var Entity.sharedInformation by propertyFor(SharedInformationComponent.mapper)

@@ -107,21 +107,21 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   override val chunkColumnsInView: Set<ChunkCoord>
     get() = allChunksInView().flatMapTo(mutableSetOf()) { it.chunkColumnsInView() }
 
-  fun addClient(uuid: String, civ: ServerClientChunksInView) {
+  fun addClient(entityId: String, civ: ServerClientChunksInView) {
     lock.write {
-      viewingChunks.put(uuid, civ)
+      viewingChunks.put(entityId, civ)
     }
   }
 
-  fun removeClient(uuid: String) {
+  fun removeClient(entityId: String) {
     lock.write {
-      viewingChunks.remove(uuid)
+      viewingChunks.remove(entityId)
     }
   }
 
-  fun getClient(uuid: String): ServerClientChunksInView? {
+  fun getClient(entityId: String): ServerClientChunksInView? {
     return lock.read {
-      viewingChunks.get(uuid)
+      viewingChunks.get(entityId)
     }
   }
 }

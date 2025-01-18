@@ -12,10 +12,10 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Com
  */
 fun despawnEntity(entity: Entity, despawnReason: Packets.DespawnEntity.DespawnReason) {
   if (Main.isServer) {
-    val uuid = entity.id
+    val entityId = entity.id
     if (!entity.authoritativeOnly) {
       launchOnAsync {
-        broadcast(clientBoundDespawnEntity(uuid, despawnReason))
+        broadcast(clientBoundDespawnEntity(entityId, despawnReason))
       }
     }
   }

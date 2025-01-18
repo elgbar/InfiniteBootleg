@@ -31,12 +31,12 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   override val render = HeadlessWorldRenderer(this)
 
-  fun disconnectPlayer(uuid: String, kicked: Boolean) {
-    val player = getEntity(uuid)
+  fun disconnectPlayer(entityId: String, kicked: Boolean) {
+    val player = getEntity(entityId)
     if (player != null) {
       removeEntity(player, if (kicked) DespawnReason.PLAYER_KICKED else DespawnReason.PLAYER_QUIT)
     } else {
-      logger.warn { "Failed to find player $uuid to remove" }
+      logger.warn { "Failed to find player $entityId to remove" }
     }
   }
 

@@ -9,10 +9,10 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.chunkToWorld
+import no.elg.infiniteBootleg.util.closestBlockTo
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
 import no.elg.infiniteBootleg.util.safeUse
-import no.elg.infiniteBootleg.util.closestBlockTo
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.getChunkOrNull
 import no.elg.infiniteBootleg.world.render.ClientWorldRender

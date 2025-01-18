@@ -101,7 +101,7 @@ class Commands : CommandExecutor() {
   private fun findEntity(nameOrId: String): Entity? {
     val world = world ?: return null
     return world.getEntity(nameOrId) ?: world.namedEntities.find { it.nameOrNull == nameOrId } ?: run {
-      logger.error { "No entity with UUID or name '$nameOrId'" }
+      logger.error { "No entity with id or name '$nameOrId'" }
       return null
     }
   }
@@ -355,10 +355,10 @@ class Commands : CommandExecutor() {
     logger.info { entities.joinToString { it.id } }
   }
 
-  @CmdArgNames("entity")
-  @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity UUID or name"])
-  fun inspect(entityUUID: String) {
-    val entity = findEntity(entityUUID) ?: return
+  @CmdArgNames("entityId")
+  @ConsoleDoc(description = "List components of an entity", paramDescriptions = ["Entity id or name"])
+  fun inspect(entityId: String) {
+    val entity = findEntity(entityId) ?: return
     logger.info { "===[ ${entityNameId(entity)} ]===" }
     val (tags, nonTags) = entity.components.partition { it is TagComponent }
     if (nonTags.isNotEmpty()) {
@@ -375,10 +375,10 @@ class Commands : CommandExecutor() {
     }
   }
 
-  @CmdArgNames("entity", "component")
-  @ConsoleDoc(description = "Inspect a component of an entity", paramDescriptions = ["Entity UUID or name", "The simple name of the component to inspect"])
-  fun inspect(entityUUID: String, componentName: String) {
-    val entity = findEntity(entityUUID) ?: return
+  @CmdArgNames("entityId", "component")
+  @ConsoleDoc(description = "Inspect a component of an entity", paramDescriptions = ["Entity id or name", "The simple name of the component to inspect"])
+  fun inspect(entityId: String, componentName: String) {
+    val entity = findEntity(entityId) ?: return
     val searchTerm = componentName.removeSuffix("Component")
     val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
       logger.error { "No component with name '$componentName' in entity ${entityNameId(entity)}" }

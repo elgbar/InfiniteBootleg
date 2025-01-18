@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
 import no.elg.infiniteBootleg.util.deleteOrLogFile
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.transients.SharedInformationComponent
@@ -40,8 +41,8 @@ object WorldLoader {
     return world.worldFolder?.child(PLAYERS_PATH)?.child(playerId)
   }
 
-  fun spawnServerPlayer(world: ServerWorld, uuid: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
-    val fileHandle = getServerPlayerFile(world, uuid)
+  fun spawnServerPlayer(world: ServerWorld, entityId: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
+    val fileHandle = getServerPlayerFile(world, entityId)
 
     val serverPlayerConfig: Entity.() -> Unit = {
       safeWith { SharedInformationComponent(sharedInformation) }
@@ -50,18 +51,18 @@ object WorldLoader {
 
     fun createNewServerPlayer(): CompletableFuture<Entity> {
       val protoEntity = world.createNewProtoPlayer(controlled = true) {
-        this.uuid = uuid
+        this.ref = entityId.toProtoEntityRef()
         this.name = username
       }
       return world.load(protoEntity, configure = serverPlayerConfig).thenApply {
         saveServerPlayer(it)
-        logger.debug { "Created persisted player profile for $uuid" }
+        logger.debug { "Created persisted player profile for $entityId" }
         it
       }
     }
 
     if (fileHandle != null && fileHandle.exists()) {
-      logger.debug { "Trying to load persisted player profile for $uuid" }
+      logger.debug { "Trying to load persisted player profile for $entityId" }
       try {
         val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
         return world.load(proto, configure = serverPlayerConfig).handle { entity, ex ->
@@ -69,7 +70,7 @@ object WorldLoader {
             logger.warn(ex) { "Exception when loading world" }
             return@handle createNewServerPlayer().join()
           } else {
-            logger.debug { "Loaded persisted player profile for $uuid" }
+            logger.debug { "Loaded persisted player profile for $entityId" }
           }
           return@handle entity
         }
@@ -78,7 +79,7 @@ object WorldLoader {
         // fall through
       }
     }
-    logger.debug { "Creating fresh player profile for $uuid" }
+    logger.debug { "Creating fresh player profile for $entityId" }
     return createNewServerPlayer()
   }
 

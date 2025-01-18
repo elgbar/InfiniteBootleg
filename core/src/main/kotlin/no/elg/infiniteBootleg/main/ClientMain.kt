@@ -63,7 +63,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
   var isMultiplayer = false
     private set
 
-  override fun isAuthorizedToChange(entity: Entity): Boolean = super.isAuthorizedToChange(entity) || entity.id == serverClient?.uuid
+  override fun isAuthorizedToChange(entity: Entity): Boolean = super.isAuthorizedToChange(entity) || entity.id == serverClient?.entityId
 
   val mouseLocator: MouseLocator = MouseLocator()
 

@@ -50,11 +50,11 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
     channels.remove(ctx.channel())
     ctxToWrapper.remove(ctx)
     val client = clients.remove(ctx.channel())
-    val playerId = client?.entityUUID ?: "<Unknown>"
+    val playerId = client?.entityId ?: "<Unknown>"
     logger.debug { "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)" }
     if (client != null) {
       client.heartbeatTask?.cancel(false)
-      ServerMain.inst().serverWorld.disconnectPlayer(client.entityUUID, false)
+      ServerMain.inst().serverWorld.disconnectPlayer(client.entityId, false)
     }
   }
 

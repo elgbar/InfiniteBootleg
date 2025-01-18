@@ -85,7 +85,6 @@ import no.elg.infiniteBootleg.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
@@ -999,11 +998,11 @@ abstract class World(
     return false
   }
 
-  fun containsEntity(uuid: String): Boolean = getEntity(uuid) != null
+  fun containsEntity(entityId: String): Boolean = getEntity(entityId) != null
 
-  fun getEntity(uuid: String): Entity? {
+  fun getEntity(entityId: String): Entity? {
     for (entity in validEntities) {
-      if (entity.getComponent(IdComponent::class.java).id == uuid) {
+      if (entity.id == entityId) {
         return entity
       }
     }
@@ -1024,18 +1023,16 @@ abstract class World(
     worldBody.removeEntity(entity)
   }
 
-  fun getPlayer(uuid: String): Entity? {
+  fun getPlayer(entityId: String): Entity? {
     for (entity in playersEntities) {
-      if (entity.id == uuid) {
+      if (entity.id == entityId) {
         return entity
       }
     }
     return null
   }
 
-  fun hasPlayer(uuid: String): Boolean {
-    return getPlayer(uuid) != null
-  }
+  fun hasPlayer(entityId: String): Boolean = getPlayer(entityId) != null
 
   /**
    * @param worldX X center (center of each block

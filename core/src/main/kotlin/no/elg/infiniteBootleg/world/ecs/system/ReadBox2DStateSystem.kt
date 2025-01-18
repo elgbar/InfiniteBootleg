@@ -41,7 +41,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     if (updatePos || updateVel) {
       if (Main.isServerClient) {
         ClientMain.inst().serverClient?.let { serverClient ->
-          if (serverClient.uuid == entity.id) {
+          if (serverClient.entityId == entity.id) {
             launchOnAsync {
               serverClient.sendServerBoundPacket { serverBoundMoveEntityPacket(entity) }
             }
