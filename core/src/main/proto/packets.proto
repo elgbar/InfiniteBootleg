@@ -189,7 +189,7 @@ message Login {
 
 //Request something from the server
 message ContentRequest {
-  optional string entityUUID = 1;
+  optional .persistence.EntityRef entityRef = 1;
   optional .persistence.Vector2i chunkLocation = 2;
   optional .persistence.ContainerOwner containerOwner = 3;
 }
