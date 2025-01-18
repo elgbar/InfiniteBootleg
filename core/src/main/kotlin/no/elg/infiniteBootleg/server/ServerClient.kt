@@ -4,6 +4,9 @@ import com.badlogic.gdx.utils.Disposable
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.netty.channel.ChannelFuture
+import no.elg.infiniteBootleg.events.ContainerEvent
+import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner.EntityOwner
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.Progress
@@ -47,8 +50,18 @@ class ServerClient(
   @Suppress("NOTHING_TO_INLINE")
   inline fun sendServerBoundPacket(packet: Packets.Packet): ChannelFuture = ctx.writeAndFlushPacket(packet)
 
+  /**
+   * Make sure the server is updated with the latest container changes
+   */
+  private val containerChangedEventListener = EventManager.registerListener<ContainerEvent.Changed> { event: ContainerEvent.Changed ->
+    if (event.owner is EntityOwner && event.owner.entityId == entityId) {
+      sendServerBoundPacket { serverBoundContainerUpdate(event.owner, event.container) }
+    }
+  }
+
   override fun dispose() {
     sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client disposed") }
+    containerChangedEventListener.removeListener()
     ctx.disconnect()
   }
 
