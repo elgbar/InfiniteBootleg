@@ -7,7 +7,8 @@ import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.server.NettyServer
-import no.elg.infiniteBootleg.server.broadcast
+import no.elg.infiniteBootleg.server.PacketBroadcaster
+import no.elg.infiniteBootleg.server.ServerPacketBroadcaster
 import no.elg.infiniteBootleg.server.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.ServerWorld
@@ -21,12 +22,15 @@ private val logger = KotlinLogging.logger {}
  */
 class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArgs, startTime) {
 
+  override lateinit var packetBroadcaster: PacketBroadcaster
+    private set
+
   lateinit var serverWorld: ServerWorld
     private set
 
   init {
     val onShutdown = Runnable {
-      broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
+      packetBroadcaster.broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
       serverWorld.save()
       serverWorld.dispose()
       dispose()
@@ -45,6 +49,8 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
     val serverWorld1 = ServerWorld(PerlinChunkGenerator(Settings.worldSeed), Settings.worldSeed, "Server World")
     serverWorld = serverWorld1
     serverWorld.initialize()
+
+    packetBroadcaster = ServerPacketBroadcaster(serverWorld1)
 
     val serverThread: Thread = Thread.ofPlatform()
       .name("Server")
@@ -73,6 +79,7 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
         serverThread.start()
       }
     }
+    afterCreate()
   }
 
   override val world: World? get() = if (::serverWorld.isInitialized) serverWorld else null

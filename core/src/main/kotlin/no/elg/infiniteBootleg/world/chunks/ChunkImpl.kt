@@ -18,14 +18,11 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
-import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.chunk
 import no.elg.infiniteBootleg.protobuf.vector2i
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
+import no.elg.infiniteBootleg.server.sendDuplexPacketInView
 import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -223,17 +220,11 @@ class ChunkImpl(
     currBlock?.dispose()
     val worldX = getWorldX(localX)
     val worldY = getWorldY(localY)
-    if (sendUpdatePacket && isValid && !bothAirish) {
-      if (Main.isServer) {
-        launchOnAsync {
-          val packet = clientBoundBlockUpdate(worldX, worldY, block)
-          broadcastToInView(packet, worldX, worldY)
-        }
-      } else if (Main.isServerClient && !block.isMarkerBlock()) {
-        launchOnAsync {
-          ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundBlockUpdate(worldX, worldY, block) }
-        }
-      }
+    if (sendUpdatePacket && isValid && !bothAirish && !block.isMarkerBlock()) {
+      sendDuplexPacketInView(
+        ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
+        ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
+      )
     }
     return block
   }

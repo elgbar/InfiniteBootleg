@@ -19,7 +19,6 @@ import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Com
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker
 import no.elg.infiniteBootleg.world.world.ClientWorld
-import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -36,7 +35,7 @@ sealed interface WorldEntity {
 
   data class GenericWorldEntity(override val world: World, override val entity: Entity) : WorldEntity
   data class ClientWorldEntity(override val world: ClientWorld, override val entity: Entity) : WorldEntity
-  data class ServerWorldEntity(override val world: ServerWorld, override val entity: Entity) : WorldEntity
+//  data class ServerWorldEntity(override val world: ServerWorld, override val entity: Entity) : WorldEntity
 }
 
 const val JUMP_VERTICAL_VEL = 10f

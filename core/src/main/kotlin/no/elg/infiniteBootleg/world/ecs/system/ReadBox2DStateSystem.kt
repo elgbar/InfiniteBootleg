@@ -5,13 +5,12 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.physics.box2d.Body
 import ktx.math.component1
 import ktx.math.component2
-import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.broadcastToInView
 import no.elg.infiniteBootleg.server.clientBoundMoveEntity
+import no.elg.infiniteBootleg.server.sendDuplexPacketInView
 import no.elg.infiniteBootleg.server.serverBoundMoveEntityPacket
-import no.elg.infiniteBootleg.util.launchOnAsync
+import no.elg.infiniteBootleg.util.toCompactLoc
+import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
@@ -39,17 +38,13 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     val updateVel = readVelocity(entity, body)
 
     if (updatePos || updateVel) {
-      if (Main.isServerClient) {
-        ClientMain.inst().serverClient?.let { serverClient ->
-          if (serverClient.entityId == entity.id) {
-            launchOnAsync {
-              serverClient.sendServerBoundPacket { serverBoundMoveEntityPacket(entity) }
-            }
-          }
+      sendDuplexPacketInView(ifIsServer = { clientBoundMoveEntity(entity) to body.position.toCompactLoc().worldToChunk() }, ifIsClient = {
+        if (entityId == entity.id) {
+          serverBoundMoveEntityPacket(entity)
+        } else {
+          null
         }
-      } else if (Main.isServer) {
-        broadcastToInView(clientBoundMoveEntity(entity), body.position.x.toInt(), body.position.x.toInt())
-      }
+      })
     }
   }
 

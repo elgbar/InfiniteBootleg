@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.world.world.ServerWorld
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
+import kotlin.sequences.flatMapTo
 
 private val logger = KotlinLogging.logger {}
 
@@ -46,7 +47,14 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     val newChunkY = event.newSpawn.worldToChunkY()
     if (spawnChunksInView.centerX != newChunkX || spawnChunksInView.centerY != newChunkY) {
       spawnChunksInView.setCenter(newChunkX, newChunkY)
-      logger.debug { "Updating spawn chunks in view, new center and world chunk spawn at ${stringifyCompactLoc(newChunkX, newChunkY)}" }
+      logger.debug {
+        "Updating spawn chunks in view, new center and world chunk spawn at ${
+          stringifyCompactLoc(
+            newChunkX,
+            newChunkY
+          )
+        }"
+      }
     } else {
       logger.debug { "World spawn updated, but its in the same chunk as before. Will not update spawn chunks in view" }
     }

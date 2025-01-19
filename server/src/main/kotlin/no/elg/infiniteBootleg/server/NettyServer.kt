@@ -45,7 +45,13 @@ class NettyServer {
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-      logger.info { "Binding server to port @|bold,green ${Settings.port}|@@|white . Server was ready in |@@|bold ${diffTimePretty(Main.inst().startTime)}|@" }
+      logger.info {
+        "Binding server to port @|bold,green ${Settings.port}|@@|white . Server was ready in |@@|bold ${
+          diffTimePretty(
+            Main.Companion.inst().startTime
+          )
+        }|@"
+      }
 
       // Bind and start to accept incoming connections.
       val channelFuture = b.bind(Settings.port).sync()

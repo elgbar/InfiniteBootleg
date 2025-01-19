@@ -11,12 +11,10 @@ import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Com
  * Despawn an entity if we are currently the server
  */
 fun despawnEntity(entity: Entity, despawnReason: Packets.DespawnEntity.DespawnReason) {
-  if (Main.isServer) {
-    val entityId = entity.id
-    if (!entity.authoritativeOnly) {
-      launchOnAsync {
-        broadcast(clientBoundDespawnEntity(entityId, despawnReason))
-      }
+  val entityId = entity.id
+  if (!entity.authoritativeOnly) {
+    launchOnAsync {
+      Main.inst().packetBroadcaster.broadcast(clientBoundDespawnEntity(entityId, despawnReason))
     }
   }
 }

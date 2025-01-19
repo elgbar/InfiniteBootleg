@@ -30,6 +30,11 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
    */
   abstract fun fetchChunk(chunkLoc: ChunkCompactLoc): LoadedChunk
 
+  /**
+   * Save the given chunk to the disk
+   */
+  open fun save(chunk: Chunk) = Unit
+
   fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
     val chunkPosition = protoChunk.position
     val chunk = ChunkImpl(world, chunkPosition.x, chunkPosition.y)

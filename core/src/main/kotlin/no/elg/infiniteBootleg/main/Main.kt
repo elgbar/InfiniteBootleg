@@ -6,6 +6,7 @@ import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.console.InGameConsoleHandler
+import no.elg.infiniteBootleg.server.PacketBroadcaster
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
 import java.time.Instant
@@ -26,6 +27,7 @@ interface Main : ApplicationListener {
   val renderThreadName: String
   val assets: InfAssets
   val startTime: Instant
+  val packetBroadcaster: PacketBroadcaster
 
   /**
    * If we are allowed to make changes or move a given entity

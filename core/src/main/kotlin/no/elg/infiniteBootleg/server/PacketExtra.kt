@@ -2,8 +2,6 @@ package no.elg.infiniteBootleg.server
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.netty.channel.group.ChannelMatcher
-import io.netty.channel.group.ChannelMatchers
 import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.inventory.container.Container
@@ -12,7 +10,6 @@ import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.ContentRequestKt
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
@@ -58,19 +55,19 @@ import no.elg.infiniteBootleg.protobuf.contentRequest
 import no.elg.infiniteBootleg.protobuf.holdingItem
 import no.elg.infiniteBootleg.protobuf.interfaceUpdate
 import no.elg.infiniteBootleg.protobuf.moveEntity
-import no.elg.infiniteBootleg.protobuf.ownedContainer
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlot
 import no.elg.infiniteBootleg.screens.ConnectingScreen
-import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
+import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.decompactLocX
+import no.elg.infiniteBootleg.util.decompactLocY
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.util.toVector2i
-import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ContainerElement.Companion.asProto
 import no.elg.infiniteBootleg.world.Material.AIR
@@ -79,7 +76,6 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
@@ -92,56 +88,20 @@ private val logger = KotlinLogging.logger {}
 // //////////////////
 
 internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
-  if (Settings.client) {
-    launchOnAsync {
-      delay(50L)
-      close()
+  require(Settings.client)
+  launchOnAsync {
+    delay(50L)
+    close()
+  }
+  launchOnMain {
+    ConnectingScreen.info = msg
+    ClientMain.inst().screen = ConnectingScreen
+    val serverClient = ClientMain.inst().serverClient
+    if (serverClient?.sharedInformation != null) {
+      this@fatal.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
     }
-    launchOnMain {
-      ConnectingScreen.info = msg
-      ClientMain.inst().screen = ConnectingScreen
-      val serverClient = ClientMain.inst().serverClient
-      if (serverClient?.sharedInformation != null) {
-        this@fatal.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
-      }
-    }
-  } else {
-    this.writeAndFlushPacket(clientBoundDisconnectPlayerPacket(msg))
   }
   logger.error { msg }
-}
-
-/**
- * Broadcast to all other channels than [this]
- */
-fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
-  require(Main.isServer) { "This broadcasting methods can only be used by servers" }
-  channels.writeAndFlush(packet, filter)
-}
-
-/**
- * Broadcast a packet to players which have the given [worldPosition] location loaded.
- *
- * Can only be used by a server instance
- */
-fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
-  require(Main.isServer) { "This broadcasting methods can only be used by servers" }
-  val world = ServerMain.inst().serverWorld
-  val renderer = world.render
-  broadcast(packet) { channel ->
-    val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
-    val viewing = renderer.getClient(sharedInfo.entityId) ?: return@broadcast false
-    return@broadcast viewing.isInView(chunkX, chunkY) && filter.matches(channel)
-  }
-}
-
-fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
-  broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
-}
-
-fun broadcastToInView(packet: Packet, entity: Entity, filter: ChannelMatcher = ChannelMatchers.all()) {
-  val (worldX, worldY) = entity.positionComponent
-  broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
 }
 
 fun ServerClient.serverBoundPacketBuilder(type: Type): Packet.Builder {
@@ -374,10 +334,28 @@ fun clientBoundInterfaceUpdate(interfaceId: String, updateType: InterfaceUpdate.
  */
 fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Packet) {
   if (Main.isServer) {
-    broadcast(ifIsServer())
+    Main.inst().packetBroadcaster.broadcast(ifIsServer())
   } else if (Main.isServerClient) {
     val client = ClientMain.inst().serverClient ?: error("Server client null after check")
     client.ctx.writeAndFlushPacket(client.ifIsClient())
+  }
+}
+
+/**
+ * Helper method to send either a server bound or client bound packet depending on which this instance currently is.
+ *
+ * @param ifIsServer The packet to send if we are the server, and the chunk to send it to
+ * @param ifIsClient The packet to send if we are a server client
+ */
+fun sendDuplexPacketInView(ifIsServer: () -> Pair<Packet?, ChunkCompactLoc>, ifIsClient: ServerClient.() -> Packet?) {
+  if (Main.isServer) {
+    val (maybePacket, chunkLoc) = ifIsServer()
+    val packet = maybePacket ?: return
+    Main.inst().packetBroadcaster.broadcastToInViewChunk(packet, chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
+  } else if (Main.isServerClient) {
+    val client = ClientMain.inst().serverClient ?: error("Server client null after check")
+    val packet = client.ifIsClient() ?: return
+    client.ctx.writeAndFlushPacket(packet)
   }
 }
 

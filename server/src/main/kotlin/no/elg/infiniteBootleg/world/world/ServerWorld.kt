@@ -3,11 +3,13 @@ package no.elg.infiniteBootleg.world.world
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
+import com.badlogic.ashley.core.EntitySystem
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.server.broadcastToInViewChunk
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
+import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
@@ -15,10 +17,13 @@ import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
+import no.elg.infiniteBootleg.world.ecs.system.server.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
-import no.elg.infiniteBootleg.world.loader.WorldLoader
+import no.elg.infiniteBootleg.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer
 import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
+import no.elg.infiniteBootleg.world.ticker.ServerWorldTicker
+import no.elg.infiniteBootleg.world.ticker.WorldTicker
 
 private val logger = KotlinLogging.logger {}
 
@@ -30,15 +35,18 @@ private val logger = KotlinLogging.logger {}
 class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : World(generator, seed, worldName) {
 
   override val render = HeadlessWorldRenderer(this)
+  override val worldTicker: WorldTicker = ServerWorldTicker(this, tick = false)
 
   fun disconnectPlayer(entityId: String, kicked: Boolean) {
     val player = getEntity(entityId)
     if (player != null) {
-      removeEntity(player, if (kicked) DespawnReason.PLAYER_KICKED else DespawnReason.PLAYER_QUIT)
+      removeEntity(player, if (kicked) Packets.DespawnEntity.DespawnReason.PLAYER_KICKED else Packets.DespawnEntity.DespawnReason.PLAYER_QUIT)
     } else {
       logger.warn { "Failed to find player $entityId to remove" }
     }
   }
+
+  override fun additionalSystems(): Set<EntitySystem> = setOf(KickPlayerWithoutChannel)
 
   override fun addEntityListeners(engine: Engine) {
     engine.addEntityListener(
@@ -64,13 +72,23 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     render.update()
     if (player.shouldSendToClients) {
       launchOnMain {
-        broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
+        Main.inst().packetBroadcaster.broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
       }
     }
   }
 
   private fun onEntityRemove(player: Entity) {
-    WorldLoader.saveServerPlayer(player)
+    ServerWorldLoader.saveServerPlayer(player)
     render.removeClient(player.id)
+  }
+
+  override fun removeEntity(entity: Entity, reason: Packets.DespawnEntity.DespawnReason) {
+    despawnEntity(entity, reason)
+    super.removeEntity(entity, reason)
+  }
+
+  override fun save() {
+    playersEntities.forEach(ServerWorldLoader::saveServerPlayer)
+    super.save()
   }
 }

@@ -11,31 +11,6 @@ import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromP
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
-import no.elg.infiniteBootleg.protobuf.Packets.BreakingBlock
-import no.elg.infiniteBootleg.protobuf.Packets.ContainerUpdate
-import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY
-import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
-import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BLOCK_UPDATE
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_BREAKING_BLOCK
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_CONTAINER_UPDATE
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_DISCONNECT
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_HEARTBEAT
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_MOVE_ENTITY
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_SECRET_EXCHANGE
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CONTENT_REQUEST
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_SELECT_SLOT
-import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
-import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
-import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
-import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
-import no.elg.infiniteBootleg.protobuf.Packets.UpdateSelectedSlot
-import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.blockOrNull
 import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
@@ -50,7 +25,6 @@ import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
 import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
-import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
@@ -77,7 +51,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
-import no.elg.infiniteBootleg.world.loader.WorldLoader
+import no.elg.infiniteBootleg.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.forEach
 import java.security.SecureRandom
@@ -94,30 +68,76 @@ private val logger = KotlinLogging.logger {}
 fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.Packet) {
   logPacket(serverSideServerBoundMarker, packet)
   when (packet.type) {
-    DX_HEARTBEAT -> handleHeartbeat(ctx)
-    DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnMain { handleMovePlayer(ctx, it) } }
-    DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let { launchOnAsync { asyncHandleBlockUpdate(ctx, it) } }
+    Packets.Packet.Type.DX_HEARTBEAT -> handleHeartbeat(ctx)
+    Packets.Packet.Type.DX_MOVE_ENTITY -> packet.moveEntityOrNull?.let { launchOnMain { handleMovePlayer(ctx, it) } }
+    Packets.Packet.Type.DX_BLOCK_UPDATE -> packet.updateBlockOrNull?.let {
+      launchOnAsync {
+        asyncHandleBlockUpdate(
+          ctx,
+          it
+        )
+      }
+    }
 
-    SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
+    Packets.Packet.Type.SB_CONTENT_REQUEST -> packet.contentRequestOrNull?.let { handleContentRequest(ctx, it) }
 
-    DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsync { asyncHandleBreakingBlock(ctx, it) } }
-    DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsync { asyncHandleContainerUpdate(ctx, it) } }
+    Packets.Packet.Type.DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let {
+      launchOnAsync {
+        asyncHandleBreakingBlock(
+          ctx,
+          it
+        )
+      }
+    }
 
-    SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let { launchOnAsync { asyncHandleUpdateSelectedSlot(ctx, it) } }
+    Packets.Packet.Type.DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let {
+      launchOnAsync {
+        asyncHandleContainerUpdate(
+          ctx,
+          it
+        )
+      }
+    }
 
-    SB_LOGIN -> packet.loginOrNull?.let { launchOnMain { handleLoginPacket(ctx, it) } }
-    SB_CLIENT_WORLD_LOADED -> launchOnAsync { asyncHandleClientsWorldLoaded(ctx) }
-    DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { launchOnMain { handleSecretExchange(ctx, it) } }
+    Packets.Packet.Type.SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let {
+      launchOnAsync {
+        asyncHandleUpdateSelectedSlot(
+          ctx,
+          it
+        )
+      }
+    }
 
-    DX_DISCONNECT -> launchOnMain { handleDisconnect(ctx, packet.disconnectOrNull) }
-    DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let { launchOnMain { handleWorldSettings(ctx, it) } }
+    Packets.Packet.Type.SB_LOGIN -> packet.loginOrNull?.let { launchOnMain { handleLoginPacket(ctx, it) } }
+    Packets.Packet.Type.SB_CLIENT_WORLD_LOADED -> launchOnAsync { asyncHandleClientsWorldLoaded(ctx) }
+    Packets.Packet.Type.DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let {
+      launchOnMain {
+        handleSecretExchange(
+          ctx,
+          it
+        )
+      }
+    }
 
-    SB_CAST_SPELL -> launchOnAsync { asyncHandleCastSpell(ctx) }
+    Packets.Packet.Type.DX_DISCONNECT -> launchOnMain { handleDisconnect(ctx, packet.disconnectOrNull) }
+    Packets.Packet.Type.DX_WORLD_SETTINGS -> packet.worldSettingsOrNull?.let {
+      launchOnMain {
+        handleWorldSettings(
+          ctx,
+          it
+        )
+      }
+    }
 
-    UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
+    Packets.Packet.Type.SB_CAST_SPELL -> launchOnAsync { asyncHandleCastSpell(ctx) }
+
+    Packets.Packet.Type.UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
     else -> ctx.fatal("Server cannot handle packet of type ${packet.type}")
   }
 }
+// ///////////////////
+// SYNCED HANDLERS  //
+// ///////////////////
 
 private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentRequest: Packets.ContentRequest) {
   // Chunk request
@@ -138,11 +158,7 @@ private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentReque
   }
 }
 
-// ///////////////////
-// SYNCED HANDLERS  //
-// ///////////////////
-
-private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: WorldSettings) {
+private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: Packets.WorldSettings) {
   logger.info { "handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
   val world = ServerMain.inst().serverWorld
   var spawn: Long? = null
@@ -162,10 +178,10 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
     timeScale = worldSettings.timeScale
   }
   // Rebroadcast the packet to all clients to stay in sync
-  broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
+  Main.inst().packetBroadcaster.broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
 }
 
-private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: MoveEntity) {
+private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Packets.MoveEntity) {
   val player = ctx.getCurrentPlayer()
   if (player == null) {
     ctx.fatal("No server side player found!")
@@ -179,10 +195,10 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Move
   player.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
 
   // Only set look direction if it exists on the entity from before
-  moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
+  moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.Companion.valueOf(it) }
 }
 
-private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: SecretExchange) {
+private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: Packets.SecretExchange) {
   val shared = ctx.getSharedInformation()
   if (shared == null) {
     ctx.fatal("No secret with this channel, send login request first")
@@ -195,7 +211,7 @@ private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchan
       ctx.fatal("Wrong shared information returned by client")
       return
     }
-    val player = Main.inst().world?.getEntity(shared.entityId)
+    val player = Main.Companion.inst().world?.getEntity(shared.entityId)
     if (player != null) {
       ctx.writeAndFlushPacket(clientBoundStartGamePacket(player))
     } else {
@@ -224,18 +240,18 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   val world = ServerMain.inst().serverWorld
 
   if (world.hasPlayer(entityId)) {
-    ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
+    ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
     ctx.close()
     return
   }
   // Client is good to login (informational packet)
-  ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
+  ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.PROCEED_LOGIN))
 
   val secret = UUID.nameUUIDFromBytes(ByteArray(128).also { secureRandom.nextBytes(it) })
   val sharedInformation = SharedInformation(entityId, secret.toString())
   ServerBoundHandler.clients[ctx.channel()] = sharedInformation
 
-  WorldLoader.spawnServerPlayer(world, entityId, username, sharedInformation)
+  ServerWorldLoader.spawnServerPlayer(world, entityId, username, sharedInformation)
     .orTimeout(10, TimeUnit.SECONDS)
     .whenComplete { _, ex ->
       if (ex == null) {
@@ -252,7 +268,7 @@ private fun handleHeartbeat(ctx: ChannelHandlerContextWrapper) {
   ctx.getSharedInformation()?.beat() ?: logger.error { "Failed to beat, because of null shared information" }
 }
 
-private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Disconnect?) {
+private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Packets.Disconnect?) {
   logger.info { "Client sent disconnect packet. Reason: ${disconnect?.reason ?: "No reason given"}" }
   ctx.close()
 }
@@ -261,7 +277,7 @@ private fun handleDisconnect(ctx: ChannelHandlerContextWrapper, disconnect: Disc
 // ASYNC HANDLERS  //
 // //////////////////
 
-private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: UpdateBlock) {
+private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdate: Packets.UpdateBlock) {
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   if (isLocInView(ctx, worldX, worldY)) {
@@ -303,7 +319,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     }
     ctx.flush()
   }
-  ctx.writeAndFlushPacket(clientBoundPacketBuilder(CB_INITIAL_CHUNKS_SENT).build())
+  ctx.writeAndFlushPacket(clientBoundPacketBuilder(Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT).build())
   logger.debug { "Initial ${chunksInView.size} chunks sent to player ${player.name}" }
 
   val validEntitiesToSendToClient = world.validEntitiesToSendToClient
@@ -323,7 +339,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
     logger.debug { "No entities to send to player ${player.name}" }
   }
 
-  ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
+  ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.LOGIN_SUCCESS))
 
   shared.heartbeatTask = ctx.executor().scheduleAtFixedRate({
 //    logger.info { "Sending heartbeat to client" }
@@ -335,7 +351,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
       ctx.channel().close()
       ctx.channel().disconnect()
     }
-  }, HEARTBEAT_PERIOD_MS, HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
+  }, SharedInformation.Companion.HEARTBEAT_PERIOD_MS, SharedInformation.Companion.HEARTBEAT_PERIOD_MS, TimeUnit.MILLISECONDS)
   logger.info { "Player ${player.name} joined" }
 }
 
@@ -343,7 +359,7 @@ private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId
   val world = ServerMain.inst().serverWorld
 
   val entity = world.getEntity(entityId) ?: run {
-    ctx.writeAndFlushPacket(clientBoundDespawnEntity(entityId, UNKNOWN_ENTITY))
+    ctx.writeAndFlushPacket(clientBoundDespawnEntity(entityId, Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY))
     return
   }
   val position = entity.position
@@ -352,12 +368,12 @@ private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId
   }
 }
 
-private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: BreakingBlock) {
+private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: Packets.BreakingBlock) {
   // Naive and simple re-broadcast
-  broadcast(clientBoundPacketBuilder(DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
+  Main.inst().packetBroadcaster.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
 }
 
-private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: ContainerUpdate) {
+private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: Packets.ContainerUpdate) {
   // Naive and simple re-broadcast
   // TODO check that the player can do this
   // FIXME make sure not to broadcast when no changes are made
@@ -365,7 +381,7 @@ private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, contai
   ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
     container.content.copyInto(serverOwnedContainer.container.content)
   }
-  broadcast(clientBoundPacketBuilder(DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
+  Main.inst().packetBroadcaster.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
 }
 
 private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
@@ -385,7 +401,7 @@ private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner
   }
 }
 
-private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, updateSelectedSlot: UpdateSelectedSlot) {
+private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, updateSelectedSlot: Packets.UpdateSelectedSlot) {
   val entity = ctx.getCurrentPlayer() ?: return
   val slot = HotbarComponent.Companion.HotbarSlot.fromOrdinalOrNull(updateSelectedSlot.slot) ?: return
   val hotbarComponent = entity.hotbarComponentOrNull ?: run {
@@ -394,7 +410,7 @@ private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, upd
   }
   hotbarComponent.selected = slot
   val selectedElement = hotbarComponent.selectedItem(entity)?.element ?: Material.AIR
-  broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
+  Main.inst().packetBroadcaster.broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
 }
 
 // ///////////

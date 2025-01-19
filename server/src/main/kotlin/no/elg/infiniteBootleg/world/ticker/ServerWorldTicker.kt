@@ -1,9 +1,8 @@
 package no.elg.infiniteBootleg.world.ticker
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.world.ticker.WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX
-import no.elg.infiniteBootleg.world.world.World
+import no.elg.infiniteBootleg.world.world.ServerWorld
 
 /**
  * There are multiple tickers for a single world internally, but the outside world should only see a
@@ -13,27 +12,19 @@ import no.elg.infiniteBootleg.world.world.World
  *
  * Multiple tickers are needed due to some ticks will happen less frequently.
  */
-interface WorldTicker : Ticker {
-  val box2DTicker: WorldBox2DTicker
+class ServerWorldTicker(world: ServerWorld, tick: Boolean) : WorldTicker {
 
-  companion object {
-    const val WORLD_TICKER_TAG_PREFIX = "World-"
-  }
-}
+  private val ticker = CommonWorldTicker(world, tick)
+  private val serverRendererTicker: ServerRendererTicker = ServerRendererTicker(world, tick)
 
-class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
-  private val ticker = TickerImpl(WorldTickee(world), WORLD_TICKER_TAG_PREFIX + world.name, tick, Settings.tps, TickerImpl.DEFAULT_NAG_DELAY)
-  override val box2DTicker: WorldBox2DTicker = WorldBox2DTicker(world, tick)
   private val logger = KotlinLogging.logger(WORLD_TICKER_TAG_PREFIX + world.name)
+  override val box2DTicker: WorldBox2DTicker get() = ticker.box2DTicker
 
   override fun start() {
-    check(!ticker.isStarted) { "World has already been started" }
+    check(!ticker.isStarted) { "Server world has already been started" }
     ticker.start()
-    box2DTicker.ticker.start()
-    while (ticker.tickId <= 0) {
-      Thread.onSpinWait()
-    }
-    while (box2DTicker.ticker.tickId <= 0) {
+    serverRendererTicker.ticker.start()
+    while (serverRendererTicker.ticker.tickId <= 0) {
       Thread.onSpinWait()
     }
     logger.info { "Started world ticker" }
@@ -47,7 +38,7 @@ class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
    */
   override fun pause() {
     ticker.pause()
-    box2DTicker.ticker.pause()
+    serverRendererTicker.ticker.pause()
   }
 
   /**
@@ -58,14 +49,14 @@ class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
    */
   override fun resume() {
     ticker.resume()
-    box2DTicker.ticker.resume()
+    serverRendererTicker.ticker.resume()
   }
 
   override fun postRunnable(runnable: () -> Unit) = ticker.postRunnable(runnable)
 
   override fun stop() {
     ticker.stop()
-    box2DTicker.ticker.stop()
+    serverRendererTicker.ticker.stop()
   }
 
   override val tps: Long get() = ticker.tps

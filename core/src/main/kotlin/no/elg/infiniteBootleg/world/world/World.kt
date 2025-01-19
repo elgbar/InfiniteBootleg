@@ -33,7 +33,6 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.world
-import no.elg.infiniteBootleg.server.despawnEntity
 import no.elg.infiniteBootleg.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -114,7 +113,6 @@ import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.world.ecs.system.magic.SpellRemovalSystem
-import no.elg.infiniteBootleg.world.ecs.system.server.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.world.loader.WorldLoader
 import no.elg.infiniteBootleg.world.loader.WorldLoader.canWriteToWorld
@@ -123,12 +121,11 @@ import no.elg.infiniteBootleg.world.loader.WorldLoader.generatorFromProto
 import no.elg.infiniteBootleg.world.loader.WorldLoader.writeLockFile
 import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.FullChunkLoader
-import no.elg.infiniteBootleg.world.loader.chunk.ServerClientChunkLoader
 import no.elg.infiniteBootleg.world.managers.container.AuthoritativeWorldContainerManager
-import no.elg.infiniteBootleg.world.managers.container.ServerClientWorldContainerManager
 import no.elg.infiniteBootleg.world.managers.container.WorldContainerManager
 import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
+import no.elg.infiniteBootleg.world.ticker.CommonWorldTicker
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
 import java.lang.ref.WeakReference
 import java.util.concurrent.CompletableFuture
@@ -172,28 +169,15 @@ abstract class World(
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(generatorFromProto(protoWorld), protoWorld.seed, protoWorld.name, forceTransient)
 
-  val worldTicker: WorldTicker
-
-  val worldContainerManager: WorldContainerManager
-
-  val worldBody: WorldBody
-  val worldTime: WorldTime
-
-  /**
-   * The entity engine of this world
-   *
-   * Adding and removing entities to the engine must be used on [ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
-   */
-  val engine: ThreadSafeEngine
-
-  val chunkLoader: ChunkLoader = if (this is ServerClientWorld) {
-    ServerClientChunkLoader(this, generator)
-  } else {
-    FullChunkLoader(this, generator)
-  }
-
   var chunkReads = AtomicInteger(0)
   var chunkWrites = AtomicInteger(0)
+
+  private val metadata: WorldMetadata = WorldMetadata(
+    name = name,
+    seed = seed,
+    spawn = compactLoc(0, generator.getHeight(0)),
+    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
+  )
 
   /**
    * must be accessed under [chunksLock]
@@ -203,6 +187,168 @@ abstract class World(
   private val chunks = LongMap<Chunk>()
 
   private val chunksLock: StampedLock = StampedLock()
+
+  /**
+   * The entity engine of this world
+   *
+   * Adding and removing entities to the engine must be used on [ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
+   */
+  val engine: ThreadSafeEngine = initializeEngine()
+
+  val worldBody: WorldBody = WorldBody(this)
+  val worldTime: WorldTime = WorldTime(this)
+
+  open val worldTicker: WorldTicker = CommonWorldTicker(this, false)
+  open val worldContainerManager: WorldContainerManager = AuthoritativeWorldContainerManager(engine)
+  open val chunkLoader: ChunkLoader = FullChunkLoader(this, generator)
+
+  val chunkColumnsManager: ChunkColumnsManager = ChunkColumnsManager(this)
+
+  /**
+   * Spawn in world coordinates
+   */
+  var spawn: WorldCompactLoc
+    get() = metadata.spawn
+    set(value) {
+      val old = metadata.spawn
+      if (value != old) {
+        dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
+        metadata.spawn = value
+      }
+    }
+
+  /**
+   * Whether this world is can be saved to disk
+   */
+  val isTransient: Boolean get() = metadata.isTransient
+
+  /**
+   * @return Unique identification of this world
+   */
+  val uuid: String get() = metadata.uuid
+  val isLoaded: Boolean get() = metadata.isLoaded
+  val name: String get() = metadata.name
+  val seed: Long get() = metadata.seed
+  val worldFolder: FileHandle? get() = metadata.worldFolder
+
+  val tick get() = worldTicker.tickId
+
+  val playersEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(playerFamily)
+  val controlledPlayerEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(localPlayerFamily)
+  val standaloneEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicStandaloneEntityFamily)
+  val validEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamily)
+  val validEntitiesToSendToClient: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
+  val namedEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(namedEntitiesFamily)
+
+  init {
+    MathUtils.random.setSeed(seed)
+    val world: World = this
+
+    oneShotListener<InitialChunksOfWorldLoadedEvent> {
+      if (Main.isAuthoritative) {
+        // Add a delay to make sure the light is calculated
+        launchOnAsync {
+          delay(200L)
+          dispatchEvent(WorldLoadedEvent(world))
+        }
+      }
+    }
+
+    oneShotListener<WorldLoadedEvent> {
+      launchOnMain {
+        logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
+        addSystems()
+        metadata.isLoaded = true
+        readChunks { readableChunks ->
+          readableChunks.values().forEach(Chunk::updateAllBlockLights)
+        }
+      }
+    }
+  }
+
+  protected open fun addEntityListeners(engine: Engine) {}
+  protected open fun additionalSystems(): Set<EntitySystem> = setOf()
+
+  private fun initializeEngine(): ThreadSafeEngine {
+    val engine = ThreadSafeEngine()
+    ensureUniquenessListener(engine)
+    disposeEntitiesOnRemoval(engine)
+    addEntityListeners(engine)
+    return engine
+  }
+
+  private fun addSystems() {
+    engine.addSystem(MaxVelocitySystem)
+    engine.addSystem(ReadBox2DStateSystem)
+    engine.addSystem(WriteBox2DStateSystem)
+    engine.addSystem(PhysicsSystem)
+    engine.addSystem(UpdateGridBlockSystem)
+    engine.addSystem(OutOfBoundsSystem)
+    engine.addSystem(FallingBlockSystem)
+    engine.addSystem(ExplosiveBlockSystem)
+    engine.addSystem(LeavesDecaySystem)
+    engine.addSystem(MineBlockSystem)
+    engine.addSystem(NoGravityInUnloadedChunksSystem)
+    engine.addSystem(FollowEntitySystem)
+    engine.addSystem(InputSystem)
+    engine.addSystem(MagicSystem)
+    engine.addSystem(SpellRemovalSystem)
+    engine.addSystem(RemoveStaleEntitiesSystem)
+    additionalSystems().forEach(engine::addSystem)
+  }
+
+  fun initialize() {
+    var willDispatchChunksLoadedEvent = false
+    val worldFolder = worldFolder
+    if (!isTransient && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
+      if (!Settings.ignoreWorldLock) {
+        metadata.isTransient = true
+        logger.warn { "World found is already in use. Initializing world as a transient." }
+      } else {
+        logger.warn { "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!" }
+      }
+    }
+    if (worldFolder == null) {
+      logger.info { "No world save found" }
+    } else if (isTransient) {
+      logger.info { "World is transient, will not load from disk" }
+    } else {
+      logger.info { "Loading world from '${worldFolder.file().absolutePath}'" }
+      if (writeLockFile(uuid)) {
+        val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
+        if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
+          try {
+            val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
+            willDispatchChunksLoadedEvent = loadFromProtoWorld(protoWorld)
+          } catch (e: InvalidProtocolBufferException) {
+            e.printStackTrace()
+          }
+        }
+      } else {
+        logger.error { "Failed to write world lock file! Setting world to transient to be safe" }
+        metadata.isTransient = true
+      }
+    }
+
+    (render as? ClientWorldRender)?.lookAt(spawn)
+    worldTicker.start()
+
+    if (!willDispatchChunksLoadedEvent) {
+      render.update()
+
+      launchOnAsync {
+        if (Main.isSingleplayer) {
+          this@World.createNewPlayer().thenApply {
+            logger.debug { "Spawned new singleplayer player" }
+          }
+          logger.debug { "Spawning new singleplayer player" }
+        }
+        render.chunkLocationsInView.forEach(::loadChunk)
+        dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
+      }
+    }
+    updateSavePeriod()
+  }
 
   fun createChunkIterator(): LongMap.Entries<Chunk> = LongMap.Entries(chunks)
 
@@ -270,172 +416,6 @@ abstract class World(
     return result
   }
 
-  val chunkColumnsManager: ChunkColumnsManager = ChunkColumnsManager(this)
-
-  /**
-   * Spawn in world coordinates
-   */
-  var spawn: WorldCompactLoc
-    get() = metadata.spawn
-    set(value) {
-      val old = metadata.spawn
-      if (value != old) {
-        dispatchEvent(WorldSpawnUpdatedEvent(this, old, value))
-        metadata.spawn = value
-      }
-    }
-
-  /**
-   * Whether this world is can be saved to disk
-   */
-  val isTransient: Boolean get() = metadata.isTransient
-
-  /**
-   * @return Unique identification of this world
-   */
-  val uuid: String get() = metadata.uuid
-  val isLoaded: Boolean get() = metadata.isLoaded
-  val name: String get() = metadata.name
-  val seed: Long get() = metadata.seed
-  val worldFolder: FileHandle? get() = metadata.worldFolder
-
-  private val metadata: WorldMetadata = WorldMetadata(
-    name = name,
-    seed = seed,
-    spawn = compactLoc(0, chunkLoader.generator.getHeight(0)),
-    isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.isServerClient
-  )
-
-  val tick get() = worldTicker.tickId
-
-  init {
-    MathUtils.random.setSeed(seed)
-    val world: World = this
-    worldTicker = WorldTicker(world, false)
-    worldTime = WorldTime(world)
-    engine = initializeEngine()
-    worldBody = WorldBody(world)
-
-    worldContainerManager = if (world is ServerClientWorld) {
-      ServerClientWorldContainerManager(world)
-    } else {
-      AuthoritativeWorldContainerManager(engine)
-    }
-
-    oneShotListener<InitialChunksOfWorldLoadedEvent> {
-      if (Main.isAuthoritative) {
-        // Add a delay to make sure the light is calculated
-        launchOnAsync {
-          delay(200L)
-          dispatchEvent(WorldLoadedEvent(world))
-        }
-      }
-    }
-
-    oneShotListener<WorldLoadedEvent> {
-      launchOnMain {
-        logger.debug { "Handling InitialChunksOfWorldLoadedEvent, adding systems to the engine" }
-        addSystems()
-        metadata.isLoaded = true
-        readChunks { readableChunks ->
-          readableChunks.values().forEach(Chunk::updateAllBlockLights)
-        }
-      }
-    }
-  }
-
-  val playersEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(playerFamily)
-  val controlledPlayerEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(localPlayerFamily)
-  val standaloneEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicStandaloneEntityFamily)
-  val validEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamily)
-  val validEntitiesToSendToClient: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
-  val namedEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(namedEntitiesFamily)
-
-  private fun initializeEngine(): ThreadSafeEngine {
-    val engine = ThreadSafeEngine()
-    ensureUniquenessListener(engine)
-    disposeEntitiesOnRemoval(engine)
-    addEntityListeners(engine)
-    return engine
-  }
-
-  private fun addSystems() {
-    engine.addSystem(MaxVelocitySystem)
-    engine.addSystem(ReadBox2DStateSystem)
-    engine.addSystem(WriteBox2DStateSystem)
-    engine.addSystem(PhysicsSystem)
-    engine.addSystem(UpdateGridBlockSystem)
-    engine.addSystem(OutOfBoundsSystem)
-    engine.addSystem(FallingBlockSystem)
-    engine.addSystem(ExplosiveBlockSystem)
-    engine.addSystem(LeavesDecaySystem)
-    engine.addSystem(MineBlockSystem)
-    engine.addSystem(NoGravityInUnloadedChunksSystem)
-    engine.addSystem(FollowEntitySystem)
-    engine.addSystem(InputSystem)
-    engine.addSystem(KickPlayerWithoutChannel)
-    engine.addSystem(MagicSystem)
-    engine.addSystem(SpellRemovalSystem)
-    engine.addSystem(RemoveStaleEntitiesSystem)
-    additionalSystems().forEach(engine::addSystem)
-  }
-
-  protected open fun addEntityListeners(engine: Engine) {}
-  protected open fun additionalSystems(): Set<EntitySystem> = setOf()
-
-  fun initialize() {
-    var willDispatchChunksLoadedEvent = false
-    val worldFolder = worldFolder
-    if (!isTransient && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
-      if (!Settings.ignoreWorldLock) {
-        metadata.isTransient = true
-        logger.warn { "World found is already in use. Initializing world as a transient." }
-      } else {
-        logger.warn { "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!" }
-      }
-    }
-    if (worldFolder == null) {
-      logger.info { "No world save found" }
-    } else if (isTransient) {
-      logger.info { "World is transient, will not load from disk" }
-    } else {
-      logger.info { "Loading world from '${worldFolder.file().absolutePath}'" }
-      if (writeLockFile(uuid)) {
-        val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
-        if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
-          try {
-            val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
-            willDispatchChunksLoadedEvent = loadFromProtoWorld(protoWorld)
-          } catch (e: InvalidProtocolBufferException) {
-            e.printStackTrace()
-          }
-        }
-      } else {
-        logger.error { "Failed to write world lock file! Setting world to transient to be safe" }
-        metadata.isTransient = true
-      }
-    }
-
-    (render as? ClientWorldRender)?.lookAt(spawn)
-    worldTicker.start()
-
-    if (!willDispatchChunksLoadedEvent) {
-      render.update()
-
-      launchOnAsync {
-        if (Main.isSingleplayer) {
-          this@World.createNewPlayer().thenApply {
-            logger.debug { "Spawned new singleplayer player" }
-          }
-          logger.debug { "Spawning new singleplayer player" }
-        }
-        render.chunkLocationsInView.forEach(::loadChunk)
-        dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
-      }
-    }
-    updateSavePeriod()
-  }
-
   fun updateSavePeriod() {
     metadata.saveTask = interval(Settings.savePeriodSeconds, Settings.savePeriodSeconds, task = ::save)
   }
@@ -468,16 +448,12 @@ abstract class World(
     }
   }
 
-  fun save() {
+  open fun save() {
     if (isTransient) {
       return
     }
     val worldFolder = worldFolder ?: return
     logger.debug { "Saving world '${metadata.name}'" }
-
-    if (Main.isServer) {
-      playersEntities.forEach(WorldLoader::saveServerPlayer)
-    }
 
     readChunks { readableChunks ->
       val chunkLoader = chunkLoader
@@ -984,7 +960,7 @@ abstract class World(
       val removedChunk: Chunk? = writeChunks { writableChunks ->
         writableChunks.remove(chunk.compactLocation)
       }
-      if (save && chunkLoader is FullChunkLoader) {
+      if (save) {
         chunkLoader.save(chunk)
       }
       chunk.dispose()
@@ -1018,8 +994,7 @@ abstract class World(
    * @throws IllegalArgumentException if the given entity is not part of this world
    */
   @JvmOverloads
-  fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
-    despawnEntity(entity, reason)
+  open fun removeEntity(entity: Entity, reason: DespawnReason = DespawnReason.UNKNOWN_REASON) {
     worldBody.removeEntity(entity)
   }
 
@@ -1219,7 +1194,7 @@ abstract class World(
       }
     }
 
-    worldTicker.dispose()
+    worldTicker.stop()
     synchronized(BOX2D_LOCK) { worldBody.dispose() }
     chunkColumnsManager.dispose()
     chunkLoader.dispose()

@@ -38,7 +38,7 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
   }
 
   //    @GuardedBy("no.elg.infiniteBootleg.world.world.World.chunksLock.writeLock()")
-  fun save(chunk: Chunk) {
+  override fun save(chunk: Chunk) {
     if (!world.isTransient && chunk.shouldSave()) {
       // only save if valid and changed
       val fh = getChunkFile(world, chunk.chunkX, chunk.chunkY) ?: return

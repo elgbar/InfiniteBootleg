@@ -15,6 +15,8 @@ import no.elg.infiniteBootleg.assets.InfAssetsImpl
 import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
+import no.elg.infiniteBootleg.server.ClientPacketBroadcaster
+import no.elg.infiniteBootleg.server.PacketBroadcaster
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.diffTimePretty
 import org.fusesource.jansi.AnsiConsole
@@ -33,6 +35,9 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
 
   final override lateinit var renderThreadName: String
     private set
+
+  override val packetBroadcaster: PacketBroadcaster
+    get() = ClientPacketBroadcaster
 
   init {
     instField = this
@@ -57,11 +62,6 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
       logger.debug { "Last commit created $it" }
     }
     logger.info { "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options" }
-    logger.info {
-      val processStartupTime = ProcessHandle.current().info().startInstant().map(::diffTimePretty).orElseGet { "???" }
-      val userStartupTime = diffTimePretty(startTime)
-      "Create in $userStartupTime (process: $processStartupTime)"
-    }
     Runtime.getRuntime().addShutdownHook(
       Thread {
         if (isAuthoritative) {
@@ -75,6 +75,11 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
 
   protected fun afterCreate() {
     progArgs.onCreate()
+    logger.info {
+      val processStartupTime = ProcessHandle.current().info().startInstant().map(::diffTimePretty).orElseGet { "???" }
+      val userStartupTime = diffTimePretty(startTime)
+      "Create in $userStartupTime (process: $processStartupTime)"
+    }
   }
 
   override val engine: Engine? get() = world?.engine
