@@ -43,19 +43,19 @@ interface Container : Iterable<IndexedItem> {
   fun isNotEmpty(): Boolean = !isEmpty()
 
   /**
-   * @return The first empty slot in the container, return a negative number if none is found
+   * @return The first empty slot in the container or -1 if none is found
    */
   fun indexOfFirstEmpty(): Int
 
   /**
    * @param element The element to match against
-   * @return The index of the first element of type `element` and where the stock is less than max stock
+   * @return The index of the first element of type `element` and where the stock is less than max stock or -1 if none is found
    */
   fun indexOfFirstNonFull(element: ContainerElement): Int
 
   /**
    * @param element The element to match against
-   * @return The index of the first element of type `element`
+   * @return The index of the first element of type `element` or -1 if none is found
    */
   fun indexOfFirst(element: ContainerElement): Int
 
@@ -167,11 +167,6 @@ interface Container : Iterable<IndexedItem> {
   }
 
   /**
-   * @return If the container has an item of this ContainerElement
-   */
-  fun containsAny(element: ContainerElement?): Boolean
-
-  /**
    * This method returns the [Item] as is at the given location, there will be no check
    *
    * @return The `Item` at the given location, `null` if there is nothing there
@@ -180,7 +175,7 @@ interface Container : Iterable<IndexedItem> {
   operator fun get(index: Int): Item?
 
   /**
-   * Overwrite a the given `Item` at `index`. If the given tile validate is `null`
+   * Overwrite the given `Item` at `index`. If the given tile validate is `null`
    * it is the same as calling [remove].
    *
    * @param index The index to place the `Item` at

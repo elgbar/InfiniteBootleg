@@ -139,11 +139,6 @@ open class ContainerImpl(
     return false
   }
 
-  // TODO implement
-  override fun containsAny(element: ContainerElement?): Boolean {
-    return false
-  }
-
   override fun get(index: Int): Item? {
     require(index in 0 until size) { "Index out of bounds: $index" }
     return content[index]
