@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Client load straight into world 0" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncherKt" />
-    <module name="InfiniteBootleg.desktop.main" />
+    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.client.ClientLauncherKt" />
+    <module name="InfiniteBootleg.client.main" />
     <option name="PROGRAM_PARAMETERS" value="--run_cmd=&quot;loadworld 0 false&quot;" />
     <option name="VM_PARAMETERS" value="-XX:+UseZGC -XX:+UseStringDeduplication " />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />

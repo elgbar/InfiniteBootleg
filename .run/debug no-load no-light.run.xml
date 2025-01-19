@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="debug no-load no-light" type="Application" factoryName="Application" singleton="true">
-    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.desktop.DesktopLauncherKt" />
-    <module name="InfiniteBootleg.desktop.main" />
+    <option name="MAIN_CLASS_NAME" value="no.elg.infiniteBootleg.client.ClientLauncherKt" />
+    <module name="InfiniteBootleg.client.main" />
     <option name="PROGRAM_PARAMETERS" value="-dlL" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/core/src/main/resources" />
     <extension name="net.ashald.envfile">

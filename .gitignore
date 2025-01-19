@@ -149,3 +149,5 @@ tests/
 /textures/*.jar
 .kotlin/
 /core/src/main/resources/logs/*
+/client/build/
+/server/build/

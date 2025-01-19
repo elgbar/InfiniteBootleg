@@ -1,0 +1,24 @@
+tasks.register('dist', Jar) {
+  dependsOn classes
+  with jar
+  manifest {
+    attributes 'Main-Class': "no.elg.infiniteBootleg.client.ClientLauncherKt"
+  }
+  archiveBaseName = appName + "-client"
+  archiveVersion = ""
+
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  dependsOn configurations.runtimeClasspath
+  from {
+    configurations.runtimeClasspath.collect {
+      exclude 'META-INF/DEPENDENCIES'
+      exclude 'META-INF/NOTICE'
+      exclude 'META-INF/LICENSE'
+      exclude 'META-INF/LICENSE.txt'
+      exclude 'META-INF/NOTICE.txt'
+      exclude 'META-INF/INDEX.LIST'
+      exclude '**/module-info.class'
+      it.isDirectory() ? it : zipTree(it)
+    }
+  }
+}

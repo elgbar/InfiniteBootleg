@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.diffTimePretty
+import org.fusesource.jansi.AnsiConsole
 import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
@@ -38,6 +39,11 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
   }
 
   override fun create() {
+    AnsiConsole.systemInstall()
+    if (!AnsiConsole.isInstalled()) {
+      logger.warn { "Failed to install jansi" }
+    }
+
     KtxAsync.initiate()
     renderThreadName = Thread.currentThread().name
     console = InGameConsoleHandler().apply {

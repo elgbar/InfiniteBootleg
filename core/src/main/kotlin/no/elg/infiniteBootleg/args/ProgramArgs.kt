@@ -11,14 +11,15 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class ProgramArgs(args: Array<String>) {
-  data class ProgramArgument(val desc: String, val alt: Char = DEFAULT_ALT_CHAR, val func: (String?) -> Unit)
+abstract class ProgramArgs(args: Array<String>) {
+  data class ProgramArgument(val desc: String, val alt: Char = DEFAULT_ALT_CHAR, val default: Any? = null, val func: (String?) -> Unit)
 
   private val arguments = mutableMapOf<String, ProgramArgument>()
   private val executeAfterCreate: MutableSet<() -> Unit> = mutableSetOf()
 
   init {
-    createArguments()
+    createCommonArguments()
+    createSpecificArguments(arguments)
     executeArguments(args)
   }
 
@@ -26,6 +27,8 @@ class ProgramArgs(args: Array<String>) {
     executeAfterCreate.forEach { it.invoke() }
     executeAfterCreate.clear()
   }
+
+  abstract fun createSpecificArguments(arguments: MutableMap<String, ProgramArgument>)
 
   private fun executeArguments(args: Array<String>) {
     for ((key, value) in interpreterArgs(args)) {
@@ -59,7 +62,7 @@ class ProgramArgs(args: Array<String>) {
     arguments.clear()
   }
 
-  private fun createArguments() {
+  private fun createCommonArguments() {
     arguments["run_cmd"] = ProgramArgument(desc = "Run commands after init has completed, split commands by ';'", alt = 'c') { value ->
       if (value == null) {
         logger.warn { "No commands given to run" }
@@ -71,11 +74,6 @@ class ProgramArgs(args: Array<String>) {
           inst().console.execCommand(cmd)
         }
       }
-    }
-
-    arguments["headless"] = ProgramArgument(desc = "Disable rendering of graphics", alt = 'h') {
-      Settings.client = false
-      logger.info { "Graphics is disabled" }
     }
 
     arguments["no_load"] = ProgramArgument(desc = "Do not save nor load the world to and from disk", alt = 'l') {
@@ -104,19 +102,14 @@ class ProgramArgs(args: Array<String>) {
       logger.info { "World seed set to '$value'" }
     }
 
-    arguments["no_lights"] = ProgramArgument(desc = "Disable rendering of lights", alt = 'L') {
-      logger.info { "Lights are disabled. To dynamically enable this use command 'lights'" }
-      Settings.renderLight = false
-    }
-
-    arguments["debug"] = ProgramArgument(desc = "Enable debugging, including debug rendering for box2d", alt = 'd') {
+    arguments["debug"] = ProgramArgument(desc = "Enable debugging", alt = 'd') {
       logger.info { "Debug is enabled. To disable this at runtime use command 'debug'" }
       Settings.debug = true
     }
 
-    arguments["tps"] = ProgramArgument(desc = "Specify physics updates per seconds. Must be a positive integer (> 0)", alt = 'T') { value ->
+    arguments["tps"] = ProgramArgument(desc = "Specify updates per seconds. Must be a positive integer (> 0)", alt = 'T', default = Settings.tps) { value ->
       if (value == null) {
-        logger.error { "Specify the of physics updates per seconds. Must be an integer greater than to 0" }
+        logger.error { "Specify the of updates per seconds. Must be an integer greater than to 0" }
         return@ProgramArgument
       }
       try {
@@ -140,29 +133,12 @@ class ProgramArgs(args: Array<String>) {
       val maxNameSize = sortedArguments.keys.maxOfOrNull { it.length } ?: 0
 
       for ((name, prgArg) in sortedArguments) {
-        val (desc, alt) = prgArg
+        val (desc, alt, default) = prgArg
         val singleFlag = if (alt != DEFAULT_ALT_CHAR) "-$alt" else "  "
-        logger.info { String.format(" --%-${maxNameSize}s %s  %s", name.replace('_', '-'), singleFlag, desc) }
+        val defaultValue = default?.let { " (default: $it)" } ?: ""
+        logger.info { String.format(" --%-${maxNameSize}s %s  %s%s", name.replace('_', '-'), singleFlag, desc, defaultValue) }
       }
       exitProcess(0)
-    }
-
-    arguments["server"] = ProgramArgument(desc = "Start instance as server, implies --headless, argument is port to start on", alt = 'S') { value ->
-      Settings.client = false
-      if (value != null) {
-        try {
-          val port = value.toInt()
-          if (port < 0 || port >= 65535) {
-            logger.error { "Argument must be an integer greater than or equal to 0 and less than 65535, got $value" }
-            return@ProgramArgument
-          }
-          Settings.port = port
-        } catch (e: NumberFormatException) {
-          logger.error(e) { "Invalid number for the port" }
-          return@ProgramArgument
-        }
-      }
-      return@ProgramArgument
     }
   }
 

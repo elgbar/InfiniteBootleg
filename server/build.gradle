@@ -1,13 +1,10 @@
-project.ext.mainClassName = "no.elg.infiniteBootleg.desktop.DesktopLauncherKt"
-project.ext.assetsDir = new File("../core/src/main/resources")
-
 tasks.register('dist', Jar) {
   dependsOn classes
   with jar
   manifest {
-    attributes 'Main-Class': project.mainClassName
+    attributes 'Main-Class': "no.elg.infiniteBootleg.server.ServerLauncherKt"
   }
-  archiveBaseName = appName + "-desktop"
+  archiveBaseName = appName + "-server"
   archiveVersion = ""
 
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE

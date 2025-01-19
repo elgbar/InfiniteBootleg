@@ -85,6 +85,10 @@ subprojects {
     }
   }
 
+  ext {
+    project.ext.assetsDir = new File("../core/src/main/resources")
+  }
+
   tasks.classes.dependsOn spotlessApply
 
   tasks.withType(KotlinCompilationTask).configureEach {
@@ -189,13 +193,21 @@ subprojects {
   }
 }
 
-project(":desktop") {
+project(":client") {
   dependencies {
     implementation project(":core")
-    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  }
+}
+
+project(":server") {
+  dependencies {
+    implementation project(":core")
+    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   }
 }
