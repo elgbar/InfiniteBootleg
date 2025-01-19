@@ -8,6 +8,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2f
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.WorldCoordFloat
 import no.elg.infiniteBootleg.util.WorldCoordNumber
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.safeWith
@@ -22,7 +23,7 @@ import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Compa
 import no.elg.infiniteBootleg.world.ecs.components.transients.tags.UpdateBox2DPositionTag.Companion.updateBox2DPosition
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f as ProtoVector2f
 
-data class PositionComponent(var x: Float, var y: Float) : EntitySavableComponent {
+data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : EntitySavableComponent {
 
   private val pos by lazy { Vector2(x, y) }
 

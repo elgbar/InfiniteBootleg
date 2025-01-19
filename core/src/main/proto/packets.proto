@@ -33,6 +33,8 @@ message Packet {
     SB_CAST_SPELL = 17; //No message associated
     DX_CONTAINER_UPDATE = 18;
     CB_INTERFACE_UPDATE = 19;
+    SB_SELECT_SLOT = 20;
+    CB_HOLDING_ITEM = 21;
   }
 
   enum Direction {
@@ -63,6 +65,8 @@ message Packet {
   optional BreakingBlock breakingBlock = 24;
   optional ContainerUpdate containerUpdate = 25; //client bound
   optional InterfaceUpdate interfaceUpdate = 26; //client bound
+  optional UpdateSelectedSlot updateSelectedSlot = 27; //server bound
+  optional HoldingItem holdingItem = 28; //client bound
 }
 
 ////////////////
@@ -177,6 +181,11 @@ message InterfaceUpdate {
   string interfaceId = 2;
 }
 
+message HoldingItem {
+  .persistence.EntityRef entityRef = 1;
+  .persistence.Element element = 2;
+}
+
 //////////////////
 // SERVER BOUND //
 //////////////////
@@ -192,4 +201,8 @@ message ContentRequest {
   optional .persistence.EntityRef entityRef = 1;
   optional .persistence.Vector2i chunkLocation = 2;
   optional .persistence.ContainerOwner containerOwner = 3;
+}
+// What slot the player is is holding
+message UpdateSelectedSlot {
+  int32 slot = 1; //Slot ordinal, so one less than the actual slot "number"
 }

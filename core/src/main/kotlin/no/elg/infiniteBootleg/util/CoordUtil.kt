@@ -211,7 +211,7 @@ inline fun stringifyChunkToWorld(chunk: Chunk, localLoc: LocalCompactLoc): Strin
  * @param worldCoord A part of a coordinate in the world
  * @return Which coordinate a block at the given world coordinate will have
  */
-inline fun worldToBlock(worldCoord: Number): Int = floor(worldCoord.toDouble()).toInt()
+inline fun worldToBlock(worldCoord: WorldCoordNumber): WorldCoord = floor(worldCoord.toDouble()).toInt()
 
 /**
  * @param worldOffset Given by [WorldBody.getWorldOffsetX] and [WorldBody.getWorldOffsetY]

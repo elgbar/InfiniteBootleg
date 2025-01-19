@@ -5,6 +5,9 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
+import no.elg.infiniteBootleg.main.ClientMain
+import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
+import no.elg.infiniteBootleg.server.serverBoundUpdateSelectedSlot
 import no.elg.infiniteBootleg.util.FLY_VEL
 import no.elg.infiniteBootleg.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.util.MAX_X_VEL
@@ -22,6 +25,7 @@ import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.g
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
@@ -105,7 +109,7 @@ object InputSystem :
     val direction = sign(amountY).toInt()
 
     val newOrdinal = (HotbarSlot.entries.size + hotbarComponent.selected.ordinal + direction) % HotbarSlot.entries.size
-    hotbarComponent.selected = HotbarSlot.fromOrdinal(newOrdinal)
+    updateSelectedItem(hotbarComponent, HotbarSlot.fromOrdinal(newOrdinal))
   }
 
   private fun WorldEntity.keyDown(keycode: Int): Boolean {
@@ -127,8 +131,13 @@ object InputSystem :
       Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> HotbarSlot.NINE
       else -> return false
     }
-    hotbarComponent.selected = hotbarSlot
+    updateSelectedItem(hotbarComponent, hotbarSlot)
     return true
+  }
+
+  private fun WorldEntity.updateSelectedItem(hotbarComponent: HotbarComponent, slot: HotbarSlot) {
+    hotbarComponent.selected = slot
+    ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundUpdateSelectedSlot(slot) }
   }
 
   private val tmpVec = Vector2()

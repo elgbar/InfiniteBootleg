@@ -9,11 +9,13 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.hotbar
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.safeWith
+import no.elg.infiniteBootleg.world.ContainerElement
 import no.elg.infiniteBootleg.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
+import no.elg.infiniteBootleg.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementOrNull
 import java.util.EnumMap
 
 private val logger = KotlinLogging.logger {}
@@ -29,6 +31,18 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<Ho
    * @return The index of the selected item in the entities container
    */
   val selectedIndex: Int get() = hotbarItems.getOrDefault(selected, EMPTY_INDEX)
+
+  fun selectedItem(entity: Entity): Item? {
+    val containerComponent = entity.containerOrNull ?: return null
+    val index = selectedIndex
+    if (index !in 0 until containerComponent.size) {
+      if (index != EMPTY_INDEX) {
+        logger.warn { "Invalid index $index for entity ${entity.nameOrNull ?: this}" }
+      }
+      return null
+    }
+    return containerComponent[index]
+  }
 
   override fun hudDebug(): String = selected.name
 
@@ -53,18 +67,12 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<Ho
     /**
      * @return The selected item in the entity container or `null` if there is no selected item (or the index is invalid)
      */
-    val Entity.selectedItem: Item?
-      get() {
-        val containerComponent = containerOrNull ?: return null
-        val index = hotbarComponentOrNull?.selectedIndex ?: return null
-        if (index !in 0 until containerComponent.size) {
-          if (index != EMPTY_INDEX) {
-            logger.warn { "Invalid index $index for entity ${this.nameOrNull ?: this}" }
-          }
-          return null
-        }
-        return containerComponent[index]
-      }
+    val Entity.selectedItem: Item? get() = hotbarComponentOrNull?.selectedItem(this)
+
+    /**
+     * @return The selected element in the entity container or the [remoteEntityHoldingElementOrNull]
+     */
+    val Entity.selectedElement: ContainerElement? get() = selectedItem?.element ?: remoteEntityHoldingElementOrNull
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       safeWith {
@@ -90,7 +98,8 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<Ho
       NINE;
 
       companion object {
-        fun fromOrdinal(ordinal: Int) = entries[ordinal]
+        fun fromOrdinal(ordinal: Int): HotbarSlot = entries[ordinal]
+        fun fromOrdinalOrNull(ordinal: Int): HotbarSlot? = entries.getOrNull(ordinal)
       }
     }
   }

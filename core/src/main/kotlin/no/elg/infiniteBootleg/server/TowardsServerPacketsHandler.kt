@@ -29,10 +29,12 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CLIENT_WORLD_LOADED
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CONTENT_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_SELECT_SLOT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.UNRECOGNIZED
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.UpdateBlock
+import no.elg.infiniteBootleg.protobuf.Packets.UpdateSelectedSlot
 import no.elg.infiniteBootleg.protobuf.Packets.WorldSettings
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.blockOrNull
@@ -46,6 +48,7 @@ import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
 import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
 import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
 import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
+import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -59,6 +62,7 @@ import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent.Companion.inputEventQueueOrNull
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
@@ -66,6 +70,8 @@ import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.events.InputEvent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
@@ -96,6 +102,8 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
 
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsync { asyncHandleBreakingBlock(ctx, it) } }
     DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsync { asyncHandleContainerUpdate(ctx, it) } }
+
+    SB_SELECT_SLOT -> packet.updateSelectedSlotOrNull?.let { launchOnAsync { asyncHandleUpdateSelectedSlot(ctx, it) } }
 
     SB_LOGIN -> packet.loginOrNull?.let { launchOnMain { handleLoginPacket(ctx, it) } }
     SB_CLIENT_WORLD_LOADED -> launchOnAsync { asyncHandleClientsWorldLoaded(ctx) }
@@ -352,11 +360,12 @@ private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breaking
 private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: ContainerUpdate) {
   // Naive and simple re-broadcast
   // TODO check that the player can do this
+  // FIXME make sure not to broadcast when no changes are made
   val (owner, container) = containerUpdate.worldContainer.fromProto()
   ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
     container.content.copyInto(serverOwnedContainer.container.content)
   }
-  broadcast(clientBoundPacketBuilder(DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) // { c -> c != ctx.channel() }
+  broadcast(clientBoundPacketBuilder(DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
 }
 
 private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
@@ -374,6 +383,18 @@ private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner
       ctx.writeAndFlushPacket(clientBoundContainerUpdate(ownedContainer))
     }
   }
+}
+
+private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, updateSelectedSlot: UpdateSelectedSlot) {
+  val entity = ctx.getCurrentPlayer() ?: return
+  val slot = HotbarComponent.Companion.HotbarSlot.fromOrdinalOrNull(updateSelectedSlot.slot) ?: return
+  val hotbarComponent = entity.hotbarComponentOrNull ?: run {
+    logger.debug { "No hotbar component found on player ${entity.nameOrNull}" }
+    return
+  }
+  hotbarComponent.selected = slot
+  val selectedElement = hotbarComponent.selectedItem(entity)?.element ?: Material.AIR
+  broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
 }
 
 // ///////////

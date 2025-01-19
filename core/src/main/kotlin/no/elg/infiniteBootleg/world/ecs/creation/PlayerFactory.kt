@@ -116,10 +116,6 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
       brushRadius = INITIAL_BRUSH_SIZE
       interactRadius = INITIAL_INTERACT_RADIUS
     }
-
-    hotbar = hotbar {
-      selected = 0
-    }
   }
   physicsEvent = PROTO_PHYSICS_EVENT
   lookDirection = lookDirection {

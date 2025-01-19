@@ -6,6 +6,8 @@ import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.Settings
+import no.elg.infiniteBootleg.inventory.container.Container
+import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
 import no.elg.infiniteBootleg.main.ClientMain
@@ -24,6 +26,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.CLIENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Direction.SERVER
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_HOLDING_ITEM
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INTERFACE_UPDATE
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
@@ -40,6 +43,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.DX_WORLD_SETTINGS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CAST_SPELL
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_CONTENT_REQUEST
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_LOGIN
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.SB_SELECT_SLOT
 import no.elg.infiniteBootleg.protobuf.Packets.SecretExchange
 import no.elg.infiniteBootleg.protobuf.Packets.ServerLoginStatus
 import no.elg.infiniteBootleg.protobuf.Packets.SpawnEntity
@@ -51,8 +55,11 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import no.elg.infiniteBootleg.protobuf.containerUpdate
 import no.elg.infiniteBootleg.protobuf.contentRequest
+import no.elg.infiniteBootleg.protobuf.holdingItem
 import no.elg.infiniteBootleg.protobuf.interfaceUpdate
 import no.elg.infiniteBootleg.protobuf.moveEntity
+import no.elg.infiniteBootleg.protobuf.ownedContainer
+import no.elg.infiniteBootleg.protobuf.updateSelectedSlot
 import no.elg.infiniteBootleg.screens.ConnectingScreen
 import no.elg.infiniteBootleg.server.ServerBoundHandler.Companion.channels
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -64,11 +71,15 @@ import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.util.toVector2i
 import no.elg.infiniteBootleg.util.worldToChunk
+import no.elg.infiniteBootleg.world.ContainerElement
+import no.elg.infiniteBootleg.world.ContainerElement.Companion.asProto
 import no.elg.infiniteBootleg.world.Material.AIR
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityComponent
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent
+import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
@@ -125,6 +136,11 @@ fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoor
 }
 
 fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
+  broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
+}
+
+fun broadcastToInView(packet: Packet, entity: Entity, filter: ChannelMatcher = ChannelMatchers.all()) {
+  val (worldX, worldY) = entity.positionComponent
   broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
 }
 
@@ -226,6 +242,7 @@ fun ServerClient.serverBoundHeartbeat(): Packet {
   return heartbeatPacketBuilder(serverBoundPacketBuilder(DX_HEARTBEAT))
 }
 
+fun ServerClient.serverBoundContainerUpdate(owner: ContainerOwner, container: Container): Packet = serverBoundContainerUpdate(OwnedContainer(owner, container))
 fun ServerClient.serverBoundContainerUpdate(ownedContainer: OwnedContainer): Packet = containerUpdateBuilder(serverBoundPacketBuilder(DX_CONTAINER_UPDATE), ownedContainer)
 
 fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.BreakingProgress>): Packet {
@@ -236,6 +253,12 @@ fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.B
 
 fun ServerClient.serverBoundSpellSpawn(): Packet {
   return serverBoundPacketBuilder(SB_CAST_SPELL).build()
+}
+
+fun ServerClient.serverBoundUpdateSelectedSlot(slot: HotbarComponent.Companion.HotbarSlot): Packet {
+  return serverBoundPacketBuilder(SB_SELECT_SLOT)
+    .setUpdateSelectedSlot(updateSelectedSlot { this.slot = slot.ordinal })
+    .build()
 }
 
 // ////////////////
@@ -255,6 +278,17 @@ fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?
 fun clientBoundMoveEntity(entity: Entity): Packet {
   return clientBoundPacketBuilder(DX_MOVE_ENTITY)
     .setMoveEntity(entityMovePacket(entity))
+    .build()
+}
+
+fun clientBoundHoldingItem(entity: Entity, element: ContainerElement): Packet {
+  return clientBoundPacketBuilder(CB_HOLDING_ITEM)
+    .setHoldingItem(
+      holdingItem {
+        this.element = element.asProto()
+        this.entityRef = entity.toProtoEntityRef()
+      }
+    )
     .build()
 }
 

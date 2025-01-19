@@ -29,7 +29,7 @@ import no.elg.infiniteBootleg.world.ecs.components.NameComponent.Companion.nameO
 import no.elg.infiniteBootleg.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.velocityOrNull
-import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
+import no.elg.infiniteBootleg.world.ecs.components.inventory.HotbarComponent.Companion.selectedElement
 import no.elg.infiniteBootleg.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
 import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
@@ -149,7 +149,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
       batch.drawBox2d(box2d, entity.currentTexture(), screenX, screenY)
 
-      val holding = entity.selectedItem?.element
+      val holding = entity.selectedElement
       if (holding != null) {
         val size = Block.BLOCK_SIZE / 2f
         val holdingTexture = holding.textureRegion?.textureRegionOrNull

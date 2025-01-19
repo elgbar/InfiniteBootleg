@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Disconnect
 import no.elg.infiniteBootleg.protobuf.Packets.MoveEntity
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_DESPAWN_ENTITY
+import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_HOLDING_ITEM
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_INITIAL_CHUNKS_SENT
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_LOGIN_STATUS
 import no.elg.infiniteBootleg.protobuf.Packets.Packet.Type.CB_SPAWN_ENTITY
@@ -43,6 +44,7 @@ import no.elg.infiniteBootleg.protobuf.breakingBlockOrNull
 import no.elg.infiniteBootleg.protobuf.containerUpdateOrNull
 import no.elg.infiniteBootleg.protobuf.despawnEntityOrNull
 import no.elg.infiniteBootleg.protobuf.disconnectOrNull
+import no.elg.infiniteBootleg.protobuf.holdingItemOrNull
 import no.elg.infiniteBootleg.protobuf.lookDirectionOrNull
 import no.elg.infiniteBootleg.protobuf.moveEntityOrNull
 import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
@@ -57,16 +59,20 @@ import no.elg.infiniteBootleg.screens.WorldScreen
 import no.elg.infiniteBootleg.server.SharedInformation.Companion.HEARTBEAT_PERIOD_MS
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.launchOnMain
+import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.toCompact
 import no.elg.infiniteBootleg.util.toVector2
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.util.worldXYtoChunkCompactLoc
+import no.elg.infiniteBootleg.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
+import no.elg.infiniteBootleg.world.ecs.components.transients.RemoteEntityHoldingElement
+import no.elg.infiniteBootleg.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementComponentOrNull
 import no.elg.infiniteBootleg.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.managers.container.ServerClientWorldContainerManager
@@ -95,6 +101,7 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
     CB_DESPAWN_ENTITY -> packet.despawnEntityOrNull?.let { launchOnAsync { asyncHandleDespawnEntity(it) } }
     DX_BREAKING_BLOCK -> packet.breakingBlockOrNull?.let { launchOnAsync { asyncHandleBreakingBlock(it) } }
     DX_CONTAINER_UPDATE -> packet.containerUpdateOrNull?.let { launchOnAsync { asyncHandleContainerUpdate(it) } }
+    CB_HOLDING_ITEM -> packet.holdingItemOrNull?.let { launchOnAsync { asyncHandleHoldingItem(it) } }
 
     // Login related packets
     DX_SECRET_EXCHANGE -> packet.secretExchangeOrNull?.let { handleSecretExchange(it) }
@@ -407,7 +414,19 @@ private fun ServerClient.asyncHandleBreakingBlock(breakingBlock: Packets.Breakin
 }
 
 private fun ServerClient.asyncHandleContainerUpdate(containerUpdate: ContainerUpdate) {
-  val containerManager = world?.worldContainerManager as ServerClientWorldContainerManager
+  val containerManager = world?.worldContainerManager as? ServerClientWorldContainerManager ?: return
   val ownedContainer = containerUpdate.worldContainer.fromProto()
   containerManager.updateContainerFromServer(ownedContainer)
+}
+
+private fun ServerClient.asyncHandleHoldingItem(holdingItem: Packets.HoldingItem) {
+  val entity = world?.getEntity(holdingItem.entityRef.id) ?: return
+  val element = holdingItem.element.fromProto()
+
+  val remoteEntityHoldingElementComponent = entity.remoteEntityHoldingElementComponentOrNull
+  if (remoteEntityHoldingElementComponent == null) {
+    entity.safeWith { RemoteEntityHoldingElement(element) }
+  } else {
+    remoteEntityHoldingElementComponent.element = element
+  }
 }
