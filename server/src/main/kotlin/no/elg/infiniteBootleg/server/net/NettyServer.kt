@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server.server
+package no.elg.infiniteBootleg.server.net
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.bootstrap.ServerBootstrap

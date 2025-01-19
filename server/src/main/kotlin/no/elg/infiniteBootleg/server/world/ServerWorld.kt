@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
-import no.elg.infiniteBootleg.server.server.despawnEntity
+import no.elg.infiniteBootleg.server.net.despawnEntity
 import no.elg.infiniteBootleg.server.world.ecs.system.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.server.world.render.HeadlessWorldRenderer

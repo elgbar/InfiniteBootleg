@@ -8,8 +8,8 @@ import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.CommonMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.server.server.NettyServer
-import no.elg.infiniteBootleg.server.server.ServerPacketBroadcaster
+import no.elg.infiniteBootleg.server.net.NettyServer
+import no.elg.infiniteBootleg.server.net.ServerPacketBroadcaster
 import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.World
