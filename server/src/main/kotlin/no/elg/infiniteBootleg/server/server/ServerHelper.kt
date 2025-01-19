@@ -1,8 +1,9 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.server.server
 
 import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.server.clientBoundDespawnEntity
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly

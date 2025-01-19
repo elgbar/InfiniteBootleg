@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.world
+package no.elg.infiniteBootleg.server.world
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
@@ -9,7 +9,11 @@ import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
-import no.elg.infiniteBootleg.server.despawnEntity
+import no.elg.infiniteBootleg.server.server.despawnEntity
+import no.elg.infiniteBootleg.server.world.ecs.system.KickPlayerWithoutChannel
+import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
+import no.elg.infiniteBootleg.server.world.render.HeadlessWorldRenderer
+import no.elg.infiniteBootleg.server.world.ticker.ServerWorldTicker
 import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.basicDynamicEntityFamily
@@ -17,13 +21,10 @@ import no.elg.infiniteBootleg.world.ecs.components.required.EntityTypeComponent.
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
-import no.elg.infiniteBootleg.world.ecs.system.server.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
-import no.elg.infiniteBootleg.world.loader.ServerWorldLoader
-import no.elg.infiniteBootleg.world.render.HeadlessWorldRenderer
 import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
-import no.elg.infiniteBootleg.world.ticker.ServerWorldTicker
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
+import no.elg.infiniteBootleg.world.world.World
 
 private val logger = KotlinLogging.logger {}
 
@@ -72,7 +73,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     render.update()
     if (player.shouldSendToClients) {
       launchOnMain {
-        Main.inst().packetBroadcaster.broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
+        Main.Companion.inst().packetBroadcaster.broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
       }
     }
   }

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.world.render
+package no.elg.infiniteBootleg.server.world.render
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.OrderedMap
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
+import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
@@ -20,7 +21,8 @@ import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Co
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.chunkColumnsInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.iterator
-import no.elg.infiniteBootleg.world.world.ServerWorld
+import no.elg.infiniteBootleg.world.render.ServerClientChunksInView
+import no.elg.infiniteBootleg.world.render.WorldRender
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write

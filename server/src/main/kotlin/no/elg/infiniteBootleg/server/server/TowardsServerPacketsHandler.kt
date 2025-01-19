@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.server.server
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.fromProto
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.fromProto
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.blockOrNull
@@ -25,6 +24,21 @@ import no.elg.infiniteBootleg.protobuf.secretExchangeOrNull
 import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
+import no.elg.infiniteBootleg.server.ChannelHandlerContextWrapper
+import no.elg.infiniteBootleg.server.ServerMain
+import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.server.clientBoundContainerUpdate
+import no.elg.infiniteBootleg.server.clientBoundDespawnEntity
+import no.elg.infiniteBootleg.server.clientBoundHeartbeat
+import no.elg.infiniteBootleg.server.clientBoundHoldingItem
+import no.elg.infiniteBootleg.server.clientBoundLoginStatusPacket
+import no.elg.infiniteBootleg.server.clientBoundPacketBuilder
+import no.elg.infiniteBootleg.server.clientBoundSecretExchange
+import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
+import no.elg.infiniteBootleg.server.clientBoundStartGamePacket
+import no.elg.infiniteBootleg.server.clientBoundUpdateChunkPacket
+import no.elg.infiniteBootleg.server.clientBoundWorldSettings
+import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
@@ -51,7 +65,6 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
-import no.elg.infiniteBootleg.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.world.render.ChunksInView
 import no.elg.infiniteBootleg.world.render.ChunksInView.Companion.forEach
 import java.security.SecureRandom
@@ -160,7 +173,7 @@ private fun handleContentRequest(ctx: ChannelHandlerContextWrapper, contentReque
 
 private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings: Packets.WorldSettings) {
   logger.info { "handleWorldSettings: spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
-  val world = ServerMain.inst().serverWorld
+  val world = ServerMain.Companion.inst().serverWorld
   var spawn: Long? = null
   var time: Float? = null
   var timeScale: Float? = null
@@ -237,7 +250,7 @@ private fun handleLoginPacket(ctx: ChannelHandlerContextWrapper, login: Packets.
   }
   logger.debug { "Login request received by user '$username', entityId '$entityId'" }
 
-  val world = ServerMain.inst().serverWorld
+  val world = ServerMain.Companion.inst().serverWorld
 
   if (world.hasPlayer(entityId)) {
     ctx.writeAndFlushPacket(clientBoundLoginStatusPacket(Packets.ServerLoginStatus.ServerStatus.ALREADY_LOGGED_IN))
@@ -281,12 +294,12 @@ private fun asyncHandleBlockUpdate(ctx: ChannelHandlerContextWrapper, blockUpdat
   val worldX = blockUpdate.pos.x
   val worldY = blockUpdate.pos.y
   if (isLocInView(ctx, worldX, worldY)) {
-    ServerMain.inst().serverWorld.setBlock(worldX, worldY, blockUpdate.blockOrNull, true)
+    ServerMain.Companion.inst().serverWorld.setBlock(worldX, worldY, blockUpdate.blockOrNull, true)
   }
 }
 
 private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord) {
-  val serverWorld = ServerMain.inst().serverWorld
+  val serverWorld = ServerMain.Companion.inst().serverWorld
 
   // Only send chunks which the player is allowed to see
   if (isChunkInView(ctx, chunkX, chunkY)) {
@@ -298,7 +311,7 @@ private fun asyncHandleChunkRequest(ctx: ChannelHandlerContextWrapper, chunkX: C
 }
 
 private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
-  val world = ServerMain.inst().serverWorld
+  val world = ServerMain.Companion.inst().serverWorld
   val shared = ctx.getSharedInformation()
   val player = ctx.getCurrentPlayer()
   if (player == null || shared == null) {
@@ -356,7 +369,7 @@ private fun asyncHandleClientsWorldLoaded(ctx: ChannelHandlerContextWrapper) {
 }
 
 private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId: String) {
-  val world = ServerMain.inst().serverWorld
+  val world = ServerMain.Companion.inst().serverWorld
 
   val entity = world.getEntity(entityId) ?: run {
     ctx.writeAndFlushPacket(clientBoundDespawnEntity(entityId, Packets.DespawnEntity.DespawnReason.UNKNOWN_ENTITY))
@@ -378,7 +391,7 @@ private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, contai
   // TODO check that the player can do this
   // FIXME make sure not to broadcast when no changes are made
   val (owner, container) = containerUpdate.worldContainer.fromProto()
-  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
+  ServerMain.Companion.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
     container.content.copyInto(serverOwnedContainer.container.content)
   }
   Main.inst().packetBroadcaster.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
@@ -392,7 +405,7 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
 }
 
 private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {
-  ServerMain.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
+  ServerMain.Companion.inst().serverWorld.worldContainerManager.find(owner).thenApply { ownedContainer ->
     if (ownedContainer == null) {
       logger.warn { "Failed to find container for $owner" }
     } else {
@@ -423,14 +436,14 @@ private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformati
 
 private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
   val uuid = getSharedInformation()?.entityId ?: return null
-  return ServerMain.inst().serverWorld.getEntity(uuid)
+  return ServerMain.Companion.inst().serverWorld.getEntity(uuid)
 }
 
 /**
  * Use to check if something should be sent to a client
  */
 private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
-  val serverWorld = ServerMain.inst().serverWorld
+  val serverWorld = ServerMain.Companion.inst().serverWorld
   val uuid = ctx.getSharedInformation()?.entityId
   if (uuid == null) {
     logger.error { "Failed to get UUID of requesting entity" }

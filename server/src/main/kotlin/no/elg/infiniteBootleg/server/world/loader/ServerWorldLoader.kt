@@ -1,10 +1,11 @@
-package no.elg.infiniteBootleg.world.loader
+package no.elg.infiniteBootleg.server.world.loader
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.files.FileHandle
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.SharedInformation
+import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.util.safeWith
 import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
@@ -14,7 +15,6 @@ import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEnti
 import no.elg.infiniteBootleg.world.ecs.creation.createNewProtoPlayer
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
-import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 

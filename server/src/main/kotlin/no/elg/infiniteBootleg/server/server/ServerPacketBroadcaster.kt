@@ -1,14 +1,14 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.server.server
 
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.group.ChannelMatcher
 import no.elg.infiniteBootleg.protobuf.Packets
-import no.elg.infiniteBootleg.protobuf.world
+import no.elg.infiniteBootleg.server.PacketBroadcaster
+import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.world.world.ServerWorld
 
 class ServerPacketBroadcaster(val world: ServerWorld) : PacketBroadcaster {
 

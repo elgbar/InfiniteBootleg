@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.main
+package no.elg.infiniteBootleg.server
 
 import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -6,12 +6,12 @@ import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
-import no.elg.infiniteBootleg.server.NettyServer
-import no.elg.infiniteBootleg.server.PacketBroadcaster
-import no.elg.infiniteBootleg.server.ServerPacketBroadcaster
-import no.elg.infiniteBootleg.server.clientBoundDisconnectPlayerPacket
+import no.elg.infiniteBootleg.main.CommonMain
+import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.server.server.NettyServer
+import no.elg.infiniteBootleg.server.server.ServerPacketBroadcaster
+import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
-import no.elg.infiniteBootleg.world.world.ServerWorld
 import no.elg.infiniteBootleg.world.world.World
 import java.time.Instant
 
@@ -91,6 +91,6 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
 
   companion object {
 
-    fun inst(): ServerMain = Main.inst() as? ServerMain ?: throw IllegalStateException("Cannot get server main as a client")
+    fun inst(): ServerMain = Main.Companion.inst() as? ServerMain ?: throw IllegalStateException("Cannot get server main as a client")
   }
 }

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.server.server
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.Channel
@@ -8,8 +8,10 @@ import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
 import no.elg.infiniteBootleg.console.serverSideClientBoundMarker
-import no.elg.infiniteBootleg.main.ServerMain
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.server.ChannelHandlerContextWrapper
+import no.elg.infiniteBootleg.server.ServerMain
+import no.elg.infiniteBootleg.server.SharedInformation
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}
@@ -23,7 +25,12 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
     packetsReceived++
-    val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) { ChannelHandlerContextWrapper(serverSideClientBoundMarker, ctx) }
+    val wrappedCtx = ctxToWrapper.computeIfAbsent(ctx) {
+      ChannelHandlerContextWrapper(
+        serverSideClientBoundMarker,
+        ctx
+      )
+    }
     if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
       wrappedCtx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
       return
@@ -54,7 +61,7 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
     logger.debug { "client inactive (player $playerId) (curr active ${clients.size} clients, ${channels.size} channels)" }
     if (client != null) {
       client.heartbeatTask?.cancel(false)
-      ServerMain.inst().serverWorld.disconnectPlayer(client.entityId, false)
+      ServerMain.Companion.inst().serverWorld.disconnectPlayer(client.entityId, false)
     }
   }
 
