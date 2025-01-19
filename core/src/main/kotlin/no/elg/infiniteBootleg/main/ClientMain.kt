@@ -13,11 +13,11 @@ import no.elg.infiniteBootleg.input.GlobalInputListener
 import no.elg.infiniteBootleg.input.MouseLocator
 import no.elg.infiniteBootleg.main.Main.Companion.isClient
 import no.elg.infiniteBootleg.main.Main.Companion.isServer
+import no.elg.infiniteBootleg.net.ServerClient
 import no.elg.infiniteBootleg.screens.AbstractScreen
 import no.elg.infiniteBootleg.screens.MainMenuScreen
 import no.elg.infiniteBootleg.screens.ScreenRenderer
 import no.elg.infiniteBootleg.screens.WorldScreen
-import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.util.FailureWatchdog
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.world.ClientWorld

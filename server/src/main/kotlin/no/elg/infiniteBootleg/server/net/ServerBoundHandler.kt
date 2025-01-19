@@ -8,10 +8,10 @@ import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
 import no.elg.infiniteBootleg.console.serverSideClientBoundMarker
+import no.elg.infiniteBootleg.net.ChannelHandlerContextWrapper
+import no.elg.infiniteBootleg.net.SharedInformation
 import no.elg.infiniteBootleg.protobuf.Packets
-import no.elg.infiniteBootleg.server.ChannelHandlerContextWrapper
 import no.elg.infiniteBootleg.server.ServerMain
-import no.elg.infiniteBootleg.server.SharedInformation
 import java.util.concurrent.ConcurrentHashMap
 
 private val logger = KotlinLogging.logger {}

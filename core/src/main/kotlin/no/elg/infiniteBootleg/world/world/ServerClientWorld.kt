@@ -1,8 +1,7 @@
 package no.elg.infiniteBootleg.world.world
 
+import no.elg.infiniteBootleg.net.ServerClient
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.protobuf.world
-import no.elg.infiniteBootleg.server.ServerClient
 import no.elg.infiniteBootleg.world.loader.WorldLoader.generatorFromProto
 import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.ServerClientChunkLoader

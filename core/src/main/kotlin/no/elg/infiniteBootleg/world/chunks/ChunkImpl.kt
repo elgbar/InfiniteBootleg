@@ -18,12 +18,12 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
+import no.elg.infiniteBootleg.net.clientBoundBlockUpdate
+import no.elg.infiniteBootleg.net.sendDuplexPacketInView
+import no.elg.infiniteBootleg.net.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.chunk
 import no.elg.infiniteBootleg.protobuf.vector2i
-import no.elg.infiniteBootleg.server.clientBoundBlockUpdate
-import no.elg.infiniteBootleg.server.sendDuplexPacketInView
-import no.elg.infiniteBootleg.server.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.LocalCoord

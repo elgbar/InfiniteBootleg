@@ -6,7 +6,7 @@ import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.console.InGameConsoleHandler
-import no.elg.infiniteBootleg.server.PacketBroadcaster
+import no.elg.infiniteBootleg.net.PacketBroadcaster
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
 import java.time.Instant

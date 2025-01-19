@@ -6,9 +6,9 @@ import com.badlogic.gdx.physics.box2d.Body
 import ktx.math.component1
 import ktx.math.component2
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.server.clientBoundMoveEntity
-import no.elg.infiniteBootleg.server.sendDuplexPacketInView
-import no.elg.infiniteBootleg.server.serverBoundMoveEntityPacket
+import no.elg.infiniteBootleg.net.clientBoundMoveEntity
+import no.elg.infiniteBootleg.net.sendDuplexPacketInView
+import no.elg.infiniteBootleg.net.serverBoundMoveEntityPacket
 import no.elg.infiniteBootleg.util.toCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.Direction

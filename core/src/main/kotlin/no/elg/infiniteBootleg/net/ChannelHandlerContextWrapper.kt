@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.net
 
 import io.github.oshai.kotlinlogging.Marker
 import io.netty.buffer.ByteBufAllocator

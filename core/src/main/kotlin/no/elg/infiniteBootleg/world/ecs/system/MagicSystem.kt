@@ -6,8 +6,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.serverBoundSpellSpawn
+import no.elg.infiniteBootleg.net.ServerClient.Companion.sendServerBoundPacket
+import no.elg.infiniteBootleg.net.serverBoundSpellSpawn
 import no.elg.infiniteBootleg.util.inputMouseLocator
 import no.elg.infiniteBootleg.world.Staff
 import no.elg.infiniteBootleg.world.ecs.UPDATE_PRIORITY_DEFAULT

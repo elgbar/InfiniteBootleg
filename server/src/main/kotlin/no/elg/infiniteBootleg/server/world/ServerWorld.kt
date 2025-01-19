@@ -6,9 +6,9 @@ import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.EntitySystem
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.net.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import no.elg.infiniteBootleg.server.clientBoundSpawnEntity
 import no.elg.infiniteBootleg.server.net.despawnEntity
 import no.elg.infiniteBootleg.server.world.ecs.system.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader

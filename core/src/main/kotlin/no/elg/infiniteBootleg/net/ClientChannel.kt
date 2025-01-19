@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.net
 
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.Channel

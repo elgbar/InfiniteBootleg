@@ -12,9 +12,9 @@ import ktx.scene2d.vis.visLabel
 import ktx.scene2d.vis.visTable
 import ktx.scene2d.vis.visTextButton
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.server.ClientChannel
-import no.elg.infiniteBootleg.server.ServerClient
-import no.elg.infiniteBootleg.server.serverBoundLoginPacket
+import no.elg.infiniteBootleg.net.ClientChannel
+import no.elg.infiniteBootleg.net.ServerClient
+import no.elg.infiniteBootleg.net.serverBoundLoginPacket
 import no.elg.infiniteBootleg.util.onInteract
 
 private val logger = KotlinLogging.logger {}

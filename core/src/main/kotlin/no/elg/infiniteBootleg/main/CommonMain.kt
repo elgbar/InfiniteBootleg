@@ -15,8 +15,8 @@ import no.elg.infiniteBootleg.assets.InfAssetsImpl
 import no.elg.infiniteBootleg.console.InGameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
-import no.elg.infiniteBootleg.server.ClientPacketBroadcaster
-import no.elg.infiniteBootleg.server.PacketBroadcaster
+import no.elg.infiniteBootleg.net.ClientPacketBroadcaster
+import no.elg.infiniteBootleg.net.PacketBroadcaster
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.diffTimePretty
 import org.fusesource.jansi.AnsiConsole

@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2
 import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.serverBoundUpdateSelectedSlot
+import no.elg.infiniteBootleg.net.ServerClient.Companion.sendServerBoundPacket
+import no.elg.infiniteBootleg.net.serverBoundUpdateSelectedSlot
 import no.elg.infiniteBootleg.util.FLY_VEL
 import no.elg.infiniteBootleg.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.util.MAX_X_VEL

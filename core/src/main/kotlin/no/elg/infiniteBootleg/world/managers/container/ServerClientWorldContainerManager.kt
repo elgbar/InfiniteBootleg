@@ -8,8 +8,8 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner.Companion.asProto
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.serverBoundContainerRequest
+import no.elg.infiniteBootleg.net.ServerClient.Companion.sendServerBoundPacket
+import no.elg.infiniteBootleg.net.serverBoundContainerRequest
 import no.elg.infiniteBootleg.world.world.ServerClientWorld
 import java.time.Duration
 import java.util.concurrent.CompletableFuture

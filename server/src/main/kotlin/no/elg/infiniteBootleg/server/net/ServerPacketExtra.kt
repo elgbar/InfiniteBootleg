@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.server.net
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.server.ChannelHandlerContextWrapper
-import no.elg.infiniteBootleg.server.clientBoundDisconnectPlayerPacket
+import no.elg.infiniteBootleg.net.ChannelHandlerContextWrapper
+import no.elg.infiniteBootleg.net.clientBoundDisconnectPlayerPacket
 
 private val logger = KotlinLogging.logger {}
 

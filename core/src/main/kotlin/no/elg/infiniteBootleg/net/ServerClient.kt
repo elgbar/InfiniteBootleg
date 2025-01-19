@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.net
 
 import com.badlogic.gdx.utils.Disposable
 import com.github.benmanes.caffeine.cache.Cache

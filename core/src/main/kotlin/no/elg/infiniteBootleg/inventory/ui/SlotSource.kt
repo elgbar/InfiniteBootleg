@@ -14,8 +14,8 @@ import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPackets
-import no.elg.infiniteBootleg.server.serverBoundContainerUpdate
+import no.elg.infiniteBootleg.net.ServerClient.Companion.sendServerBoundPackets
+import no.elg.infiniteBootleg.net.serverBoundContainerUpdate
 import no.elg.infiniteBootleg.world.blocks.Block
 
 private val logger = KotlinLogging.logger {}

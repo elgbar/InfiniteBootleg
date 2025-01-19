@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.server
+package no.elg.infiniteBootleg.net
 
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.group.ChannelMatcher

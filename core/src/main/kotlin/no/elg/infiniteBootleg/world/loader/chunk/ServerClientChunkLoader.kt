@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.world.loader.chunk
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import no.elg.infiniteBootleg.server.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.server.serverBoundChunkRequestPacket
+import no.elg.infiniteBootleg.net.ServerClient.Companion.sendServerBoundPacket
+import no.elg.infiniteBootleg.net.serverBoundChunkRequestPacket
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
