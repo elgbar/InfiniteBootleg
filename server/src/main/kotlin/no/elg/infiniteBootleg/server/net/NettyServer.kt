@@ -44,6 +44,7 @@ class NettyServer {
         )
         .option(ChannelOption.SO_BACKLOG, 128)
         .childOption(ChannelOption.SO_KEEPALIVE, true)
+        .childOption(ChannelOption.TCP_NODELAY, true)
 
       logger.info {
         "Binding server to port @|bold,green ${Settings.port}|@@|white . Server was ready in |@@|bold ${

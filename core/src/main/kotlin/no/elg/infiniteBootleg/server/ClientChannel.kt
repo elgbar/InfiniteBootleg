@@ -32,6 +32,7 @@ class ClientChannel(val client: ServerClient) {
       b.group(workerGroup)
       b.channel(NioSocketChannel::class.java)
       b.option(ChannelOption.SO_KEEPALIVE, true)
+      b.option(ChannelOption.TCP_NODELAY, true)
       b.handler(
         object : ChannelInitializer<SocketChannel>() {
           public override fun initChannel(ch: SocketChannel) {
