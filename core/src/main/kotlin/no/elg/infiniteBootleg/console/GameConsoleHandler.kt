@@ -13,7 +13,7 @@ import com.strongjoshua.console.LogLevel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
-import no.elg.infiniteBootleg.console.InGameConsoleLogger.Companion.DEBUG_PREFIX
+import no.elg.infiniteBootleg.console.GameConsoleLogger.Companion.DEBUG_PREFIX
 import no.elg.infiniteBootleg.console.commands.Commands
 import no.elg.infiniteBootleg.console.consoles.CGUIConsole
 import no.elg.infiniteBootleg.console.consoles.StdConsole
@@ -25,7 +25,10 @@ import kotlin.reflect.full.memberFunctions
 
 private val logger = KotlinLogging.logger {}
 
-class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : InGameConsoleLogger, Disposable, Resizable {
+//class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : InGameConsoleLogger, Disposable, Resizable {
+//
+//}
+class GameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : GameConsoleLogger, Disposable, Resizable {
   private val console: Console
   val exec: Commands = Commands()
   private val consoleReader: SystemConsoleReader

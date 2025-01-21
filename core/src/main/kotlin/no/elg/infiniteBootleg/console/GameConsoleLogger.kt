@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.Settings
 /**
  * @author Elg
  */
-interface InGameConsoleLogger : ApplicationLogger {
+interface GameConsoleLogger : ApplicationLogger {
 
   /**
    * @param level The level to log at
