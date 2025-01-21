@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D
 import no.elg.infiniteBootleg.util.safeUse
 import no.elg.infiniteBootleg.util.toDegrees
@@ -63,14 +63,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     val velocityOrNull = velocityOrNull
     val rotatableTextureRegion: RotatableTextureRegion = if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
       if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
-        Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer)
+        ClientMain.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer)
       } else if (abs(velocityOrNull.x) > EFFECTIVE_ZERO && groundedComponentOrNull?.onGround == true) {
-        Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer)
+        ClientMain.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer)
       } else {
-        Main.inst().assets.playerTexture
+        ClientMain.inst().assets.playerTexture
       }
     } else {
-      Main.inst().assets.findTexture(textureRegionComponent.textureName, false)
+      ClientMain.inst().assets.findTexture(textureRegionComponent.textureName, false)
     }
     val texture: TextureRegion = rotatableTextureRegion.textureRegion
     val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
@@ -179,7 +179,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       }
 
       entity.nameOrNull?.let { name ->
-        val font = Main.inst().assets.font10pt
+        val font = ClientMain.inst().assets.font10pt
         layout.setText(font, name, batch.color, 0f, Align.center, false)
         font.draw(batch, layout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
       }
@@ -188,7 +188,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         batch.color = Color.WHITE // Make sure we can see the debug light
         val size = Block.BLOCK_SIZE / 4f // The size of the debug cube
         val offset = Block.BLOCK_SIZE / 2f - size / 2f
-        batch.draw(Main.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
+        batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
       }
     }
   }

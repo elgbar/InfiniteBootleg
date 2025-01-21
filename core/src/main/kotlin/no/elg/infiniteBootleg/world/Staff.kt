@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.StaffItem
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.protobuf.ElementKt.staff
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.magic.Equippable
@@ -64,7 +64,7 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
     rings.forEach { it.onUnequip(entity) }
   }
 
-  override val textureRegion: RotatableTextureRegion get() = Main.inst().assets.staffTexture
+  override val textureRegion: RotatableTextureRegion get() = ClientMain.inst().assets.staffTexture
   override val itemType: ItemType = ItemType.TOOL
   override fun toItem(maxStock: UInt, stock: UInt): Item = StaffItem(this, maxStock, stock)
 

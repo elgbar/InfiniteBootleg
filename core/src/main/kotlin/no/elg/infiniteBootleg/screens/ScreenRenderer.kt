@@ -8,11 +8,10 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.safeUse
 
 class ScreenRenderer : Disposable, Resizable {
-  val font: BitmapFont = Main.inst().assets.font16pt
+  val font: BitmapFont = ClientMain.inst().assets.font16pt
   private val spacing = font.lineHeight * ClientMain.scale / 2
   val batch: SpriteBatch = SpriteBatch().also {
     it.projectionMatrix = Matrix4().setToOrtho2D(0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())

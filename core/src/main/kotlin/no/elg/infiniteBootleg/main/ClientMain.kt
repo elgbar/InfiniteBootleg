@@ -33,7 +33,7 @@ private val logger = KotlinLogging.logger {}
 class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArgs, startTime) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
 
-  override val assets: InfAssets = InfAssetsImpl()
+  val assets: InfAssets = InfAssetsImpl()
 
   lateinit var screenRenderer: ScreenRenderer
     private set

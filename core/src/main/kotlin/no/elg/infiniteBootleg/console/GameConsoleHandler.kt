@@ -25,9 +25,9 @@ import kotlin.reflect.full.memberFunctions
 
 private val logger = KotlinLogging.logger {}
 
-//class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : InGameConsoleLogger, Disposable, Resizable {
+// class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : InGameConsoleLogger, Disposable, Resizable {
 //
-//}
+// }
 class GameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : GameConsoleLogger, Disposable, Resizable {
   private val console: Console
   val exec: Commands = Commands()

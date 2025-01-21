@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.world.render
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import no.elg.infiniteBootleg.api.Renderer
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.isNotAir
 import no.elg.infiniteBootleg.util.withColor
 import no.elg.infiniteBootleg.util.worldToScreen
@@ -47,7 +47,7 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
               break
             }
             worldRender.batch.draw(
-              Main.inst().assets.whiteTexture.textureRegion,
+              ClientMain.inst().assets.whiteTexture.textureRegion,
               worldToScreen(futureWorldX),
               worldToScreen(futureWorldY),
               1f,

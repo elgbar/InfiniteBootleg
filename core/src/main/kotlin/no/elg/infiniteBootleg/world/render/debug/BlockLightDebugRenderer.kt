@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.events.BlockLightChangedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.LongMapUtil.component1
 import no.elg.infiniteBootleg.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.util.ProgressHandler
@@ -40,8 +39,8 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Over
     }
   }
 
-  private val skylightDebugTexture by lazy { Main.inst().assets.skylightDebugTexture.textureRegion }
-  private val luminanceDebugTexture by lazy { Main.inst().assets.luminanceDebugTexture.textureRegion }
+  private val skylightDebugTexture by lazy { ClientMain.inst().assets.skylightDebugTexture.textureRegion }
+  private val luminanceDebugTexture by lazy { ClientMain.inst().assets.luminanceDebugTexture.textureRegion }
 
   override val isActive: Boolean
     get() = Settings.renderLight && (Settings.debugBlockLight || Settings.renderBlockLightUpdates)

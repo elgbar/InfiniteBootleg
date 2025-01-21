@@ -26,7 +26,7 @@ import no.elg.infiniteBootleg.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.items.Item
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.IBVisWindow
 import no.elg.infiniteBootleg.util.ibVisWindowClosed
 import no.elg.infiniteBootleg.util.launchOnMain
@@ -148,11 +148,11 @@ fun createDrawable(batch: Batch, maybeItem: Item?, index: Int, fbo: FrameBuffer?
     batch.safeUse {
       batch.draw(texture, 0f, 0f, FBO_SLOT_SIZE, FBO_SLOT_SIZE)
       if (drawIndex) {
-        Main.inst().assets.font16pt.withColor(r = 0.75f, g = 0.75f, b = 0.75f, a = 1f) { font ->
+        ClientMain.inst().assets.font16pt.withColor(r = 0.75f, g = 0.75f, b = 0.75f, a = 1f) { font ->
           font.draw(batch, "i:$index", 0f, FBO_SLOT_SIZE - font.capHeight / 3f)
         }
       }
-      Main.inst().assets.font20pt.withColor(1f, 1f, 1f, 1f) { font ->
+      ClientMain.inst().assets.font20pt.withColor(1f, 1f, 1f, 1f) { font ->
         font.draw(batch, "${item.stock}", 0f, font.capHeight)
       }
     }

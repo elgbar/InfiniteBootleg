@@ -65,7 +65,7 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
             }
             renderBreakingOverlay(world, blockWorldLoc, rawProgress)
           } else {
-            renderPlaceableBlock(world, Main.inst().assets.breakableBlockTexture.textureRegion, blockWorldLoc)
+            renderPlaceableBlock(world, ClientMain.inst().assets.breakableBlockTexture.textureRegion, blockWorldLoc)
           }
         }
       } else if (element.itemType == ItemType.BLOCK && !isBreaking) {
@@ -84,9 +84,9 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
       // Render nothing when there is no progress made yet
       return
     }
-    val textures = Main.inst().assets.breakingBlockTextures.size - 1f
+    val textures = ClientMain.inst().assets.breakingBlockTextures.size - 1f
     val index = (textures * progress).roundToInt()
-    renderPlaceableBlock(world, Main.inst().assets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
+    renderPlaceableBlock(world, ClientMain.inst().assets.breakingBlockTextures[index].textureRegion, blockWorldLoc, 1f)
   }
 
   private fun renderPlaceableBlock(world: World, texture: TextureRegion, blockWorldLoc: WorldCompactLoc, overrideAlpha: Float? = null) {

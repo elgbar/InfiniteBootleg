@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.console.GameConsoleHandler
 import no.elg.infiniteBootleg.net.PacketBroadcaster
 import no.elg.infiniteBootleg.world.world.World
@@ -25,7 +24,6 @@ interface Main : ApplicationListener {
    */
   val world: World?
   val renderThreadName: String
-  val assets: InfAssets
   val startTime: Instant
   val packetBroadcaster: PacketBroadcaster
 

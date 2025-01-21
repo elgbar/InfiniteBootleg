@@ -8,8 +8,8 @@ import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.strongjoshua.console.ImprovedGUIConsole
-import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil
 import no.elg.infiniteBootleg.console.GameConsoleHandler
+import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil
 
 class CGUIConsole(private val consoleHandler: GameConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) : ImprovedGUIConsole(
   skin,
