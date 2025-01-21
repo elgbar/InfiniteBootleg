@@ -9,9 +9,9 @@ import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.strongjoshua.console.ImprovedGUIConsole
 import no.elg.infiniteBootleg.console.HelpfulConsoleHelpUtil
-import no.elg.infiniteBootleg.console.InGameConsoleHandler
+import no.elg.infiniteBootleg.console.GameConsoleHandler
 
-class CGUIConsole(private val consoleHandler: InGameConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) : ImprovedGUIConsole(
+class CGUIConsole(private val consoleHandler: GameConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) : ImprovedGUIConsole(
   skin,
   useMultiplexer,
   keyID,

@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
 import ktx.ashley.with
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.EntityType.SPELL
 import no.elg.infiniteBootleg.util.futureEntity
 import no.elg.infiniteBootleg.util.safeWith
@@ -33,7 +33,7 @@ fun Engine.createSpellEntity(
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
-    safeWith { TextureRegionComponent(Main.inst().assets.spellTexture) }
+    safeWith { TextureRegionComponent(InfAssets.SPELL_TEXTURE) }
     safeWith { TintedComponent(Color.RED) }
     this.entity.isTransientEntity = true
 

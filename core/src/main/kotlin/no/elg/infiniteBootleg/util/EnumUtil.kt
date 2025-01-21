@@ -3,8 +3,6 @@ package no.elg.infiniteBootleg.util
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.allowedRotation
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Companion.disallowedRotation
 import org.apache.commons.lang3.EnumUtils
 
 fun Enum<*>.findTextures(customTextureName: String? = null): RotatableTextureRegion {
@@ -18,13 +16,12 @@ fun Enum<*>.findTextures(customTextureName: String? = null): RotatableTextureReg
 }
 
 fun Enum<*>.findTexturesOrNull(customTextureName: String? = null): RotatableTextureRegion? {
-  if (Main.isServer) {
-    return serverRotatableTextureRegion(customTextureName)
+  return if (Main.isServer) {
+    serverRotatableTextureRegion(customTextureName)
   } else {
     val textureName = textureName(customTextureName)
-    val rotatableTextureName = rotatableTextureName(textureName)
-    return ClientMain.inst().assets.safeTextureAtlas.findRegion(rotatableTextureName)?.allowedRotation(rotatableTextureName)
-      ?: ClientMain.inst().assets.safeTextureAtlas.findRegion(textureName)?.disallowedRotation(textureName)
+    ClientMain.inst().assets.findTextureOrNull(rotatableTextureName(textureName), rotationAllowed = true)
+      ?: ClientMain.inst().assets.findTextureOrNull(textureName, rotationAllowed = false)
       ?: serverRotatableTextureRegion(customTextureName)
   }
 }

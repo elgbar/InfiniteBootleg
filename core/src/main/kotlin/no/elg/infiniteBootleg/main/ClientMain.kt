@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.GL20
 import com.kotcrab.vis.ui.VisUI
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.args.ProgramArgs
+import no.elg.infiniteBootleg.assets.InfAssets
+import no.elg.infiniteBootleg.assets.InfAssetsImpl
 import no.elg.infiniteBootleg.input.GlobalInputListener
 import no.elg.infiniteBootleg.input.MouseLocator
 import no.elg.infiniteBootleg.main.Main.Companion.isClient
@@ -30,6 +32,8 @@ private val logger = KotlinLogging.logger {}
 
 class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArgs, startTime) {
   val inputMultiplexer: InputMultiplexer = InputMultiplexer()
+
+  override val assets: InfAssets = InfAssetsImpl()
 
   lateinit var screenRenderer: ScreenRenderer
     private set
@@ -85,6 +89,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
   override fun create() {
     VisUI.load(if (scale > 1) VisUI.SkinScale.X2 else VisUI.SkinScale.X1)
     super.create()
+    assets.loadAssets()
     // must load VisUI first
     Gdx.input.inputProcessor = inputMultiplexer
     logger.info {

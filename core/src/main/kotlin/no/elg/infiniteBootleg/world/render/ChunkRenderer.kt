@@ -24,7 +24,7 @@ import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Comp
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_INVALID_REASON
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangeRejectedEvent.Companion.CHUNK_OUT_OF_VIEW_REASON
 import no.elg.infiniteBootleg.events.chunks.ChunkTextureChangedEvent
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.chunkToWorld
@@ -184,7 +184,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
   private fun doRenderChunk(chunk: Chunk) {
     val fbo = chunk.frameBuffer ?: return
     val chunkColumn = chunk.chunkColumn
-    val assets = Main.inst().assets
+    val assets = ClientMain.inst().assets
 
     // this is the main render function
     fbo.use { _ ->

@@ -44,9 +44,35 @@ interface InfAssets {
    */
   fun loadAssets()
 
+  fun findTextureOrNull(name: String, rotationAllowed: Boolean): RotatableTextureRegion? {
+    if (safeTextureAtlas.existsRegion(name)) {
+      return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
+    }
+    return null
+  }
+
+  fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion {
+    return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
+  }
+
   companion object {
     const val FONTS_FOLDER = "fonts/"
     const val TEXTURES_BLOCK_FILE = "textures/textures.atlas"
+
+    const val BREAKING_BLOCK_TEXTURE = "breaking_block"
+    const val HAND_TEXTURE = "hand"
+    const val PLAYER_TEXTURE = "player"
+    const val DOOR_OPEN_TEXTURE = "door_open"
+    const val DOOR_CLOSED_TEXTURE = "door_closed"
+    const val VISIBLE_AIR_TEXTURE = "visible_air"
+    const val PICKAXE_TEXTURE = "pickaxe"
+    const val STICK_TEXTURE = "stick"
+    const val SPELL_TEXTURE = "spell"
+
+    const val BREAK_TEXTURE_PREFIX = "break"
+
+    const val PLAYER_IDLE_PREFIX = "player_idle"
+    const val PLAYER_WALKING_PREFIX = "player_walking"
 
     fun createTextureRegion(color: Color): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, color.a)
     fun createTextureRegion(color: Color, a: Float): RotatableTextureRegion = createTextureRegion(color.r, color.g, color.b, a)

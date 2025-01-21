@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
+import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.CommonMain
@@ -29,6 +30,8 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
 
   lateinit var serverWorld: ServerWorld
     private set
+
+  override val assets: InfAssets get() = TODO("Tried to get assets on server")
 
   init {
     val onShutdown = Runnable {

@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.world.box2d.service
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.main.Main
+import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.world.box2d.ObjectContactTracker
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.world.ecs.components.DoorComponent.Companion.doorComponentOrNull
@@ -14,9 +14,9 @@ object DoorService {
 
   private fun updateTexture(doorComponent: DoorComponent, textureComponent: TextureRegionComponent) {
     if (doorComponent.closed) {
-      textureComponent.texture = Main.inst().assets.doorClosedTexture
+      textureComponent.textureName = InfAssets.DOOR_CLOSED_TEXTURE
     } else {
-      textureComponent.texture = Main.inst().assets.doorOpenTexture
+      textureComponent.textureName = InfAssets.DOOR_OPEN_TEXTURE
     }
   }
 

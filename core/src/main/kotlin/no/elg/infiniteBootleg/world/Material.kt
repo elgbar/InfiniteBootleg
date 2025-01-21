@@ -141,7 +141,7 @@ enum class Material(
   override var textureRegion: RotatableTextureRegion? = null
 
   init {
-    if (Settings.client) {
+    if (Settings.client && canBeHandled) {
       textureRegion = this.findTextures(textureName)
       if (textureRegion == null && !canBeHandled) {
         throw NullPointerException("Failed to find a texture for $displayName")

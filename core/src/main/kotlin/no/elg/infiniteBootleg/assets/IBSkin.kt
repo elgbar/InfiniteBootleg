@@ -19,13 +19,13 @@ import ktx.style.window
 import no.elg.infiniteBootleg.main.Main
 
 fun InfAssets.loadInfBootSkin() {
-  if (Main.isClient) {
+  if (Main.Companion.isClient) {
     // Only load vis ui on clients
     with(VisUI.getSkin() as Skin) {
       val notFlippedFont = font20pt
       val boldNotFlippedFont = font20pt
 
-      this["default-font"] = notFlippedFont
+      set("default-font", notFlippedFont)
 
       label(extend = "default") { font = notFlippedFont }
       label(extend = "link-label") { font = notFlippedFont }

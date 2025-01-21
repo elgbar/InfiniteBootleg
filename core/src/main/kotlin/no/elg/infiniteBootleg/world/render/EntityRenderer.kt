@@ -36,6 +36,7 @@ import no.elg.infiniteBootleg.world.ecs.drawableEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
 import no.elg.infiniteBootleg.world.magic.SpellState.Companion.canNotCastAgain
 import no.elg.infiniteBootleg.world.magic.SpellState.Companion.timeToCast
+import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.ClientWorld
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -60,17 +61,18 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   private fun Entity.currentTexture(): TextureRegion {
     val lookDirectionOrNull = lookDirectionComponentOrNull
     val velocityOrNull = velocityOrNull
-    val texture: TextureRegion = if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
+    val rotatableTextureRegion: RotatableTextureRegion = if (box2d.type == Box2D.BodyType.PLAYER && velocityOrNull != null) {
       if (velocityOrNull.isZero(EFFECTIVE_ZERO)) {
-        Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer).textureRegion
+        Main.inst().assets.playerIdleTextures.getKeyFrame(globalAnimationTimer)
       } else if (abs(velocityOrNull.x) > EFFECTIVE_ZERO && groundedComponentOrNull?.onGround == true) {
-        Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer).textureRegion
+        Main.inst().assets.playerWalkingTextures.getKeyFrame(globalAnimationTimer)
       } else {
-        textureRegionComponent.texture.textureRegion
+        Main.inst().assets.playerTexture
       }
     } else {
-      textureRegionComponent.texture.textureRegion
+      Main.inst().assets.findTexture(textureRegionComponent.textureName, false)
     }
+    val texture: TextureRegion = rotatableTextureRegion.textureRegion
     val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
     texture.flip(shouldFlipX, false)
     return texture

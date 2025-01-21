@@ -10,6 +10,7 @@ class SafeTextureAtlas(textFileName: String) {
 
   private val textureAtlas: TextureAtlas?
   private val textureAtlasData: TextureAtlas.TextureAtlasData
+  private val cache = mutableMapOf<String, RotatableTextureRegion>()
 
   init {
     val fileHandle = Gdx.files.internal(textFileName)
@@ -31,6 +32,10 @@ class SafeTextureAtlas(textFileName: String) {
   }
 
   fun findRotationAwareRegion(name: String, rotationAllowed: Boolean, index: Int? = null): RotatableTextureRegion {
-    return RotatableTextureRegion(findRegion(name, index), rotationAllowed, name)
+    val index1 = index ?: -1
+    if (!existsRegion(name, index1)) {
+      throw IllegalArgumentException("Could not find region with name $name and index $index")
+    }
+    return cache.getOrPut(name + rotationAllowed + index1) { RotatableTextureRegion(findRegion(name, index), rotationAllowed, name) }
   }
 }

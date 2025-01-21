@@ -14,24 +14,26 @@ import no.elg.infiniteBootleg.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
-data class TextureRegionComponent(var texture: RotatableTextureRegion) : EntitySavableComponent, ClientComponent {
+data class TextureRegionComponent(var textureName: String) : EntitySavableComponent, ClientComponent {
 
-  override fun hudDebug(): String = "texture ${texture.name}, rotation allowed? ${texture.rotationAllowed}"
+  val texture: RotatableTextureRegion get() = Main.inst().assets.findTexture(textureName, false)
+
+  override fun hudDebug(): String = "texture $textureName"
 
   companion object : EntityLoadableMapper<TextureRegionComponent>() {
     var Entity.textureRegionComponent by propertyFor(mapper)
     var Entity.textureRegionComponentOrNull by optionalPropertyFor(mapper)
+
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasTexture()
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent? {
-      val region = Main.inst().assets.safeTextureAtlas.findRotationAwareRegion(protoEntity.texture.texture, false)
-      return safeWith { TextureRegionComponent(region) }
+      return safeWith { TextureRegionComponent(protoEntity.texture.texture) }
     }
   }
 
   override fun EntityKt.Dsl.save() {
     texture = texture {
-      texture = this@TextureRegionComponent.texture.name
+      texture = this@TextureRegionComponent.textureName
     }
   }
 }

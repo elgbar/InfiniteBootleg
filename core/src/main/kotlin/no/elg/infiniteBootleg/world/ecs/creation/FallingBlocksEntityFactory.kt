@@ -50,7 +50,7 @@ fun Engine.createFallingBlockStandaloneEntity(
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
-    safeWith { TextureRegionComponent(material.textureRegion ?: error("Failed to get ${material.displayName} material texture region")) }
+    safeWith { TextureRegionComponent(material.textureName ?: error("Failed to get ${material.displayName} material texture region")) }
 
     // This entity will handle input events
     with<PhysicsEventQueueComponent>()

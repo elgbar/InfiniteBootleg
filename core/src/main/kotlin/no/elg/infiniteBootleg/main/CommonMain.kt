@@ -10,9 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.async.KtxAsync
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
-import no.elg.infiniteBootleg.assets.InfAssets
-import no.elg.infiniteBootleg.assets.InfAssetsImpl
-import no.elg.infiniteBootleg.console.InGameConsoleHandler
+import no.elg.infiniteBootleg.console.GameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
 import no.elg.infiniteBootleg.net.ClientPacketBroadcaster
@@ -28,10 +26,8 @@ private val logger = KotlinLogging.logger {}
  * @author Elg
  */
 abstract class CommonMain(private val progArgs: ProgramArgs, override val startTime: Instant) : ApplicationAdapter(), Main {
-  override lateinit var console: InGameConsoleHandler
+  override lateinit var console: GameConsoleHandler
     protected set
-
-  override val assets: InfAssets = InfAssetsImpl()
 
   final override lateinit var renderThreadName: String
     private set
@@ -45,23 +41,19 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
 
   override fun create() {
     AnsiConsole.systemInstall()
-    if (!AnsiConsole.isInstalled()) {
-      logger.warn { "Failed to install jansi" }
-    }
-
     KtxAsync.initiate()
     renderThreadName = Thread.currentThread().name
-    console = InGameConsoleHandler().apply {
+    console = GameConsoleHandler().apply {
       alpha = 0.85f
     }
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
     Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO
-    assets.loadAssets()
-    logger.info { "Version ${Util.version}" }
-    Util.getLastCommitDate(Util.RELATIVE_TIME)?.also {
-      logger.debug { "Last commit created $it" }
+
+    if (!AnsiConsole.isInstalled()) {
+      logger.warn { "Failed to install jansi" }
     }
-    logger.info { "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options" }
+    logger.info { "Version ${Util.version}" }
+
     Runtime.getRuntime().addShutdownHook(
       Thread {
         if (isAuthoritative) {
@@ -75,6 +67,10 @@ abstract class CommonMain(private val progArgs: ProgramArgs, override val startT
 
   protected fun afterCreate() {
     progArgs.onCreate()
+    Util.getLastCommitDate(Util.RELATIVE_TIME)?.also {
+      logger.debug { "Last commit created $it" }
+    }
+    logger.info { "You can also start the program with arguments for '--help' or '-?' as arg to see all possible options" }
     logger.info {
       val processStartupTime = ProcessHandle.current().info().startInstant().map(::diffTimePretty).orElseGet { "???" }
       val userStartupTime = diffTimePretty(startTime)

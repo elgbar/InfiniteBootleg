@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.world.ecs.creation
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import no.elg.infiniteBootleg.assets.InfAssets
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.box2D
@@ -125,7 +126,7 @@ private fun EntityKt.Dsl.addCommonClientPlayerComponentsProto(controlled: Boolea
     }
   }
   texture = texture {
-    texture = Main.inst().assets.playerTexture.name
+    texture = InfAssets.PLAYER_TEXTURE
   }
 }
 

@@ -10,8 +10,20 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.GdxArray
 import ktx.collections.plusAssign
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.BREAKING_BLOCK_TEXTURE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.BREAK_TEXTURE_PREFIX
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.DOOR_CLOSED_TEXTURE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.DOOR_OPEN_TEXTURE
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.FONTS_FOLDER
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.HAND_TEXTURE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.PICKAXE_TEXTURE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.PLAYER_IDLE_PREFIX
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.PLAYER_TEXTURE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.PLAYER_WALKING_PREFIX
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.SPELL_TEXTURE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.STICK_TEXTURE
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.TEXTURES_BLOCK_FILE
+import no.elg.infiniteBootleg.assets.InfAssets.Companion.VISIBLE_AIR_TEXTURE
 import no.elg.infiniteBootleg.assets.InfAssets.Companion.createTextureRegion
 import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.main.ClientMain.Companion.scale
@@ -80,22 +92,22 @@ class InfAssetsImpl : InfAssets {
   override fun loadAssets() {
     safeTextureAtlas = SafeTextureAtlas(TEXTURES_BLOCK_FILE)
 
-    breakableBlockTexture = safeTextureAtlas.findRotationAwareRegion("breaking_block", false)
-    handTexture = safeTextureAtlas.findRotationAwareRegion("hand", false)
-    playerTexture = safeTextureAtlas.findRotationAwareRegion("player", false)
-    doorOpenTexture = safeTextureAtlas.findRotationAwareRegion("door_open", false)
-    doorClosedTexture = safeTextureAtlas.findRotationAwareRegion("door_closed", false)
-    visibleAirTexture = safeTextureAtlas.findRotationAwareRegion("visible_air", false)
-    pickaxeTexture = safeTextureAtlas.findRotationAwareRegion("pickaxe", false)
-    staffTexture = safeTextureAtlas.findRotationAwareRegion("stick", false)
-    spellTexture = safeTextureAtlas.findRotationAwareRegion("spell", false)
+    breakableBlockTexture = safeTextureAtlas.findRotationAwareRegion(BREAKING_BLOCK_TEXTURE, false)
+    handTexture = safeTextureAtlas.findRotationAwareRegion(HAND_TEXTURE, false)
+    playerTexture = safeTextureAtlas.findRotationAwareRegion(PLAYER_TEXTURE, false)
+    doorOpenTexture = safeTextureAtlas.findRotationAwareRegion(DOOR_OPEN_TEXTURE, false)
+    doorClosedTexture = safeTextureAtlas.findRotationAwareRegion(DOOR_CLOSED_TEXTURE, false)
+    visibleAirTexture = safeTextureAtlas.findRotationAwareRegion(VISIBLE_AIR_TEXTURE, false)
+    pickaxeTexture = safeTextureAtlas.findRotationAwareRegion(PICKAXE_TEXTURE, false)
+    staffTexture = safeTextureAtlas.findRotationAwareRegion(STICK_TEXTURE, false)
+    spellTexture = safeTextureAtlas.findRotationAwareRegion(SPELL_TEXTURE, false)
 
     breakingBlockTextures = (1..9).map {
-      safeTextureAtlas.findRotationAwareRegion("break", false, it)
+      safeTextureAtlas.findRotationAwareRegion(BREAK_TEXTURE_PREFIX, false, it)
     }.toTypedArray()
 
-    playerIdleTextures = findAnimation("player_idle", 3, 0.35f, startIndex = 1)
-    playerWalkingTextures = findAnimation("player_walking", 2, 0.2f, startIndex = 0)
+    playerIdleTextures = findAnimation(PLAYER_IDLE_PREFIX, 3, 0.35f, startIndex = 1)
+    playerWalkingTextures = findAnimation(PLAYER_WALKING_PREFIX, 2, 0.2f, startIndex = 0)
 
     skyTexture = createTextureRegion(ClientMain.CLEAR_COLOR_R, ClientMain.CLEAR_COLOR_G, ClientMain.CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)
     caveTexture = createTextureRegion(ChunkRenderer.CAVE_CLEAR_COLOR_R, ChunkRenderer.CAVE_CLEAR_COLOR_G, ChunkRenderer.CAVE_CLEAR_COLOR_B, ClientMain.CLEAR_COLOR_A)
