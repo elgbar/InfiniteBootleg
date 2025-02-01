@@ -60,9 +60,9 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
       logger.debug { "Loading new screen ${value.javaClass.simpleName}" }
       updateStatus(world)
 
-      (screen as? AbstractScreen)?.tryCreate()
-      screen.show()
-      screen.resize(Gdx.graphics.width, Gdx.graphics.height)
+      (value as? AbstractScreen)?.tryCreate()
+      value.show()
+      value.resize(Gdx.graphics.width, Gdx.graphics.height)
     }
 
   /**
@@ -156,7 +156,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
   fun updateStatus(world: ClientWorld?) {
     isSingleplayer = world is SinglePlayerWorld
     isMultiplayer = world is ServerClientWorld
-    logger.debug { "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer" }
+    logger.trace { "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer" }
   }
 
   fun shouldNotIgnoreWorldInput(): Boolean = !shouldIgnoreWorldInput()
