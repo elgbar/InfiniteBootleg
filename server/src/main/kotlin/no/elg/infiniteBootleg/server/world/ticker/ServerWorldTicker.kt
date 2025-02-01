@@ -2,10 +2,10 @@ package no.elg.infiniteBootleg.server.world.ticker
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.world.ticker.CommonWorldTicker
+import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker.Companion.WORLD_TICKER_TAG_PREFIX
 import no.elg.infiniteBootleg.server.world.ServerWorld
-import no.elg.infiniteBootleg.world.ticker.WorldBox2DTicker
 
 /**
  * There are multiple tickers for a single world internally, but the outside world should only see a

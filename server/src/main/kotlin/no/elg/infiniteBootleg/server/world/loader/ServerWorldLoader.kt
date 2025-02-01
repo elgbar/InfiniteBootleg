@@ -3,19 +3,19 @@ package no.elg.infiniteBootleg.server.world.loader
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.files.FileHandle
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.core.net.SharedInformation
+import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
+import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SharedInformationComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
+import no.elg.infiniteBootleg.core.world.ecs.creation.createNewProtoPlayer
+import no.elg.infiniteBootleg.core.world.ecs.load
+import no.elg.infiniteBootleg.core.world.ecs.save
 import no.elg.infiniteBootleg.core.world.world.World
-import no.elg.infiniteBootleg.net.SharedInformation
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.world.ServerWorld
-import no.elg.infiniteBootleg.util.safeWith
-import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
-import no.elg.infiniteBootleg.world.ecs.creation.createNewProtoPlayer
-import no.elg.infiniteBootleg.world.ecs.load
-import no.elg.infiniteBootleg.world.ecs.save
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

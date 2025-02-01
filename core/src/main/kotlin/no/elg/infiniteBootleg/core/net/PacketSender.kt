@@ -7,12 +7,6 @@ import no.elg.infiniteBootleg.protobuf.Packets.Packet
  * Handle sending packets on clients and servers. This is the preferred method of sending packets on both server and client
  */
 interface PacketSender {
-//  fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all())
-//
-
-//  fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoord, filter: ChannelMatcher = ChannelMatchers.all())
-//  fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all())
-//  fun broadcastToInView(packet: Packet, entity: Entity, filter: ChannelMatcher = ChannelMatchers.all())
 
   /**
    * Helper method to send either a server bound or client bound packet depending on which this instance currently is.

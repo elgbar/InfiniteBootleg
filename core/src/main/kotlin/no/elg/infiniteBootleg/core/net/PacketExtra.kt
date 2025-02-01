@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.net
 
 import com.badlogic.ashley.core.Entity
-import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
@@ -72,7 +71,6 @@ import no.elg.infiniteBootleg.protobuf.moveEntity
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlot
 import java.time.Instant
 
-private val logger = KotlinLogging.logger {}
 // //////////////////
 // util functions //
 // //////////////////
@@ -179,6 +177,7 @@ fun ServerClient.serverBoundContainerUpdate(owner: ContainerOwner, container: Co
   serverBoundContainerUpdate(
     OwnedContainer(owner, container)
   )
+
 fun ServerClient.serverBoundContainerUpdate(ownedContainer: OwnedContainer): Packet = containerUpdateBuilder(serverBoundPacketBuilder(DX_CONTAINER_UPDATE), ownedContainer)
 
 fun ServerClient.serverBoundBreakingBlock(progress: List<Packets.BreakingBlock.BreakingProgress>): Packet {

@@ -2,8 +2,8 @@ package no.elg.infiniteBootleg.server.world.ticker
 
 import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.world.ticker.Ticker
+import no.elg.infiniteBootleg.core.world.ticker.TickerImpl
 import no.elg.infiniteBootleg.server.world.ServerWorld
-import no.elg.infiniteBootleg.world.ticker.TickerImpl
 
 class ServerRendererTicker(private val world: ServerWorld, tick: Boolean) : Ticking {
 

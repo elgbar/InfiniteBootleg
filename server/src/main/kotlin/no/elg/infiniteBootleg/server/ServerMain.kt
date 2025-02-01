@@ -2,19 +2,19 @@ package no.elg.infiniteBootleg.server
 
 import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.args.ProgramArgs
+import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.args.ProgramArgs
+import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
+import no.elg.infiniteBootleg.core.main.CommonMain
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.net.clientBoundDisconnectPlayerPacket
+import no.elg.infiniteBootleg.core.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
-import no.elg.infiniteBootleg.events.WorldLoadedEvent
-import no.elg.infiniteBootleg.main.CommonMain
-import no.elg.infiniteBootleg.net.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.server.console.HeadlessGameConsoleHandler
 import no.elg.infiniteBootleg.server.net.NettyServer
 import no.elg.infiniteBootleg.server.net.ServerPacketSender
 import no.elg.infiniteBootleg.server.world.ServerWorld
-import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import java.time.Instant
 
 private val logger = KotlinLogging.logger {}

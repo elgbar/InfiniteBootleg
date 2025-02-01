@@ -5,16 +5,16 @@ import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.core.net.PacketSender
 import no.elg.infiniteBootleg.core.net.ServerClient
+import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
+import no.elg.infiniteBootleg.core.util.ChunkCoord
+import no.elg.infiniteBootleg.core.util.WorldCoord
+import no.elg.infiniteBootleg.core.util.decompactLocX
+import no.elg.infiniteBootleg.core.util.decompactLocY
+import no.elg.infiniteBootleg.core.util.worldToChunk
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.server.world.ServerWorld
-import no.elg.infiniteBootleg.util.ChunkCompactLoc
-import no.elg.infiniteBootleg.util.ChunkCoord
-import no.elg.infiniteBootleg.util.WorldCoord
-import no.elg.infiniteBootleg.util.decompactLocX
-import no.elg.infiniteBootleg.util.decompactLocY
-import no.elg.infiniteBootleg.util.worldToChunk
-import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 
 class ServerPacketSender(private val world: ServerWorld) : PacketSender {
 
