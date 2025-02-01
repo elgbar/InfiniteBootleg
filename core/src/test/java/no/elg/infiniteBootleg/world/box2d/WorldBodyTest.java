@@ -1,8 +1,9 @@
 package no.elg.infiniteBootleg.world.box2d;
 
-import static no.elg.infiniteBootleg.world.box2d.WorldBody.WORLD_MOVE_OFFSET_THRESHOLD;
+import static no.elg.infiniteBootleg.core.world.box2d.WorldBody.WORLD_MOVE_OFFSET_THRESHOLD;
 import static org.junit.Assert.assertEquals;
 
+import no.elg.infiniteBootleg.core.world.box2d.WorldBody;
 import org.junit.Test;
 
 /**

@@ -3,8 +3,8 @@ package no.elg.infiniteBootleg.server.net
 import com.badlogic.ashley.core.Entity
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
-import no.elg.infiniteBootleg.net.PacketSender
-import no.elg.infiniteBootleg.net.ServerClient
+import no.elg.infiniteBootleg.core.net.PacketSender
+import no.elg.infiniteBootleg.core.net.ServerClient
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.server.world.ServerWorld

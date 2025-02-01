@@ -3,12 +3,12 @@ package no.elg.infiniteBootleg.client
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.client.args.ClientProgramArgs
-import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.util.defaultDisplayHeight
-import no.elg.infiniteBootleg.util.defaultDisplayWidth
+import no.elg.infiniteBootleg.client.main.ClientMain
+import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.defaultDisplayHeight
+import no.elg.infiniteBootleg.core.util.defaultDisplayWidth
 import java.time.Instant
 import kotlin.system.exitProcess
 

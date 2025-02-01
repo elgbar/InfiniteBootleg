@@ -1,8 +1,8 @@
 package no.elg.infiniteBootleg.client.args
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
-import no.elg.infiniteBootleg.args.ProgramArgs
+import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.args.ProgramArgs
 
 private val logger = KotlinLogging.logger {}
 

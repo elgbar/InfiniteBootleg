@@ -1,0 +1,73 @@
+package no.elg.infiniteBootleg.core.world.ecs.system.block
+
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
+import ktx.collections.GdxLongArray
+import no.elg.infiniteBootleg.core.events.LeafDecayCheckEvent
+import no.elg.infiniteBootleg.core.events.api.EventManager
+import no.elg.infiniteBootleg.core.util.chunkOffset
+import no.elg.infiniteBootleg.core.util.component1
+import no.elg.infiniteBootleg.core.util.component2
+import no.elg.infiniteBootleg.core.util.decompactLocX
+import no.elg.infiniteBootleg.core.util.decompactLocY
+import no.elg.infiniteBootleg.core.util.isWithin
+import no.elg.infiniteBootleg.core.util.relativeCompact
+import no.elg.infiniteBootleg.core.world.Direction
+import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
+import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.getChunkOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
+import no.elg.infiniteBootleg.core.world.ecs.leafBlockFamily
+import no.elg.infiniteBootleg.core.world.ecs.system.FamilyEntitySystem
+
+object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_DEFAULT), AuthoritativeSystem {
+
+  private const val DESPAWN_LEAVES_RADIUS = 5f
+
+  override fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float) {
+    val entity: Entity = entities.random()
+    val chunk = entity.getChunkOrNull() ?: return
+    val world = entity.world
+
+    val srcLoc = entity.compactBlockLoc
+    EventManager.dispatchEventAsync(LeafDecayCheckEvent(srcLoc))
+
+    val stack = GdxLongArray(false, 16)
+    val seen = GdxLongArray()
+
+    stack.add(srcLoc)
+
+    while (stack.notEmpty()) {
+      val loc = stack.removeIndex(0)
+      seen.add(loc)
+      for (dir in Direction.Companion.CARDINAL) {
+        val nextLoc = relativeCompact(loc.decompactLocX(), loc.decompactLocY(), dir)
+        if (!isWithin(srcLoc, nextLoc, DESPAWN_LEAVES_RADIUS)) {
+          // Block is too far away to be connected
+          continue
+        }
+        val (worldX, worldY) = nextLoc
+
+        val neighborMaterial = world.actionOnBlock(worldX, worldY, false) { localX, localY, nullableChunk ->
+          // Chunk is not loaded, so we don't know if we should despawn this leaf
+          val nextChunk = nullableChunk ?: return
+          nextChunk.getRawBlock(localX, localY).materialOrAir()
+        }
+
+        if (neighborMaterial == Material.BIRCH_TRUNK) {
+          // If there is a trunk connected to this leaf block, we don't want to despawn it and can return early
+          return
+        }
+        if (neighborMaterial == Material.BIRCH_LEAVES && nextLoc !in seen) {
+          stack.add(nextLoc)
+        }
+      }
+    }
+
+    // If no trunks were found, remove the leaf block
+    chunk.removeBlock(srcLoc.decompactLocX().chunkOffset(), srcLoc.decompactLocY().chunkOffset())
+  }
+}

@@ -2,7 +2,9 @@ package no.elg.infiniteBootleg.util
 
 import io.mockk.every
 import io.mockk.mockk
-import no.elg.infiniteBootleg.world.Direction
+import no.elg.infiniteBootleg.core.util.directionTo
+import no.elg.infiniteBootleg.core.util.isNeighbor
+import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
