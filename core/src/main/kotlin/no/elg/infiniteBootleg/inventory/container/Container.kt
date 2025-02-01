@@ -7,7 +7,6 @@ import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.Item.Companion.DEFAULT_MAX_STOCK
 import no.elg.infiniteBootleg.items.Item.Companion.asProto
 import no.elg.infiniteBootleg.items.Item.Companion.fromProto
-import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.protobuf.ContainerKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
@@ -203,20 +202,6 @@ interface Container : Iterable<IndexedItem> {
 
   companion object : ProtoConverter<Container, ProtoContainer> {
     private val logger = KotlinLogging.logger {}
-
-    fun OwnedContainer.isOpen(): Boolean = ClientMain.inst().world?.render?.interfaceManager?.isOpen(owner.toInterfaceId()) ?: false
-
-    fun OwnedContainer.open() {
-      ClientMain.inst().world?.render?.let { render -> render.openInterface(owner.toInterfaceId()) { render.createContainerActor(this) } }
-    }
-
-    fun OwnedContainer.close() {
-      ClientMain.inst().world?.render?.closeInterface(owner.toInterfaceId())
-    }
-
-    fun OwnedContainer.toggle() {
-      ClientMain.inst().world?.render?.let { render -> render.toggleInterface(owner.toInterfaceId()) { render.createContainerActor(this) } }
-    }
 
     override fun ProtoWorld.Container.fromProto(): Container =
       when (type) {

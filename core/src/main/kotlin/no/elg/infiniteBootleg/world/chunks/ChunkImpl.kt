@@ -1,11 +1,7 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
-import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -18,8 +14,8 @@ import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.events.chunks.ChunkLightChangedEvent
 import no.elg.infiniteBootleg.events.chunks.ChunkUnloadedEvent
 import no.elg.infiniteBootleg.exceptions.checkChunkCorrupt
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.net.clientBoundBlockUpdate
-import no.elg.infiniteBootleg.net.sendDuplexPacketInView
 import no.elg.infiniteBootleg.net.serverBoundBlockUpdate
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.chunk
@@ -38,7 +34,6 @@ import no.elg.infiniteBootleg.util.dst2
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.isMarkerBlock
 import no.elg.infiniteBootleg.util.launchOnAsync
-import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.util.singleLinePrinter
 import no.elg.infiniteBootleg.util.stringifyChunkToWorld
@@ -51,7 +46,6 @@ import no.elg.infiniteBootleg.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.CHUNK_SIZE
 import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.save
-import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.world.World
 import org.jetbrains.annotations.Contract
 import java.util.concurrent.CompletableFuture
@@ -59,10 +53,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
-class ChunkImpl(
-  override val world: World,
-  override val chunkX: ChunkCoord,
-  override val chunkY: ChunkCoord
+open class ChunkImpl(
+  final override val world: World,
+  final override val chunkX: ChunkCoord,
+  final override val chunkY: ChunkCoord
 ) : Chunk {
 
   val blocks: Array<Array<Block?>> = Array(CHUNK_SIZE) { arrayOfNulls(CHUNK_SIZE) }
@@ -83,36 +77,32 @@ class ChunkImpl(
   /**
    * if this chunk should be prioritized to be updated
    */
-  private var prioritize: Boolean = false
+  protected var prioritize: Boolean = false
 
   /**
    * If the chunk has been modified since loaded
    */
-  private var modified: Boolean = false
+  protected var modified: Boolean = false
 
-  /**
-   * Whether this chunk is allowed to unload.
-   * Sometimes we do not want to unload specific chunks, for example if there is a player in that chunk
-   *  or it is the spawn chunk
-   */
-  private var allowUnload: Boolean = true
+  override var allowedToUnload: Boolean = true
+    set(value) {
+      field = if (isDisposed) {
+        // already unloaded, then it must have been allowed to be unloaded
+        true
+      } else {
+        value
+      }
+    }
 
   /**
    * If the chunk is still being initialized, meaning not all blocks are in [blocks]
    */
-  private var initializing: Boolean = true
+  protected var initializing: Boolean = true
 
-  private var allAir: Boolean = false
+  override var isAllAir: Boolean = false
+    protected set
 
   private var disposed: Boolean = false
-
-  /**
-   * @return The last tick this chunk's texture was pulled
-   */
-  override var lastViewedTick: Long = 0
-
-  @GuardedBy("chunkBody")
-  private var fbo: FrameBuffer? = null
 
   private val chunkListeners by lazy { ChunkListeners(this) }
 
@@ -194,8 +184,7 @@ class ChunkImpl(
     }
     modified = true
     if (updateTexture) {
-      dirty()
-      this.prioritize = this.prioritize or prioritize // do not remove prioritization if chunk already is prioritized
+      dirty(prioritize)
     }
     if (!bothAirish) {
       if (currBlock != null) {
@@ -204,7 +193,7 @@ class ChunkImpl(
       if (block != null) {
         chunkBody.addBlock(block)
       }
-      launchOnAsync { chunkColumn.updateTopBlock(localX, getWorldY(localY)) }
+      launchOnAsync { chunkColumn.updateTopBlock(localX, this@ChunkImpl.chunkY.chunkToWorld(localY)) }
     }
 
     if (!initializing && !bothAirish) {
@@ -212,95 +201,21 @@ class ChunkImpl(
     }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
-        val originWorldX = getWorldX(localX)
-        val originWorldY = getWorldY(localY)
+        val originWorldX = chunkX.chunkToWorld(localX)
+        val originWorldY = chunkY.chunkToWorld(localY)
         EventManager.dispatchEvent(ChunkLightChangedEvent(compactLocation, originWorldX.chunkOffset(), originWorldY.chunkOffset()))
       }
     }
     currBlock?.dispose()
-    val worldX = getWorldX(localX)
-    val worldY = getWorldY(localY)
+    val worldX = chunkX.chunkToWorld(localX)
+    val worldY = chunkY.chunkToWorld(localY)
     if (sendUpdatePacket && isValid && !bothAirish && !block.isMarkerBlock()) {
-      sendDuplexPacketInView(
+      Main.inst().packetSender.sendDuplexPacketInView(
         ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
         ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }
       )
     }
     return block
-  }
-
-  override fun getWorldX(localX: LocalCoord): WorldCoord {
-    return chunkX.chunkToWorld(localX)
-  }
-
-  override fun getWorldY(localY: LocalCoord): WorldCoord {
-    return chunkY.chunkToWorld(localY)
-  }
-
-  @Synchronized
-  override fun updateTexture(prioritize: Boolean) {
-    dirty()
-    modified = true
-    this.prioritize = this.prioritize or prioritize
-  }
-
-  override val texture: Texture?
-    get() {
-      synchronized(chunkBody) {
-        if (isDirty) {
-          updateIfDirty()
-        }
-        return fbo?.colorBufferTexture
-      }
-    }
-
-  override fun hasTexture(): Boolean = fbo != null
-
-  /**
-   * Force update of texture and recalculate internal variables This is usually called when the
-   * dirty flag of the chunk is set and either [isAllAir] or [texture]
-   * called.
-   */
-  private fun updateIfDirty() {
-    if (isInvalid) {
-      return
-    }
-    var wasPrioritize: Boolean
-    synchronized(blocks) {
-      if (!isDirty || initializing) {
-        return
-      }
-      wasPrioritize = prioritize
-      prioritize = false
-      isDirty = false
-
-      // test if all the blocks in this chunk has the material air
-      allAir = true
-      outer@ for (localX in 0 until CHUNK_SIZE) {
-        for (localY in 0 until CHUNK_SIZE) {
-          val b = blocks[localX][localY]
-          if (b != null && b.material !== Material.AIR) {
-            allAir = false
-            break@outer
-          }
-        }
-      }
-    }
-
-    // Render the world with the changes (but potentially without the light changes)
-    queueForRendering(wasPrioritize)
-  }
-
-  /**
-   * Queue this chunk to be rendered
-   */
-  override fun queueForRendering(prioritize: Boolean) {
-    val render = world.render as? ClientWorldRender ?: return
-    render.chunkRenderer.queueRendering(this, prioritize)
-  }
-
-  override fun updateAllBlockLights() {
-    doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
   }
 
   private fun isNoneWithinDistance(sources: WorldCompactLocArray, worldX: WorldCoord, worldY: WorldCoord): Boolean {
@@ -329,13 +244,16 @@ class ChunkImpl(
     }
   }
 
-  private suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean) {
+  /**
+   * @return if any block was recalculated
+   */
+  protected open suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean): Boolean {
     if (Settings.renderLight) {
       val anyRecalculated = AtomicBoolean(false)
       coroutineScope {
         for (localX in 0 until CHUNK_SIZE) {
           for (localY in CHUNK_SIZE - 1 downTo 0) {
-            if (checkDistance && isNoneWithinDistance(sources, getWorldX(localX), getWorldY(localY))) {
+            if (checkDistance && isNoneWithinDistance(sources, this@ChunkImpl.chunkX.chunkToWorld(localX), this@ChunkImpl.chunkY.chunkToWorld(localY))) {
               continue
             }
             launch {
@@ -348,31 +266,10 @@ class ChunkImpl(
           }
         }
       }
-      if (anyRecalculated.get()) {
-        queueForRendering(prioritize = false)
-      }
+      return anyRecalculated.get()
     }
+    return false
   }
-
-  override fun view() {
-    lastViewedTick = world.tick
-  }
-
-  override val frameBuffer: FrameBuffer?
-    get() {
-      if (isDisposed) {
-        return null
-      }
-      synchronized(chunkBody) {
-        if (fbo != null) {
-          return fbo
-        }
-        val fbo = FrameBuffer(Pixmap.Format.RGBA8888, Chunk.CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, false)
-        fbo.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        this.fbo = fbo
-        return fbo
-      }
-    }
 
   override fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight {
     return blockLights[blockMapIndex(localX, localY)]
@@ -381,14 +278,6 @@ class ChunkImpl(
   override fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block? {
     return blocks[localX][localY]
   }
-
-  override val isAllAir: Boolean
-    get() {
-      if (isDirty) {
-        updateIfDirty()
-      }
-      return allAir
-    }
 
   override val isDisposed: Boolean get() = disposed
 
@@ -399,14 +288,6 @@ class ChunkImpl(
   override val isInvalid: Boolean
     get() = isDisposed || initializing
 
-  override fun setAllowUnload(allowUnload: Boolean) {
-    if (isDisposed) {
-      return // already unloaded
-    }
-    this.allowUnload = allowUnload
-  }
-
-  override val isAllowedToUnload: Boolean get() = allowUnload
   override val chunkColumn: ChunkColumn
     get() = world.getChunkColumn(chunkX)
 
@@ -468,15 +349,8 @@ class ChunkImpl(
     }
     EventManager.dispatchEvent(ChunkUnloadedEvent(this))
     disposed = true
-    allowUnload = false
     chunkBody.dispose()
     chunkListeners.dispose()
-    synchronized(chunkBody) {
-      fbo?.also {
-        launchOnMain { it.dispose() }
-        fbo = null
-      }
-    }
     for (blockArr in blocks) {
       for (block in blockArr) {
         block?.dispose()
@@ -484,8 +358,13 @@ class ChunkImpl(
     }
   }
 
-  override fun dirty() {
+  override fun dirty(prioritize: Boolean) {
     isDirty = true
+    this.prioritize = this.prioritize or prioritize
+  }
+
+  override fun updateAllBlockLights() {
+    doUpdateLightMultipleSources(NOT_CHECKING_DISTANCE, checkDistance = false)
   }
 
   /**

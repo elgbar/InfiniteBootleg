@@ -2,14 +2,10 @@ package no.elg.infiniteBootleg.net
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.delay
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.inventory.container.Container
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
-import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ContentRequestKt
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
@@ -56,15 +52,9 @@ import no.elg.infiniteBootleg.protobuf.holdingItem
 import no.elg.infiniteBootleg.protobuf.interfaceUpdate
 import no.elg.infiniteBootleg.protobuf.moveEntity
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlot
-import no.elg.infiniteBootleg.screens.ConnectingScreen
-import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.WorldCoord
-import no.elg.infiniteBootleg.util.decompactLocX
-import no.elg.infiniteBootleg.util.decompactLocY
-import no.elg.infiniteBootleg.util.launchOnAsync
-import no.elg.infiniteBootleg.util.launchOnMain
 import no.elg.infiniteBootleg.util.toComponentsString
 import no.elg.infiniteBootleg.util.toProtoEntityRef
 import no.elg.infiniteBootleg.util.toVector2i
@@ -86,23 +76,6 @@ private val logger = KotlinLogging.logger {}
 // //////////////////
 // util functions //
 // //////////////////
-
-internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
-  require(Settings.client)
-  launchOnAsync {
-    delay(50L)
-    close()
-  }
-  launchOnMain {
-    ConnectingScreen.info = msg
-    ClientMain.inst().screen = ConnectingScreen
-    val serverClient = ClientMain.inst().serverClient
-    if (serverClient?.sharedInformation != null) {
-      this@fatal.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
-    }
-  }
-  logger.error { msg }
-}
 
 fun ServerClient.serverBoundPacketBuilder(type: Type): Packet.Builder {
   return Packet.newBuilder()
@@ -321,43 +294,6 @@ fun clientBoundInterfaceUpdate(interfaceId: String, updateType: InterfaceUpdate.
       this.updateType = updateType
     }
   ).build()
-
-// ////////////
-//   DUAL   //
-// ////////////
-
-/**
- * Helper method to send either a server bound or client bound packet depending on which this instance currently is.
- *
- * @param ifIsServer The packet to send if we are the server
- * @param ifIsClient The packet to send if we are a server client
- */
-fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Packet) {
-  if (Main.isServer) {
-    Main.inst().packetBroadcaster.broadcast(ifIsServer())
-  } else if (Main.isServerClient) {
-    val client = ClientMain.inst().serverClient ?: error("Server client null after check")
-    client.ctx.writeAndFlushPacket(client.ifIsClient())
-  }
-}
-
-/**
- * Helper method to send either a server bound or client bound packet depending on which this instance currently is.
- *
- * @param ifIsServer The packet to send if we are the server, and the chunk to send it to
- * @param ifIsClient The packet to send if we are a server client
- */
-fun sendDuplexPacketInView(ifIsServer: () -> Pair<Packet?, ChunkCompactLoc>, ifIsClient: ServerClient.() -> Packet?) {
-  if (Main.isServer) {
-    val (maybePacket, chunkLoc) = ifIsServer()
-    val packet = maybePacket ?: return
-    Main.inst().packetBroadcaster.broadcastToInViewChunk(packet, chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
-  } else if (Main.isServerClient) {
-    val client = ClientMain.inst().serverClient ?: error("Server client null after check")
-    val packet = client.ifIsClient() ?: return
-    client.ctx.writeAndFlushPacket(packet)
-  }
-}
 
 // /////////////////////
 //   DUAL Builders   //

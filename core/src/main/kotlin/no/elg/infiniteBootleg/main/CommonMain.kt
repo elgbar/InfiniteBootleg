@@ -6,6 +6,7 @@ import com.badlogic.gdx.Application
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Collections
+import com.strongjoshua.console.CommandExecutor
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.async.KtxAsync
 import no.elg.infiniteBootleg.Settings
@@ -13,10 +14,11 @@ import no.elg.infiniteBootleg.args.ProgramArgs
 import no.elg.infiniteBootleg.console.GameConsoleHandler
 import no.elg.infiniteBootleg.logging.Slf4jApplicationLogger
 import no.elg.infiniteBootleg.main.Main.Companion.isAuthoritative
-import no.elg.infiniteBootleg.net.ClientPacketBroadcaster
-import no.elg.infiniteBootleg.net.PacketBroadcaster
 import no.elg.infiniteBootleg.util.Util
 import no.elg.infiniteBootleg.util.diffTimePretty
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
+import no.elg.infiniteBootleg.world.generator.chunk.ChunkFactory
+import no.elg.infiniteBootleg.world.generator.chunk.ChunkImplFactory
 import org.fusesource.jansi.AnsiConsole
 import java.time.Instant
 
@@ -25,25 +27,28 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-abstract class CommonMain(private val progArgs: ProgramArgs, override val startTime: Instant) : ApplicationAdapter(), Main {
-  override lateinit var console: GameConsoleHandler
+abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: ProgramArgs, override val startTime: Instant) : ApplicationAdapter(), Main {
+  final override lateinit var console: CONSOLE
     protected set
+
+  open val exec: CommandExecutor get() = console.exec
 
   final override lateinit var renderThreadName: String
     private set
 
-  override val packetBroadcaster: PacketBroadcaster
-    get() = ClientPacketBroadcaster
+  override val chunkFactory: ChunkFactory<out ChunkImpl> = ChunkImplFactory()
 
   init {
     instField = this
   }
 
+  abstract fun createConsole(): CONSOLE
+
   override fun create() {
     AnsiConsole.systemInstall()
     KtxAsync.initiate()
     renderThreadName = Thread.currentThread().name
-    console = GameConsoleHandler().apply {
+    console = createConsole().apply {
       alpha = 0.85f
     }
     Gdx.app.applicationLogger = Slf4jApplicationLogger()

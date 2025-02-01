@@ -11,7 +11,7 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.Progress
 import no.elg.infiniteBootleg.util.WorldCompactLoc
-import no.elg.infiniteBootleg.world.world.ServerClientWorld
+import no.elg.infiniteBootleg.world.world.World
 import java.time.Duration
 
 /**
@@ -21,7 +21,7 @@ import java.time.Duration
  */
 class ServerClient(
   val name: String,
-  var world: ServerClientWorld? = null,
+  var world: World? = null,
   var protoEntity: ProtoWorld.Entity? = null
 ) : Disposable {
 

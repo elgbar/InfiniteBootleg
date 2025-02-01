@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.net.clientBoundDespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets
+import no.elg.infiniteBootleg.server.ServerMain
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
@@ -15,7 +16,7 @@ fun despawnEntity(entity: Entity, despawnReason: Packets.DespawnEntity.DespawnRe
   val entityId = entity.id
   if (!entity.authoritativeOnly) {
     launchOnAsync {
-      Main.inst().packetBroadcaster.broadcast(clientBoundDespawnEntity(entityId, despawnReason))
+      ServerMain.inst().packetSender.broadcast(clientBoundDespawnEntity(entityId, despawnReason))
     }
   }
 }

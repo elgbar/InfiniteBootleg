@@ -4,14 +4,15 @@ import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.args.ProgramArgs
+import no.elg.infiniteBootleg.console.HeadlessGameConsoleHandler
 import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.CommonMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.net.PacketBroadcaster
+import no.elg.infiniteBootleg.net.PacketSender
 import no.elg.infiniteBootleg.net.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.server.net.NettyServer
-import no.elg.infiniteBootleg.server.net.ServerPacketBroadcaster
+import no.elg.infiniteBootleg.server.net.ServerPacketSender
 import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.world.world.World
@@ -22,17 +23,21 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArgs, startTime) {
+class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<HeadlessGameConsoleHandler>(progArgs, startTime) {
 
-  override lateinit var packetBroadcaster: PacketBroadcaster
+  override lateinit var packetSender: ServerPacketSender
     private set
+  override val isSingleplayer: Boolean
+    get() = false
+  override val isMultiplayer: Boolean
+    get() = true
 
   lateinit var serverWorld: ServerWorld
     private set
 
   init {
     val onShutdown = Runnable {
-      packetBroadcaster.broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
+      packetSender.broadcast(clientBoundDisconnectPlayerPacket("Server closed"))
       serverWorld.save()
       serverWorld.dispose()
       dispose()
@@ -44,6 +49,8 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
     serverWorld.render.render()
   }
 
+  override fun createConsole(): HeadlessGameConsoleHandler = HeadlessGameConsoleHandler()
+
   override fun create() {
     super.create()
 
@@ -52,7 +59,7 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain(progArg
     serverWorld = serverWorld1
     serverWorld.initialize()
 
-    packetBroadcaster = ServerPacketBroadcaster(serverWorld1)
+    packetSender = ServerPacketSender(serverWorld1)
 
     val serverThread: Thread = Thread.ofPlatform()
       .name("Server")

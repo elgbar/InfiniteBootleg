@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.world.chunks
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.physics.box2d.Body
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.CheckableDisposable
@@ -28,7 +26,6 @@ import kotlin.math.ln
 interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   /**
-   * Might cause a call to [updateIfDirty] if the chunk is marked as dirty
    *
    * @return If all blocks in this chunk is air
    */
@@ -52,9 +49,11 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   /**
    * If players are in this chunk, unloading should never be allowed
    *
+   * Sometimes we do not want to unload specific chunks, for example if there is a player in that chunk or it is the spawn chunk
+   *
    * @return If this chunk is allowed to be unloaded
    */
-  val isAllowedToUnload: Boolean
+  var allowedToUnload: Boolean
 
   val world: World
 
@@ -70,28 +69,12 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
 
   val worldY: WorldCoord
 
-  val lastViewedTick: Long
-
-  //  Future<Array<Entity>> getEntities();
   val chunkBody: ChunkBody
 
   /**
    * @return if this chunk is dirty
    */
   val isDirty: Boolean
-
-  /**
-   * Might cause a call to [updateIfDirty] if the chunk is marked as dirty
-   *
-   * @return The texture of this chunk
-   */
-  val texture: Texture?
-
-  /**
-   * @return The backing [FrameBuffer] which holds the texture of this chunk. Will be null if
-   * the chunk is disposed, never null otherwise.
-   */
-  val frameBuffer: FrameBuffer?
 
   /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
@@ -146,40 +129,8 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
     sendUpdatePacket: Boolean = true
   )
 
-  /**
-   * Force update of this chunk's texture and invariants
-   *
-   * Prioritization will not be removed if already prioritized.
-   *
-   * @param prioritize If this chunk should be prioritized when rendering
-   */
-  fun updateTexture(prioritize: Boolean)
-
-  /**
-   * Will not update textures
-   *
-   * @return If this chunk has a texture generated
-   */
-  fun hasTexture(): Boolean
-  fun queueForRendering(prioritize: Boolean)
-
   /** Update the light of the chunk  */
   fun updateAllBlockLights()
-
-  /** Mark this chunk as viewed during the current tick  */
-  fun view()
-
-  /**
-   * @param localX The local chunk x coordinate
-   * @return The world coordinate from the local position as offset
-   */
-  fun getWorldX(localX: LocalCoord): Int
-
-  /**
-   * @param localY The local chunk y coordinate
-   * @return The world coordinate from the local position as offset
-   */
-  fun getWorldY(localY: LocalCoord): Int
 
   fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight
 
@@ -205,31 +156,24 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
    */
   fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true): Block?
 
+  /** Mark chunk as dirty  */
+  fun dirty(prioritize: Boolean = false)
+
   /**
-   * If `isAllowingUnloading` is `false` this chunk cannot be unloaded
-   *
-   * @param allowUnload If the chunk can be unloaded or not
+   * Find all entities in the chunk
    */
-  fun setAllowUnload(allowUnload: Boolean)
+  fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit))
 
   /**
    * @return If the chunk has been modified since creation
    */
   fun shouldSave(): Boolean
 
-  /** Mark chunk as dirty  */
-  fun dirty()
-
   fun load(protoChunk: ProtoWorld.Chunk): Boolean
 
   fun save(): CompletableFuture<ProtoWorld.Chunk>
 
   fun saveBlocksOnly(): ProtoWorld.Chunk
-
-  /**
-   * Find all entities in the chunk
-   */
-  fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit))
 
   companion object {
     /**

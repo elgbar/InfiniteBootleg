@@ -5,18 +5,12 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.util.LocalCoord
-import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Material.Companion.asProto
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.getRawRelative
-import no.elg.infiniteBootleg.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.ecs.save
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
-import no.elg.infiniteBootleg.world.render.texture.TextureNeighbor
-import java.util.EnumMap
 
 /**
  * A block in the world each block is a part of a chunk which is a part of a world. Each block know
@@ -36,16 +30,6 @@ class BlockImpl(
     block {
       this.material = this@BlockImpl.material.asProto()
       this@BlockImpl.entity?.save(toAuthoritative = true)?.also { entity = it }
-    }
-
-  override val texture: RotatableTextureRegion?
-    get() {
-      val map = EnumMap<Direction, Material>(Direction::class.java)
-      for (direction in Direction.CARDINAL) {
-        val relMat = this.getRawRelative(direction, false).materialOrAir()
-        map[direction] = relMat
-      }
-      return TextureNeighbor.getTexture(material, map)
     }
 
   override fun dispose() {

@@ -1,22 +1,14 @@
 package no.elg.infiniteBootleg.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.screens.MainMenuScreen
 import kotlin.system.exitProcess
 
 enum class IllegalAction {
 
   /**
-   * Throw an uncatchable error, this will crash the game
+   * Exit the game with a crash message
    */
   CRASH,
-
-  /**
-   * Return to the main menu, handles as a [CRASH] if the game is running as the server
-   */
-  TO_MAIN_MENU,
 
   /**
    * Throw a runtime exception
@@ -35,23 +27,14 @@ enum class IllegalAction {
 
   @Suppress("NOTHING_TO_INLINE") // want inline to get the correct logger
   inline fun handle(cause: Throwable? = null, noinline message: () -> String) {
+    val logger = KotlinLogging.logger {}
     when (this) {
-      THROW -> throw Error(message(), cause)
-      STACKTRACE -> KotlinLogging.logger {}.warn(cause) { "${message()}\n${stacktrace()}" }
-      LOG -> KotlinLogging.logger {}.warn(cause, message)
+      THROW -> throw RuntimeException(message(), cause)
+      STACKTRACE -> logger.warn(cause) { "${message()}\n${stacktrace()}" }
+      LOG -> logger.warn(cause, message)
       CRASH -> {
-        KotlinLogging.logger {}.error(cause, message)
+        logger.error(cause, message)
         exitProcess(333)
-      }
-
-      TO_MAIN_MENU -> {
-        if (Main.isServer) {
-          KotlinLogging.logger {}.error(cause, message)
-          exitProcess(334)
-        } else {
-          KotlinLogging.logger {}.error(cause, message)
-          launchOnMain { ClientMain.inst().screen = MainMenuScreen }
-        }
       }
     }
   }

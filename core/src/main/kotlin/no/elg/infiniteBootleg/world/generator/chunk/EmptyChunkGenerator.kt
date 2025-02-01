@@ -1,9 +1,9 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.biome.Biome
 import no.elg.infiniteBootleg.world.world.World
 
@@ -15,7 +15,7 @@ import no.elg.infiniteBootleg.world.world.World
 class EmptyChunkGenerator : ChunkGenerator {
 
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk =
-    ChunkImpl(world, chunkX, chunkY).also {
+    Main.inst().chunkFactory.createChunk(world, chunkX, chunkY).also {
       it.finishLoading()
     }
 

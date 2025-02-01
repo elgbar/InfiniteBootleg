@@ -88,18 +88,14 @@ import no.elg.infiniteBootleg.world.ecs.components.required.IdComponent.Companio
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.world.ecs.ensureUniquenessListener
-import no.elg.infiniteBootleg.world.ecs.load
 import no.elg.infiniteBootleg.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.world.ecs.namedEntitiesFamily
 import no.elg.infiniteBootleg.world.ecs.playerFamily
 import no.elg.infiniteBootleg.world.ecs.save
-import no.elg.infiniteBootleg.world.ecs.system.MagicSystem
 import no.elg.infiniteBootleg.world.ecs.system.MaxVelocitySystem
-import no.elg.infiniteBootleg.world.ecs.system.MineBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.NoGravityInUnloadedChunksSystem
 import no.elg.infiniteBootleg.world.ecs.system.OutOfBoundsSystem
 import no.elg.infiniteBootleg.world.ecs.system.ReadBox2DStateSystem
@@ -109,8 +105,6 @@ import no.elg.infiniteBootleg.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.world.ecs.system.block.LeavesDecaySystem
 import no.elg.infiniteBootleg.world.ecs.system.block.UpdateGridBlockSystem
-import no.elg.infiniteBootleg.world.ecs.system.client.FollowEntitySystem
-import no.elg.infiniteBootleg.world.ecs.system.event.InputSystem
 import no.elg.infiniteBootleg.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.world.ecs.system.magic.SpellRemovalSystem
 import no.elg.infiniteBootleg.world.generator.chunk.ChunkGenerator
@@ -123,7 +117,6 @@ import no.elg.infiniteBootleg.world.loader.chunk.ChunkLoader
 import no.elg.infiniteBootleg.world.loader.chunk.FullChunkLoader
 import no.elg.infiniteBootleg.world.managers.container.AuthoritativeWorldContainerManager
 import no.elg.infiniteBootleg.world.managers.container.WorldContainerManager
-import no.elg.infiniteBootleg.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.world.render.WorldRender
 import no.elg.infiniteBootleg.world.ticker.CommonWorldTicker
 import no.elg.infiniteBootleg.world.ticker.WorldTicker
@@ -137,10 +130,6 @@ import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
-
-val NEVER_CANCEL: () -> Boolean = { false }
-
-val ACCEPT_EVERY_BLOCK: (Block) -> Boolean = { true }
 
 /**
  * Different kind of views
@@ -287,17 +276,13 @@ abstract class World(
     engine.addSystem(FallingBlockSystem)
     engine.addSystem(ExplosiveBlockSystem)
     engine.addSystem(LeavesDecaySystem)
-    engine.addSystem(MineBlockSystem)
     engine.addSystem(NoGravityInUnloadedChunksSystem)
-    engine.addSystem(FollowEntitySystem)
-    engine.addSystem(InputSystem)
-    engine.addSystem(MagicSystem)
     engine.addSystem(SpellRemovalSystem)
     engine.addSystem(RemoveStaleEntitiesSystem)
     additionalSystems().forEach(engine::addSystem)
   }
 
-  fun initialize() {
+  open fun initialize() {
     var willDispatchChunksLoadedEvent = false
     val worldFolder = worldFolder
     if (!isTransient && worldFolder != null && worldFolder.isDirectory && !canWriteToWorld(uuid)) {
@@ -330,7 +315,6 @@ abstract class World(
       }
     }
 
-    (render as? ClientWorldRender)?.lookAt(spawn)
     worldTicker.start()
 
     if (!willDispatchChunksLoadedEvent) {
@@ -423,7 +407,7 @@ abstract class World(
   /**
    * @return Whether this will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
    */
-  fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
+  open fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
     if (Settings.debug && Settings.logPersistence) {
       logger.debug { singleLinePrinter.printToString(protoWorld) }
     }
@@ -432,20 +416,7 @@ abstract class World(
     worldTime.time = protoWorld.time
     chunkColumnsManager.fromProtobuf(protoWorld.chunkColumnsList)
 
-    return if (Main.isClient && protoWorld.hasPlayer()) {
-      launchOnAsync {
-        val playerPosition = protoWorld.player.position
-        (render as? ClientWorldRender)?.lookAt(playerPosition.x, playerPosition.y)
-        render.chunkLocationsInView.forEach(::loadChunk)
-        this@World.load(protoWorld.player).thenApply {
-          it.isTransientEntity = true
-          dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
-        }
-      }
-      true
-    } else {
-      false
-    }
+    return false
   }
 
   open fun save() {
@@ -618,7 +589,7 @@ abstract class World(
    *
    * @return The loaded chunk
    */
-  private fun loadChunk(chunkLoc: ChunkCompactLoc): Chunk? {
+  protected fun loadChunk(chunkLoc: ChunkCompactLoc): Chunk? {
     if (worldTicker.isPaused) {
       return null
     }
@@ -802,7 +773,7 @@ abstract class World(
       blockChunks.add(block.chunk)
     }
     for (chunk in blockChunks) {
-      chunk.updateTexture(prioritize)
+      chunk.dirty(prioritize)
     }
   }
 
@@ -817,7 +788,7 @@ abstract class World(
       }
     }
     for (chunk in blockChunks) {
-      chunk.updateTexture(prioritize)
+      chunk.dirty(prioritize)
     }
     giveBlocks(removed, giveTo)
     return removed
@@ -951,7 +922,7 @@ abstract class World(
    * @return If the unloading was successful
    */
   fun unloadChunk(chunk: Chunk?, force: Boolean = false, save: Boolean = true): Boolean {
-    if (chunk != null && (force || chunk.isAllowedToUnload)) {
+    if (chunk != null && (force || chunk.allowedToUnload)) {
       if (chunk.world !== this) {
         logger.warn { "Tried to unload chunk from different world" }
         return false
@@ -1211,6 +1182,9 @@ abstract class World(
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F: Float = LIGHT_SOURCE_LOOK_BLOCKS + 2f
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW = LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA * LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA
     const val TRY_LOCK_CHUNKS_DURATION_MS = 20L
+
+    val NEVER_CANCEL: () -> Boolean = { false }
+    val ACCEPT_EVERY_BLOCK: (Block) -> Boolean = { true }
 
     val CHUNK_THREAD_LOCAL = AtomicInteger(0)
     val CHUNK_REMOVED_THREAD_LOCAL = AtomicInteger(0)

@@ -6,10 +6,6 @@ import com.badlogic.gdx.utils.LongMap
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
-import no.elg.infiniteBootleg.main.ClientMain
-import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.net.ServerClient.Companion.sendServerBoundPacket
-import no.elg.infiniteBootleg.net.serverBoundBreakingBlock
 import no.elg.infiniteBootleg.protobuf.BreakingBlockKt.breakingProgress
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.util.ProgressHandler
@@ -22,25 +18,11 @@ class CurrentlyBreakingComponent : DebuggableComponent {
 
   val breaking: LongMap<CurrentlyBreaking> = LongMap(16, 0.8f)
 
-  fun reset() {
-    sendCurrentProgress(true)
-    breaking.clear()
-  }
-
-  fun sendCurrentProgress(zeroProgress: Boolean = false) {
-    if (Main.isServerClient && breaking.size > 0) {
-      ClientMain.inst().serverClient.sendServerBoundPacket {
-        val progresses = breaking.values().map { it.toBreakingProgress(zeroProgress) }
-        serverBoundBreakingBlock(progresses)
-      }
-    }
-  }
-
   override fun hudDebug(): String = "Currently breaking ${breaking.values().map { "${it.block.hudDebug()} (${it.progressHandler.progress * 100f}%)" }}"
 
   companion object : Mapper<CurrentlyBreakingComponent>() {
-    var Entity.currentlyBreakingComponent by propertyFor(CurrentlyBreakingComponent.mapper)
-    var Entity.currentlyBreakingComponentOrNull by optionalPropertyFor(CurrentlyBreakingComponent.mapper)
+    var Entity.currentlyBreakingComponent by propertyFor(mapper)
+    var Entity.currentlyBreakingComponentOrNull by optionalPropertyFor(mapper)
   }
 
   data class CurrentlyBreaking(

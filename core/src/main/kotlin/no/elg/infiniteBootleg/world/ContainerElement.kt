@@ -9,16 +9,13 @@ import no.elg.infiniteBootleg.util.valueOfOrNull
 import no.elg.infiniteBootleg.world.Staff.Companion.fromProto
 import no.elg.infiniteBootleg.world.Staff.Companion.toProto
 import no.elg.infiniteBootleg.world.ecs.api.ProtoConverter
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 sealed interface ContainerElement {
 
-  val textureRegion: RotatableTextureRegion?
-
   val itemType: ItemType
 
-  val displayName: String get() = textureRegion?.name ?: this::class.simpleName ?: itemType.name
+  val displayName: String get() = this::class.simpleName ?: itemType.name
 
   fun toItem(maxStock: UInt = DEFAULT_MAX_STOCK, stock: UInt = DEFAULT_MAX_STOCK): Item
 

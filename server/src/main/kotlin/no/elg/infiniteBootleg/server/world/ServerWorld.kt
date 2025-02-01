@@ -73,7 +73,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     render.update()
     if (player.shouldSendToClients) {
       launchOnMain {
-        Main.Companion.inst().packetBroadcaster.broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
+        Main.Companion.inst().packetSender.broadcastToInViewChunk(clientBoundSpawnEntity(player), chunkX, chunkY)
       }
     }
   }

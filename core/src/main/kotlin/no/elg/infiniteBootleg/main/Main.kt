@@ -5,7 +5,9 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.ApplicationListener
 import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.console.GameConsoleHandler
-import no.elg.infiniteBootleg.net.PacketBroadcaster
+import no.elg.infiniteBootleg.net.PacketSender
+import no.elg.infiniteBootleg.world.chunks.ChunkImpl
+import no.elg.infiniteBootleg.world.generator.chunk.ChunkFactory
 import no.elg.infiniteBootleg.world.world.World
 import java.io.File
 import java.time.Instant
@@ -25,7 +27,8 @@ interface Main : ApplicationListener {
   val world: World?
   val renderThreadName: String
   val startTime: Instant
-  val packetBroadcaster: PacketBroadcaster
+  val packetSender: PacketSender
+  val chunkFactory: ChunkFactory<out ChunkImpl>
 
   /**
    * If we are allowed to make changes or move a given entity
@@ -33,6 +36,16 @@ interface Main : ApplicationListener {
    * As a client we are only allowed to change our own entity and as a server or while in singleplayer we are allowed to change any entity
    */
   fun isAuthorizedToChange(entity: Entity): Boolean
+
+  /**
+   * @return If the player is singleplayer
+   */
+  val isSingleplayer: Boolean
+
+  /**
+   * @return If the client is connected to a server
+   */
+  val isMultiplayer: Boolean
 
   companion object {
 
@@ -43,7 +56,7 @@ interface Main : ApplicationListener {
      * @return If this is a client of a server
      */
     val isServerClient: Boolean
-      get() = Settings.client && ClientMain.inst().serverClient != null
+      get() = isClient && isMultiplayer
 
     /**
      * @return If this is a server instance (i.e., is NOT rendering)
@@ -61,13 +74,13 @@ interface Main : ApplicationListener {
      * @return If this is a singleplayer instance
      */
     val isSingleplayer: Boolean
-      get() = isClient && ClientMain.inst().isSingleplayer
+      get() = isClient && inst().isSingleplayer
 
     /**
      * @return If the current instance is multiplayer (either as the server or a client of a server)
      */
     val isMultiplayer: Boolean
-      get() = isServer || ClientMain.inst().isMultiplayer
+      get() = isServer || inst().isMultiplayer
 
     /**
      * @return If this instance is authoritative (i.e., have the final say)

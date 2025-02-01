@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.plusAssign
-import no.elg.infiniteBootleg.screens.hud.DebugText.pos
 import no.elg.infiniteBootleg.util.chunkOffset
 import no.elg.infiniteBootleg.util.chunkOffsetX
 import no.elg.infiniteBootleg.util.chunkOffsetY

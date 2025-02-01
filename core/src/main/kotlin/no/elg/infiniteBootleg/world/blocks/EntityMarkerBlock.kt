@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.world.chunks.Chunk
 import no.elg.infiniteBootleg.world.chunks.Chunk.Companion.valid
 import no.elg.infiniteBootleg.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO
 import no.elg.infiniteBootleg.world.ecs.components.MaterialComponent.Companion.material
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 
 /**
  * An adapter block to represent an entity in the chunk world.
@@ -58,8 +57,6 @@ class EntityMarkerBlock(
   }
 
   override fun save(): ProtoWorld.Block = AIR_BLOCK_PROTO
-
-  override val texture: RotatableTextureRegion? get() = null
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

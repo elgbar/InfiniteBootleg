@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.protobuf.material
 import no.elg.infiniteBootleg.util.CheckableDisposable
 import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
+import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.compactLoc
 import no.elg.infiniteBootleg.util.isInsideChunk
 import no.elg.infiniteBootleg.util.launchOnAsync
@@ -19,12 +20,10 @@ import no.elg.infiniteBootleg.world.Direction
 import no.elg.infiniteBootleg.world.Material
 import no.elg.infiniteBootleg.world.Material.Companion.fromProto
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 
 interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> {
 
-  val texture: RotatableTextureRegion?
   val material: Material
   val chunk: Chunk
 
@@ -69,8 +68,8 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
     const val BLOCK_SIZE_WORLD = 1
 
     val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
-    val Block.worldX: WorldCoord get() = chunk.getWorldX(localX)
-    val Block.worldY: WorldCoord get() = chunk.getWorldY(localY)
+    val Block.worldX: WorldCoord get() = chunk.chunkX.chunkToWorld(localX)
+    val Block.worldY: WorldCoord get() = chunk.chunkY.chunkToWorld(localY)
 
     /**
      * Get the chunk of this block or the current valid chunk, which might be different from the chunk of this block or null if there is no longer a valid chunk for this block

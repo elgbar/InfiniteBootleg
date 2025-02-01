@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.exceptions.CorruptChunkException
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.util.ChunkCoord
@@ -37,7 +38,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
 
   fun loadChunkFromProto(protoChunk: ProtoWorld.Chunk): Chunk? {
     val chunkPosition = protoChunk.position
-    val chunk = ChunkImpl(world, chunkPosition.x, chunkPosition.y)
+    val chunk = Main.inst().chunkFactory.createChunk(world, chunkPosition.x, chunkPosition.y)
 
     try {
       if (fullyLoadChunk(chunk, protoChunk)) {

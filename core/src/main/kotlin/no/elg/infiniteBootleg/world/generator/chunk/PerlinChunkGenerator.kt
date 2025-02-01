@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.world.generator.chunk
 
 import com.badlogic.gdx.utils.Disposable
+import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.util.ChunkCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.chunkOffset
@@ -8,7 +9,6 @@ import no.elg.infiniteBootleg.util.chunkToWorld
 import no.elg.infiniteBootleg.util.getNoise
 import no.elg.infiniteBootleg.util.worldToChunk
 import no.elg.infiniteBootleg.world.chunks.Chunk
-import no.elg.infiniteBootleg.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.world.generator.ChunkGeneratedListener
 import no.elg.infiniteBootleg.world.generator.biome.Biome
 import no.elg.infiniteBootleg.world.generator.features.ForestGenerator
@@ -72,7 +72,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
   }
 
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk {
-    val chunk = ChunkImpl(world, chunkX, chunkY)
+    val chunk = Main.inst().chunkFactory.createChunk(world, chunkX, chunkY)
     for (localX in 0 until Chunk.CHUNK_SIZE) {
       val worldX = chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)

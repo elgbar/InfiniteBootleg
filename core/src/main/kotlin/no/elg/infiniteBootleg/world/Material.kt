@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.world
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.MaterialItem
 import no.elg.infiniteBootleg.main.Main
@@ -12,9 +11,7 @@ import no.elg.infiniteBootleg.util.LocalCoord
 import no.elg.infiniteBootleg.util.WorldCoord
 import no.elg.infiniteBootleg.util.component1
 import no.elg.infiniteBootleg.util.component2
-import no.elg.infiniteBootleg.util.findTextures
 import no.elg.infiniteBootleg.util.safeWith
-import no.elg.infiniteBootleg.util.serverRotatableTextureRegion
 import no.elg.infiniteBootleg.util.stringifyCompactLocWithChunk
 import no.elg.infiniteBootleg.world.blocks.Block
 import no.elg.infiniteBootleg.world.blocks.BlockImpl
@@ -29,7 +26,6 @@ import no.elg.infiniteBootleg.world.ecs.creation.createGravityAffectedBlockEntit
 import no.elg.infiniteBootleg.world.ecs.creation.createLeafEntity
 import no.elg.infiniteBootleg.world.ecs.explosiveBlockFamily
 import no.elg.infiniteBootleg.world.ecs.load
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.world.world.World
 import java.util.concurrent.CompletableFuture
 
@@ -61,12 +57,12 @@ enum class Material(
    */
   val emitsLight: Boolean = false,
   /**
-   * @return If this material can be rotated, but the entity can handle the rendering
+   * @return If this material has no texture
    */
   val invisibleBlock: Boolean = false,
   /**
    *
-   * @return If this material can be handled by the player, otherwise this is a meta material
+   * @return If this material can be handled by the player, otherwise this is a _meta material_
    */
   val canBeHandled: Boolean = true,
   private val createNew: ((World, WorldCoord, WorldCoord, Material) -> CompletableFuture<Entity>)? = null
@@ -138,19 +134,6 @@ enum class Material(
     world.engine.createContainerEntity(world, worldX, worldY, material)
   });
 
-  override var textureRegion: RotatableTextureRegion? = null
-
-  init {
-    if (Settings.client && canBeHandled) {
-      textureRegion = this.findTextures(textureName)
-      if (textureRegion == null && !canBeHandled) {
-        throw NullPointerException("Failed to find a texture for $displayName")
-      }
-    } else {
-      textureRegion = serverRotatableTextureRegion(textureName)
-    }
-  }
-
   /**
    * @param world World this block this exists in
    * @param chunk
@@ -204,7 +187,7 @@ enum class Material(
       }
     }
     for (chunk in chunks) {
-      chunk.updateTexture(prioritize)
+      chunk.dirty(prioritize)
     }
   }
 

@@ -1,23 +1,17 @@
 package no.elg.infiniteBootleg.console
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntArray
 import com.badlogic.gdx.utils.reflect.ClassReflection
 import com.badlogic.gdx.utils.reflect.Method
 import com.badlogic.gdx.utils.reflect.ReflectionException
-import com.kotcrab.vis.ui.VisUI
+import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.Settings
 import no.elg.infiniteBootleg.api.Resizable
 import no.elg.infiniteBootleg.console.GameConsoleLogger.Companion.DEBUG_PREFIX
-import no.elg.infiniteBootleg.console.commands.Commands
-import no.elg.infiniteBootleg.console.consoles.CGUIConsole
-import no.elg.infiniteBootleg.console.consoles.StdConsole
-import no.elg.infiniteBootleg.main.ClientMain
 import java.io.PrintWriter
 import java.io.StringWriter
 import kotlin.reflect.KParameter.Kind
@@ -25,41 +19,25 @@ import kotlin.reflect.full.memberFunctions
 
 private val logger = KotlinLogging.logger {}
 
-// class InGameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : InGameConsoleLogger, Disposable, Resizable {
-//
-// }
-class GameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = Settings.client) : GameConsoleLogger, Disposable, Resizable {
-  private val console: Console
-  val exec: Commands = Commands()
+abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
+  protected abstract val console: Console
+  abstract val exec: CommandExecutor
+
   private val consoleReader: SystemConsoleReader
   private var disposed = false
 
   init {
-    if (inGameConsole) {
-      console = CGUIConsole(this, VisUI.getSkin(), false, Input.Keys.APOSTROPHE)
-      console.setLoggingToSystem(false)
-    } else {
-      console = StdConsole()
-      console.setConsoleStackTrace(true)
-      console.setLoggingToSystem(true)
-    }
     console.setCommandExecutor(exec)
 
     consoleReader = SystemConsoleReader(this)
     consoleReader.start()
   }
 
-  var openConsoleKey: Int
-    get() = if (inGameConsole) console.displayKeyID else Int.MIN_VALUE
-    set(value) = if (inGameConsole) console.displayKeyID = value else Unit
+  abstract var openConsoleKey: Int
 
-  var alpha: Float
-    get() = if (inGameConsole) console.window.color.a else 1f
-    set(a) {
-      if (inGameConsole) {
-        console.window.color.a = a
-      }
-    }
+  abstract var alpha: Float
+
+  abstract fun addToInputMultiplexer()
 
   var isVisible: Boolean
     get() = console.isVisible
@@ -231,9 +209,5 @@ class GameConsoleHandler @JvmOverloads constructor(val inGameConsole: Boolean = 
 
   override fun resize(width: Int, height: Int) {
     console.refresh(false)
-  }
-
-  fun addToInputMultiplexer() {
-    ClientMain.inst().inputMultiplexer.addProcessor(console.inputProcessor)
   }
 }

@@ -5,10 +5,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.inventory.container.Container
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.close
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.isOpen
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.open
-import no.elg.infiniteBootleg.inventory.container.Container.Companion.toggle
 import no.elg.infiniteBootleg.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.inventory.container.OwnedContainer.Companion.asProto
@@ -37,20 +33,6 @@ data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavabl
 
     val Entity.containerOrNull: Container? get() = containerComponentOrNull?.ownedContainer?.container
     val Entity.ownedContainerOrNull: OwnedContainer? get() = containerComponentOrNull?.ownedContainer
-
-    fun Entity.isInventoryOpen(): Boolean = ownedContainerOrNull?.isOpen() ?: false
-
-    fun Entity.openContainer() {
-      ownedContainerOrNull?.open()
-    }
-
-    fun Entity.closeContainer() {
-      ownedContainerOrNull?.close()
-    }
-
-    fun Entity.toggleContainer() {
-      ownedContainerOrNull?.toggle()
-    }
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       safeWith {

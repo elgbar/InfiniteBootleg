@@ -14,7 +14,6 @@ import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion.Compan
 
 interface InfAssets {
 
-  val safeTextureAtlas: SafeTextureAtlas
   val font20pt: BitmapFont
   val font16pt: BitmapFont
   val font10pt: BitmapFont
@@ -44,16 +43,9 @@ interface InfAssets {
    */
   fun loadAssets()
 
-  fun findTextureOrNull(name: String, rotationAllowed: Boolean): RotatableTextureRegion? {
-    if (safeTextureAtlas.existsRegion(name)) {
-      return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
-    }
-    return null
-  }
+  fun findTextureOrNull(name: String, rotationAllowed: Boolean): RotatableTextureRegion?
 
-  fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion {
-    return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
-  }
+  fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion
 
   companion object {
     const val FONTS_FOLDER = "fonts/"

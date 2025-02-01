@@ -7,7 +7,6 @@ import ktx.math.component1
 import ktx.math.component2
 import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.net.clientBoundMoveEntity
-import no.elg.infiniteBootleg.net.sendDuplexPacketInView
 import no.elg.infiniteBootleg.net.serverBoundMoveEntityPacket
 import no.elg.infiniteBootleg.util.toCompactLoc
 import no.elg.infiniteBootleg.util.worldToChunk
@@ -38,7 +37,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     val updateVel = readVelocity(entity, body)
 
     if (updatePos || updateVel) {
-      sendDuplexPacketInView(ifIsServer = { clientBoundMoveEntity(entity) to body.position.toCompactLoc().worldToChunk() }, ifIsClient = {
+      Main.inst().packetSender.sendDuplexPacketInView(ifIsServer = { clientBoundMoveEntity(entity) to body.position.toCompactLoc().worldToChunk() }, ifIsClient = {
         if (entityId == entity.id) {
           serverBoundMoveEntityPacket(entity)
         } else {

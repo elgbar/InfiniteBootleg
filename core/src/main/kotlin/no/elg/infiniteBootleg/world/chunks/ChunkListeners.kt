@@ -46,7 +46,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
               body.isAwake = true
             }
           }
-        } else {
+        } else if (chunk is TexturedChunk) {
           // Update the texture of this chunk if a blocks changes either in this chunk or in a neighbor chunk
           if (chunk.isWithinRadius(block, 1f)) {
             chunk.queueForRendering(false)

@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.util.launchOnAsync
 import no.elg.infiniteBootleg.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.world.chunks.Chunk
+import no.elg.infiniteBootleg.world.chunks.ViewableChunk
 import no.elg.infiniteBootleg.world.world.World
 
 private val logger = KotlinLogging.logger {}
@@ -42,7 +43,7 @@ internal class WorldTickee(private val world: World) : Ticking {
           }
           continue
         }
-        if (chunk.isAllowedToUnload && world.render.isOutOfView(chunk) && tick - chunk.lastViewedTick > chunkUnloadTime) {
+        if (chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
           launchOnAsync {
             world.unloadChunk(chunk)
           }

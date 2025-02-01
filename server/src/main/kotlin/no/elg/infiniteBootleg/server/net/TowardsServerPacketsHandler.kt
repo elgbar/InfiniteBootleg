@@ -191,7 +191,7 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
     timeScale = worldSettings.timeScale
   }
   // Rebroadcast the packet to all clients to stay in sync
-  Main.inst().packetBroadcaster.broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
+  ServerMain.inst().packetSender.broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
 }
 
 private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Packets.MoveEntity) {
@@ -383,7 +383,7 @@ private fun asyncHandleEntityRequest(ctx: ChannelHandlerContextWrapper, entityId
 
 private fun asyncHandleBreakingBlock(ctx: ChannelHandlerContextWrapper, breakingBlock: Packets.BreakingBlock) {
   // Naive and simple re-broadcast
-  Main.inst().packetBroadcaster.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
+  ServerMain.inst().packetSender.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_BREAKING_BLOCK).setBreakingBlock(breakingBlock).build()) { c -> c != ctx.channel() }
 }
 
 private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, containerUpdate: Packets.ContainerUpdate) {
@@ -394,7 +394,9 @@ private fun asyncHandleContainerUpdate(ctx: ChannelHandlerContextWrapper, contai
   ServerMain.Companion.inst().serverWorld.worldContainerManager.find(owner).thenApply { serverOwnedContainer ->
     container.content.copyInto(serverOwnedContainer.container.content)
   }
-  Main.inst().packetBroadcaster.broadcast(clientBoundPacketBuilder(Packets.Packet.Type.DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()) { c -> c != ctx.channel() }
+  ServerMain.inst().packetSender.broadcast(
+    clientBoundPacketBuilder(Packets.Packet.Type.DX_CONTAINER_UPDATE).setContainerUpdate(containerUpdate).build()
+  ) { c -> c != ctx.channel() }
 }
 
 private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
@@ -423,7 +425,7 @@ private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, upd
   }
   hotbarComponent.selected = slot
   val selectedElement = hotbarComponent.selectedItem(entity)?.element ?: Material.AIR
-  Main.inst().packetBroadcaster.broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
+  ServerMain.inst().packetSender.broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
 }
 
 // ///////////

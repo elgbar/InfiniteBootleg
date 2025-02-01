@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.items.Item
 import no.elg.infiniteBootleg.items.ItemType
 import no.elg.infiniteBootleg.items.StaffItem
-import no.elg.infiniteBootleg.main.ClientMain
 import no.elg.infiniteBootleg.protobuf.ElementKt.staff
 import no.elg.infiniteBootleg.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.world.magic.Equippable
@@ -13,7 +12,6 @@ import no.elg.infiniteBootleg.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.world.magic.Ring
 import no.elg.infiniteBootleg.world.magic.SpellState
 import no.elg.infiniteBootleg.world.magic.Wood
-import no.elg.infiniteBootleg.world.render.texture.RotatableTextureRegion
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Element as ProtoElement
 
 data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : Equippable, ContainerElement {
@@ -64,11 +62,12 @@ data class Staff(val wood: Wood, val gems: List<Gem>, val rings: List<Ring>) : E
     rings.forEach { it.onUnequip(entity) }
   }
 
-  override val textureRegion: RotatableTextureRegion get() = ClientMain.inst().assets.staffTexture
   override val itemType: ItemType = ItemType.TOOL
   override fun toItem(maxStock: UInt, stock: UInt): Item = StaffItem(this, maxStock, stock)
 
   companion object {
+
+    //    val textureRegion: RotatableTextureRegion get() = ClientMain.inst().assets.staffTexture
     fun ProtoElement.Staff.fromProto(): Staff =
       Staff(
         wood = Wood.fromProto(wood),

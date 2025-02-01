@@ -5,4 +5,5 @@ package no.elg.infiniteBootleg.world.ecs.api.restriction.system
  *
  * This is not the same as a [AuthoritativeSystem], as this is intended to be used for network og server side only logic.
  */
+@Deprecated("Not applicable when as all server systems are in the server module")
 interface ServerSystem

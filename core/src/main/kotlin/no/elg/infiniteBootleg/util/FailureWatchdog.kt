@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 
-class FailureWatchdog(val failureMessage: String, val illegalAction: IllegalAction = IllegalAction.TO_MAIN_MENU) {
+class FailureWatchdog(val failureMessage: String, val illegalAction: IllegalAction = IllegalAction.CRASH) {
 
   var failuresInARow: Int = 0
 

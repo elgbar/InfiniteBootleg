@@ -133,7 +133,7 @@ fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
 
 fun Chunk.shortestDistanceSquared(block: Block): Float {
   val (localX, localY) = closestBlockTo(block)
-  return Vector2.dst2(getWorldX(localX) + 0.5f, getWorldY(localY) + 0.5f, block.worldX + 0.5f, block.worldY + 0.5f)
+  return Vector2.dst2(chunkX.chunkToWorld(localX) + 0.5f, chunkY.chunkToWorld(localY) + 0.5f, block.worldX + 0.5f, block.worldY + 0.5f)
 }
 
 fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanceSquared(block) <= radius * radius
