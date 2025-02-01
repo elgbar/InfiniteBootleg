@@ -6,7 +6,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EARLY
-import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.compactBlockLoc

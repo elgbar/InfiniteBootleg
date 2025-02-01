@@ -4,10 +4,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.client.world.textureRegion
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component1
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component2
-import no.elg.infiniteBootleg.core.util.component1
-import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion

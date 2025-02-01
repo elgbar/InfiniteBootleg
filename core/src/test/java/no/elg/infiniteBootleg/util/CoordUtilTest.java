@@ -1,10 +1,10 @@
 package no.elg.infiniteBootleg.util;
 
 import static no.elg.infiniteBootleg.world.chunks.Chunk.CHUNK_SIZE;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import no.elg.infiniteBootleg.core.util.CoordUtilKt;
 import org.junit.Test;
 
 /**

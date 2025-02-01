@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
+import no.elg.infiniteBootleg.core.world.box2d.WorldBody.Companion.WORLD_MOVE_OFFSET_THRESHOLD
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker

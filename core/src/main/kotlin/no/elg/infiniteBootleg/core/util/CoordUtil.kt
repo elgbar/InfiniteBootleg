@@ -16,7 +16,6 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import org.jetbrains.annotations.Contract
 import java.lang.Short.SIZE
-import kotlin.collections.plusAssign
 import kotlin.math.abs
 import kotlin.math.floor
 

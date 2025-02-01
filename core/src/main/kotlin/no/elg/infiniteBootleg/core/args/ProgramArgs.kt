@@ -4,7 +4,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.asWorldSeed
-import kotlin.collections.iterator
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}

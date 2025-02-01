@@ -7,7 +7,6 @@ import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.util.removeSelf
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_LAST
-import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.core.world.ecs.staleEntityFamily
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 

@@ -3,6 +3,9 @@ package no.elg.infiniteBootleg.core.world.ticker
 import com.badlogic.gdx.utils.Array.ArrayIterator
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.core.util.IllegalAction
+import kotlin.Exception
+import kotlin.Unit
+import kotlin.synchronized
 
 class PostRunnableHandler() : PostRunnable {
 

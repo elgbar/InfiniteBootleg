@@ -28,7 +28,6 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.material
 import java.util.concurrent.CompletableFuture
-import kotlin.collections.plusAssign
 
 private val logger = KotlinLogging.logger {}
 

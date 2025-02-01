@@ -6,7 +6,6 @@ import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.ecs.api.ProtoConverter
 import no.elg.infiniteBootleg.protobuf.ContainerKt.item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import kotlin.collections.plusAssign
 import kotlin.math.absoluteValue
 
 sealed interface Item {

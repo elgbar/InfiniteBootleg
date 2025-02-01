@@ -10,7 +10,6 @@ import no.elg.infiniteBootleg.core.world.magic.Equippable
 import no.elg.infiniteBootleg.core.world.magic.MagicEffectsWithRating
 import no.elg.infiniteBootleg.core.world.magic.MutableSpellState
 import no.elg.infiniteBootleg.core.world.magic.Named
-import kotlin.collections.plusAssign
 
 private val logger = KotlinLogging.logger {}
 

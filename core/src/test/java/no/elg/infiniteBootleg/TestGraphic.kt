@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg
 
 import de.tomgrill.gdxtesting.GdxTestRunner
+import no.elg.infiniteBootleg.core.Settings
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle

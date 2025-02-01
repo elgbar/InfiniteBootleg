@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.core.inventory.container.impl
 
-import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.SortOrder
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld

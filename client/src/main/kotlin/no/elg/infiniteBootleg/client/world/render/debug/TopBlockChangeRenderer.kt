@@ -13,8 +13,6 @@ import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.core.events.ChunkColumnUpdatedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component1
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.core.util.ProgressHandler
 import no.elg.infiniteBootleg.core.util.blend
 import no.elg.infiniteBootleg.core.util.chunkToWorld

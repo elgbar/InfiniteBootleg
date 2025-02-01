@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
-import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementOrNull

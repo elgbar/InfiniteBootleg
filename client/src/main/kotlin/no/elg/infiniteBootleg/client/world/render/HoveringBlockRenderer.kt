@@ -9,8 +9,6 @@ import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.main.Main
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component1
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.core.util.Progress
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.breakableLocs

@@ -15,11 +15,7 @@ import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.chunks.ChunkAddedToChunkRendererEvent
 import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangeRejectedEvent
 import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangedEvent
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component1
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.core.util.compactLoc
-import no.elg.infiniteBootleg.core.util.component1
-import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE_HALF

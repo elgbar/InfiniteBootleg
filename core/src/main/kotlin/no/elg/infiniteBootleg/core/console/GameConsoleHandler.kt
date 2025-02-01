@@ -11,6 +11,7 @@ import com.strongjoshua.console.ConsoleUtils
 import com.strongjoshua.console.LogLevel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Resizable
+import no.elg.infiniteBootleg.core.console.GameConsoleLogger.Companion
 import java.io.PrintWriter
 import java.io.StringWriter
 import kotlin.reflect.KParameter.Kind

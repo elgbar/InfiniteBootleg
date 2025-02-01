@@ -13,8 +13,6 @@ import no.elg.infiniteBootleg.protobuf.ContainerKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.container
 import no.elg.infiniteBootleg.protobuf.itemOrNull
-import kotlin.collections.iterator
-import kotlin.collections.plusAssign
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Container as ProtoContainer
 
 /**
