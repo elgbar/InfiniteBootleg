@@ -50,6 +50,7 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
     renderThreadName = Thread.currentThread().name
     console = createConsole().apply {
       alpha = 0.85f
+      create()
     }
     Gdx.app.applicationLogger = Slf4jApplicationLogger()
     Gdx.app.logLevel = if (Settings.debug) Application.LOG_DEBUG else Application.LOG_INFO

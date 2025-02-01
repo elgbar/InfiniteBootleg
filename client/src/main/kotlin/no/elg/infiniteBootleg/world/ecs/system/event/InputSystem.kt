@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.util.interpolate
 import no.elg.infiniteBootleg.util.placeBlocks
 import no.elg.infiniteBootleg.util.setVel
 import no.elg.infiniteBootleg.world.Material
-import no.elg.infiniteBootleg.world.ecs.api.restriction.system.ClientSystem
 import no.elg.infiniteBootleg.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.world.ecs.components.InputEventQueueComponent
@@ -35,9 +34,11 @@ import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.sign
 
-object InputSystem :
-  EventSystem<InputEvent, InputEventQueueComponent>(controlledEntityWithInputEventFamily, InputEvent::class, InputEventQueueComponent.Companion.mapper),
-  ClientSystem {
+object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
+  controlledEntityWithInputEventFamily,
+  InputEvent::class,
+  InputEventQueueComponent.Companion.mapper
+) {
 
   override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
     val entityWorld = entity.world as? ClientWorld ?: return

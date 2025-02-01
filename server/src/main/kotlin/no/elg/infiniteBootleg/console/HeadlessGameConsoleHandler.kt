@@ -21,6 +21,4 @@ class HeadlessGameConsoleHandler : GameConsoleHandler() {
   override var alpha: Float
     get() = 1f
     set(_) = Unit
-
-  override fun addToInputMultiplexer() = Unit
 }

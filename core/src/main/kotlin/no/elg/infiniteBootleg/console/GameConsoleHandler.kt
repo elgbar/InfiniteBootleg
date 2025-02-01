@@ -23,21 +23,19 @@ abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
   protected abstract val console: Console
   abstract val exec: CommandExecutor
 
-  private val consoleReader: SystemConsoleReader
+  private val consoleReader: SystemConsoleReader = SystemConsoleReader(this)
   private var disposed = false
-
-  init {
-    console.setCommandExecutor(exec)
-
-    consoleReader = SystemConsoleReader(this)
-    consoleReader.start()
-  }
 
   abstract var openConsoleKey: Int
 
   abstract var alpha: Float
 
-  abstract fun addToInputMultiplexer()
+  open fun addToInputMultiplexer() = Unit
+
+  open fun create() {
+    console.setCommandExecutor(exec)
+    consoleReader.start()
+  }
 
   var isVisible: Boolean
     get() = console.isVisible
