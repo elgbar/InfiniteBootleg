@@ -1,19 +1,20 @@
 package no.elg.infiniteBootleg.client.net
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.ConnectingScreen
-import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.client.world.world.ServerClientWorld
 import no.elg.infiniteBootleg.core.net.ChannelHandlerContextWrapper
+import no.elg.infiniteBootleg.core.net.ServerClient
 import no.elg.infiniteBootleg.core.net.serverBoundClientDisconnectPacket
 import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.util.launchOnMain
+import no.elg.infiniteBootleg.core.world.world.World
 
-private val logger = KotlinLogging.logger {}
+val ServerClient.world: World get() = worldOrNull ?: ctx.fatal("World is not set for client $name")
+val ServerClient.clientWorld: ServerClientWorld get() = world as? ServerClientWorld ?: ctx.fatal("Failed to get world as a ServerClientWorld, was ${world.javaClass.simpleName}")
 
-internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
-  require(Settings.client)
+internal fun ChannelHandlerContextWrapper.fatal(msg: String): Nothing {
   launchOnAsync {
     delay(50L)
     close()
@@ -26,5 +27,5 @@ internal fun ChannelHandlerContextWrapper.fatal(msg: String) {
       this@fatal.writeAndFlushPacket(serverClient.serverBoundClientDisconnectPacket(msg))
     }
   }
-  logger.error { msg }
+  error(msg)
 }

@@ -150,11 +150,6 @@ private fun ServerClient.handleDisconnect(disconnect: Disconnect?) {
 }
 
 private fun ServerClient.handleWorldSettings(worldSettings: WorldSettings) {
-  val world = this.world
-  if (world == null) {
-    logger.warn { "Failed to find world" }
-    return
-  }
   logger.debug { "spawn? ${worldSettings.hasSpawn()}, time? ${worldSettings.hasTime()}, time scale? ${worldSettings.hasTimeScale()}" }
   if (worldSettings.hasSpawn()) {
     world.spawn = worldSettings.spawn.toCompact()
@@ -208,7 +203,7 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
 }
 
 private fun ServerClient.handleLoginSuccess() {
-  val world = world
+  val world = clientWorld
   if (world !is ServerClientWorld) {
     ctx.fatal("Failed to get world as a ServerClientWorld, was ${world?.javaClass?.simpleName}")
     return
@@ -249,7 +244,7 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
     }
     this@handleStartGame.protoEntity = startGame.controlling
     val protoWorld = startGame.world
-    this@handleStartGame.world = ServerClientWorld(protoWorld, this@handleStartGame).apply {
+    this@handleStartGame.worldOrNull = ServerClientWorld(protoWorld, this@handleStartGame).apply {
       val pos = startGame.controlling.position
       render.lookAt(pos.x, pos.y) // set position to not request wrong initial chunks
       loadFromProtoWorld(protoWorld)
@@ -262,11 +257,8 @@ private fun ServerClient.handleStartGame(startGame: StartGame) {
 
 private fun ServerClient.handleInitialChunkSent() {
   logger.debug { "Setting chunks as loaded" }
+  val world = this.world // will call fatal if world is null
   chunksLoaded = true
-  val world = world ?: run {
-    ctx.fatal("Failed to find world")
-    return
-  }
   dispatchEvent(InitialChunksOfWorldLoadedEvent(world))
 }
 
@@ -276,11 +268,6 @@ private fun ServerClient.handleInitialChunkSent() {
 
 private fun ServerClient.asyncHandleBlockUpdate(blockUpdate: UpdateBlock) {
   if (!chunksLoaded) {
-    return
-  }
-  val world = this.world
-  if (world == null) {
-    logger.warn { "Failed to find world" }
     return
   }
   val worldX = blockUpdate.pos.x
@@ -299,11 +286,6 @@ private fun ServerClient.asyncHandleSpawnEntity(spawnEntity: Packets.SpawnEntity
     logger.debug { "Server sent spawn entity packet" }
   } else {
     logger.debug { "Server sent spawn entity packet before chunks loaded packet, ignoring it" }
-    return
-  }
-  val world = this.world
-  if (world == null) {
-    logger.warn { "Failed to find world" }
     return
   }
   val protoEntity = spawnEntity.entity
@@ -336,11 +318,6 @@ private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
   if (entities > 0) {
     logger.warn { "Got $entities entities in chunk update" }
   }
-  val world = world
-  if (world == null) {
-    ctx.fatal("Tried to update chunk before world was sent")
-    return
-  }
   val chunk = world.chunkLoader.loadChunkFromProto(updateChunk.chunk)
   if (chunk == null) {
     logger.warn { "Failed to load the chunk from proto" }
@@ -351,11 +328,6 @@ private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
 
 private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   if (!started) {
-    return
-  }
-  val world = world
-  if (world == null) {
-    logger.warn { "Failed to find world" }
     return
   }
   val chunkLoc = worldXYtoChunkCompactLoc(moveEntity.position.x.toInt(), moveEntity.position.y.toInt())
@@ -398,11 +370,6 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
 private val nonWarnDespawnReasons = listOf(DespawnEntity.DespawnReason.UNKNOWN_ENTITY, DespawnEntity.DespawnReason.CHUNK_UNLOADED)
 
 private fun ServerClient.asyncHandleDespawnEntity(despawnEntity: DespawnEntity) {
-  val world = world
-  if (world == null) {
-    logger.error { "Failed to find world" }
-    return
-  }
   val id: String = despawnEntity.ref.id
   val entity: Entity = world.getEntity(id) ?: run {
     if (despawnEntity.despawnReason !in nonWarnDespawnReasons) {
@@ -421,13 +388,13 @@ private fun ServerClient.asyncHandleBreakingBlock(breakingBlock: Packets.Breakin
 }
 
 private fun ServerClient.asyncHandleContainerUpdate(containerUpdate: ContainerUpdate) {
-  val containerManager = world?.worldContainerManager as? ServerClientWorldContainerManager ?: return
+  val containerManager = world.worldContainerManager as? ServerClientWorldContainerManager ?: return
   val ownedContainer = containerUpdate.worldContainer.fromProto()
   containerManager.updateContainerFromServer(ownedContainer)
 }
 
 private fun ServerClient.asyncHandleHoldingItem(holdingItem: Packets.HoldingItem) {
-  val entity = world?.getEntity(holdingItem.entityRef.id) ?: return
+  val entity = world.getEntity(holdingItem.entityRef.id) ?: return
   val element = holdingItem.element.fromProto()
 
   val remoteEntityHoldingElementComponent = entity.remoteEntityHoldingElementComponentOrNull

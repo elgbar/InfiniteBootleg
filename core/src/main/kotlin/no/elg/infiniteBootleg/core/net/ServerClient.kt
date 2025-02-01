@@ -21,7 +21,7 @@ import java.time.Duration
  */
 class ServerClient(
   val name: String,
-  var world: World? = null,
+  var worldOrNull: World? = null,
   var protoEntity: ProtoWorld.Entity? = null
 ) : Disposable {
 
