@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Material.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.world.World
+import no.elg.infiniteBootleg.core.world.world.World.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
@@ -57,15 +58,10 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
     /**
      * Texture size of block
      */
-    const val BLOCK_SIZE = 16
+    const val BLOCK_TEXTURE_SIZE = 16
 
-    const val BLOCK_SIZE_F = BLOCK_SIZE.toFloat()
-    const val HALF_BLOCK_SIZE_F = BLOCK_SIZE_F * 0.5f
-
-    /**
-     * Size of block in world coordinates
-     */
-    const val BLOCK_SIZE_WORLD = 1
+    const val BLOCK_TEXTURE_SIZE_F = BLOCK_TEXTURE_SIZE.toFloat()
+    const val HALF_BLOCK_TEXTURE_SIZE_F = BLOCK_TEXTURE_SIZE_F * 0.5f
 
     val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
     val Block.worldX: WorldCoord get() = chunk.chunkX.chunkToWorld(localX)
@@ -81,7 +77,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
      * Find all entities in the block
      */
     fun Block.queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
-      world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE_WORLD, worldY + BLOCK_SIZE_WORLD, callback)
+      world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback)
 
     /**
      * Remove this block by setting it to air

@@ -154,7 +154,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
       val holding = entity.selectedElement
       if (holding != null) {
-        val size = Block.Companion.BLOCK_SIZE / 2f
+        val size = Block.Companion.BLOCK_TEXTURE_SIZE / 2f
         val holdingTexture = holding.textureRegion?.textureRegionOrNull
         if (holdingTexture != null) {
           val ratio = holdingTexture.regionWidth.toFloat() / holdingTexture.regionHeight.toFloat()
@@ -187,8 +187,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
       if (Settings.debugEntityLight) {
         batch.color = Color.WHITE // Make sure we can see the debug light
-        val size = Block.Companion.BLOCK_SIZE / 4f // The size of the debug cube
-        val offset = Block.Companion.BLOCK_SIZE / 2f - size / 2f
+        val size = Block.Companion.BLOCK_TEXTURE_SIZE / 4f // The size of the debug cube
+        val offset = Block.Companion.BLOCK_TEXTURE_SIZE / 2f - size / 2f
         batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
       }
     }

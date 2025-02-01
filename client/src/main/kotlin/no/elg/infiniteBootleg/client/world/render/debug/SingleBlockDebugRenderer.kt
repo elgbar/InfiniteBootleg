@@ -26,8 +26,8 @@ abstract class SingleBlockDebugRenderer(private val worldRender: ClientWorldRend
               texture.textureRegion,
               worldToScreen(block.worldX.toFloat()),
               worldToScreen(block.worldY.toFloat()),
-              Block.BLOCK_SIZE.toFloat(),
-              Block.BLOCK_SIZE.toFloat()
+              Block.BLOCK_TEXTURE_SIZE.toFloat(),
+              Block.BLOCK_TEXTURE_SIZE.toFloat()
             )
           }
         }

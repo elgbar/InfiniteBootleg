@@ -102,10 +102,10 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
     }
     val alpha = overrideAlpha ?: (1f - averageBrightness).coerceAtLeast(0.33f)
     worldRender.batch.withColor(averageBrightness, averageBrightness, averageBrightness, alpha) {
-      val mouseScreenX = blockWorldX * Block.Companion.BLOCK_SIZE
-      val mouseScreenY = blockWorldY * Block.Companion.BLOCK_SIZE
-      val diffFromBlockSizeX = Math.floorMod(mouseScreenX, Block.Companion.BLOCK_SIZE).toFloat()
-      val diffFromBlockSizeY = Math.floorMod(mouseScreenY, Block.Companion.BLOCK_SIZE).toFloat()
+      val mouseScreenX = blockWorldX * Block.Companion.BLOCK_TEXTURE_SIZE
+      val mouseScreenY = blockWorldY * Block.Companion.BLOCK_TEXTURE_SIZE
+      val diffFromBlockSizeX = Math.floorMod(mouseScreenX, Block.Companion.BLOCK_TEXTURE_SIZE).toFloat()
+      val diffFromBlockSizeY = Math.floorMod(mouseScreenY, Block.Companion.BLOCK_TEXTURE_SIZE).toFloat()
       it.draw(
         texture,
         // Draw the block aligned to the block grid
@@ -113,8 +113,8 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
         mouseScreenY - diffFromBlockSizeY,
         0f,
         0f,
-        Block.Companion.BLOCK_SIZE.toFloat(),
-        Block.Companion.BLOCK_SIZE.toFloat(),
+        Block.Companion.BLOCK_TEXTURE_SIZE.toFloat(),
+        Block.Companion.BLOCK_TEXTURE_SIZE.toFloat(),
         1f,
         1f,
         0f

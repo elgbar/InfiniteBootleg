@@ -217,7 +217,7 @@ inline fun worldToBlock(worldCoord: WorldCoordNumber): WorldCoord = floor(worldC
  * @param worldCoord  The world coordinate to translate to screen coordinates
  * @return The world coordinate to translated to screen coordinates
  */
-inline fun worldToScreen(worldCoord: WorldCoordNumber): Float = worldCoord.toFloat() * Block.Companion.BLOCK_SIZE
+inline fun worldToScreen(worldCoord: WorldCoordNumber): Float = worldCoord.toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE
 
 operator fun Long.component1(): Int = this.decompactLocX()
 operator fun Long.component2(): Int = this.decompactLocY()

@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.core.util.closestBlockTo
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.getChunkOrNull
 
 class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
@@ -44,6 +44,6 @@ class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRende
   }
 
   companion object {
-    const val TEXTURE_SIZE = BLOCK_SIZE.toFloat()
+    const val TEXTURE_SIZE = BLOCK_TEXTURE_SIZE.toFloat()
   }
 }

@@ -49,8 +49,8 @@ class MouseLocator {
       previousMouseBlockX = mouseBlockX
       previousMouseBlockY = mouseBlockY
 
-      mouseWorldX = screenInputVec.x / Block.Companion.BLOCK_SIZE
-      mouseWorldY = screenInputVec.y / Block.Companion.BLOCK_SIZE
+      mouseWorldX = screenInputVec.x / Block.Companion.BLOCK_TEXTURE_SIZE
+      mouseWorldY = screenInputVec.y / Block.Companion.BLOCK_TEXTURE_SIZE
       mouseWorldInput.set(mouseWorldX, mouseWorldY)
       mouseBlockX = worldToBlock(mouseWorldX)
       mouseBlockY = worldToBlock(mouseWorldY)

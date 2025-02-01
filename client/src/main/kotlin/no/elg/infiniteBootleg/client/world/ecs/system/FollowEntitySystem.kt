@@ -49,8 +49,8 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
       val camera: OrthographicCamera = worldRender.camera
       val position = entity.positionComponent
       processedPosition.set(position.x, position.y)
-      val x = position.x * Block.Companion.BLOCK_SIZE
-      val y = position.y * Block.Companion.BLOCK_SIZE
+      val x = position.x * Block.Companion.BLOCK_TEXTURE_SIZE
+      val y = position.y * Block.Companion.BLOCK_TEXTURE_SIZE
       val diffX = x - camera.position.x
       val diffY = y - camera.position.y
       val teleportCam = !Settings.enableCameraFollowLerp || abs(diffX) > Gdx.graphics.width || abs(diffY) > Gdx.graphics.height

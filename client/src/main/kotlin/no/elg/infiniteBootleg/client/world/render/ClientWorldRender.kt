@@ -130,7 +130,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   fun lookAt(loc: WorldCompactLoc) = lookAt(loc.decompactLocX(), loc.decompactLocY())
   fun lookAt(worldX: WorldCoordNumber, worldY: WorldCoordNumber) {
-    camera.position.set(worldX.toFloat() * Block.Companion.BLOCK_SIZE, worldY.toFloat() * Block.Companion.BLOCK_SIZE, 0f)
+    camera.position.set(worldX.toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE, worldY.toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE, 0f)
     update()
   }
 
@@ -161,7 +161,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   override fun update() {
     camera.update()
-    box2dDebugM4.set(camera.combined).scl(Block.Companion.BLOCK_SIZE.toFloat())
+    box2dDebugM4.set(camera.combined).scl(Block.Companion.BLOCK_TEXTURE_SIZE.toFloat())
     val width = camera.viewportWidth * camera.zoom
     val height = camera.viewportHeight * camera.zoom
     val w = width * abs(camera.up.y) + height * abs(camera.up.x)

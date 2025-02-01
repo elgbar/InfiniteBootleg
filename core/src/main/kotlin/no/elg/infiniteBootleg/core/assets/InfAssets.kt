@@ -73,7 +73,7 @@ interface InfAssets {
       return if (Main.Companion.isServer) {
         RotatableTextureRegion(null, false, name)
       } else {
-        Pixmap(Block.Companion.BLOCK_SIZE, Block.Companion.BLOCK_SIZE, Pixmap.Format.RGBA4444).useDispose {
+        Pixmap(Block.Companion.BLOCK_TEXTURE_SIZE, Block.Companion.BLOCK_TEXTURE_SIZE, Pixmap.Format.RGBA4444).useDispose {
           it.setColor(r, g, b, a)
           it.fill()
           TextureRegion(Texture(it)).disallowedRotation(name)

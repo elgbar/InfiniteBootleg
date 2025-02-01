@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 
 object CurrentBlockHUDRenderer {
 
-  private val blockScale = Block.BLOCK_SIZE * ClientMain.scale
+  private val blockScale = Block.BLOCK_TEXTURE_SIZE * ClientMain.scale
   private val x2Block = blockScale * 2f
   private val x3Block = blockScale * 3f
   private val x4Block = blockScale * 4f

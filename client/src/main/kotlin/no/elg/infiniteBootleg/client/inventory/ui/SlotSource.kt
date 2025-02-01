@@ -137,6 +137,6 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
   }
 
   companion object {
-    const val DRAG_ICON_SIZE = Block.BLOCK_SIZE * 3f
+    const val DRAG_ICON_SIZE = Block.BLOCK_TEXTURE_SIZE * 3f
   }
 }

@@ -22,7 +22,7 @@ import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.worldToScreen
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 
@@ -77,13 +77,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Over
     for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = worldToScreen(luminescentBlock.worldX.toFloat())
       val lightY = worldToScreen(luminescentBlock.worldY.toFloat())
-      batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+      batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_TEXTURE_SIZE.toFloat(), BLOCK_TEXTURE_SIZE.toFloat())
     }
 
     for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = worldToScreen(skyblock.worldX.toFloat())
       val lightY = worldToScreen(skyblock.worldY.toFloat())
-      batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_SIZE.toFloat(), BLOCK_SIZE.toFloat())
+      batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_TEXTURE_SIZE.toFloat(), BLOCK_TEXTURE_SIZE.toFloat())
     }
   }
 
@@ -94,6 +94,6 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : Over
 
   companion object {
     val BLOCK_LIGHT_UPDATE_COLOR: Color = Color.PURPLE
-    const val TEXTURE_SIZE = BLOCK_SIZE.toFloat()
+    const val TEXTURE_SIZE = BLOCK_TEXTURE_SIZE.toFloat()
   }
 }

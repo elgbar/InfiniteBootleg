@@ -227,8 +227,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
             val secondaryTexture: RotatableTextureRegion?
 
             val worldY = chunk.chunkY.chunkToWorld(localY)
-            val dx = localX * Block.Companion.BLOCK_SIZE_F
-            val dy = localY * Block.Companion.BLOCK_SIZE_F
+            val dx = localX * Block.Companion.BLOCK_TEXTURE_SIZE_F
+            val dy = localY * Block.Companion.BLOCK_TEXTURE_SIZE_F
 
             val isMarker = block.isMarkerBlock()
             if (material.invisibleBlock || isMarker) {
@@ -299,25 +299,25 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
     batch.draw(
       upperHalf.textureRegion,
       dx,
-      dy + Block.Companion.HALF_BLOCK_SIZE_F,
-      Block.Companion.BLOCK_SIZE_F,
-      Block.Companion.HALF_BLOCK_SIZE_F
+      dy + Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F,
+      Block.Companion.BLOCK_TEXTURE_SIZE_F,
+      Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F
     )
-    batch.draw(lowerHalf.textureRegion, dx, dy, Block.Companion.BLOCK_SIZE_F, Block.Companion.HALF_BLOCK_SIZE_F)
+    batch.draw(lowerHalf.textureRegion, dx, dy, Block.Companion.BLOCK_TEXTURE_SIZE_F, Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F)
   }
 
   private fun drawRotatedTexture(texture: RotatableTextureRegion, dx: Float, dy: Float, rotation: Int) {
     if (rotation == NO_ROTATION || !texture.rotationAllowed) {
-      batch.draw(texture.textureRegion, dx, dy, Block.Companion.BLOCK_SIZE_F, Block.Companion.BLOCK_SIZE_F)
+      batch.draw(texture.textureRegion, dx, dy, Block.Companion.BLOCK_TEXTURE_SIZE_F, Block.Companion.BLOCK_TEXTURE_SIZE_F)
     } else {
       batch.draw(
         texture.textureRegion,
         dx,
         dy,
-        Block.Companion.HALF_BLOCK_SIZE_F,
-        Block.Companion.HALF_BLOCK_SIZE_F,
-        Block.Companion.BLOCK_SIZE_F,
-        Block.Companion.BLOCK_SIZE_F,
+        Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F,
+        Block.Companion.HALF_BLOCK_TEXTURE_SIZE_F,
+        Block.Companion.BLOCK_TEXTURE_SIZE_F,
+        Block.Companion.BLOCK_TEXTURE_SIZE_F,
         1f,
         1f,
         rotation.toFloat()
@@ -391,7 +391,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
 
   companion object {
 
-    const val LIGHT_SUBBLOCK_SIZE = Block.Companion.BLOCK_SIZE_F / BlockLight.Companion.LIGHT_RESOLUTION
+    const val LIGHT_SUBBLOCK_SIZE = Block.Companion.BLOCK_TEXTURE_SIZE_F / BlockLight.Companion.LIGHT_RESOLUTION
     const val HALF_LIGHT_SUBBLOCK_SIZE = LIGHT_SUBBLOCK_SIZE * 0.5f
 
     const val CAVE_CLEAR_COLOR_R = 0.408824f

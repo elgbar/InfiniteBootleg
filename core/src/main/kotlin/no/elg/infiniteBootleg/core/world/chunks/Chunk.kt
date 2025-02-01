@@ -181,7 +181,7 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
      * Chunks size in blocks
      */
     const val CHUNK_SIZE: LocalCoord = 16
-    const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.Companion.BLOCK_SIZE
+    const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.Companion.BLOCK_TEXTURE_SIZE
     const val CHUNK_TEXTURE_SIZE_HALF = CHUNK_TEXTURE_SIZE / 2
     val CHUNK_SIZE_SHIFT = (ln(CHUNK_SIZE.toDouble()) / ln(2.0)).toInt()
 

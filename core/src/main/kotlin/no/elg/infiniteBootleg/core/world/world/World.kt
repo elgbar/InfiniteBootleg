@@ -130,7 +130,7 @@ private val logger = KotlinLogging.logger {}
  *
  *  * Chunk view: One unit in chunk view is [no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE] times larger than a unit in
  * world view
- *  * World view: One unit in world view is [Block.Companion.BLOCK_SIZE] times larger than a unit in
+ *  * World view: One unit in world view is [Block.Companion.BLOCK_TEXTURE_SIZE] times larger than a unit in
  * Box2D view
  *  * Box2D view: 1 (ie base unit)
  *
@@ -1185,8 +1185,12 @@ abstract class World(
   }
 
   companion object {
+    /**
+     * Size of block in world coordinates
+     */
     const val BLOCK_SIZE = 1f
     const val HALF_BLOCK_SIZE = BLOCK_SIZE / 2f
+    
     const val LIGHT_SOURCE_LOOK_BLOCKS = 10
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F: Float = LIGHT_SOURCE_LOOK_BLOCKS + 2f

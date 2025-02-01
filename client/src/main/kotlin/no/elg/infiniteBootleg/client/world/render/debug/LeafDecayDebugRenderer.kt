@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.core.util.ProgressHandler
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_SIZE
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE
 
 class LeafDecayDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
 
@@ -54,6 +54,6 @@ class LeafDecayDebugRenderer(private val worldRender: ClientWorldRender) : Overl
 
   companion object {
     val LEAF_DECAY_CHECK_COLOR: Color = Color.NAVY
-    const val TEXTURE_SIZE = BLOCK_SIZE.toFloat()
+    const val TEXTURE_SIZE = BLOCK_TEXTURE_SIZE.toFloat()
   }
 }
