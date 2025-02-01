@@ -95,7 +95,7 @@ subprojects {
     compilerOptions {
       languageVersion = KotlinVersion.KOTLIN_2_2
       progressiveMode = true
-      extraWarnings.set(true)
+      extraWarnings.set(false)
       optIn = ["kotlin.contracts.ExperimentalContracts"]
       freeCompilerArgs.add("-Xdebug")
       freeCompilerArgs.add("-Xwhen-guards") // https://github.com/Kotlin/KEEP/blob/guards/proposals/guards.md
@@ -131,7 +131,7 @@ subprojects {
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.fasterxml.uuid:java-uuid-generator:5.1.0"
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.0'
     implementation "com.google.protobuf:protobuf-bom:$protobufVersion"
     implementation "com.google.protobuf:protobuf-kotlin:$protobufVersion"
     implementation "com.kotcrab.vis:vis-ui:$visVersion"
@@ -150,11 +150,11 @@ subprojects {
     implementation "io.github.libktx:ktx-math:$ktxVersion"
     implementation "io.github.libktx:ktx-preferences:$ktxVersion"
     implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation platform(platform("io.netty:netty-bom:4.1.116.Final"))
+    implementation platform(platform("io.netty:netty-bom:4.1.117.Final"))
     implementation "io.netty:netty-all"
     implementation "org.apache.commons:commons-collections4:4.4"
     implementation "org.apache.commons:commons-lang3:3.17.0"
-    implementation "org.jetbrains:annotations:26.0.1"
+    implementation "org.jetbrains:annotations:26.0.2"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation "it.unimi.dsi:fastutil:8.5.15"
