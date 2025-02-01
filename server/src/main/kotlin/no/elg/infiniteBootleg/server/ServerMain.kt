@@ -9,7 +9,6 @@ import no.elg.infiniteBootleg.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.events.api.EventManager
 import no.elg.infiniteBootleg.main.CommonMain
 import no.elg.infiniteBootleg.main.Main
-import no.elg.infiniteBootleg.net.PacketSender
 import no.elg.infiniteBootleg.net.clientBoundDisconnectPlayerPacket
 import no.elg.infiniteBootleg.server.net.NettyServer
 import no.elg.infiniteBootleg.server.net.ServerPacketSender

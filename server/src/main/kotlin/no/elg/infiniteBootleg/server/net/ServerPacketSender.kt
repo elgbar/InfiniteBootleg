@@ -61,5 +61,4 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
     val packet = maybePacket ?: return
     broadcastToInViewChunk(packet, chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
   }
-
 }

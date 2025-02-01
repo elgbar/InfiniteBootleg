@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.server.net
 
 import com.badlogic.ashley.core.Entity
-import no.elg.infiniteBootleg.main.Main
 import no.elg.infiniteBootleg.net.clientBoundDespawnEntity
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.server.ServerMain
