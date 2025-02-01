@@ -20,9 +20,7 @@ import java.util.EnumMap
 
 private val logger = KotlinLogging.logger {}
 
-data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarSlot, Int>) :
-  EntitySavableComponent,
-  UniversalSystem {
+data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarSlot, Int>) : EntitySavableComponent {
 
   init {
     // Make sure the hotbar is filled with empty slots if there is nothing else there

@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.protobuf.Packets
 
 private val logger = KotlinLogging.logger {}
 
-object OutOfBoundsSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY), UniversalSystem {
+object OutOfBoundsSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world
     val compactedChunkLoc = entity.compactChunkLoc

@@ -6,7 +6,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EARLY
-import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
@@ -19,9 +18,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.InUnload
 private val logger = KotlinLogging.logger {}
 
 // TODO refactor this system to be NoMovementInUnlockedChunksSystem, disabling all movement and setting velocity to 0
-object NoGravityInUnloadedChunksSystem :
-  IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY),
-  UniversalSystem {
+object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world

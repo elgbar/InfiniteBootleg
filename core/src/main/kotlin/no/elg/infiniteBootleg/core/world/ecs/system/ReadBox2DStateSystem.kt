@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.core.util.toCompactLoc
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
-import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.UniversalSystem
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
@@ -28,9 +27,7 @@ import kotlin.math.abs
 /**
  * Read the position of the entity from the box2D entity
  */
-object ReadBox2DStateSystem :
-  IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS),
-  UniversalSystem {
+object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_BEFORE_EVENTS) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody

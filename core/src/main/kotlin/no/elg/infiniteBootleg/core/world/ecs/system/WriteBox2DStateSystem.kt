@@ -17,7 +17,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.UpdateBo
 /**
  * Write the position of the entity from the box2D entity
  */
-object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST), UniversalSystem {
+object WriteBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST) {
 
   private val tmp = Vector2()
 

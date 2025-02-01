@@ -5,4 +5,4 @@ package no.elg.infiniteBootleg.core.world.ecs.api.restriction.system
  *
  * Since both a client and server can be authoritative, this system can be used on both the client and server, thus is universal.
  */
-interface AuthoritativeSystem : UniversalSystem
+interface AuthoritativeSystem
