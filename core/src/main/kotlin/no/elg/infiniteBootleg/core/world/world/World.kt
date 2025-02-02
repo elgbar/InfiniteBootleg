@@ -8,6 +8,7 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
@@ -82,7 +83,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Com
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.core.world.ecs.creation.createNewPlayer
 import no.elg.infiniteBootleg.core.world.ecs.disposeEntitiesOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
@@ -286,8 +286,7 @@ abstract class World(
     additionalSystems().forEach(engine::addSystem)
   }
 
-  open fun initialize() {
-    var willDispatchChunksLoadedEvent = false
+  fun initialize() {
     val worldFolder = worldFolder
     if (!isTransient && worldFolder != null && worldFolder.isDirectory && !WorldLoader.canWriteToWorld(uuid)) {
       if (!Settings.ignoreWorldLock) {
@@ -297,25 +296,31 @@ abstract class World(
         logger.warn { "World found is already in use. However, ignore world lock is enabled therefore the world will be loaded normally. Here be corrupt worlds!" }
       }
     }
-    if (worldFolder == null) {
+    val worldInfoFile = worldFolder?.child(WorldLoader.WORLD_INFO_PATH)
+
+    val willDispatchChunksLoadedEvent = if (worldFolder == null || worldInfoFile == null || !worldInfoFile.exists() || worldInfoFile.isDirectory) {
       logger.info { "No world save found" }
+      loadNewWorld()
     } else if (isTransient) {
       logger.info { "World is transient, will not load from disk" }
+      loadNewWorld()
     } else {
       logger.info { "Loading world from '${worldFolder.file().absolutePath}'" }
       if (WorldLoader.writeLockFile(uuid)) {
-        val worldInfoFile = worldFolder.child(WorldLoader.WORLD_INFO_PATH)
-        if (worldInfoFile.exists() && !worldInfoFile.isDirectory) {
-          try {
-            val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
-            willDispatchChunksLoadedEvent = loadFromProtoWorld(protoWorld)
-          } catch (e: InvalidProtocolBufferException) {
-            e.printStackTrace()
-          }
+        try {
+          val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
+          loadFromProtoWorld(protoWorld)
+        } catch (e: InvalidProtocolBufferException) {
+          e.printStackTrace()
+          loadNewWorld()
+        } catch (e: GdxRuntimeException) {
+          e.printStackTrace()
+          loadNewWorld()
         }
       } else {
         logger.error { "Failed to write world lock file! Setting world to transient to be safe" }
         metadata.isTransient = true
+        loadNewWorld()
       }
     }
 
@@ -323,14 +328,7 @@ abstract class World(
 
     if (!willDispatchChunksLoadedEvent) {
       render.update()
-
       launchOnAsync {
-        if (Main.Companion.isSingleplayer) {
-          this@World.createNewPlayer().thenApply {
-            logger.debug { "Spawned new singleplayer player" }
-          }
-          logger.debug { "Spawning new singleplayer player" }
-        }
         render.chunkLocationsInView.forEach(::loadChunk)
         EventManager.dispatchEvent(InitialChunksOfWorldLoadedEvent(this@World))
       }
@@ -409,7 +407,20 @@ abstract class World(
   }
 
   /**
+   * Called when loading a new world where a [ProtoWorld.World] is unavailable
+   *
    * @return Whether this will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
+   *
+   * @see loadFromProtoWorld
+   */
+  open fun loadNewWorld(): Boolean = false
+
+  /**
+   * Called when loading an existing world.
+   *
+   * @return Whether this will call `dispatchEvent(InitialChunksOfWorldLoadedEvent(this))`
+   *
+   * @see loadNewWorld
    */
   open fun loadFromProtoWorld(protoWorld: ProtoWorld.World): Boolean {
     if (Settings.debug && Settings.logPersistence) {
@@ -1190,7 +1201,7 @@ abstract class World(
      */
     const val BLOCK_SIZE = 1f
     const val HALF_BLOCK_SIZE = BLOCK_SIZE / 2f
-    
+
     const val LIGHT_SOURCE_LOOK_BLOCKS = 10
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_F: Float = LIGHT_SOURCE_LOOK_BLOCKS + 2f
