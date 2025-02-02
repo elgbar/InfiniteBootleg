@@ -8,7 +8,7 @@ import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
-fun findTexture(material: Material): RotatableTextureRegion? {
+private fun findTexture(material: Material): RotatableTextureRegion? {
   return if (material.canBeHandled) {
     material.findTextures(material.textureName)
   } else {

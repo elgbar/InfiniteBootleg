@@ -2,6 +2,8 @@ package no.elg.infiniteBootleg.client.util
 
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.rotatableTextureName
+import no.elg.infiniteBootleg.core.util.textureName
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
 fun Enum<*>.findTextures(customTextureName: String? = null): RotatableTextureRegion {
@@ -24,8 +26,5 @@ fun Enum<*>.findTexturesOrNull(customTextureName: String? = null): RotatableText
       ?: serverRotatableTextureRegion(customTextureName)
   }
 }
-
-fun Enum<*>.textureName(customTextureName: String? = null): String = customTextureName ?: name.lowercase()
-fun rotatableTextureName(textureName: String): String = "${textureName}_rotatable"
 
 fun Enum<*>.serverRotatableTextureRegion(customTextureName: String?) = RotatableTextureRegion(null, false, textureName(customTextureName))

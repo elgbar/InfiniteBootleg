@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
+import no.elg.infiniteBootleg.core.util.textureName
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -39,7 +40,7 @@ enum class Material(
    * How hard it is to break this material
    */
   val hardness: Float,
-  val textureName: String? = null,
+  private val customTextureName: String? = null,
   /**
    * @return If the texture of the material has any transparency
    */
@@ -194,6 +195,8 @@ enum class Material(
   override val itemType: ItemType get() = ItemType.BLOCK
 
   override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
+
+  val textureName: String? get() = if (canBeHandled) textureName(customTextureName) else null
 
   companion object : ProtoConverter<Material, ProtoWorld.Material> {
 

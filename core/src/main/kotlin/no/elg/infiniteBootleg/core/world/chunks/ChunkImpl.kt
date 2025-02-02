@@ -105,9 +105,7 @@ open class ChunkImpl(
 
   override var isAllAir: Boolean = false
     get() {
-      if (isDirty) {
-        updateIfDirty()
-      }
+      updateIfDirty()
       return field
     }
 
@@ -124,8 +122,8 @@ open class ChunkImpl(
    *
    * @return If this chunk was prioritized
    */
-  open fun updateIfDirty(): Boolean {
-    if (isInvalid) {
+  override fun updateIfDirty(): Boolean {
+    if (isInvalid || !isDirty) {
       return false
     }
     val wasPrioritize: Boolean

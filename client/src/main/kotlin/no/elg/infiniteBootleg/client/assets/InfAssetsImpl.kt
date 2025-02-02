@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.world.render.ChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.texture.TextureNeighbor
 import no.elg.infiniteBootleg.core.assets.InfAssets
+import no.elg.infiniteBootleg.core.util.rotatableTextureName
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
@@ -82,6 +83,15 @@ class InfAssetsImpl : InfAssets {
   override fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion {
     return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
   }
+
+  override fun findTexture(name: String): RotatableTextureRegion =
+    if (safeTextureAtlas.existsRegion(name)) {
+      safeTextureAtlas.findRotationAwareRegion(name, false)
+    } else if (safeTextureAtlas.existsRegion(rotatableTextureName(name))) {
+      safeTextureAtlas.findRotationAwareRegion(rotatableTextureName(name), true)
+    } else {
+      throw IllegalArgumentException("No texture found with name $name or ${rotatableTextureName(name)}")
+    }
 
   override fun loadAssets() {
     safeTextureAtlas = SafeTextureAtlas(InfAssets.Companion.TEXTURES_BLOCK_FILE)

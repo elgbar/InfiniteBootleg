@@ -71,7 +71,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         ClientMain.inst().assets.playerTexture
       }
     } else {
-      ClientMain.inst().assets.findTexture(textureRegionComponent.textureName, false)
+      ClientMain.inst().assets.findTexture(textureRegionComponent.textureName)
     }
     val texture: TextureRegion = rotatableTextureRegion.textureRegion
     val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))

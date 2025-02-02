@@ -14,7 +14,7 @@ sealed interface ContainerElement {
 
   val itemType: ItemType
 
-  val displayName: String get() = this::class.simpleName ?: itemType.name
+  val displayName: String get() = (this as? Enum<*>)?.name ?: this::class.simpleName ?: itemType.name
 
   fun toItem(maxStock: UInt = Item.Companion.DEFAULT_MAX_STOCK, stock: UInt = Item.Companion.DEFAULT_MAX_STOCK): Item
 

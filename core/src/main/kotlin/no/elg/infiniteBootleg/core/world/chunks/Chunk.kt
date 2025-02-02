@@ -78,6 +78,14 @@ interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
   val isDirty: Boolean
 
   /**
+   * Force update of texture and recalculate internal variables This is usually called when the
+   * dirty flag of the chunk is set and either [isAllAir] called.
+   *
+   * @return If this chunk was prioritized
+   */
+  fun updateIfDirty(): Boolean
+
+  /**
    * @param localX The local x ie a value between 0 and [CHUNK_SIZE]
    * @param localY The local y ie a value between 0 and [CHUNK_SIZE]
    * @param material The material of the new block

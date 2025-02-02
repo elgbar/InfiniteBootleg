@@ -47,6 +47,8 @@ interface InfAssets {
 
   fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion
 
+  fun findTexture(name: String): RotatableTextureRegion
+
   companion object {
     const val FONTS_FOLDER = "fonts/"
     const val TEXTURES_BLOCK_FILE = "textures/textures.atlas"
