@@ -6,7 +6,7 @@ import no.elg.infiniteBootleg.core.net.clientBoundDisconnectPlayerPacket
 
 private val logger = KotlinLogging.logger {}
 
-fun ChannelHandlerContextWrapper.fatal(msg: String) {
+fun ChannelHandlerContextWrapper.fatal(msg: String, cause: Throwable? = null) {
   this.writeAndFlushPacket(clientBoundDisconnectPlayerPacket(msg))
-  logger.error { msg }
+  logger.error(cause) { msg }
 }
