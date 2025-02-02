@@ -5,9 +5,10 @@
     <Console name="STDOUT" target="SYSTEM_OUT">
       <PatternLayout
         disableAnsi="false"
-        pattern="%style{%d}{bright_black} %highlight{%-5level [%t]%notEmpty{ %marker} %msg{ansi}}{FATAL=red, ERROR=bright_red, WARN=bright_yellow bold, INFO=white, DEBUG=bright_black bold, TRACE=bright_black}%n"
+        pattern="%style{%date}{bright_black} %highlight{%-5level [%thread|%logger{1.1.1.2.*}]%notEmpty{ %marker} %msg{ansi}}{FATAL=red, ERROR=bright_red, WARN=bright_yellow bold, INFO=white, DEBUG=bright_black bold, TRACE=bright_black}%n"
       />
     </Console>
+
 
     <InGameConsole name="InGameConsole"/>
 
@@ -15,7 +16,7 @@
                              filePattern="${sys:user.home}/.infiniteBootleg/logs/$${date:yyyy-MM-dd}/log-%d{yyyy-MM-dd-HH-mm}_%i.log.zip"
     >
       <PatternLayout>
-        <Pattern>%d pid=%pid %5level %c [%t] %msg%n</Pattern>
+        <Pattern>%date pid=%pid %5level %logger [%thread] %msg%n</Pattern>
       </PatternLayout>
       <Policies>
         <SizeBasedTriggeringPolicy size="250 MB"/>
