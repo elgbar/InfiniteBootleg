@@ -47,7 +47,7 @@ data class ContainerComponent(val ownedContainer: OwnedContainer) : EntitySavabl
             is ContainerOwner.EntityOwner -> ContainerOwner.EntityOwner(entity.id)
             is ContainerOwner.BlockOwner -> ContainerOwner.BlockOwner(entity.compactBlockLoc)
           }
-          logger.error { "Invalid owner of container! Got $owner, but expected $ownedContainer" }
+          logger.warn { "Invalid owner of container! Got $owner, but expected $newOwner" }
           ContainerComponent(OwnedContainer(newOwner, ownedContainer.container))
         } else {
           ContainerComponent(ownedContainer)
