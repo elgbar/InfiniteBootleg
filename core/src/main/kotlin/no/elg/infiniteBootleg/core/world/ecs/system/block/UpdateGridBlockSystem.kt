@@ -35,7 +35,7 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
       world.getBlocksAABB(pos.blockX.toFloat(), pos.blockY.toFloat(), halfBox2dWidth, halfBox2dHeight, raw = false, loadChunk = false, includeAir = true)
 
     // Remove markers that are no longer occupied
-    val noLongerOccupied = entity.occupyingLocations.filter { it in currentOccupations }
+    val noLongerOccupied = entity.occupyingLocations.filter { it !in currentOccupations }
     entity.occupyingLocations.removeAll(noLongerOccupied)
 
     val newOccupation = currentOccupations.filter { it !in entity.occupyingLocations }
