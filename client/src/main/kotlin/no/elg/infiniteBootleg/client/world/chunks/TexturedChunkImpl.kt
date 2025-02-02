@@ -27,9 +27,7 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
   override val texture: Texture?
     get() {
       synchronized(chunkBody) {
-        if (isDirty) {
-          updateIfDirty()
-        }
+        updateIfDirty()
         return fbo?.colorBufferTexture
       }
     }
@@ -47,7 +45,7 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
    * called.
    */
   override fun updateIfDirty(): Boolean {
-    if (isInvalid) {
+    if (isInvalid || !isDirty) {
       return false
     }
     return super.updateIfDirty().also { wasPrioritize ->

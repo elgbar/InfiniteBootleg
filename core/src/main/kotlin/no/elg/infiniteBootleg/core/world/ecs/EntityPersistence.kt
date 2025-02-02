@@ -187,6 +187,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
         future.complete(Unit)
       }
     }
+
     if (protoEntity.checkShouldLoad(futureCompleter)) {
       Box2DBodyComponent.Companion.load(this, protoEntity, futureCompleter)
     } else {

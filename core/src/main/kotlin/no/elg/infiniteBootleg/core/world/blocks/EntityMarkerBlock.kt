@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import no.elg.infiniteBootleg.core.util.EntityRemoveListener
 import no.elg.infiniteBootleg.core.util.LocalCoord
-import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.remove
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -29,20 +28,14 @@ class EntityMarkerBlock(
 ) : Block {
 
   private var removeEntityListener: EntityListener? =
-    EntityRemoveListener { if (it === entity) removeEntityMarker(async = false) }
+    EntityRemoveListener { if (it === entity) removeEntityMarker() }
 
   init {
     removeEntityListener?.also { world.engine.addEntityListener(it) }
   }
 
-  fun removeEntityMarker(async: Boolean = false) {
-    if (async) {
-      launchOnAsync {
-        remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
-      }
-    } else {
-      remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
-    }
+  fun removeEntityMarker() {
+    remove(updateTexture = false, prioritize = false, sendUpdatePacket = false)
   }
 
   override val material: Material get() = entity.material

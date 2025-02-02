@@ -19,11 +19,9 @@ object Settings {
    *
    * Use [no.elg.infiniteBootleg.core.world.world.World.isTransient] to check if the world is transient
    */
-  @JvmField
   var loadWorldFromDisk = true
 
   /** Ignore the world lock  */
-  @JvmField
   var ignoreWorldLock = false
 
   /**
@@ -32,27 +30,22 @@ object Settings {
    *
    * If [GraphicsEnvironment.isHeadless] is `false` this will always be `false`.
    */
-  @JvmField
   var client = !GraphicsEnvironment.isHeadless()
 
   /** Seed of the world loaded  */
-  @JvmField
   var worldSeed: Long = "0".asWorldSeed()
 
   /** If general debug variable. Use this and-ed with your specific debug variable  */
-  @JvmField
   var debug = false
 
   /**
    * The ticks per seconds to use by default. Changing this will only apply to new instances
    * created.
    */
-  @JvmField
   var tps = TickerImpl.Companion.DEFAULT_TICKS_PER_SECOND
 
   var dayTicking = false
 
-  @JvmField
   var renderLight = true
 
   var renderBox2dDebug = false
@@ -101,7 +94,6 @@ object Settings {
 
   var enableEventStatistics = true
 
-  @JvmField
   var port = DEFAULT_PORT
 
   var host = ""

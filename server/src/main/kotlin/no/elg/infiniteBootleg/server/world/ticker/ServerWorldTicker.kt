@@ -30,7 +30,7 @@ class ServerWorldTicker(world: ServerWorld, tick: Boolean) : WorldTicker {
     while (serverRendererTicker.ticker.tickId <= 0) {
       Thread.onSpinWait()
     }
-    logger.info { "Started world ticker" }
+    logger.info { "Started server world ticker" }
   }
 
   /**

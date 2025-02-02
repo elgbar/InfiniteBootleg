@@ -176,7 +176,7 @@ abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
     if (disposed) {
       return
     }
-    if (msg.startsWith(GameConsoleLogger.Companion.DEBUG_PREFIX)) {
+    if (msg.startsWith(Companion.DEBUG_PREFIX)) {
       // Do not log debug messages to in-game console since it will be spammed
       return
     }

@@ -76,8 +76,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
     /**
      * Find all entities in the block
      */
-    fun Block.queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
-      world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback)
+    fun Block.queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) = world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback)
 
     /**
      * Remove this block by setting it to air

@@ -50,7 +50,7 @@ object WorldLoader {
       val lockPID = try {
         lockInfo.toLong()
       } catch (e: NumberFormatException) {
-        logger.warn { "World lock file for $uuid did not contain a valid pid, read: $lockInfo" }
+        logger.warn(e) { "World lock file for $uuid did not contain a valid pid, read: $lockInfo" }
         // Invalid pid, allow writing
         return deleteOrLogFile(worldLockFile)
       }
@@ -93,6 +93,7 @@ object WorldLoader {
       ProtoWorld.World.Generator.PERLIN, ProtoWorld.World.Generator.UNRECOGNIZED, null -> PerlinChunkGenerator(
         protoWorld.seed
       )
+
       ProtoWorld.World.Generator.FLAT -> FlatChunkGenerator()
       ProtoWorld.World.Generator.EMPTY -> EmptyChunkGenerator()
     }

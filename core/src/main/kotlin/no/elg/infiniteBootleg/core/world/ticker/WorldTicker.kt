@@ -35,7 +35,7 @@ class CommonWorldTicker(world: World, tick: Boolean) : WorldTicker {
     while (box2DTicker.ticker.tickId <= 0) {
       Thread.onSpinWait()
     }
-    logger.info { "Started world ticker" }
+    logger.info { "Started world tickers" }
   }
 
   /**
