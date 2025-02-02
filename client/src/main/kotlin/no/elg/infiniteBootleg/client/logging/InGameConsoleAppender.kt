@@ -1,7 +1,9 @@
 package no.elg.infiniteBootleg.client.logging
 
 import com.strongjoshua.console.LogLevel
-import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.client.console.InGameConsoleHandler
+import no.elg.infiniteBootleg.client.main.ClientMain
+import no.elg.infiniteBootleg.core.Settings
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.Appender
 import org.apache.logging.log4j.core.Core
@@ -11,11 +13,15 @@ import org.apache.logging.log4j.core.config.plugins.Plugin
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute
 import org.apache.logging.log4j.core.config.plugins.PluginFactory
 
-@Plugin(name = "InGameConsole", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
-class InGameConsoleAppender(name: String) : AbstractAppender(name, null, null, true, null) {
+/**
+ * An appender that logs to the in game console. If the package changes so must `package` in `log4j2.xml`
+ */
+@Plugin(name = "InGameConsole", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE)
+class InGameConsoleAppender(name: String) : AbstractAppender(name, null, null, !Settings.debug, null) {
+
+  private val console: InGameConsoleHandler by lazy { ClientMain.inst().console }
 
   override fun append(event: LogEvent) {
-    val console = Main.Companion.inst().console
     when (event.level) {
       Level.ERROR, Level.FATAL -> console.log(LogLevel.ERROR, event.message.toString())
       Level.WARN -> console.log(LogLevel.ERROR, "WARN ${event.message}")
@@ -24,6 +30,7 @@ class InGameConsoleAppender(name: String) : AbstractAppender(name, null, null, t
   }
 
   companion object {
+    @Suppress("unused")
     @JvmStatic
     @PluginFactory
     fun createAppender(@PluginAttribute("name") name: String): InGameConsoleAppender = InGameConsoleAppender(name)
