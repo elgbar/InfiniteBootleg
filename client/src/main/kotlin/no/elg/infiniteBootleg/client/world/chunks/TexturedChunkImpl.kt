@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.core.util.launchOnMain
-import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
 import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
@@ -47,34 +46,14 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
    * dirty flag of the chunk is set and either [isAllAir] or [texture]
    * called.
    */
-  private fun updateIfDirty() {
+  override fun updateIfDirty(): Boolean {
     if (isInvalid) {
-      return
+      return false
     }
-    var wasPrioritize: Boolean
-    synchronized(blocks) {
-      if (!isDirty || initializing) {
-        return
-      }
-      wasPrioritize = prioritize
-      prioritize = false
-      isDirty = false
-
-      // test if all the blocks in this chunk has the material air
-      isAllAir = true
-      outer@ for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
-        for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
-          val b = blocks[localX][localY]
-          if (b != null && b.material !== Material.AIR) {
-            isAllAir = false
-            break@outer
-          }
-        }
-      }
+    return super.updateIfDirty().also { wasPrioritize ->
+      // Render the world with the changes (but potentially without the light changes)
+      queueForRendering(wasPrioritize)
     }
-
-    // Render the world with the changes (but potentially without the light changes)
-    queueForRendering(wasPrioritize)
   }
 
   override fun view() {
@@ -95,14 +74,6 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
         this.fbo = fbo
         return fbo
       }
-    }
-
-  override var isAllAir: Boolean = false
-    get() {
-      if (isDirty) {
-        updateIfDirty()
-      }
-      return field
     }
 
   override fun dispose() {

@@ -104,7 +104,12 @@ open class ChunkImpl(
   protected var initializing: Boolean = true
 
   override var isAllAir: Boolean = false
-    protected set
+    get() {
+      if (isDirty) {
+        updateIfDirty()
+      }
+      return field
+    }
 
   private var disposed: Boolean = false
 
@@ -112,6 +117,40 @@ open class ChunkImpl(
 
   @Volatile
   var recalculateLightJob: Job? = null
+
+  /**
+   * Force update of texture and recalculate internal variables This is usually called when the
+   * dirty flag of the chunk is set and either [isAllAir] called.
+   *
+   * @return If this chunk was prioritized
+   */
+  open fun updateIfDirty(): Boolean {
+    if (isInvalid) {
+      return false
+    }
+    val wasPrioritize: Boolean
+    synchronized(blocks) {
+      wasPrioritize = prioritize
+      if (!isDirty || initializing) {
+        return wasPrioritize
+      }
+      prioritize = false
+      isDirty = false
+
+      // test if all the blocks in this chunk has the material air
+      isAllAir = true
+      outer@ for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
+        for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
+          val b = blocks[localX][localY]
+          if (b != null && b.material !== Material.AIR) {
+            isAllAir = false
+            break@outer
+          }
+        }
+      }
+    }
+    return wasPrioritize
+  }
 
   @Contract("_, _, !null, _, _, _ -> !null; _, _, null, _, _, _ -> null")
   override fun setBlock(

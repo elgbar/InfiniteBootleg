@@ -67,7 +67,9 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
     // chunksLock.writeLock()
     for (chunk in world.loadedChunks) {
       if (chunk.isValid && chunk.isDirty) {
+        // implicitly calls ChunkImpl#updateIfDirty
         chunk.chunkBody.update()
+        require(!chunk.isDirty) { "Chunk ${chunk.chunkX}, ${chunk.chunkY} is still dirty after updating" }
       }
     }
   }
