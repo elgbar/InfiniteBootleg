@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.world.world
 
+import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.events.InitialChunksOfWorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
@@ -52,4 +53,6 @@ class SinglePlayerWorld(generator: ChunkGenerator, seed: Long, worldName: String
     super.loadFromProtoWorld(protoWorld)
     return loadPlayer(protoWorld)
   }
+
+  override fun isAuthorizedToChange(entity: Entity): Boolean = true
 }

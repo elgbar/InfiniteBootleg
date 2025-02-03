@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.server
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
@@ -43,6 +44,8 @@ class ServerMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<Headles
     }
     Runtime.getRuntime().addShutdownHook(Thread(onShutdown))
   }
+
+  override fun isAuthorizedToChange(entity: Entity): Boolean = true
 
   override fun render() {
     serverWorld.render.render()

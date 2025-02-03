@@ -15,6 +15,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
+import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIteratingSystem
 
 private val logger = KotlinLogging.logger {}
 
@@ -72,8 +73,15 @@ class ThreadSafeEngine : Engine(), Disposable {
         }
       }
 
+      if (system is AuthoritativeSystem && system is AuthorizedEntitiesIteratingSystem) {
+        logger.warn {
+          "System ${system::class.simpleName} is both an AuthoritativeSystem and an AuthorizedEntitiesIteratingSystem. " +
+            "It is pointless to check if the system can modify an entity when we're authoritative"
+        }
+      }
+
       when (system) {
-        is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.Companion.isAuthoritative }
+        is AuthoritativeSystem -> addToSystemConditionally(system, "authoritative") { Main.isAuthoritative }
         else -> {
           logger.debug { "Adding system ${system::class.simpleName}" }
           super.addSystem(system)

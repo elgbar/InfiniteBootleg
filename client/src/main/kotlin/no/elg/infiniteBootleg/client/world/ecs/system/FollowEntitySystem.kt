@@ -16,7 +16,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.core.world.ecs.followEntityFamily
-import no.elg.infiniteBootleg.core.world.ecs.system.FamilyEntitySystem
+import no.elg.infiniteBootleg.core.world.ecs.system.api.FamilyEntitySystem
 import kotlin.math.abs
 
 private val logger = KotlinLogging.logger {}

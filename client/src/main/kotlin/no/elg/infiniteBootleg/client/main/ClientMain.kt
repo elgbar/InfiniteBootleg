@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.main
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
@@ -159,6 +160,8 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
     isMultiplayer = world is ServerClientWorld
     logger.trace { "World status updated: Multiplayer? $isMultiplayer, Singleplayer? $isSingleplayer" }
   }
+
+  override fun isAuthorizedToChange(entity: Entity): Boolean = world?.isAuthorizedToChange(entity) ?: Main.Companion.isAuthoritative
 
   fun shouldNotIgnoreWorldInput(): Boolean = !shouldIgnoreWorldInput()
 

@@ -1,4 +1,4 @@
-package no.elg.infiniteBootleg.core.world.ecs.system
+package no.elg.infiniteBootleg.core.world.ecs.system.api
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
@@ -8,11 +8,11 @@ import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Array
 
 /**
- * Progress a whole family of entities and not just one at a time (which [com.badlogic.ashley.systems.IteratingSystem] does)
+ * Conditionally process entities in a family
  *
  * @see com.badlogic.ashley.systems.IteratingSystem
  */
-abstract class FamilyEntitySystem(private val family: Family, priority: Int) : EntitySystem(priority) {
+abstract class ConditionalIteratingSystem(private val family: Family, priority: Int) : EntitySystem(priority) {
 
   private var entities: ImmutableArray<Entity> = EMPTY_ENTITIES
 
@@ -26,10 +26,12 @@ abstract class FamilyEntitySystem(private val family: Family, priority: Int) : E
 
   final override fun update(deltaTime: Float) {
     if (entities.size() == 0) return
-    processEntities(entities, deltaTime)
+    entities.filter(::condition).forEach { processEntity(it, deltaTime) }
   }
 
-  abstract fun processEntities(entities: ImmutableArray<Entity>, deltaTime: Float)
+  abstract fun condition(entity: Entity): Boolean
+
+  abstract fun processEntity(entity: Entity, deltaTime: Float)
 
   companion object {
     private val EMPTY_ENTITIES = ImmutableArray<Entity>(Array.with())

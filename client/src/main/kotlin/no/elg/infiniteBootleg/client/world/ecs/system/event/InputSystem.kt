@@ -30,7 +30,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.core.world.ecs.controlledEntityWithInputEventFamily
-import no.elg.infiniteBootleg.core.world.ecs.system.event.EventSystem
+import no.elg.infiniteBootleg.core.world.ecs.system.api.EventSystem
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.sign

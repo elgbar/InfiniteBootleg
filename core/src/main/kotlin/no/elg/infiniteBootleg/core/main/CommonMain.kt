@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.main
 
 import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
@@ -84,8 +83,6 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
   }
 
   override val engine: Engine? get() = world?.engine
-
-  override fun isAuthorizedToChange(entity: Entity): Boolean = Main.Companion.isAuthoritative
 
   override fun dispose() {
     console.dispose()

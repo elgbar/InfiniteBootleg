@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.systems.IteratingSystem
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -14,11 +13,12 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FlyingTag.Companion.flying
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.InUnloadedChunkTag.Companion.isInUnloadedChunk
+import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIteratingSystem
 
 private val logger = KotlinLogging.logger {}
 
 // TODO refactor this system to be NoMovementInUnlockedChunksSystem, disabling all movement and setting velocity to 0
-object NoGravityInUnloadedChunksSystem : IteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
+object NoGravityInUnloadedChunksSystem : AuthorizedEntitiesIteratingSystem(basicStandaloneEntityFamily, UPDATE_PRIORITY_EARLY) {
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val world = entity.world

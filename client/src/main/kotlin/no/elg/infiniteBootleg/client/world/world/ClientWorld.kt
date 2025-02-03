@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.world.world
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import no.elg.infiniteBootleg.client.input.ECSInputListener
 import no.elg.infiniteBootleg.client.input.WorldInputHandler
@@ -29,6 +30,8 @@ abstract class ClientWorld : World {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean) : super(protoWorld, forceTransient)
   constructor(generator: ChunkGenerator, seed: Long, worldName: String, forceTransient: Boolean) : super(generator, seed, worldName, forceTransient)
+
+  abstract fun isAuthorizedToChange(entity: Entity): Boolean
 
   override fun resize(width: Int, height: Int) {
     render.resize(width, height)
