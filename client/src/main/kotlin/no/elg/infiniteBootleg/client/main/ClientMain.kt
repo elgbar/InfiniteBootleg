@@ -59,6 +59,7 @@ class ClientMain(progArgs: ProgramArgs, startTime: Instant) : CommonMain<InGameC
       Gdx.input.setOnscreenKeyboardVisible(false)
       logger.debug { "Loading new screen ${value.javaClass.simpleName}" }
       updateStatus(world)
+      console.isVisible = false
 
       (value as? AbstractScreen)?.tryCreate()
       value.show()
