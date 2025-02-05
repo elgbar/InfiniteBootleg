@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.EntitySystem
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.net.clientBoundSpawnEntity
+import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
@@ -14,6 +15,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Com
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.shouldSendToClients
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
+import no.elg.infiniteBootleg.core.world.loader.WorldLoader
 import no.elg.infiniteBootleg.core.world.render.ServerClientChunksInView
 import no.elg.infiniteBootleg.core.world.ticker.WorldTicker
 import no.elg.infiniteBootleg.core.world.world.World
@@ -37,6 +39,17 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
 
   override val render = HeadlessWorldRenderer(this)
   override val worldTicker: WorldTicker = ServerWorldTicker(this, tick = false)
+
+  override fun initialize() {
+    super.initialize()
+    if (isTransient) {
+      IllegalAction.CRASH.handle {
+        val worldLockFile = WorldLoader.getWorldLockFile(uuid)
+        "Server is marked as transient which is not allowed. " +
+          "You may have to manually delete the world lock file located at '$worldLockFile' if there is no process with the id in th lock file"
+      }
+    }
+  }
 
   fun disconnectPlayer(entityId: String, kicked: Boolean) {
     val player = getEntity(entityId)

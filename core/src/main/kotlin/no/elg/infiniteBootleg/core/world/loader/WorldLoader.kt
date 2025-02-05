@@ -26,15 +26,18 @@ object WorldLoader {
     return Gdx.files.external(Main.Companion.WORLD_FOLDER + uuid)
   }
 
-  private fun getWorldLockFile(uuid: String): FileHandle {
+  fun getWorldLockFile(uuid: String): FileHandle {
     return getWorldFolder(uuid).child(LOCK_FILE_NAME)
   }
 
   fun canWriteToWorld(uuid: String): Boolean {
+    if (Settings.ignoreWorldLock) {
+      return true
+    }
+    if (Main.isNotAuthoritative) {
+      return false
+    }
     synchronized(WORLD_LOCK_LOCK) {
-      if (Settings.ignoreWorldLock) {
-        return true
-      }
       val worldLockFile = getWorldLockFile(uuid)
       if (worldLockFile.isDirectory) {
         // Invalid format, allow writing
@@ -61,7 +64,7 @@ object WorldLoader {
       val optionalProcessHandle = ProcessHandle.of(lockPID)
       if (!optionalProcessHandle.map(ProcessHandle::isAlive).orElse(false)) {
         // If there is no process with the read pid, it was probably left from an old instance
-        logger.warn { "World lock file for $uuid still existed for a non-existing process (PID $lockPID), an old lock file found" }
+        logger.warn { "World lock file for $uuid still existed for a non-existing process (PID $lockPID), deleting the old lock file" }
         return deleteOrLogFile(worldLockFile)
       }
       return false
