@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.world.ServerWorld
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
@@ -30,6 +31,7 @@ object ServerWorldLoader {
 
   fun spawnServerPlayer(world: ServerWorld, entityId: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
     val fileHandle = getServerPlayerFile(world, entityId)
+    logger.debug { "Persisted player profile file ${fileHandle?.path()}" }
 
     val serverPlayerConfig: Entity.() -> Unit = {
       safeWith { SharedInformationComponent(sharedInformation) }
@@ -37,6 +39,7 @@ object ServerWorldLoader {
     }
 
     fun createNewServerPlayer(): CompletableFuture<Entity> {
+      logger.debug { "Creating fresh player profile for $entityId" }
       val protoEntity = world.createNewProtoPlayer(controlled = true) {
         this.ref = entityId.toProtoEntityRef()
         this.name = username
@@ -50,23 +53,24 @@ object ServerWorldLoader {
 
     if (fileHandle != null && fileHandle.exists()) {
       logger.debug { "Trying to load persisted player profile for $entityId" }
-      try {
-        val proto = ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
-        return world.load(proto, configure = serverPlayerConfig).handle { entity, ex ->
-          if (ex != null) {
-            logger.warn(ex) { "Exception when loading world" }
-            return@handle createNewServerPlayer().join()
-          } else {
-            logger.debug { "Loaded persisted player profile for $entityId" }
-          }
-          return@handle entity
-        }
+      val proto = try {
+        ProtoWorld.Entity.parseFrom(fileHandle.readBytes())
       } catch (e: Exception) {
-        logger.warn(e) { "Exception when loading world" }
-        // fall through
+        logger.error(e) { "Failed to parse server profile for $entityId" }
+        return createNewServerPlayer()
+      }
+
+      // Handle async as recovering from exception joins a future
+      return world.load(proto, configure = serverPlayerConfig).handleAsync { entity, ex ->
+        if (ex != null || entity == null) {
+          logger.error(ex) { "Failed to load server profile for $entityId" }
+          createNewServerPlayer().get(10, TimeUnit.SECONDS)
+        } else {
+          logger.debug { "Loaded persisted player profile for $entityId" }
+          entity
+        }
       }
     }
-    logger.debug { "Creating fresh player profile for $entityId" }
     return createNewServerPlayer()
   }
 
