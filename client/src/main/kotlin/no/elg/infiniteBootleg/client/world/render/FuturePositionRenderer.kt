@@ -48,8 +48,8 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
             }
             worldRender.batch.draw(
               ClientMain.inst().assets.whiteTexture.textureRegion,
-              worldToScreen(futureWorldX),
-              worldToScreen(futureWorldY),
+              futureWorldX.worldToScreen(),
+              futureWorldY.worldToScreen(),
               1f,
               1f
             )

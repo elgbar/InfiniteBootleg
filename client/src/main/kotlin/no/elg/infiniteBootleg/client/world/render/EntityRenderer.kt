@@ -85,7 +85,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val blockY = centerPos.y.roundToInt()
       val topX = world.getTopBlockWorldY(blockX, ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG)
       if (blockY > topX) {
-        lightVector.set(worldToScreen(blockX), worldToScreen(topX + 1))
+        lightVector.set(blockX.worldToScreen(), (topX + 1).worldToScreen())
         batch.color = Color.WHITE
       } else {
         val blockLight = world.getBlockLight(blockX, blockY, false)
@@ -98,7 +98,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
           } else {
             batch.color = Color.BLACK
           }
-          lightVector.set(worldToScreen(blockX), worldToScreen(blockY))
+          lightVector.set(blockX.worldToScreen(), blockY.worldToScreen())
         } else {
           lightVector.setZero()
           batch.color = Color.WHITE
@@ -142,8 +142,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
       setupEntityLight(centerPos, box2d)
 
-      val screenX = worldToScreen(worldX)
-      val screenY = worldToScreen(worldY)
+      val screenX = worldX.worldToScreen()
+      val screenY = worldY.worldToScreen()
 
       // Draw with a tint if there is one
       entity.tintedComponentOrNull?.also {

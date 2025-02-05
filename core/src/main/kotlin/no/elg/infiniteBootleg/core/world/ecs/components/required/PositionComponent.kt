@@ -27,8 +27,10 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
 
   private val pos by lazy { Vector2(x, y) }
 
-  val blockX: WorldCoord get() = worldToBlock(x)
-  val blockY: WorldCoord get() = worldToBlock(y)
+  val blockX: WorldCoord get() = x.worldToBlock()
+  val blockY: WorldCoord get() = y.worldToBlock()
+  val chunkX: WorldCoord get() = x.worldToChunk()
+  val chunkY: WorldCoord get() = y.worldToChunk()
 
   fun setPosition(vector2: Vector2) {
     x = vector2.x
@@ -58,7 +60,7 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
   companion object : EntityLoadableMapper<PositionComponent>() {
     val Entity.position: Vector2 get() = positionComponent.toVector2()
     val Entity.compactBlockLoc: Long get() = positionComponent.run { compactLoc(blockX, blockY) }
-    val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(x.worldToChunk(), y.worldToChunk()) }
+    val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)
 
     /**

@@ -168,8 +168,8 @@ fun WorldEntity.interpolate(justPressed: Boolean, action: (WorldEntity, blockX: 
 
       val pWx = halfpoint(worldX, inputMouseLocator.previousMouseWorldX, multiplierX)
       val pWy = halfpoint(worldY, inputMouseLocator.previousMouseWorldY, multiplierY)
-      val pBx = worldToBlock(pWx)
-      val pBy = worldToBlock(pWy)
+      val pBx = pWx.worldToBlock()
+      val pBy = pWy.worldToBlock()
 
       if (logging) {
         logger.info { "--inter $i mltX: $multiplierX | mltY: $multiplierY, pBx:$pBx | pBy:$pBy | pWx:$pWx | pWy:$pWy" }

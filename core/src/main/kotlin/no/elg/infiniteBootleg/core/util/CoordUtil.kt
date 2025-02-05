@@ -53,6 +53,19 @@ inline fun ChunkCoord.chunkToWorld(offset: LocalCoord = 0): WorldCoord = (this s
 inline fun ChunkCompactLoc.chunkToWorld(localCoords: LocalCompactLoc): WorldCompactLoc = compactChunkToWorld(this, localCoords.decompactLocX(), localCoords.decompactLocY())
 
 /**
+ * @param worldCoord A part of a coordinate in the world
+ * @return Which coordinate a block at the given world coordinate will have
+ */
+inline fun WorldCoordNumber.worldToBlock(): WorldCoord = floor(this.toDouble()).toInt()
+
+/**
+ * @param worldOffset Given by [WorldBody.getWorldOffsetX] and [WorldBody.getWorldOffsetY]
+ * @param this@worldToScreen  The world coordinate to translate to screen coordinates
+ * @return The world coordinate to translated to screen coordinates
+ */
+inline fun WorldCoordNumber.worldToScreen(): Float = toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE
+
+/**
  * Calculate the offset the given world coordinate have in its chunk
  *
  * @param this@chunkOffset A coordinate in world view
@@ -205,19 +218,6 @@ inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(v
 inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunk.chunkX.chunkToWorld(localX)},${chunk.chunkY.chunkToWorld(localY)})"
 inline fun stringifyChunkToWorld(chunk: Chunk, localLoc: LocalCompactLoc): String =
   "(${chunk.chunkX.chunkToWorld(localLoc.decompactLocX())},${chunk.chunkY.chunkToWorld(localLoc.decompactLocY())})"
-
-/**
- * @param worldCoord A part of a coordinate in the world
- * @return Which coordinate a block at the given world coordinate will have
- */
-inline fun worldToBlock(worldCoord: WorldCoordNumber): WorldCoord = floor(worldCoord.toDouble()).toInt()
-
-/**
- * @param worldOffset Given by [WorldBody.getWorldOffsetX] and [WorldBody.getWorldOffsetY]
- * @param worldCoord  The world coordinate to translate to screen coordinates
- * @return The world coordinate to translated to screen coordinates
- */
-inline fun worldToScreen(worldCoord: WorldCoordNumber): Float = worldCoord.toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE
 
 operator fun Long.component1(): Int = this.decompactLocX()
 operator fun Long.component2(): Int = this.decompactLocY()
