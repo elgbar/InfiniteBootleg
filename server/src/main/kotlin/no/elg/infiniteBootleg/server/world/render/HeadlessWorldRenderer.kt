@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.chunkColu
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.core.world.render.ServerClientChunksInView
 import no.elg.infiniteBootleg.core.world.render.WorldRender
+import no.elg.infiniteBootleg.protobuf.chunk
 import no.elg.infiniteBootleg.server.world.ServerWorld
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -65,11 +66,13 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   override fun render() {
     // Note to self: do not call chunkBody#update while under the chunksLock.readLock() or
     // chunksLock.writeLock()
-    for (chunk in world.loadedChunks) {
-      if (chunk.isValid && chunk.isDirty) {
-        // implicitly calls ChunkImpl#updateIfDirty
+    val filter = world.loadedChunks.filter { chunk -> chunk.isValid && chunk.isDirty }
+    val size = filter.size
+    if (size > 0) {
+      logger.debug { "Updating $size dirty chunks" }
+      for (chunk in filter) {
+        chunk.updateIfDirty()
         chunk.chunkBody.update()
-        require(!chunk.isDirty) { "Chunk ${chunk.chunkX}, ${chunk.chunkY} is still dirty after updating" }
       }
     }
   }
