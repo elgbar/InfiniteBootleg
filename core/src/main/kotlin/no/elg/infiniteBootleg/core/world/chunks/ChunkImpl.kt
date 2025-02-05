@@ -444,27 +444,21 @@ open class ChunkImpl(
 
   override fun save(): CompletableFuture<ProtoWorld.Chunk> {
     val future = CompletableFuture<ProtoWorld.Chunk>()
-    chunk {
-      position = vector2i {
-        x = chunkX
-        y = chunkY
-      }
-      blocks += this@ChunkImpl.map { it?.save() ?: AIR_BLOCK_PROTO }
-      queryEntities { entities ->
-        this.entities += entities.mapNotNull { (_, entity) ->
-          if (world.playersEntities.contains(entity)) {
-            // do not save players
-            null
-          } else {
-            entity.save(toAuthoritative = true)
-          }
+    val protoChunkWithoutEntities = saveBlocksOnly()
+    queryEntities { entities ->
+      val protoWorldEntities = entities.mapNotNull { (_, entity) ->
+        if (world.playersEntities.contains(entity)) {
+          // do not save players
+          null
+        } else {
+          entity.save(toAuthoritative = true)
         }
-        val protoChunk = _build()
-        if (Settings.debug && Settings.logPersistence) {
-          logger.debug { singleLinePrinter.printToString(protoChunk) }
-        }
-        future.complete(protoChunk)
       }
+      val protoChunk = protoChunkWithoutEntities.toBuilder().addAllEntities(protoWorldEntities).build()
+      if (Settings.debug && Settings.logPersistence) {
+        logger.debug { singleLinePrinter.printToString(protoChunk) }
+      }
+      future.complete(protoChunk)
     }
     return future
   }

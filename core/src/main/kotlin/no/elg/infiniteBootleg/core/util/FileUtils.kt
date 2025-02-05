@@ -11,6 +11,6 @@ fun deleteOrLogFile(file: FileHandle): Boolean =
     Files.delete(file.file().toPath())
     true
   } catch (e: Exception) {
-    logger.error(e) { "failed to delete file ${file.path()}" }
+    logger.error(e) { "failed to delete file ${file.path()}, the lock is likely still valid then" }
     false
   }

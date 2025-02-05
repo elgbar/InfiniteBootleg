@@ -162,7 +162,7 @@ abstract class World(
   var chunkReads = AtomicInteger(0)
   var chunkWrites = AtomicInteger(0)
 
-  private val metadata: WorldMetadata = WorldMetadata(
+  protected val metadata: WorldMetadata = WorldMetadata(
     name = name,
     seed = seed,
     spawn = compactLoc(0, generator.getHeight(0)),
@@ -286,7 +286,7 @@ abstract class World(
     additionalSystems().forEach(engine::addSystem)
   }
 
-  fun initialize() {
+  open fun initialize() {
     val worldFolder = worldFolder
     if (!isTransient && worldFolder != null && worldFolder.isDirectory && !WorldLoader.canWriteToWorld(uuid)) {
       if (!Settings.ignoreWorldLock) {
@@ -1177,13 +1177,12 @@ abstract class World(
       }.also { writableChunks.clear() }
     } ?: emptyList()
     logger.debug { "Waiting for ${saveTasks.size} chunks in '$name' to be saved world" }
-    CompletableFuture.allOf(*saveTasks.toTypedArray()).get(100, TimeUnit.SECONDS)
+    CompletableFuture.allOf(*saveTasks.toTypedArray()).thenApply { }.orTimeout(1, TimeUnit.MINUTES).exceptionally {
+      logger.error(it) { "Failed to save chunks in world '$name'" }
+    }.get()
 
-    if (Main.Companion.isAuthoritative && !isTransient) {
-      val worldFolder = worldFolder
-      if (worldFolder != null && worldFolder.isDirectory) {
-        WorldLoader.deleteLockFile(uuid)
-      }
+    if (!isTransient) {
+      WorldLoader.deleteLockFile(uuid)
     }
 
     worldTicker.stop()
@@ -1192,7 +1191,7 @@ abstract class World(
     chunkLoader.dispose()
     metadata.dispose()
     engine.dispose()
-    logger.debug { "Chunks have been saved for chunks in '$name'" }
+    logger.debug { "World $name have been fully disposed" }
   }
 
   companion object {

@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.ChainShape
 import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.LongMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.compactLoc
@@ -18,6 +19,8 @@ import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.queuePhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.world.World
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -102,6 +105,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
     if (isDisposed) {
+      logger.debug { "Chunk body was disposed while creating the body, disposing the new body" }
       box2dBody = null
       chunk.world.worldBody.destroyBody(tmpBody)
     } else {
@@ -121,11 +125,10 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   }
 
   fun addBlock(block: Block, box2dBody: Body? = null) {
-    val worldBody = chunk.world.worldBody
     chunk.world.postBox2dRunnable {
       val body = box2dBody ?: this.box2dBody
       if (body == null) {
-        worldBody.updateChunk(this@ChunkBody)
+        update()
         return@postBox2dRunnable
       }
       val localX = block.localX

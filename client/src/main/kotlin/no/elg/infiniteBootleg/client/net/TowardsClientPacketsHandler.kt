@@ -353,6 +353,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
 
     val clientServerDiffSquaredToUpdateControllingEntity = 2
     if (clientPos.dst2(serverPos) <= clientServerDiffSquaredToUpdateControllingEntity) {
+      logger.trace { "we're less then 2 blocks away from the server, we don't need to move" }
       // If we're less then 2 blocks away from the server, we don't need to move
       return
     }

@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.core.util.decompactLocX
 import no.elg.infiniteBootleg.core.util.decompactLocY
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
-import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.server.world.ServerWorld
 
@@ -22,7 +21,7 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
    * Broadcast a packet to players which have the given [worldPosition] location loaded.
 
    */
-  fun broadcastToInViewChunk(packet: Packets.Packet, chunkX: ChunkCoord, chunkY: ChunkCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
+  fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
     broadcast(packet) { channel ->
       val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
       val viewing = world.render.getClient(sharedInfo.entityId) ?: return@broadcast false
@@ -34,19 +33,19 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
    * Broadcast a packet to players which have the given [worldPosition] location loaded.
 
    */
-  fun broadcastToInView(packet: Packets.Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
+  fun broadcastToInView(packet: Packet, worldX: WorldCoord, worldY: WorldCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
     broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
   }
 
   /**
    * Broadcast a packet to players which have the given [worldPosition] location loaded.
    */
-  fun broadcastToInView(packet: Packets.Packet, entity: Entity, filter: ChannelMatcher = ChannelMatchers.all()) {
+  fun broadcastToInView(packet: Packet, entity: Entity, filter: ChannelMatcher = ChannelMatchers.all()) {
     val (worldX, worldY) = entity.positionComponent
     broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
   }
 
-  fun broadcast(packet: Packets.Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
+  fun broadcast(packet: Packet, filter: ChannelMatcher = ChannelMatchers.all()) {
     ServerBoundHandler.Companion.channels.writeAndFlush(packet, filter)
   }
 

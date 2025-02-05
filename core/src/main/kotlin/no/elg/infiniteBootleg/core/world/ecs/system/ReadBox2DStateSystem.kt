@@ -36,19 +36,24 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     val updateVel = readVelocity(entity, body)
 
     if (updatePos || updateVel) {
-      Main.Companion.inst().packetSender.sendDuplexPacketInView(ifIsServer = { clientBoundMoveEntity(entity) to body.position.toCompactLoc().worldToChunk() }, ifIsClient = {
-        if (entityId == entity.id) {
-          serverBoundMoveEntityPacket(entity)
-        } else {
-          null
+      Main.inst().packetSender.sendDuplexPacketInView(
+        ifIsServer = {
+          clientBoundMoveEntity(entity) to body.position.toCompactLoc().worldToChunk()
+        },
+        ifIsClient = {
+          if (entityId == entity.id) {
+            serverBoundMoveEntityPacket(entity)
+          } else {
+            null
+          }
         }
-      })
+      )
     }
   }
 
   private fun readPosition(entity: Entity, body: Body): Boolean {
     if (!entity.updateBox2DPosition) {
-      val updateServer = if (Main.Companion.isMultiplayer) {
+      val updateServer = if (Main.isMultiplayer) {
         val oldPosition = entity.position
         val newPosition = body.position
         oldPosition.dst2(newPosition) > POSITION_SQUARED_DIFF_TO_SEND_ENTITY_MOVE_PACKET
@@ -65,7 +70,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     val newVelocity = body.linearVelocity
     val (newDx, newDy) = newVelocity
 
-    val updateServer = if (Main.Companion.isMultiplayer) {
+    val updateServer = if (Main.isMultiplayer) {
       val oldVelocity = entity.velocityOrZero
       oldVelocity.dst2(newVelocity) > VELOCITY_SQUARED_DIFF_TO_SEND_ENTITY_MOVE_PACKET
     } else {
@@ -78,7 +83,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     }
 
     val lookDirection = entity.lookDirectionComponentOrNull ?: return updateServer
-    if (abs(newDx) > MIN_VELOCITY_TO_FLIP && Main.Companion.inst().isAuthorizedToChange(entity)) {
+    if (abs(newDx) > MIN_VELOCITY_TO_FLIP && Main.inst().isAuthorizedToChange(entity)) {
       lookDirection.direction = if (newDx < 0f) Direction.WEST else Direction.EAST
     }
     return updateServer
