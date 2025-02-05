@@ -79,7 +79,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
       box2dBody = null
       return false
     }
-    return true
+    return box2dBody == null
   }
 
   /**
