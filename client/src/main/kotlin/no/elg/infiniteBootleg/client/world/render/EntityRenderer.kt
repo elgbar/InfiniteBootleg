@@ -19,6 +19,7 @@ import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.toDegrees
 import no.elg.infiniteBootleg.core.util.worldToScreen
+import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
@@ -30,6 +31,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.C
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.EFFECTIVE_ZERO
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedElement
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
@@ -110,13 +112,63 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     }
   }
 
-  fun Batch.drawBox2d(box2d: Box2DBodyComponent, texture: TextureRegion, screenX: Float, screenY: Float) {
+  fun drawBox2d(
+    batch: Batch,
+    box2d: Box2DBodyComponent,
+    texture: TextureRegion,
+    screenX: Float,
+    screenY: Float
+  ) {
     if (box2d.body.isFixedRotation) {
-      draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
+      batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
     } else {
-      draw(
+      batch.draw(
         texture, screenX, screenY, box2d.worldWidth / 2f, box2d.worldHeight / 2f, box2d.worldWidth, box2d.worldHeight, 1f, 1f, box2d.body.angle.toDegrees()
       )
+    }
+  }
+
+  fun drawHolding(entity: Entity, holding: ContainerElement?, screenX: Float, screenY: Float) {
+    if (holding == null) return
+    val size = Block.Companion.BLOCK_TEXTURE_SIZE / 2f
+    val holdingTexture = holding.textureRegion?.textureRegionOrNull
+    if (holdingTexture != null) {
+      val ratio = holdingTexture.regionWidth.toFloat() / holdingTexture.regionHeight.toFloat()
+      batch.draw(holdingTexture, screenX, screenY, size, size * ratio)
+    }
+
+    if (holding is Staff) {
+      val lastSpellCaste = entity.lastSpellCastOrNull
+      if (lastSpellCaste.canNotCastAgain()) {
+        batch.end() // End the batch to draw the shape renderer
+        shapeRenderer.safeUse(ShapeRenderer.ShapeType.Line, batch.projectionMatrix) {
+          val width = size
+          val height = size / 2f
+          val x = size + screenX + 1 // place to the right of the held item, +1 to avoid overlap
+          shapeRenderer.rect(x, screenY, width, height)
+          shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
+          val percent = 1 - lastSpellCaste.timeToCast() / lastSpellCaste.castDelay
+          shapeRenderer.rect(x, screenY, width * percent.toFloat(), height)
+        }
+        batch.begin()
+      }
+    }
+  }
+
+  fun drawName(entity: Entity, box2d: Box2DBodyComponent, screenX: Float, screenY: Float) {
+    entity.nameOrNull?.let { name ->
+      val font = ClientMain.inst().assets.font10pt
+      layout.setText(font, name, batch.color, 0f, Align.center, false)
+      font.draw(batch, layout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
+    }
+  }
+
+  fun debugEntityLight() {
+    if (Settings.debugEntityLight) {
+      batch.color = Color.WHITE // Make sure we can see the debug light
+      val size = Block.Companion.BLOCK_TEXTURE_SIZE / 4f // The size of the debug cube
+      val offset = Block.Companion.BLOCK_TEXTURE_SIZE / 2f - size / 2f
+      batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
     }
   }
 
@@ -150,52 +202,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         batch.color = batch.color.mul(it.tint)
       }
 
-      batch.drawBox2d(box2d, entity.currentTexture(), screenX, screenY)
-
-      val holding = entity.selectedElement
-      if (holding != null) {
-        val size = Block.Companion.BLOCK_TEXTURE_SIZE / 2f
-        val holdingTexture = holding.textureRegion?.textureRegionOrNull
-        if (holdingTexture != null) {
-          val ratio = holdingTexture.regionWidth.toFloat() / holdingTexture.regionHeight.toFloat()
-          batch.draw(holdingTexture, screenX, screenY, size, size * ratio)
-        }
-
-        if (holding is Staff) {
-          val lastSpellCaste = entity.lastSpellCastOrNull
-          if (lastSpellCaste.canNotCastAgain()) {
-            batch.end() // End the batch to draw the shape renderer
-            shapeRenderer.safeUse(ShapeRenderer.ShapeType.Line, batch.projectionMatrix) {
-              val width = size
-              val height = size / 2f
-              val x = size + screenX + 1 // place to the right of the held item, +1 to avoid overlap
-              shapeRenderer.rect(x, screenY, width, height)
-              shapeRenderer.set(ShapeRenderer.ShapeType.Filled)
-              val percent = 1 - lastSpellCaste.timeToCast() / lastSpellCaste.castDelay
-              shapeRenderer.rect(x, screenY, width * percent.toFloat(), height)
-            }
-            batch.begin()
-          }
-        }
-      }
-
-      entity.nameOrNull?.let { name ->
-        val font = ClientMain.inst().assets.font10pt
-        layout.setText(font, name, batch.color, 0f, Align.center, false)
-        font.draw(batch, layout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
-      }
-
-      if (Settings.debugEntityLight) {
-        batch.color = Color.WHITE // Make sure we can see the debug light
-        val size = Block.Companion.BLOCK_TEXTURE_SIZE / 4f // The size of the debug cube
-        val offset = Block.Companion.BLOCK_TEXTURE_SIZE / 2f - size / 2f
-        batch.draw(ClientMain.inst().assets.whiteTexture.textureRegion, lightVector.x + offset, lightVector.y + offset, size, size)
-      }
+      drawBox2d(batch, box2d, entity.currentTexture(), screenX, screenY)
+      drawHolding(entity, entity.selectedElement, screenX, screenY)
+      drawName(entity, box2d, screenX, screenY)
+      debugEntityLight()
     }
   }
 
   companion object {
-    const val EFFECTIVE_ZERO = 0.01f
     var globalAnimationTimer = 0f
   }
 }
