@@ -145,7 +145,14 @@ fun handleServerBoundPackets(ctx: ChannelHandlerContextWrapper, packet: Packets.
     Packets.Packet.Type.SB_CAST_SPELL -> launchOnAsync { asyncHandleCastSpell(ctx) }
 
     Packets.Packet.Type.UNRECOGNIZED -> ctx.fatal("Unknown packet type received by server: ${packet.type}")
-    else -> ctx.fatal("Server cannot handle packet of type ${packet.type}")
+    else -> {
+      if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
+        ctx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
+        return
+      } else {
+        ctx.fatal("Server cannot handle packet of type ${packet.type}")
+      }
+    }
   }
 }
 // ///////////////////
@@ -204,6 +211,7 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Pack
     ctx.fatal("Client tried to update someone else")
     return
   }
+
   player.teleport(moveEntity.position.x, moveEntity.position.y)
   player.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
 

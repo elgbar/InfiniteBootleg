@@ -36,10 +36,6 @@ class ClientBoundHandler(private val client: ServerClient) : SimpleChannelInboun
   }
 
   override fun channelRead0(ctx: ChannelHandlerContext, packet: Packets.Packet) {
-    if (packet.direction == Packets.Packet.Direction.SERVER || packet.type.name.startsWith("SB_")) {
-      client.ctx.fatal("Client got a server packet ${packet.type} direction ${packet.direction}")
-      return
-    }
     client.handleClientBoundPackets(packet)
   }
 

@@ -31,10 +31,6 @@ class ServerBoundHandler : SimpleChannelInboundHandler<Packets.Packet>() {
         ctx
       )
     }
-    if (packet.direction == Packets.Packet.Direction.CLIENT || packet.type.name.startsWith("CB_")) {
-      wrappedCtx.fatal("Server got a client packet ${packet.type} direction ${packet.direction}")
-      return
-    }
     if (packet.type != Packets.Packet.Type.SB_LOGIN) {
       val sharedInformation = clients[ctx.channel()]
       if (sharedInformation == null) {

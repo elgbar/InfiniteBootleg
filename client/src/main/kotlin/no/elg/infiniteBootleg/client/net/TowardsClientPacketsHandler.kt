@@ -122,7 +122,13 @@ fun ServerClient.handleClientBoundPackets(packet: Packets.Packet) {
 
     // Error handling
     UNRECOGNIZED -> ctx.fatal("Unknown packet type received by client: ${packet.type}")
-    else -> ctx.fatal("Client cannot handle packet of type ${packet.type}")
+    else -> {
+      if (packet.direction == Packets.Packet.Direction.SERVER || packet.type.name.startsWith("SB_")) {
+        ctx.fatal("Client got a server packet ${packet.type} direction ${packet.direction}")
+      } else {
+        ctx.fatal("Client cannot handle packet of type ${packet.type}")
+      }
+    }
   }
 }
 
