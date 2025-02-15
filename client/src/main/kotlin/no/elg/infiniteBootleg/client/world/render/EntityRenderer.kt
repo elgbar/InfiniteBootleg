@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.Settings.renderBox2dEntityDifference
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.toDegrees
@@ -34,6 +35,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent.Companio
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.EFFECTIVE_ZERO
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedElement
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag.Companion.followedByCamera
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.LastSpellCastComponent.Companion.lastSpellCastOrNull
 import no.elg.infiniteBootleg.core.world.ecs.drawableEntitiesFamily
@@ -55,6 +57,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     it.color = Color.GREEN
     it.setAutoShapeType(true)
   }
+
+  private val tmpColor = Color()
 
   private val batch: Batch
     get() = worldRender.batch
@@ -189,20 +193,29 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       } else {
         entity.box2dBody.position
       }
-      val worldX = centerPos.x - box2d.halfBox2dWidth
-      val worldY = centerPos.y - box2d.halfBox2dHeight
+
+      val texture = entity.currentTexture()
+
+      if (renderBox2dEntityDifference) {
+        batch.color = ASHLEY_COLOR
+        val position = entity.position
+        val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
+        val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
+        drawBox2d(batch, box2d, texture, ashleyScreenX, ashleyScreenY)
+        batch.color = Color.WHITE
+      }
 
       setupEntityLight(centerPos, box2d)
 
-      val screenX = worldX.worldToScreen()
-      val screenY = worldY.worldToScreen()
-
       // Draw with a tint if there is one
       entity.tintedComponentOrNull?.also {
-        batch.color = batch.color.mul(it.tint)
+        batch.color = tmpColor.set(batch.color).mul(it.tint)
       }
 
-      drawBox2d(batch, box2d, entity.currentTexture(), screenX, screenY)
+      val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
+      val screenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
+
+      drawBox2d(batch, box2d, texture, screenX, screenY)
       drawHolding(entity, entity.selectedElement, screenX, screenY)
       drawName(entity, box2d, screenX, screenY)
       debugEntityLight()
@@ -211,5 +224,6 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   companion object {
     var globalAnimationTimer = 0f
+    val ASHLEY_COLOR = Color(1f, 0f, 0f, 0.5f)
   }
 }
