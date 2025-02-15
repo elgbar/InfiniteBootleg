@@ -46,7 +46,6 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
   private var disposed = false
 
   private val postRunnable = PostRunnableHandler()
-  private val postRunnableRemoveEntity = PostRunnableHandler()
 
   private val contactManager = ContactManager(world.engine)
 

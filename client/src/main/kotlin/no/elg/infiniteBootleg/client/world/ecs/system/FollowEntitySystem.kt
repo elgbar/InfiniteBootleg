@@ -40,6 +40,8 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
    * The position of the entity was last time the camera was updated.
    *
    * Should be treated as read only outside the class
+   *
+   * OK that this is mutable as only one entity are allowed to be followed by the camera at a time
    */
   val processedPosition: Vector2 = Vector2()
 

@@ -244,6 +244,10 @@ typealias LocalCoordFloat = Float
 typealias WorldCoordFloat = Float
 typealias ChunkCoordFloat = Float
 
+typealias LocalCoordSquaredFloat = Float
+typealias WorldCoordSquaredFloat = Float
+typealias ChunkCoordSquaredFloat = Float
+
 typealias LocalCoordNumber = Number
 typealias WorldCoordNumber = Number
 typealias ChunkCoordNumber = Number

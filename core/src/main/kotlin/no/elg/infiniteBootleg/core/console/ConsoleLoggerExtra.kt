@@ -2,11 +2,9 @@ package no.elg.infiniteBootleg.core.console
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.Marker
-import io.github.oshai.kotlinlogging.slf4j.toKotlinLogging
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.protobuf.Packets
-import org.slf4j.MarkerFactory
 
 private val logger = KotlinLogging.logger {}
 
@@ -27,12 +25,6 @@ fun temporallyFilterPacket(vararg packets: Packets.Packet.Type, block: () -> Uni
     filterOutPackets.removeAll(packetsSet)
   }
 }
-
-val clientSideServerBoundMarker: Marker = MarkerFactory.getMarker("client->server").toKotlinLogging()
-val clientSideClientBoundMarker: Marker = MarkerFactory.getMarker("client<-server").toKotlinLogging()
-
-val serverSideClientBoundMarker: Marker = MarkerFactory.getMarker("server->client").toKotlinLogging()
-val serverSideServerBoundMarker: Marker = MarkerFactory.getMarker("server<-client").toKotlinLogging()
 
 fun logPacket(directionMarker: Marker, packet: Packets.Packet) {
   if (Settings.logPackets && packet.type !in filterOutPackets) {

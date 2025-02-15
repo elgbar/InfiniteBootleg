@@ -12,7 +12,9 @@ import no.elg.infiniteBootleg.core.world.ecs.entityWithPhysicsEventFamily
 import no.elg.infiniteBootleg.core.world.ecs.system.api.EventSystem
 
 object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
-  family = entityWithPhysicsEventFamily, eventType = PhysicsEvent::class, queueMapper = PhysicsEventQueueComponent.Companion.mapper
+  family = entityWithPhysicsEventFamily,
+  eventType = PhysicsEvent::class,
+  queueMapper = PhysicsEventQueueComponent.Companion.mapper
 ) {
 
   inline fun <reified T : Any> PhysicsEvent.getOtherFixtureUserData(entity: Entity, filter: (userData: Any?) -> Boolean): T? {
