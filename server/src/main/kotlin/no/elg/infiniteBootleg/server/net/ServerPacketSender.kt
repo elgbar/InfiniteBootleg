@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.server.net
 
 import com.badlogic.ashley.core.Entity
+import io.netty.channel.Channel
 import io.netty.channel.group.ChannelMatcher
 import io.netty.channel.group.ChannelMatchers
 import no.elg.infiniteBootleg.core.net.PacketSender
@@ -11,6 +12,7 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.decompactLocX
 import no.elg.infiniteBootleg.core.util.decompactLocY
 import no.elg.infiniteBootleg.core.util.worldToChunk
+import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.server.world.ServerWorld
@@ -37,11 +39,18 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
     broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
   }
 
+  fun entityFilter(entityId: String): ChannelMatcher = ChannelMatcher { channel: Channel -> ServerBoundHandler.clients[channel]?.entityId != entityId }
+
   /**
-   * Broadcast a packet to players which have the given [worldPosition] location loaded.
+   * Broadcast a packet to players which have the chunks loaded where the entity is located
+   *
+   * @param packet the packet to broadcast to clients
+   * @param entity the entity to use as the location to broadcast the packet from
+   * @param excludeEntity if true the [entity] will not receive the packet
    */
-  fun broadcastToInView(packet: Packet, entity: Entity, filter: ChannelMatcher = ChannelMatchers.all()) {
+  fun broadcastToInView(packet: Packet, entity: Entity, excludeEntity: Boolean) {
     val (worldX, worldY) = entity.positionComponent
+    val filter: ChannelMatcher = if (excludeEntity) entityFilter(entity.id) else ChannelMatchers.all()
     broadcastToInViewChunk(packet, worldX.worldToChunk(), worldY.worldToChunk(), filter)
   }
 
@@ -49,12 +58,12 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
     ServerBoundHandler.Companion.channels.writeAndFlush(packet, filter)
   }
 
-  @Deprecated("Use sendDuplexPacketInView instead when on the server", level = DeprecationLevel.ERROR)
+  @Deprecated("Use sendDuplexPacketInView instead when on the server")
   override fun sendDuplexPacket(ifIsServer: () -> Packet, ifIsClient: ServerClient.() -> Packet) {
     broadcast(ifIsServer())
   }
 
-  @Deprecated("Use broadcastToInViewChunk instead when on the server", level = DeprecationLevel.ERROR)
+  @Deprecated("Use broadcastToInViewChunk instead when on the server")
   override fun sendDuplexPacketInView(ifIsServer: () -> Pair<Packet?, ChunkCompactLoc>, ifIsClient: ServerClient.() -> Packet?) {
     val (maybePacket, chunkLoc) = ifIsServer()
     val packet = maybePacket ?: return

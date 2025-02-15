@@ -32,6 +32,7 @@ import no.elg.infiniteBootleg.core.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
@@ -40,6 +41,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityH
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityHoldingElement.Companion.remoteEntityHoldingElementComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.creation.createFallingBlockStandaloneEntity
 import no.elg.infiniteBootleg.core.world.ecs.load
+import no.elg.infiniteBootleg.core.world.ecs.system.WriteBox2DStateSystem
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.Packets.ContainerUpdate
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity
@@ -210,11 +212,6 @@ private fun ServerClient.handleLoginStatus(loginStatus: ServerLoginStatus) {
 
 private fun ServerClient.handleLoginSuccess() {
   val world = clientWorld
-  if (world !is ServerClientWorld) {
-    ctx.fatal("Failed to get world as a ServerClientWorld, was ${world?.javaClass?.simpleName}")
-    return
-  }
-
   val protoPlayerEntity = protoEntity
   if (protoPlayerEntity == null) {
     ctx.fatal("Invalid player client side: Did not a receive an entity to control")
@@ -332,6 +329,9 @@ private fun ServerClient.asyncHandleUpdateChunk(updateChunk: UpdateChunk) {
   world.updateChunk(chunk, newlyGenerated = false)
 }
 
+private const val CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY = 0.5f * 0.5f
+
+// Must be sync to reuse the same vector
 private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
   if (!started) {
     return
@@ -353,22 +353,29 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     sendServerBoundPacket(serverBoundEntityRequest(id))
     return
   }
+  val serverPos = moveEntity.position
   if (Main.inst().isAuthorizedToChange(entity)) {
     val clientPos = entity.position
-    val serverPos = moveEntity.position.toVector2()
+    val deltaPos = clientPos.dst2(serverPos.x, serverPos.y)
+    if (deltaPos > CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY) {
+      logger.warn { "Teleporting controlled entity, we're too far away. $deltaPos > $CLIENT_SERVER_DIFF_SQUARED_TO_UPDATE_CONTROLLING_ENTITY" }
 
-    val clientServerDiffSquaredToUpdateControllingEntity = 2
-    if (clientPos.dst2(serverPos) <= clientServerDiffSquaredToUpdateControllingEntity) {
-      logger.trace { "we're less then 2 blocks away from the server, we don't need to move" }
-      // If we're less then 2 blocks away from the server, we don't need to move
-      return
+      entity.teleport(serverPos)
+      entity.setVelocity(moveEntity.velocity)
+    } else {
+      logger.trace { "We're less than 1/2 blocks away from the server, we don't need to move" }
     }
+  } else {
+    entity.teleport(serverPos)
+    entity.setVelocity(moveEntity.velocity)
+    world.postBox2dRunnable {
+      val body = entity.box2dBody
+      WriteBox2DStateSystem.updatePosition(body, serverPos.toVector2())
+      WriteBox2DStateSystem.updateVelocity(body, moveEntity.velocity.x, moveEntity.velocity.y)
+    }
+    // Only set look direction if it exists on the entity from before
+    moveEntity.lookDirectionOrNull?.let { entity.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
   }
-  entity.teleport(moveEntity.position.x, moveEntity.position.y)
-  entity.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
-
-  // Only set look direction if it exists on the entity from before
-  moveEntity.lookDirectionOrNull?.let { entity.lookDirectionComponentOrNull?.direction = Direction.valueOf(it) }
 }
 
 /**

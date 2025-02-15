@@ -41,11 +41,13 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     velocity = toProtoVector2f()
   }
 
-  fun toVector2(): Vector2 = Vector2(dx, dy)
+  fun toVector2(target: Vector2 = Vector2()): Vector2 = target.set(dx, dy)
 
   override fun hudDebug(): String = stringifyCompactLoc(dx, dy)
 
   companion object : EntityLoadableMapper<VelocityComponent>() {
+
+    const val EFFECTIVE_ZERO = 0.01f
 
     val Entity.velocityOrNull: Vector2? get() = velocityComponentOrNull?.toVector2()
     val Entity.velocityOrZero: Vector2 get() = velocityComponentOrNull?.toVector2() ?: Vector2.Zero
@@ -53,6 +55,8 @@ class VelocityComponent(dx: Float, dy: Float) : EntitySavableComponent {
     var Entity.velocityComponent by propertyFor(mapper)
     var Entity.velocityComponentOrNull by optionalPropertyFor(mapper)
 
+    inline fun Entity.setVelocity(velocity: ProtoWorld.Vector2f) = setVelocity(velocity.x, velocity.y)
+    inline fun Entity.setVelocity(velocity: Vector2) = setVelocity(velocity.x, velocity.y)
     fun Entity.setVelocity(dx: Float, dy: Float) {
       velocityComponentOrNull?.also {
         it.dx = dx.coerceIn(-it.maxDx, it.maxDx)

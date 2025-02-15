@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.client.world.world
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntitySystem
+import no.elg.infiniteBootleg.client.world.ecs.system.net.SendPlayerVelocities
 import no.elg.infiniteBootleg.client.world.loader.chunk.ServerClientChunkLoader
 import no.elg.infiniteBootleg.client.world.managers.container.ServerClientWorldContainerManager
 import no.elg.infiniteBootleg.core.net.ServerClient
@@ -15,9 +17,11 @@ class ServerClientWorld(protoWorld: ProtoWorld.World, val serverClient: ServerCl
   override val worldContainerManager: WorldContainerManager = ServerClientWorldContainerManager(this)
   override val chunkLoader: ChunkLoader = ServerClientChunkLoader(this, WorldLoader.generatorFromProto(protoWorld))
 
+  override fun additionalSystems(): Set<EntitySystem> = super.additionalSystems() + setOf(SendPlayerVelocities)
+
   override fun isAuthorizedToChange(entity: Entity): Boolean {
-    val id = entity.id
-    return serverClient.entityId == id
+    val entityId = entity.id
+    return serverClient.entityId == entityId
   }
 
   override fun dispose() {

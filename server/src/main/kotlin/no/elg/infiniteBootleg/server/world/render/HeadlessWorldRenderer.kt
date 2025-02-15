@@ -22,7 +22,6 @@ import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.chunkColu
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.iterator
 import no.elg.infiniteBootleg.core.world.render.ServerClientChunksInView
 import no.elg.infiniteBootleg.core.world.render.WorldRender
-import no.elg.infiniteBootleg.protobuf.chunk
 import no.elg.infiniteBootleg.server.world.ServerWorld
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -64,6 +63,7 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
 
   @Synchronized
   override fun render() {
+    update()
     // Note to self: do not call chunkBody#update while under the chunksLock.readLock() or
     // chunksLock.writeLock()
     val filter = world.loadedChunks.filter { chunk -> chunk.isValid && chunk.isDirty }

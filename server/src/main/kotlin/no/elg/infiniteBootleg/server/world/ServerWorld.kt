@@ -23,6 +23,8 @@ import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.ServerMain
 import no.elg.infiniteBootleg.server.net.despawnEntity
+import no.elg.infiniteBootleg.server.world.ecs.system.BroadcastMovingPlayerPositions
+import no.elg.infiniteBootleg.server.world.ecs.system.BroadcastPeriodicPlayerPositions
 import no.elg.infiniteBootleg.server.world.ecs.system.KickPlayerWithoutChannel
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
 import no.elg.infiniteBootleg.server.world.render.HeadlessWorldRenderer
@@ -60,7 +62,7 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     }
   }
 
-  override fun additionalSystems(): Set<EntitySystem> = setOf(KickPlayerWithoutChannel)
+  override fun additionalSystems(): Set<EntitySystem> = setOf(KickPlayerWithoutChannel, BroadcastMovingPlayerPositions, BroadcastPeriodicPlayerPositions)
 
   override fun addEntityListeners(engine: Engine) {
     engine.addEntityListener(

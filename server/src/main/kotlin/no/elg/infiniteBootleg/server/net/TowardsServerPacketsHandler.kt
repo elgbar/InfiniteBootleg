@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.net.clientBoundDespawnEntity
 import no.elg.infiniteBootleg.core.net.clientBoundHeartbeat
 import no.elg.infiniteBootleg.core.net.clientBoundHoldingItem
 import no.elg.infiniteBootleg.core.net.clientBoundLoginStatusPacket
+import no.elg.infiniteBootleg.core.net.clientBoundMoveEntity
 import no.elg.infiniteBootleg.core.net.clientBoundPacketBuilder
 import no.elg.infiniteBootleg.core.net.clientBoundSecretExchange
 import no.elg.infiniteBootleg.core.net.clientBoundSpawnEntity
@@ -40,6 +41,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.C
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.setVelocity
+import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
@@ -66,6 +68,7 @@ import no.elg.infiniteBootleg.protobuf.updateBlockOrNull
 import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.server.ServerMain
+import no.elg.infiniteBootleg.server.world.ecs.components.transients.LastPositionComponent.Companion.lastPositionUpdatedComponent
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
 import java.security.SecureRandom
 import java.util.UUID
@@ -201,6 +204,10 @@ private fun handleWorldSettings(ctx: ChannelHandlerContextWrapper, worldSettings
   ServerMain.inst().packetSender.broadcast(clientBoundWorldSettings(spawn, time, timeScale)) { c -> c != ctx.channel() }
 }
 
+private const val MAX_BLOCKS_PER_SECOND_SQUARED = 4 * 4
+private const val MAX_BLOCKS_PER_SECOND_FALLING_SQUARED = MAX_BLOCKS_PER_SECOND_SQUARED * 4
+private const val NEG_Y_VEL_TO_BE_FALLING = -10
+
 private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Packets.MoveEntity) {
   val player = ctx.getCurrentPlayer()
   if (player == null) {
@@ -212,11 +219,35 @@ private fun handleMovePlayer(ctx: ChannelHandlerContextWrapper, moveEntity: Pack
     return
   }
 
-  player.teleport(moveEntity.position.x, moveEntity.position.y)
-  player.setVelocity(moveEntity.velocity.x, moveEntity.velocity.y)
+  val velocity = player.velocityOrZero
+  val position = player.position
+  val nextX = moveEntity.position.x
+  val nextY = moveEntity.position.y
 
-  // Only set look direction if it exists on the entity from before
-  moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.Companion.valueOf(it) }
+  val lastUpdated = player.lastPositionUpdatedComponent
+  val elapsedSeconds = lastUpdated.getAndUpdateElapsedSeconds()
+  val deltaPos = position.dst2(nextX, nextY)
+  val isFalling = velocity.y < NEG_Y_VEL_TO_BE_FALLING
+  val maxMovement = if (isFalling) MAX_BLOCKS_PER_SECOND_FALLING_SQUARED else MAX_BLOCKS_PER_SECOND_SQUARED
+  logger.debug {
+    "Player ${player.nameOrNull} moved $deltaPos blocks in $elapsedSeconds seconds (falling straight down? $isFalling). " +
+      "Max allowed for this timeframe is ${elapsedSeconds * maxMovement})"
+  }
+
+  val maxDistance = maxMovement * elapsedSeconds
+  if (deltaPos > maxDistance) {
+    logger.warn { "Player ${player.nameOrNull} moved too fast, delta: $deltaPos, maxDistance: $maxDistance" }
+    // ignore update packet, will force client backwards next update
+    ctx.writeAndFlushPacket(clientBoundMoveEntity(player))
+    player.teleport(position)
+    player.setVelocity(velocity)
+  } else {
+    player.teleport(nextX, nextY)
+    player.setVelocity(moveEntity.velocity)
+
+    // Only set look direction if it exists on the entity from before
+    moveEntity.lookDirectionOrNull?.let { player.lookDirectionComponentOrNull?.direction = Direction.Companion.valueOf(it) }
+  }
 }
 
 private fun handleSecretExchange(ctx: ChannelHandlerContextWrapper, secretExchange: Packets.SecretExchange) {

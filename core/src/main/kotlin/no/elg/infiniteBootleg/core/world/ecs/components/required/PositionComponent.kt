@@ -63,6 +63,23 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
     val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)
 
+
+    /**
+     * Teleport the entity to the given world coordinates
+     *
+     * @param pos The world coordinates to teleport to
+     * @param killVelocity If the velocity of the entity should be set to zero
+     */
+    inline fun Entity.teleport(pos: ProtoWorld.Vector2f, killVelocity: Boolean = false) = teleport(pos.x, pos.y, killVelocity)
+
+    /**
+     * Teleport the entity to the given world coordinates
+     *
+     * @param pos The world coordinates to teleport to
+     * @param killVelocity If the velocity of the entity should be set to zero
+     */
+    inline fun Entity.teleport(pos: Vector2, killVelocity: Boolean = false) = teleport(pos.x, pos.y, killVelocity)
+
     /**
      * Teleport the entity to the given world coordinates
      *

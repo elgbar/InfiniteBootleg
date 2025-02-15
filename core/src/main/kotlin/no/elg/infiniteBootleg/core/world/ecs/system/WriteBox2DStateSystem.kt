@@ -29,7 +29,7 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
   private fun updateVelocity(entity: Entity, body: Body) {
     if (entity.updateBox2DVelocity) {
       entity.updateBox2DVelocity = false
-      body.setLinearVelocity(entity.velocityComponent.dx, entity.velocityComponent.dy)
+      updateVelocity(body, entity.velocityComponent.dx, entity.velocityComponent.dy)
     }
   }
 
@@ -41,8 +41,26 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
 
       tmp.x = entity.positionComponent.x
       tmp.y = entity.positionComponent.y
-      body.setTransform(tmp, 0f)
-      body.isAwake = true
+      updatePosition(body, tmp)
     }
+  }
+
+  /**
+   * Official way to transfer the velocity of an entity to the box2d body
+   *
+   * MUST BE CALLED ON BOX2D THREAD!
+   */
+  fun updateVelocity(body: Body, dx: Float, dy: Float) {
+    body.setLinearVelocity(dx, dy)
+  }
+
+  /**
+   * Official way to transfer the position of an entity to the box2d body
+   *
+   * MUST BE CALLED ON BOX2D THREAD!
+   */
+  fun updatePosition(body: Body, pos: Vector2) {
+    body.setTransform(pos, 0f)
+    body.isAwake = true
   }
 }

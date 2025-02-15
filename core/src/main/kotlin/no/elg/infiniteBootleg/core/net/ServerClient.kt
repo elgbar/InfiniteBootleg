@@ -12,6 +12,7 @@ import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.Packets
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
+import no.elg.infiniteBootleg.protobuf.packet
 import java.time.Duration
 
 /**
@@ -66,10 +67,19 @@ class ServerClient(
   }
 
   companion object {
+
+    val ALWAYS_SEND_FILTER: ServerClient.() -> Boolean = { true }
+
+    fun ServerClient?.sendServerBoundPacket(packet: ServerClient.() -> Packets.Packet?): ChannelFuture? = sendServerBoundPacket(ALWAYS_SEND_FILTER, packet)
+
     /**
      * Sends a packet from the client to the server, given that [packet] and the [ServerClient] is not null
      */
-    fun ServerClient?.sendServerBoundPacket(packet: ServerClient.() -> Packets.Packet?): ChannelFuture? = this?.run { packet()?.let { sendServerBoundPacket(it) } }
+    fun ServerClient?.sendServerBoundPacket(filter: ServerClient.() -> Boolean, packet: ServerClient.() -> Packets.Packet?): ChannelFuture? =
+      this?.run {
+        val resolvedPacket = if (filter()) packet() else null
+        resolvedPacket?.let(::sendServerBoundPacket)
+      }
 
     /**
      * Sends multiple packets from the client to the server efficiently, given that [packet] and the [ServerClient] is not null

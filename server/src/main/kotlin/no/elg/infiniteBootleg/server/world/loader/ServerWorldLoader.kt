@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.world.ecs.save
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.world.ServerWorld
+import no.elg.infiniteBootleg.server.world.ecs.components.transients.LastPositionComponent
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
@@ -35,6 +36,7 @@ object ServerWorldLoader {
 
     val serverPlayerConfig: Entity.() -> Unit = {
       safeWith { SharedInformationComponent(sharedInformation) }
+      safeWith { LastPositionComponent() }
       isTransientEntity = true
     }
 
