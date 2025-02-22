@@ -57,7 +57,6 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
     interfaces.remove(interfaceId)?.let { removedWindow ->
       removedWindow.close()
       logger.debug { "Removing interface id $interfaceId, closing and removing old window" }
-    }.also {
       EventManager.dispatchEvent(InterfaceEvent.Removed(interfaceId))
     }
   }
