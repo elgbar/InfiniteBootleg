@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIteratingSystem
+import kotlin.contracts.contract
 
 private val logger = KotlinLogging.logger {}
 
@@ -169,8 +170,14 @@ class ThreadSafeEngine : Engine(), Disposable {
     }
   }
 
+  fun <T> doUnderEngineLock(block: () -> T): T {
+    contract { callsInPlace(block, kotlin.contracts.InvocationKind.EXACTLY_ONCE) }
+    return synchronized(engineLock, block)
+  }
+
   override fun dispose() {
     removeAllSystems()
+    removeAllEntities()
     ECSEventQueueComponent.Companion.entitiesCache.clear()
   }
 }

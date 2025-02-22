@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Com
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.protobuf.Packets.Packet
 import no.elg.infiniteBootleg.server.world.ServerWorld
+import no.elg.infiniteBootleg.server.world.ecs.components.transients.ServerClientChunksInViewComponent.Companion.chunksInView
 
 class ServerPacketSender(private val world: ServerWorld) : PacketSender {
 
@@ -25,9 +26,8 @@ class ServerPacketSender(private val world: ServerWorld) : PacketSender {
    */
   fun broadcastToInViewChunk(packet: Packet, chunkX: ChunkCoord, chunkY: ChunkCoord, filter: ChannelMatcher = ChannelMatchers.all()) {
     broadcast(packet) { channel ->
-      val sharedInfo = ServerBoundHandler.clients[channel] ?: return@broadcast false
-      val viewing = world.render.getClient(sharedInfo.entityId) ?: return@broadcast false
-      return@broadcast viewing.isInView(chunkX, chunkY) && filter.matches(channel)
+      val player = world.getPlayer(channel) ?: return@broadcast false
+      return@broadcast player.chunksInView.isInView(chunkX, chunkY) && filter.matches(channel)
     }
   }
 

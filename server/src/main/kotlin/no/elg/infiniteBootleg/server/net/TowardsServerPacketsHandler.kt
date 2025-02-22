@@ -69,6 +69,7 @@ import no.elg.infiniteBootleg.protobuf.updateSelectedSlotOrNull
 import no.elg.infiniteBootleg.protobuf.worldSettingsOrNull
 import no.elg.infiniteBootleg.server.ServerMain
 import no.elg.infiniteBootleg.server.world.ecs.components.transients.LastPositionComponent.Companion.lastPositionUpdatedComponent
+import no.elg.infiniteBootleg.server.world.ecs.components.transients.ServerClientChunksInViewComponent.Companion.chunksInView
 import no.elg.infiniteBootleg.server.world.loader.ServerWorldLoader
 import java.security.SecureRandom
 import java.util.UUID
@@ -476,26 +477,20 @@ private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformati
 }
 
 private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
-  val uuid = getSharedInformation()?.entityId ?: return null
-  return ServerMain.Companion.inst().serverWorld.getEntity(uuid)
+  val uuid = getSharedInformation() ?: return null
+  return ServerMain.Companion.inst().serverWorld.getPlayer(uuid)
 }
 
 /**
  * Use to check if something should be sent to a client
  */
 private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
-  val serverWorld = ServerMain.Companion.inst().serverWorld
-  val uuid = ctx.getSharedInformation()?.entityId
-  if (uuid == null) {
-    logger.error { "Failed to get UUID of requesting entity" }
+  val entity = ctx.getCurrentPlayer()
+  if (entity == null) {
+    logger.error { "Failed to get the current player" }
     return null
   }
-  val chunksInView = serverWorld.render.getClient(uuid)
-  if (chunksInView == null) {
-    logger.error { "Failed to get chunks in view of entity $uuid" }
-    return null
-  }
-  return chunksInView
+  return entity.chunksInView
 }
 
 private fun isChunkInView(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {

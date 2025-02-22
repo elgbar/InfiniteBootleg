@@ -7,16 +7,19 @@ import no.elg.infiniteBootleg.core.net.SharedInformation
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
+import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SharedInformationComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.TransientEntityTag.Companion.isTransientEntity
 import no.elg.infiniteBootleg.core.world.ecs.creation.createNewProtoPlayer
 import no.elg.infiniteBootleg.core.world.ecs.load
 import no.elg.infiniteBootleg.core.world.ecs.save
+import no.elg.infiniteBootleg.core.world.render.ServerClientChunksInView
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.server.world.ServerWorld
 import no.elg.infiniteBootleg.server.world.ecs.components.transients.LastPositionComponent
+import no.elg.infiniteBootleg.server.world.ecs.components.transients.ServerClientChunksInViewComponent
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
@@ -37,6 +40,11 @@ object ServerWorldLoader {
     val serverPlayerConfig: Entity.() -> Unit = {
       safeWith { SharedInformationComponent(sharedInformation) }
       safeWith { LastPositionComponent() }
+      safeWith {
+        val positionComponent = positionComponent
+        val serverClientChunksInView = ServerClientChunksInView(positionComponent.chunkX, positionComponent.chunkY)
+        ServerClientChunksInViewComponent(serverClientChunksInView)
+      }
       isTransientEntity = true
     }
 

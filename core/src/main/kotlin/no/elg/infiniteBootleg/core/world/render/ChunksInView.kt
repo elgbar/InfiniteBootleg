@@ -1,6 +1,6 @@
 package no.elg.infiniteBootleg.core.world.render
 
-import com.badlogic.gdx.utils.LongArray
+import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.compactLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -36,7 +36,7 @@ interface ChunksInView {
      * @param world The chunk in the world to iterator over
      * @return An iterator for the given world
      */
-    inline fun ChunksInView.forEach(world: World, crossinline apply: (chunk: Chunk) -> Unit) {
+    fun ChunksInView.forEach(world: World, apply: (chunk: Chunk) -> Unit) {
       for (y in verticalStart until verticalEnd) {
         for (x in horizontalStart until horizontalEnd) {
           val chunk = world.getChunk(x, y, true) ?: continue
@@ -45,15 +45,14 @@ interface ChunksInView {
       }
     }
 
-    fun ChunksInView.iterator(): LongIterator {
-      val locs = LongArray(size)
-      for (y in verticalStart until verticalEnd) {
-        for (x in horizontalStart until horizontalEnd) {
-          locs.add(compactLoc(x, y))
+    fun ChunksInView.sequence(): Sequence<ChunkCompactLoc> =
+      sequence {
+        for (y in verticalStart until verticalEnd) {
+          for (x in horizontalStart until horizontalEnd) {
+            yield(compactLoc(x, y))
+          }
         }
       }
-      return locs.toArray().iterator()
-    }
 
     fun ChunksInView.chunkColumnsInView(): Set<ChunkCoord> = (horizontalStart..horizontalEnd).toSet()
   }

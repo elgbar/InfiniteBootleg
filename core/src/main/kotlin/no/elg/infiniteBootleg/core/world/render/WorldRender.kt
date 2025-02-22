@@ -19,16 +19,16 @@ interface WorldRender : Updatable, Renderer, Disposable, Resizable {
    * @param chunk The chunk to check
    * @return `true` if the given chunk is outside the view of the camera
    */
-  fun isOutOfView(chunk: Chunk): Boolean
-
   fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean
+  fun isOutOfView(chunk: Chunk): Boolean = isOutOfView(chunk.chunkX, chunk.chunkY)
   fun isOutOfView(chunkLoc: ChunkCompactLoc): Boolean = isOutOfView(chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
 
   fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean
   fun isInView(chunkLoc: ChunkCompactLoc): Boolean = isInView(chunkLoc.decompactLocX(), chunkLoc.decompactLocY())
 
   val world: World
-  val chunkLocationsInView: Iterator<Long>
+
+  val chunkLocationsInView: Sequence<Long>
 
   /**
    * List of chunk columns coordinates that are in view

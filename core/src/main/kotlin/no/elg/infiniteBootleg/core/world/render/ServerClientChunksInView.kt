@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world.render
 
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.ChunkCoord
+import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 
 class ServerClientChunksInView(centerX: ChunkCoord, centerY: ChunkCoord) : ChunksInView {
 
@@ -9,6 +10,7 @@ class ServerClientChunksInView(centerX: ChunkCoord, centerY: ChunkCoord) : Chunk
     private set
   var centerX = centerX
     private set
+
   override var horizontalStart: ChunkCoord
     get() = centerX - Settings.viewDistance
     set(value) {
@@ -37,4 +39,6 @@ class ServerClientChunksInView(centerX: ChunkCoord, centerY: ChunkCoord) : Chunk
     centerX = chunkX
     centerY = chunkY
   }
+
+  override fun toString(): String = "Center: ${stringifyCompactLoc(centerX, centerY)} (View distance: ${Settings.viewDistance})"
 }
