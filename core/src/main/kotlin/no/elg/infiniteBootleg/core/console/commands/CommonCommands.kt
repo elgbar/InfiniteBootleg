@@ -319,7 +319,7 @@ open class CommonCommands : CommandExecutor() {
   @CmdArgNames("chunkX", "chunkY")
   fun entInChunk(chunkX: ChunkCoord, chunkY: ChunkCoord) {
     val world = world ?: return
-    val chunk = world.getChunk(chunkX, chunkY, load = true) ?: run {
+    val chunk = world.getChunk(chunkX, chunkY, load = false) ?: run {
       logger.error { "Failed to find a chunk at ${stringifyCompactLoc(chunkX, chunkY)}" }
       return
     }
