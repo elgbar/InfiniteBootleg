@@ -40,7 +40,7 @@ import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.chunkColumnsInView
-import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.iterator
+import no.elg.infiniteBootleg.core.world.render.ChunksInView.Companion.sequence
 import no.elg.infiniteBootleg.core.world.render.WorldRender
 import kotlin.math.abs
 
@@ -194,10 +194,9 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     }
   }
 
-  override fun isOutOfView(chunk: Chunk): Boolean = chunksInView.isOutOfView(chunk.chunkX, chunk.chunkY)
   override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isOutOfView(chunkX, chunkY)
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView.isInView(chunkX, chunkY)
 
-  override val chunkLocationsInView get() = chunksInView.iterator()
+  override val chunkLocationsInView get() = chunksInView.sequence()
   override val chunkColumnsInView get() = chunksInView.chunkColumnsInView()
 }

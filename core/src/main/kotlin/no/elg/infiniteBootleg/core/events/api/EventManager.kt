@@ -118,7 +118,7 @@ object EventManager {
    *
    * @param event The event to notify about
    */
-  inline fun <reified T : AsyncEvent> dispatchEventAsync(event: T, reason: String? = null) {
+  inline fun <reified T : Event> dispatchEventAsync(event: T, reason: String? = null) {
     launchOnEvents { dispatchEvent(T::class, event, reason) }
   }
 

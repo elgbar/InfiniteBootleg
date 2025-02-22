@@ -26,7 +26,7 @@ private val logger = KotlinLogging.logger {}
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
 
   private var listeners: Array<RegisteredEventListener>? = null
-  private val lightLocs = LongOpenHashSet()
+  private val lightLocs = LongOpenHashSet(0)
 
   val chunkLookRange = (chunk.chunkX - 2)..(chunk.chunkX + 2)
   val chunkCompactLocation = chunk.compactLocation
@@ -58,11 +58,14 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       registerListenerConditionally { event: WorldTickedEvent ->
         if (event.world == chunk.world) {
           val sources = lightLocs
-          synchronized(sources) {
+          if (sources.isEmpty()) return@registerListenerConditionally // Fast, unsynchronized return
+          val sourcesArray = synchronized(sources) {
             if (sources.isEmpty()) return@registerListenerConditionally
-            chunk.doUpdateLightMultipleSources(sources.toLongArray(), checkDistance = true)
-            sources.clear()
+            sources.toLongArray().also {
+              sources.clear()
+            }
           }
+          chunk.doUpdateLightMultipleSources(sourcesArray, checkDistance = true)
         } else {
           logger.warn { "Failed to update lights for ${stringifyCompactLoc(chunk)}" }
         }
@@ -88,7 +91,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
         if ((event.flag and ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG != 0) && event.chunkX in chunkLookRange) {
           val lights: WorldCompactLocArray = event.calculatedDiffColumn
           val sources = lightLocs
+          if (sources.isEmpty()) return@registerListenerConditionally // Fast, unsynchronized return
           synchronized(sources) {
+            if (sources.isEmpty()) return@registerListenerConditionally
             sources.ensureCapacity(sources.size + lights.size)
             for (pos in lights) {
               sources.add(pos)

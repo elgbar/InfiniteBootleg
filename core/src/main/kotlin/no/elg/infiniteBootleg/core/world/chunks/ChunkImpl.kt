@@ -244,7 +244,7 @@ open class ChunkImpl(
       if (Settings.renderLight) {
         val originWorldX = chunkX.chunkToWorld(localX)
         val originWorldY = chunkY.chunkToWorld(localY)
-        EventManager.dispatchEvent(
+        EventManager.dispatchEventAsync(
           ChunkLightChangedEvent(
             compactLocation,
             originWorldX.chunkOffset(),

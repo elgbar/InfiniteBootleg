@@ -20,7 +20,7 @@ enum class ThreadType {
   RENDER,
 
   /**
-   * The event was distracted from the Box2D physics thread
+   * The event was distracted from the Box2D physics thread and ashley engine
    */
   PHYSICS,
 
@@ -43,7 +43,10 @@ enum class ThreadType {
 
     fun isCurrentThreadType(expected: ThreadType): Boolean = currentThreadType() == expected
 
-    fun checkCorrectThreadType(expected: ThreadType, message: () -> String = { "Expected event to be dispatched from $expected but was dispatched from ${currentThreadType()}" }) {
+    fun requireCorrectThreadType(
+      expected: ThreadType,
+      message: () -> String = { "Expected event to be dispatched from $expected but was dispatched from ${currentThreadType()}" }
+    ) {
       if (!isCurrentThreadType(expected)) {
         throw CalledFromWrongThreadTypeException(message())
       }
