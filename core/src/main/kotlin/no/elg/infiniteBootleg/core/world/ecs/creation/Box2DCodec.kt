@@ -72,7 +72,7 @@ fun EngineEntity.createPlayerBodyComponent(
         /* hy = */
         ESSENTIALLY_ZERO,
         /* center = */
-        Vector2(0f, -PLAYER_HEIGHT / 2f - ESSENTIALLY_ZERO),
+        Vector2(0f, -PLAYER_HEIGHT / 2f - A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO),
         /* angle = */
         0f
       )

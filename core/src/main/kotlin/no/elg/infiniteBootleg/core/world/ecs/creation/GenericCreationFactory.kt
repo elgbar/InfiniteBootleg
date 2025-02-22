@@ -25,6 +25,8 @@ import no.elg.infiniteBootleg.protobuf.vector2f
 import java.util.UUID
 
 const val ESSENTIALLY_ZERO = 0.001f
+const val A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO = 0.01f
+const val A_LITTLE_BIT = 0.1f
 
 internal fun checkFamilies(entity: Entity, wantedFamilies: Array<Pair<Family, String>>) {
   check(basicRequiredEntityFamily.matches(entity)) { "Finished entity does not match the required entity family" }
