@@ -15,6 +15,7 @@ import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody.Companion.WORLD_MOVE_OFFSET_THRESHOLD
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ToBeDestroyedTag.Companion.toBeDestroyed
 import no.elg.infiniteBootleg.core.world.ticker.PostRunnableHandler
 import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
 import no.elg.infiniteBootleg.core.world.world.World
@@ -77,6 +78,7 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
       world.engine.removeEntity(entity)
       return
     }
+    entity.toBeDestroyed = true
     postRunnable.postRunnable { world.engine.removeEntity(entity) }
   }
 
