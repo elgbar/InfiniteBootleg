@@ -76,10 +76,10 @@ open class WorldBody(private val world: World) : Ticking, CheckableDisposable {
     if (ThreadType.Companion.isCurrentThreadType(ThreadType.PHYSICS)) {
       // OK to remove at once since this is the only thread we can remove entities from
       world.engine.removeEntity(entity)
-      return
+    } else {
+      entity.toBeDestroyed = true
+      postRunnable.postRunnable { world.engine.removeEntity(entity) }
     }
-    entity.toBeDestroyed = true
-    postRunnable.postRunnable { world.engine.removeEntity(entity) }
   }
 
   /**

@@ -63,7 +63,6 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
     val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)
 
-
     /**
      * Teleport the entity to the given world coordinates
      *

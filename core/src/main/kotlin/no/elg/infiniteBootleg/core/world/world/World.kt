@@ -954,11 +954,7 @@ abstract class World(
       logger.trace { "Unloaded chunk ${stringifyCompactLoc(chunk)}" }
       if (removedChunk != null && chunk !== removedChunk) {
         logger.warn {
-          "Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${
-            stringifyCompactLoc(
-              removedChunk
-            )
-          }"
+          "Removed unloaded chunk ${stringifyCompactLoc(chunk)} was different from chunk in list of loaded chunks: ${stringifyCompactLoc(removedChunk)}"
         }
         removedChunk.dispose()
       }

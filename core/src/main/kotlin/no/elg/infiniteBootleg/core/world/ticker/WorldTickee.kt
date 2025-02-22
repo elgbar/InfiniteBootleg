@@ -35,19 +35,15 @@ internal class WorldTickee(private val world: World) : Ticking {
         // clean up dead chunks
         if (chunk == null) {
           logger.warn { "Found null chunk when ticking world" }
-          continue
         } else if (chunk.isDisposed) {
           logger.warn { "Found disposed chunk ${stringifyCompactLoc(chunk)} when ticking world" }
           launchOnAsync {
             world.unloadChunk(chunk, force = true)
           }
-          continue
-        }
-        if (chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
+        } else if (chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
           launchOnAsync {
             world.unloadChunk(chunk)
           }
-          continue
         }
       }
     }

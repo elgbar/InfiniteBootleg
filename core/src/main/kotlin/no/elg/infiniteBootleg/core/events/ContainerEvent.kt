@@ -10,7 +10,8 @@ sealed interface ContainerEvent : Event {
   val container: Container
   val owner: ContainerOwner?
 
-  sealed class OwnedContainerEvent(val ownedContainer: OwnedContainer) : ContainerEvent {
+  sealed interface OwnedContainerEvent : ContainerEvent {
+    val ownedContainer: OwnedContainer
     override val owner: ContainerOwner
       get() = ownedContainer.owner
     override val container: Container
@@ -24,6 +25,6 @@ sealed interface ContainerEvent : Event {
     constructor(ownedContainer: OwnedContainer) : this(ownedContainer.container, ownedContainer.owner)
   }
 
-  class Removed(ownedContainer: OwnedContainer) : OwnedContainerEvent(ownedContainer)
-  class Added(ownedContainer: OwnedContainer) : OwnedContainerEvent(ownedContainer)
+  data class Removed(override val ownedContainer: OwnedContainer) : OwnedContainerEvent
+  data class Added(override val ownedContainer: OwnedContainer) : OwnedContainerEvent
 }
