@@ -14,6 +14,8 @@ import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.LocalCompactLoc
 import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.decompactLocX
+import no.elg.infiniteBootleg.core.util.decompactLocY
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -123,7 +125,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
   private fun getFixture(body: Body, localX: Int, localY: Int): Fixture {
     val compactLoc = compactLoc(localX, localY)
     val cacheFix: Fixture? = fixtureMap.get(compactLoc)
-    return cacheFix ?: body.createFixture(getChainShape(localX, localY, compactLoc), 0f).also {
+    return cacheFix ?: body.createFixture(getChainShape(compactLoc), 0f).also {
       fixtureMap.put(compactLoc, it)
     }
   }
@@ -181,26 +183,28 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   companion object {
     private val chainCache: Long2ObjectMap<ChainShape> = Long2ObjectOpenHashMap()
+    private val mappingFunction: java.util.function.LongFunction<ChainShape> = java.util.function.LongFunction { v ->
+      ChainShape().also {
+        val localX = v.decompactLocX()
+        val localY = v.decompactLocY()
+        it.createLoop(
+          floatArrayOf(
+            localX + 0f,
+            localY + 0f,
 
-    private fun getChainShape(localX: Int, localY: Int, compactLoc: LocalCompactLoc): ChainShape =
-      chainCache.computeIfAbsent(compactLoc) {
-        ChainShape().also {
-          it.createLoop(
-            floatArrayOf(
-              localX + 0f,
-              localY + 0f,
+            localX + 0f,
+            localY + 1f,
 
-              localX + 0f,
-              localY + 1f,
+            localX + 1f,
+            localY + 1f,
 
-              localX + 1f,
-              localY + 1f,
-
-              localX + 1f,
-              localY + 0f
-            )
+            localX + 1f,
+            localY + 0f
           )
-        }
+        )
       }
+    }
+
+    private fun getChainShape(compactLoc: LocalCompactLoc): ChainShape = chainCache.computeIfAbsent(compactLoc, mappingFunction)
   }
 }
