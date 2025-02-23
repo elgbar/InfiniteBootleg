@@ -16,6 +16,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import kotlinx.coroutines.delay
 import ktx.async.interval
 import ktx.collections.GdxArray
@@ -783,10 +784,10 @@ abstract class World(
     locs.mapNotNullTo(mutableSetOf()) { (blockX, blockY) -> getBlock(blockX, blockY, loadChunk) }
 
   fun removeBlocks(blocks: Iterable<Block>, prioritize: Boolean = false) {
-    val blockChunks = ObjectSet<Chunk>()
+    val blockChunks = ObjectOpenHashSet<Chunk>()
     for (block in blocks) {
-      block.remove(updateTexture = false)
-      blockChunks.add(block.chunk)
+      val chunk = block.remove() ?: continue
+      blockChunks.add(chunk)
     }
     for (chunk in blockChunks) {
       chunk.dirty(prioritize)

@@ -17,6 +17,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.system.AuthoritativeSystem
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent.Companion.RESISTANCE
 import no.elg.infiniteBootleg.core.world.ecs.components.ExplosiveComponent.Companion.explosiveComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
@@ -55,7 +56,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
             worldY,
             block.worldX,
             block.worldY
-          ) * hardness * abs(MathUtils.random.nextGaussian() + ExplosiveComponent.Companion.RESISTANCE)
+          ) * hardness * abs(MathUtils.random.nextGaussian() + RESISTANCE)
           val otherBlockEntity = block.entity
           if (dist < strength * strength && (otherBlockEntity == null || otherBlockEntity.hasNot(ExplosiveComponent.Companion.mapper))) {
             destroyed.add(block)

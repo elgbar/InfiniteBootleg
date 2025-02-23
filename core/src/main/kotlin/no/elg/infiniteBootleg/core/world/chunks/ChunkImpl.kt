@@ -234,7 +234,7 @@ open class ChunkImpl(
       if (block != null) {
         chunkBody.addBlock(block)
       }
-      launchOnAsync { chunkColumn.updateTopBlock(localX, this@ChunkImpl.chunkY.chunkToWorld(localY)) }
+      launchOnAsync { chunkColumn.updateTopBlock(localX, chunkY.chunkToWorld(localY)) }
     }
 
     if (!initializing && !bothAirish) {
@@ -242,21 +242,13 @@ open class ChunkImpl(
     }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
-        val originWorldX = chunkX.chunkToWorld(localX)
-        val originWorldY = chunkY.chunkToWorld(localY)
-        EventManager.dispatchEventAsync(
-          ChunkLightChangedEvent(
-            compactLocation,
-            originWorldX.chunkOffset(),
-            originWorldY.chunkOffset()
-          )
-        )
+        EventManager.dispatchEventAsync(ChunkLightChangedEvent(compactLocation, localX, localY))
       }
     }
     currBlock?.dispose()
-    val worldX = chunkX.chunkToWorld(localX)
-    val worldY = chunkY.chunkToWorld(localY)
-    if (sendUpdatePacket && isValid && !bothAirish && !block.isMarkerBlock()) {
+    if (Main.isMultiplayer && sendUpdatePacket && isValid && !bothAirish && !block.isMarkerBlock()) {
+      val worldX = chunkX.chunkToWorld(localX)
+      val worldY = chunkY.chunkToWorld(localY)
       Main.Companion.inst().packetSender.sendDuplexPacketInView(
         ifIsServer = { clientBoundBlockUpdate(worldX, worldY, block) to compactLocation },
         ifIsClient = { serverBoundBlockUpdate(worldX, worldY, block) }

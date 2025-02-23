@@ -80,9 +80,11 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
 
     /**
      * Remove this block by setting it to air
+     *
+     * @return The valid chunk of this block
      */
-    fun Block.remove(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true) {
-      val validChunk = this.validChunk ?: return
+    fun Block.remove(updateTexture: Boolean = true, prioritize: Boolean = false, sendUpdatePacket: Boolean = true): Chunk? {
+      val validChunk = this.validChunk ?: return null
       if (validChunk.getRawBlock(localX, localY) === this) {
         validChunk.removeBlock(
           localX = localX,
@@ -91,7 +93,9 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
           prioritize = prioritize,
           sendUpdatePacket = sendUpdatePacket
         )
+        return validChunk
       }
+      return null
     }
 
     /**

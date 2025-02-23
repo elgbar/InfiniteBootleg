@@ -48,7 +48,8 @@ inline fun WorldCompactLoc.worldToChunkY(): ChunkCoord = decompactLocY().worldTo
  * @return The chunk coordinate in world view plus the offset
  */
 @Contract(pure = true)
-inline fun ChunkCoord.chunkToWorld(offset: LocalCoord = 0): WorldCoord = (this shl Chunk.Companion.CHUNK_SIZE_SHIFT) + offset
+inline fun ChunkCoord.chunkToWorld(offset: LocalCoord): WorldCoord = chunkToWorld() + offset
+inline fun ChunkCoord.chunkToWorld(): WorldCoord = this shl Chunk.Companion.CHUNK_SIZE_SHIFT
 
 inline fun ChunkCompactLoc.chunkToWorld(localCoords: LocalCompactLoc): WorldCompactLoc = compactChunkToWorld(this, localCoords.decompactLocX(), localCoords.decompactLocY())
 

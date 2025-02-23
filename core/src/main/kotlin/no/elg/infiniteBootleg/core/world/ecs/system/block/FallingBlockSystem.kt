@@ -40,22 +40,23 @@ object FallingBlockSystem : IteratingSystem(gravityAffectedBlockFamily, UPDATE_P
       }
       return
     }
-    val material = entity.material
-    val pos = entity.positionComponent
     val world = chunk.world
-    val locBelow = relativeCompact(pos.blockX, pos.blockY, Direction.SOUTH)
+    val pos = entity.positionComponent
+    val blockX = pos.blockX
+    val blockY = pos.blockY
+    val locBelow = relativeCompact(blockX, blockY, Direction.SOUTH)
     val isAirBelow = if (locBelow.worldToChunk() == chunk.compactLocation) {
       chunk.getRawBlock(locBelow.chunkOffsetX(), locBelow.chunkOffsetY()).isAir()
     } else {
       world.isAirBlock(locBelow, loadChunk = false)
     }
     if (isAirBelow) {
-      val block = chunk.getRawBlock(pos.blockX.chunkOffset(), pos.blockY.chunkOffset()) ?: run {
+      val block = chunk.getRawBlock(blockX.chunkOffset(), blockY.chunkOffset()) ?: run {
         logger.warn { "Failed to get block at ${stringifyCompactLoc(pos)}" }
         return
       }
       entity.gravityAffected = false // Prevent the block to fall multiple times
-      world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, material) { fallingEntity ->
+      world.engine.createFallingBlockStandaloneEntity(world, block.worldX + 0.5f, block.worldY + 0.5f, 0f, 0f, entity.material) { fallingEntity ->
         val validChunk = block.validChunk ?: run {
           logger.error { "Failed to get valid chunk for block ${stringifyCompactLocWithChunk(block)}" }
           entity.gravityAffected = true // If we failed to fall, we want it to fall in the future
