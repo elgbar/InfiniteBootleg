@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.onEntityAdded
@@ -144,19 +145,20 @@ const val UPDATE_PRIORITY_DEFAULT = 0
 const val UPDATE_PRIORITY_LATE = 1_000
 const val UPDATE_PRIORITY_LAST = 2_000
 
+private val knownIds = ObjectOpenHashSet<String>()
+
 fun ensureUniquenessListener(engine: Engine) {
   val idFamily = IdComponent::class.toFamily()
-  val duplicateEntities = engine.getEntitiesFor(idFamily)
   engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { newlyAddedEntity ->
-    val newlyAddedId = newlyAddedEntity.id
-    if (Settings.enableUniquenessEntityIdCheck &&
-      duplicateEntities.any { existingEntity -> existingEntity !== newlyAddedEntity && existingEntity.id == newlyAddedId }
-    ) {
+    val newId = newlyAddedEntity.id
+    if (Settings.enableUniquenessEntityIdCheck && newId in knownIds) {
       logger.warn {
         val componentsString = newlyAddedEntity.toComponentsString()
-        "Duplicate entity with id '$newlyAddedId' removed: Components $componentsString"
+        "Duplicate entity with id '$newId' removed: Components $componentsString"
       }
       newlyAddedEntity.removeSelf()
+    } else {
+      knownIds += newId
     }
   }
 }
@@ -164,6 +166,7 @@ fun ensureUniquenessListener(engine: Engine) {
 fun disposeEntitiesOnRemoval(engine: Engine) {
   val family = Box2DBodyComponent::class.toFamily()
   engine.onEntityRemoved(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
+    knownIds -= entity.id
     entity.box2d.dispose()
   }
 }
