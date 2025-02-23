@@ -60,7 +60,6 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
           val sources = lightLocs
           if (sources.isEmpty()) return@registerListenerConditionally // Fast, unsynchronized return
           val sourcesArray = synchronized(sources) {
-            if (sources.isEmpty()) return@registerListenerConditionally
             sources.toLongArray().also {
               sources.clear()
             }
@@ -90,10 +89,9 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
       registerListenerConditionally { event: ChunkColumnUpdatedEvent ->
         if ((event.flag and ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG != 0) && event.chunkX in chunkLookRange) {
           val lights: WorldCompactLocArray = event.calculatedDiffColumn
+          if (lights.isEmpty()) return@registerListenerConditionally // Fast, unsynchronized return
           val sources = lightLocs
-          if (sources.isEmpty()) return@registerListenerConditionally // Fast, unsynchronized return
           synchronized(sources) {
-            if (sources.isEmpty()) return@registerListenerConditionally
             sources.ensureCapacity(sources.size + lights.size)
             for (pos in lights) {
               sources.add(pos)
