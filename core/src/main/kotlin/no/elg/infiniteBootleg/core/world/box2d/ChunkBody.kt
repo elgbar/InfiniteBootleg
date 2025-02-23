@@ -8,11 +8,14 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.utils.LongMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
+import no.elg.infiniteBootleg.core.util.LocalCompactLoc
 import no.elg.infiniteBootleg.core.util.compactLoc
-import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
+import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -93,15 +96,8 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
    */
   @GuardedBy("BOX2D_LOCK")
   fun onBodyCreated(tmpBody: Body) {
-    for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
-      for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
-        val block = chunk.getRawBlock(localX, localY)
-        if (block.isAir()) {
-          continue
-        }
-        addBlock(block)
-      }
-    }
+    val blocks = chunk.asSequence().filterNotNull().filter(Block::isNotAir)
+    addBlocks(blocks, tmpBody)
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
     if (isDisposed) {
@@ -124,6 +120,38 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     }
   }
 
+  private fun getFixture(body: Body, localX: Int, localY: Int): Fixture {
+    val compactLoc = compactLoc(localX, localY)
+    val cacheFix: Fixture? = fixtureMap.get(compactLoc)
+    return cacheFix ?: body.createFixture(getChainShape(localX, localY, compactLoc), 0f).also {
+      fixtureMap.put(compactLoc, it)
+    }
+  }
+
+  private fun addBlockNow(block: Block, body: Body) {
+    val fixture: Fixture = getFixture(body, block.localX, block.localY)
+//      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
+    fixture.userData = block
+    fixture.filterData = when {
+      block.isMarkerBlock() -> Filters.NON_INTERACTIVE__GROUND_FILTER
+      block.material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
+      else -> Filters.GR_FB__GROUND_FILTER
+    }
+  }
+
+  fun addBlocks(blocks: Sequence<Block>, box2dBody: Body? = null) {
+    chunk.world.postBox2dRunnable {
+      val body = box2dBody ?: this.box2dBody
+      if (body == null) {
+        update()
+        return@postBox2dRunnable
+      }
+      for (block in blocks) {
+        addBlockNow(block, body)
+      }
+    }
+  }
+
   fun addBlock(block: Block, box2dBody: Body? = null) {
     chunk.world.postBox2dRunnable {
       val body = box2dBody ?: this.box2dBody
@@ -131,44 +159,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
         update()
         return@postBox2dRunnable
       }
-      val localX = block.localX
-      val localY = block.localY
-
-      val compactLoc = compactLoc(localX, localY)
-      val cacheFix: Fixture? = fixtureMap.get(compactLoc)
-      val fixture: Fixture = if (cacheFix != null) {
-        cacheFix
-      } else {
-        val chainShape = ChainShape()
-        chainShape.createLoop(
-          floatArrayOf(
-            localX + 0f,
-            localY + 0f,
-
-            localX + 0f,
-            localY + 1f,
-
-            localX + 1f,
-            localY + 1f,
-
-            localX + 1f,
-            localY + 0f
-          )
-        )
-        body.createFixture(chainShape, 0f).also {
-          fixtureMap.put(compactLoc, it)
-          chainShape.dispose()
-        }
-      }
-
-      val material = block.material
-      fixture.userData = block
-//      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
-      fixture.filterData = when {
-        block.isMarkerBlock() -> Filters.NON_INTERACTIVE__GROUND_FILTER
-        material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
-        else -> Filters.GR_FB__GROUND_FILTER
-      }
+      addBlockNow(block, body)
     }
   }
 
@@ -186,5 +177,30 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
 
   override fun hashCode(): Int {
     return chunk.hashCode()
+  }
+
+  companion object {
+    private val chainCache: Long2ObjectMap<ChainShape> = Long2ObjectOpenHashMap()
+
+    private fun getChainShape(localX: Int, localY: Int, compactLoc: LocalCompactLoc): ChainShape =
+      chainCache.computeIfAbsent(compactLoc) {
+        ChainShape().also {
+          it.createLoop(
+            floatArrayOf(
+              localX + 0f,
+              localY + 0f,
+
+              localX + 0f,
+              localY + 1f,
+
+              localX + 1f,
+              localY + 1f,
+
+              localX + 1f,
+              localY + 0f
+            )
+          )
+        }
+      }
   }
 }
