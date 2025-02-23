@@ -211,7 +211,12 @@ inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(c
 inline fun stringifyCompactLoc(posComp: PositionComponent): String = stringifyCompactLoc(posComp.blockX, posComp.blockY)
 inline fun stringifyCompactLoc(chunk: Chunk): String = stringifyCompactLoc(chunk.compactLocation)
 inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.worldX, block.worldY)
-inline fun stringifyCompactLocWithChunk(block: Block): String = "${stringifyCompactLoc(block.worldX, block.worldY)} in chunk ${stringifyCompactLoc(block.chunk)}"
+
+inline fun stringifyCompactLocWithChunk(blockX: WorldCoordNumber, blockY: WorldCoordNumber, chunkX: ChunkCoordNumber, chunkY: ChunkCoordNumber): String =
+  "${stringifyCompactLoc(blockX, blockY)} in chunk ${stringifyCompactLoc(chunkX, chunkY)}"
+
+inline fun stringifyCompactLocWithChunk(block: Block): String = stringifyCompactLocWithChunk(block.worldX, block.worldY, block.chunk.chunkX, block.chunk.chunkY)
+inline fun stringifyCompactLocWithChunk(posComp: PositionComponent): String = stringifyCompactLocWithChunk(posComp.blockX, posComp.blockY, posComp.chunkX, posComp.chunkY)
 
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 
