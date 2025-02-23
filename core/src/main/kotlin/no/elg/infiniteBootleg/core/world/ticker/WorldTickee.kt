@@ -27,6 +27,8 @@ internal class WorldTickee(private val world: World) : Ticking {
     // tick all chunks and blocks in chunks
     val tick = world.worldTicker.tickId
 
+    var unloadQuota = ALLOWED_NORMAL_CHUNK_UNLOADS_PER_SECOND / world.worldTicker.tps
+
     world.readChunks {
       chunkIterator.reset()
       while (chunkIterator.hasNext()) {
@@ -40,7 +42,8 @@ internal class WorldTickee(private val world: World) : Ticking {
           launchOnAsync {
             world.unloadChunk(chunk, force = true)
           }
-        } else if (chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
+        } else if (unloadQuota > 0 && chunk.allowedToUnload && world.render.isOutOfView(chunk) && (chunk is ViewableChunk && tick - chunk.lastViewedTick > chunkUnloadTime)) {
+          unloadQuota--
           launchOnAsync {
             world.unloadChunk(chunk)
           }
@@ -57,5 +60,6 @@ internal class WorldTickee(private val world: World) : Ticking {
 
   companion object {
     private const val CHUNK_UNLOAD_SECONDS = 30L
+    private const val ALLOWED_NORMAL_CHUNK_UNLOADS_PER_SECOND = 120
   }
 }
