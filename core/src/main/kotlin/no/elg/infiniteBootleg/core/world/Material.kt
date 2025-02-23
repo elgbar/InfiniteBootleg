@@ -131,7 +131,7 @@ enum class Material(
     hardness = 1f,
     hasTransparentTexture = false
   ),
-  CONTAINER(hardness = 1f, hasTransparentTexture = false, isCollidable = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+  CONTAINER(hardness = 1f, hasTransparentTexture = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
     world.engine.createContainerEntity(world, worldX, worldY, material)
   });
 
