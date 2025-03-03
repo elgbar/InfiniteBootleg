@@ -40,11 +40,11 @@ The drying rate is also affected by the wood type. Some wood types will dry fast
 
 | Wood rating | Absolute power | Relative power increase | Drying duration (real time) | Drying duration total | Description                                                                                         |
 |-------------|----------------|-------------------------|-----------------------------|-----------------------|-----------------------------------------------------------------------------------------------------|
-| Freshly cut | 30%            | N/A                     | 0 seconds                   | 0 seconds             | This wood is still green, it will not be very powerful                                              |
-| Dried       | 50%            | +20%                    | 1 hour                      | 1 hour                | This wood has been left to dry for a while, it will be more powerful                                |
-| Aged        | 70%            | +20%                    | 2 hours                     | 3 hours               | This wood has been left to dry for a long time, it will be powerful                                 |
-| Ancient     | 90%            | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful                       |
-| Petrified   | 100%           | +10%                    | 10 hours                    | 18 hours              | This wood has been left to dry for a extremely long time, there is no point in drying it any longer |
+| Freshly cut | 100%           | N/A                     | 0 seconds                   | 0 seconds             | This wood is still green, it will not be very powerful                                              |
+| Dried       | 120%           | +20%                    | 1 hour                      | 1 hour                | This wood has been left to dry for a while, it will be more powerful                                |
+| Aged        | 140%           | +20%                    | 2 hours                     | 3 hours               | This wood has been left to dry for a long time, it will be powerful                                 |
+| Ancient     | 160%           | +20%                    | 5 hours                     | 8 hours               | This wood has been left to dry for a very long time, it will be very powerful                       |
+| Petrified   | 170%           | +10%                    | 10 hours                    | 18 hours              | This wood has been left to dry for a extremely long time, there is no point in drying it any longer |
 
 ## Gems
 
@@ -72,9 +72,9 @@ Note that the flaw rating will only affect the power of the gem, not the whole s
 |-------------|----------------|----------------------------------------|-----------------------------------------------------------|
 | Flawless    | 100%           | N/A                                    | I didn't know this perfection of existed anymore!         |
 | Scratched   | 85%            | -15%                                   | A few surface scratches shouldn't be too much of an issue |
-| Chipped     | 70%            | -15%                                   | Someone hit this on with a hammer!                        |
-| Cracked     | 50%            | -20%                                   | Not bad, not great                                        |
-| Fractured   | 25%            | -25%                                   | At least its not broken                                   |
+| Chipped     | 70%            | -15%                                   | It has a sharp edge for the missing part                  |
+| Cracked     | 50%            | -20%                                   | Someone hit this with a hammer!                           |
+| Fractured   | 25%            | -25%                                   | At least its not ruined                                   |
 | Ruined      | 1%             | -24%                                   | This is useless                                           |
 
 ## Rings
@@ -99,13 +99,13 @@ Some rings will have a special effect on the spell, these will not have a flaw r
 
 To give some meat here is the boring list of all the "normal" rings
 
-| Ring type  | Effect                                                                        | Name Reason           |
-|------------|-------------------------------------------------------------------------------|-----------------------|
-| Iron       | Increases gem power                                                           | Iron symbolises power |
-| Aluminium  | Increases spell range                                                         | Lightweight material  |
-| Copper     | Increases incarnation speed (decreases delay between each cast)               |                       |
-| Tin        | Increases spell speed (Speed of spell-entity)                                 |                       |
-| Titanium   | Increases player movement speed                                               | Lightweight material  |
+| Ring type | Effect                                                          | Name Reason           |
+|-----------|-----------------------------------------------------------------|-----------------------|
+| Iron      | Increases gem power                                             | Iron symbolises power |
+| Aluminium | Increases spell range                                           | Lightweight material  |
+| Copper    | Increases incarnation speed (decreases delay between each cast) |                       |
+| Tin       | Increases spell speed (Speed of spell-entity)                   |                       |
+| Titanium  | Increases player movement speed                                 | Lightweight material  |
 
 | Flaw rating    | +Effect% | Relative increase | Description                                                     |
 |----------------|----------|-------------------|-----------------------------------------------------------------|
