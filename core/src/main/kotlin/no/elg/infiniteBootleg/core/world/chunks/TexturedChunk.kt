@@ -24,5 +24,11 @@ interface TexturedChunk : Chunk {
    * @return If this chunk has a texture generated
    */
   fun hasTexture(): Boolean
+
   fun queueForRendering(prioritize: Boolean)
+
+  /**
+   * Mark chunks as air only
+   */
+  fun setAllSkyAir()
 }

@@ -179,11 +179,9 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           )
           continue
         }
-        if (candidateChunk.isAllAir && candidateChunk.chunkColumn.isChunkAboveTopBlock(
-            candidateChunk.chunkY,
-            ChunkColumn.Companion.FeatureFlag.TOP_MOST_FLAG
-          )
-        ) {
+        if (candidateChunk.isAllAir && candidateChunk.chunkColumn.isChunkAboveTopBlock(candidateChunk.chunkY)) {
+          candidateChunk.setAllSkyAir() // Chunks above top block should always be rendered as air
+
           EventManager.dispatchEvent(
             ChunkTextureChangeRejectedEvent(
               candidateChunk.compactLocation,

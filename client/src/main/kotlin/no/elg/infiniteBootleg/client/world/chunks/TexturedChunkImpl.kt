@@ -19,6 +19,8 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
   @GuardedBy("chunkBody")
   private var fbo: FrameBuffer? = null
 
+  private var isAllSkyAir = false
+
   /**
    * @return The last tick this chunk's texture was pulled
    */
@@ -26,6 +28,9 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
 
   override val texture: Texture?
     get() {
+      if (isAllSkyAir) {
+        return null
+      }
       synchronized(chunkBody) {
         updateIfDirty()
         return fbo?.colorBufferTexture
@@ -67,6 +72,7 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
         if (fbo != null) {
           return fbo
         }
+        isAllSkyAir = false
         val fbo = FrameBuffer(Pixmap.Format.RGBA8888, Chunk.CHUNK_TEXTURE_SIZE, Chunk.CHUNK_TEXTURE_SIZE, false)
         fbo.colorBufferTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         this.fbo = fbo
@@ -76,12 +82,23 @@ class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : 
 
   override fun dispose() {
     super.dispose()
+    disposeFbo()
+  }
+
+  private fun disposeFbo() {
     synchronized(chunkBody) {
-      fbo?.also {
-        launchOnMain { it.dispose() }
+      fbo?.also { oldFbo ->
+        launchOnMain {
+          oldFbo.dispose()
+        }
         fbo = null
       }
     }
+  }
+
+  override fun setAllSkyAir() {
+    isAllSkyAir = true
+    disposeFbo()
   }
 
   override suspend fun doUpdateLightMultipleSources0(sources: WorldCompactLocArray, checkDistance: Boolean): Boolean {

@@ -48,11 +48,7 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
         }
 
         // get texture here to update last viewed in chunk
-        val textureRegion = chunk.texture
-        if (textureRegion == null) {
-          chunk.queueForRendering(true)
-          continue
-        }
+        val textureRegion = chunk.texture ?: continue
         chunksToDraw.put(chunk, textureRegion)
       }
     }
