@@ -46,7 +46,7 @@ class ChunkColumnImpl(
         "Chunk column was given initial top light blocks with wrong size! Expected ${Chunk.Companion.CHUNK_SIZE}, got ${initialTopLight.size}"
       }
       initialTopSolid.copyInto(topWorldYSolid, endIndex = Chunk.Companion.CHUNK_SIZE)
-      initialTopSolid.copyInto(topWorldYLight, endIndex = Chunk.Companion.CHUNK_SIZE)
+      initialTopLight.copyInto(topWorldYLight, endIndex = Chunk.Companion.CHUNK_SIZE)
     } else {
       for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
         val worldX = getWorldX(localX)
@@ -215,11 +215,12 @@ class ChunkColumnImpl(
         return
       }
     }
+    setTopBlock(top, localX, (currentTopChunkY - MAX_CHUNKS_TO_LOOK).chunkToWorld(), currTopWorldY)
   }
 
   override fun toProtobuf(): ProtoWorld.ChunkColumn =
     chunkColumn {
-      chunkX = chunkX
+      this@chunkColumn.chunkX = this@ChunkColumnImpl.chunkX
       topSolidBlocks += topWorldYSolid.asIterable()
       topTransparentBlocks += topWorldYLight.asIterable()
     }
