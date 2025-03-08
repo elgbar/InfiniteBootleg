@@ -124,7 +124,7 @@ class ChunkColumnImpl(
     }
   }
 
-  override fun updateTopBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag) {
+  override fun updateTopBlockWithoutHint(localX: LocalCoord, features: ChunkColumnFeatureFlag) {
     updateTopBlock(localX, topBlockHeight(localX, features), features)
   }
 

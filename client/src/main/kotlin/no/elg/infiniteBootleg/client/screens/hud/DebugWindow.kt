@@ -174,7 +174,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
             world.render.chunkColumnsInView.forEach {
               launchOnAsync {
                 for (localX in 0 until Chunk.CHUNK_SIZE) {
-                  world.getChunkColumn(it).updateTopBlock(localX)
+                  world.getChunkColumn(it).updateTopBlockWithoutHint(localX)
                 }
               }
             }

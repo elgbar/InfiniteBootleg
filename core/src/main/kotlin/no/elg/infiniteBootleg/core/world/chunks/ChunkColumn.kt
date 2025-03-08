@@ -44,7 +44,7 @@ interface ChunkColumn {
    * @param localX The x-coordinate of the block column to recalculate. Must be in `0..`[Chunk.Companion.CHUNK_SIZE]
    * Recalculate the top block of a given local x
    */
-  fun updateTopBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag = FeatureFlag.TOP_MOST_FLAG)
+  fun updateTopBlockWithoutHint(localX: LocalCoord, features: ChunkColumnFeatureFlag = FeatureFlag.TOP_MOST_FLAG)
 
   /**
    * @param localX The x-coordinate of the block column to recalculate. Must be in `0..`[Chunk.Companion.CHUNK_SIZE]

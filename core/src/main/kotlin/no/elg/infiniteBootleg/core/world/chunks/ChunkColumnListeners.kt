@@ -23,7 +23,7 @@ class ChunkColumnListeners : Disposable {
         val flagLight = if (worldToChunkLight == eventChunk.chunkY) FeatureFlag.BLOCKS_LIGHT_FLAG else 0
         val flagSolid = if (worldToChunkSolid == eventChunk.chunkY) FeatureFlag.SOLID_FLAG else 0
         launchOnAsync {
-          chunkColumn.updateTopBlock(localX, flagLight or flagSolid)
+          chunkColumn.updateTopBlockWithoutHint(localX, flagLight or flagSolid)
         }
       }
     }

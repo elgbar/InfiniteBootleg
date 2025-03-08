@@ -20,6 +20,7 @@ import no.elg.infiniteBootleg.core.util.isNeighbor
 import no.elg.infiniteBootleg.core.util.isWithinRadius
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.queryEntities
+import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.isBlocksLightFlag
 
 private val logger = KotlinLogging.logger {}
 
@@ -87,7 +88,7 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
        * Update chunk light when a chunk column is updated
        */
       registerListenerConditionally { event: ChunkColumnUpdatedEvent ->
-        if ((event.flag and ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG != 0) && event.chunkX in chunkLookRange) {
+        if (event.flag.isBlocksLightFlag() && event.chunkX in chunkLookRange) {
           val lights: WorldCompactLocArray = event.calculatedDiffColumn
           if (lights.isEmpty()) return@registerListenerConditionally // Fast, unsynchronized return
           val sources = lightLocs
