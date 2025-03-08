@@ -20,6 +20,8 @@ import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.NO_LIGHTS_L
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.SKYLIGHT_LIGHT_MAP
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight.Companion.lightMapIndex
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
+import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.selectedItem
@@ -72,7 +74,8 @@ object DebugText {
   fun pointing(sb: StringBuilder, world: ClientWorld, mouseBlockX: Int, mouseBlockY: Int) {
     val localX = mouseBlockX.chunkOffset()
     val localY = mouseBlockY.chunkOffset()
-    val chunk = world.getChunk(compactLoc(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
+    val chunkX = mouseBlockX.worldToChunk()
+    val chunk = world.getChunk(compactLoc(chunkX, mouseBlockY.worldToChunk()), false)
     val block = chunk?.getRawBlock(localX, localY)
     val material = block.materialOrAir()
     val rawX = ClientMain.inst().mouseLocator.mouseWorldX
@@ -93,19 +96,22 @@ object DebugText {
     val pc = world.getChunk(chunkX, chunkY, false)
     val cc = world.getChunkColumn(chunkX)
     val topBlock = cc.topBlockHeight(mouseBlockX.chunkOffset())
+    val topBlockSolid = cc.topBlockHeight(mouseBlockX.chunkOffset(), FeatureFlag.SOLID_FLAG)
+    val topBlockLight = cc.topBlockHeight(mouseBlockX.chunkOffset(), FeatureFlag.BLOCKS_LIGHT_FLAG)
     if (pc == null) {
-      val format = "chunk (% 4d,% 4d) [top block %2d]: <not loaded>"
-      sb.append(String.format(format, chunkX, chunkY, topBlock))
+      val format = "chunk (% 4d,% 4d) [top/solid/light % 3d/% 3d/% 3d]: <not loaded>"
+      sb.append(String.format(format, chunkX, chunkY, topBlock, topBlockSolid, topBlockLight))
     } else {
       val generator = world.chunkLoader.generator
       val biome = generator.getBiome(mouseBlockX)
-      val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0f
+      val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0.0
       val allAir = pc.isAllAir
       val modified = pc.shouldSave()
       val allowUnloading = pc.allowedToUnload
       val skychunk = cc.isChunkAboveTopBlock(chunkY)
-      val format = "chunk (% 4d,% 4d) [top % 4d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|modified?%-5b"
-      sb.append(String.format(format, chunkX, chunkY, topBlock, biome, biomeHeight, allAir, allowUnloading, skychunk, modified))
+      val hasTexture = (pc as? TexturedChunk)?.hasTexture() ?: false
+      val format = "chunk (% 4d,% 4d) [top/solid/light % 3d/% 3d/% 3d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|modified?%-5b|has texture?%-5b"
+      sb.append(String.format(format, chunkX, chunkY, topBlock, topBlockSolid, topBlockLight, biome, biomeHeight, allAir, allowUnloading, skychunk, modified, hasTexture))
     }
   }
 
@@ -179,9 +185,8 @@ object DebugText {
   fun counters(builder: StringBuilder, world: ClientWorld) {
     builder.append("Chunk reads/writes: ").append(world.chunkReads.get()).append(" / ").append(world.chunkWrites.get())
       .append(" | active listeners: ").append(EventManager.activeListeners.get()).append(", removed ").append(EventManager.unregisteredListeners.get())
-      .append(", weak/1sh: ").append(" / ").append(EventManager.registeredWeakListeners.get())
-      .append(" / ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ").append(EventManager.dispatchedEvents.get()).append(" listened to: ")
-      .append(EventManager.listenerListenedToEvent.get())
+      .append(", weak/1sh: ").append(EventManager.registeredWeakListeners.get()).append(" / ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ")
+      .append(EventManager.dispatchedEvents.get()).append(" listened to: ").append(EventManager.listenerListenedToEvent.get())
       .appendLine()
       .append(" > Chunk Rdr Q: ").append(ChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")
       .append((World.CHUNK_ADDED_THREAD_LOCAL.get() - World.CHUNK_REMOVED_THREAD_LOCAL.get()) / World.CHUNK_THREAD_LOCAL.get())
