@@ -171,6 +171,8 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
           continue
         }
         if (worldRender.isOutOfView(candidateChunk)) {
+          candidateChunk.dirty() // Make sure we update texture next time we need to render it
+
           EventManager.dispatchEvent(
             ChunkTextureChangeRejectedEvent(
               candidateChunk.compactLocation,
