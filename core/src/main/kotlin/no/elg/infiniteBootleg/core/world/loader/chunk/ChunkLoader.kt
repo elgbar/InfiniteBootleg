@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.core.world.loader.chunk
 
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Disposable
-import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.exceptions.CorruptChunkException
 import no.elg.infiniteBootleg.core.main.Main
@@ -53,16 +52,6 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
     return null
   }
 
-  protected fun loadChunkFromFile(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
-    val protoChunk = readChunkFile(chunkX, chunkY)
-    return if (protoChunk != null) {
-      loadChunkFromProto(protoChunk)
-    } else {
-      logger.trace { "Chunk ${stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
-      null
-    }
-  }
-
   private fun fullyLoadChunk(chunk: ChunkImpl, protoChunk: ProtoWorld.Chunk): Boolean {
     if (chunk.load(protoChunk)) {
       chunk.finishLoading()
@@ -71,22 +60,7 @@ abstract class ChunkLoader(val generator: ChunkGenerator) : Disposable {
     return false
   }
 
-  private fun readChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord): ProtoWorld.Chunk? {
-    val chunkFile = getChunkFile(world, chunkX, chunkY)?.file()
-    if (chunkFile != null && chunkFile.isFile && chunkFile.canRead()) {
-      val bytes = chunkFile.readBytes()
-      return try {
-        ProtoWorld.Chunk.parseFrom(bytes)
-      } catch (e: InvalidProtocolBufferException) {
-        logger.error(e) { "Invalid protobuf while reading chunk file" }
-        deleteChunkFile(chunkX, chunkY)
-        null
-      }
-    }
-    return null
-  }
-
-  private fun deleteChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord) {
+  protected fun deleteChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord) {
     getChunkFile(world, chunkX, chunkY)?.let(::deleteOrLogFile)
   }
 

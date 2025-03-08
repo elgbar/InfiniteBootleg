@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.core.world.loader.chunk
 
+import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.ChunkCoord
@@ -9,6 +10,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.world.World
+import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 private val logger = KotlinLogging.logger {}
 
@@ -26,6 +28,31 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
     val (chunkX, chunkY) = chunkLoc
     val loadChunkFromFile = loadChunkFromFile(chunkX, chunkY)
     return LoadedChunk(loadChunkFromFile ?: generateChunk(chunkX, chunkY), loadChunkFromFile == null)
+  }
+
+  private fun loadChunkFromFile(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
+    val protoChunk = readChunkFile(chunkX, chunkY)
+    return if (protoChunk != null) {
+      loadChunkFromProto(protoChunk)
+    } else {
+      logger.trace { "Chunk ${stringifyCompactLoc(chunkX, chunkY)} did not exist on file" }
+      null
+    }
+  }
+
+  private fun readChunkFile(chunkX: ChunkCoord, chunkY: ChunkCoord): ProtoWorld.Chunk? {
+    val chunkFile = getChunkFile(world, chunkX, chunkY)?.file()
+    if (chunkFile != null && chunkFile.isFile && chunkFile.canRead()) {
+      val bytes = chunkFile.readBytes()
+      return try {
+        ProtoWorld.Chunk.parseFrom(bytes)
+      } catch (e: InvalidProtocolBufferException) {
+        logger.error(e) { "Invalid protobuf while reading chunk file" }
+        deleteChunkFile(chunkX, chunkY)
+        null
+      }
+    }
+    return null
   }
 
   private fun generateChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
