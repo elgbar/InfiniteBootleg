@@ -31,6 +31,9 @@ class FullChunkLoader(override val world: World, generator: ChunkGenerator) : Ch
   }
 
   private fun loadChunkFromFile(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
+    if (world.isTransient) {
+      return null
+    }
     val protoChunk = readChunkFile(chunkX, chunkY)
     return if (protoChunk != null) {
       loadChunkFromProto(protoChunk)
