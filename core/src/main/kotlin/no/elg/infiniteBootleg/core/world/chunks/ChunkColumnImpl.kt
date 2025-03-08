@@ -206,7 +206,11 @@ class ChunkColumnImpl(
 
     for (nextChunkY in 0..MAX_CHUNKS_TO_LOOK) {
       // If the chunk is not loaded we can safely assume no other chunks above are loaded
-      val nextChunk = getChunk(currentTopChunkY - nextChunkY, load = false) ?: break
+      val chunkY = currentTopChunkY - nextChunkY
+      val nextChunk = getChunk(chunkY, load = false) ?: let {
+        setTopBlock(top, localX, chunkY.chunkToWorld(), currTopWorldY)
+        break
+      }
       if (testChunk(nextChunk, top, localX, currTopWorldY, rule)) {
         return
       }
