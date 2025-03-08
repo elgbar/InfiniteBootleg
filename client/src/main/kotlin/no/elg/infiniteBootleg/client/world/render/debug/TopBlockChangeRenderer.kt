@@ -33,7 +33,7 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : Overl
   private val newlyUpdatedChunks = ConcurrentHashMap<Long, ChunkColumnUpdate>()
 
   override val isActive: Boolean
-    get() = Settings.renderTopBlockChanges && newlyUpdatedChunks.isNotEmpty()
+    get() = (Settings.renderTopBlockChanges && newlyUpdatedChunks.isNotEmpty()) || Settings.renderTopBlocks
 
   data class ChunkColumnUpdate(
     val progress: ProgressHandler,

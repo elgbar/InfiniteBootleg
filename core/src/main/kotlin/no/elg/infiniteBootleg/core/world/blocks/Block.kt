@@ -66,6 +66,8 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
     val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
     val Block.worldX: WorldCoord get() = chunk.chunkX.chunkToWorld(localX)
     val Block.worldY: WorldCoord get() = chunk.chunkY.chunkToWorld(localY)
+    val Block.chunkX: WorldCoord get() = chunk.chunkX
+    val Block.chunkY: WorldCoord get() = chunk.chunkY
 
     /**
      * Get the chunk of this block or the current valid chunk, which might be different from the chunk of this block or null if there is no longer a valid chunk for this block

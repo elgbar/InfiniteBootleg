@@ -217,8 +217,14 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderClosestBlockToPlayerChunk
         )
+        toggleableDebugButton(
+          "Render top block",
+          "Render top blocks in chunk columns. Solid = green, light = blue, both = cyan",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::renderTopBlocks
+        )
 
-        // ROOM for two more buttons
+        // Room for one more button
       }
       sep()
       // Future positions renderers

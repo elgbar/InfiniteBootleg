@@ -24,6 +24,7 @@ import no.elg.infiniteBootleg.client.world.render.debug.DebugChunkRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.EntityMarkerBlockRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.LeafDecayDebugRenderer
 import no.elg.infiniteBootleg.client.world.render.debug.TopBlockChangeRenderer
+import no.elg.infiniteBootleg.client.world.render.debug.TopBlockChunkColumnRenderer
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.Renderer
@@ -57,6 +58,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     CachedChunkRenderer(this),
     AirBlockRenderer(this),
     HoveringBlockRenderer(this),
+    TopBlockChunkColumnRenderer(this),
     EntityRenderer(this),
     DebugChunkRenderer(this),
     DebugChunkAddedToChunkRenderer(this),

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.world.render.debug
 
+import com.badlogic.gdx.graphics.g2d.Batch
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.core.util.withColor
@@ -16,13 +17,15 @@ abstract class SingleBlockDebugRenderer(private val worldRender: ClientWorldRend
   protected abstract val texture: RotatableTextureRegion
 
   abstract fun shouldRender(block: Block): Boolean
+  open fun beforeRender(block: Block, batch: Batch): Unit = Unit
 
   override fun render() {
-    worldRender.batch.withColor(a = alpha) {
+    worldRender.batch.withColor(a = alpha) { batch ->
       for (chunk: Chunk in worldRender.world.loadedChunks) {
         for (block in chunk) {
           if (block != null && shouldRender(block)) {
-            worldRender.batch.draw(
+            beforeRender(block, batch)
+            batch.draw(
               texture.textureRegion,
               block.worldX.toFloat().worldToScreen(),
               block.worldY.toFloat().worldToScreen(),

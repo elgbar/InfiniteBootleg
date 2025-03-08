@@ -111,8 +111,9 @@ inline fun Batch.withColor(
   g: Float = this.color.g,
   b: Float = this.color.b,
   a: Float = this.color.a,
-  action: (Batch) -> Unit
+  crossinline action: (Batch) -> Unit
 ) {
+  contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
   val oldColor = this.color.cpy()
   this.setColor(r, g, b, a)
   action(this)
@@ -124,8 +125,9 @@ inline fun BitmapFont.withColor(
   g: Float = this.color.g,
   b: Float = this.color.b,
   a: Float = this.color.a,
-  action: (BitmapFont) -> Unit
+  crossinline action: (BitmapFont) -> Unit
 ) {
+  contract { callsInPlace(action, InvocationKind.EXACTLY_ONCE) }
   val oldColor = this.color.cpy()
   this.setColor(r, g, b, a)
   action(this)

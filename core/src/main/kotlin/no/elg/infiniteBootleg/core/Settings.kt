@@ -68,6 +68,8 @@ object Settings {
 
   var renderTopBlockChanges = false
 
+  var renderTopBlocks = false
+
   var renderClosestBlockToPlayerChunk = false
 
   var renderBox2dEntityDifference = false
