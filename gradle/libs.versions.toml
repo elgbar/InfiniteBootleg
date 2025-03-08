@@ -1,0 +1,87 @@
+[versions]
+kotlin = "2.1.10"
+gdx = "1.13.1"
+ktx = "1.13.1-rc1"
+protobuf = "4.30.0"
+vis = "1.5.5"
+caffeine = "3.2.0"
+uuid = "5.1.0"
+logging = "7.0.5"
+log4j = "2.24.3"
+junit = "5.12.0"
+mockk = "1.13.17"
+jansi = "2.4.1"
+fastutil = "8.5.15"
+netty = "4.1.119.Final"
+
+stacktracedecoroutinator = "2.4.8"
+spotless = "6.25.0"
+versionsPlugin = "0.51.0"
+protobufPlugin = "0.9.4"
+
+[libraries]
+gdx-core = { group = "com.badlogicgames.gdx", name = "gdx", version.ref = "gdx" }
+gdx-box2d = { group = "com.badlogicgames.gdx", name = "gdx-box2d", version.ref = "gdx" }
+gdx-freetype = { group = "com.badlogicgames.gdx", name = "gdx-freetype", version.ref = "gdx" }
+gdx-backend-headless = { group = "com.badlogicgames.gdx", name = "gdx-backend-headless", version.ref = "gdx" }
+gdx-backend-lwjgl3 = { group = "com.badlogicgames.gdx", name = "gdx-backend-lwjgl3", version.ref = "gdx" }
+gdx-box2d-platform = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdx" }
+gdx-freetype-platform = { group = "com.badlogicgames.gdx", name = "gdx-freetype-platform", version.ref = "gdx" }
+gdx-platform = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdx" }
+
+ktx-actors = { group = "io.github.libktx", name = "ktx-actors", version.ref = "ktx" }
+ktx-app = { group = "io.github.libktx", name = "ktx-app", version.ref = "ktx" }
+ktx-assets = { group = "io.github.libktx", name = "ktx-assets", version.ref = "ktx" }
+ktx-async = { group = "io.github.libktx", name = "ktx-async", version.ref = "ktx" }
+ktx-collections = { group = "io.github.libktx", name = "ktx-collections", version.ref = "ktx" }
+ktx-graphics = { group = "io.github.libktx", name = "ktx-graphics", version.ref = "ktx" }
+ktx-style = { group = "io.github.libktx", name = "ktx-style", version.ref = "ktx" }
+ktx-vis = { group = "io.github.libktx", name = "ktx-vis", version.ref = "ktx" }
+ktx-vis-style = { group = "io.github.libktx", name = "ktx-vis-style", version.ref = "ktx" }
+ktx-ashley = { group = "io.github.libktx", name = "ktx-ashley", version.ref = "ktx" }
+ktx-box2d = { group = "io.github.libktx", name = "ktx-box2d", version.ref = "ktx" }
+ktx-math = { group = "io.github.libktx", name = "ktx-math", version.ref = "ktx" }
+ktx-preferences = { group = "io.github.libktx", name = "ktx-preferences", version.ref = "ktx" }
+ktx-log = { group = "io.github.libktx", name = "ktx-log", version.ref = "ktx" }
+
+log4j-bom = { group = "org.apache.logging.log4j", name = "log4j-bom", version.ref = "log4j" }
+log4j-api = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
+log4j-core = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+log4j-slf4j = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version.ref = "log4j" }
+
+protobuf-bom = { group = "com.google.protobuf", name = "protobuf-bom", version.ref = "protobuf" }
+protobuf-kotlin = { group = "com.google.protobuf", name = "protobuf-kotlin", version.ref = "protobuf" }
+protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
+
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.1" }
+
+apacheCommons-collections = { group = "org.apache.commons", name = "commons-collections4", version = "4.4" }
+apacheCommons-lang = { group = "org.apache.commons", name = "commons-lang3", version = "3.17.0" }
+
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version.ref = "caffeine" }
+uuid = { group = "com.fasterxml.uuid", name = "java-uuid-generator", version.ref = "uuid" }
+visUi = { group = "com.kotcrab.vis", name = "vis-ui", version.ref = "vis" }
+inGameConsole = { group = "com.strongjoshua", name = "libgdx-inGameConsole", version = "1.0.0" }
+netty-bom = { group = "io.netty", name = "netty-bom", version.ref = "netty" }
+netty-all = { group = "io.netty", name = "netty-all", version.ref = "netty" }
+annotations = { group = "org.jetbrains", name = "annotations", version = "26.0.2" }
+oshaiLogging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "logging" }
+fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+jansi = { group = "org.fusesource.jansi", name = "jansi", version.ref = "jansi" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+
+junit-jupiter-bom = { group = "org.junit.jupiter", name = "junit-jupiter-bom", version.ref = "junit" }
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+junit-vintage-engine = { group = "org.junit.vintage", name = "junit-vintage-engine", version.ref = "junit" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+stacktracedecoroutinator = { id = "dev.reformator.stacktracedecoroutinator", version.ref = "stacktracedecoroutinator" }

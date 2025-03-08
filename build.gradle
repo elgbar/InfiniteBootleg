@@ -3,12 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
   id "java"
-  id "org.jetbrains.kotlin.jvm" version "$kotlinVersion" apply false
-  id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion" apply false
-  id "com.diffplug.spotless" version "6.25.0" apply false
-  id "com.github.ben-manes.versions" version "0.51.0" apply false
-  id "com.google.protobuf" version "0.9.4" apply false
-  id "dev.reformator.stacktracedecoroutinator" version "2.4.8" apply false
+  alias(libs.plugins.kotlin.jvm).apply(false)
+  alias(libs.plugins.kotlin.allopen).apply(false)
+  alias(libs.plugins.spotless).apply(false)
+  alias(libs.plugins.versions).apply(false)
+  alias(libs.plugins.protobuf).apply(false)
+  alias(libs.plugins.stacktracedecoroutinator).apply(false)
 }
 
 tasks.named("wrapper") {
@@ -122,60 +122,58 @@ subprojects {
                "--add-opens", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
                "--add-opens", "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
                "--add-opens", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-               "--add-opens", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
-    ]
+               "--add-opens", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",]
   }
 
   dependencies {
-    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-    implementation "com.fasterxml.uuid:java-uuid-generator:5.1.0"
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.0'
-    implementation "com.google.protobuf:protobuf-bom:$protobufVersion"
-    implementation "com.google.protobuf:protobuf-kotlin:$protobufVersion"
-    implementation "com.kotcrab.vis:vis-ui:$visVersion"
-    implementation "com.strongjoshua:libgdx-inGameConsole:1.0.0"
-    implementation "io.github.libktx:ktx-actors:$ktxVersion"
-    implementation "io.github.libktx:ktx-app:$ktxVersion"
-    implementation "io.github.libktx:ktx-assets:$ktxVersion"
-    implementation "io.github.libktx:ktx-async:$ktxVersion"
-    implementation "io.github.libktx:ktx-collections:$ktxVersion"
-    implementation "io.github.libktx:ktx-graphics:$ktxVersion"
-    implementation "io.github.libktx:ktx-style:$ktxVersion"
-    implementation "io.github.libktx:ktx-vis:$ktxVersion"
-    implementation "io.github.libktx:ktx-vis-style:$ktxVersion"
-    implementation "io.github.libktx:ktx-ashley:$ktxVersion"
-    implementation "io.github.libktx:ktx-box2d:$ktxVersion"
-    implementation "io.github.libktx:ktx-math:$ktxVersion"
-    implementation "io.github.libktx:ktx-preferences:$ktxVersion"
-    implementation "io.github.libktx:ktx-log:$ktxVersion"
-    implementation platform(platform("io.netty:netty-bom:4.1.119.Final"))
-    implementation "io.netty:netty-all"
-    implementation "org.apache.commons:commons-collections4:4.4"
-    implementation "org.apache.commons:commons-lang3:3.17.0"
-    implementation "org.jetbrains:annotations:26.0.2"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
-    implementation "it.unimi.dsi:fastutil:8.5.15"
+    implementation libs.gdx.core
+    implementation libs.gdx.box2d
+    implementation libs.gdx.freetype
+    implementation libs.uuid
+    implementation libs.caffeine
+    implementation libs.protobuf.bom
+    implementation libs.protobuf.kotlin
+    implementation libs.visUi
+    implementation libs.inGameConsole
+    implementation libs.ktx.actors
+    implementation libs.ktx.app
+    implementation libs.ktx.assets
+    implementation libs.ktx.async
+    implementation libs.ktx.collections
+    implementation libs.ktx.graphics
+    implementation libs.ktx.style
+    implementation libs.ktx.vis
+    implementation libs.ktx.vis.style
+    implementation libs.ktx.ashley
+    implementation libs.ktx.box2d
+    implementation libs.ktx.math
+    implementation libs.ktx.preferences
+    implementation libs.ktx.log
+    implementation platform(libs.netty.bom)
+    implementation libs.netty.all
+    implementation libs.apacheCommons.collections
+    implementation libs.apacheCommons.lang
+    implementation libs.annotations
+    implementation libs.kotlin.reflect
+    implementation libs.kotlin.coroutines
+    implementation libs.fastutil
+    implementation libs.oshaiLogging
+    implementation platform(libs.log4j.bom)
+    implementation libs.log4j.api
+    implementation libs.log4j.core
+    implementation libs.log4j.slf4j
+    implementation libs.jansi
 
-    implementation 'io.github.oshai:kotlin-logging-jvm:7.0.5'
-    implementation platform('org.apache.logging.log4j:log4j-bom:2.24.3')
-    implementation 'org.apache.logging.log4j:log4j-api'
-    implementation 'org.apache.logging.log4j:log4j-core'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl'
-    implementation 'org.fusesource.jansi:jansi:2.4.1'
+    testImplementation libs.gdx.backend.headless
+    testImplementation libs.mockk
+    testImplementation platform(libs.junit.jupiter.bom)
+    testImplementation libs.junit.jupiter.api
+    testImplementation libs.junit.jupiter.engine
+    testImplementation libs.junit.vintage.engine
+    testImplementation libs.junit.jupiter.params
 
-    testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    testImplementation "io.mockk:mockk:1.13.17"
-    testImplementation platform("org.junit:junit-bom:5.12.0")
-    testImplementation "org.junit.jupiter:junit-jupiter-api"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine"
-    testImplementation "org.junit.vintage:junit-vintage-engine"
-    testImplementation "org.junit.jupiter:junit-jupiter-params"
-
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    testRuntimeOnly libs.junit.platform.launcher
+    testRuntimeOnly libs.gdx.platform
   }
 
   def isNonStable = { String version ->
@@ -195,20 +193,20 @@ subprojects {
 
 project(":client") {
   dependencies {
-    implementation project(":core")
-    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation(project(":core"))
+    implementation(libs.gdx.backend.lwjgl3)
+    implementation(variantOf(libs.gdx.box2d.platform) { classifier("natives-desktop") })
+    implementation(variantOf(libs.gdx.freetype.platform) { classifier("natives-desktop") })
+    implementation(variantOf(libs.gdx.platform) { classifier("natives-desktop") })
   }
 }
 
 project(":server") {
   dependencies {
     implementation project(":core")
-    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation(libs.gdx.backend.headless)
+    implementation(variantOf(libs.gdx.box2d.platform) { classifier("natives-desktop") })
+    implementation(variantOf(libs.gdx.platform) { classifier("natives-desktop") })
   }
 }
 
@@ -217,8 +215,7 @@ project(":core") {
 
   protobuf {
     protoc {
-      // Download from repositories
-      artifact = "com.google.protobuf:protoc:$protobufVersion"
+      artifact = libs.protobuf.protoc.get()
     }
     generateProtoTasks {
       all().each { task ->
