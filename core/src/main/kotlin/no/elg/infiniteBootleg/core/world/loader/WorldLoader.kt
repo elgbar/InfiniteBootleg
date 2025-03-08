@@ -66,6 +66,14 @@ object WorldLoader {
         // If there is no process with the read pid, it was probably left from an old instance
         logger.warn { "World lock file for $uuid still existed for a non-existing process (PID $lockPID), deleting the old lock file" }
         return deleteOrLogFile(worldLockFile)
+      } else {
+        val command = optionalProcessHandle.map(ProcessHandle::info).flatMap(ProcessHandle.Info::command).orElse("unknown")
+        if (command.contains("java", ignoreCase = true)) {
+          logger.info { "World lock file for $uuid is locked by another process (PID $lockPID), cmd '$command'" }
+        } else {
+          logger.warn { "World lock file for $uuid is seemingly locked by another NON-java process (PID $lockPID), cmd '$command'. This is probably an error, deleting the lock" }
+          return deleteOrLogFile(worldLockFile)
+        }
       }
       return false
     }
