@@ -15,6 +15,9 @@ import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.valid
+import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
+import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.isBlocksLightFlag
+import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.isSolidFlag
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.chunkColumn
@@ -56,8 +59,8 @@ class ChunkColumnImpl(
 
   override fun topBlockHeight(localX: LocalCoord, features: ChunkColumnFeatureFlag): WorldCoord {
     require(localX in 0 until Chunk.Companion.CHUNK_SIZE) { "Local x is out of bounds. localX: $localX" }
-    val solid = if (features and ChunkColumn.Companion.FeatureFlag.SOLID_FLAG != 0) topWorldYSolid[localX] else Int.MIN_VALUE
-    val light = if (features and ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG != 0) topWorldYLight[localX] else Int.MIN_VALUE
+    val solid = if (features.isSolidFlag()) topWorldYSolid[localX] else Int.MIN_VALUE
+    val light = if (features.isBlocksLightFlag()) topWorldYLight[localX] else Int.MIN_VALUE
     val max = max(light, solid)
     require(max != Int.MIN_VALUE) { "Failed to find to block at local x $localX, with the given features $features in the chunk $chunkX column" }
     return max
@@ -104,7 +107,7 @@ class ChunkColumnImpl(
             localX,
             newWorldY,
             oldTop,
-            ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
+            FeatureFlag.BLOCKS_LIGHT_FLAG
           )
         )
       } else if (currentTops === topWorldYSolid) {
@@ -114,24 +117,27 @@ class ChunkColumnImpl(
             localX,
             newWorldY,
             oldTop,
-            ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
+            FeatureFlag.SOLID_FLAG
           )
         )
       }
     }
   }
 
-  override fun updateTopBlock(localX: LocalCoord) {
-    updateTopBlock(localX, topBlockHeight(localX))
+  override fun updateTopBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag) {
+    updateTopBlock(localX, topBlockHeight(localX, features), features)
   }
 
-  override fun updateTopBlock(localX: LocalCoord, worldYHint: WorldCoord) {
-    updateTopBlock(topWorldYSolid, localX, worldYHint) {
-      it.material.isCollidable
+  override fun updateTopBlock(localX: LocalCoord, worldYHint: WorldCoord, features: ChunkColumnFeatureFlag) {
+    if (features.isSolidFlag()) {
+      updateTopBlock(topWorldYSolid, localX, worldYHint) {
+        it.material.isCollidable
+      }
     }
-
-    updateTopBlock(topWorldYLight, localX, worldYHint) {
-      it.material.blocksLight
+    if (features.isBlocksLightFlag()) {
+      updateTopBlock(topWorldYLight, localX, worldYHint) {
+        it.material.blocksLight
+      }
     }
   }
 
@@ -180,9 +186,9 @@ class ChunkColumnImpl(
     }
 
     val currTopLocalY = currTopWorldY.chunkOffset()
-    val currTopChunk = getLoadedChunkFromWorldY(currTopWorldY)
-    val currTopBlock: Block? = currTopChunk?.getRawBlock(localX, currTopLocalY)
-    if (worldYHint < currTopWorldY && (currTopChunk == null || currTopBlock.isNotAir())) {
+    val currTopChunk = getLoadedChunkFromWorldY(currTopWorldY) ?: return
+    val currTopBlock: Block? = currTopChunk.getRawBlock(localX, currTopLocalY)
+    if (worldYHint < currTopWorldY && currTopBlock.isNotAir()) {
       // World y hint is below the current top block.
       // But the current top block is not air or the chunk is not loaded, so the top block (should) not have changed
       return

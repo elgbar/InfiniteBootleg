@@ -44,14 +44,14 @@ interface ChunkColumn {
    * @param localX The x-coordinate of the block column to recalculate. Must be in `0..`[Chunk.Companion.CHUNK_SIZE]
    * Recalculate the top block of a given local x
    */
-  fun updateTopBlock(localX: LocalCoord)
+  fun updateTopBlock(localX: LocalCoord, features: ChunkColumnFeatureFlag = FeatureFlag.TOP_MOST_FLAG)
 
   /**
    * @param localX The x-coordinate of the block column to recalculate. Must be in `0..`[Chunk.Companion.CHUNK_SIZE]
    * @param worldYHint Hint what could be the next topmost block
    * Recalculate the top block of a given local x
    */
-  fun updateTopBlock(localX: LocalCoord, worldYHint: WorldCoord)
+  fun updateTopBlock(localX: LocalCoord, worldYHint: WorldCoord, features: ChunkColumnFeatureFlag = FeatureFlag.TOP_MOST_FLAG)
 
   /**
    * @param features What kind of top block to return
@@ -101,6 +101,10 @@ interface ChunkColumn {
           TOP_MOST_FLAG -> "TOP_MOST_FLAG"
           else -> "Unknown flag"
         }
+
+      fun ChunkColumnFeatureFlag.isSolidFlag() = this and SOLID_FLAG != 0
+      fun ChunkColumnFeatureFlag.isBlocksLightFlag() = this and BLOCKS_LIGHT_FLAG != 0
+      fun ChunkColumnFeatureFlag.isTopMostFlag() = this and BLOCKS_LIGHT_FLAG != 0
     }
   }
 }

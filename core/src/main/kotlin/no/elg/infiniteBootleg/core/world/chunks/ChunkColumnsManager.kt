@@ -18,8 +18,7 @@ class ChunkColumnsManager(val world: World) : Disposable {
     synchronized(chunkColumns) {
       for (protoCC in columns) {
         val chunkColumn = ChunkColumnImpl.Companion.fromProtobuf(world, protoCC)
-        val chunkX = protoCC.chunkX
-        chunkColumns.put(chunkX, chunkColumn)
+        chunkColumns.put(chunkColumn.chunkX, chunkColumn)
       }
     }
   }

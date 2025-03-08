@@ -5,6 +5,7 @@ import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.chunks.ChunkLoadedEvent
 import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.util.worldToChunk
+import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
 
 class ChunkColumnListeners : Disposable {
 
@@ -16,9 +17,13 @@ class ChunkColumnListeners : Disposable {
   private val validateChunkTopBlockOnChunkLoad = EventManager.registerListener { (eventChunk, _): ChunkLoadedEvent ->
     val chunkColumn = eventChunk.chunkColumn
     for (localX in 0 until Chunk.CHUNK_SIZE) {
-      if (chunkColumn.topBlockHeight(localX).worldToChunk() == eventChunk.chunkY) {
+      val worldToChunkLight = chunkColumn.topBlockHeight(localX, FeatureFlag.BLOCKS_LIGHT_FLAG).worldToChunk()
+      val worldToChunkSolid = chunkColumn.topBlockHeight(localX, FeatureFlag.SOLID_FLAG).worldToChunk()
+      if (worldToChunkLight == eventChunk.chunkY || worldToChunkSolid == eventChunk.chunkY) {
+        val flagLight = if (worldToChunkLight == eventChunk.chunkY) FeatureFlag.BLOCKS_LIGHT_FLAG else 0
+        val flagSolid = if (worldToChunkSolid == eventChunk.chunkY) FeatureFlag.SOLID_FLAG else 0
         launchOnAsync {
-          chunkColumn.updateTopBlock(localX)
+          chunkColumn.updateTopBlock(localX, flagLight or flagSolid)
         }
       }
     }
