@@ -133,7 +133,12 @@ enum class Material(
   ),
   CONTAINER(hardness = 1f, hasTransparentTexture = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
     world.engine.createContainerEntity(world, worldX, worldY, material)
-  });
+  }),
+  COAL_ORE(hardness = 1.25f, hasTransparentTexture = false),
+  COPPER_ORE(hardness = 2f, hasTransparentTexture = false),
+  IRON_ORE(hardness = 3f, hasTransparentTexture = false),
+  GOLD_ORE(hardness = 1f, hasTransparentTexture = false)
+  ;
 
   /**
    * @param world World this block this exists in
