@@ -81,7 +81,7 @@ subprojects {
 
   java {
     toolchain {
-      languageVersion.set(JavaLanguageVersion.of(23))
+      languageVersion = JavaLanguageVersion.of(23)
     }
   }
 
