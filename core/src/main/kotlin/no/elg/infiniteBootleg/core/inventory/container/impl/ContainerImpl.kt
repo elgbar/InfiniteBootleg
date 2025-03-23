@@ -181,7 +181,7 @@ open class ContainerImpl(
     return object : MutableIterator<IndexedItem> {
       var index: Int = -1
 
-      override fun hasNext(): Boolean = index < size
+      override fun hasNext(): Boolean = index < size - 1
 
       override fun next(): IndexedItem {
         val nextIndex = ++index

@@ -78,6 +78,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     super.dispose()
     ClientMain.inst().updateStatus(null)
     world.disposeSafely()
+    hud.dispose()
   }
 
   val isDebugMenuVisible: Boolean get() = ::debugMenu.isInitialized && debugMenu.isDebugMenuVisible

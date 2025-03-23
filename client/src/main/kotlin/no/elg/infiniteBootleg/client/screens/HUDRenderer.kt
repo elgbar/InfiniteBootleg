@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.client.screens
 
+import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.client.main.ClientMain
+import no.elg.infiniteBootleg.client.screens.hud.ContainerChangeRenderer
 import no.elg.infiniteBootleg.client.screens.hud.DebugGraph
 import no.elg.infiniteBootleg.client.screens.hud.DebugGraph.render
 import no.elg.infiniteBootleg.client.screens.hud.DebugText.chunk
@@ -20,9 +22,10 @@ import no.elg.infiniteBootleg.core.api.Resizable
 /**
  * @author Elg
  */
-class HUDRenderer : Renderer, Resizable {
-  private var modus = DISPLAY_CURRENT_BLOCK
+class HUDRenderer : Renderer, Resizable, Disposable {
+  private var modus = DISPLAY_CURRENT_BLOCK or DISPLAY_CONTAINER_CHANGE
   private val builder = StringBuilder()
+  private val containerChangeRenderer = ContainerChangeRenderer()
 
   init {
     modus = modus or if (Settings.debug) DISPLAY_DEBUG else DISPLAY_NOTHING
@@ -67,6 +70,9 @@ class HUDRenderer : Renderer, Resizable {
       if (hasMode(DISPLAY_CURRENT_BLOCK) && world != null) {
         HeldBlockRenderer.render(sr, world)
       }
+      if (hasMode(DISPLAY_CONTAINER_CHANGE) && world != null) {
+        containerChangeRenderer.render()
+      }
       if (hasMode(DISPLAY_GRAPH_FPS)) {
         render(sr, world)
       }
@@ -97,11 +103,16 @@ class HUDRenderer : Renderer, Resizable {
     DebugGraph.resize(width, height)
   }
 
+  override fun dispose() {
+    containerChangeRenderer.dispose()
+  }
+
   companion object {
     const val DISPLAY_NOTHING = 0
     const val DISPLAY_CURRENT_BLOCK = 0b0001
     const val DISPLAY_MINIMAL_DEBUG = 0b0010
     const val DISPLAY_DEBUG = 0b0100
     const val DISPLAY_GRAPH_FPS = 0b1000
+    const val DISPLAY_CONTAINER_CHANGE = 0b0001_0000
   }
 }

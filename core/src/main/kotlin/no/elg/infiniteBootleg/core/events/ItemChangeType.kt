@@ -3,8 +3,15 @@ package no.elg.infiniteBootleg.core.events
 import no.elg.infiniteBootleg.core.items.Item
 
 sealed interface ItemChangeType {
-  val oldItem: Item?
-  val newItem: Item?
+  /**
+   * The item that was removed, or `null` if the item was added
+   */
+  val removedItem: Item?
+
+  /**
+   * The item that was added, or `null` if the item was removed
+   */
+  val addedItem: Item?
 
   companion object {
     fun getItemChangeType(addedItem: Item?, removedItem: Item?): ItemChangeType? {
@@ -24,12 +31,12 @@ sealed interface ItemChangeType {
   }
 }
 
-data class ItemAddedChangeType(override val newItem: Item) : ItemChangeType {
-  override val oldItem: Item? get() = null
+data class ItemAddedChangeType(override val addedItem: Item) : ItemChangeType {
+  override val removedItem: Item? get() = null
 }
 
-data class ItemRemovedChangeType(override val oldItem: Item) : ItemChangeType {
-  override val newItem: Item? get() = null
+data class ItemRemovedChangeType(override val removedItem: Item) : ItemChangeType {
+  override val addedItem: Item? get() = null
 }
 
 /**
@@ -37,9 +44,9 @@ data class ItemRemovedChangeType(override val oldItem: Item) : ItemChangeType {
  *
  * Note that if the [Item.maxStock] changes this will be considered a [ItemChangedChangeType]
  */
-data class ItemChangedChangeType(override val oldItem: Item, override val newItem: Item) : ItemChangeType {
+data class ItemChangedChangeType(override val removedItem: Item, override val addedItem: Item) : ItemChangeType {
   init {
-    require(oldItem != newItem) { "Old and new items does not differ, use ItemStockChangeType" }
+    require(removedItem != addedItem) { "Old and new items does not differ, use ItemStockChangeType" }
   }
 }
 
@@ -48,17 +55,17 @@ data class ItemChangedChangeType(override val oldItem: Item, override val newIte
  *
  * Note that if the [Item.maxStock] changes this will be considered a [ItemChangedChangeType]
  */
-data class ItemStockChangeType(override val oldItem: Item, override val newItem: Item) : ItemChangeType {
+data class ItemStockChangeType(override val removedItem: Item, override val addedItem: Item) : ItemChangeType {
   init {
-    require(oldItem == newItem && !oldItem.equalsIncludingStock(newItem)) { "Old and new items differ in other ways than the stock, $oldItem and $newItem" }
+    require(removedItem == addedItem && !removedItem.equalsIncludingStock(addedItem)) { "Old and new items differ in other ways than the stock, $removedItem and $addedItem" }
   }
 }
 
-///**
-// * Items in [index] and [indexOther] were swapped. 
-// * 
+// /**
+// * Items in [index] and [indexOther] were swapped.
+// *
 // * Either [oldItem]/[oldItemOther] or [newItem]/[newItemOther] of will be non-null
-// * 
+// *
 // * @param index The index of the first item
 // * @param oldItem The old item at [index]
 // * @param newItem The new item at [index]
@@ -66,15 +73,15 @@ data class ItemStockChangeType(override val oldItem: Item, override val newItem:
 // * @param oldItemOther The old item at [indexOther]
 // * @param newItemOther The new item at [indexOther]
 // */
-//data class ItemSwappedChangeType(
+// data class ItemSwappedChangeType(
 //  override val oldItem: Item?,
 //  override val newItem: Item?,
 //  val oldItemOther: Item?,
 //  val newItemOther: Item?
-//) : ItemChangeType{
+// ) : ItemChangeType{
 //  init {
 //    require(oldItem != null || newItem != null) { "Either the old or the new item must be non-null" }
 //    require(oldItem === newItemOther) { "The items at index and indexOther must be swapped" }
 //    require(newItem === oldItemOther) { "The items at index and indexOther must be swapped" }
 //  }
-//}
+// }
