@@ -31,9 +31,9 @@ import no.elg.infiniteBootleg.core.events.api.EventManager.registerListener
 import no.elg.infiniteBootleg.core.events.api.RegisteredEventListener
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.items.Item
+import no.elg.infiniteBootleg.core.items.Item.Companion.displayName
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.safeUse
-import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.util.withColor
 
 @Scene2dDsl
@@ -101,7 +101,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
             fbo = null
             defaultDrawable
           }
-          tooltip.setText(item?.run { element.displayName.lowercase().toTitleCase() } ?: "<Empty>")
+          tooltip.setText(item.displayName)
         }
 
         it.pad(2f).space(2f)

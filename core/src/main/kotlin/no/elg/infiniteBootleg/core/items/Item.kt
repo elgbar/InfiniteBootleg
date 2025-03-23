@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.core.items
 
+import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.asProto
 import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
@@ -84,6 +85,7 @@ sealed interface Item {
     const val DEFAULT_MAX_STOCK = 65_536u
 
     val Item?.labelText: String get() = this?.run { "$stock / $maxStock" } ?: "<empty>"
+    val Item?.displayName: String get() = this?.run { element.displayName.lowercase().toTitleCase().replace('_', ' ') } ?: "<Empty>"
 
     fun mergeAll(items: List<Item>, newElementMaxStock: UInt = DEFAULT_MAX_STOCK): List<Item> {
       if (items.isEmpty() || items.none { it != items.first() }) {
