@@ -46,11 +46,12 @@ sealed interface Item {
    * @param delta The amount to change the stock by
    * @return The resulting items, empty if depleted, or number of items if the delta is larger than the max stock
    */
-  fun change(delta: Int): List<Item> = when {
-    delta == 0 -> listOf(this)
-    delta < 0 -> use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
-    else -> merge(copyToFit(delta.toUInt()))
-  }
+  fun change(delta: Int): List<Item> =
+    when {
+      delta == 0 -> listOf(this)
+      delta < 0 -> use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
+      else -> merge(copyToFit(delta.toUInt()))
+    }
 
   fun willBeDepleted(usages: UInt = 1u): Boolean = usages >= stock
 

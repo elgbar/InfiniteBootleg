@@ -28,7 +28,6 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
     if (enabled) {
       worldRender.batch.withColor(a = .75f) {
         for (entity: Entity in entities) {
-//          val texture = entity.textureRegionComponent.texture.textureRegion
           val box2dComp = entity.box2d
           val body = box2dComp.body
           val spawn = entity.spellStateComponentOrNull ?: continue

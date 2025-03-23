@@ -270,7 +270,7 @@ class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable
                   }
                   drawRotatedTexture(texture, dx, dy, rotation)
                 } else {
-                  // Optimization: If the draw anything if the block is not lit or in the sky, the background is already cleared to black
+                  // Optimization: the block is not lit or in the sky, the background is already cleared to black
                   continue
                 }
               }

@@ -108,26 +108,6 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     interfaceManager.toggleInterface(interfaceId, maybeStage ?: return, createIfMissing)
   }
 
-//  /**
-//   * Register an IContainer with the UI, if one is already registered return a saved instance
-//   *
-//   * @return The ContainerActor for the given container
-//   */
-//  fun getContainerActor(ownedContainer: OwnedContainer): CompletableFuture<WindowAndStage>? {
-//    val stage = maybeStage ?: return null
-//    val interfaceId = ownedContainer.owner.toInterfaceId()
-//
-//    val storedActor = interfaceManager.getInterface(interfaceId)
-//    return if (storedActor == null) {
-//      Main.inst().scheduler.executeSync {
-//        val actor = interfaceManager.getInterface(interfaceId) ?: createContainerActor(ownedContainer)
-//        WindowAndStage(actor, stage)
-//      }
-//    } else {
-//      CompletableFuture.completedFuture(WindowAndStage(storedActor, stage))
-//    }
-//  }
-
   fun createContainerActor(ownedContainer: OwnedContainer) = world.createContainerActor(ownedContainer, dad, batch)
 
   fun lookAt(loc: WorldCompactLoc) = lookAt(loc.decompactLocX(), loc.decompactLocY())
@@ -137,7 +117,6 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   }
 
   override fun render() {
-    batch.projectionMatrix = camera.combined
     chunkRenderer.renderMultiple()
     batch.safeUse(camera.combined) {
       for (renderer in renderers) {
@@ -147,10 +126,12 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
           batch.projectionMatrix = camera.combined
         }
         batch.color = Color.WHITE
+        if (!batch.isDrawing) {
+          batch.begin()
+        }
         renderer.render()
         if (!batch.isDrawing) {
-          logger.warn { "Batch is no longer drawing after ${renderer::class}, restarting the batch" }
-          batch.begin()
+          logger.warn { "Batch is no longer drawing after ${renderer::class}" }
         }
       }
     }

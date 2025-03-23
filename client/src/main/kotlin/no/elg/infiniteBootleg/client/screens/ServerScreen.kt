@@ -17,8 +17,6 @@ import no.elg.infiniteBootleg.client.util.onInteract
 import no.elg.infiniteBootleg.core.net.ServerClient
 import no.elg.infiniteBootleg.core.net.serverBoundLoginPacket
 
-private val logger = KotlinLogging.logger {}
-
 /**
  * @author Elg
  */
