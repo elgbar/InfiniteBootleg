@@ -67,7 +67,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
 
     val filter: (InterfaceEvent) -> Boolean = { it.interfaceId == interfaceId }
     events = arrayOf(
-      registerListener<ContainerEvent.Changed>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
+      registerListener<ContainerEvent.ContentChanged>({ it.container === container || it.owner?.toInterfaceId() == interfaceId }) {
         val serverContainer = this.container
         launchOnMain {
           serverContainer.content.copyInto(container.content)

@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.inventory.container.impl
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.events.ContainerEvent
+import no.elg.infiniteBootleg.core.events.ItemChangeType
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.inventory.container.Container
 import no.elg.infiniteBootleg.core.inventory.container.IndexedItem
@@ -34,8 +35,8 @@ open class ContainerImpl(
 
   override fun add(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
+    var amountNotAdded = amount
     try {
-      var amountNotAdded = amount
       while (amountNotAdded > 0u) {
         val index = indexOfFirstNonFull(element).let { if (it < 0) indexOfFirstEmpty() else it }
         if (index < 0) {
@@ -51,50 +52,43 @@ open class ContainerImpl(
       }
       return amountNotAdded
     } finally {
-      updateContainer()
+      updateContainer(addedItem = element.toItem(UInt.MAX_VALUE, amount - amountNotAdded))
     }
   }
 
-  override fun removeAll(element: ContainerElement) {
-    for (i in 0 until size) {
-      val item = content[i]
-      if (item != null && item.element === element) {
-        content[i] = null
-      }
-    }
-    updateContainer()
-  }
+  override fun removeAll(element: ContainerElement) = remove(element.toItem(UInt.MAX_VALUE, UInt.MAX_VALUE))
 
   override fun remove(element: Item, amount: UInt): UInt = remove(element.element, amount)
 
   override fun remove(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
     logger.debug { "Removing $amount of $element" }
-    var counter = amount
+    var stockToRemove = amount
     var i = 0
     val length = content.size
     try {
       while (i < length) {
         val item = content[i]
         if (item != null && element === item.element) {
-          val newAmount = (item.stock - counter).toInt()
+          val newAmount = (item.stock - stockToRemove).toInt()
           if (newAmount < 0) {
-            counter -= item.stock
+            stockToRemove -= item.stock
             content[i] = null
           } else {
             if (newAmount != 0) {
-              content[i] = item.use(counter)
+              content[i] = item.use(stockToRemove)
             } else {
               content[i] = null
             }
-            return 0u
+            stockToRemove = 0u
+            break
           }
         }
         i++
       }
-      return counter
+      return stockToRemove
     } finally {
-      updateContainer()
+      updateContainer(removedItem = element.toItem(UInt.MAX_VALUE, amount - stockToRemove))
     }
   }
 
@@ -104,19 +98,22 @@ open class ContainerImpl(
     }
     var i = 0
     val length = content.size
+    var stockRemoved = 0u
     while (i < length) {
       if (item == content[i]) {
+        stockRemoved += item.stock
         content[i] = null
       }
       i++
     }
-    updateContainer()
+    updateContainer(removedItem = item.copyToFit(stockRemoved))
   }
 
   override fun remove(index: Int) {
-    if (content[index] != null) {
+    val old = content[index]
+    if (old != null) {
       content[index] = null
-      updateContainer()
+      updateContainer(removedItem = old)
     }
   }
 
@@ -124,7 +121,7 @@ open class ContainerImpl(
     for (i in content.indices) {
       content[i] = null
     }
-    updateContainer()
+    updateContainer(changeType = null)
   }
 
   override fun contains(item: Item?): Boolean {
@@ -147,38 +144,53 @@ open class ContainerImpl(
   override fun put(index: Int, item: Item?) {
     require(index in 0 until size) { "Index out of bounds: $index" }
     require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
+    val old = content[index]
     content[index] = item
-    updateContainer()
+    updateContainer(addedItem = item, removedItem = old)
   }
 
   override fun swap(index1: Int, index2: Int) {
     require(index1 in 0 until size) { "Index out of bounds: $index1" }
     require(index2 in 0 until size) { "Index out of bounds: $index2" }
     val item1 = content[index1]
-    content[index1] = content[index2]
-    content[index2] = item1
-    updateContainer()
+    val item2 = content[index2]
+    if (item1 != null || item2 != null) {
+      content[index1] = item2
+      content[index2] = item1
+//      val changeType = ItemSwappedChangeType(
+//        index1,
+//        oldItem = item1,
+//        newItem = item2,
+//        indexOther = index2,
+//        oldItemOther = item2,
+//        newItemOther = item1,
+//      )
+      updateContainer(changeType = null)
+    }
   }
 
-  protected open fun updateContainer() {
-    EventManager.dispatchEvent(ContainerEvent.Changed(this))
+  private fun updateContainer(addedItem: Item? = null, removedItem: Item? = null) {
+    updateContainer(ItemChangeType.getItemChangeType(addedItem, removedItem))
+  }
+
+  protected open fun updateContainer(changeType: ItemChangeType?) {
+    EventManager.dispatchEvent(ContainerEvent.ContentChanged(this, changeType = changeType))
   }
 
   override fun iterator(): MutableIterator<IndexedItem> {
     return object : MutableIterator<IndexedItem> {
-      var index: Int = 0
+      var index: Int = -1
 
-      override fun hasNext(): Boolean {
-        return index < size
-      }
+      override fun hasNext(): Boolean = index < size
 
       override fun next(): IndexedItem {
-        return IndexedItem(index, content[index++])
+        val nextIndex = ++index
+        return IndexedItem(nextIndex, content[nextIndex])
       }
 
       override fun remove() {
-        updateContainer()
-        content[index] = null
+        check(index >= 0) { "Next has not been called yet" }
+        remove(index)
       }
     }
   }

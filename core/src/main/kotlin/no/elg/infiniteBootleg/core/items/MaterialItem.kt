@@ -15,7 +15,7 @@ data class MaterialItem(
   override val stock: UInt = Item.Companion.DEFAULT_MAX_STOCK
 ) : Item {
 
-  override val itemType: ItemType = ItemType.BLOCK
+  override val itemType: ItemType get() = ItemType.BLOCK
 
   /**
    * Change the charge of this item by [usages] amount
@@ -24,7 +24,7 @@ data class MaterialItem(
    */
   override fun use(usages: UInt): MaterialItem? {
     if (willBeDepleted(usages)) return null
-    return MaterialItem(element, maxStock, stock - usages)
+    return copy(stock = stock - usages)
   }
 
   override fun equals(other: Any?): Boolean {

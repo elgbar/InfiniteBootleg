@@ -41,7 +41,7 @@ class ServerClientWorldContainerManager(val world: ServerClientWorld) : WorldCon
       logger.debug { "Failed to find a container for $owner" }
     }
     internalContainers[owner] = ownedContainer
-    EventManager.dispatchEvent(ContainerEvent.Changed(ownedContainer))
+    EventManager.dispatchEvent(ContainerEvent.ContentChanged(ownedContainer))
   }
 
   companion object {

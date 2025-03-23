@@ -8,10 +8,10 @@ data class StaffItem(
   override val stock: UInt
 ) : Item {
 
-  override val itemType: ItemType = ItemType.TOOL
+  override val itemType: ItemType get() = ItemType.TOOL
 
   override fun use(usages: UInt): StaffItem? {
     if (willBeDepleted(usages)) return null
-    return StaffItem(element, maxStock, stock - usages)
+    return copy(stock = stock - usages)
   }
 }

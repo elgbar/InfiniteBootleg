@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.core.inventory.container.impl
 
+import no.elg.infiniteBootleg.core.events.ItemChangeType
 import no.elg.infiniteBootleg.core.inventory.container.SortOrder
 import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
@@ -17,9 +18,9 @@ class AutoSortedContainer(
 
   override val type: ProtoWorld.Container.Type get() = ProtoWorld.Container.Type.AUTO_SORTED
 
-  override fun updateContainer() {
-    super.updateContainer()
+  override fun updateContainer(changeType: ItemChangeType?) {
     sortOrder.sort(content)
+    super.updateContainer(changeType)
   }
 
   override fun put(index: Int, item: Item?) {

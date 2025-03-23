@@ -36,19 +36,20 @@ sealed interface Item {
   fun use(usages: UInt = 1u): Item?
 
   /**
+   * @return A copy with the [Item.maxStock] and [Item.stock] set to [stock]
+   */
+  fun copyToFit(stock: UInt): Item = element.toItem(maxStock = stock, stock = stock)
+
+  /**
    * Change the charge of this item by [delta] amount
    *
    * @param delta The amount to change the stock by
    * @return The resulting items, empty if depleted, or number of items if the delta is larger than the max stock
    */
-  fun change(delta: Int): List<Item> {
-    return if (delta == 0) {
-      listOf(this)
-    } else if (delta < 0) {
-      use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
-    } else {
-      Item.mergeAll(listOf(this, this.element.toItem(Int.MAX_VALUE.toUInt(), delta.toUInt())), maxStock)
-    }
+  fun change(delta: Int): List<Item> = when {
+    delta == 0 -> listOf(this)
+    delta < 0 -> use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
+    else -> merge(copyToFit(delta.toUInt()))
   }
 
   fun willBeDepleted(usages: UInt = 1u): Boolean = usages >= stock
@@ -65,9 +66,7 @@ sealed interface Item {
    *
    * @return The resulting item, or the same items if the items cannot be merged
    */
-  fun merge(other: Item): List<Item> {
-    return mergeAll(listOf(this, other))
-  }
+  fun merge(other: Item): List<Item> = mergeAll(listOf(this, other), maxStock)
 
   /**
    * @return If this item is equal to [other] including the stock left
@@ -84,7 +83,7 @@ sealed interface Item {
   companion object : ProtoConverter<Item, ProtoWorld.Container.Item> {
     const val DEFAULT_MAX_STOCK = 65_536u
 
-    val Item?.labelText: String get() = this?.run { "$stock / $maxStock" } ?: "<empty>"
+    val Item?.stockText: String get() = this?.run { "$stock / $maxStock" } ?: "??? / ???"
     val Item?.displayName: String get() = this?.run { element.displayName.lowercase().toTitleCase().replace('_', ' ') } ?: "<Empty>"
 
     fun mergeAll(items: List<Item>, newElementMaxStock: UInt = DEFAULT_MAX_STOCK): List<Item> {

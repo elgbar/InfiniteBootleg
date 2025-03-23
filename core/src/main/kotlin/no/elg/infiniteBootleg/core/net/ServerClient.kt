@@ -54,7 +54,7 @@ class ServerClient(
   /**
    * Make sure the server is updated with the latest container changes
    */
-  private val containerChangedEventListener = EventManager.registerListener<ContainerEvent.Changed> { event: ContainerEvent.Changed ->
+  private val containerContentChangedEventListener = EventManager.registerListener<ContainerEvent.ContentChanged> { event: ContainerEvent.ContentChanged ->
     if (event.owner is EntityOwner && event.owner.entityId == entityId) {
       sendServerBoundPacket { serverBoundContainerUpdate(event.owner, event.container) }
     }
@@ -62,7 +62,7 @@ class ServerClient(
 
   override fun dispose() {
     sendServerBoundPacket { serverBoundClientDisconnectPacket("Server client disposed") }
-    containerChangedEventListener.removeListener()
+    containerContentChangedEventListener.removeListener()
     ctx.disconnect()
   }
 
