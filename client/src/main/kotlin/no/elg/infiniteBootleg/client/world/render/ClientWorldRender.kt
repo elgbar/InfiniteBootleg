@@ -142,7 +142,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     batch.safeUse(camera.combined) {
       for (renderer in renderers) {
         if (renderer.isInactive) continue
-        if (batch.projectionMatrix != camera.combined) {
+        if (!batch.projectionMatrix.values.contentEquals(camera.combined.values)) {
           @Suppress("GDXKotlinFlushInsideLoop")
           batch.projectionMatrix = camera.combined
         }
