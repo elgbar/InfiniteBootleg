@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.client.screens
 
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.screens.hud.CurrentBlockHUDRenderer
 import no.elg.infiniteBootleg.client.screens.hud.DebugGraph
 import no.elg.infiniteBootleg.client.screens.hud.DebugGraph.render
 import no.elg.infiniteBootleg.client.screens.hud.DebugText.chunk
@@ -13,10 +12,10 @@ import no.elg.infiniteBootleg.client.screens.hud.DebugText.pointing
 import no.elg.infiniteBootleg.client.screens.hud.DebugText.pos
 import no.elg.infiniteBootleg.client.screens.hud.DebugText.time
 import no.elg.infiniteBootleg.client.screens.hud.DebugText.viewChunk
+import no.elg.infiniteBootleg.client.screens.hud.HeldBlockRenderer
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.api.Resizable
-import no.elg.infiniteBootleg.core.main.Main
 
 /**
  * @author Elg
@@ -26,11 +25,11 @@ class HUDRenderer : Renderer, Resizable {
   private val builder = StringBuilder()
 
   init {
-    modus = modus or if (Settings.debug) DISPLAY_DEBUG else DISPLAY_CURRENT_BLOCK
+    modus = modus or if (Settings.debug) DISPLAY_DEBUG else DISPLAY_NOTHING
   }
 
   override fun render() {
-    if (modus == DISPLAY_NOTHING || Main.isServer) {
+    if (modus == DISPLAY_NOTHING) {
       return
     }
     val main = ClientMain.inst()
@@ -66,7 +65,7 @@ class HUDRenderer : Renderer, Resizable {
         sr.drawTop(builder.toString(), 1f)
       }
       if (hasMode(DISPLAY_CURRENT_BLOCK) && world != null) {
-        CurrentBlockHUDRenderer.render(sr, world)
+        HeldBlockRenderer.render(sr, world)
       }
       if (hasMode(DISPLAY_GRAPH_FPS)) {
         render(sr, world)
@@ -100,9 +99,9 @@ class HUDRenderer : Renderer, Resizable {
 
   companion object {
     const val DISPLAY_NOTHING = 0
-    const val DISPLAY_CURRENT_BLOCK = 1
-    const val DISPLAY_MINIMAL_DEBUG = 2
-    const val DISPLAY_DEBUG = 4
-    const val DISPLAY_GRAPH_FPS = 8
+    const val DISPLAY_CURRENT_BLOCK = 0b0001
+    const val DISPLAY_MINIMAL_DEBUG = 0b0010
+    const val DISPLAY_DEBUG = 0b0100
+    const val DISPLAY_GRAPH_FPS = 0b1000
   }
 }
