@@ -10,7 +10,6 @@ import no.elg.infiniteBootleg.core.util.INITIAL_INTERACT_RADIUS
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
-import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.KillableComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
@@ -89,7 +88,7 @@ private fun EntityKt.Dsl.addCommonPlayerComponentsProto(
     y = dy
   }
   name = playerName
-  grounded = GroundedComponent.Companion.PROTO_GROUNDED
+  grounded = ProtoWorld.Entity.Grounded.getDefaultInstance()
   killable = killable {
     health = KillableComponent.Companion.DEFAULT_MAX_HEALTH
     maxHealth = KillableComponent.Companion.DEFAULT_MAX_HEALTH
