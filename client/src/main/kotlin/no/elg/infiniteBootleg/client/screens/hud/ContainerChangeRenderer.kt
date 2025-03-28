@@ -59,14 +59,14 @@ class ContainerChangeRenderer : Renderer, Disposable {
     }
   }
 
-  private val contentChangedEvent = EventManager.registerListener { (container, _, type): ContainerEvent.ContentChanged ->
+  private val onContentChanged = EventManager.registerListener { (container, _, type): ContainerEvent.ContentChanged ->
     if (type != null && (type.addedItem != null || type.removedItem != null) && isControlledContainer(container)) {
       addForProcessing(type.addedItem, false)
       addForProcessing(type.removedItem, true)
     }
   }
 
-  private val updater = EventManager.registerListener { e: WorldTickedEvent ->
+  private val onWorldTick = EventManager.registerListener { e: WorldTickedEvent ->
     if (changeHandlersHold.isNotEmpty() && (changeHandlers.isEmpty() || e.tickId % (e.world.worldTicker.tps / LINES_PER_SECONDS) == 0L)) {
       synchronized(changeHandlersHold) {
         val data = changeHandlersHold
@@ -119,8 +119,8 @@ class ContainerChangeRenderer : Renderer, Disposable {
   }
 
   override fun dispose() {
-    contentChangedEvent.removeListener()
-    updater.removeListener()
+    onContentChanged.removeListener()
+    onWorldTick.removeListener()
   }
 
   fun getData(item: Item, remove: Boolean, xOffset: Int): ItemDisplayData? {
@@ -147,6 +147,6 @@ class ContainerChangeRenderer : Renderer, Disposable {
     /**
      * How many lines to be created each second
      */
-    const val LINES_PER_SECONDS = 5
+    const val LINES_PER_SECONDS = 3
   }
 }
