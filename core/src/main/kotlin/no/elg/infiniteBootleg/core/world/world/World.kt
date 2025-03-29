@@ -16,6 +16,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import kotlinx.coroutines.delay
 import ktx.async.interval
@@ -796,7 +797,7 @@ abstract class World(
 
   @JvmName("removeLocs")
   fun removeBlocks(blocks: Iterable<WorldCompactLoc>, giveTo: Entity? = null, prioritize: Boolean = false): Set<Block> {
-    val removed = mutableSetOf<Block>()
+    val removed = ObjectOpenHashSet<Block>()
     val blockChunks = actionOnBlocks(blocks) { localX, localY, nullableChunk ->
       val chunk = nullableChunk ?: return@actionOnBlocks
       chunk.getRawBlock(localX, localY)?.also { oldBlock ->
@@ -1254,7 +1255,7 @@ abstract class World(
      * @param radius Radius to be equal or less from center
      * @return Set of blocks within the given radius
      */
-    fun getLocationsWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): LongArray = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+    fun getLocationsWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): LongOpenHashSet = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
 
     /**
      * @param worldX X center
@@ -1262,15 +1263,25 @@ abstract class World(
      * @param radius Radius to be equal or less from center
      * @return Set of blocks within the given radius
      */
-    fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongArray {
+    fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongOpenHashSet {
       require(radius >= 0) { "Radius should be a non-negative number" }
-      val locs = GdxLongArray(false, (radius * radius * Math.PI).toInt() + 1)
+      val loadFactor = .85f
+      // estimation matches good enough, except for radius == 1f
+      val expected = if (radius == 1f) 1 else (radius * radius * Math.PI).toInt()
+      val locs = LongOpenHashSet(expected, loadFactor)
       for (compact in getLocationsAABBFromCenter(worldX, worldY, radius, radius)) {
         if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
           locs.add(compact)
         }
       }
-      return locs.toArray()
+//      logger.trace {
+//        val arraySizeEst = arraySize(expected, loadFactor)
+//        val arraySizeAct = arraySize(locs.size, loadFactor)
+//        val maxFillEst = maxFill(arraySizeEst, loadFactor)
+//        val maxFillAct = maxFill(arraySizeAct, loadFactor)
+//        "radius: $radius, estimated: $expected (initial size $arraySizeEst, maxFill $maxFillEst), actual ${locs.size} (initial size $arraySizeAct, maxFill $maxFillAct)"
+//      }
+      return locs
     }
   }
 }

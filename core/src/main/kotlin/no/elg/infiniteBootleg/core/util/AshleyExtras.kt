@@ -52,9 +52,9 @@ fun Entity.breakableLocs(
 fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY: WorldCoord, interactionRadius: Float): Sequence<Long> {
   return interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
     .filter { world.isAirBlock(it) }
-    .let {
-      if (it.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
-        it
+    .let { seq ->
+      if (seq.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
+        seq
       } else {
         emptySequence()
       }

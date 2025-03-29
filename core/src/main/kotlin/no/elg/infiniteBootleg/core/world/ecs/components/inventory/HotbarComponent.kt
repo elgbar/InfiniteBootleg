@@ -2,6 +2,8 @@ package no.elg.infiniteBootleg.core.world.ecs.components.inventory
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.objects.Object2IntArrayMap
+import it.unimi.dsi.fastutil.objects.Object2IntMap
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import no.elg.infiniteBootleg.core.items.Item
@@ -15,11 +17,10 @@ import no.elg.infiniteBootleg.core.world.ecs.components.transients.RemoteEntityH
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.hotbar
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import java.util.EnumMap
 
 private val logger = KotlinLogging.logger {}
 
-data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<HotbarSlot, Int>) : EntitySavableComponent {
+data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: Object2IntMap<HotbarSlot>) : EntitySavableComponent {
 
   init {
     // Make sure the hotbar is filled with empty slots if there is nothing else there
@@ -76,7 +77,7 @@ data class HotbarComponent(var selected: HotbarSlot, val hotbarItems: EnumMap<Ho
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity) =
       safeWith {
         val protoHotbar = protoEntity.hotbar
-        val map: EnumMap<HotbarSlot, Int> = EnumMap(HotbarSlot::class.java)
+        val map: Object2IntMap<HotbarSlot> = Object2IntArrayMap(HotbarSlot.entries.size)
         protoHotbar.hotbarItemsList.forEachIndexed { index, itemIndex ->
           map[HotbarSlot.fromOrdinal(index)] = itemIndex
         }

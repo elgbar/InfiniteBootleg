@@ -2,6 +2,7 @@ package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.ashley.core.Entity
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.longs.LongIterators
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.MaterialItem
 import no.elg.infiniteBootleg.core.main.Main
@@ -29,6 +30,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.material
 import java.util.concurrent.CompletableFuture
+import it.unimi.dsi.fastutil.longs.LongIterator as FastUtilLongIterator
 
 private val logger = KotlinLogging.logger {}
 
@@ -180,11 +182,13 @@ enum class Material(
     }
   }
 
-  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) {
-    createBlocks(world, locs.asIterable(), prioritize, allowOverwiteNonAir)
-  }
+  fun createBlocks(world: World, locs: LongArray, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) =
+    createBlocks(world, LongIterators.wrap(locs), prioritize, allowOverwiteNonAir)
 
-  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) {
+  fun createBlocks(world: World, locs: Iterable<Long>, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) =
+    createBlocks(world, LongIterators.asLongIterator(locs.iterator()), prioritize, allowOverwiteNonAir)
+
+  fun createBlocks(world: World, locs: FastUtilLongIterator, prioritize: Boolean = true, allowOverwiteNonAir: Boolean = false) {
     val chunks = mutableSetOf<Chunk>()
     for ((worldX, worldY) in locs) {
       if (allowOverwiteNonAir || world.isAirBlock(worldX, worldY, markerIsAir = false)) {

@@ -2,7 +2,8 @@ package no.elg.infiniteBootleg.core.world.ecs.components.transients
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.utils.LongMap
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import ktx.ashley.Mapper
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
@@ -16,9 +17,9 @@ import no.elg.infiniteBootleg.protobuf.Packets
 
 class CurrentlyBreakingComponent : DebuggableComponent {
 
-  val breaking: LongMap<CurrentlyBreaking> = LongMap(16, 0.8f)
+  val breaking: Long2ObjectMap<CurrentlyBreaking> = Long2ObjectOpenHashMap(0)
 
-  override fun hudDebug(): String = "Currently breaking ${breaking.values().map { "${it.block.hudDebug()} (${it.progressHandler.progress * 100f}%)" }}"
+  override fun hudDebug(): String = "Currently breaking ${breaking.values.map { "${it.block.hudDebug()} (${it.progressHandler.progress * 100f}%)" }}"
 
   companion object : Mapper<CurrentlyBreakingComponent>() {
     var Entity.currentlyBreakingComponent by propertyFor(mapper)
