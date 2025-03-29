@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.core.net.serverBoundBreakingBlock
 import no.elg.infiniteBootleg.core.util.LongMapUtil.component1
 import no.elg.infiniteBootleg.core.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.core.util.breakableLocs
+import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
@@ -76,6 +77,6 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
       // Just take the number the pickaxe can mine, not more
       justDone.take(size - leftOver.toInt())
     }
-    world.removeBlocks(validJustDone, giveTo = entity, prioritize = true)
+    launchOnMultithreadedAsync { world.removeBlocks(validJustDone, giveTo = entity, prioritize = true) }
   }
 }
