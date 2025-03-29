@@ -29,7 +29,7 @@ sealed interface Item {
   val itemType: ItemType
 
   /**
-   * Change the charge of this item by [usages] amount
+   * Use the item by [usages] amount, removes [stock] from the item
    *
    * @return The resulting item, or `null` if the item would be depleted
    */
@@ -48,20 +48,21 @@ sealed interface Item {
    */
   fun change(delta: Int): List<Item> =
     when {
-      delta < 0 -> remove(delta.absoluteValue.toUInt())
+      delta == 0 -> listOf(this)
+      delta < 0 -> use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
       else -> add(delta.toUInt())
     }
 
+  /**
+   * Add [toAdd] stocks amount to this item
+   *
+   * @param toAdd How much to add
+   * @return The resulting items of adding [toAdd] to this item. The max stock of the items will be [maxStock] of this item
+   */
   fun add(toAdd: UInt): List<Item> =
     when {
       toAdd == 0u -> listOf(this)
       else -> merge(copyToFit(toAdd))
-    }
-
-  fun remove(toRemove: UInt): List<Item> =
-    when {
-      toRemove == 0u -> listOf(this)
-      else -> use(toRemove)?.let { listOf(it) } ?: emptyList()
     }
 
   fun willBeDepleted(usages: UInt = 1u): Boolean = usages >= stock
