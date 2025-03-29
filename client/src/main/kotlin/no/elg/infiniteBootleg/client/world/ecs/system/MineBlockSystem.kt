@@ -2,13 +2,12 @@ package no.elg.infiniteBootleg.client.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.util.inputMouseLocator
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundBreakingBlock
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component1
-import no.elg.infiniteBootleg.core.util.LongMapUtil.component2
 import no.elg.infiniteBootleg.core.util.breakableLocs
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.core.util.safeWith
@@ -31,9 +30,9 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
   }
 
   fun CurrentlyBreakingComponent.sendCurrentProgress(zeroProgress: Boolean = false) {
-    if (Main.Companion.isServerClient && breaking.size > 0) {
+    if (Main.Companion.isServerClient && breaking.isNotEmpty()) {
       ClientMain.inst().serverClient.sendServerBoundPacket {
-        val progresses = breaking.values().map { it.toBreakingProgress(zeroProgress) }
+        val progresses = breaking.values.map { it.toBreakingProgress(zeroProgress) }
         serverBoundBreakingBlock(progresses)
       }
     }
@@ -41,30 +40,39 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val controls = entity.locallyControlledComponent
-    val world = entity.world
-    val currentLocs = entity.breakableLocs(world, inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
-
     if (!controls.isBreaking(entity)) {
       entity.currentlyBreakingComponentOrNull?.reset()
       return
     }
 
     val breakingComponent = entity.currentlyBreakingComponentOrNull ?: entity.safeWith { CurrentlyBreakingComponent() } ?: return
+    val world = entity.world
+    val currentLocs = entity
+      .breakableLocs(world, inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY, controls.brushSize, controls.interactRadius)
 
-    breakingComponent.breaking.removeAll { (loc, breaking) ->
-      loc !in currentLocs || world.getMaterial(loc) != breaking.block.material
+    val evaluatedCurrentLocs = if (breakingComponent.breaking.isNotEmpty()) {
+      // must be a set otherwise it kills the performance
+      val currentLocsSet = LongOpenHashSet(currentLocs.iterator())
+      breakingComponent.breaking.long2ObjectEntrySet().removeIf { (loc, breaking) ->
+        loc !in currentLocsSet || world.getMaterial(loc) != breaking.block.material
+      }
+      // we might as well use the result of the forced set above to save some duplicate work
+      currentLocsSet.asSequence()
+    } else {
+      currentLocs
     }
-    currentLocs
+
+    evaluatedCurrentLocs
       .filterNot { breakingComponent.breaking.containsKey(it) }
       .mapNotNull { world.getBlock(it) }
       .forEach { block ->
         breakingComponent.breaking.put(block.compactWorldLoc, CurrentlyBreakingComponent.CurrentlyBreaking(block))
       }
 
-    // MUST use .values() as the entries iterator is returning the same instance (fuck me)
-    val justDone = breakingComponent.breaking.values()
+    val justDone = breakingComponent.breaking.values
+      .asSequence()
       .filter { breaking -> breaking.progressHandler.update(deltaTime) }
-      .mapTo(mutableSetOf()) { it.block.compactWorldLoc }
+      .mapTo(LongOpenHashSet()) { it.block.compactWorldLoc }
 
     breakingComponent.sendCurrentProgress()
 
