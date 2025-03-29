@@ -48,9 +48,20 @@ sealed interface Item {
    */
   fun change(delta: Int): List<Item> =
     when {
-      delta == 0 -> listOf(this)
-      delta < 0 -> use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
-      else -> merge(copyToFit(delta.toUInt()))
+      delta < 0 -> remove(delta.absoluteValue.toUInt())
+      else -> add(delta.toUInt())
+    }
+
+  fun add(toAdd: UInt): List<Item> =
+    when {
+      toAdd == 0u -> listOf(this)
+      else -> merge(copyToFit(toAdd))
+    }
+
+  fun remove(toRemove: UInt): List<Item> =
+    when {
+      toRemove == 0u -> listOf(this)
+      else -> use(toRemove)?.let { listOf(it) } ?: emptyList()
     }
 
   fun willBeDepleted(usages: UInt = 1u): Boolean = usages >= stock
@@ -88,11 +99,15 @@ sealed interface Item {
     val Item?.displayName: String get() = this?.run { element.displayName.lowercase().toTitleCase().replace('_', ' ') } ?: "<Empty>"
 
     fun mergeAll(items: List<Item>, newElementMaxStock: UInt = DEFAULT_MAX_STOCK): List<Item> {
-      if (items.isEmpty() || items.none { it != items.first() }) {
+      if (items.isEmpty()) {
         return items
       }
       val element = items.first().element
-      val totalStock = items.sumOf { it.stock }
+      // Check by element type, max stock does not matter
+      if (items.any { it.element != element }) {
+        return items
+      }
+      val totalStock = items.sumOf(Item::stock)
       if (totalStock <= newElementMaxStock) {
         return listOf(element.toItem(newElementMaxStock, totalStock))
       } else {
