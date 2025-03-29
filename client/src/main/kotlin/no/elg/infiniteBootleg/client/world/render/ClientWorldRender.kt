@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.elg.infiniteBootleg.client.inventory.ui.SlotSource.Companion.DRAG_ICON_SIZE
 import no.elg.infiniteBootleg.client.inventory.ui.createContainerActor
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.screens.StageScreen
@@ -92,7 +93,11 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
   val box2DDebugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer(true, false, false, false, true, false) }
 
-  private val dad: DragAndDrop = DragAndDrop()
+  private val dad: DragAndDrop = DragAndDrop().apply {
+    setButton(-1)
+    setDragActorPosition(DRAG_ICON_SIZE / 2f, -DRAG_ICON_SIZE / 2f) // center on drag image
+    dragTime = 50 // ms
+  }
 
   val interfaceManager = InterfaceManager(world)
 
