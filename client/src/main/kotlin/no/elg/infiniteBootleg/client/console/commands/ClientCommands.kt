@@ -78,6 +78,41 @@ class ClientCommands : CommonCommands() {
 
   @CmdArgNames("item", "quantity")
   @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
+  fun take(elementName: String, quantity: Int) {
+    val world = clientWorld ?: return
+    val entities = world.controlledPlayerEntities
+    if (entities.size() == 0) {
+      logger.error { "There is no local, controlled, player in this world" }
+      return
+    }
+    val player = entities.first()
+    val container = player.containerOrNull ?: run {
+      logger.error { "Player has no container" }
+      return
+    }
+
+    if (quantity < 1) {
+      logger.error { "Quantity must be at least 1, use 'give' command to add items" }
+      return
+    }
+    val element: ContainerElement = ContainerElement.valueOf(elementName) ?: run {
+      logger.error { "Unknown container element '$elementName'" }
+      return
+    }
+
+    val notAdded = container.remove(element, quantity.toUInt())
+    if (notAdded == 0u) {
+      logger.info { "Took $quantity $element from player" }
+    } else {
+      logger.info {
+        val taken = quantity - notAdded.toInt()
+        "Failed to take $notAdded $element from player, took $taken $element instead"
+      }
+    }
+  }
+
+  @CmdArgNames("item", "quantity")
+  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
   fun give(elementName: String, quantity: Int) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
@@ -92,7 +127,7 @@ class ClientCommands : CommonCommands() {
     }
 
     if (quantity < 1) {
-      logger.error { "Quantity must be at least 1" }
+      logger.error { "Quantity must be at least 1, use 'take' command to remove items" }
       return
     }
     val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
