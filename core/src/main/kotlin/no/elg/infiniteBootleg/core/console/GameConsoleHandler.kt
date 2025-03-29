@@ -12,8 +12,6 @@ import com.strongjoshua.console.LogLevel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Resizable
 import no.elg.infiniteBootleg.core.console.GameConsoleLogger.Companion
-import java.io.PrintWriter
-import java.io.StringWriter
 import kotlin.reflect.KParameter.Kind
 import kotlin.reflect.full.memberFunctions
 
@@ -109,8 +107,8 @@ abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
       val method = methods[possible[argNr]]
       val params: Array<Class<*>> = method.parameterTypes
       if (numArgs == params.size) {
+        val args = mutableListOf<Any>()
         return try {
-          val args = mutableListOf<Any>()
           try {
             for (j in params.indices) {
               val value = commandArgs[j]
@@ -141,17 +139,9 @@ abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
           }
           return true
         } catch (e: ReflectionException) {
-          if (argNr > 0) {
-            logger.error {
-              "Failed to execute command ${method.name}(${method.parameterTypes.joinToString(",") { it.simpleName }})' with args ${commandArgs.take(argNr).joinToString(" ")}"
-            }
-          } else {
-            logger.error { "Failed to execute command: ${method.name}" }
-          }
-          logger.error {
-            val pw = PrintWriter(StringWriter())
-            e.cause?.cause?.printStackTrace(pw) ?: e.printStackTrace(pw)
-            pw.toString()
+          logger.error(e) {
+            val args = method.parameterTypes.mapIndexed { i, type -> "${args[i]}: ${type.simpleName}" }.joinToString(", ")
+            "Failed to execute command ${method.name}($args)"
           }
           return false
         }
