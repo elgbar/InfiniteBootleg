@@ -9,6 +9,7 @@ import no.elg.infiniteBootleg.client.util.WorldEntity
 import no.elg.infiniteBootleg.client.util.breakBlocks
 import no.elg.infiniteBootleg.client.util.inputMouseLocator
 import no.elg.infiniteBootleg.client.util.interpolate
+import no.elg.infiniteBootleg.client.util.isAltPressed
 import no.elg.infiniteBootleg.client.util.placeBlocks
 import no.elg.infiniteBootleg.client.util.setVel
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
@@ -19,12 +20,15 @@ import no.elg.infiniteBootleg.core.util.FLY_VEL
 import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Tool
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.HotbarSlot
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent.Companion.hotbarComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.teleport
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
@@ -74,14 +78,13 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   }
 
   private fun WorldEntity.mouseDragged(set: Set<Int>) {
-    val update =
-      if (Input.Buttons.LEFT in set) {
-        interpolate(true, ::breakBlocks)
-      } else if (Input.Buttons.RIGHT in set) {
-        interpolate(true, ::placeBlocks)
-      } else {
-        false
-      }
+    val update = if (Input.Buttons.LEFT in set) {
+      interpolate(true, ::breakBlocks)
+    } else if (Input.Buttons.RIGHT in set) {
+      interpolate(true, ::placeBlocks)
+    } else {
+      false
+    }
     if (update) {
       world.render.update()
     }
@@ -107,9 +110,17 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   private fun WorldEntity.scrolled(amountY: Float) {
     val hotbarComponent = entity.hotbarComponentOrNull ?: return
     val direction = sign(amountY).toInt()
-
-    val newOrdinal = (HotbarComponent.Companion.HotbarSlot.entries.size + hotbarComponent.selected.ordinal + direction) % HotbarComponent.Companion.HotbarSlot.entries.size
-    updateSelectedItem(hotbarComponent, HotbarComponent.Companion.HotbarSlot.Companion.fromOrdinal(newOrdinal))
+    if (isAltPressed()) {
+      val locallyControlledComponent = entity.locallyControlledComponentOrNull ?: return
+      val selectedItem = hotbarComponent.selectedItem(entity) ?: return
+      if (selectedItem.element is Tool) {
+        val newBrushSize = locallyControlledComponent.brushSize + direction * 0.25f
+        locallyControlledComponent.brushSize = newBrushSize.coerceAtLeast(1f)
+      }
+    } else {
+      val newOrdinal = (HotbarSlot.entries.size + hotbarComponent.selected.ordinal + direction) % HotbarSlot.entries.size
+      updateSelectedItem(hotbarComponent, HotbarSlot.fromOrdinal(newOrdinal))
+    }
   }
 
   private fun WorldEntity.keyDown(keycode: Int): Boolean {
@@ -120,22 +131,22 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
 
     val hotbarComponent = entity.hotbarComponentOrNull ?: return false
     val hotbarSlot = when (keycode) {
-      Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> HotbarComponent.Companion.HotbarSlot.ONE
-      Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> HotbarComponent.Companion.HotbarSlot.TWO
-      Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> HotbarComponent.Companion.HotbarSlot.THREE
-      Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> HotbarComponent.Companion.HotbarSlot.FOUR
-      Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> HotbarComponent.Companion.HotbarSlot.FIVE
-      Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> HotbarComponent.Companion.HotbarSlot.SIX
-      Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> HotbarComponent.Companion.HotbarSlot.SEVEN
-      Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> HotbarComponent.Companion.HotbarSlot.EIGHT
-      Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> HotbarComponent.Companion.HotbarSlot.NINE
+      Input.Keys.NUM_1, Input.Keys.NUMPAD_1 -> HotbarSlot.ONE
+      Input.Keys.NUM_2, Input.Keys.NUMPAD_2 -> HotbarSlot.TWO
+      Input.Keys.NUM_3, Input.Keys.NUMPAD_3 -> HotbarSlot.THREE
+      Input.Keys.NUM_4, Input.Keys.NUMPAD_4 -> HotbarSlot.FOUR
+      Input.Keys.NUM_5, Input.Keys.NUMPAD_5 -> HotbarSlot.FIVE
+      Input.Keys.NUM_6, Input.Keys.NUMPAD_6 -> HotbarSlot.SIX
+      Input.Keys.NUM_7, Input.Keys.NUMPAD_7 -> HotbarSlot.SEVEN
+      Input.Keys.NUM_8, Input.Keys.NUMPAD_8 -> HotbarSlot.EIGHT
+      Input.Keys.NUM_9, Input.Keys.NUMPAD_9 -> HotbarSlot.NINE
       else -> return false
     }
     updateSelectedItem(hotbarComponent, hotbarSlot)
     return true
   }
 
-  private fun WorldEntity.updateSelectedItem(hotbarComponent: HotbarComponent, slot: HotbarComponent.Companion.HotbarSlot) {
+  private fun WorldEntity.updateSelectedItem(hotbarComponent: HotbarComponent, slot: HotbarSlot) {
     hotbarComponent.selected = slot
     ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundUpdateSelectedSlot(slot) }
   }
