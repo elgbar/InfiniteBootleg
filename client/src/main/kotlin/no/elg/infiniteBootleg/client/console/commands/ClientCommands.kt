@@ -102,9 +102,17 @@ class ClientCommands : CommonCommands() {
 
     val notAdded = container.add(item)
     if (notAdded.isEmpty()) {
-      logger.info { "Gave player $item" }
+      logger.info { "Gave player ${item.stock} ${item.element}" }
     } else {
-      logger.error { "Failed to give player $item, not enough space for $notAdded" }
+      logger.error {
+        val notGiven = notAdded.sumOf { it.stock }
+        val given = item.stock - notGiven
+        if (given == 0u) {
+          "Failed to give player ${item.stock} ${item.element}"
+        } else {
+          "Managed to give player $given ${item.element}, failed to find room for $notGiven ${item.element}"
+        }
+      }
     }
   }
 
