@@ -38,17 +38,23 @@ open class ContainerImpl(
     var amountNotAdded = amount
     try {
       while (amountNotAdded > 0u) {
-        val index = indexOfFirstNonFull(element).let { if (it < 0) indexOfFirstEmpty() else it }
+        val index = indexOfFirstCanAdd(element)
         if (index < 0) {
           return amountNotAdded
         }
-        val existingItem = content[index] ?: element.toItem(stock = 0u)
-        val canFitInThisItem = Item.Companion.DEFAULT_MAX_STOCK - existingItem.stock
-        val toAdd = canFitInThisItem.coerceAtMost(amountNotAdded)
-        amountNotAdded -= toAdd
+        val contentItem = content[index]
+        if (contentItem == null) {
+          val toAdd = amountNotAdded.coerceAtMost(Item.Companion.DEFAULT_MAX_STOCK)
+          amountNotAdded -= toAdd
+          content[index] = element.toItem(stock = toAdd)
+        } else {
+          val canFitInThisItem = contentItem.maxStock - contentItem.stock
+          val toAdd = canFitInThisItem.coerceAtMost(amountNotAdded)
+          amountNotAdded -= toAdd
 
-        val newItem = existingItem.change(toAdd.toInt()).single()
-        content[index] = newItem
+          val newItems = contentItem.add(toAdd)
+          content[index] = newItems.single()
+        }
       }
       return amountNotAdded
     } finally {

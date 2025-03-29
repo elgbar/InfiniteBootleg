@@ -54,6 +54,12 @@ interface Container : Iterable<IndexedItem> {
 
   /**
    * @param element The element to match against
+   * @return The index of in the container where the [element] can be added
+   */
+  fun indexOfFirstCanAdd(element: ContainerElement): Int = indexOfFirstNonFull(element).let { if (it < 0) indexOfFirstEmpty() else it }
+
+  /**
+   * @param element The element to match against
    * @return The index of the first element of type `element` or -1 if none is found
    */
   fun indexOfFirst(element: ContainerElement): Int
