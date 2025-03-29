@@ -82,7 +82,7 @@ open class ContainerImpl(
             content[i] = null
           } else {
             if (newAmount != 0) {
-              content[i] = item.use(stockToRemove)
+              content[i] = item.remove(stockToRemove)
             } else {
               content[i] = null
             }

@@ -22,7 +22,7 @@ data class MaterialItem(
    *
    * @return The resulting item, or `null` if the item would be depleted
    */
-  override fun use(usages: UInt): MaterialItem? {
+  override fun remove(usages: UInt): MaterialItem? {
     if (willBeDepleted(usages)) return null
     return copy(stock = stock - usages)
   }

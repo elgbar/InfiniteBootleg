@@ -21,7 +21,7 @@ data class ToolItem(
    *
    * @return The resulting item, or `null` if the item would be depleted
    */
-  override fun use(usages: UInt): ToolItem? {
+  override fun remove(usages: UInt): ToolItem? {
     if (willBeDepleted(usages)) return null
     return copy(stock = stock - usages)
   }

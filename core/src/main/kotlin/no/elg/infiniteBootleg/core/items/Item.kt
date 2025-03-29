@@ -33,7 +33,7 @@ sealed interface Item {
    *
    * @return The resulting item, or `null` if the item would be depleted
    */
-  fun use(usages: UInt = 1u): Item?
+  fun remove(usages: UInt = 1u): Item?
 
   /**
    * @return A copy with the [Item.maxStock] and [Item.stock] set to [stock]
@@ -49,20 +49,20 @@ sealed interface Item {
   fun change(delta: Int): List<Item> =
     when {
       delta == 0 -> listOf(this)
-      delta < 0 -> use(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
+      delta < 0 -> remove(delta.absoluteValue.toUInt())?.let { listOf(it) } ?: emptyList()
       else -> add(delta.toUInt())
     }
 
   /**
-   * Add [toAdd] stocks amount to this item
+   * Add [additionalStock] stocks amount to this item
    *
-   * @param toAdd How much to add
-   * @return The resulting items of adding [toAdd] to this item. The max stock of the items will be [maxStock] of this item
+   * @param additionalStock How much to add
+   * @return The resulting items of adding [additionalStock] to this item. The max stock of the items will be [maxStock] of this item
    */
-  fun add(toAdd: UInt): List<Item> =
+  fun add(additionalStock: UInt): List<Item> =
     when {
-      toAdd == 0u -> listOf(this)
-      else -> merge(copyToFit(toAdd))
+      additionalStock == 0u -> listOf(this)
+      else -> merge(copyToFit(additionalStock))
     }
 
   fun willBeDepleted(usages: UInt = 1u): Boolean = usages >= stock
