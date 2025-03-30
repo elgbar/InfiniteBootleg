@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.inventory.ui
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -23,6 +24,11 @@ private val logger = KotlinLogging.logger {}
 
 class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndDrop.Source(actor) {
 
+  fun image(textureRegion: TextureRegionDrawable): Image =
+    Image(textureRegion, Scaling.fit).also {
+      it.setSize(DRAG_ICON_SIZE, DRAG_ICON_SIZE)
+    }
+
   override fun dragStart(event: InputEvent, x: Float, y: Float, pointer: Int): Payload? {
     val srcItem = sourceSlot.item ?: return null
 
@@ -34,21 +40,16 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
     payload.setObject(sourceSlot)
 
     val icon = srcItem.element.textureRegion ?: return null
-    val textureRegion = TextureRegionDrawable(icon.textureRegionOrNull ?: ClientMain.inst().assets.whiteTexture.textureRegion)
+    val textureRegion: TextureRegionDrawable = TextureRegionDrawable(icon.textureRegionOrNull ?: ClientMain.inst().assets.whiteTexture.textureRegion)
 
-    fun image(): Image =
-      Image(textureRegion, Scaling.fit).also {
-        it.setSize(DRAG_ICON_SIZE, DRAG_ICON_SIZE)
-      }
-
-    val dragActor = image()
+    val dragActor = image(textureRegion)
     dragActor.color = Color.WHITE.cpy().mul(0.75f, 0.75f, 0.75f, 1f)
     payload.dragActor = dragActor
 
-    val validDragActor: Actor = image()
+    val validDragActor: Actor = image(textureRegion)
     payload.validDragActor = validDragActor
 
-    val invalidDragActor: Actor = image()
+    val invalidDragActor: Actor = image(textureRegion)
     invalidDragActor.color = Color.WHITE.cpy().mul(1f, 0f, 0f, 1f)
     payload.invalidDragActor = invalidDragActor
 
@@ -73,8 +74,9 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
   ) {
     val sourceSlot = payload?.getObject() as? InventorySlot ?: return
     val targetSlot = target?.actor?.userObject as? InventorySlot ?: return
+    val splitStack = event.button == Input.Buttons.RIGHT
     if (targetSlot.ownedContainer == sourceSlot.ownedContainer) {
-      val updatedContainer = sameContainer(sourceSlot.ownedContainer.container, sourceSlot, targetSlot)
+      val updatedContainer = sameContainer(sourceSlot.ownedContainer.container, sourceSlot, targetSlot, splitStack)
       if (updatedContainer) {
         sendContainerUpdate(sourceSlot.ownedContainer)
       }
@@ -86,21 +88,30 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
     }
   }
 
-  private fun sameContainer(container: Container, sourceSlot: InventorySlot, targetSlot: InventorySlot): Boolean {
+  private fun sameContainer(container: Container, sourceSlot: InventorySlot, targetSlot: InventorySlot, splitStack: Boolean): Boolean {
     if (targetSlot.index == sourceSlot.index) {
       logger.debug { "Dragging to same slot, ignoring" }
       return false
     }
 
-    val targetItem = targetSlot.item
     val draggingItem = sourceSlot.item ?: return false
+    val targetItem = targetSlot.item ?: if (splitStack) draggingItem.element.toItem(stock = 0u) else null
     if (targetItem?.element != draggingItem.element) {
       container.swap(targetSlot.index, sourceSlot.index)
     } else {
-      val change = targetItem.change(draggingItem.stock.toInt())
-      container.remove(sourceSlot.index)
-      container.put(targetSlot.index, change.firstOrNull())
-      container.add(change.drop(1))
+      // cannot split stack when stock is size 1
+      val stockToMove = if (splitStack && draggingItem.stock > 1u) (draggingItem.stock / 2u) else draggingItem.stock
+      val newItems = targetItem.add(stockToMove)
+      val usages = if (newItems.size == 2) {
+        // stock did not fit into the target item, we cannot move the rest
+        val notAdded = newItems.last()
+        stockToMove - notAdded.stock
+      } else {
+        // stock fit into the target item
+        stockToMove
+      }
+      container[targetSlot.index] = newItems.firstOrNull()
+      container[sourceSlot.index] = draggingItem.remove(usages)
     }
     return true
   }
@@ -113,17 +124,17 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
     val targetItem = targetSlot.item
 
     if (targetItem == null || targetItem.element != sourceItem.element) {
-      targetContainer.put(targetSlot.index, sourceItem)
-      sourceContainer.put(sourceSlot.index, targetItem)
+      targetContainer[targetSlot.index] = sourceItem
+      sourceContainer[sourceSlot.index] = targetItem
     } else if (targetItem.element == sourceItem.element) {
-      val change = targetItem.change(sourceItem.stock.toInt())
+      val change = targetItem.add(sourceItem.stock)
       sourceContainer.remove(sourceSlot.index)
-      targetContainer.put(targetSlot.index, change.firstOrNull())
+      targetContainer[targetSlot.index] = change.firstOrNull()
       val remaining = targetContainer.add(change.drop(1))
 
       if (remaining.isNotEmpty()) {
         if (remaining.size == 1) {
-          sourceContainer.put(sourceSlot.index, remaining.single())
+          sourceContainer[sourceSlot.index] = remaining.single()
         } else {
           val remainingRemaining = sourceContainer.add(remaining)
           if (remainingRemaining.isNotEmpty()) {

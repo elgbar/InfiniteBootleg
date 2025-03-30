@@ -23,7 +23,7 @@ class AutoSortedContainer(
     super.updateContainer(changeType)
   }
 
-  override fun put(index: Int, item: Item?) {
+  override fun set(index: Int, item: Item?) {
     require(index in 0 until size) { "Index out of bounds: $index" }
     require(!validOnly || item == null || item.isValid()) { "This container does not allow invalid stacks" }
     content[index] = null

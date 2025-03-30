@@ -147,7 +147,7 @@ open class ContainerImpl(
     return content[index]
   }
 
-  override fun put(index: Int, item: Item?) {
+  override fun set(index: Int, item: Item?) {
     require(index in 0 until size) { "Index out of bounds: $index" }
     require(!(validOnly && item != null && !item.isValid())) { "This container does not allow invalid stacks" }
     val old = content[index]
@@ -163,14 +163,6 @@ open class ContainerImpl(
     if (item1 != null || item2 != null) {
       content[index1] = item2
       content[index2] = item1
-//      val changeType = ItemSwappedChangeType(
-//        index1,
-//        oldItem = item1,
-//        newItem = item2,
-//        indexOther = index2,
-//        oldItemOther = item2,
-//        newItemOther = item1,
-//      )
       updateContainer(changeType = null)
     }
   }

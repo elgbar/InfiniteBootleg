@@ -82,7 +82,7 @@ interface Container : Iterable<IndexedItem> {
   /**
    * Add one or more items to the container
    *
-   * @param Item What to add
+   * @param items What to add
    */
   fun add(vararg items: Item): List<Item> = add(items.toList())
 
@@ -94,11 +94,11 @@ interface Container : Iterable<IndexedItem> {
    * @throws IllegalArgumentException if one of the `Item`s is `null`
    */
   fun add(items: List<Item>): List<Item> {
+    if (items.isEmpty()) return emptyList()
     val collector: MutableMap<ContainerElement, UInt> = HashMap()
 
     // tally up how many we got of each type
     for (stack in items) {
-      //            if (stack == null) { continue; }
       collector[stack.element] = collector.getOrDefault(stack.element, 0u) + stack.stock
     }
 
@@ -187,7 +187,7 @@ interface Container : Iterable<IndexedItem> {
    * @param Item The Item to put at `index`
    * @throws IndexOutOfBoundsException if the index is less than 0 or greater than or equal to [size]
    */
-  fun put(index: Int, item: Item?)
+  operator fun set(index: Int, item: Item?)
 
   fun swap(index1: Int, index2: Int)
 
