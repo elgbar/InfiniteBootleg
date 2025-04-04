@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.core.events
 
+import no.elg.infiniteBootleg.core.events.ItemStockChangeType.Companion.calculateStockChange
 import no.elg.infiniteBootleg.core.items.Item
+import no.elg.infiniteBootleg.core.util.IllegalAction
 
 sealed interface ItemChangeType {
   /**
@@ -18,7 +20,7 @@ sealed interface ItemChangeType {
       return when {
         addedItem != null && removedItem != null ->
           if (addedItem == removedItem) {
-            ItemStockChangeType(removedItem, addedItem)
+            ItemStockChangeType.calculateStockChange(removedItem, addedItem)
           } else {
             ItemChangedChangeType(removedItem, addedItem)
           }
@@ -51,37 +53,54 @@ data class ItemChangedChangeType(override val removedItem: Item, override val ad
 }
 
 /**
- * The stock of an item updated, but the item itself is the same
+ * The stock of an item updated, but the item itself is the same.
+ * Only one of the items will be set, the other will be null.
+ *
+ * Use [calculateStockChange] to calculate the stock change.
  *
  * Note that if the [Item.maxStock] changes this will be considered a [ItemChangedChangeType]
  */
-data class ItemStockChangeType(override val removedItem: Item, override val addedItem: Item) : ItemChangeType {
+class ItemStockChangeType private constructor(override val removedItem: Item?, override val addedItem: Item?) : ItemChangeType {
   init {
-    require(removedItem == addedItem && !removedItem.equalsIncludingStock(addedItem)) { "Old and new items differ in other ways than the stock, $removedItem and $addedItem" }
+    require(removedItem != null || addedItem != null) { "Old and new items cannot be null" }
+    require(removedItem == null || addedItem == null) { "Old and new items cannot both be set" }
+  }
+
+  companion object {
+    /**
+     * Calculate how the two items changed in stock.
+     *
+     * This requires that they are equal except for the stock
+     */
+    fun calculateStockChange(removedItem: Item, addedItem: Item): ItemStockChangeType? {
+      require(removedItem == addedItem) { "Old and new items differ in other ways than the stock, $removedItem and $addedItem" }
+      val addedStock = addedItem.stock
+      val removedStock = removedItem.stock
+      return if (addedStock > removedStock) {
+        ItemStockChangeType(null, addedItem.remove(removedStock))
+      } else if (addedStock < removedStock) {
+        ItemStockChangeType(removedItem.remove(addedStock), null)
+      } else {
+        IllegalAction.STACKTRACE.handle { "Calculating stock change when the stock is the same: removed $removedItem, added $addedItem" }
+        // No stock difference
+        null
+      }
+    }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is ItemStockChangeType) return false
+
+    if (removedItem != other.removedItem) return false
+    if (addedItem != other.addedItem) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = removedItem?.hashCode() ?: 0
+    result = 31 * result + (addedItem?.hashCode() ?: 0)
+    return result
   }
 }
-
-// /**
-// * Items in [index] and [indexOther] were swapped.
-// *
-// * Either [oldItem]/[oldItemOther] or [newItem]/[newItemOther] of will be non-null
-// *
-// * @param index The index of the first item
-// * @param oldItem The old item at [index]
-// * @param newItem The new item at [index]
-// * @param indexOther The index of the second item
-// * @param oldItemOther The old item at [indexOther]
-// * @param newItemOther The new item at [indexOther]
-// */
-// data class ItemSwappedChangeType(
-//  override val oldItem: Item?,
-//  override val newItem: Item?,
-//  val oldItemOther: Item?,
-//  val newItemOther: Item?
-// ) : ItemChangeType{
-//  init {
-//    require(oldItem != null || newItem != null) { "Either the old or the new item must be non-null" }
-//    require(oldItem === newItemOther) { "The items at index and indexOther must be swapped" }
-//    require(newItem === oldItemOther) { "The items at index and indexOther must be swapped" }
-//  }
-// }

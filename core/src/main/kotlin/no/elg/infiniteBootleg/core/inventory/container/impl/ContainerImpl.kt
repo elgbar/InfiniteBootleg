@@ -168,6 +168,10 @@ open class ContainerImpl(
   }
 
   private fun updateContainer(addedItem: Item? = null, removedItem: Item? = null) {
+    if (addedItem == removedItem && addedItem != null && addedItem.equalsIncludingStock(removedItem)) {
+      // Do not send an update when the items are the same
+      return
+    }
     updateContainer(ItemChangeType.getItemChangeType(addedItem, removedItem))
   }
 

@@ -110,8 +110,11 @@ class SlotSource(actor: Actor, private val sourceSlot: InventorySlot) : DragAndD
         // stock fit into the target item
         stockToMove
       }
-      container[targetSlot.index] = newItems.firstOrNull()
-      container[sourceSlot.index] = draggingItem.remove(usages)
+      val targetUpdatedItem = newItems.firstOrNull()
+      val sourceUpdatedItem = draggingItem.remove(usages)
+
+      container[targetSlot.index] = targetUpdatedItem
+      container[sourceSlot.index] = sourceUpdatedItem
     }
     return true
   }

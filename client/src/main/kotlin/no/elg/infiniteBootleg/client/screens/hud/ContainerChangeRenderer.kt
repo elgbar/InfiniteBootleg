@@ -24,13 +24,14 @@ import no.elg.infiniteBootleg.core.util.withColor
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE_F
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.ownedContainerOrNull
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
+import kotlin.math.absoluteValue
 
 class ContainerChangeRenderer : Renderer, Disposable {
 
   private val screenRenderer: ScreenRenderer get() = ClientMain.Companion.inst().screenRenderer
 
   private val knownContainers = ObjectOpenHashSet<Container>()
-  private val changeHandlers = mutableListOf<EventDisplayData>()
+  private val changeHandlers = ObjectOpenHashSet<EventDisplayData>()
   private val changeHandlersHold = ObjectOpenHashSet<ChangeToBeProcessed>()
   private val layout = GlyphLayout()
 
@@ -69,15 +70,17 @@ class ContainerChangeRenderer : Renderer, Disposable {
   private val onWorldTick = EventManager.registerListener { e: WorldTickedEvent ->
     if (changeHandlersHold.isNotEmpty() && (changeHandlers.isEmpty() || e.tickId % (e.world.worldTicker.tps / LINES_PER_SECONDS) == 0L)) {
       synchronized(changeHandlersHold) {
-        val data = changeHandlersHold
-          .partitionMap { it -> it.remove.toString() + it.item.element.displayName + it.item.stock }
-          .map { (_, items) ->
-            val first = items.first()
-            val copyToFit = first.item.copyToFit(items.sumOf { it.item.stock })
-            copyToFit to first.remove
+        val data = changeHandlersHold.partitionMap { it -> it.item.element.displayName + it.item.stock }.mapNotNull { (_, items) ->
+          val first = items.first()
+          val sumOfStock = items.sumOf { (if (it.remove) -1 else 1) * it.item.stock.toInt() }
+          if (sumOfStock != 0) {
+            val copyToFit = first.item.copyToFit(sumOfStock.absoluteValue.toUInt())
+            copyToFit to sumOfStock
+          } else {
+            // Sum of stock is 0, so we don't need to display anything
+            null
           }
-          .sortedBy { (_, removed) -> if (removed) 0 else 1 }
-          .mapIndexedNotNull { index, (item, removed) -> getData(item, removed, index) }
+        }.sortedBy(Pair<*, Int>::second).mapIndexedNotNull { index, (item, sumOfStock) -> getData(item, sumOfStock < 0, index) }
 
         val progressHandler = ProgressHandler(DISPLAY_DURATION_SECONDS, Interpolation.sineOut, start = 1f)
         changeHandlers += EventDisplayData(data, progressHandler)
