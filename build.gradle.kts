@@ -94,7 +94,7 @@ subprojects {
 
   tasks.withType<KotlinCompilationTask<*>> {
     compilerOptions {
-      languageVersion.set(KotlinVersion.KOTLIN_2_2)
+      languageVersion.set(KotlinVersion.KOTLIN_2_3)
       progressiveMode.set(true)
       extraWarnings.set(false)
       optIn.add("kotlin.contracts.ExperimentalContracts")
