@@ -2,20 +2,21 @@
 kotlin = "2.1.20"
 gdx = "1.13.1"
 ktx = "1.13.1-rc1"
-protobuf = "4.30.1"
+protobuf = "4.30.2"
 vis = "1.5.5"
 caffeine = "3.2.0"
 uuid = "5.1.0"
-logging = "7.0.5"
+logging = "7.0.6"
 log4j = "2.24.3"
 junit = "5.12.1"
-mockk = "1.13.17"
+mockk = "1.14.0"
 jansi = "2.4.1"
 fastutil = "8.5.15"
-netty = "4.1.119.Final"
+netty = "4.2.0.Final"
+kotlinCoroutines = "1.10.2"
 
 stacktracedecoroutinator = "2.4.8"
-spotless = "6.25.0"
+spotless = "7.0.2"
 versionsPlugin = "0.51.0"
 protobufPlugin = "0.9.4"
 
@@ -54,7 +55,8 @@ protobuf-kotlin = { group = "com.google.protobuf", name = "protobuf-kotlin", ver
 protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
 
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
-kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.1" }
+kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
+kotlin-bom = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-bom", version.ref = "kotlinCoroutines" }
 
 apacheCommons-collections = { group = "org.apache.commons", name = "commons-collections4", version = "4.4" }
 apacheCommons-lang = { group = "org.apache.commons", name = "commons-lang3", version = "3.17.0" }

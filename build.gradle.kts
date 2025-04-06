@@ -47,7 +47,7 @@ allprojects {
     format("misc") {
       target("**/*.md", ".gitignore", "**/*.yml", "**/*.yaml", "**/*.proto")
       trimTrailingWhitespace()
-      indentWithSpaces(2)
+      leadingTabsToSpaces(2)
       endWithNewline()
     }
     java {
@@ -159,6 +159,7 @@ subprojects {
     implementation(rootProject.libs.annotations)
     implementation(rootProject.libs.kotlin.reflect)
     implementation(rootProject.libs.kotlin.coroutines)
+    implementation(rootProject.libs.kotlin.bom)
     implementation(rootProject.libs.fastutil)
     implementation(rootProject.libs.oshaiLogging)
     implementation(platform(rootProject.libs.log4j.bom))

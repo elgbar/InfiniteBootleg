@@ -5,7 +5,6 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
 import io.netty.channel.EventLoopGroup
-import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.protobuf.ProtobufDecoder
@@ -14,6 +13,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.createEventLoopGroup
 import no.elg.infiniteBootleg.core.util.diffTimePretty
 import no.elg.infiniteBootleg.protobuf.Packets
 
@@ -24,8 +24,8 @@ private val logger = KotlinLogging.logger {}
  */
 class NettyServer {
   fun start() {
-    val bossGroup: EventLoopGroup = NioEventLoopGroup()
-    val workerGroup: EventLoopGroup = NioEventLoopGroup()
+    val bossGroup: EventLoopGroup = createEventLoopGroup()
+    val workerGroup: EventLoopGroup = createEventLoopGroup()
     try {
       val b = ServerBootstrap()
       b.group(bossGroup, workerGroup)

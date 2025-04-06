@@ -5,7 +5,6 @@ import io.netty.channel.Channel
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
 import io.netty.channel.EventLoopGroup
-import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.protobuf.ProtobufDecoder
@@ -15,6 +14,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender
 import kotlinx.coroutines.CoroutineScope
 import no.elg.infiniteBootleg.client.screens.ConnectingScreen
 import no.elg.infiniteBootleg.core.net.ServerClient
+import no.elg.infiniteBootleg.core.util.createEventLoopGroup
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.protobuf.Packets
 
@@ -27,7 +27,7 @@ class ClientChannel(val client: ServerClient) {
 
   @Throws(InterruptedException::class)
   fun connect(host: String, port: Int, onConnect: suspend CoroutineScope.() -> Unit) {
-    val workerGroup: EventLoopGroup = NioEventLoopGroup()
+    val workerGroup: EventLoopGroup = createEventLoopGroup()
     try {
       val b = Bootstrap()
       b.group(workerGroup)
