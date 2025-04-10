@@ -67,7 +67,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     when (button) {
       Input.Buttons.RIGHT -> {
         val block = world.getBlock(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY) ?: return
-        if (block.material == Material.CONTAINER) {
+        if (block.material == Material.Container) {
           val owner = ContainerOwner.Companion.from(inputMouseLocator.mouseBlockX, inputMouseLocator.mouseBlockY)
           world.worldContainerManager.find(owner).thenApply { container ->
             container?.open()

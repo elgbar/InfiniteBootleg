@@ -44,7 +44,7 @@ object UpdateGridBlockSystem : IteratingSystem(standaloneGridOccupyingBlocksFami
         logger.error { "Failed to get valid chunk for block ${stringifyCompactLocWithChunk(newOccupation)}" }
         continue
       }
-      if ((newOccupation !is EntityMarkerBlock || newOccupation.entity != entity) && newOccupation.material == Material.AIR) {
+      if ((newOccupation !is EntityMarkerBlock || newOccupation.entity != entity) && newOccupation.material == Material.Air) {
         val occupiedBlock = EntityMarkerBlock.Companion.replaceBlock(validChunk, newOccupation.localX, newOccupation.localY, entity) ?: run {
           logger.error { "Failed to replace marker block ${stringifyCompactLocWithChunk(newOccupation)}" }
           continue

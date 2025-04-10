@@ -370,8 +370,19 @@ open class ChunkImpl(
     if (!isValid) {
       logger.warn { "Fetched block from invalid chunk ${stringifyChunkToWorld(this, localX, localY)}" }
     }
-    require(isInsideChunk(localX, localY)) { "Given arguments are not inside this chunk, localX=$localX localY=$localY" }
-    return getRawBlock(localX, localY) ?: setBlock(localX, localY, Material.AIR, updateTexture = false, sendUpdatePacket = false) ?: error("Failed to create air block!")
+    require(
+      isInsideChunk(
+        localX,
+        localY
+      )
+    ) { "Given arguments are not inside this chunk, localX=$localX localY=$localY" }
+    return getRawBlock(localX, localY) ?: setBlock(
+      localX,
+      localY,
+      Material.Air,
+      updateTexture = false,
+      sendUpdatePacket = false
+    ) ?: error("Failed to create air block!")
   }
 
   override fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? {
@@ -524,9 +535,7 @@ open class ChunkImpl(
     }
   }
 
-  override fun toString(): String {
-    return "Chunk{world=${world.name}, chunkX=$chunkX, chunkY=$chunkY, valid=$isValid}"
-  }
+  override fun toString(): String = "Chunk{world=${world.name}, chunkX=$chunkX, chunkY=$chunkY, valid=$isValid}"
 
   override fun compareTo(o: Chunk): Int {
     val compare = chunkX.compareTo(o.chunkX)
@@ -534,13 +543,11 @@ open class ChunkImpl(
   }
 
   companion object {
-    val AIR_BLOCK_PROTO = Block.Companion.save(Material.AIR).build()
+    val AIR_BLOCK_PROTO = Block.Companion.save(Material.Air).build()
     val NOT_CHECKING_DISTANCE = LongArray(0)
 
     private fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.Companion.CHUNK_SIZE + localY
 
-    private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean {
-      return blockA.materialOrAir() === Material.AIR && blockB.materialOrAir() === Material.AIR
-    }
+    private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.materialOrAir() === Material.Air && blockB.materialOrAir() === Material.Air
   }
 }

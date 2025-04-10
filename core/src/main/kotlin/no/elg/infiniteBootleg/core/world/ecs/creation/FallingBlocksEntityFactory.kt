@@ -8,6 +8,8 @@ import no.elg.infiniteBootleg.core.util.futureEntity
 import no.elg.infiniteBootleg.core.util.removeSelf
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Material.Companion.fromProto
+import no.elg.infiniteBootleg.core.world.TexturedContainerElement
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
@@ -20,14 +22,13 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
 fun Engine.createFallingBlockStandaloneEntity(world: World, fallingBlock: ProtoWorld.Entity) {
-  val material = Material.Companion.fromOrdinal(fallingBlock.material.ordinal)
   createFallingBlockStandaloneEntity(
     world,
     fallingBlock.position.x,
     fallingBlock.position.y,
     fallingBlock.velocity.x,
     fallingBlock.velocity.y,
-    material,
+    fallingBlock.material.fromProto(),
     fallingBlock.ref.id
   )
 }
@@ -50,7 +51,9 @@ fun Engine.createFallingBlockStandaloneEntity(
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
-    safeWith { TextureRegionComponent(material.textureName ?: error("Material $material has no texture! (can be handled? ${material.canBeHandled})")) }
+    if (material is TexturedContainerElement) {
+      safeWith { TextureRegionComponent(material.textureName) }
+    }
 
     // This entity will handle input events
     with<PhysicsEventQueueComponent>()

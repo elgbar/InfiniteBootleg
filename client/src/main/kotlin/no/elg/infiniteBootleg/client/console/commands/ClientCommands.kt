@@ -69,7 +69,7 @@ class ClientCommands : CommonCommands() {
   @CmdArgNames("quantity")
   @ConsoleDoc(description = "Give one of each element to player", paramDescriptions = ["Quantity to give, default 100"])
   fun giveAll(quantity: Int = 100) {
-    (Tool.entries + Material.normalMaterials).forEach { give(it.name, quantity) }
+    (Tool.tools + Material.normalMaterials).forEach { give(it::class.simpleName!!, quantity) }
   }
 
   @CmdArgNames("item")
@@ -531,8 +531,8 @@ class ClientCommands : CommonCommands() {
     launchOnMain {
       for (x in chunkXs) {
         launchOnAsync {
-          world.setBlock(x, y + LIGHT_SOURCE_LOOK_BLOCKS, Material.SAND, prioritize = true)
-          world.setBlock(x, y, Material.TORCH, prioritize = true)
+          world.setBlock(x, y + LIGHT_SOURCE_LOOK_BLOCKS, Material.Sand, prioritize = true)
+          world.setBlock(x, y, Material.Torch, prioritize = true)
         }
         delay(delayMillis)
       }
@@ -548,7 +548,7 @@ class ClientCommands : CommonCommands() {
     launchOnMain {
       for (x in chunkXs) {
         coroutineScope {
-          launchOnAsync { world.setBlock(x, y, Material.SAND, prioritize = true) }
+          launchOnAsync { world.setBlock(x, y, Material.Sand, prioritize = true) }
         }
         delay(delayMillis)
       }

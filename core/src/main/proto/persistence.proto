@@ -16,7 +16,7 @@ message Vector2i {
 }
 
 message Material {
-  int32 ordinal = 1; //ordinal from Material enum
+  string name = 1;
 }
 
 message World {
@@ -55,18 +55,15 @@ message ChunkColumn {
 }
 
 message Element {
-  ItemType itemType = 1;
-  optional EnumElement enumElement = 2;
-  optional Staff staff = 3;
 
-  enum ItemType {
-    MATERIAL = 0;
-    TOOL = 1;
-    STAFF = 2;
+  oneof itemType {
+    NamedElement material = 1;
+    NamedElement tool = 2;
+    Staff staff = 3;
   }
 
-  message EnumElement {
-    uint32 index = 1;
+  message NamedElement {
+    string name = 1;
   }
 
   message Staff {

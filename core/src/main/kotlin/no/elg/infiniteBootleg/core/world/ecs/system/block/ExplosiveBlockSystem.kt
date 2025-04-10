@@ -50,7 +50,7 @@ object ExplosiveBlockSystem : IteratingSystem(explosiveBlockFamily, UPDATE_PRIOR
         val block = world.getRawBlock(x, y, true)
         val mat = block.materialOrAir()
         val hardness = mat.hardness
-        if (mat != Material.AIR && hardness >= 0 && block != null) {
+        if (mat != Material.Air && hardness >= 0 && block != null) {
           val dist = distCubed(
             worldX,
             worldY,

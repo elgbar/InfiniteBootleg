@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.stringifyCompactLocWithChunk
-import no.elg.infiniteBootleg.core.util.textureName
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.BlockImpl
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
@@ -34,113 +33,183 @@ import it.unimi.dsi.fastutil.longs.LongIterator as FastUtilLongIterator
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * @author Elg
- */
-enum class Material(
+@Suppress("unused")
+sealed interface Material : ContainerElement {
   /**
    * How hard it is to break this material
    */
-  val hardness: Float,
-  private val customTextureName: String? = null,
+  val hardness: Float
+
   /**
    * @return If the texture of the material has any transparency
    */
-  val hasTransparentTexture: Boolean,
+  val hasTransparentTexture: Boolean get() = false
+
   /**
    * @return If this material can be collided with
    */
-  val isCollidable: Boolean = true,
+  val isCollidable: Boolean get() = true
+
   /**
    * @return If this material blocks light
    */
-  val blocksLight: Boolean = true,
+  val blocksLight: Boolean get() = true
+
   /**
    * @return If this material emits light
    */
-  val emitsLight: Boolean = false,
+  val emitsLight: Boolean get() = false
+
   /**
    * @return If this material has no texture
    */
-  val invisibleBlock: Boolean = false,
+  val invisibleBlock: Boolean get() = false
+
   /**
    *
    * @return If this material can be handled by the player, otherwise this is a _meta material_
    */
-  val canBeHandled: Boolean = true,
-  private val createNew: ((World, WorldCoord, WorldCoord, Material) -> CompletableFuture<Entity>)? = null
-) : ContainerElement {
-  AIR(
-    hardness = 0f,
-    hasTransparentTexture = true,
-    isCollidable = false,
-    blocksLight = false,
-    emitsLight = false,
-    invisibleBlock = true,
-    canBeHandled = false
-  ),
-  STONE(hardness = 1.5f, hasTransparentTexture = false),
-  BRICK(hardness = 2f, hasTransparentTexture = false),
-  DIRT(
-    hardness = 1f,
-    hasTransparentTexture = false
-  ),
-  GRASS(hardness = 0.8f, hasTransparentTexture = false),
-  TNT(
-    hardness = 0.5f,
-    hasTransparentTexture = false,
-    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+  val canBeHandled: Boolean get() = true
+
+  /**
+   * @return The entity to attach to this block
+   */
+  val createNew: ((World, WorldCoord, WorldCoord, Material) -> CompletableFuture<Entity>)? get() = null
+
+  override val itemType: ItemType get() = ItemType.BLOCK
+  override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
+//  val textureName: String? get() = if (canBeHandled) if (customTextureName != null) customTextureName else this::class.simpleName. else null
+
+  object Air : Material {
+    override val hardness get() = 0f
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val invisibleBlock get() = true
+    override val canBeHandled get() = false
+  }
+
+  object Stone : Material, TexturedContainerElement {
+    override val hardness get() = 1.5f
+    override val textureName: String get() = "stone"
+  }
+
+  object Brick : Material, TexturedContainerElement {
+    override val hardness get() = 2f
+    override val textureName: String get() = "brick"
+  }
+
+  object Dirt : Material, TexturedContainerElement {
+    override val hardness get() = 1f
+    override val textureName: String get() = "dirt"
+  }
+
+  object Grass : Material, TexturedContainerElement {
+    override val hardness get() = 0.8f
+    override val textureName: String get() = "grass"
+  }
+
+  object Tnt : Material, TexturedContainerElement {
+    override val hardness get() = 0.5f
+    override val textureName: String get() = "tnt"
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createBlockEntity(world, worldX, worldY, material, arrayOf(explosiveBlockFamily to "explosiveBlockFamily")) {
         safeWith { ExplosiveComponent() }
       }
     }
-  ),
-  SAND(hardness = 0.75f, hasTransparentTexture = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-    world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
-  }),
-  TORCH(
-    hardness = 0.1f,
-    hasTransparentTexture = true,
-    isCollidable = false,
-    blocksLight = false,
-    emitsLight = true,
-    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+  }
+
+  object Sand : Material, TexturedContainerElement {
+    override val hardness get() = 0.75f
+    override val textureName: String get() = "sand"
+    override val hasTransparentTexture: Boolean get() = false
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
     }
-  ),
-  GLASS(hardness = 0.1f, hasTransparentTexture = true, blocksLight = false),
-  DOOR(
-    hardness = 1f,
-    hasTransparentTexture = true,
-    isCollidable = false,
-    blocksLight = false,
-    invisibleBlock = true,
-    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+  }
+
+  object Torch : Material, TexturedContainerElement {
+    override val hardness get() = 0.1f
+    override val textureName: String get() = "torch"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val emitsLight get() = true
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createGravityAffectedBlockEntity(world, worldX, worldY, material)
+    }
+  }
+
+  object Glass : Material, TexturedContainerElement {
+    override val hardness get() = 0.1f
+    override val textureName: String get() = "glass"
+    override val hasTransparentTexture get() = true
+    override val blocksLight get() = false
+  }
+
+  object Door : Material, TexturedContainerElement {
+    override val hardness get() = 1f
+    override val textureName: String get() = "door"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+    override val invisibleBlock get() = true
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createDoorBlockEntity(world, worldX, worldY, material)
     }
-  ),
-  BIRCH_TRUNK(hardness = 1.25f, hasTransparentTexture = true, isCollidable = false, blocksLight = false),
-  BIRCH_LEAVES(
-    hardness = 0.1f,
-    hasTransparentTexture = true,
-    isCollidable = false,
-    blocksLight = false,
-    createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+  }
+
+  object BirchTrunk : Material, TexturedContainerElement {
+    override val hardness get() = 1.25f
+    override val textureName: String get() = "birch_trunk"
+    override val hasTransparentTexture get() = true
+    override val isCollidable get() = false
+    override val blocksLight get() = false
+  }
+
+  object BirchLeaves : Material, TexturedContainerElement {
+    override val hardness = 0.1f
+    override val textureName: String get() = "birch_leaves"
+    override val hasTransparentTexture = true
+    override val isCollidable = false
+    override val blocksLight = false
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
       world.engine.createLeafEntity(world, worldX, worldY, material)
     }
-  ),
-  SANDSTONE(
-    hardness = 1f,
-    hasTransparentTexture = false
-  ),
-  CONTAINER(hardness = 1f, hasTransparentTexture = false, createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
-    world.engine.createContainerEntity(world, worldX, worldY, material)
-  }),
-  COAL_ORE(hardness = 1.25f, hasTransparentTexture = false),
-  COPPER_ORE(hardness = 2f, hasTransparentTexture = false),
-  IRON_ORE(hardness = 3f, hasTransparentTexture = false),
-  GOLD_ORE(hardness = 1f, hasTransparentTexture = false)
-  ;
+  }
+
+  object Sandstone : Material, TexturedContainerElement {
+    override val hardness = 1f
+    override val textureName: String get() = "sandstone"
+  }
+
+  object Container : Material, TexturedContainerElement {
+    override val hardness = 1f
+    override val textureName: String get() = "container"
+    override val createNew = { world: World, worldX: WorldCoord, worldY: WorldCoord, material: Material ->
+      world.engine.createContainerEntity(world, worldX, worldY, material)
+    }
+  }
+
+  object CoalOre : Material, TexturedContainerElement {
+    override val hardness = 1.25f
+    override val textureName: String get() = "coal_ore"
+  }
+
+  object CopperOre : Material, TexturedContainerElement {
+    override val hardness = 2f
+    override val textureName: String get() = "copper_ore"
+  }
+
+  object IronOre : Material, TexturedContainerElement {
+    override val hardness = 3f
+    override val textureName: String get() = "iron_ore"
+  }
+
+  object GoldOre : Material, TexturedContainerElement {
+    override val hardness = 1f
+    override val textureName: String get() = "gold_ore"
+  }
 
   /**
    * @param world World this block this exists in
@@ -201,26 +270,31 @@ enum class Material(
     }
   }
 
-  override val itemType: ItemType get() = ItemType.BLOCK
-
-  override fun toItem(maxStock: UInt, stock: UInt): MaterialItem = MaterialItem(this, maxStock, stock)
-
-  val textureName: String? get() = if (canBeHandled) textureName(customTextureName) else null
-
   companion object : ProtoConverter<Material, ProtoWorld.Material> {
+
+    val materials: List<Material> = Material::class.sealedSubclasses.map { it.objectInstance ?: error("Material ${it.simpleName} is not an object") }
 
     /**
      * All materials that can be interacted in a normal fashion by the player
      */
-    val normalMaterials: List<Material> = entries.filter(Material::canBeHandled)
+    val normalMaterials: List<Material> = materials.filter(Material::canBeHandled)
+
+    private val nameToMaterial: Map<String, Material> =
+      materials.associateBy { it.javaClass.simpleName.lowercase() } + mapOf("" to Air)
+
+    private val materialToName: Map<Material, String> = materials.associateWith { it.javaClass.simpleName.lowercase() }
+
+    fun nameOf(material: Material): String = materialToName[material] ?: error("Failed to find name for material $material")
+
+    fun valueOfOrNull(name: String): Material? = nameToMaterial[name.lowercase()]
+
+    fun valueOf(name: String): Material = valueOfOrNull(name) ?: error("Unknown material with name '$name'")
 
     override fun Material.asProto(): ProtoWorld.Material =
       material {
-        ordinal = this@asProto.ordinal
+        name = if (this@asProto === Air) "" else nameOf(this@asProto)
       }
 
-    override fun ProtoWorld.Material.fromProto(): Material = entries[ordinal]
-
-    fun fromOrdinal(ordinal: Int): Material = entries[ordinal]
+    override fun ProtoWorld.Material.fromProto(): Material = valueOf(this@fromProto.name)
   }
 }

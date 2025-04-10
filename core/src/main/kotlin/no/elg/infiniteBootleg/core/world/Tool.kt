@@ -3,14 +3,25 @@ package no.elg.infiniteBootleg.core.world
 import no.elg.infiniteBootleg.core.items.ItemType
 import no.elg.infiniteBootleg.core.items.ToolItem
 
-enum class Tool(val textureName: String? = null) : ContainerElement {
-  PICKAXE;
-
+@Suppress("unused")
+sealed interface Tool : TexturedContainerElement {
+  override val itemType: ItemType get() = ItemType.TOOL
   override fun toItem(maxStock: UInt, stock: UInt): ToolItem = ToolItem(this, maxStock, stock)
 
-  override val itemType: ItemType get() = ItemType.TOOL
+  object Pickaxe : Tool {
+    override val textureName: String = "pickaxe"
+  }
 
   companion object {
-    fun fromOrdinal(ordinal: Int): Tool = entries[ordinal]
+    val tools: List<Tool> = Tool::class.sealedSubclasses.map { it.objectInstance ?: error("Tool ${it.simpleName} is not an object") }
+
+    private val nameToTool: Map<String, Tool> = tools.associateBy { it.javaClass.simpleName.lowercase() }
+    private val toolToName: Map<Tool, String> = tools.associateWith { it.javaClass.simpleName.lowercase() }
+
+    fun nameOf(tool: Tool): String = toolToName[tool] ?: error("Failed to find name for tool $tool")
+
+    fun valueOfOrNull(name: String): Tool? = nameToTool[name.lowercase()]
+
+    fun valueOf(name: String): Tool = valueOfOrNull(name) ?: error("Unknown tool with name '$name'")
   }
 }

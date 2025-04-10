@@ -8,11 +8,9 @@ import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.LongMap
 import com.badlogic.gdx.utils.ObjectSet
 import com.google.errorprone.annotations.concurrent.GuardedBy
-import com.google.protobuf.InvalidProtocolBufferException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
@@ -313,11 +311,8 @@ abstract class World(
         try {
           val protoWorld = ProtoWorld.World.parseFrom(worldInfoFile.readBytes())
           loadFromProtoWorld(protoWorld)
-        } catch (e: InvalidProtocolBufferException) {
-          e.printStackTrace()
-          loadNewWorld()
-        } catch (e: GdxRuntimeException) {
-          e.printStackTrace()
+        } catch (e: Exception) {
+          logger.error(e) { "Failed to load world ${worldFolder.file().absolutePath}" }
           loadNewWorld()
         }
       } else {

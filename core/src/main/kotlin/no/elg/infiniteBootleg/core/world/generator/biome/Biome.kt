@@ -1,6 +1,5 @@
 package no.elg.infiniteBootleg.core.world.generator.biome
 
-import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.world.Material
@@ -23,22 +22,25 @@ enum class Biome @SafeVarargs constructor(
   private val topmostBlock: Material,
   vararg topBlocks: Pair<Material, Int>
 ) {
-  PLAINS(0.1, 0.9, 64.0, 0.009, 0, Material.STONE, Material.GRASS, Material.GRASS to 4, Material.DIRT to 10),
-  MOUNTAINS(100.0, 0.9, 356.0, 0.005, 25, Material.STONE, Material.GRASS, Material.GRASS to 2, Material.DIRT to 6),
-  DESERT(0.1, 0.9, 32.0, 0.005, 0, Material.SANDSTONE, Material.SAND, Material.SAND to 12);
+  PLAINS(0.1, 0.9, 64.0, 0.009, 0, Material.Stone, Material.Grass, Material.Grass to 4, Material.Dirt to 10),
+  MOUNTAINS(
+    100.0,
+    0.9,
+    356.0,
+    0.005,
+    25,
+    Material.Stone,
+    Material.Grass,
+    Material.Grass to 2,
+    Material.Dirt to 6
+  ),
+  DESERT(0.1, 0.9, 32.0, 0.005, 0, Material.Sandstone, Material.Sand, Material.Sand to 12);
 
-  private val topBlocks: Array<Material>
-
-  init {
-    val mats = GdxArray<Material>(true, 16, Material::class.java)
-    for ((first, second) in topBlocks) {
-      mats.ensureCapacity(second)
-      for (i in 0 until second) {
-        mats.add(first)
-      }
+  private val topBlocks: Array<Material> = topBlocks.flatMap { (material, size) ->
+    buildList<Material>(size) {
+      repeat(size) { add(material) }
     }
-    this.topBlocks = mats.toArray()
-  }
+  }.toTypedArray()
 
   fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {
     var y = 0
@@ -53,9 +55,7 @@ enum class Biome @SafeVarargs constructor(
     return y / (INTERPOLATION_RADIUS * 2 + 1)
   }
 
-  private fun rawHeightAt(noise: PerlinNoise, worldX: WorldCoord): Double {
-    return rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset)
-  }
+  private fun rawHeightAt(noise: PerlinNoise, worldX: WorldCoord): Double = rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset)
 
   fun fillUpTo(
     noise: PerlinNoise,
@@ -94,8 +94,6 @@ enum class Biome @SafeVarargs constructor(
       amplitude: Double,
       frequency: Double,
       offset: Int
-    ): Double {
-      return noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude + offset
-    }
+    ): Double = noise.octaveNoise(worldX * frequency, y * frequency, z * frequency, 6, 0.5) * amplitude + offset
   }
 }

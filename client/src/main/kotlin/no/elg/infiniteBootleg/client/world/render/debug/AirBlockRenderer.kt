@@ -14,5 +14,5 @@ class AirBlockRenderer(worldRender: ClientWorldRender) : SingleBlockDebugRendere
 
   override val texture: RotatableTextureRegion = ClientMain.inst().assets.visibleAirTexture
 
-  override fun shouldRender(block: Block): Boolean = block.material == Material.AIR
+  override fun shouldRender(block: Block): Boolean = block.material == Material.Air
 }

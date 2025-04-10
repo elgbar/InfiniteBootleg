@@ -14,6 +14,7 @@ import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Direction
 import no.elg.infiniteBootleg.core.world.Material
+import no.elg.infiniteBootleg.core.world.Material.Companion.asProto
 import no.elg.infiniteBootleg.core.world.Material.Companion.fromProto
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.world.World
@@ -21,9 +22,11 @@ import no.elg.infiniteBootleg.core.world.world.World.Companion.BLOCK_SIZE
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.block
 import no.elg.infiniteBootleg.protobuf.entityOrNull
-import no.elg.infiniteBootleg.protobuf.material
 
-interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> {
+interface Block :
+  CheckableDisposable,
+  HUDDebuggable,
+  Savable<ProtoWorld.Block> {
 
   val material: Material
   val chunk: Chunk
@@ -49,9 +52,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
 
   override val isDisposed: Boolean get() = chunk.getRawBlock(localX, localY) !== this
 
-  override fun hudDebug(): String {
-    return "Block $material, pos ${stringifyCompactLoc(this)}"
-  }
+  override fun hudDebug(): String = "Block $material, pos ${stringifyCompactLoc(this)}"
 
   companion object {
 
@@ -122,7 +123,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
       }
     }
 
-    fun Block?.materialOrAir(): Material = this?.material ?: Material.AIR
+    fun Block?.materialOrAir(): Material = this?.material ?: Material.Air
 
     fun fromProto(
       world: World,
@@ -135,7 +136,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
         return null
       }
       val material = protoBlock.material.fromProto()
-      if (material === Material.AIR) {
+      if (material === Material.Air) {
         return null
       }
       return material.createBlock(world, chunk, localX, localY, protoBlock.entityOrNull)
@@ -143,9 +144,7 @@ interface Block : CheckableDisposable, HUDDebuggable, Savable<ProtoWorld.Block> 
 
     fun save(material: Material): ProtoWorld.Block.Builder =
       block {
-        this.material = material {
-          ordinal = material.ordinal
-        }
+        this.material = material.asProto()
       }.toBuilder()
   }
 }

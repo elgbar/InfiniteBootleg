@@ -25,7 +25,7 @@ class ForestGenerator(override val seed: Long, private val cutoff: Float) : Feat
   private fun createTree(world: World, worldX: WorldCoord, worldY: WorldCoord) {
     val treeHeight = shouldGenerateTreeNoise.getNoise(worldX, worldY, 1, MAX_TREE_HEIGHT).coerceAtLeast(MIN_TREE_HEIGHT).roundToInt()
     val locs = World.Companion.getLocationsAABBFromCorner(worldX.toFloat(), worldY.toFloat() + treeHeight, 0f, treeHeight.toFloat())
-    Material.BIRCH_TRUNK.createBlocks(world, locs, prioritize = false, allowOverwiteNonAir = true)
+    Material.BirchTrunk.createBlocks(world, locs, prioritize = false, allowOverwiteNonAir = true)
 
     val leavesRadius = shouldGenerateTreeNoise.getNoise(worldX, worldY, 2, MAX_PRIMARY_LEAVES_RADIUS).coerceAtLeast(MIN_PRIMARY_LEAVES_RADIUS)
     generateLeavesBlob(world, worldX, worldY + treeHeight, leavesRadius)
@@ -43,7 +43,7 @@ class ForestGenerator(override val seed: Long, private val cutoff: Float) : Feat
 
   private fun generateLeavesBlob(world: World, worldX: WorldCoord, worldY: WorldCoord, radius: Float) {
     val leaves = World.Companion.getLocationsWithin(worldX, worldY, radius)
-    Material.BIRCH_LEAVES.createBlocks(world, leaves, false)
+    Material.BirchLeaves.createBlocks(world, leaves, false)
   }
 
   companion object {

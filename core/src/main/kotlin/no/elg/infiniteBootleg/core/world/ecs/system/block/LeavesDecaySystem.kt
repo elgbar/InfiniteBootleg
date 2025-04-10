@@ -61,11 +61,11 @@ object LeavesDecaySystem : FamilyEntitySystem(leafBlockFamily, UPDATE_PRIORITY_D
             nextChunk.getRawBlock(localX, localY).materialOrAir()
           }
 
-          if (neighborMaterial == Material.BIRCH_TRUNK) {
+          if (neighborMaterial == Material.BirchTrunk) {
             // If there is a trunk connected to this leaf block, we don't want to despawn it and can return early
             return
           }
-          if (neighborMaterial == Material.BIRCH_LEAVES && nextLoc !in seen) {
+          if (neighborMaterial == Material.BirchLeaves && nextLoc !in seen) {
             stack.addFirst(nextLoc)
           }
         }
