@@ -8,10 +8,7 @@ import kotlin.reflect.KClass
  *
  * The constructor is private to prevent wong use, use [createRegisteredEventListener] to create new instances
  */
-class RegisteredEventListener private constructor(
-  private val listener: EventListener<out Event>,
-  private val eventClass: KClass<out Event>
-) {
+class RegisteredEventListener private constructor(private val listener: EventListener<out Event>, private val eventClass: KClass<out Event>) {
 
   /**
    * Removes the listener

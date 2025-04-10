@@ -22,13 +22,9 @@ object WorldLoader {
   private val WORLD_LOCK_LOCK = Any()
   const val WORLD_INFO_PATH = "world.dat"
 
-  fun getWorldFolder(uuid: String): FileHandle {
-    return Gdx.files.external(Main.Companion.WORLD_FOLDER + uuid)
-  }
+  fun getWorldFolder(uuid: String): FileHandle = Gdx.files.external(Main.Companion.WORLD_FOLDER + uuid)
 
-  fun getWorldLockFile(uuid: String): FileHandle {
-    return getWorldFolder(uuid).child(LOCK_FILE_NAME)
-  }
+  fun getWorldLockFile(uuid: String): FileHandle = getWorldFolder(uuid).child(LOCK_FILE_NAME)
 
   fun canWriteToWorld(uuid: String): Boolean {
     if (Settings.ignoreWorldLock) {
@@ -99,8 +95,8 @@ object WorldLoader {
     }
   }
 
-  fun generatorFromProto(protoWorld: ProtoWorld.World): ChunkGenerator {
-    return when (protoWorld.generator) {
+  fun generatorFromProto(protoWorld: ProtoWorld.World): ChunkGenerator =
+    when (protoWorld.generator) {
       ProtoWorld.World.Generator.PERLIN, ProtoWorld.World.Generator.UNRECOGNIZED, null -> PerlinChunkGenerator(
         protoWorld.seed
       )
@@ -108,5 +104,4 @@ object WorldLoader {
       ProtoWorld.World.Generator.FLAT -> FlatChunkGenerator()
       ProtoWorld.World.Generator.EMPTY -> EmptyChunkGenerator()
     }
-  }
 }

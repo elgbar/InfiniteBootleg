@@ -47,9 +47,7 @@ fun ClientWorld.createContainerActor(ownedContainer: OwnedContainer, dragAndDrop
     closeOnEscape()
 
     defaults().maxWidth(object : Value() {
-      override fun get(actor: Actor?): Float {
-        return Gdx.graphics.width * 0.75f
-      }
+      override fun get(actor: Actor?): Float = Gdx.graphics.width * 0.75f
     })
 
     val updateFunctions: MutableList<() -> Unit> = mutableListOf()

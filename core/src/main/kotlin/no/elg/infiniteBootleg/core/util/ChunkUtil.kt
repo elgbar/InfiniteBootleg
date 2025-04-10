@@ -19,13 +19,12 @@ fun Chunk.isNeighbor(other: ChunkCompactLoc): Boolean = isNeighbor(other.decompa
 /**
  * Check if this chunk is a neighbor of the given chunk, this chunk is not a neighbor of itself
  */
-fun Chunk.isNeighbor(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
-  return if (chunkX == this.chunkX && chunkY == this.chunkY) {
+fun Chunk.isNeighbor(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
+  if (chunkX == this.chunkX && chunkY == this.chunkY) {
     false
   } else {
     abs(chunkX - this.chunkX) <= 1 && abs(chunkY - this.chunkY) <= 1
   }
-}
 
 inline fun Chunk.directionTo(other: Chunk): Direction = directionTo(other.chunkX, other.chunkY)
 

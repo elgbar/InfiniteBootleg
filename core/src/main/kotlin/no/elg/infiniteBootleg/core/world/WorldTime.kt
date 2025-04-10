@@ -34,25 +34,23 @@ class WorldTime(val world: World) {
    * @param time The time to calculate
    * @return A brightness value between 0 and 1 (both inclusive)
    */
-  fun getSkyBrightness(time: Float = this.time): Float {
-    return atTime(
+  fun getSkyBrightness(time: Float = this.time): Float =
+    atTime(
       time = time,
       day = { 1f },
       dusk = { 1f - (it - SUNSET_TIME) / (DUSK_TIME - SUNSET_TIME) },
       night = { 0f },
       dawn = { (it - DAWN_TIME) / (SUNRISE_TIME - DAWN_TIME) }
     )
-  }
 
-  fun timeOfDay(time: Float = this.time): String {
-    return atTime(
+  fun timeOfDay(time: Float = this.time): String =
+    atTime(
       time = time,
       day = { "Day" },
       dusk = { "Dusk" },
       night = { "Night" },
       dawn = { "Dawn" }
     )
-  }
 
   inline fun <T> atTime(
     time: Float = this.time,
@@ -76,9 +74,7 @@ class WorldTime(val world: World) {
     }
   }
 
-  fun normalizedTime(): Float {
-    return Util.normalizedDir(time)
-  }
+  fun normalizedTime(): Float = Util.normalizedDir(time)
 
   companion object {
     /**

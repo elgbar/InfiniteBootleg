@@ -26,7 +26,10 @@ enum class RingRating(val effectPercent: Double) {
   DUST(1.01)
 }
 
-sealed interface RingType<in R : RingRating?> : Named, Equippable, MagicEffectsWithRating<R> {
+sealed interface RingType<in R : RingRating?> :
+  Named,
+  Equippable,
+  MagicEffectsWithRating<R> {
   companion object {
 
     fun valueOf(serializedName: String): RingType<RingRating?>? {
@@ -47,8 +50,12 @@ sealed interface RingType<in R : RingRating?> : Named, Equippable, MagicEffectsW
   }
 }
 
-sealed interface RatelessRingType : Named, RingType<RingRating?>
-sealed interface RatedRingType : Named, RingType<RingRating>
+sealed interface RatelessRingType :
+  Named,
+  RingType<RingRating?>
+sealed interface RatedRingType :
+  Named,
+  RingType<RingRating>
 
 // data object Palantir : RatelessRingType {
 //  override val displayName: String = "Palantir"
@@ -116,7 +123,7 @@ data object SpellLightRing : RatedRingType {
   override val serializedName: String = "SpellLight"
 
   override fun onSpellCreate(state: MutableSpellState, rating: RingRating) {
-    // fixme Drops torhces sometimes
-    state.entityModifications += { spell: Entity -> spell.safeWith { MaterialComponent(Material.TORCH) } }
+    // fixme Drops torches sometimes
+    state.entityModifications += { spell: Entity -> spell.safeWith { MaterialComponent(Material.Torch) } }
   }
 }

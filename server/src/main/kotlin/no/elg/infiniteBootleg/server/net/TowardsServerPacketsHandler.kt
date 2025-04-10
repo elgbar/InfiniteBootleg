@@ -464,7 +464,7 @@ private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, upd
     return
   }
   hotbarComponent.selected = slot
-  val selectedElement = hotbarComponent.selectedItem(entity)?.element ?: Material.AIR
+  val selectedElement = hotbarComponent.selectedItem(entity)?.element ?: Material.Air
   ServerMain.inst().packetSender.broadcast(clientBoundHoldingItem(entity, selectedElement)) { c -> c != ctx.channel() }
 }
 
@@ -472,9 +472,7 @@ private fun asyncHandleUpdateSelectedSlot(ctx: ChannelHandlerContextWrapper, upd
 //  UTILS  //
 // ///////////
 
-private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformation? {
-  return ServerBoundHandler.clients[this.channel()]
-}
+private fun ChannelHandlerContextWrapper.getSharedInformation(): SharedInformation? = ServerBoundHandler.clients[this.channel()]
 
 private fun ChannelHandlerContextWrapper.getCurrentPlayer(): Entity? {
   val uuid = getSharedInformation() ?: return null
@@ -493,10 +491,7 @@ private fun chunksInView(ctx: ChannelHandlerContextWrapper): ChunksInView? {
   return entity.chunksInView
 }
 
-private fun isChunkInView(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean {
-  return chunksInView(ctx)?.isInView(chunkX, chunkY) ?: false
-}
+private fun isChunkInView(ctx: ChannelHandlerContextWrapper, chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = chunksInView(ctx)?.isInView(chunkX, chunkY) ?: false
 
-private fun isLocInView(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord): Boolean {
-  return chunksInView(ctx)?.isInView(worldX.worldToChunk(), worldY.worldToChunk()) ?: false
-}
+private fun isLocInView(ctx: ChannelHandlerContextWrapper, worldX: WorldCoord, worldY: WorldCoord): Boolean =
+  chunksInView(ctx)?.isInView(worldX.worldToChunk(), worldY.worldToChunk()) ?: false

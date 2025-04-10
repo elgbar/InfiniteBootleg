@@ -80,9 +80,7 @@ class InfAssetsImpl : InfAssets {
     return null
   }
 
-  override fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion {
-    return safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
-  }
+  override fun findTexture(name: String, rotationAllowed: Boolean): RotatableTextureRegion = safeTextureAtlas.findRotationAwareRegion(name, rotationAllowed)
 
   override fun findTexture(name: String): RotatableTextureRegion =
     if (safeTextureAtlas.existsRegion(name)) {

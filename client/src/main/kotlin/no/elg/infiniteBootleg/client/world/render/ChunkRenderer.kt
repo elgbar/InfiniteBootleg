@@ -50,7 +50,9 @@ typealias SystemTimeMillis = Long
 /**
  * @author Elg
  */
-class ChunkRenderer(private val worldRender: WorldRender) : Renderer, Disposable {
+class ChunkRenderer(private val worldRender: WorldRender) :
+  Renderer,
+  Disposable {
 
   private val batch: SpriteBatch = SpriteBatch().also {
     it.projectionMatrix =

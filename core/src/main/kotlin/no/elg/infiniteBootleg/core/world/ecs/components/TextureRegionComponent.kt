@@ -12,9 +12,10 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class TextureRegionComponent(var textureName: String) : EntitySavableComponent, ClientComponent {
+data class TextureRegionComponent(var textureName: String) :
+  EntitySavableComponent,
+  ClientComponent {
 
-  //  val texture: RotatableTextureRegion get() = Main.inst().assets.findTexture(textureName, false)
   override fun hudDebug(): String = "texture $textureName"
 
   companion object : EntityLoadableMapper<TextureRegionComponent>() {
@@ -23,9 +24,7 @@ data class TextureRegionComponent(var textureName: String) : EntitySavableCompon
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasTexture()
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent? {
-      return safeWith { TextureRegionComponent(protoEntity.texture.texture) }
-    }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent? = safeWith { TextureRegionComponent(protoEntity.texture.texture) }
   }
 
   override fun EntityKt.Dsl.save() {

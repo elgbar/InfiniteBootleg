@@ -113,7 +113,5 @@ class ServerWorld(generator: ChunkGenerator, seed: Long, worldName: String) : Wo
     return getPlayer(information)
   }
 
-  fun getPlayer(sharedInformation: SharedInformation): Entity? {
-    return getEntity(sharedInformation.entityId)
-  }
+  fun getPlayer(sharedInformation: SharedInformation): Entity? = getEntity(sharedInformation.entityId)
 }

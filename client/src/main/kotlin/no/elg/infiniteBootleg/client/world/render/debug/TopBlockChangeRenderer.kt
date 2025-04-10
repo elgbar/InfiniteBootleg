@@ -25,7 +25,9 @@ import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFla
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.chunkColumnFeatureFlags
 import java.util.concurrent.ConcurrentHashMap
 
-class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera

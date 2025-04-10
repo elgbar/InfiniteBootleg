@@ -23,7 +23,8 @@ class ContainerOwnerListener(
   private val engine: Engine,
   family: Family,
   private val convertEntityToOwner: (Entity) -> ContainerOwner
-) : EntityListener, Disposable {
+) : EntityListener,
+  Disposable {
 
   @GuardedBy("chunksLock")
   private val owners: Map<Entity, ContainerOwner> = Collections.synchronizedMap(WeakHashMap())

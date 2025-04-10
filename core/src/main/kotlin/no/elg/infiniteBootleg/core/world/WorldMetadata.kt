@@ -9,13 +9,7 @@ import no.elg.infiniteBootleg.core.world.loader.WorldLoader
 /**
  * Additional fields of a world not essential to the world itself to
  */
-data class WorldMetadata(
-  val name: String,
-  val seed: Long,
-  var spawn: Long,
-  var isTransient: Boolean,
-  var isLoaded: Boolean = false
-) : Disposable {
+data class WorldMetadata(val name: String, val seed: Long, var spawn: Long, var isTransient: Boolean, var isLoaded: Boolean = false) : Disposable {
 
   val uuid: String = generateUUIDFromLong(seed).toString()
   var worldFolder: FileHandle? = null

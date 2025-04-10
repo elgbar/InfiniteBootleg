@@ -29,9 +29,7 @@ object ServerWorldLoader {
 
   private const val PLAYERS_PATH = "players"
 
-  private fun getServerPlayerFile(world: World, playerId: String): FileHandle? {
-    return world.worldFolder?.child(PLAYERS_PATH)?.child(playerId)
-  }
+  private fun getServerPlayerFile(world: World, playerId: String): FileHandle? = world.worldFolder?.child(PLAYERS_PATH)?.child(playerId)
 
   fun spawnServerPlayer(world: ServerWorld, entityId: String, username: String, sharedInformation: SharedInformation): CompletableFuture<Entity> {
     val fileHandle = getServerPlayerFile(world, entityId)

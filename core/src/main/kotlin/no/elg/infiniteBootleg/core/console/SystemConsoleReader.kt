@@ -9,7 +9,9 @@ import java.util.Scanner
 private val logger = KotlinLogging.logger {}
 
 /** Read input from [System.console] or [System. in] if no console exists.  */
-class SystemConsoleReader(private val consoleHandler: GameConsoleHandler) : Runnable, Disposable {
+class SystemConsoleReader(private val consoleHandler: GameConsoleHandler) :
+  Runnable,
+  Disposable {
   private var running = false
   fun start() {
     val thread = Thread(this, "System Console Reader Thread")

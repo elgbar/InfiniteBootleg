@@ -17,7 +17,10 @@ import kotlin.reflect.full.memberFunctions
 
 private val logger = KotlinLogging.logger {}
 
-abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
+abstract class GameConsoleHandler :
+  GameConsoleLogger,
+  Disposable,
+  Resizable {
   protected abstract val console: Console
   abstract val exec: CommandExecutor
 
@@ -88,7 +91,8 @@ abstract class GameConsoleHandler() : GameConsoleLogger, Disposable, Resizable {
       try {
         // Try to execute with default params if no args are given
         val filter = exec.javaClass.kotlin.memberFunctions.filter {
-          it.name.startsWith(commandPart, ignoreCase = true) && // Find the function with the same name
+          it.name.startsWith(commandPart, ignoreCase = true) &&
+            // Find the function with the same name
             it.parameters.filter { it.kind == Kind.VALUE }.all { it.isOptional && !it.isVararg } // All parameters must be optional and not vararg
         }
         if (filter.size == 1) {

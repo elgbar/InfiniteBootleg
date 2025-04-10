@@ -19,7 +19,9 @@ import kotlin.contracts.contract
 
 private val logger = KotlinLogging.logger {}
 
-class ThreadSafeEngine : Engine(), Disposable {
+class ThreadSafeEngine :
+  Engine(),
+  Disposable {
 
   private val engineLock = Any()
 
@@ -28,9 +30,7 @@ class ThreadSafeEngine : Engine(), Disposable {
 
   override fun createEntity(): Entity = super.createEntity()
 
-  override fun <T : Component> createComponent(componentType: Class<T>): T {
-    return super.createComponent(componentType)
-  }
+  override fun <T : Component> createComponent(componentType: Class<T>): T = super.createComponent(componentType)
 
   override fun addEntity(entity: Entity): Unit =
     synchronized(engineLock) {

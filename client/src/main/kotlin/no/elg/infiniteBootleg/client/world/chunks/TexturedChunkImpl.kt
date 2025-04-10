@@ -14,7 +14,11 @@ import no.elg.infiniteBootleg.core.world.chunks.TexturedChunk
 import no.elg.infiniteBootleg.core.world.chunks.ViewableChunk
 import no.elg.infiniteBootleg.core.world.world.World
 
-class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) : ChunkImpl(world, chunkX, chunkY), TexturedChunk, ViewableChunk, Chunk {
+class TexturedChunkImpl(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord) :
+  ChunkImpl(world, chunkX, chunkY),
+  TexturedChunk,
+  ViewableChunk,
+  Chunk {
 
   @GuardedBy("chunkBody")
   private var fbo: FrameBuffer? = null

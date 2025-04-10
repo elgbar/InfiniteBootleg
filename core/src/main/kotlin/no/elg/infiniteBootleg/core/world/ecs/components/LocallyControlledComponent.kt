@@ -23,7 +23,8 @@ data class LocallyControlledComponent(
   var brushSize: Float = INITIAL_BRUSH_SIZE,
   var interactRadius: Float = INITIAL_INTERACT_RADIUS,
   var instantBreak: Boolean = INITIAL_INSTANT_BREAK
-) : EntitySavableComponent, AuthoritativeOnlyComponent {
+) : EntitySavableComponent,
+  AuthoritativeOnlyComponent {
 
   fun isBreaking(entity: Entity) = !instantBreak && Gdx.input.isButtonPressed(Input.Buttons.LEFT) && entity.selectedItem?.element is Tool
 

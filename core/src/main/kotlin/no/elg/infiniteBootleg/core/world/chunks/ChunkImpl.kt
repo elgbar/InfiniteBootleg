@@ -51,11 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
-open class ChunkImpl(
-  final override val world: World,
-  final override val chunkX: ChunkCoord,
-  final override val chunkY: ChunkCoord
-) : Chunk {
+open class ChunkImpl(final override val world: World, final override val chunkX: ChunkCoord, final override val chunkY: ChunkCoord) : Chunk {
 
   val blocks: Array<Array<Block?>> = Array(Chunk.Companion.CHUNK_SIZE) { arrayOfNulls(Chunk.Companion.CHUNK_SIZE) }
 
@@ -140,7 +136,7 @@ open class ChunkImpl(
       outer@ for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
         for (localY in 0 until Chunk.Companion.CHUNK_SIZE) {
           val b = blocks[localX][localY]
-          if (b != null && b.material !== Material.AIR) {
+          if (b != null && b.material !== Material.Air) {
             isAllAir = false
             break@outer
           }
@@ -269,7 +265,8 @@ open class ChunkImpl(
 
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
     if (isValid && world.isLoaded) {
-      synchronized(this) { // TODO synchronize on something else
+      synchronized(this) {
+        // TODO synchronize on something else
         if (!checkDistance) {
           // Safe to cancel when doing a full update
           // Note to self, DO NOT CANCEL when updating from sources,
@@ -292,7 +289,13 @@ open class ChunkImpl(
       coroutineScope {
         for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
           for (localY in Chunk.Companion.CHUNK_SIZE - 1 downTo 0) {
-            if (checkDistance && isNoneWithinDistance(sources, this@ChunkImpl.chunkX.chunkToWorld(localX), this@ChunkImpl.chunkY.chunkToWorld(localY))) {
+            if (checkDistance &&
+              isNoneWithinDistance(
+                sources,
+                this@ChunkImpl.chunkX.chunkToWorld(localX),
+                this@ChunkImpl.chunkY.chunkToWorld(localY)
+              )
+            ) {
               continue
             }
             launch {
@@ -310,13 +313,9 @@ open class ChunkImpl(
     return false
   }
 
-  override fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight {
-    return blockLights[blockMapIndex(localX, localY)]
-  }
+  override fun getBlockLight(localX: LocalCoord, localY: LocalCoord): BlockLight = blockLights[blockMapIndex(localX, localY)]
 
-  override fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block? {
-    return blocks[localX][localY]
-  }
+  override fun getRawBlock(localX: LocalCoord, localY: LocalCoord): Block? = blocks[localX][localY]
 
   override val isDisposed: Boolean get() = disposed
 
@@ -345,9 +344,7 @@ open class ChunkImpl(
     return object : MutableIterator<Block?> {
       var x = 0
       var y = 0
-      override fun hasNext(): Boolean {
-        return y < Chunk.Companion.CHUNK_SIZE - 1 || x < Chunk.Companion.CHUNK_SIZE
-      }
+      override fun hasNext(): Boolean = y < Chunk.Companion.CHUNK_SIZE - 1 || x < Chunk.Companion.CHUNK_SIZE
 
       override fun next(): Block? {
         if (x == Chunk.Companion.CHUNK_SIZE) {

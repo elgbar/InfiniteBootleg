@@ -16,7 +16,9 @@ import no.elg.infiniteBootleg.core.world.ecs.creation.PLAYERS_RIGHT_ARM_USER_DAT
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class GroundedComponent : EntitySavableComponent, AuthoritativeOnlyComponent {
+class GroundedComponent :
+  EntitySavableComponent,
+  AuthoritativeOnlyComponent {
 
   val feetContacts = LongContactTracker(PLAYERS_FOOT_USER_DATA)
   val holeContacts = LongContactTracker(HOLE_DETECTOR_USER_DATA)

@@ -20,20 +20,21 @@ enum class GemRating(val powerPercent: Double) {
   RUINED(0.0)
 }
 
-sealed interface GemType : Named, MagicEffectsWithRating<GemRating> {
+sealed interface GemType :
+  Named,
+  MagicEffectsWithRating<GemRating> {
 
   val maxPower: Double
 
   companion object {
-    fun valueOf(serializedName: String): GemType? {
-      return when (serializedName) {
+    fun valueOf(serializedName: String): GemType? =
+      when (serializedName) {
         Diamond.serializedName -> Diamond
         else -> {
           logger.error { "Failed to parse gem type '$serializedName', it will be absent" }
           null
         }
       }
-    }
   }
 }
 

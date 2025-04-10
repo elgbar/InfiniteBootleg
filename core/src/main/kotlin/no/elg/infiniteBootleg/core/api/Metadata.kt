@@ -4,9 +4,7 @@ package no.elg.infiniteBootleg.core.api
  * @author Elg
  */
 interface Metadata {
-  operator fun <T> get(key: String): T? {
-    return get<T?>(key, null)
-  }
+  operator fun <T> get(key: String): T? = get<T?>(key, null)
 
   /**
    * @param key Key to the castle

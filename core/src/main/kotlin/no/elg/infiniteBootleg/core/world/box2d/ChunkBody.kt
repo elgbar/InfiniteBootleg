@@ -30,7 +30,9 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
+class ChunkBody(private val chunk: Chunk) :
+  Updatable,
+  CheckableDisposable {
 
   private val fixtureMap = LongMap<Fixture>()
 
@@ -177,9 +179,7 @@ class ChunkBody(private val chunk: Chunk) : Updatable, CheckableDisposable {
     return chunk == other.chunk
   }
 
-  override fun hashCode(): Int {
-    return chunk.hashCode()
-  }
+  override fun hashCode(): Int = chunk.hashCode()
 
   companion object {
     private val chainCache: Long2ObjectMap<ChainShape> = Long2ObjectOpenHashMap()

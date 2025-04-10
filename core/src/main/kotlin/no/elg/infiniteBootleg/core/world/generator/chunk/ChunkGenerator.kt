@@ -39,13 +39,12 @@ interface ChunkGenerator {
   fun generateFeatures(chunk: Chunk) {}
 
   companion object {
-    fun getGeneratorType(generator: ChunkGenerator?): ProtoWorld.World.Generator {
-      return when (generator) {
+    fun getGeneratorType(generator: ChunkGenerator?): ProtoWorld.World.Generator =
+      when (generator) {
         is PerlinChunkGenerator -> ProtoWorld.World.Generator.PERLIN
         is FlatChunkGenerator -> ProtoWorld.World.Generator.FLAT
         is EmptyChunkGenerator -> ProtoWorld.World.Generator.EMPTY
         else -> ProtoWorld.World.Generator.UNRECOGNIZED
       }
-    }
   }
 }

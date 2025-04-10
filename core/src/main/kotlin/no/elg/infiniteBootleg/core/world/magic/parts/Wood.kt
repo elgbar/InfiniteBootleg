@@ -14,16 +14,13 @@ enum class WoodRating(val powerPercent: Double, timeToNext: Duration) {
   PETRIFIED(1.0, Duration.INFINITE)
 }
 
-sealed class WoodType(
-  val gemSlots: UInt,
-  val ringSlots: UInt,
-  val dryingRate: Double,
-  val castDelay: Duration
-) : Named, MagicEffectsWithRating<WoodRating> {
+sealed class WoodType(val gemSlots: UInt, val ringSlots: UInt, val dryingRate: Double, val castDelay: Duration) :
+  Named,
+  MagicEffectsWithRating<WoodRating> {
   companion object {
 
-    fun valueOf(displayName: String): WoodType {
-      return when (displayName) {
+    fun valueOf(displayName: String): WoodType =
+      when (displayName) {
         Birch.serializedName -> Birch
         Aerowode.serializedName -> Aerowode
         RedWood.serializedName -> RedWood
@@ -32,7 +29,6 @@ sealed class WoodType(
         Trekant.serializedName -> Trekant
         else -> throw IllegalArgumentException("Unknown wood type $displayName")
       }
-    }
   }
 }
 

@@ -32,11 +32,7 @@ import kotlin.math.sign
 typealias Brightness = Float
 typealias BrightnessArray = FloatArray
 
-class BlockLight(
-  val chunk: Chunk,
-  val localX: LocalCoord,
-  val localY: LocalCoord
-) {
+class BlockLight(val chunk: Chunk, val localX: LocalCoord, val localY: LocalCoord) {
 
   /**
    * Whether this block is above the top-most block of the given world y-coordinate
@@ -280,8 +276,8 @@ class BlockLight(
   /**
    * @return If the given block is a valid skylight candidate
    */
-  private fun skylightBlockFilter(worldX: Float, worldY: Float, block: Block): Boolean {
-    return !block.material.blocksLight &&
+  private fun skylightBlockFilter(worldX: Float, worldY: Float, block: Block): Boolean =
+    !block.material.blocksLight &&
       !block.material.emitsLight &&
       block.chunk.chunkColumn.isBlockAboveTopBlock(
         block.localX,
@@ -294,7 +290,6 @@ class BlockLight(
         block.worldX,
         block.worldY
       ) <= World.Companion.LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA_POW
-  }
 
   /**
    * Given two y-coordinates ([worldYA] and [worldYB]) get a column of blocks between the two

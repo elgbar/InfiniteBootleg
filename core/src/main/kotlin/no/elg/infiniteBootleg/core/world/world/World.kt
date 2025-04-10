@@ -149,7 +149,8 @@ abstract class World(
    */
   name: String,
   forceTransient: Boolean = false
-) : Disposable, Resizable {
+) : Disposable,
+  Resizable {
 
   constructor(protoWorld: ProtoWorld.World, forceTransient: Boolean = false) : this(
     WorldLoader.generatorFromProto(
@@ -479,9 +480,7 @@ abstract class World(
    * @return The block (including Air!) at the given local x, if `null` the chunk failed to load.
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
-  fun getTopBlock(worldX: WorldCoord, features: ChunkColumnFeatureFlag): Block? {
-    return getChunkColumn(worldX.worldToChunk()).topBlock(worldX.chunkOffset(), features)
-  }
+  fun getTopBlock(worldX: WorldCoord, features: ChunkColumnFeatureFlag): Block? = getChunkColumn(worldX.worldToChunk()).topBlock(worldX.chunkOffset(), features)
 
   /**
    * @param worldX   The block column to query for the worldX for
@@ -489,9 +488,7 @@ abstract class World(
    * @return The worldY coordinate of the top block of the given worldX
    * @see no.elg.infiniteBootleg.world.ChunkColumn.Companion.FeatureFlag
    */
-  fun getTopBlockWorldY(worldX: WorldCoord, features: ChunkColumnFeatureFlag): WorldCoord {
-    return getChunkColumn(worldX.worldToChunk()).topBlockHeight(worldX.chunkOffset(), features)
-  }
+  fun getTopBlockWorldY(worldX: WorldCoord, features: ChunkColumnFeatureFlag): WorldCoord = getChunkColumn(worldX.worldToChunk()).topBlockHeight(worldX.chunkOffset(), features)
 
   fun getChunkFromWorld(worldX: WorldCoord, worldY: WorldCoord, load: Boolean): Chunk? {
     val chunkX = worldX.worldToChunk()
@@ -591,9 +588,7 @@ abstract class World(
    * @param chunkY The y-coordinate of the chunk to load (in Chunk coordinate-view)
    * @return The loaded chunk
    */
-  fun loadChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? {
-    return loadChunk(compactLoc(chunkX, chunkY))
-  }
+  fun loadChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? = loadChunk(compactLoc(chunkX, chunkY))
 
   /**
    * Load a chunk into memory, either from disk or generate the chunk from its position
@@ -691,8 +686,8 @@ abstract class World(
   ) = actionOnBlock(worldX, worldY, loadChunk) { localX, localY, chunk -> chunk?.removeBlock(localX, localY, updateTexture, prioritize, sendUpdatePacket) }
 
   /**
-   * Check if a given location in the world is [Material.AIR] (or internally, doesn't exists)
-   * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.AIR` as
+   * Check if a given location in the world is [Material.Air] (or internally, doesn't exists)
+   * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.Air` as
    * the [getRawBlock] method might createBlock and store a new air block
    * at the given location
    *
@@ -705,8 +700,8 @@ abstract class World(
     isAirBlock(compactWorldLoc.decompactLocX(), compactWorldLoc.decompactLocY(), loadChunk, markerIsAir)
 
   /**
-   * Check if a given location in the world is [Material.AIR] (or internally, does not exist)
-   * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.AIR` as
+   * Check if a given location in the world is [Material.Air] (or internally, does not exist)
+   * this is faster than a standard `getBlock(worldX, worldY).getMaterial == Material.Air` as
    * the [getRawBlock] method might create a Block and store a new air
    * block at the given location.
    *
@@ -1157,9 +1152,7 @@ abstract class World(
 
   override fun resize(width: Int, height: Int) = Unit
 
-  override fun toString(): String {
-    return "World{name='$name', uuid=$uuid}"
-  }
+  override fun toString(): String = "World{name='$name', uuid=$uuid}"
 
   override fun dispose() {
     logger.info { "Disposing world '$name'" }

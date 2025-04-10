@@ -11,18 +11,19 @@ import com.strongjoshua.console.ImprovedGUIConsole
 import no.elg.infiniteBootleg.core.console.GameConsoleHandler
 import no.elg.infiniteBootleg.core.console.HelpfulConsoleHelpUtil
 
-class InGameConsole(private val consoleHandler: GameConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) : ImprovedGUIConsole(
-  skin,
-  useMultiplexer,
-  keyID,
-  VisWindow::class.java,
-  VisTable::class.java,
-  "default-pane",
-  TextField::class.java,
-  VisTextButton::class.java,
-  VisLabel::class.java,
-  VisScrollPane::class.java
-) {
+class InGameConsole(private val consoleHandler: GameConsoleHandler, skin: Skin, useMultiplexer: Boolean, keyID: Int) :
+  ImprovedGUIConsole(
+    skin,
+    useMultiplexer,
+    keyID,
+    VisWindow::class.java,
+    VisTable::class.java,
+    "default-pane",
+    TextField::class.java,
+    VisTextButton::class.java,
+    VisLabel::class.java,
+    VisScrollPane::class.java
+  ) {
 
   init {
     setMaxEntries(5_000)

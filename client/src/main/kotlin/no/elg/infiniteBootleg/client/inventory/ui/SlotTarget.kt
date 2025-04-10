@@ -12,9 +12,7 @@ class SlotTarget(actor: Actor) : DragAndDrop.Target(actor) {
     x: Float,
     y: Float,
     pointer: Int
-  ): Boolean {
-    return true
-  }
+  ): Boolean = true
 
   override fun drop(
     source: DragAndDrop.Source,

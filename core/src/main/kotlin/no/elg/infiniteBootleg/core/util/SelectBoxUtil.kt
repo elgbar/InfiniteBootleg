@@ -49,12 +49,8 @@ inline fun <T> KWidget<*>.visIBSelectBox(
   return selectBox
 }
 
-class IBVisSelectBox<T>(
-  items: GdxArray<T>,
-  selectedItem: T? = null,
-  styleName: String = defaultStyle,
-  private val stringify: (T) -> String = ::defaultStringify
-) : VisSelectBox<T>(styleName) {
+class IBVisSelectBox<T>(items: GdxArray<T>, selectedItem: T? = null, styleName: String = defaultStyle, private val stringify: (T) -> String = ::defaultStringify) :
+  VisSelectBox<T>(styleName) {
   public override fun toString(item: T): String = stringify(item)
 
   init {

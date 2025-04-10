@@ -20,13 +20,12 @@ import java.util.UUID
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-fun fromUUIDOrNull(string: String?): UUID? {
-  return try {
+fun fromUUIDOrNull(string: String?): UUID? =
+  try {
     UUID.fromString(string)
   } catch (e: Exception) {
     null
   }
-}
 
 private val namespace = UUID.fromString("1aeeb167-a72e-45d3-8b75-8a144e56ca54")
 private val uuidv5Generator = Generators.nameBasedGenerator(namespace)
@@ -80,7 +79,7 @@ fun Int.stringSize(): Int {
 
 inline fun Block?.isAir(markerIsAir: Boolean = true): Boolean {
   contract { returns(false) implies (this@isAir != null) }
-  return this == null || (markerIsAir && this.isMarkerBlock()) || this.material == Material.AIR
+  return this == null || (markerIsAir && this.isMarkerBlock()) || this.material == Material.Air
 }
 
 inline fun Block?.isNotAir(markerIsAir: Boolean = true): Boolean {

@@ -14,7 +14,9 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class InputEventQueueComponent : ECSEventQueueComponent<InputEvent>, AuthoritativeOnlyComponent {
+class InputEventQueueComponent :
+  ECSEventQueueComponent<InputEvent>,
+  AuthoritativeOnlyComponent {
   override val events = ConcurrentLinkedQueue<InputEvent>()
 
   override fun EntityKt.Dsl.save() {

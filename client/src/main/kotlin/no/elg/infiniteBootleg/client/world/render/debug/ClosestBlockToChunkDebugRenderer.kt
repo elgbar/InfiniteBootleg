@@ -17,7 +17,9 @@ import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.getChunkOrNull
 
-class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000).also {
     it.color = Color.RED

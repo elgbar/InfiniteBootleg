@@ -20,12 +20,7 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
  * The block will be automatically removed if the entity is deleted or the entity is no longer in this world block
  * @see no.elg.infiniteBootleg.core.world.ecs.system.block.UpdateGridBlockSystem
  */
-class EntityMarkerBlock(
-  override val chunk: Chunk,
-  override val localX: LocalCoord,
-  override val localY: LocalCoord,
-  override val entity: Entity
-) : Block {
+class EntityMarkerBlock(override val chunk: Chunk, override val localX: LocalCoord, override val localY: LocalCoord, override val entity: Entity) : Block {
 
   private var removeEntityListener: EntityListener? =
     EntityRemoveListener { if (it === entity) removeEntityMarker() }
@@ -73,9 +68,7 @@ class EntityMarkerBlock(
     return result
   }
 
-  override fun toString(): String {
-    return "EntityMarkerBlock(chunk=$chunk, localX=$localX, localY=$localY, entity=$entity, material=$material)"
-  }
+  override fun toString(): String = "EntityMarkerBlock(chunk=$chunk, localX=$localX, localY=$localY, entity=$entity, material=$material)"
 
   companion object {
     /**

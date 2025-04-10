@@ -18,7 +18,9 @@ import kotlin.reflect.KClass
 /**
  * The queue of events to be processed by an entity, we cannot map events directly onto entities as multiple events might occur between processing
  */
-interface ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent, Pool.Poolable {
+interface ECSEventQueueComponent<T : ECSEvent> :
+  EntitySavableComponent,
+  Pool.Poolable {
 
   val events: ConcurrentLinkedQueue<T>
 

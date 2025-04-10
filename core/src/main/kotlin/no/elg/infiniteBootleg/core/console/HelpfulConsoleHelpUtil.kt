@@ -76,13 +76,12 @@ object HelpfulConsoleHelpUtil {
     return append("> ")
   }
 
-  fun generateCommandSignature(method: Method): String? {
-    return if ("\$default" in method.name) {
+  fun generateCommandSignature(method: Method): String? =
+    if ("\$default" in method.name) {
       null
     } else {
       createCmdPrefix(method).appendCmdSignature(method).toString()
     }
-  }
 
   private fun getArgNames(method: Method, params: Array<Class<*>>): Array<String>? {
     val annotation = method.getDeclaredAnnotation(CmdArgNames::class.java)

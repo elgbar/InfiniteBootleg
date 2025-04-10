@@ -24,7 +24,10 @@ import kotlin.math.ln
  *
  * @author Elg
  */
-interface Chunk : Iterable<Block?>, CheckableDisposable, Comparable<Chunk> {
+interface Chunk :
+  Iterable<Block?>,
+  CheckableDisposable,
+  Comparable<Chunk> {
 
   /**
    *

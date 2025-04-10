@@ -27,8 +27,8 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
     private val FALLING_BLOCK_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.FALLING_BLOCK)
     private val SPELL_ENTITY_TYPE_COMPONENT = EntityTypeComponent(EntityType.SPELL)
 
-    fun getType(entityType: EntityType): EntityTypeComponent {
-      return when (entityType) {
+    fun getType(entityType: EntityType): EntityTypeComponent =
+      when (entityType) {
         EntityType.BLOCK -> BLOCK_ENTITY_TYPE_COMPONENT
         EntityType.PLAYER -> PLAYER_ENTITY_TYPE_COMPONENT
         EntityType.FALLING_BLOCK -> FALLING_BLOCK_ENTITY_TYPE_COMPONENT
@@ -36,7 +36,6 @@ data class EntityTypeComponent(val entityType: EntityType) : EntitySavableCompon
         EntityType.UNRECOGNIZED -> error("Unrecognized entity type")
         EntityType.GENERIC_ENTITY -> error("Generic entities are not supported")
       }
-    }
 
     override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): EntityTypeComponent? = safeWith { getType(protoEntity.entityType) }
 

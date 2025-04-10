@@ -34,9 +34,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
         return ts1!!.element.displayName.compareTo(ts2!!.element.displayName)
       }
 
-      override fun reversed(): Comparator<Item?> {
-        return TT_NAME_ASC
-      }
+      override fun reversed(): Comparator<Item?> = TT_NAME_ASC
     }
 
     /** Sort ascending by the name of the tile type with null at the end  */
@@ -49,9 +47,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
         return -ts1!!.element.displayName.compareTo(ts2!!.element.displayName)
       }
 
-      override fun reversed(): Comparator<Item?> {
-        return ELEM_NAME_DESC
-      }
+      override fun reversed(): Comparator<Item?> = ELEM_NAME_DESC
     }
 
     /** Sort by the amount of tiles in ascending order  */
@@ -64,9 +60,7 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
         return (ts1!!.stock - ts2!!.stock).toInt()
       }
 
-      override fun reversed(): Comparator<Item?> {
-        return AMOUNT_DESC
-      }
+      override fun reversed(): Comparator<Item?> = AMOUNT_DESC
     }
 
     /** Sort by the amount of tiles in descending order  */
@@ -79,20 +73,17 @@ data class SortOrder(private val reverse: Boolean, val sorter: Comparator<Item?>
         return (ts2!!.stock - ts1!!.stock).toInt()
       }
 
-      override fun reversed(): Comparator<Item?> {
-        return AMOUNT_ASC
-      }
+      override fun reversed(): Comparator<Item?> = AMOUNT_ASC
     }
 
-    private fun nullCmp(o1: Any?, o2: Any?): Int {
-      return if (o1 == null) {
+    private fun nullCmp(o1: Any?, o2: Any?): Int =
+      if (o1 == null) {
         1
       } else if (o2 == null) {
         -1
       } else {
         0
       }
-    }
 
     /**
      * Sort the given array with the given settings. This is the same as declaring a new SortOrder

@@ -8,7 +8,9 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.world.World
 import java.util.concurrent.CopyOnWriteArraySet
 
-class ECSInputListener(val world: World) : InputProcessor, Disposable {
+class ECSInputListener(val world: World) :
+  InputProcessor,
+  Disposable {
 
   fun handleEvent(inputEvent: InputEvent): Boolean {
     world.engine.queueInputEvent(inputEvent) {

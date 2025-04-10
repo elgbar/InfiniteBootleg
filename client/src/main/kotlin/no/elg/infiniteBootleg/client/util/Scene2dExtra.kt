@@ -105,10 +105,13 @@ inline fun <T : Actor> T.onKeyDown(keycode: Int, catchEvent: Boolean = false, on
 inline fun <T : Actor> T.onAllKeysDownEvent(vararg keycodes: Int, catchEvent: Boolean = false, onlyWhenShown: Boolean = false, crossinline listener: T.() -> Unit): EventListener {
   require(keycodes.isNotEmpty()) { "At least one key must be given" }
   return this.onKeyDown(catchEvent) { eventKey ->
-    if ((!onlyWhenShown || isShown()) && eventKey in keycodes && keycodes.all {
-        it == eventKey || Gdx.input.isKeyPressed(
-          it
-        )
+    if ((!onlyWhenShown || isShown()) &&
+      eventKey in keycodes &&
+      keycodes.all {
+        it == eventKey ||
+          Gdx.input.isKeyPressed(
+            it
+          )
       }
     ) {
       listener()
@@ -127,8 +130,8 @@ inline fun <T : Actor> T.onAnyKeysDownEvent(vararg keycodes: Int, catchEvent: Bo
 }
 
 @Scene2dDsl
-fun ClientWorld.confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow {
-  return ibVisWindowClosed(title, title) {
+fun ClientWorld.confirmWindow(title: String, text: String, whenDenied: VisWindow.() -> Unit = {}, whenConfirmed: VisWindow.() -> Unit): VisWindow =
+  ibVisWindowClosed(title, title) {
     isMovable = false
     isModal = true
 
@@ -184,11 +187,10 @@ fun ClientWorld.confirmWindow(title: String, text: String, whenDenied: VisWindow
     pack()
     fadeOut(0f)
   }
-}
 
 @Scene2dDsl
-fun ClientWorld.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow {
-  return ibVisWindowClosed(title, title) {
+fun ClientWorld.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisWindow.() -> Unit>, whenConfirmed: VisWindow.() -> Unit, text: () -> String): VisWindow =
+  ibVisWindowClosed(title, title) {
     isMovable = false
     isModal = true
     val label = visLabel("")
@@ -217,7 +219,6 @@ fun ClientWorld.okWindow(title: String, labelUpdater: MutableMap<VisWindow, VisW
     centerWindow()
     fadeOut(0f)
   }
-}
 
 /**
  * A [IBVisWindow] that is initially closed
@@ -230,12 +231,10 @@ inline fun ClientWorld.ibVisWindowClosed(title: String, interfaceId: InterfaceId
 
 @Suppress("jol")
 @Scene2dDsl
-class IBVisWindow(
-  title: String,
-  styleName: String,
-  val world: ClientWorld,
-  val interfaceId: InterfaceId
-) : VisWindow(title, styleName), KTable, Disposable {
+class IBVisWindow(title: String, styleName: String, val world: ClientWorld, val interfaceId: InterfaceId) :
+  VisWindow(title, styleName),
+  KTable,
+  Disposable {
 
   private val interfaceManager = world.render.interfaceManager
 

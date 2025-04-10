@@ -22,7 +22,10 @@ import no.elg.infiniteBootleg.core.api.Resizable
 /**
  * @author Elg
  */
-class HUDRenderer : Renderer, Resizable, Disposable {
+class HUDRenderer :
+  Renderer,
+  Resizable,
+  Disposable {
   private var modus = DISPLAY_CURRENT_BLOCK or DISPLAY_CONTAINER_CHANGE
   private val builder = StringBuilder()
   private val containerChangeRenderer = ContainerChangeRenderer()

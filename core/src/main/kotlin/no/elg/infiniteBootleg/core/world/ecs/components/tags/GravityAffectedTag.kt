@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class GravityAffectedTag : TagSavableComponent, AuthoritativeOnlyComponent {
+class GravityAffectedTag :
+  TagSavableComponent,
+  AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<GravityAffectedTag>() {
     var Entity.gravityAffected by tagFor<GravityAffectedTag>()

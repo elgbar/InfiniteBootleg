@@ -10,7 +10,9 @@ import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.core.api.Resizable
 import no.elg.infiniteBootleg.core.util.safeUse
 
-class ScreenRenderer : Disposable, Resizable {
+class ScreenRenderer :
+  Disposable,
+  Resizable {
   val font: BitmapFont = ClientMain.inst().assets.font16pt
   private val spacing = font.lineHeight * ClientMain.scale / 2
   val batch: SpriteBatch = SpriteBatch().also {

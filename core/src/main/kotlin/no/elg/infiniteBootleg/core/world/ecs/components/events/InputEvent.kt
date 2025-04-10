@@ -17,13 +17,21 @@ sealed interface InputEvent : ECSEvent {
 
   data class KeyTypedEvent(val char: Char) : InputEvent
 
-  data class TouchDownEvent(override val screenX: Int, override val screenY: Int, val pointer: Int, val button: Int) : InputEvent, MouseInputEvent
+  data class TouchDownEvent(override val screenX: Int, override val screenY: Int, val pointer: Int, val button: Int) :
+    InputEvent,
+    MouseInputEvent
 
-  data class TouchUpEvent(override val screenX: Int, override val screenY: Int, val pointer: Int, val button: Int) : InputEvent, MouseInputEvent
+  data class TouchUpEvent(override val screenX: Int, override val screenY: Int, val pointer: Int, val button: Int) :
+    InputEvent,
+    MouseInputEvent
 
-  data class TouchDraggedEvent(override val screenX: Int, override val screenY: Int, val pointer: Int, val buttons: Set<Int>) : InputEvent, MouseInputEvent
+  data class TouchDraggedEvent(override val screenX: Int, override val screenY: Int, val pointer: Int, val buttons: Set<Int>) :
+    InputEvent,
+    MouseInputEvent
 
-  data class MouseMovedEvent(override val screenX: Int, override val screenY: Int) : InputEvent, MouseInputEvent
+  data class MouseMovedEvent(override val screenX: Int, override val screenY: Int) :
+    InputEvent,
+    MouseInputEvent
 
   data class ScrolledEvent(val amountX: Float, val amountY: Float) : InputEvent
 

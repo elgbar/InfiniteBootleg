@@ -26,9 +26,7 @@ class SafeTextureAtlas(textFileName: String) {
 
   fun existsRegion(name: String, index: Int = -1): Boolean = textureAtlasData.regions.any { region -> region.name == name && (index == -1 || region.index == index) }
 
-  fun findRegion(name: String, index: Int? = null): TextureAtlas.AtlasRegion? {
-    return index?.let { textureAtlas?.findRegion(name, it) } ?: textureAtlas?.findRegion(name)
-  }
+  fun findRegion(name: String, index: Int? = null): TextureAtlas.AtlasRegion? = index?.let { textureAtlas?.findRegion(name, it) } ?: textureAtlas?.findRegion(name)
 
   fun findRotationAwareRegion(name: String, rotationAllowed: Boolean, index: Int? = null): RotatableTextureRegion {
     val index1 = index ?: -1

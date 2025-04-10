@@ -16,8 +16,8 @@ sealed interface ItemChangeType {
   val addedItem: Item?
 
   companion object {
-    fun getItemChangeType(addedItem: Item?, removedItem: Item?): ItemChangeType? {
-      return when {
+    fun getItemChangeType(addedItem: Item?, removedItem: Item?): ItemChangeType? =
+      when {
         addedItem != null && removedItem != null ->
           if (addedItem == removedItem) {
             ItemStockChangeType.calculateStockChange(removedItem, addedItem)
@@ -29,7 +29,6 @@ sealed interface ItemChangeType {
         removedItem != null -> ItemRemovedChangeType(removedItem)
         else -> null // unknown change
       }
-    }
   }
 }
 

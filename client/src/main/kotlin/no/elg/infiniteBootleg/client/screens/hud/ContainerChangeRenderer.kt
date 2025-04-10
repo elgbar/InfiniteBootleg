@@ -26,7 +26,9 @@ import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerCompo
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 import kotlin.math.absoluteValue
 
-class ContainerChangeRenderer : Renderer, Disposable {
+class ContainerChangeRenderer :
+  Renderer,
+  Disposable {
 
   private val screenRenderer: ScreenRenderer get() = ClientMain.Companion.inst().screenRenderer
 

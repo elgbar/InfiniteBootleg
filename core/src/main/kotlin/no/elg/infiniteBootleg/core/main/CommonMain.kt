@@ -25,7 +25,9 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: ProgramArgs, override val startTime: Instant) : ApplicationAdapter(), Main {
+abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: ProgramArgs, override val startTime: Instant) :
+  ApplicationAdapter(),
+  Main {
   final override lateinit var console: CONSOLE
     protected set
 

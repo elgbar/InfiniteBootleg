@@ -7,7 +7,7 @@ import kotlin.Exception
 import kotlin.Unit
 import kotlin.synchronized
 
-class PostRunnableHandler() : PostRunnable {
+class PostRunnableHandler : PostRunnable {
 
   private val runnables = GdxArray<Runnable>()
   private val executedRunnables = GdxArray<Runnable>()

@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class FlyingTag : TagSavableComponent, AuthoritativeOnlyComponent {
+class FlyingTag :
+  TagSavableComponent,
+  AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<FlyingTag>() {
     var Entity.flying by tagFor<FlyingTag>()

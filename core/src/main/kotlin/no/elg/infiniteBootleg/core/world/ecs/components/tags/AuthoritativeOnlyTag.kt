@@ -16,7 +16,9 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld
  *
  * This is different from, [no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent] since that component is used for types of components that should not be sent to clients
  */
-class AuthoritativeOnlyTag : TagSavableComponent, AuthoritativeOnlyComponent {
+class AuthoritativeOnlyTag :
+  TagSavableComponent,
+  AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<AuthoritativeOnlyTag>() {
     var Entity.authoritativeOnly by tagFor<AuthoritativeOnlyTag>()

@@ -20,7 +20,9 @@ import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE_HALF
 
-class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 

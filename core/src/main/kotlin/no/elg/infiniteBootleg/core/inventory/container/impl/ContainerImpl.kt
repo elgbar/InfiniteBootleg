@@ -15,10 +15,7 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author kheba
  */
-open class ContainerImpl(
-  override val name: String,
-  final override val size: Int = DEFAULT_SIZE
-) : Container {
+open class ContainerImpl(override val name: String, final override val size: Int = DEFAULT_SIZE) : Container {
 
   override val type: ProtoWorld.Container.Type get() = ProtoWorld.Container.Type.GENERIC
   override val content: Array<Item?> = arrayOfNulls(size)
@@ -217,9 +214,7 @@ open class ContainerImpl(
     return result
   }
 
-  override fun toString(): String {
-    return "ContainerImpl(name='$name', size=$size, type=$type)"
-  }
+  override fun toString(): String = "ContainerImpl(name='$name', size=$size, type=$type)"
 
   companion object {
     const val DEFAULT_SIZE = 40

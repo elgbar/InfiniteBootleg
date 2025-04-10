@@ -26,10 +26,7 @@ class CurrentlyBreakingComponent : DebuggableComponent {
     var Entity.currentlyBreakingComponentOrNull by optionalPropertyFor(mapper)
   }
 
-  data class CurrentlyBreaking(
-    val block: Block,
-    val progressHandler: ProgressHandler = ProgressHandler(block.material.hardness, Interpolation.linear, 0f, 1f)
-  ) {
+  data class CurrentlyBreaking(val block: Block, val progressHandler: ProgressHandler = ProgressHandler(block.material.hardness, Interpolation.linear, 0f, 1f)) {
     fun toBreakingProgress(zeroProgress: Boolean): Packets.BreakingBlock.BreakingProgress =
       breakingProgress {
         blockLocation = block.compactWorldLoc.toVector2i()

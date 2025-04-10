@@ -34,12 +34,9 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.SPELL
  * @param box2dWidth  The height of this entity in box2d view
  * @param box2dHeight The width of this entity in box2d view
  */
-class Box2DBodyComponent(
-  body: Body,
-  val type: ProtoWorld.Entity.Box2D.BodyType,
-  private val box2dWidth: Float,
-  private val box2dHeight: Float
-) : EntitySavableComponent, CheckableDisposable {
+class Box2DBodyComponent(body: Body, val type: ProtoWorld.Entity.Box2D.BodyType, private val box2dWidth: Float, private val box2dHeight: Float) :
+  EntitySavableComponent,
+  CheckableDisposable {
 
   private var internalBody: Body? = body
   private var disposed = false

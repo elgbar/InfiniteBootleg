@@ -24,7 +24,9 @@ import no.elg.infiniteBootleg.main.ServerMain
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.Extension
 
-class GdxTestRunner : ApplicationListener, Extension {
+class GdxTestRunner :
+  ApplicationListener,
+  Extension {
   override fun create() {}
   override fun resize(width: Int, height: Int) {}
   override fun render() {}

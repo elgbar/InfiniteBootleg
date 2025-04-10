@@ -32,10 +32,11 @@ fun Entity.interactableBlocks(
   return World.Companion.getLocationsWithin(centerBlockX, centerBlockY, radius).asSequence()
     .filter { worldLoc: WorldCompactLoc -> world.isChunkLoaded(worldLoc.worldToChunk()) }
     .filter { (targetX, targetY) ->
-      ignorePlaceableCheck || (
-        isBlockInsideRadius(worldX, worldY, targetX, targetY, interactionRadius) &&
-          (!Settings.renderLight || world.getBlockLight(targetX, targetY, false)?.isLit ?: true)
-        )
+      ignorePlaceableCheck ||
+        (
+          isBlockInsideRadius(worldX, worldY, targetX, targetY, interactionRadius) &&
+            (!Settings.renderLight || world.getBlockLight(targetX, targetY, false)?.isLit ?: true)
+          )
     }
 }
 
@@ -45,12 +46,10 @@ fun Entity.breakableLocs(
   centerBlockY: WorldCoord,
   radius: Float,
   interactionRadius: Float
-): Sequence<Long> {
-  return interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
-}
+): Sequence<Long> = interactableBlocks(world, centerBlockX, centerBlockY, radius, interactionRadius).filterNot { world.isAirBlock(it, false) }
 
-fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY: WorldCoord, interactionRadius: Float): Sequence<Long> {
-  return interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
+fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY: WorldCoord, interactionRadius: Float): Sequence<Long> =
+  interactableBlocks(world, centerBlockX, centerBlockY, 1f, interactionRadius)
     .filter { world.isAirBlock(it) }
     .let { seq ->
       if (seq.any { (worldX, worldY) -> world.canEntityPlaceBlock(worldX, worldY, this) }) {
@@ -59,7 +58,6 @@ fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY:
         emptySequence()
       }
     }
-}
 
 fun Entity.toComponentsString() = "${components.map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}"
 

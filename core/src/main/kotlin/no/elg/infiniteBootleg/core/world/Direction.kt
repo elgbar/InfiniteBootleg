@@ -19,9 +19,7 @@ enum class Direction(val dx: Int, val dy: Int) {
   WEST(WESTWARD, ALIGNED),
   NORTH_WEST(WESTWARD, NORTHWARD);
 
-  override fun toString(): String {
-    return "Direction[$name]{dx=$dx, dy=$dy}"
-  }
+  override fun toString(): String = "Direction[$name]{dx=$dx, dy=$dy}"
 
   val horizontalDirection: HorizontalDirection = HorizontalDirection.of(dx)
   val verticalDirection: VerticalDirection = VerticalDirection.of(dy)

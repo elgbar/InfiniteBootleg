@@ -23,7 +23,9 @@ import kotlin.math.min
 /**
  * @author Elg
  */
-class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable {
+class PerlinChunkGenerator(override val seed: Long) :
+  ChunkGenerator,
+  Disposable {
 
   private val chunkGeneratedListener = ChunkGeneratedListener(this)
   private val sparseTreeGenerator = ForestGenerator(seed, 0.8f)
@@ -67,9 +69,7 @@ class PerlinChunkGenerator(override val seed: Long) : ChunkGenerator, Disposable
     }
   }
 
-  override fun getHeight(worldX: WorldCoord): Int {
-    return getBiome(worldX).heightAt(this, worldX)
-  }
+  override fun getHeight(worldX: WorldCoord): Int = getBiome(worldX).heightAt(this, worldX)
 
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk {
     val chunk = Main.Companion.inst().chunkFactory.createChunk(world, chunkX, chunkY)

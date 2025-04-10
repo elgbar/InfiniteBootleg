@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class CanBeOutOfBoundsTag : TagSavableComponent, AuthoritativeOnlyComponent {
+class CanBeOutOfBoundsTag :
+  TagSavableComponent,
+  AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<CanBeOutOfBoundsTag>() {
     var Entity.canBeOutOfBounds by tagFor<CanBeOutOfBoundsTag>()

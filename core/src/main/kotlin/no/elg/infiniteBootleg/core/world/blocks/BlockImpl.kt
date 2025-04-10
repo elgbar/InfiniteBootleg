@@ -18,13 +18,8 @@ import no.elg.infiniteBootleg.protobuf.block
  *
  * @author Elg
  */
-class BlockImpl(
-  override val chunk: Chunk,
-  override val localX: LocalCoord,
-  override val localY: LocalCoord,
-  override val material: Material,
-  override var entity: Entity? = null
-) : Block {
+class BlockImpl(override val chunk: Chunk, override val localX: LocalCoord, override val localY: LocalCoord, override val material: Material, override var entity: Entity? = null) :
+  Block {
 
   override fun save(): ProtoWorld.Block =
     block {

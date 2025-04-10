@@ -14,7 +14,11 @@ import no.elg.infiniteBootleg.core.world.world.World
 /**
  * @author Elg
  */
-interface WorldRender : Updatable, Renderer, Disposable, Resizable {
+interface WorldRender :
+  Updatable,
+  Renderer,
+  Disposable,
+  Resizable {
   /**
    * @param chunk The chunk to check
    * @return `true` if the given chunk is outside the view of the camera

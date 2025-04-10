@@ -9,11 +9,8 @@ import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComp
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem.handleEvent
 import kotlin.reflect.KClass
 
-abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(
-  family: Family,
-  eventType: KClass<T>,
-  private val queueMapper: ComponentMapper<out Q>
-) : ConditionalIteratingSystem(family, UPDATE_PRIORITY_EVENT_HANDLING) {
+abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(family: Family, eventType: KClass<T>, private val queueMapper: ComponentMapper<out Q>) :
+  ConditionalIteratingSystem(family, UPDATE_PRIORITY_EVENT_HANDLING) {
 
   init {
     require(eventType.isSealed) { "Event components must be sealed types. The type $eventType is not a sealed type!" }

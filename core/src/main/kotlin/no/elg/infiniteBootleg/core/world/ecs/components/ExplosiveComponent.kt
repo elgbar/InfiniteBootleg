@@ -11,10 +11,7 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.explosive
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class ExplosiveComponent(
-  var fuse: Float = FUSE_DURATION_SECONDS,
-  val strength: Float = EXPLOSION_STRENGTH.toFloat()
-) : EntitySavableComponent {
+data class ExplosiveComponent(var fuse: Float = FUSE_DURATION_SECONDS, val strength: Float = EXPLOSION_STRENGTH.toFloat()) : EntitySavableComponent {
 
   override fun EntityKt.Dsl.save() {
     explosive = explosive {

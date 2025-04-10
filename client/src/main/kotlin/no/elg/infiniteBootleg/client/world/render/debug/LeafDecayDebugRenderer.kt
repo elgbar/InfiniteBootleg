@@ -18,7 +18,9 @@ import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE_F
 
-class LeafDecayDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class LeafDecayDebugRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000).also {
     it.color = LEAF_DECAY_CHECK_SRC_COLOR

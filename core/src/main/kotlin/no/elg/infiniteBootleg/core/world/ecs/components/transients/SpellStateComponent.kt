@@ -10,13 +10,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Debuggabl
 import no.elg.infiniteBootleg.core.world.magic.SpellState
 
 // The spell state of a spell entity
-data class SpellStateComponent(
-  val state: SpellState,
-  val spawnX: WorldCoordNumber,
-  val spawnY: WorldCoordNumber,
-  val spawnDx: Number,
-  val spawnDy: Number
-) : DebuggableComponent {
+data class SpellStateComponent(val state: SpellState, val spawnX: WorldCoordNumber, val spawnY: WorldCoordNumber, val spawnDx: Number, val spawnDy: Number) : DebuggableComponent {
 
   override fun hudDebug(): String =
     "state $state, spawn pos ${

@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class LeafDecayTag : TagSavableComponent, AuthoritativeOnlyComponent {
+class LeafDecayTag :
+  TagSavableComponent,
+  AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<LeafDecayTag>() {
     var Entity.leafDecay by tagFor<LeafDecayTag>()

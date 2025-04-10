@@ -14,13 +14,9 @@ import no.elg.infiniteBootleg.core.world.world.World
 import kotlin.math.max
 import kotlin.math.min
 
-data class ChunkColumnUpdatedEvent(
-  val chunkX: ChunkCoord,
-  val localX: LocalCoord,
-  val newTopWorldY: WorldCoord,
-  val oldTopWorldY: WorldCoord,
-  val flag: ChunkColumnFeatureFlag
-) : ReasonedEvent, AsyncEvent(ThreadType.ASYNC) {
+data class ChunkColumnUpdatedEvent(val chunkX: ChunkCoord, val localX: LocalCoord, val newTopWorldY: WorldCoord, val oldTopWorldY: WorldCoord, val flag: ChunkColumnFeatureFlag) :
+  AsyncEvent(ThreadType.ASYNC),
+  ReasonedEvent {
 
   /**
    * All world locations from the old top coordinate to the new top coordinate, including the new changed coordinates

@@ -21,7 +21,9 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class WorldInputHandler(private val worldRender: ClientWorldRender) : InputAdapter(), Disposable {
+class WorldInputHandler(private val worldRender: ClientWorldRender) :
+  InputAdapter(),
+  Disposable {
 
   override fun keyDown(keycode: Int): Boolean {
     if (keycode != Input.Keys.TAB && (ClientMain.inst().shouldIgnoreWorldInput() || (Main.Companion.isMultiplayer && keycode != Input.Keys.F3))) {

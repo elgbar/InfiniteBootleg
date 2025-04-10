@@ -11,7 +11,9 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-class IgnorePlaceableCheckTag : TagSavableComponent, AuthoritativeOnlyComponent {
+class IgnorePlaceableCheckTag :
+  TagSavableComponent,
+  AuthoritativeOnlyComponent {
 
   companion object : TagLoadableMapper<IgnorePlaceableCheckTag>() {
     var Entity.ignorePlaceableCheck by tagFor<IgnorePlaceableCheckTag>()

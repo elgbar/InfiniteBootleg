@@ -26,7 +26,9 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SI
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 
-class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000).also {
     it.color = BLOCK_LIGHT_UPDATE_COLOR

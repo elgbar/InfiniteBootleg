@@ -18,7 +18,9 @@ import no.elg.infiniteBootleg.core.util.compactLoc
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 
-class DebugChunkRenderer(private val worldRender: ClientWorldRender) : OverlayRenderer, Disposable {
+class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
+  OverlayRenderer,
+  Disposable {
   private val shapeRenderer: ShapeRenderer = ShapeRenderer(1000)
   private val camera: OrthographicCamera get() = worldRender.camera
 
