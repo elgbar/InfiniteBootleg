@@ -33,7 +33,12 @@ private val uuidv5Generator = Generators.nameBasedGenerator(namespace)
 /**
  * Uniform handling of string to seed (i.e., long) conversion.
  */
-fun String.asWorldSeed(): Long = hashCode().toLong()
+fun String.asWorldSeed(): Long =
+  try {
+    java.lang.Long.valueOf(this)
+  } catch (_: Exception) {
+    hashCode().toLong()
+  }
 
 fun generateUUIDFromString(string: String): UUID = uuidv5Generator.generate(string)
 
