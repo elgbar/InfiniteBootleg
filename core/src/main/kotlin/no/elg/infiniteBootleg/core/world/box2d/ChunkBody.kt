@@ -30,7 +30,7 @@ private val logger = KotlinLogging.logger {}
 /**
  * @author Elg
  */
-class ChunkBody(private val chunk: Chunk) :
+class ChunkBody(val chunk: Chunk) :
   Updatable,
   CheckableDisposable {
 
@@ -102,6 +102,7 @@ class ChunkBody(private val chunk: Chunk) :
   fun onBodyCreated(tmpBody: Body) {
     val blocks = chunk.asSequence().filterNotNull().filter(Block::isNotAir)
     addBlocks(blocks, tmpBody)
+    tmpBody.userData = this
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
     if (isDisposed) {

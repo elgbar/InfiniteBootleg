@@ -11,6 +11,7 @@ import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
+import no.elg.infiniteBootleg.core.util.IllegalAction
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody.Companion.WORLD_MOVE_OFFSET_THRESHOLD
@@ -101,6 +102,10 @@ open class WorldBody(private val world: World) :
   private fun createBodyNow(def: BodyDef, callback: (Body) -> Unit) {
     val body = box2dWorld.createBody(def)
     callback(body)
+    val userData = body.userData
+    if (userData == null) {
+      IllegalAction.STACKTRACE.handle { "Userdata not added when creating body" }
+    }
   }
 
   /**

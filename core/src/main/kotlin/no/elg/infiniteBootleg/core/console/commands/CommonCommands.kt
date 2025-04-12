@@ -22,6 +22,7 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.WorldTime
+import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
@@ -78,10 +79,7 @@ open class CommonCommands : CommandExecutor() {
   @AuthoritativeOnly
   @ConsoleDoc(description = "Print the world seed")
   fun seed() {
-    val world = world ?: let {
-      logger.error { "Not in a world" }
-      return
-    }
+    val world = world ?: return
     logger.info { world.seed.toString() }
   }
 
@@ -210,6 +208,13 @@ open class CommonCommands : CommandExecutor() {
           }
           invalid++
           logger.error { "Found entity not added to the world! $id" }
+        } else if (userData is ChunkBody) {
+          val chunk = userData.chunk
+          val worldChunk = world.getChunk(chunk.compactLocation, load = false)
+          if (chunk !== worldChunk) {
+            invalid++
+            logger.error { "Found chunk body that is not the same as the world's chunk. chunk userdata: $chunk, world chunk: $worldChunk" }
+          }
         } else if (userData == null) {
           nullUserData++
         } else {
