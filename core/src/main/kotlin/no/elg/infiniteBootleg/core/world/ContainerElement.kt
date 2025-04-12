@@ -26,7 +26,7 @@ sealed interface ContainerElement {
 
   companion object : ProtoConverter<ContainerElement, ProtoElement> {
 
-    fun valueOf(name: String): ContainerElement? = Material.valueOfOrNull(name) ?: Tool.valueOfOrNull(name)
+    fun valueOfOrNull(name: String): ContainerElement? = Material.valueOfOrNull(name) ?: Tool.valueOfOrNull(name)
 
     override fun ProtoElement.fromProto(): ContainerElement =
       when {

@@ -23,7 +23,6 @@ import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.inventory.container.OwnedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.AutoSortedContainer
 import no.elg.infiniteBootleg.core.inventory.container.impl.ContainerImpl
-import no.elg.infiniteBootleg.core.items.Item
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundClientDisconnectPacket
@@ -72,13 +71,13 @@ class ClientCommands : CommonCommands() {
     (Tool.tools + Material.normalMaterials).forEach { give(it::class.simpleName!!, quantity) }
   }
 
-  @CmdArgNames("item")
-  @ConsoleDoc(description = "Give an item to player", paramDescriptions = ["Item to given"])
-  fun give(elementName: String) = give(elementName, 1)
-
-  @CmdArgNames("item", "quantity")
-  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
-  fun take(elementName: String, quantity: Int) {
+  private fun takeOrGive(
+    elementName: String,
+    quantity: Int,
+    task: String,
+    antiTask: String,
+    func: (Container, ContainerElement) -> Unit
+  ) {
     val world = clientWorld ?: return
     val entities = world.controlledPlayerEntities
     if (entities.size() == 0) {
@@ -91,61 +90,58 @@ class ClientCommands : CommonCommands() {
       return
     }
 
-    if (quantity < 1) {
-      logger.error { "Quantity must be at least 1, use 'give' command to add items" }
-      return
-    }
-    val element: ContainerElement = ContainerElement.valueOf(elementName) ?: run {
+    val element: ContainerElement = ContainerElement.valueOfOrNull(elementName) ?: run {
       logger.error { "Unknown container element '$elementName'" }
       return
     }
+    if (quantity < 1) {
+      logger.error { "Quantity must be at least 1, use '$antiTask' command to add items" }
+      return
+    }
+    func(container, element)
+  }
 
-    val notAdded = container.remove(element, quantity.toUInt())
-    if (notAdded == 0u) {
-      logger.info { "Took $quantity $element from player" }
-    } else {
-      logger.info {
-        val taken = quantity - notAdded.toInt()
-        "Failed to take $notAdded $element from player, took $taken $element instead"
+  @CmdArgNames("item")
+  @ConsoleDoc(description = "Give a single item to player", paramDescriptions = ["Item to give"])
+  fun give(elementName: String) = give(elementName, 1)
+
+  @CmdArgNames("item")
+  @ConsoleDoc(description = "Take a single item from the player", paramDescriptions = ["Item to take"])
+  fun take(elementName: String) = take(elementName, 1)
+
+  @CmdArgNames("item", "quantity")
+  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to take", "Quantity to give, default 1"])
+  fun take(elementName: String, quantity: Int) {
+    takeOrGive(elementName, quantity, "take", "give") { container, element ->
+      val notRemoved = container.remove(element, quantity.toUInt())
+      if (notRemoved == 0u) {
+        logger.info { "Took $quantity ${element.displayName} from player" }
+      } else {
+        logger.info {
+          val taken = quantity - notRemoved.toInt()
+          "Failed to take $notRemoved ${element.displayName} from player, took $taken ${element.displayName} instead"
+        }
       }
     }
   }
 
   @CmdArgNames("item", "quantity")
-  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to given", "Quantity to give, default 1"])
+  @ConsoleDoc(description = "Give item to player", paramDescriptions = ["Item to give", "Quantity to give, default 1"])
   fun give(elementName: String, quantity: Int) {
-    val world = clientWorld ?: return
-    val entities = world.controlledPlayerEntities
-    if (entities.size() == 0) {
-      logger.error { "There is no local, controlled, player in this world" }
-      return
-    }
-    val player = entities.first()
-    val container = player.containerOrNull ?: run {
-      logger.error { "Player has no container" }
-      return
-    }
-
-    if (quantity < 1) {
-      logger.error { "Quantity must be at least 1, use 'take' command to remove items" }
-      return
-    }
-    val item: Item = ContainerElement.valueOf(elementName)?.toItem(stock = quantity.toUInt()) ?: run {
-      logger.error { "Unknown container element '$elementName'" }
-      return
-    }
-
-    val notAdded = container.add(item)
-    if (notAdded.isEmpty()) {
-      logger.info { "Gave player ${item.stock} ${item.element}" }
-    } else {
-      logger.error {
-        val notGiven = notAdded.sumOf { it.stock }
-        val given = item.stock - notGiven
-        if (given == 0u) {
-          "Failed to give player ${item.stock} ${item.element}"
-        } else {
-          "Managed to give player $given ${item.element}, failed to find room for $notGiven ${item.element}"
+    takeOrGive(elementName, quantity, "give", "take") { container, element ->
+      val item = element.toItem(stock = quantity.toUInt())
+      val notAdded = container.add(item)
+      if (notAdded.isEmpty()) {
+        logger.info { "Gave player ${item.stock} ${element.displayName}" }
+      } else {
+        logger.error {
+          val notGiven = notAdded.sumOf { it.stock }
+          val given = item.stock - notGiven
+          if (given == 0u) {
+            "Failed to give player ${item.stock} ${element.displayName}"
+          } else {
+            "Managed to give player $given ${element.displayName}, failed to find room for $notGiven ${element.displayName}"
+          }
         }
       }
     }
