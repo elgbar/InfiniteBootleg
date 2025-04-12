@@ -101,6 +101,7 @@ sealed interface Item {
 
     val Item?.stockText: String get() = this?.run { "$stock / $maxStock" } ?: "??? / ???"
     val Item?.displayName: String get() = this?.run { element.displayName.lowercase().toTitleCase().replace('_', ' ') } ?: "<Empty>"
+    val Item?.fullName: String get() = "$displayName ($stockText)"
 
     fun mergeAll(items: List<Item>, newElementMaxStock: UInt = DEFAULT_MAX_STOCK): List<Item> {
       if (items.isEmpty()) {

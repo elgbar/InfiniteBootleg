@@ -21,6 +21,7 @@ data class NameComponent(val name: String) : EntitySavableComponent {
   companion object : EntityLoadableMapper<NameComponent>() {
     val Entity.name get() = nameComponent.name
     val Entity.nameOrNull get() = nameComponentOrNull?.name
+    val Entity.nameOrToString get() = nameOrNull ?: toString()
     var Entity.nameComponent by propertyFor(mapper)
     var Entity.nameComponentOrNull by optionalPropertyFor(mapper)
 

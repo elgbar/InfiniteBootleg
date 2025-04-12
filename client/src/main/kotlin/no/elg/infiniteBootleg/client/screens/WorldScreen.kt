@@ -55,7 +55,7 @@ class WorldScreen(val world: ClientWorld, val load: Boolean = true) : StageScree
     EventManager.oneShotListener { event: WorldLoadedEvent ->
       if (event.world === world) {
         worldFinishedLoading = true
-        logger.info { "Finished loading world ${world.name} (${world.uuid}) in ${System.currentTimeMillis() - showed}ms" }
+        logger.info { "Finished loading $world in ${System.currentTimeMillis() - showed}ms" }
       }
     }
 

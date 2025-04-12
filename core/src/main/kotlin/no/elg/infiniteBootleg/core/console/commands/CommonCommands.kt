@@ -67,7 +67,7 @@ open class CommonCommands : CommandExecutor() {
       logger.error { "Cannot save the transient $world" }
     } else {
       world.save()
-      logger.info { "World $world saved" }
+      logger.info { "Saved $world" }
     }
   }
 

@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.core.events.WorldLoadedEvent
 import no.elg.infiniteBootleg.core.events.WorldSpawnUpdatedEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.chunks.ChunkLoadedEvent
+import no.elg.infiniteBootleg.core.items.Item.Companion.fullName
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.ChunkColumnFeatureFlag
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
@@ -79,6 +80,7 @@ import no.elg.infiniteBootleg.core.world.ecs.basicRequiredEntityFamilyToSendToCl
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrToString
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent.Companion.containerOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
@@ -438,7 +440,7 @@ abstract class World(
       return
     }
     val worldFolder = worldFolder ?: return
-    logger.debug { "Saving world '${metadata.name}'" }
+    logger.debug { "Saving $this" }
 
     readChunks { readableChunks ->
       val chunkLoader = chunkLoader
@@ -807,13 +809,13 @@ abstract class World(
       val container = giveTo?.containerOrNull
       if (container != null) {
         val items = blocks.partitionCount { it.material }.map { (mat, count) -> mat.toItem(stock = count.toUInt()) }
-        logger.debug { "Will give $items to $giveTo" }
+        logger.trace { "Will give ${items.map { it.fullName }} to ${giveTo.nameOrToString}" }
         val notAdded = container.add(items)
         if (notAdded.isNotEmpty()) {
           logger.debug { "Failed to add items when removing block, not enough space for $notAdded" }
         }
       } else if (giveTo != null) {
-        logger.debug { "Cannot give items to $giveTo" }
+        logger.debug { "Cannot give items to ${giveTo.nameOrToString}, failed to find a container" }
       }
     }
   }
@@ -1152,10 +1154,10 @@ abstract class World(
 
   override fun resize(width: Int, height: Int) = Unit
 
-  override fun toString(): String = "World{name='$name', uuid=$uuid}"
+  override fun toString(): String = "World $name ($uuid)"
 
   override fun dispose() {
-    logger.info { "Disposing world '$name'" }
+    logger.info { "Disposing $this" }
     EventManager.clear()
 
     val saveTasks = writeChunks { writableChunks ->
@@ -1163,9 +1165,9 @@ abstract class World(
         chunk.save().thenRun { chunk.dispose() }
       }.also { writableChunks.clear() }
     } ?: emptyList()
-    logger.debug { "Waiting for ${saveTasks.size} chunks in '$name' to be saved world" }
+    logger.debug { "Waiting for ${saveTasks.size} chunks in $this to be saved" }
     CompletableFuture.allOf(*saveTasks.toTypedArray()).thenApply { }.orTimeout(1, TimeUnit.MINUTES).exceptionally {
-      logger.error(it) { "Failed to save chunks in world '$name'" }
+      logger.error(it) { "Failed to save chunks in $this" }
     }.get()
 
     if (!isTransient) {
@@ -1178,7 +1180,7 @@ abstract class World(
     chunkLoader.dispose()
     metadata.dispose()
     engine.dispose()
-    logger.debug { "World $name have been fully disposed" }
+    logger.debug { "$this have been fully disposed" }
   }
 
   companion object {
