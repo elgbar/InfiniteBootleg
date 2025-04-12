@@ -76,6 +76,16 @@ open class CommonCommands : CommandExecutor() {
   // /////////////////
 
   @AuthoritativeOnly
+  @ConsoleDoc(description = "Print the world seed")
+  fun seed() {
+    val world = world ?: let {
+      logger.error { "Not in a world" }
+      return
+    }
+    logger.info { world.seed.toString() }
+  }
+
+  @AuthoritativeOnly
   @ConsoleDoc(description = "Toggle debug")
   fun debug() {
     Settings.debug = !Settings.debug
