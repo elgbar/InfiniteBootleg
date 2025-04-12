@@ -76,9 +76,13 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
 
     breakingComponent.sendCurrentProgress()
 
-    val heldStaff = entity.selectedItem?.element as? Tool
     val size = justDone.size
-    val leftOver = heldStaff?.let { entity.containerOrNull?.remove(it, size.toUInt()) } ?: 0u
+    val selectedItem = entity.selectedItem
+    val leftOver = if (selectedItem?.element is Tool) {
+      entity.containerOrNull?.remove(selectedItem, size.toUInt())
+    } else {
+      0u
+    }
     val validJustDone = if (leftOver == 0u) {
       justDone
     } else {

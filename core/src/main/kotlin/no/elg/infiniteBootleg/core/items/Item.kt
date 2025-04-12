@@ -65,6 +65,9 @@ sealed interface Item {
       else -> merge(copyToFit(additionalStock))
     }
 
+  /**
+   * @return If this item will be depleted after [usages] amount of usages
+   */
   fun willBeDepleted(usages: UInt = 1u): Boolean = usages >= stock
 
   /**

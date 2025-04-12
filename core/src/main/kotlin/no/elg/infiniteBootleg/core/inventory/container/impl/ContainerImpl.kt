@@ -61,7 +61,23 @@ open class ContainerImpl(override val name: String, final override val size: Int
 
   override fun removeAll(element: ContainerElement) = remove(element.toItem(UInt.MAX_VALUE, UInt.MAX_VALUE))
 
-  override fun remove(element: Item, amount: UInt): UInt = remove(element.element, amount)
+  override fun remove(item: Item, amount: UInt): UInt {
+    if (amount == 0u) return 0u
+    val index = indexOfFirst { it === item }
+    if (item.isValid() && index != -1) {
+      if (item.canBeUsed(amount)) {
+        val newItem = item.remove(amount)
+        set(index, newItem)
+        return 0u
+      } else {
+        // we remove more than the item has, so we remove the item and then call the generic remove to remove the rest
+        set(index, null)
+        return remove(item.element, amount - item.stock)
+      }
+    } else {
+      return remove(item.element, amount)
+    }
+  }
 
   override fun remove(element: ContainerElement, amount: UInt): UInt {
     if (amount == 0u) return 0u
