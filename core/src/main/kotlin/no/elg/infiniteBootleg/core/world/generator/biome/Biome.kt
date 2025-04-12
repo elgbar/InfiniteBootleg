@@ -9,38 +9,16 @@ import no.elg.infiniteBootleg.core.world.generator.noise.PerlinNoise
 import kotlin.math.abs
 import kotlin.math.floor
 
-/**
- * @author Elg
- */
-enum class Biome @SafeVarargs constructor(
-  private val y: Double,
-  private val z: Double,
-  private val amplitude: Double,
-  private val frequency: Double,
-  private val offset: Int,
-  private val filler: Material,
-  private val topmostBlock: Material,
-  vararg topBlocks: Pair<Material, Int>
-) {
-  PLAINS(0.1, 0.9, 64.0, 0.009, 0, Material.Stone, Material.Grass, Material.Grass to 4, Material.Dirt to 10),
-  MOUNTAINS(
-    100.0,
-    0.9,
-    356.0,
-    0.005,
-    25,
-    Material.Stone,
-    Material.Grass,
-    Material.Grass to 2,
-    Material.Dirt to 6
-  ),
-  DESERT(0.1, 0.9, 32.0, 0.005, 0, Material.Sandstone, Material.Sand, Material.Sand to 12);
+sealed interface Biome {
 
-  private val topBlocks: Array<Material> = topBlocks.flatMap { (material, size) ->
-    buildList<Material>(size) {
-      repeat(size) { add(material) }
-    }
-  }.toTypedArray()
+  val y: Double
+  val z: Double
+  val amplitude: Double
+  val frequency: Double
+  val offset: Int
+  val filler: Material
+  val topmostBlock: Material
+  val topBlocks: Array<Material>
 
   fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {
     var y = 0
@@ -55,7 +33,7 @@ enum class Biome @SafeVarargs constructor(
     return y / (INTERPOLATION_RADIUS * 2 + 1)
   }
 
-  private fun rawHeightAt(noise: PerlinNoise, worldX: WorldCoord): Double = rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset)
+  fun rawHeightAt(noise: PerlinNoise, worldX: WorldCoord): Double = rawHeightAt(noise, worldX, y, z, amplitude, frequency, offset)
 
   fun fillUpTo(
     noise: PerlinNoise,
@@ -71,7 +49,7 @@ enum class Biome @SafeVarargs constructor(
     }
   }
 
-  private fun materialAt(noise: PerlinNoise, height: Int, worldX: WorldCoord, worldY: WorldCoord): Material {
+  fun materialAt(noise: PerlinNoise, height: Int, worldX: WorldCoord, worldY: WorldCoord): Material {
     var delta = height - worldY
     if (delta == 0) {
       return topmostBlock
@@ -84,8 +62,50 @@ enum class Biome @SafeVarargs constructor(
     }
   }
 
+  object Plains : Biome {
+    override val y = 0.1
+    override val z = 0.9
+    override val amplitude = 64.0
+    override val frequency = 0.009
+    override val offset = 0
+    override val filler = Material.Stone
+    override val topmostBlock = Material.Grass
+    override val topBlocks = arrayOf<Material>(
+      *Array(4) { Material.Grass },
+      *Array(10) { Material.Dirt }
+    )
+  }
+
+  object Mountains : Biome {
+    override val y = 100.0
+    override val z = 0.9
+    override val amplitude = 356.0
+    override val frequency = 0.005
+    override val offset = 25
+    override val filler = Material.Stone
+    override val topmostBlock = Material.Grass
+    override val topBlocks = arrayOf<Material>(
+      *Array(2) { Material.Grass },
+      *Array(6) { Material.Dirt }
+    )
+  }
+
+  object Desert : Biome {
+    override val y = 0.1
+    override val z = 0.9
+    override val amplitude = 32.0
+    override val frequency = 0.005
+    override val offset = 0
+    override val filler = Material.Sandstone
+    override val topmostBlock = Material.Sand
+    override val topBlocks = arrayOf<Material>(
+      *Array(12) { Material.Sand }
+    )
+  }
+
   companion object {
     const val INTERPOLATION_RADIUS = 25
+
     fun rawHeightAt(
       noise: PerlinNoise,
       worldX: WorldCoord,

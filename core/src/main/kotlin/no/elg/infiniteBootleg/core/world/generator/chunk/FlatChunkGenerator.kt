@@ -26,7 +26,7 @@ class FlatChunkGenerator : ChunkGenerator {
       chunk.finishLoading()
     }
 
-  override fun getBiome(worldX: WorldCoord): Biome = Biome.PLAINS
+  override fun getBiome(worldX: WorldCoord): Biome = Biome.Plains
   override fun getHeight(worldX: WorldCoord): Int = 0
   override val seed: Long = 0
 }

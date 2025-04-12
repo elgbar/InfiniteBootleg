@@ -62,10 +62,10 @@ class PerlinChunkGenerator(override val seed: Long) :
   override fun getBiome(worldX: WorldCoord): Biome {
     val height = getBiomeHeight(worldX)
     return when {
-      height > 0.65 -> Biome.MOUNTAINS
-      height > 0.45 -> Biome.PLAINS
-      height > 0.15 -> Biome.DESERT
-      else -> Biome.PLAINS
+      height > 0.65 -> Biome.Mountains
+      height > 0.45 -> Biome.Plains
+      height > 0.15 -> Biome.Desert
+      else -> Biome.Plains
     }
   }
 
@@ -101,9 +101,9 @@ class PerlinChunkGenerator(override val seed: Long) :
       val genHeight = biome.heightAt(this, worldX)
       val genChunkY = genHeight.worldToChunk()
       if (chunk.chunkY == genChunkY) {
-        if (biome == Biome.MOUNTAINS) {
+        if (biome == Biome.Mountains) {
           sparseTreeGenerator.generateFeature(chunk, worldX, genHeight + 1)
-        } else if (biome == Biome.PLAINS) {
+        } else if (biome == Biome.Plains) {
           denseTreeGenerator.generateFeature(chunk, worldX, genHeight + 1)
         }
       }
