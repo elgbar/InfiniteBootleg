@@ -12,9 +12,9 @@ import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 val ContainerElement.textureRegion: RotatableTextureRegion?
   get() {
     return when (this) {
-      is Material if (!canBeHandled) -> null
       is Staff -> ClientMain.inst().assets.staffTexture
       is TexturedContainerElement -> findTextures()
+      is Material -> null
     }
   }
 

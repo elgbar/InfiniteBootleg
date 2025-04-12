@@ -79,7 +79,7 @@ object MineBlockSystem : IteratingSystem(localPlayerFamily, UPDATE_PRIORITY_DEFA
     val size = justDone.size
     val selectedItem = entity.selectedItem
     val leftOver = if (selectedItem?.element is Tool) {
-      entity.containerOrNull?.remove(selectedItem, size.toUInt())
+      entity.containerOrNull?.remove(selectedItem, size.toUInt()) ?: 0u
     } else {
       0u
     }
