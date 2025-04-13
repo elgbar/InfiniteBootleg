@@ -11,6 +11,7 @@ import java.util.Random;
  * <p><a
  * href="https://web.archive.org/web/20190426093413/https://mrl.nyu.edu/~perlin/noise/">source</a>
  */
+@Deprecated
 public class PerlinNoise {
 
   private static final int[] permutation = {

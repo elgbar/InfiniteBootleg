@@ -1,12 +1,14 @@
 package no.elg.infiniteBootleg.core.world.generator.chunk
 
 import com.badlogic.gdx.utils.Disposable
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.ChunkCoord
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.chunkToWorld
 import no.elg.infiniteBootleg.core.util.getNoise
+import no.elg.infiniteBootleg.core.util.getNoisePositive
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.generator.ChunkGeneratedListener
@@ -15,10 +17,10 @@ import no.elg.infiniteBootleg.core.world.generator.features.ForestGenerator
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.FractalType
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.NoiseType
-import no.elg.infiniteBootleg.core.world.generator.noise.PerlinNoise
 import no.elg.infiniteBootleg.core.world.world.World
-import kotlin.math.abs
 import kotlin.math.min
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * @author Elg
@@ -28,43 +30,51 @@ class PerlinChunkGenerator(override val seed: Long) :
   Disposable {
 
   private val chunkGeneratedListener = ChunkGeneratedListener(this)
-  private val sparseTreeGenerator = ForestGenerator(seed, 0.8f)
-  private val denseTreeGenerator = ForestGenerator(seed, 0.7f)
+  private val sparseTreeGenerator = ForestGenerator(seed, 0.8)
+  private val denseTreeGenerator = ForestGenerator(seed, 0.7)
 
-  val noise: PerlinNoise = PerlinNoise(seed)
+  val biomeTypeNoise: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
+    it.setNoiseType(NoiseType.Perlin)
+    it.setFrequency(0.001)
+  }
   private val noise2: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
-    it.SetNoiseType(NoiseType.Perlin)
-    it.SetFrequency(0.01f)
-    it.SetFractalType(FractalType.Ridged)
-    it.SetFractalOctaves(1)
-    it.SetFractalLacunarity(1.0f)
-    it.SetFractalGain(0.5f)
+    it.setNoiseType(NoiseType.Perlin)
+    it.setFrequency(0.01)
+    it.setFractalType(FractalType.Ridged)
+    it.setFractalOctaves(1)
+    it.setFractalLacunarity(1.0)
+    it.setFractalGain(0.5)
+  }
+
+  private val wormCave: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
+    it.setNoiseType(NoiseType.Perlin)
+    it.setFrequency(WORM_SIZE_FREQUENCY)
   }
 
   private val noiseCheeseCave: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
-    it.SetNoiseType(NoiseType.OpenSimplex2)
-    it.SetFrequency(0.05f)
-    it.SetFractalOctaves(2)
-    it.SetFractalLacunarity(1.0f)
-    it.SetFractalGain(0.5f)
+    it.setNoiseType(NoiseType.OpenSimplex2)
+    it.setFrequency(0.05)
+    it.setFractalOctaves(2)
+    it.setFractalLacunarity(1.0)
+    it.setFractalGain(0.5)
   }
 
   private val noiseGreatHall: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
-    it.SetNoiseType(NoiseType.OpenSimplex2)
-    it.SetFrequency(0.004f)
-    it.SetFractalOctaves(2)
-    it.SetFractalLacunarity(1.0f)
-    it.SetFractalGain(0.5f)
+    it.setNoiseType(NoiseType.OpenSimplex2)
+    it.setFrequency(0.004)
+    it.setFractalOctaves(2)
+    it.setFractalLacunarity(1.0)
+    it.setFractalGain(0.5)
   }
 
-  fun getBiomeHeight(worldX: WorldCoord): Double = (noise.noise(worldX.toDouble(), 0.5, 0.5, BIOME_HEIGHT_AMPLITUDE, 0.001) + BIOME_HEIGHT_AMPLITUDE) / (BIOME_HEIGHT_AMPLITUDE * 2)
+  fun getBiomeHeight(worldX: WorldCoord): Double = biomeTypeNoise.getNoisePositive(worldX, 0.5, BIOME_HEIGHT_AMPLITUDE)
 
   override fun getBiome(worldX: WorldCoord): Biome {
     val height = getBiomeHeight(worldX)
     return when {
       height > 0.65 -> Biome.Mountains
       height > 0.45 -> Biome.Plains
-      height > 0.15 -> Biome.Desert
+      height > 0.20 -> Biome.Desert
       else -> Biome.Plains
     }
   }
@@ -79,9 +89,9 @@ class PerlinChunkGenerator(override val seed: Long) :
       val genHeight = biome.heightAt(this, worldX)
       val genChunkY = genHeight.worldToChunk()
       if (chunkY == genChunkY) {
-        biome.fillUpTo(noise, chunk, localX, genHeight.chunkOffset() + 1, genHeight)
+        biome.fillUpTo(seed, chunk, localX, genHeight.chunkOffset() + 1, genHeight)
       } else if (chunkY < genChunkY) {
-        biome.fillUpTo(noise, chunk, localX, Chunk.Companion.CHUNK_SIZE, genHeight)
+        biome.fillUpTo(seed, chunk, localX, Chunk.Companion.CHUNK_SIZE, genHeight)
       }
 
       // generate caves (where there is something to generate them in
@@ -119,13 +129,15 @@ class PerlinChunkGenerator(override val seed: Long) :
       val worldYd = worldY.toDouble()
 
       // calculate the size of the worm
-      val wormSize = 1 + abs(noise.noise(worldXd, worldYd, 1.0, WORM_SIZE_AMPLITUDE, WORM_SIZE_FREQUENCY))
-      val caveNoise = noise2.GetNoise(worldXd, worldYd) / wormSize
+//      val wormSize = 1 + abs(noise.noise(worldXd, worldYd, 1.0, WORM_SIZE_AMPLITUDE.toDouble(), WORM_SIZE_FREQUENCY.toDouble()))
+      val wormSizeNew = 1 + wormCave.getNoisePositive(worldXd, worldYd, WORM_SIZE_AMPLITUDE)
+//      logger.warn { "Worm: loc ${stringifyCompactLoc(worldXd, worldYd)},  old $wormSize, new $wormSizeNew" }
+      val caveNoise = noise2.getNoise(worldXd, worldYd) / wormSizeNew
       val diffToSurface = (genHeight - worldY).toDouble()
       val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
 
-      val cheese = noiseCheeseCave.getNoise(worldXd, worldYd, wormSize)
-      val greatHall = noiseGreatHall.getNoise(worldXd, worldYd, wormSize)
+      val cheese = noiseCheeseCave.getNoisePositive(worldXd, worldYd, wormSizeNew)
+      val greatHall = noiseGreatHall.getNoisePositive(worldXd, worldYd, wormSizeNew)
       if (caveNoise > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier ||
         cheese > CHEESE_CAVE_CREATION_THRESHOLD / depthModifier ||
         greatHall > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier
@@ -144,7 +156,7 @@ class PerlinChunkGenerator(override val seed: Long) :
     private const val WORM_SIZE_AMPLITUDE = 0.15
 
     /** How fast the size of the caves (worms) changes  */
-    private const val WORM_SIZE_FREQUENCY = 0.1
+    private const val WORM_SIZE_FREQUENCY = 0.07
 
     /** How many blocks of the surface should not be caved in  */
     private const val CAVELESS_DEPTH = 16.0

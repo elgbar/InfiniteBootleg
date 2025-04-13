@@ -84,7 +84,7 @@ object DebugText {
     val blockDebug = block?.let { " ${it.hudDebug()}" } ?: ""
 
     val format = "Pointing at %-5s (% 8.2f,% 8.2f) block (% 5d,% 5d) local (% 5d,% 5d) exists? %-5s%s"
-    sb.append(String.format(format, material, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug))
+    sb.append(String.format(format, material.displayName, rawX, rawY, mouseBlockX, mouseBlockY, localX, localY, exists, blockDebug))
 
     val blockEntity = block?.entity?.let(::ent) ?: "N/A"
     sb.appendLine().append("Block entity: $blockEntity")
@@ -104,14 +104,32 @@ object DebugText {
     } else {
       val generator = world.chunkLoader.generator
       val biome = generator.getBiome(mouseBlockX)
+      val rawHeight = biome.rawHeightAt(world.seed, mouseBlockX)
       val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0.0
       val allAir = pc.isAllAir
       val modified = pc.shouldSave()
       val allowUnloading = pc.allowedToUnload
       val skychunk = cc.isChunkAboveTopBlock(chunkY)
       val hasTexture = (pc as? TexturedChunk)?.hasTexture() ?: false
-      val format = "chunk (% 4d,% 4d) [top/solid/light % 3d/% 3d/% 3d]: type: %-9.9s|noise % .2f|all air?%-5b|can unload?%-5b|sky?%-5b|modified?%-5b|has texture?%-5b"
-      sb.append(String.format(format, chunkX, chunkY, topBlock, topBlockSolid, topBlockLight, biome, biomeHeight, allAir, allowUnloading, skychunk, modified, hasTexture))
+      val format = "chunk (% 4d,% 4d) [top/solid/light % 3d/% 3d/% 3d]: type: %-9.9s|noise % .2f|gheight % .3f|all air?%-5b|can unload?%-5b|sky?%-5b|modified?%-5b|has texture?%-5b"
+      sb.append(
+        String.format(
+          format,
+          chunkX,
+          chunkY,
+          topBlock,
+          topBlockSolid,
+          topBlockLight,
+          biome::class.simpleName,
+          biomeHeight,
+          rawHeight,
+          allAir,
+          allowUnloading,
+          skychunk,
+          modified,
+          hasTexture
+        )
+      )
     }
   }
 

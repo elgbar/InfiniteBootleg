@@ -25,7 +25,7 @@ import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
-import no.elg.infiniteBootleg.core.util.getNoise
+import no.elg.infiniteBootleg.core.util.getNoisePositive
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.launchOnMultithreadedAsync
 import no.elg.infiniteBootleg.core.util.safeUse
@@ -81,8 +81,8 @@ class ChunkRenderer(private val worldRender: WorldRender) :
 
   private val rotationNoise: FastNoiseLite =
     FastNoiseLite(worldRender.world.seed.toInt()).also {
-      it.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2)
-      it.SetFrequency(1f)
+      it.setNoiseType(FastNoiseLite.NoiseType.OpenSimplex2)
+      it.setFrequency(1.0)
     }
 
   private fun nextChunk(): TexturedChunk? {
@@ -291,7 +291,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
   }
 
   private fun calculateRotation(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): Int {
-    val noise = rotationNoise.getNoise(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
+    val noise = rotationNoise.getNoisePositive(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
     val cardinalDirections = 4
     val cardinalDirectionDegrees = 90
     return (noise * cardinalDirections).toInt() * cardinalDirectionDegrees

@@ -63,6 +63,6 @@ internal class WorldTickee(private val world: World) : Ticking {
 
   companion object {
     private const val CHUNK_UNLOAD_SECONDS = 30L
-    private const val ALLOWED_NORMAL_CHUNK_UNLOADS_PER_SECOND = 120
+    private const val ALLOWED_NORMAL_CHUNK_UNLOADS_PER_SECOND = 500
   }
 }

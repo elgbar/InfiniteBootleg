@@ -234,6 +234,14 @@ inline fun isBlockInsideRadius(
   targetBlockX: WorldCoord,
   targetBlockY: WorldCoord,
   radius: Float
+): Boolean = isBlockInsideRadius(worldX, worldY, targetBlockX, targetBlockY, radius.toDouble())
+
+fun isBlockInsideRadius(
+  worldX: Float,
+  worldY: Float,
+  targetBlockX: WorldCoord,
+  targetBlockY: WorldCoord,
+  radius: Double
 ): Boolean = abs(Vector2.dst2(worldX, worldY, targetBlockX + World.Companion.HALF_BLOCK_SIZE, targetBlockY + World.Companion.HALF_BLOCK_SIZE)) < radius * radius
 
 typealias Progress = Float
