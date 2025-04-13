@@ -16,18 +16,14 @@ sealed class Biome(val y: Double, val amplitude: Double, val frequency: Double, 
     setNoiseType(FastNoiseLite.NoiseType.Perlin)
     setFrequency(frequency)
     setFractalType(FastNoiseLite.FractalType.FBm)
-    setFractalOctaves(6)
+    setFractalOctaves(2)
     setFractalLacunarity(2.0)
     setFractalGain(0.5)
   }
 
   val fillerToTopBlockNoise: FastNoiseLite = FastNoiseLite(0).apply {
     setNoiseType(FastNoiseLite.NoiseType.Perlin)
-    setFrequency(frequency)
-    setFractalType(FastNoiseLite.FractalType.FBm)
-    setFractalOctaves(6)
-    setFractalLacunarity(2.0)
-    setFractalGain(0.05)
+    setFrequency(frequency * 2)
   }
 
   fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {

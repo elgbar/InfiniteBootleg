@@ -18,7 +18,6 @@ import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.FractalType
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.NoiseType
 import no.elg.infiniteBootleg.core.world.world.World
-import kotlin.math.min
 
 private val logger = KotlinLogging.logger {}
 
@@ -129,15 +128,13 @@ class PerlinChunkGenerator(override val seed: Long) :
       val worldYd = worldY.toDouble()
 
       // calculate the size of the worm
-//      val wormSize = 1 + abs(noise.noise(worldXd, worldYd, 1.0, WORM_SIZE_AMPLITUDE.toDouble(), WORM_SIZE_FREQUENCY.toDouble()))
-      val wormSizeNew = 1 + wormCave.getNoisePositive(worldXd, worldYd, WORM_SIZE_AMPLITUDE)
-//      logger.warn { "Worm: loc ${stringifyCompactLoc(worldXd, worldYd)},  old $wormSize, new $wormSizeNew" }
-      val caveNoise = noise2.getNoise(worldXd, worldYd) / wormSizeNew
+      val wormSize = 1 + wormCave.getNoisePositive(worldXd, worldYd, WORM_SIZE_AMPLITUDE)
+      val caveNoise = noise2.getNoise(worldXd, worldYd) / wormSize
       val diffToSurface = (genHeight - worldY).toDouble()
-      val depthModifier = min(1.0, diffToSurface / CAVELESS_DEPTH)
+      val depthModifier = (diffToSurface / CAVELESS_DEPTH).coerceAtMost(1.0)
 
-      val cheese = noiseCheeseCave.getNoisePositive(worldXd, worldYd, wormSizeNew)
-      val greatHall = noiseGreatHall.getNoisePositive(worldXd, worldYd, wormSizeNew)
+      val cheese = noiseCheeseCave.getNoisePositive(worldXd, worldYd, wormSize)
+      val greatHall = noiseGreatHall.getNoisePositive(worldXd, worldYd, wormSize)
       if (caveNoise > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier ||
         cheese > CHEESE_CAVE_CREATION_THRESHOLD / depthModifier ||
         greatHall > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier
