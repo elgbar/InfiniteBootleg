@@ -14,56 +14,6 @@ import kotlin.math.floor
 
 sealed class Biome(val topmostBlock: Material, val topBlocks: Array<Material>, val filler: Material, val heightNoise: NoiseGenerator, val fillerToTopBlockNoise: NoiseGenerator) {
 
-//  fun noise(
-// // seed: Int = 1337,
-//    frequency: Double = 0.01,
-//    noiseType: NoiseType = NoiseType.OpenSimplex2,
-//    rotationType3D: RotationType3D = RotationType3D.None,
-// // transformType3D: TransformType3D = TransformType3D.DefaultOpenSimplex2,
-//    fractalType: FractalType = FractalType.None,
-//    octaves: Int = 3,
-//    lacunarity: Double = 2.0,
-//    gain: Double = 0.5,
-//    weightedStrength: Double = 0.0,
-//    pingPongStrength: Double = 2.0,
-//    fractalBounding: Double = 1 / 1.75,
-//    cellularDistanceFunction: CellularDistanceFunction = CellularDistanceFunction.EuclideanSq,
-//    cellularReturnType: CellularReturnType = CellularReturnType.Distance,
-//    cellularJitterModifier: Double = 1.0,
-//    domainWarpType: DomainWarpType = DomainWarpType.OpenSimplex2,
-// // warpTransformType3D: TransformType3D = TransformType3D.DefaultOpenSimplex2,
-//    domainWarpAmp: Double = 1.0,
-//  ): FastNoiseLite {
-//    FastNoiseLite(0).apply {
-//      setNoiseType(FastNoiseLite.NoiseType.Perlin)
-//      setFrequency(frequency)
-//      setFractalType(FastNoiseLite.FractalType.FBm)
-//      setFractalOctaves(2)
-//      setFractalLacunarity(2.0)
-//      setFractalGain(0.5)
-//    }
-//  }
-//
-//  val heightNoise: FastNoiseLite = FastNoiseLite(0).apply {
-//    setNoiseType(FastNoiseLite.NoiseType.Perlin)
-//    setFrequency(frequency)
-//    setFractalType(FastNoiseLite.FractalType.FBm)
-//    setFractalOctaves(2)
-//    setFractalLacunarity(2.0)
-//    setFractalGain(0.5)
-//
-//  }
-//
-//
-//
-//  val fillerToTopBlockNoise: FastNoiseLite = FastNoiseLite(0).apply {
-//    setNoiseType(FastNoiseLite.NoiseType.Perlin)
-//    setFrequency(frequency * 2)
-//    createNoiseGenerator(
-//      noiseType = NoiseType.Perlin,
-//    )
-//  }
-
   fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {
     var y = 0
     val seed = pcg.seed.toInt()
