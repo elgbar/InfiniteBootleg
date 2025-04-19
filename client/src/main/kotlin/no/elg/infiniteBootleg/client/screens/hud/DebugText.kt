@@ -104,7 +104,7 @@ object DebugText {
     } else {
       val generator = world.chunkLoader.generator
       val biome = generator.getBiome(mouseBlockX)
-      val rawHeight = biome.rawHeightAt(world.seed, mouseBlockX)
+      val rawHeight = biome.rawHeightAt(world.seed.toInt(), mouseBlockX)
       val biomeHeight = if (generator is PerlinChunkGenerator) generator.getBiomeHeight(mouseBlockX) else 0.0
       val allAir = pc.isAllAir
       val modified = pc.shouldSave()

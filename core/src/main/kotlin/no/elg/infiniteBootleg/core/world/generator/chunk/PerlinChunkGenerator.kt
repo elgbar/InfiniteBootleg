@@ -86,6 +86,7 @@ class PerlinChunkGenerator(override val seed: Long) :
       val biome = getBiome(worldX)
       val genHeight = biome.heightAt(this, worldX)
       val genChunkY = genHeight.worldToChunk()
+      val seed = seed.toInt()
       if (chunkY == genChunkY) {
         biome.fillUpTo(seed, chunk, localX, genHeight.chunkOffset() + 1, genHeight)
       } else if (chunkY < genChunkY) {
