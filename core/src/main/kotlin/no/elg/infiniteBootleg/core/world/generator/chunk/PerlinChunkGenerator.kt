@@ -95,7 +95,7 @@ class PerlinChunkGenerator(override val seed: Long) :
 
       // generate caves (where there is something to generate them in
       if (chunkY <= genChunkY) {
-        generateCaves(chunk, chunkY, genHeight, worldX)
+        generateCaves(chunk, chunkY, genHeight, biome, worldX)
       }
     }
     chunk.finishLoading()
@@ -108,8 +108,9 @@ class PerlinChunkGenerator(override val seed: Long) :
       val worldX = chunk.chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
       val genHeight = biome.heightAt(this, worldX)
+      val material = biome.materialAt(seed.toInt(), 0, worldX, 0)
       val genChunkY = genHeight.worldToChunk()
-      if (chunk.chunkY == genChunkY) {
+      if (chunk.chunkY == genChunkY && material == biome.topBlocks[0]) {
         if (biome == Biome.Mountains) {
           sparseTreeGenerator.generateFeature(chunk, worldX, genHeight + 1)
         } else if (biome == Biome.Plains) {
@@ -119,7 +120,13 @@ class PerlinChunkGenerator(override val seed: Long) :
     }
   }
 
-  private fun generateCaves(chunk: Chunk, chunkY: ChunkCoord, genHeight: Int, worldX: WorldCoord) {
+  private fun generateCaves(
+    chunk: Chunk,
+    chunkY: ChunkCoord,
+    genHeight: Int,
+    biome: Biome,
+    worldX: WorldCoord
+  ) {
     val worldChunkY = chunkY.chunkToWorld()
     val localX = worldX.chunkOffset()
     val worldXd = worldX.toDouble()
@@ -135,7 +142,7 @@ class PerlinChunkGenerator(override val seed: Long) :
       val greatHall by lazy { noiseGreatHall.getNoisePositive(worldXd, worldYd, amplitude = caveAmplitude) }
 
       val diffToSurface = (genHeight - worldY).toDouble()
-      val depthModifier = (diffToSurface / CAVELESS_DEPTH).coerceAtMost(1.0)
+      val depthModifier = (diffToSurface / biome.biomeMaxDepth).coerceAtMost(1.0)
       if (worm > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier ||
         cheese > CHEESE_CAVE_CREATION_THRESHOLD / depthModifier ||
         greatHall > SNAKE_CAVE_CREATION_THRESHOLD / depthModifier

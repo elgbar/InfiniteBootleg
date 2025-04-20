@@ -10,6 +10,8 @@ Biomes are split into three categories:
 
 ### surface biomes
 
+---
+
 The surface biomes are have a couple of parameters
 
 * height, when air becomes ground
@@ -20,8 +22,6 @@ These are created with only the world-x-coordinate. so they are simple 1D lines 
 
 #### biome types
 
-The biome type is defined by thge
-
 ##### plains
 
 ##### mountains
@@ -30,12 +30,15 @@ The biome type is defined by thge
 
 ### super-surface biomes
 
+---
+
 Currently, not prioritized, but can be used to create interesting terrain in the sky.
 
 For now these are just air
 
 ### sub-surface biomes
 
-The most complex biomes, taking both the x and y world coordinate as input.
-These are used to create caves, ores, and other underground features.
+---
 
+The most complex biomes, taking both the x and y world coordinate as input, i.e., they are 2d biomes.
+These are used to create caves, ores, and other underground features.

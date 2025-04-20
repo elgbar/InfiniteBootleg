@@ -10,9 +10,8 @@ import no.elg.infiniteBootleg.core.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.FractalType
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.NoiseType
 import kotlin.math.abs
-import kotlin.math.floor
 
-sealed class Biome(val topmostBlock: Material, val topBlocks: Array<Material>, val filler: Material, val heightNoise: NoiseGenerator, val fillerToTopBlockNoise: NoiseGenerator) {
+sealed class Biome(val topBlocks: Array<Material>, val filler: Material, val biomeMaxDepth: Int, val heightNoise: NoiseGenerator, val fillerToTopBlockNoise: NoiseGenerator) {
 
   fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {
     var y = 0
@@ -44,85 +43,83 @@ sealed class Biome(val topmostBlock: Material, val topBlocks: Array<Material>, v
   }
 
   fun materialAt(seed: Int, height: Int, worldX: WorldCoord, worldY: WorldCoord): Material {
-    var delta = height - worldY
-    if (delta == 0) {
-      return topmostBlock
-    }
-    delta += abs(floor(fillerHeightAt(seed, worldX)).toInt())
-    return if (delta >= topBlocks.size) {
-      filler
+    val delta = height - worldY
+    val fillerHeight = fillerHeightAt(seed, worldX).toInt()
+    val mdelta = delta + fillerHeight
+    return if (mdelta in 0 until topBlocks.size) {
+      topBlocks[mdelta]
     } else {
-      topBlocks[delta]
+      filler
     }
   }
 
   fun rawHeightAt(seed: Int, worldX: WorldCoord): Double = heightNoise.getNoise(seed, x = worldX)
 
-  fun fillerHeightAt(seed: Int, worldX: WorldCoord): Double = fillerToTopBlockNoise.getNoise(seed, x = worldX)
+  fun fillerHeightAt(seed: Int, worldX: WorldCoord): UInt = abs(fillerToTopBlockNoise.getNoisePositive(seed, x = worldX)).toUInt()
 
   companion object {
     const val INTERPOLATION_RADIUS = 25
   }
 
   object Plains : Biome(
-    topmostBlock = Material.Grass,
-    topBlocks = arrayOf<Material>(
-      *Array(4) { Material.Grass },
+    topBlocks = arrayOf(
+      *Array(5) { Material.Grass },
       *Array(10) { Material.Dirt }
     ),
     filler = Material.Stone,
+    biomeMaxDepth = 20,
     heightNoise = createNoiseGenerator(
       amplitude = 64.0,
       frequency = 0.009,
-      noiseType = NoiseType.Perlin,
-      fractalType = FractalType.FBm,
-      fractalOctaves = 2
+      noiseType = NoiseType.Value,
+      fractalType = FractalType.FBm
     ),
     fillerToTopBlockNoise = createNoiseGenerator(
-      amplitude = 10.0,
-      frequency = 0.018,
-      noiseType = NoiseType.Perlin
+      amplitude = 5.0, // note: matches number of grass top blocks
+      frequency = 0.02,
+      noiseType = NoiseType.OpenSimplex2,
+      fractalType = FractalType.FBm
     )
   )
 
   object Mountains : Biome(
-    topmostBlock = Material.Grass,
-    topBlocks = arrayOf<Material>(
+    topBlocks = arrayOf(
       *Array(2) { Material.Grass },
-      *Array(6) { Material.Dirt }
+      *Array(6) { Material.Dirt },
+      *Array(8) { Material.Stone }
     ),
     filler = Material.Stone,
+    biomeMaxDepth = 16,
     heightNoise = createNoiseGenerator(
-      amplitude = 356.0,
-      offset = 25.0,
-      noiseType = NoiseType.Perlin,
+      amplitude = 256.0,
+      offset = 128.0,
+      noiseType = NoiseType.OpenSimplex2,
       fractalType = FractalType.FBm,
-      fractalOctaves = 2
+      fractalLacunarity = 4.0,
+      fractalOctaves = 4
     ),
     fillerToTopBlockNoise = createNoiseGenerator(
       amplitude = 10.0,
-      frequency = 0.02,
-      noiseType = NoiseType.Perlin
+      frequency = 0.025
     )
   )
 
   object Desert : Biome(
-    topmostBlock = Material.Sand,
-    topBlocks = arrayOf<Material>(
-      *Array(12) { Material.Sand }
+    topBlocks = arrayOf(
+      *Array(48) { Material.Sand }
     ),
     filler = Material.Sandstone,
-
+    biomeMaxDepth = 64,
     heightNoise = createNoiseGenerator(
       amplitude = 32.0,
+      offset = -32.0,
       frequency = 0.005,
       noiseType = NoiseType.Perlin,
       fractalType = FractalType.FBm,
-      fractalOctaves = 2
+      fractalOctaves = 4
     ),
     fillerToTopBlockNoise = createNoiseGenerator(
-      amplitude = 10.0,
-      noiseType = NoiseType.Perlin
+      amplitude = 4.0
     )
   )
 }

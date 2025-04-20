@@ -11,7 +11,6 @@ import kotlin.math.roundToInt
 class ForestGenerator(override val seed: Long, private val cutoff: Double) : FeatureGenerator {
 
   private val shouldGenerateTreeNoise: FastNoiseLite = FastNoiseLite(seed.toInt()).also {
-    it.setNoiseType(FastNoiseLite.NoiseType.Perlin)
     it.setFrequency(0.55)
   }
 
