@@ -320,11 +320,11 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   override val isDisposed: Boolean get() = disposed
 
   override val isNotDisposed: Boolean
-    get() = !isDisposed
+    get() = !disposed
   override val isValid: Boolean
-    get() = !isDisposed && !initializing
+    get() = !disposed && !initializing
   override val isInvalid: Boolean
-    get() = isDisposed || initializing
+    get() = disposed || initializing
 
   override val chunkColumn: ChunkColumn
     get() = world.getChunkColumn(chunkX)

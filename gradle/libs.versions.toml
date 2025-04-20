@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.1.20"
+kotlin = "2.1.21-RC"
 gdx = "1.13.1"
 ktx = "1.13.1-rc1"
 protobuf = "4.30.2"
