@@ -264,7 +264,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   }
 
   internal fun doUpdateLightMultipleSources(sources: WorldCompactLocArray, checkDistance: Boolean) {
-    if (isValid && world.isLoaded) {
+    if (Settings.renderLight && isValid && world.isLoaded) {
       synchronized(this) {
         // TODO synchronize on something else
         if (!checkDistance) {
