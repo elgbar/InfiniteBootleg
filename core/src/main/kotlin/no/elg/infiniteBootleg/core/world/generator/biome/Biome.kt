@@ -6,27 +6,11 @@ import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.createNoiseGenerator
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl
-import no.elg.infiniteBootleg.core.world.generator.chunk.PerlinChunkGenerator
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.FractalType
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.NoiseType
 import kotlin.math.abs
 
 sealed class Biome(val topBlocks: Array<Material>, val filler: Material, val biomeMaxDepth: Int, val heightNoise: NoiseGenerator, val fillerToTopBlockNoise: NoiseGenerator) {
-
-  fun heightAt(pcg: PerlinChunkGenerator, worldX: WorldCoord): Int {
-    var y = 0
-    val seed = pcg.seed.toInt()
-    for (dx in -INTERPOLATION_RADIUS..INTERPOLATION_RADIUS) {
-      y = if (dx != 0) {
-        val biome = pcg.getBiome(worldX + dx)
-        (y + biome.rawHeightAt(seed, worldX + dx)).toInt()
-      } else {
-        (y + rawHeightAt(seed, worldX)).toInt()
-      }
-    }
-    val finalY = y / (INTERPOLATION_RADIUS * 2 + 1)
-    return finalY
-  }
 
   fun fillUpTo(
     seed: Int,
@@ -43,11 +27,10 @@ sealed class Biome(val topBlocks: Array<Material>, val filler: Material, val bio
   }
 
   fun materialAt(seed: Int, height: Int, worldX: WorldCoord, worldY: WorldCoord): Material {
-    val delta = height - worldY
     val fillerHeight = fillerHeightAt(seed, worldX).toInt()
-    val mdelta = delta + fillerHeight
-    return if (mdelta in 0 until topBlocks.size) {
-      topBlocks[mdelta]
+    val delta = height - worldY + fillerHeight
+    return if (delta in 0 until topBlocks.size) {
+      topBlocks[delta]
     } else {
       filler
     }
