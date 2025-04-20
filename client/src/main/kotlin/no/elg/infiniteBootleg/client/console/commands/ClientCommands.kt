@@ -565,7 +565,7 @@ class ClientCommands : CommonCommands() {
   @CmdArgNames("worldSeed", "forceTransient")
   fun loadWorld(worldSeed: String, forceTransient: Boolean) {
     val seed = worldSeed.asWorldSeed()
-    if (world?.seed == seed) {
+    if (worldSilent?.seed == seed) {
       logger.error { "Already in the world '$worldSeed' (long: $seed)" }
       return
     }

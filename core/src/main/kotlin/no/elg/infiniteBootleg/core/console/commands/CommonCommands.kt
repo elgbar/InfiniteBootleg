@@ -40,11 +40,19 @@ private val logger = KotlinLogging.logger {}
  */
 @Suppress("unused")
 open class CommonCommands : CommandExecutor() {
+  /**
+   * Returns the current world if any, or logs an error
+   */
   protected val world: World?
-    get() = Main.Companion.inst().world ?: run {
+    get() = worldSilent ?: run {
       logger.error { "Failed to find the current world" }
       null
     }
+
+  /**
+   * Returns the current world if any, will not log an error when not found
+   */
+  protected val worldSilent: World? get() = Main.Companion.inst().world
 
   protected fun findEntity(nameOrId: String): Entity? {
     val world = world ?: return null
