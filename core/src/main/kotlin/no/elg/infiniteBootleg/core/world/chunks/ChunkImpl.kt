@@ -234,7 +234,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     }
 
     if (!initializing && !bothAirish) {
-      EventManager.dispatchEvent(BlockChangedEvent(currBlock, block))
+      EventManager.dispatchEventAsync(BlockChangedEvent(currBlock, block))
     }
     if (block != null && block.material.emitsLight || currBlock != null && currBlock.material.emitsLight) {
       if (Settings.renderLight) {
