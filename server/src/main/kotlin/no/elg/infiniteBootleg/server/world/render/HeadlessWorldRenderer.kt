@@ -66,14 +66,16 @@ class HeadlessWorldRenderer(override val world: ServerWorld) : WorldRender {
   override fun update() = Unit
 
   override fun isOutOfView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
-    spawnChunksInView.isOutOfView(chunkX, chunkY) && world.engine.doUnderEngineLock {
-      inViewEntities.all { it.chunksInView.isOutOfView(chunkX, chunkY) }
-    }
+    spawnChunksInView.isOutOfView(chunkX, chunkY) &&
+      world.engine.doUnderEngineLock {
+        inViewEntities.all { it.chunksInView.isOutOfView(chunkX, chunkY) }
+      }
 
   override fun isInView(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean =
-    spawnChunksInView.isInView(chunkX, chunkY) || world.engine.doUnderEngineLock {
-      inViewEntities.any { it.chunksInView.isInView(chunkX, chunkY) }
-    }
+    spawnChunksInView.isInView(chunkX, chunkY) ||
+      world.engine.doUnderEngineLock {
+        inViewEntities.any { it.chunksInView.isInView(chunkX, chunkY) }
+      }
 
   private fun allChunksInView(): Sequence<ServerClientChunksInView> =
     sequenceOf(spawnChunksInView) + world.engine.doUnderEngineLock { inViewEntities.map { it.chunksInView }.asSequence() }
