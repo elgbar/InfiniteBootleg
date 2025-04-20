@@ -3,7 +3,6 @@ package no.elg.infiniteBootleg.core.events.api
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEvent
 import no.elg.infiniteBootleg.core.events.api.EventManager.dispatchEventAsync
 import no.elg.infiniteBootleg.core.util.launchOnAsync
@@ -25,7 +24,7 @@ object EventManager {
   val isLoggingEventsListenedTo get() = eventsTracker?.logEventsListenedTo ?: false
   val isLoggingEventListenersChange get() = eventsTracker?.logEventListenersChange ?: false
 
-  var eventsTracker: EventsTracker? = if (Settings.debug) EventsTracker() else null
+  var eventsTracker: EventsTracker? = null
     private set
 
   val activeListeners = AtomicLong(0) // active number of listeners
