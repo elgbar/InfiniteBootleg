@@ -7,6 +7,7 @@ import no.elg.infiniteBootleg.core.Settings
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.core.Appender
 import org.apache.logging.log4j.core.Core
+import org.apache.logging.log4j.core.ErrorHandler
 import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.appender.AbstractAppender
 import org.apache.logging.log4j.core.config.plugins.Plugin
@@ -17,9 +18,22 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory
  * An appender that logs to the in game console. If the package changes so must `package` in `log4j2.xml`
  */
 @Plugin(name = "InGameConsole", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE)
-class InGameConsoleAppender(name: String) : AbstractAppender(name, null, null, !Settings.debug, null) {
+class InGameConsoleAppender(name: String) : AbstractAppender(name, null, null, true, null) {
 
   private val console: InGameConsoleHandler by lazy { ClientMain.inst().console }
+
+  init {
+    // Ignore exceptions in this appender
+    handler = object : ErrorHandler {
+      override fun error(msg: String?) = error(msg, null, null)
+      override fun error(msg: String?, t: Throwable?) = error(msg, null, t)
+      override fun error(msg: String?, event: LogEvent?, t: Throwable?) {
+        if (Settings.debug) {
+          t?.printStackTrace()
+        }
+      }
+    }
+  }
 
   override fun append(event: LogEvent) {
     when (event.level) {
