@@ -12,7 +12,6 @@ import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.generator.ChunkGeneratedListener
 import no.elg.infiniteBootleg.core.world.generator.biome.Biome
-import no.elg.infiniteBootleg.core.world.generator.biome.Biome.Companion.INTERPOLATION_RADIUS
 import no.elg.infiniteBootleg.core.world.generator.features.ForestGenerator
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite
 import no.elg.infiniteBootleg.core.world.generator.noise.FastNoiseLite.FractalType
@@ -78,14 +77,14 @@ class PerlinChunkGenerator(override val seed: Long) :
     }
   }
 
-  override fun getHeight(worldX: WorldCoord): Int = getBiome(worldX).heightAt(worldX)
+  override fun getHeight(worldX: WorldCoord): Int = heightAt(worldX)
 
   override fun generate(world: World, chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk {
     val chunk = Main.Companion.inst().chunkFactory.createChunk(world, chunkX, chunkY)
     for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
       val worldX = chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
-      val genHeight = biome.heightAt(worldX)
+      val genHeight = heightAt(worldX)
       val genChunkY = genHeight.worldToChunk()
       val seed = seed.toInt()
       if (chunkY == genChunkY) {
@@ -108,7 +107,7 @@ class PerlinChunkGenerator(override val seed: Long) :
     for (localX in 0 until Chunk.Companion.CHUNK_SIZE) {
       val worldX = chunk.chunkX.chunkToWorld(localX)
       val biome = getBiome(worldX)
-      val genHeight = biome.heightAt(worldX)
+      val genHeight = heightAt(worldX)
       val material = biome.materialAt(seed.toInt(), 0, worldX, 0)
       val genChunkY = genHeight.worldToChunk()
       if (chunk.chunkY == genChunkY && material == biome.topBlocks[0]) {
@@ -153,16 +152,12 @@ class PerlinChunkGenerator(override val seed: Long) :
     }
   }
 
-  fun Biome.heightAt(worldX: WorldCoord): Int {
+  fun heightAt(worldX: WorldCoord): WorldCoord {
     var y = 0
     val seed = seed.toInt()
     for (dx in -INTERPOLATION_RADIUS..INTERPOLATION_RADIUS) {
-      y = if (dx != 0) {
-        val biome = getBiome(worldX + dx)
-        (y + biome.rawHeightAt(seed, worldX + dx)).toInt()
-      } else {
-        (y + rawHeightAt(seed, worldX)).toInt()
-      }
+      val biome = getBiome(worldX + dx)
+      y += biome.rawHeightAt(seed, worldX + dx).toInt()
     }
     val finalY = y / (INTERPOLATION_RADIUS * 2 + 1)
     return finalY
@@ -187,5 +182,7 @@ class PerlinChunkGenerator(override val seed: Long) :
     private const val CAVELESS_DEPTH = 16.0
 
     private const val BIOME_HEIGHT_AMPLITUDE = 1.25
+
+    const val INTERPOLATION_RADIUS = 25
   }
 }

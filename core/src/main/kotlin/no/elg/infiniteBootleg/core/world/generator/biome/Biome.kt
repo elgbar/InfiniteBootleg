@@ -40,10 +40,6 @@ sealed class Biome(val topBlocks: Array<Material>, val filler: Material, val bio
 
   fun fillerHeightAt(seed: Int, worldX: WorldCoord): UInt = abs(fillerToTopBlockNoise.getNoisePositive(seed, x = worldX)).toUInt()
 
-  companion object {
-    const val INTERPOLATION_RADIUS = 25
-  }
-
   object Plains : Biome(
     topBlocks = arrayOf(
       *Array(5) { Material.Grass },

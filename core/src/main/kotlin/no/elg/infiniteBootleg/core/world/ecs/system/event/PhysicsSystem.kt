@@ -20,12 +20,12 @@ object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
   inline fun <reified T : Any> PhysicsEvent.getOtherFixtureUserData(entity: Entity, filter: (userData: Any?) -> Boolean): T? {
     val userDataA: Any? = fixtureA?.userData
     val userDataB: Any? = fixtureB?.userData
-    val otherUserData: Any = when {
+    val otherUserData: Any? = when {
       filter(userDataA) && fixtureA?.body?.userData === entity -> userDataB
       filter(userDataB) && fixtureB?.body?.userData === entity -> userDataA
       else -> null
-    } ?: return null
-    return otherUserData as? T?
+    }
+    return otherUserData as? T
   }
 
   override fun condition(entity: Entity): Boolean = Main.inst().isAuthorizedToChange(entity)
