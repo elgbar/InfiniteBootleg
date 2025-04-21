@@ -37,20 +37,25 @@ fun launchOnEvents(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspen
 fun launchOnMultithreadedAsync(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Dispatchers.Default, start = start, block = block)
 
-fun launchOnWorldTicker(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+fun launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(WorldTickCoroutineDispatcher, start = start, block = block)
 
-fun launchOnBox2d(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
+fun launchOnWorldTicker(block: () -> Unit) =
+  Main.Companion.inst().world?.postWorldTickerRunnable(block)
+
+fun launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Box2DTickCoroutineDispatcher, start = start, block = block)
+
+fun launchOnBox2d(block: () -> Unit) = Main.Companion.inst().world?.postBox2dRunnable(block)
 
 object WorldTickCoroutineDispatcher : CoroutineDispatcher() {
   override fun dispatch(context: CoroutineContext, block: Runnable) {
-    Main.Companion.inst().world?.postWorldTickerRunnable { block.run() }
+    launchOnWorldTicker(block::run)
   }
 }
 
 object Box2DTickCoroutineDispatcher : CoroutineDispatcher() {
   override fun dispatch(context: CoroutineContext, block: Runnable) {
-    Main.Companion.inst().world?.postBox2dRunnable { block.run() }
+    launchOnBox2d(block::run)
   }
 }
