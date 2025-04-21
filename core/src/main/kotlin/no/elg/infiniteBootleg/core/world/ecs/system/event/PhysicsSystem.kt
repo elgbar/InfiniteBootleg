@@ -30,7 +30,7 @@ object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
 
   override fun condition(entity: Entity): Boolean = Main.inst().isAuthorizedToChange(entity)
 
-  override fun handleEvent(entity: Entity, deltaTime: Float, event: PhysicsEvent) {
+  override fun handleEvent(entity: Entity, event: PhysicsEvent) {
     when (event) {
       is PhysicsEvent.ContactBeginsEvent -> {
         OnGroundService.handleOnGroundContactBeginsEvent(entity, event)

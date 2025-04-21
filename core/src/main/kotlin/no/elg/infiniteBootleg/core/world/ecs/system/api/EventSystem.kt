@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.Family
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EVENT_HANDLING
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem.handleEvent
 import kotlin.reflect.KClass
 
 abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(family: Family, eventType: KClass<T>, private val queueMapper: ComponentMapper<out Q>) :
@@ -19,13 +18,9 @@ abstract class EventSystem<T : ECSEvent, Q : ECSEventQueueComponent<T>>(family: 
   override fun condition(entity: Entity): Boolean = true
 
   final override fun processEntity(entity: Entity, deltaTime: Float) {
-    queueMapper.get(entity)?.events?.also { events ->
-      while (true) {
-        val event: T = events.poll() ?: return
-        handleEvent(entity, deltaTime, event)
-      }
-    }
+    val eventQueueComponent = queueMapper.get(entity) ?: return
+    eventQueueComponent.processEvents(entity, ::handleEvent)
   }
 
-  abstract fun handleEvent(entity: Entity, deltaTime: Float, event: T)
+  abstract fun handleEvent(entity: Entity, event: T)
 }

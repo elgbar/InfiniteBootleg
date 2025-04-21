@@ -443,7 +443,7 @@ private fun asyncHandleCastSpell(ctx: ChannelHandlerContextWrapper) {
   val player = ctx.getCurrentPlayer() ?: return
   val staff = player.selectedItem?.element as? Staff ?: return
   val inputEventQueue = player.inputEventQueueOrNull ?: return
-  inputEventQueue.events += InputEvent.SpellCastEvent(staff)
+  inputEventQueue.enqueueAsync(InputEvent.SpellCastEvent(staff))
 }
 
 private fun asyncHandleContainerRequest(ctx: ChannelHandlerContextWrapper, owner: ContainerOwner) {

@@ -3,7 +3,7 @@ package no.elg.infiniteBootleg.client.input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent.Companion.queueInputEvent
+import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent.Companion.queueInputEventAsync
 import no.elg.infiniteBootleg.core.world.ecs.components.events.InputEvent
 import no.elg.infiniteBootleg.core.world.world.World
 import java.util.concurrent.CopyOnWriteArraySet
@@ -13,7 +13,7 @@ class ECSInputListener(val world: World) :
   Disposable {
 
   fun handleEvent(inputEvent: InputEvent): Boolean {
-    world.engine.queueInputEvent(inputEvent) {
+    world.engine.queueInputEventAsync(inputEvent) {
       ClientMain.inst().shouldNotIgnoreWorldInput()
     }
     return false

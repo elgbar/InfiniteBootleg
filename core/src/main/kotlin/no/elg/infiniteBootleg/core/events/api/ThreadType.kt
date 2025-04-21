@@ -43,12 +43,12 @@ enum class ThreadType {
 
     fun isCurrentThreadType(expected: ThreadType): Boolean = currentThreadType() == expected
 
-    fun requireCorrectThreadType(
-      expected: ThreadType,
-      message: () -> String = { "Expected event to be dispatched from $expected but was dispatched from ${currentThreadType()}" }
-    ) {
-      if (!isCurrentThreadType(expected)) {
-        throw CalledFromWrongThreadTypeException(message())
+    fun requireCorrectThreadType(expected: ThreadType, message: (() -> String)? = null) {
+      val current = currentThreadType()
+      if (current != expected) {
+        val string = "Expected event to be dispatched from $expected but was dispatched from $current"
+        val message = message?.invoke() ?: ""
+        throw CalledFromWrongThreadTypeException("$message $string")
       }
     }
 

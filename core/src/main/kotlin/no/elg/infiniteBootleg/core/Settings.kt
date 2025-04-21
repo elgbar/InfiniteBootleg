@@ -74,6 +74,8 @@ object Settings {
 
   var renderBox2dEntityDifference = false
 
+  var enableThreadCheck = false
+
   /**
    * Make sure entities have unique uuid when added to the engine
    */

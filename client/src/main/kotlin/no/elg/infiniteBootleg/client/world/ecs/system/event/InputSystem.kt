@@ -45,7 +45,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   InputEventQueueComponent.Companion.mapper
 ) {
 
-  override fun handleEvent(entity: Entity, deltaTime: Float, event: InputEvent) {
+  override fun handleEvent(entity: Entity, event: InputEvent) {
     val entityWorld = entity.world as? ClientWorld ?: return
     val worldEntity = WorldEntity.ClientWorldEntity(entityWorld, entity)
     inputMouseLocator.update(entityWorld)

@@ -4,49 +4,92 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
-import com.badlogic.gdx.utils.ObjectMap
-import com.badlogic.gdx.utils.Pool
 import io.github.oshai.kotlinlogging.KotlinLogging
+import it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import ktx.ashley.allOf
-import ktx.collections.getOrPut
+import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.events.api.ThreadType
+import no.elg.infiniteBootleg.core.events.api.ThreadType.Companion.requireCorrectThreadType
 import no.elg.infiniteBootleg.core.main.Main
+import no.elg.infiniteBootleg.core.util.launchOnBox2d
 import no.elg.infiniteBootleg.core.world.ecs.BASIC_STANDALONE_ENTITY
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KClass
 
 /**
  * The queue of events to be processed by an entity, we cannot map events directly onto entities as multiple events might occur between processing
  */
-interface ECSEventQueueComponent<T : ECSEvent> :
-  EntitySavableComponent,
-  Pool.Poolable {
-
-  val events: ConcurrentLinkedQueue<T>
-
-  override fun reset() {
-    events.clear()
-  }
+abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
+  /**
+   * Must only be accessed on the box2d thread!
+   */
+  private val events = ObjectOpenHashSet<T>(0, FAST_LOAD_FACTOR)
 
   override fun hudDebug(): String = "Event queue size: ${events.size}"
 
+  /**
+   * Enqueue an event from the physics thread
+   */
+  fun enqueue(event: T) {
+    if (Settings.enableThreadCheck) {
+      requireCorrectThreadType(ThreadType.PHYSICS) { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
+    }
+    events.add(event)
+  }
+
+  /**
+   * Enqueue an event from any other thread
+   */
+  fun enqueueAsync(event: T) {
+    launchOnBox2d { enqueue(event) }
+  }
+
+  fun processEvents(entity: Entity, processEvent: (entity: Entity, event: T) -> Unit) {
+    if (Settings.enableThreadCheck) {
+      requireCorrectThreadType(ThreadType.PHYSICS) { "Event queue must be accessed on the ${ThreadType.PHYSICS} thread" }
+    }
+    for (event: T in events) {
+      processEvent(entity, event)
+    }
+    events.clear()
+  }
+
   companion object {
 
-    val entitiesCache = ObjectMap<KClass<out ECSEventQueueComponent<out ECSEvent>>, ImmutableArray<Entity>>()
+    /**
+     * Optimization to skip filtering
+     */
+    val ALLOW_ALL_FILTER: (Entity) -> Boolean = { _: Entity -> true }
+
+    val entitiesCache = Object2ObjectOpenHashMap<KClass<out ECSEventQueueComponent<out ECSEvent>>, ImmutableArray<Entity>>()
+
+    val loggerrr = KotlinLogging.logger {}
+
+    inline fun <T : ECSEvent, reified Q : ECSEventQueueComponent<T>> Engine.queueEventAsync(
+      queueMapper: ComponentMapper<out Q>,
+      event: T,
+      noinline filter: (Entity) -> Boolean = ALLOW_ALL_FILTER
+    ) {
+      launchOnBox2d { queueEvent(queueMapper, event, filter) }
+    }
 
     inline fun <T : ECSEvent, reified Q : ECSEventQueueComponent<T>> Engine.queueEvent(
       queueMapper: ComponentMapper<out Q>,
       event: T,
-      noinline filter: (Entity) -> Boolean = { true }
+      noinline filter: (Entity) -> Boolean = ALLOW_ALL_FILTER
     ) {
       if (Main.Companion.inst().world?.worldTicker?.isPaused != false) {
         KotlinLogging.logger {}.debug { "Dropping queued event as the world ticker is paused" }
         return
       }
       val entities = entitiesCache.getOrPut(Q::class) { getEntitiesFor(allOf(*BASIC_STANDALONE_ENTITY, Q::class).get()) }
-      entities.asSequence().filter(filter).forEach {
-        val ecsEvents = queueMapper.get(it) ?: return@forEach
-        ecsEvents.events += event
+      for (entity in entities) {
+        if (filter === ALLOW_ALL_FILTER || filter(entity)) {
+          val ecsEvents = queueMapper.get(entity) ?: continue
+          ecsEvents.enqueue(event)
+        }
       }
     }
   }

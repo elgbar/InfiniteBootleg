@@ -7,14 +7,11 @@ import ktx.ashley.optionalPropertyFor
 import ktx.ashley.with
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.events.ECSEventQueueComponent.Companion.queueEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
-import java.util.concurrent.ConcurrentLinkedQueue
 
-class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent> {
-  override val events = ConcurrentLinkedQueue<PhysicsEvent>()
+class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent>() {
 
   override fun EntityKt.Dsl.save() {
     physicsEvent = PROTO_PHYSICS_EVENT
@@ -22,7 +19,7 @@ class PhysicsEventQueueComponent : ECSEventQueueComponent<PhysicsEvent> {
 
   companion object : EntityLoadableMapper<PhysicsEventQueueComponent>() {
     var Entity.physicsEventQueueOrNull by optionalPropertyFor(mapper)
-    fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = { true }) {
+    fun Engine.queuePhysicsEvent(event: PhysicsEvent, filter: (Entity) -> Boolean = ALLOW_ALL_FILTER) {
       queueEvent(mapper, event, filter)
     }
 
