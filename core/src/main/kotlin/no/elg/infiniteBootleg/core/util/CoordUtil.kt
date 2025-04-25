@@ -13,6 +13,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.world.World
+import no.elg.infiniteBootleg.core.world.world.World.Companion.HALF_BLOCK_SIZE_D
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import org.jetbrains.annotations.Contract
 import java.lang.Short.SIZE
@@ -34,9 +35,13 @@ inline fun WorldCoord.worldToChunk(): ChunkCoord = this shr Chunk.Companion.CHUN
 @Contract(pure = true)
 inline fun Number.worldToChunk(): ChunkCoord = toInt().worldToChunk()
 
+@Contract(pure = true)
 inline fun WorldCompactLoc.worldToChunk(): ChunkCompactLoc = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
 
+@Contract(pure = true)
 inline fun WorldCompactLoc.worldToChunkX(): ChunkCoord = decompactLocX().worldToChunk()
+
+@Contract(pure = true)
 inline fun WorldCompactLoc.worldToChunkY(): ChunkCoord = decompactLocY().worldToChunk()
 
 /**
@@ -49,14 +54,18 @@ inline fun WorldCompactLoc.worldToChunkY(): ChunkCoord = decompactLocY().worldTo
  */
 @Contract(pure = true)
 inline fun ChunkCoord.chunkToWorld(offset: LocalCoord): WorldCoord = chunkToWorld() + offset
+
+@Contract(pure = true)
 inline fun ChunkCoord.chunkToWorld(): WorldCoord = this shl Chunk.Companion.CHUNK_SIZE_SHIFT
 
+@Contract(pure = true)
 inline fun ChunkCompactLoc.chunkToWorld(localCoords: LocalCompactLoc): WorldCompactLoc = compactChunkToWorld(this, localCoords.decompactLocX(), localCoords.decompactLocY())
 
 /**
  * @param worldCoord A part of a coordinate in the world
  * @return Which coordinate a block at the given world coordinate will have
  */
+@Contract(pure = true)
 inline fun WorldCoordNumber.worldToBlock(): WorldCoord = floor(this.toDouble()).toInt()
 
 /**
@@ -64,6 +73,7 @@ inline fun WorldCoordNumber.worldToBlock(): WorldCoord = floor(this.toDouble()).
  * @param this@worldToScreen  The world coordinate to translate to screen coordinates
  * @return The world coordinate to translated to screen coordinates
  */
+@Contract(pure = true)
 inline fun WorldCoordNumber.worldToScreen(): Float = toFloat() * Block.Companion.BLOCK_TEXTURE_SIZE
 
 /**
@@ -98,6 +108,7 @@ inline fun isInsideChunk(localX: LocalCoord, localY: LocalCoord): Boolean = loca
 @Contract(pure = true)
 inline fun isInnerEdgeOfChunk(localCoord: LocalCoord): Boolean = localCoord == 0 || localCoord == Chunk.Companion.CHUNK_SIZE - 1
 
+@Contract(pure = true)
 inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> =
   mutableListOf<Direction>().also {
     if (localX == 0) it += Direction.WEST
@@ -114,6 +125,7 @@ inline fun Block.findWhichInnerEdgesOfChunk(): List<Direction> =
 @Contract(pure = true)
 inline fun isInnerEdgeOfChunk(localX: LocalCoord, localY: LocalCoord): Boolean = isInnerEdgeOfChunk(localX) || isInnerEdgeOfChunk(localY)
 
+@Contract(pure = true)
 inline fun isInnerEdgeOfChunk(localLoc: LocalCompactLoc): Boolean {
   val (localX, localY) = localLoc
   return isInnerEdgeOfChunk(localX, localY)
@@ -122,13 +134,16 @@ inline fun isInnerEdgeOfChunk(localLoc: LocalCompactLoc): Boolean {
 /**
  * If this chunk is a neighbor of the given block.
  */
+@Contract(pure = true)
 inline fun Chunk.isCardinalNeighbor(chunk: Chunk) = abs(chunk.chunkX - this.chunkX) + abs(chunk.chunkY - this.chunkY) == 1
 
 /**
  * @return If this block is on the edge to the given chunk
  */
+@Contract(pure = true)
 inline fun Block.isNextTo(chunk: Chunk): Boolean = this.chunk.isCardinalNeighbor(chunk) && isInnerEdgeOfChunk(localX, localY)
 
+@Contract(pure = true)
 fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
   val other = block.chunk
   val localX = when (horizontalDirectionTo(other)) {
@@ -144,11 +159,13 @@ fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
   return compactLoc(localX, localY)
 }
 
+@Contract(pure = true)
 fun Chunk.shortestDistanceSquared(block: Block): Float {
   val (localX, localY) = closestBlockTo(block)
   return Vector2.dst2(chunkX.chunkToWorld(localX) + 0.5f, chunkY.chunkToWorld(localY) + 0.5f, block.worldX + 0.5f, block.worldY + 0.5f)
 }
 
+@Contract(pure = true)
 fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanceSquared(block) <= radius * radius
 
 /**
@@ -166,13 +183,25 @@ inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): Chu
  * @param y The y coordinate of the location
  * @return A long containing both the x and y int
  */
+@Contract(pure = true)
 inline fun compactLoc(x: Int, y: Int): Long = x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
+
+/**
+ * An int have 32 bits and long 64, we can store two ints inside a long
+ *
+ * @param x The x coordinate of the location, acts as a long keep
+ * @param y The y coordinate of the location
+ * @return A long containing both the x and y int
+ */
+@Contract(pure = true)
+inline fun compactLoc(x: Long, y: Long): Long = x shl Integer.SIZE or (y and 0xffffffffL)
 
 /**
  * @param this@decompactLocX A long created by [compactLoc]
  * @return The x coordinate of the compacted location
  */
 
+@Contract(pure = true)
 inline fun Long.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
 
 /**
@@ -180,15 +209,20 @@ inline fun Long.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
  * @return The y coordinate of the compacted location
  */
 
+@Contract(pure = true)
 inline fun Long.decompactLocY(): Int = toInt()
 
+@Contract(pure = true)
 inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
 
+@Contract(pure = true)
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl SIZE or (b.toInt() and 0xffff)
 
+@Contract(pure = true)
 inline fun compactChunkToWorld(chunkPos: ChunkCompactLoc, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
   compactLoc(chunkPos.decompactLocX().chunkToWorld(localX), chunkPos.decompactLocY().chunkToWorld(localY))
 
+@Contract(pure = true)
 inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
   compactLoc(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
 
@@ -196,38 +230,58 @@ inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCo
  * @param this@decompactShortA A long created by [compactLoc]
  * @return The x coordinate of the compacted location
  */
+@Contract(pure = true)
 inline fun Int.decompactShortA(): Short = (this shr SIZE).toShort()
 
 /**
  * @param this@decompactShortB A long created by [compactLoc]
  * @return The y coordinate of the compacted location
  */
-
+@Contract(pure = true)
 inline fun Int.decompactShortB(): Short = toShort()
 
+@Contract(pure = true)
 inline fun stringifyCompactLoc(x: Number, y: Number): String = "($x,$y)"
 
+@Contract(pure = true)
 inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
 
+@Contract(pure = true)
 inline fun stringifyCompactLoc(posComp: PositionComponent): String = stringifyCompactLoc(posComp.blockX, posComp.blockY)
+
+@Contract(pure = true)
 inline fun stringifyCompactLoc(chunk: Chunk): String = stringifyCompactLoc(chunk.compactLocation)
+
+@Contract(pure = true)
 inline fun stringifyCompactLoc(block: Block): String = stringifyCompactLoc(block.worldX, block.worldY)
 
+@Contract(pure = true)
 inline fun stringifyCompactLocWithChunk(blockX: WorldCoordNumber, blockY: WorldCoordNumber, chunkX: ChunkCoordNumber, chunkY: ChunkCoordNumber): String =
   "${stringifyCompactLoc(blockX, blockY)} in chunk ${stringifyCompactLoc(chunkX, chunkY)}"
 
+@Contract(pure = true)
 inline fun stringifyCompactLocWithChunk(block: Block): String = stringifyCompactLocWithChunk(block.worldX, block.worldY, block.chunk.chunkX, block.chunk.chunkY)
+
+@Contract(pure = true)
 inline fun stringifyCompactLocWithChunk(posComp: PositionComponent): String = stringifyCompactLocWithChunk(posComp.blockX, posComp.blockY, posComp.chunkX, posComp.chunkY)
 
+@Contract(pure = true)
 inline fun stringifyCompactLoc(vector: Vector2i): String = stringifyCompactLoc(vector.x, vector.y)
 
+@Contract(pure = true)
 inline fun stringifyChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): String = "(${chunk.chunkX.chunkToWorld(localX)},${chunk.chunkY.chunkToWorld(localY)})"
+
+@Contract(pure = true)
 inline fun stringifyChunkToWorld(chunk: Chunk, localLoc: LocalCompactLoc): String =
   "(${chunk.chunkX.chunkToWorld(localLoc.decompactLocX())},${chunk.chunkY.chunkToWorld(localLoc.decompactLocY())})"
 
+@Contract(pure = true)
 operator fun Long.component1(): Int = this.decompactLocX()
+
+@Contract(pure = true)
 operator fun Long.component2(): Int = this.decompactLocY()
 
+@Contract(pure = true)
 inline fun isBlockInsideRadius(
   worldX: Float,
   worldY: Float,
@@ -236,13 +290,32 @@ inline fun isBlockInsideRadius(
   radius: Float
 ): Boolean = isBlockInsideRadius(worldX, worldY, targetBlockX, targetBlockY, radius.toDouble())
 
+@Contract(pure = true)
 fun isBlockInsideRadius(
   worldX: Float,
   worldY: Float,
   targetBlockX: WorldCoord,
   targetBlockY: WorldCoord,
   radius: Double
-): Boolean = abs(Vector2.dst2(worldX, worldY, targetBlockX + World.Companion.HALF_BLOCK_SIZE, targetBlockY + World.Companion.HALF_BLOCK_SIZE)) < radius * radius
+): Boolean = Vector2.dst2(worldX, worldY, targetBlockX + World.Companion.HALF_BLOCK_SIZE, targetBlockY + World.Companion.HALF_BLOCK_SIZE) < radius * radius
+
+@Contract(pure = true)
+fun isBlockInsideRadius(
+  worldX: Double,
+  worldY: Double,
+  targetBlockX: WorldCoord,
+  targetBlockY: WorldCoord,
+  radius: Double
+): Boolean = distCubed(worldX, worldY, targetBlockX + HALF_BLOCK_SIZE_D, targetBlockY + HALF_BLOCK_SIZE_D) < radius * radius
+
+@Contract(pure = true)
+inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long = compactLoc(x + dir.dx, y + dir.dy)
+
+@Contract(pure = true)
+inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
+
+@Contract(pure = true)
+inline fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 
 typealias Progress = Float
 
@@ -277,9 +350,3 @@ typealias ChunkCompactLocArray = LongArray
 typealias LocalCompactLocGdxArray = GdxLongArray
 typealias WorldCompactLocGdxArray = GdxLongArray
 typealias ChunkCompactLocGdxArray = GdxLongArray
-
-inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long = compactLoc(x + dir.dx, y + dir.dy)
-
-inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
-
-inline fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)

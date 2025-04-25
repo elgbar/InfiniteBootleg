@@ -55,6 +55,7 @@ import no.elg.infiniteBootleg.core.util.singleLinePrinter
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toCompact
 import no.elg.infiniteBootleg.core.util.toVector2i
+import no.elg.infiniteBootleg.core.util.worldToBlock
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
@@ -186,7 +187,7 @@ abstract class World(
   /**
    * The entity engine of this world
    *
-   * Adding and removing entities to the engine must be used on [ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
+   * Adding and removing entities to the engine must be used on [no.elg.infiniteBootleg.core.events.api.ThreadType.PHYSICS] thread. Either within a System or within the [postBox2dRunnable] method.
    */
   val engine: ThreadSafeEngine = initializeEngine()
 
@@ -1190,6 +1191,7 @@ abstract class World(
      */
     const val BLOCK_SIZE = 1f
     const val HALF_BLOCK_SIZE = BLOCK_SIZE / 2f
+    const val HALF_BLOCK_SIZE_D = BLOCK_SIZE / 2.0
 
     const val LIGHT_SOURCE_LOOK_BLOCKS = 10
     const val LIGHT_SOURCE_LOOK_BLOCKS_WITH_EXTRA = LIGHT_SOURCE_LOOK_BLOCKS + 2
@@ -1212,10 +1214,10 @@ abstract class World(
 
     fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): WorldCompactLocArray =
       getLocationsAABBFromCenter(
-        centerWorldX = cornerWorldX.toFloat() - offsetX / 2f,
-        centerWorldY = cornerWorldY.toFloat() - offsetY / 2f,
-        offsetX = offsetX / 2f,
-        offsetY = offsetY / 2f
+        centerWorldX = cornerWorldX.toDouble() - offsetX / 2.0,
+        centerWorldY = cornerWorldY.toDouble() - offsetY / 2.0,
+        offsetX = offsetX / 2.0,
+        offsetY = offsetY / 2.0
       )
 
     fun getLocationsAABBFromCorner(cornerWorldX: WorldCoordNumber, cornerWorldY: WorldCoordNumber, offsetX: Double, offsetY: Double): WorldCompactLocArray =
@@ -1229,26 +1231,30 @@ abstract class World(
     /**
      * @return A square of locations within the given offset from the center
      */
-    fun getLocationsAABBFromCenter(centerWorldX: WorldCoordNumber, centerWorldY: WorldCoordNumber, offsetX: Float, offsetY: Float): WorldCompactLocArray =
-      getLocationsAABBFromCenter(centerWorldX, centerWorldY, offsetX.toDouble(), offsetY.toDouble())
+    fun getLocationsAABBFromCenter(centerWorldX: Float, centerWorldY: Float, offsetX: Float, offsetY: Float): WorldCompactLocArray =
+      getLocationsAABBFromCenter(centerWorldX.toDouble(), centerWorldY.toDouble(), offsetX.toDouble(), offsetY.toDouble())
 
-    fun getLocationsAABBFromCenter(centerWorldX: WorldCoordNumber, centerWorldY: WorldCoordNumber, offsetX: Double, offsetY: Double): WorldCompactLocArray {
-      val capacity = (offsetX * offsetX).toInt()
-      val blocks = GdxLongArray(true, capacity)
-      val centerWorldXF = centerWorldX.toFloat()
-      val centerWorldYF = centerWorldY.toFloat()
-      var x = floor(centerWorldXF - offsetX).toInt()
-      val maxX = centerWorldXF + offsetX
-      val maxY = centerWorldYF + offsetY
+    /**
+     * @return A square of locations within the given offset from the center
+     */
+    fun getLocationsAABBFromCenter(centerWorldX: Double, centerWorldY: Double, offsetX: Double, offsetY: Double): WorldCompactLocArray {
+      var x = floor(centerWorldX - offsetX).toLong()
+      val maxX = (centerWorldX + offsetX).toLong()
+      val maxY = (centerWorldY + offsetY).toLong()
+      val startY = floor(centerWorldY - offsetY).toLong()
+      val capacity = (maxX - x + 1) * (maxY - startY + 1)
+      val blocks = LongArray(capacity.toInt())
+      var i = 0
       while (x <= maxX) {
-        var y = floor(centerWorldYF - offsetY).toInt()
+        var y = startY
         while (y <= maxY) {
-          blocks.add(compactLoc(x, y))
+          blocks[i++] = compactLoc(x, y)
           y++
         }
         x++
       }
-      return blocks.toArray()
+      require(i == blocks.size) { "Expected to fill all blocks, but only filled $i" }
+      return blocks
     }
 
     /**
@@ -1257,35 +1263,27 @@ abstract class World(
      * @param radius Radius to be equal or less from center
      * @return Set of blocks within the given radius
      */
-    fun getLocationsWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Float): LongOpenHashSet = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
-    fun getLocationsWithin(worldX: WorldCoord, worldY: WorldCoord, radius: Double): LongOpenHashSet = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius)
+    fun getLocationsWithin(worldX: WorldCoordNumber, worldY: WorldCoordNumber, radius: Float): LongOpenHashSet =
+      getLocationsWithin(worldX.toDouble(), worldY.toDouble(), radius.toDouble())
 
-    /**
-     * @param worldX X center
-     * @param worldY Y center
-     * @param radius Radius to be equal or less from center
-     * @return Set of blocks within the given radius
-     */
-    fun getLocationsWithin(worldX: Float, worldY: Float, radius: Float): LongOpenHashSet = getLocationsWithin(worldX + HALF_BLOCK_SIZE, worldY + HALF_BLOCK_SIZE, radius.toDouble())
-    fun getLocationsWithin(worldX: Float, worldY: Float, radius: Double): LongOpenHashSet {
+    fun getLocationsWithin(worldX: WorldCoordNumber, worldY: WorldCoordNumber, radius: Double): LongOpenHashSet {
       require(radius >= 0) { "Radius should be a non-negative number" }
-      val loadFactor = .85f
-      // estimation matches good enough, except for radius == 1f
-      val expected = if (radius == 1.0) 1 else (radius * radius * Math.PI).toInt()
-      val locs = LongOpenHashSet(expected, loadFactor)
-      for (compact in getLocationsAABBFromCenter(worldX, worldY, radius, radius)) {
-        if (isBlockInsideRadius(worldX, worldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
-          locs.add(compact)
+      if (radius <= 1.0) {
+        val coord = compactLoc(worldX.worldToBlock(), worldY.worldToBlock())
+        return LongOpenHashSet(1).apply { add(coord) }
+      } else {
+        val loadFactor = .85f
+        val expected = (radius * radius * Math.PI).toInt()
+        val locs = LongOpenHashSet(expected, loadFactor)
+        val centerWorldX = worldX.toDouble() + HALF_BLOCK_SIZE_D
+        val centerWorldY = worldY.toDouble() + HALF_BLOCK_SIZE_D
+        for (compact in getLocationsAABBFromCenter(centerWorldX, centerWorldY, radius, radius)) {
+          if (isBlockInsideRadius(centerWorldX, centerWorldY, compact.decompactLocX(), compact.decompactLocY(), radius)) {
+            locs.add(compact)
+          }
         }
+        return locs
       }
-//      logger.trace {
-//        val arraySizeEst = arraySize(expected, loadFactor)
-//        val arraySizeAct = arraySize(locs.size, loadFactor)
-//        val maxFillEst = maxFill(arraySizeEst, loadFactor)
-//        val maxFillAct = maxFill(arraySizeAct, loadFactor)
-//        "radius: $radius, estimated: $expected (initial size $arraySizeEst, maxFill $maxFillEst), actual ${locs.size} (initial size $arraySizeAct, maxFill $maxFillAct)"
-//      }
-      return locs
     }
   }
 }
