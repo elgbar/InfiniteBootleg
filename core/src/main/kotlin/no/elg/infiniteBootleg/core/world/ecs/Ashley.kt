@@ -24,7 +24,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
@@ -110,7 +110,7 @@ val localPlayerFamily: Family = allOf(
   GroundedComponent::class,
   LocallyControlledComponent::class,
   FollowedByCameraTag::class,
-  TextureRegionComponent::class,
+  TextureRegionNameComponent::class,
   InputEventQueueComponent::class,
   PhysicsEventQueueComponent::class
 ).buildAlive()
@@ -118,7 +118,7 @@ val localPlayerFamily: Family = allOf(
 val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).buildAlive()
 val basicRequiredEntityFamilyToSendToClient: Family = allOf(*REQUIRED_COMPONENTS).buildAlive(AuthoritativeOnlyTag::class)
 val basicStandaloneEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY).buildAlive()
-val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionComponent::class).buildAlive()
+val drawableEntitiesFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, TextureRegionNameComponent::class).buildAlive()
 val selectedMaterialComponentFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, *INVENTORY_COMPONENTS).buildAlive()
 val basicDynamicEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY).buildAlive()
 
@@ -130,7 +130,7 @@ val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, Physi
 
 val staleEntityFamily: Family = allOf(ToBeDestroyedTag::class).get()
 
-val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionComponent::class, SpellStateComponent::class).buildAlive()
+val spellEntityFamily: Family = allOf(*DYNAMIC_STANDALONE_ENTITY, TextureRegionNameComponent::class, SpellStateComponent::class).buildAlive()
 val namedEntitiesFamily: Family = allOf(*REQUIRED_COMPONENTS, NameComponent::class).buildAlive()
 
 // ////////////////////////////////////

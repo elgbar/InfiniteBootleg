@@ -5,14 +5,14 @@ import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.world.box2d.ObjectContactTracker
 import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.DoorComponent.Companion.doorComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponentOrNull
+import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent.Companion.textureRegionNameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem.getOtherFixtureUserData
 
 object DoorService {
 
-  private fun updateTexture(doorComponent: DoorComponent, textureComponent: TextureRegionComponent) {
+  private fun updateTexture(doorComponent: DoorComponent, textureComponent: TextureRegionNameComponent) {
     if (doorComponent.closed) {
       textureComponent.textureName = InfAssets.Companion.DOOR_CLOSED_TEXTURE
     } else {
@@ -21,7 +21,7 @@ object DoorService {
   }
 
   private fun handleDoorContactEvent(entity: Entity, event: PhysicsEvent, handle: ObjectContactTracker<Entity>.(otherEntity: Entity) -> Unit) {
-    val textureComponent = entity.textureRegionComponentOrNull ?: return
+    val textureComponent = entity.textureRegionNameComponentOrNull ?: return
     val doorComponent = entity.doorComponentOrNull ?: return
 
     val otherEntity = event.getOtherFixtureUserData<Entity>(entity) { it === entity } ?: return

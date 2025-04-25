@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.client.main.ClientMain
+import no.elg.infiniteBootleg.client.world.ecs.components.transients.TextureComponent.Companion.textureRegion
 import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
@@ -30,7 +31,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Compa
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent.Companion.textureRegionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent.Companion.tintedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.EFFECTIVE_ZERO
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrNull
@@ -77,7 +77,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         ClientMain.inst().assets.playerTexture
       }
     } else {
-      ClientMain.inst().assets.findTexture(textureRegionComponent.textureName)
+      this.textureRegion
     }
     val texture: TextureRegion = rotatableTextureRegion.textureRegion
     val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))

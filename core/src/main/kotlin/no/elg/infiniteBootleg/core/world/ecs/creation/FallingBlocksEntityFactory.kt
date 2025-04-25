@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.core.world.TexturedContainerElement
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.AuthoritativeOnlyTag.Companion.authoritativeOnly
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag.Companion.gravityAffected
@@ -52,7 +52,7 @@ fun Engine.createFallingBlockStandaloneEntity(
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
     if (material is TexturedContainerElement) {
-      safeWith { TextureRegionComponent(material.textureName) }
+      safeWith { TextureRegionNameComponent(material.textureName) }
     }
 
     // This entity will handle input events

@@ -9,7 +9,7 @@ import no.elg.infiniteBootleg.core.util.futureEntity
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent
@@ -33,7 +33,7 @@ fun Engine.createSpellEntity(
 
     // BASIC_DYNAMIC_ENTITY_ARRAY
     safeWith { VelocityComponent(dx, dy) }
-    safeWith { TextureRegionComponent(InfAssets.Companion.SPELL_TEXTURE) }
+    safeWith { TextureRegionNameComponent(InfAssets.Companion.SPELL_TEXTURE) }
     safeWith { TintedComponent(Color.RED) }
     this.entity.isTransientEntity = true
 

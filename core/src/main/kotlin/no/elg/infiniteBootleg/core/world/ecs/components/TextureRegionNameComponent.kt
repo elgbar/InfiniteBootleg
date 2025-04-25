@@ -12,24 +12,24 @@ import no.elg.infiniteBootleg.protobuf.EntityKt
 import no.elg.infiniteBootleg.protobuf.EntityKt.texture
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 
-data class TextureRegionComponent(var textureName: String) :
+data class TextureRegionNameComponent(var textureName: String) :
   EntitySavableComponent,
   ClientComponent {
 
   override fun hudDebug(): String = "texture $textureName"
 
-  companion object : EntityLoadableMapper<TextureRegionComponent>() {
-    var Entity.textureRegionComponent by propertyFor(mapper)
-    var Entity.textureRegionComponentOrNull by optionalPropertyFor(mapper)
+  companion object : EntityLoadableMapper<TextureRegionNameComponent>() {
+    var Entity.textureRegionNameComponent by propertyFor(mapper)
+    var Entity.textureRegionNameComponentOrNull by optionalPropertyFor(mapper)
 
     override fun ProtoWorld.Entity.checkShouldLoad(): Boolean = hasTexture()
 
-    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionComponent? = safeWith { TextureRegionComponent(protoEntity.texture.texture) }
+    override fun EngineEntity.loadInternal(protoEntity: ProtoWorld.Entity): TextureRegionNameComponent? = safeWith { TextureRegionNameComponent(protoEntity.texture.texture) }
   }
 
   override fun EntityKt.Dsl.save() {
     texture = texture {
-      texture = this@TextureRegionComponent.textureName
+      texture = this@TextureRegionNameComponent.textureName
     }
   }
 }
