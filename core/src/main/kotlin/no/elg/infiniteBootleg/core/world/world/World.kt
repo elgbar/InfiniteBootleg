@@ -1272,9 +1272,8 @@ abstract class World(
         val coord = compactLoc(worldX.worldToBlock(), worldY.worldToBlock())
         return LongOpenHashSet(1).apply { add(coord) }
       } else {
-        val loadFactor = .85f
         val expected = (radius * radius * Math.PI).toInt()
-        val locs = LongOpenHashSet(expected, loadFactor)
+        val locs = LongOpenHashSet(expected)
         val centerWorldX = worldX.toDouble() + HALF_BLOCK_SIZE_D
         val centerWorldY = worldY.toDouble() + HALF_BLOCK_SIZE_D
         for (compact in getLocationsAABBFromCenter(centerWorldX, centerWorldY, radius, radius)) {
