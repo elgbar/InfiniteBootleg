@@ -134,21 +134,22 @@ fun EngineEntity.createFallingBlockBodyComponent(
   onReady: (Entity) -> Unit = {}
 ) {
   createBody2DBodyComponent(
-    ProtoWorld.Entity.Box2D.BodyType.FALLING_BLOCK,
-    entity,
-    world,
-    worldX,
-    worldY,
-    dx,
-    dy,
-    1f,
-    1f,
-    arrayOf(
+    serializationType = ProtoWorld.Entity.Box2D.BodyType.FALLING_BLOCK,
+    entity = entity,
+    world = world,
+    worldX = worldX,
+    worldY = worldY,
+    dx = dx,
+    dy = dy,
+    width = 1f,
+    height = 1f,
+    wantedFamilies = arrayOf(
       basicDynamicEntityFamily to "basicDynamicEntityFamily",
       drawableEntitiesFamily to "drawableEntitiesFamily",
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily",
       standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
-    )
+    ),
+    afterBodyComponentAdded = onReady
   ) {
     val shape = PolygonShape()
     shape.setAsBox(0.45f, 0.45f)
@@ -163,7 +164,6 @@ fun EngineEntity.createFallingBlockBodyComponent(
     fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
     fix.userData = this.userData
     shape.dispose()
-    onReady(entity)
   }
 }
 
