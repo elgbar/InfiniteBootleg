@@ -3,9 +3,6 @@ package no.elg.infiniteBootleg.core.world.ticker
 import com.badlogic.gdx.utils.Array.ArrayIterator
 import ktx.collections.GdxArray
 import no.elg.infiniteBootleg.core.util.IllegalAction
-import kotlin.Exception
-import kotlin.Unit
-import kotlin.synchronized
 
 class PostRunnableHandler : PostRunnable {
 
@@ -18,6 +15,8 @@ class PostRunnableHandler : PostRunnable {
       runnables.add(runnable)
     }
   }
+
+  fun hasRunnables(): Boolean = runnables.size > 0
 
   /**
    * Execute all runnables that have been posted since the last time this method was called.

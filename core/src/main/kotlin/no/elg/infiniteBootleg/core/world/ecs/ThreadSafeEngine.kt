@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
+import com.badlogic.ashley.core.NonPooledComponentOperationHandler
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.ObjectMap
@@ -22,6 +23,22 @@ private val logger = KotlinLogging.logger {}
 class ThreadSafeEngine :
   Engine(),
   Disposable {
+
+  private val declaredField = Engine::class.java.getDeclaredField("updating").also { it.isAccessible = true }
+  val isUpdating: Boolean get() = declaredField.getBoolean(this)
+
+  init {
+
+    val engineClass = Engine::class.java
+    val field = engineClass.getDeclaredField("componentOperationHandler").also { it.isAccessible = true }
+
+    val engineDelayedInformerClass =
+      engineClass.declaredClasses.find { it.name == "com.badlogic.ashley.core.Engine\$EngineDelayedInformer" } ?: error { "Failed to find EngineDelayedInformer class" }
+    val constructor = engineDelayedInformerClass.getDeclaredConstructor(engineClass).apply { isAccessible = true }
+    val engineDelayedInformer: Any = constructor?.newInstance(this) ?: error { "Failed to create EngineDelayedInformer" }
+
+    field.set(this, NonPooledComponentOperationHandler(engineDelayedInformer))
+  }
 
   private val engineLock = Any()
 

@@ -284,7 +284,11 @@ open class CommonCommands : CommandExecutor() {
     val entities = if (searchTerm == "*") {
       world.validEntities.toList()
     } else {
-      world.validEntities.filter { it.components.any { component -> component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true) } }
+      world.validEntities.filter {
+        it.components.any { component ->
+          component != null && component.javaClass.simpleName.removeSuffix("Component").removeSuffix("Tag").equals(searchTerm, true)
+        }
+      }
     }
 
     logger.info { "Found ${entities.size} entities" }
@@ -316,7 +320,7 @@ open class CommonCommands : CommandExecutor() {
   fun inspect(entityId: String, componentName: String) {
     val entity = findEntity(entityId) ?: return
     val searchTerm = componentName.removeSuffix("Component")
-    val component = entity.components.find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
+    val component = entity.components.filterNotNull().find { it::class.simpleName?.removeSuffix("Component")?.removeSuffix("Tag").equals(searchTerm, true) } ?: run {
       logger.error { "No component with name '$componentName' in entity ${entityNameId(entity)}" }
       return
     }
