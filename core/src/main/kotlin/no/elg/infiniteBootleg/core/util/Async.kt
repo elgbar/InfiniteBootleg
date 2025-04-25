@@ -40,8 +40,7 @@ fun launchOnMultithreadedAsync(start: CoroutineStart = CoroutineStart.DEFAULT, b
 fun launchOnWorldTickerSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(WorldTickCoroutineDispatcher, start = start, block = block)
 
-fun launchOnWorldTicker(block: () -> Unit) =
-  Main.Companion.inst().world?.postWorldTickerRunnable(block)
+fun launchOnWorldTicker(block: () -> Unit) = Main.Companion.inst().world?.postWorldTickerRunnable(block)
 
 fun launchOnBox2dSuspendable(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit) =
   KtxAsync.launch(Box2DTickCoroutineDispatcher, start = start, block = block)
