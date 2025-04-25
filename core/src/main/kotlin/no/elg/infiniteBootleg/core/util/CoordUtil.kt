@@ -276,10 +276,10 @@ inline fun stringifyChunkToWorld(chunk: Chunk, localLoc: LocalCompactLoc): Strin
   "(${chunk.chunkX.chunkToWorld(localLoc.decompactLocX())},${chunk.chunkY.chunkToWorld(localLoc.decompactLocY())})"
 
 @Contract(pure = true)
-operator fun Long.component1(): Int = this.decompactLocX()
+inline operator fun Long.component1(): Int = this.decompactLocX()
 
 @Contract(pure = true)
-operator fun Long.component2(): Int = this.decompactLocY()
+inline operator fun Long.component2(): Int = this.decompactLocY()
 
 @Contract(pure = true)
 inline fun isBlockInsideRadius(
@@ -309,7 +309,10 @@ fun isBlockInsideRadius(
 ): Boolean = distCubed(worldX, worldY, targetBlockX + HALF_BLOCK_SIZE_D, targetBlockY + HALF_BLOCK_SIZE_D) < radius * radius
 
 @Contract(pure = true)
-inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long = compactLoc(x + dir.dx, y + dir.dy)
+inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long {
+  val (dx, dy) = dir.compact
+  return compactLoc(x + dx, y + dy)
+}
 
 @Contract(pure = true)
 inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)

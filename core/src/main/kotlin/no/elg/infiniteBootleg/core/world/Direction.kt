@@ -23,6 +23,7 @@ enum class Direction(val dx: Int, val dy: Int) {
 
   val horizontalDirection: HorizontalDirection = HorizontalDirection.of(dx)
   val verticalDirection: VerticalDirection = VerticalDirection.of(dy)
+  val compact: Long = compactLoc(dx, dy)
 
   fun toProtoVector2i(): ProtoWorld.Vector2i =
     vector2i {
