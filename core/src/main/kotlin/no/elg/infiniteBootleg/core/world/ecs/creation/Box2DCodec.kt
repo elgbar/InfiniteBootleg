@@ -243,7 +243,7 @@ internal fun createBody2DBodyComponent(
     it.userData = entity
 
     beforeBodyComponentAdded(it)
-    entity += Box2DBodyComponent(it, serializationType, width, height)
+    entity += Box2DBodyComponent(it, serializationType, width, height, it.isFixedRotation)
     afterBodyComponentAdded(entity)
     if (Settings.debug) {
       check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }

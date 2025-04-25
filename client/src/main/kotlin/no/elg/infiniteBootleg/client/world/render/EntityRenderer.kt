@@ -27,7 +27,6 @@ import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
-import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
@@ -123,7 +122,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     screenX: Float,
     screenY: Float
   ) {
-    if (box2d.body.isFixedRotation) {
+    if (box2d.fixedRotation) {
       batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
     } else {
       batch.draw(
@@ -191,14 +190,14 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         batch.projectionMatrix = worldRender.camera.combined
         FollowEntitySystem.processedPosition
       } else {
-        entity.box2dBody.position
+        entity.position
       }
 
       val texture = entity.currentTexture()
 
       if (renderBox2dEntityDifference) {
         batch.color = ASHLEY_COLOR
-        val position = entity.position
+        val position = box2d.body.position
         val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
         val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
         drawBox2d(batch, box2d, texture, ashleyScreenX, ashleyScreenY)
