@@ -35,7 +35,7 @@ enum class Direction(val dx: Int, val dy: Int) {
 
     val CARDINAL = arrayOf(NORTH, EAST, SOUTH, WEST)
     val NON_CARDINAL = arrayOf(NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST)
-    val NEIGHBORS = arrayOf(NORTH, EAST, SOUTH, WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NORTH_WEST)
+    val NEIGHBORS = arrayOf(NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST)
     private val directionMap = LongMap<Direction>()
 
     init {
@@ -45,12 +45,10 @@ enum class Direction(val dx: Int, val dy: Int) {
     }
 
     inline fun diff(from: Int, to: Int): Int =
-      if (to > from) {
-        -1
-      } else if (to < from) {
-        1
-      } else {
-        ALIGNED
+      when {
+        to > from -> -1
+        to < from -> 1
+        else -> ALIGNED
       }
 
     inline fun getVerticalDirection(fromY: Int, toY: Int): VerticalDirection = VerticalDirection.of(diff(toY, fromY))
@@ -59,29 +57,23 @@ enum class Direction(val dx: Int, val dy: Int) {
     fun direction(fromX: Int, fromY: Int, toX: Int, toY: Int): Direction {
       val diffX = diff(toX, fromX)
       val diffY = diff(toY, fromY)
-      return if (diffX == EASTWARD) {
-        if (diffY == NORTHWARD) {
-          NORTH_EAST
-        } else if (diffY == SOUTHWARD) {
-          SOUTH_EAST
-        } else {
-          EAST
+      return when (diffX) {
+        EASTWARD -> when (diffY) {
+          NORTHWARD -> NORTH_EAST
+          SOUTHWARD -> SOUTH_EAST
+          else -> EAST
         }
-      } else if (diffX == WESTWARD) {
-        if (diffY == NORTHWARD) {
-          NORTH_WEST
-        } else if (diffY == SOUTHWARD) {
-          SOUTH_WEST
-        } else {
-          WEST
+
+        WESTWARD -> when (diffY) {
+          NORTHWARD -> NORTH_WEST
+          SOUTHWARD -> SOUTH_WEST
+          else -> WEST
         }
-      } else {
-        if (diffY == NORTHWARD) {
-          NORTH
-        } else if (diffY == SOUTHWARD) {
-          SOUTH
-        } else {
-          CENTER
+
+        else -> when (diffY) {
+          NORTHWARD -> NORTH
+          SOUTHWARD -> SOUTH
+          else -> CENTER
         }
       }
     }
