@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.Authorita
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.TagComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.name
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ticker.Ticker
@@ -56,10 +57,14 @@ open class CommonCommands : CommandExecutor() {
 
   protected fun findEntity(nameOrId: String): Entity? {
     val world = world ?: return null
-    return world.getEntity(nameOrId) ?: world.namedEntities.find { it.nameOrNull == nameOrId } ?: run {
-      logger.error { "No entity with id or name '$nameOrId'" }
-      return null
-    }
+    return world.getEntity(nameOrId)
+      ?: world.namedEntities.find { it.nameOrNull == nameOrId }
+      ?: world.validEntities.find { it.id.startsWith(nameOrId) }
+      ?: world.namedEntities.find { it.name.startsWith(nameOrId) }
+      ?: run {
+        logger.error { "No entity with id or name '$nameOrId'" }
+        return null
+      }
   }
 
   protected fun entityNameId(entity: Entity) = "${entity.id}${entity.nameOrNull?.let { " ($it)" } ?: ""}"
