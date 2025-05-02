@@ -18,10 +18,9 @@ import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.core.util.compactChunkToWorld
 import no.elg.infiniteBootleg.core.util.isNeighbor
 import no.elg.infiniteBootleg.core.util.isWithinRadius
+import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.queryEntities
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.isBlocksLightFlag
-
-private val logger = KotlinLogging.logger {}
 
 class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
 
@@ -31,26 +30,35 @@ class ChunkListeners(private val chunk: ChunkImpl) : Disposable {
   val chunkLookRange = (chunk.chunkX - 2)..(chunk.chunkX + 2)
   val chunkCompactLocation = chunk.compactLocation
 
+  private fun onBlockChangedUpdateTexture(block: Block) {
+    if (block.chunk != chunk && chunk is TexturedChunk) {
+      // Update the texture of this chunk if a blocks changes either in this chunk or in a neighbor chunk
+      if (chunk.isWithinRadius(block, 1f)) {
+        chunk.queueForRendering(false)
+      }
+    }
+  }
+
+  private fun onBlockChangeAwakeBox2dBodies(block: Block) {
+    if (block.chunk == chunk) {
+      // Awakens players to allow them to jump in a hole when placing a block
+      block.queryEntities {
+        for ((body, _) in it) {
+          body.isAwake = true
+        }
+      }
+    }
+  }
+
   fun registerListeners() {
     require(listeners == null) { "Listeners cannot be registered twice" }
 
     listeners = arrayOf(
       registerListenerConditionally { event: BlockChangedEvent ->
-        // Note: there are two events registered in the same listener
+        // Note: there are multiple events registered in the same listener
         val block = event.oldOrNewBlock ?: return@registerListenerConditionally
-        if (block.chunk === chunk) {
-          // Awakens players to allow them to jump in a hole when placing a block
-          block.queryEntities {
-            for ((body, _) in it) {
-              body.isAwake = true
-            }
-          }
-        } else if (chunk is TexturedChunk) {
-          // Update the texture of this chunk if a blocks changes either in this chunk or in a neighbor chunk
-          if (chunk.isWithinRadius(block, 1f)) {
-            chunk.queueForRendering(false)
-          }
-        }
+        onBlockChangeAwakeBox2dBodies(block)
+        onBlockChangedUpdateTexture(block)
       },
       /*
        * Actually update the light of the chunk based on lights that have been queued by [registerLightChangeForNearbyChunks]
