@@ -28,7 +28,7 @@ interface Main : ApplicationListener {
   val renderThreadName: String
   val startTime: Instant
   val packetSender: PacketSender
-  val chunkFactory: ChunkFactory<out ChunkImpl>
+  val chunkFactory: ChunkFactory<ChunkImpl>
 
   /**
    * If we are allowed to make changes or move a given entity

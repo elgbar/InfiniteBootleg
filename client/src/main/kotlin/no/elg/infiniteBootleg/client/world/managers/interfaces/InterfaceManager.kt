@@ -24,17 +24,17 @@ class InterfaceManager(private val world: ClientWorld) : Disposable {
   private val interfaces: MutableMap<InterfaceId, IBVisWindow> = ConcurrentHashMap()
 
   // Make sure the interface close when block is changed/removed
-  private val containerDestroyedEvent = EventManager.registerListener<BlockChangedEvent> {
-    val block = it.oldOrNewBlock ?: return@registerListener
+  private val containerDestroyedEvent = EventManager.registerListener<BlockChangedEvent> { event ->
+    val block = event.oldOrNewBlock ?: return@registerListener
     if (block.world === world) {
       val interfaceId = ContainerOwner.toInterfaceId(block)
       removeInterface(interfaceId)
     }
   }
 
-  private val containerChunkUnloadedEvent = EventManager.registerListener<ChunkUnloadedEvent> {
-    if (it.chunk.world === world) {
-      it.chunk.asSequence()
+  private val containerChunkUnloadedEvent = EventManager.registerListener<ChunkUnloadedEvent> { event ->
+    if (event.chunk.world === world) {
+      event.chunk.asSequence()
         .mapNotNull { it?.entity?.ownedContainerOrNull }
         .forEach { removeInterface(it.owner.toInterfaceId()) }
     }

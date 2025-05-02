@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
-import no.elg.infiniteBootleg.client.world.render.debug.BlockLightDebugRenderer.Companion.TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.api.render.OverlayRenderer
 import no.elg.infiniteBootleg.core.events.ChunkColumnUpdatedEvent
@@ -20,6 +19,7 @@ import no.elg.infiniteBootleg.core.util.compactLoc
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE_F
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.BLOCKS_LIGHT_FLAG
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.SOLID_FLAG
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag.chunkColumnFeatureFlags
@@ -50,15 +50,15 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) :
   data class FlagSetting(
     val newColor: Color,
     val oldColor: Color,
-    val width: Float = TEXTURE_SIZE,
-    val height: Float = TEXTURE_SIZE,
+    val width: Float = BLOCK_TEXTURE_SIZE_F,
+    val height: Float = BLOCK_TEXTURE_SIZE_F,
     val offsetX: Float = 0f,
     val offsetY: Float = 0f
   )
 
   private val flagSettings = IntMap<FlagSetting>().apply {
-    put(BLOCKS_LIGHT_FLAG, FlagSetting(NEW_LIGHT_COLOR, OLD_LIGHT_COLOR, height = TEXTURE_SIZE / 2f))
-    put(SOLID_FLAG, FlagSetting(NEW_SOLID_COLOR, OLD_SOLID_COLOR, height = TEXTURE_SIZE / 2f, offsetY = TEXTURE_SIZE / 2f))
+    put(BLOCKS_LIGHT_FLAG, FlagSetting(NEW_LIGHT_COLOR, OLD_LIGHT_COLOR, height = BLOCK_TEXTURE_SIZE_F / 2f))
+    put(SOLID_FLAG, FlagSetting(NEW_SOLID_COLOR, OLD_SOLID_COLOR, height = BLOCK_TEXTURE_SIZE_F / 2f, offsetY = BLOCK_TEXTURE_SIZE_F / 2f))
   }
 
   private val listener = EventManager.registerListener { e: ChunkColumnUpdatedEvent ->
@@ -96,8 +96,8 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) :
           shapeRenderer.color.set(color)
           shapeRenderer.color.a = progress
           shapeRenderer.rect(
-            worldX * TEXTURE_SIZE + flagSetting.offsetX,
-            worldY * TEXTURE_SIZE + flagSetting.offsetY,
+            worldX * BLOCK_TEXTURE_SIZE_F + flagSetting.offsetX,
+            worldY * BLOCK_TEXTURE_SIZE_F + flagSetting.offsetY,
             flagSetting.width,
             flagSetting.height
           )

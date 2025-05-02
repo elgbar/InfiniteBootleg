@@ -534,17 +534,19 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
 
   override fun toString(): String = "Chunk{world=${world.name}, chunkX=$chunkX, chunkY=$chunkY, valid=$isValid}"
 
-  override fun compareTo(o: Chunk): Int {
-    val compare = chunkX.compareTo(o.chunkX)
-    return if (compare != 0) compare else chunkY.compareTo(o.chunkY)
+  override fun compareTo(other: Chunk): Int {
+    val compare = chunkX.compareTo(other.chunkX)
+    return if (compare != 0) compare else chunkY.compareTo(other.chunkY)
   }
 
   companion object {
     val AIR_BLOCK_PROTO = Block.Companion.save(Material.Air).build()
     val NOT_CHECKING_DISTANCE = LongArray(0)
 
-    private fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.Companion.CHUNK_SIZE + localY
+    @Contract(pure = true)
+    private inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.Companion.CHUNK_SIZE + localY
 
+    @Contract(pure = true)
     private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.materialOrAir() === Material.Air && blockB.materialOrAir() === Material.Air
   }
 }

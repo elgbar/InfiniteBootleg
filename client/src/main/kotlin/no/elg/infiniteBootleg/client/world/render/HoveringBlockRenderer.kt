@@ -113,8 +113,8 @@ class HoveringBlockRenderer(private val worldRender: ClientWorldRender) : Render
         mouseScreenY - diffFromBlockSizeY,
         0f,
         0f,
-        Block.Companion.BLOCK_TEXTURE_SIZE.toFloat(),
-        Block.Companion.BLOCK_TEXTURE_SIZE.toFloat(),
+        Block.Companion.BLOCK_TEXTURE_SIZE_F,
+        Block.Companion.BLOCK_TEXTURE_SIZE_F,
         1f,
         1f,
         0f

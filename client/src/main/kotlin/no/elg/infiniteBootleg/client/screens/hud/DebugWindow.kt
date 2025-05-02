@@ -70,7 +70,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           "Render an outline around each chunk",
           onAnyElementChanged = onAnyElementChanged,
           booleanGetter = Settings::renderChunkBounds,
-          onToggle = ClientMain.inst().console.exec::debChu
+          onToggle = ClientMain.inst().console.exec::renderChunkBorders
         )
         toggleableDebugButton(
           "Render chunk updates",

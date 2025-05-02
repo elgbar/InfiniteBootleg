@@ -75,8 +75,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
           }
         }
       }
-      val sr = ClientMain.inst().screenRenderer
-      sr.use {
+      ClientMain.inst().screenRenderer.use { sr ->
         sr.drawBottom("Debug Chunk outline legend", 7f)
         sr.font.color = WITHIN_CAMERA_COLOR
         sr.drawBottom("  Loaded chunks within the camera boarders", 5f)
@@ -85,7 +84,6 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
         sr.font.color = OUTSIDE_CAMERA_COLOR
         sr.drawBottom("  Chunks outside camera boarders, only physics active", 1f)
       }
-      sr.resetFontColor()
     }
   }
 

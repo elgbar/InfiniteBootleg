@@ -22,7 +22,7 @@ import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.util.worldToScreen
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE_F
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldX
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 
@@ -63,7 +63,12 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) :
       for ((compactLoc, visualizeUpdate: ProgressHandler?) in newlyUpdatedChunks.entries()) {
         val (worldX, worldY) = compactLoc
         shapeRenderer.color.a = visualizeUpdate?.updateAndGetProgress(Gdx.graphics.deltaTime) ?: continue
-        shapeRenderer.rect(worldX * TEXTURE_SIZE + TEXTURE_SIZE / 2f, worldY * TEXTURE_SIZE + TEXTURE_SIZE / 2f, TEXTURE_SIZE / 4f, TEXTURE_SIZE / 4f)
+        shapeRenderer.rect(
+          worldX * BLOCK_TEXTURE_SIZE_F + BLOCK_TEXTURE_SIZE_F / 2f,
+          worldY * BLOCK_TEXTURE_SIZE_F + BLOCK_TEXTURE_SIZE_F / 2f,
+          BLOCK_TEXTURE_SIZE_F / 4f,
+          BLOCK_TEXTURE_SIZE_F / 4f
+        )
       }
     }
   }
@@ -79,13 +84,13 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) :
     for (luminescentBlock in light.findLuminescentBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = luminescentBlock.worldX.toFloat().worldToScreen()
       val lightY = luminescentBlock.worldY.toFloat().worldToScreen()
-      batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_TEXTURE_SIZE.toFloat(), BLOCK_TEXTURE_SIZE.toFloat())
+      batch.draw(luminanceDebugTexture, lightX, lightY, BLOCK_TEXTURE_SIZE_F, BLOCK_TEXTURE_SIZE_F)
     }
 
     for (skyblock in light.findSkylightBlocks(pointerWorldX, pointerWorldY)) {
       val lightX = skyblock.worldX.toFloat().worldToScreen()
       val lightY = skyblock.worldY.toFloat().worldToScreen()
-      batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_TEXTURE_SIZE.toFloat(), BLOCK_TEXTURE_SIZE.toFloat())
+      batch.draw(skylightDebugTexture, lightX, lightY, BLOCK_TEXTURE_SIZE_F, BLOCK_TEXTURE_SIZE_F)
     }
   }
 
@@ -96,6 +101,5 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) :
 
   companion object {
     val BLOCK_LIGHT_UPDATE_COLOR: Color = Color.PURPLE
-    const val TEXTURE_SIZE = BLOCK_TEXTURE_SIZE.toFloat()
   }
 }

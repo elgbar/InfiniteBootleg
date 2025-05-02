@@ -39,14 +39,13 @@ class HUDRenderer :
       return
     }
     val main = ClientMain.inst()
-    val world = main.world
-    val sr = ClientMain.inst().screenRenderer
+    val world = main.world ?: return
     reset()
-    sr.use {
+    ClientMain.inst().screenRenderer.use { sr ->
       if (hasMode(DISPLAY_MINIMAL_DEBUG or DISPLAY_DEBUG)) {
         fpsString(builder, world)
       }
-      if (hasMode(DISPLAY_DEBUG) && world != null) {
+      if (hasMode(DISPLAY_DEBUG)) {
         val mouseBlockX = main.mouseLocator.mouseBlockX
         val mouseBlockY = main.mouseLocator.mouseBlockY
         val controlled = world.controlledPlayerEntities
@@ -70,10 +69,10 @@ class HUDRenderer :
       if (builder.isNotEmpty()) {
         sr.drawTop(builder.toString(), 1f)
       }
-      if (hasMode(DISPLAY_CURRENT_BLOCK) && world != null) {
+      if (hasMode(DISPLAY_CURRENT_BLOCK)) {
         HeldBlockRenderer.render(sr, world)
       }
-      if (hasMode(DISPLAY_CONTAINER_CHANGE) && world != null) {
+      if (hasMode(DISPLAY_CONTAINER_CHANGE)) {
         containerChangeRenderer.render()
       }
       if (hasMode(DISPLAY_GRAPH_FPS)) {

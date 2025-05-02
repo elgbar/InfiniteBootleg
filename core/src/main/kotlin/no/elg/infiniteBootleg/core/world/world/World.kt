@@ -234,9 +234,7 @@ abstract class World(
   val standaloneEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicStandaloneEntityFamily)
   val validEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(basicRequiredEntityFamily)
   val validEntitiesToSendToClient: ImmutableArray<Entity>
-    get() = engine.getEntitiesFor(
-      basicRequiredEntityFamilyToSendToClient
-    )
+    get() = engine.getEntitiesFor(basicRequiredEntityFamilyToSendToClient)
   val namedEntities: ImmutableArray<Entity> get() = engine.getEntitiesFor(namedEntitiesFamily)
 
   init {

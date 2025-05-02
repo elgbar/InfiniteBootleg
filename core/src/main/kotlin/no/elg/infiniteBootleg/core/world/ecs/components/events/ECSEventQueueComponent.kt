@@ -65,8 +65,6 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
 
     val entitiesCache = Object2ObjectOpenHashMap<KClass<out ECSEventQueueComponent<out ECSEvent>>, ImmutableArray<Entity>>()
 
-    val loggerrr = KotlinLogging.logger {}
-
     inline fun <T : ECSEvent, reified Q : ECSEventQueueComponent<T>> Engine.queueEventAsync(
       queueMapper: ComponentMapper<out Q>,
       event: T,

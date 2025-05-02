@@ -149,7 +149,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
 
   override fun update() {
     camera.update()
-    box2dDebugM4.set(camera.combined).scl(Block.Companion.BLOCK_TEXTURE_SIZE.toFloat())
+    box2dDebugM4.set(camera.combined).scl(Block.Companion.BLOCK_TEXTURE_SIZE_F)
     val width = camera.viewportWidth * camera.zoom
     val height = camera.viewportHeight * camera.zoom
     val w = width * abs(camera.up.y) + height * abs(camera.up.x)

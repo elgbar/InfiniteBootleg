@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.core.util.closestBlockTo
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE
+import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.BLOCK_TEXTURE_SIZE_F
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.getChunkOrNull
 
 class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRender) :
@@ -37,15 +37,16 @@ class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRende
       val closestBlockToChunk = playerChunk.closestBlockTo(blockAt)
       val (worldX, worldY) = playerChunk.compactLocation.chunkToWorld(closestBlockToChunk)
 
-      shapeRenderer.rect(worldX * TEXTURE_SIZE + TEXTURE_SIZE / 4f, worldY * TEXTURE_SIZE + TEXTURE_SIZE / 4f, TEXTURE_SIZE / 2f, TEXTURE_SIZE / 2f)
+      shapeRenderer.rect(
+        worldX * BLOCK_TEXTURE_SIZE_F + BLOCK_TEXTURE_SIZE_F / 4f,
+        worldY * BLOCK_TEXTURE_SIZE_F + BLOCK_TEXTURE_SIZE_F / 4f,
+        BLOCK_TEXTURE_SIZE_F / 2f,
+        BLOCK_TEXTURE_SIZE_F / 2f
+      )
     }
   }
 
   override fun dispose() {
     shapeRenderer.dispose()
-  }
-
-  companion object {
-    const val TEXTURE_SIZE = BLOCK_TEXTURE_SIZE.toFloat()
   }
 }

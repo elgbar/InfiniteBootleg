@@ -36,7 +36,7 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
   final override lateinit var renderThreadName: String
     private set
 
-  override val chunkFactory: ChunkFactory<out ChunkImpl> = ChunkImplFactory()
+  override val chunkFactory: ChunkFactory<ChunkImpl> = ChunkImplFactory()
 
   init {
     instField = this
