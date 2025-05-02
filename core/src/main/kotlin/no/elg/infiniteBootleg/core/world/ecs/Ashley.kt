@@ -145,28 +145,33 @@ const val UPDATE_PRIORITY_DEFAULT = 0
 const val UPDATE_PRIORITY_LATE = 1_000
 const val UPDATE_PRIORITY_LAST = 2_000
 
-private val knownIds = ObjectOpenHashSet<String>()
-
 fun ensureUniquenessListener(engine: Engine) {
-  val idFamily = IdComponent::class.toFamily()
-  engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { newlyAddedEntity ->
-    val newId = newlyAddedEntity.id
-    if (Settings.enableUniquenessEntityIdCheck && newId in knownIds) {
-      logger.warn {
-        val componentsString = newlyAddedEntity.toComponentsString()
-        "Duplicate entity with id '$newId' removed: Components $componentsString"
+  if (Settings.enableUniquenessEntityIdCheck) {
+    val knownIds = ObjectOpenHashSet<String>()
+    val idFamily = IdComponent::class.toFamily()
+
+    engine.onEntityAdded(idFamily, UPDATE_PRIORITY_ID_CHECK) { newlyAddedEntity ->
+      val newId = newlyAddedEntity.id
+      if (newId in knownIds) {
+        logger.warn {
+          val componentsString = newlyAddedEntity.toComponentsString()
+          "Duplicate entity with id '$newId' removed: Components $componentsString"
       }
       newlyAddedEntity.removeSelf()
     } else {
-      knownIds += newId
+        knownIds += newId
+      }
+    }
+
+    engine.onEntityRemoved(idFamily, UPDATE_PRIORITY_ID_CHECK) { entity ->
+      knownIds -= entity.id
     }
   }
 }
 
-fun disposeEntitiesOnRemoval(engine: Engine) {
+fun disposeBox2dOnRemoval(engine: Engine) {
   val family = Box2DBodyComponent::class.toFamily()
   engine.onEntityRemoved(family, UPDATE_PRIORITY_ID_CHECK) { entity ->
-    knownIds -= entity.id
     entity.box2d.dispose()
   }
 }

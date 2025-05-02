@@ -87,7 +87,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Com
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
-import no.elg.infiniteBootleg.core.world.ecs.disposeEntitiesOnRemoval
+import no.elg.infiniteBootleg.core.world.ecs.disposeBox2dOnRemoval
 import no.elg.infiniteBootleg.core.world.ecs.ensureUniquenessListener
 import no.elg.infiniteBootleg.core.world.ecs.localPlayerFamily
 import no.elg.infiniteBootleg.core.world.ecs.namedEntitiesFamily
@@ -269,7 +269,7 @@ abstract class World(
   private fun initializeEngine(): ThreadSafeEngine {
     val engine = ThreadSafeEngine()
     ensureUniquenessListener(engine)
-    disposeEntitiesOnRemoval(engine)
+    disposeBox2dOnRemoval(engine)
     addEntityListeners(engine)
     return engine
   }
