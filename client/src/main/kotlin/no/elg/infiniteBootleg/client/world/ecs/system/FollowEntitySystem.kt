@@ -9,7 +9,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.client.world.render.ClientWorldRender
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_DEFAULT
+import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_EARLY
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.positionComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
@@ -21,7 +21,7 @@ import kotlin.math.abs
 
 private val logger = KotlinLogging.logger {}
 
-object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_DEFAULT) {
+object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORITY_EARLY) {
 
   private const val CAMERA_LERP = 10f
   private const val LERP_CUTOFF = 5f

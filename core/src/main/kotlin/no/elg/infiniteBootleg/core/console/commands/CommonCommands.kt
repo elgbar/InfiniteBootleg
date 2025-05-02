@@ -368,4 +368,14 @@ open class CommonCommands : CommandExecutor() {
     EventStatistics.clear()
     logger.info { "Cleared event stats by command" }
   }
+
+  @ConsoleDoc(description = "List ecs systems in the iteration order")
+  fun systemOrder() {
+    val world = world ?: return
+    val systems = world.engine.systems
+    logger.info { "Systems in iteration order:" }
+    for (system in systems) {
+      logger.info { system::class.simpleName + " (${system.priority})" }
+    }
+  }
 }
