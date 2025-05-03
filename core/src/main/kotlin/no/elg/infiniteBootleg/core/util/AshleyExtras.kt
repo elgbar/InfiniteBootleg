@@ -59,7 +59,7 @@ fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY:
       }
     }
 
-fun Entity.toComponentsString() = "${components.mapNotNull { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}"
+fun Entity.toComponentsString() = "${components.filterNotNull().map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}"
 
 val Entity.isBeingRemoved: Boolean get() = isRemoving || isScheduledForRemoval
 

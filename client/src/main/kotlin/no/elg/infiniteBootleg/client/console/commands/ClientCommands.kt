@@ -3,6 +3,7 @@ package no.elg.infiniteBootleg.client.console.commands
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.strongjoshua.console.annotation.ConsoleDoc
+import com.strongjoshua.console.annotation.HiddenCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -64,6 +65,9 @@ class ClientCommands : CommonCommands() {
       logger.error { "Failed to find the current client world" }
       null
     }
+
+  @HiddenCommand
+  fun ga() = giveAll()
 
   @CmdArgNames("quantity")
   @ConsoleDoc(description = "Give one of each element to player", paramDescriptions = ["Quantity to give, default 100"])
@@ -256,7 +260,7 @@ class ClientCommands : CommonCommands() {
   }
 
   @ConsoleDoc(description = "Toggles debug rendering of chunk bounds")
-  fun debChu() {
+  fun renderChunkBorders() {
     Settings.renderChunkBounds = !Settings.renderChunkBounds
     logger.info { "Debug rendering of chunks is now ${Settings.renderChunkBounds.toAbled()}" }
   }

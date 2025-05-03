@@ -281,7 +281,7 @@ abstract class World(
     engine.addSystem(PhysicsSystem)
     engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)
-    engine.addSystem(FallingBlockSystem)
+    engine.addSystem(FallingBlockSystem())
     engine.addSystem(ExplosiveBlockSystem)
     engine.addSystem(LeavesDecaySystem)
     engine.addSystem(NoGravityInUnloadedChunksSystem)
@@ -746,6 +746,24 @@ abstract class World(
       val material = chunk.getRawBlock(localX, localY).materialOrAir()
       material.isCollidable && !isAnyEntityAt(worldX, worldY)
     }
+
+  fun <R> actionOnChunk(
+    maybeChunk: Chunk,
+    worldX: WorldCoord,
+    worldY: WorldCoord,
+    loadChunk: Boolean = true,
+    action: (actionChunk: Chunk?) -> R
+  ): R {
+    val chunkX: ChunkCoord = worldX.worldToChunk()
+    val chunkY: ChunkCoord = worldY.worldToChunk()
+    val chunk: Chunk? = if (maybeChunk.isValid && compactLoc(chunkX, chunkY) == maybeChunk.compactLocation) {
+      maybeChunk
+    } else {
+      getChunk(chunkX, chunkY, loadChunk)
+    }
+
+    return action(chunk)
+  }
 
   inline fun <R> actionOnBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean = true, action: (localX: LocalCoord, localY: LocalCoord, chunk: Chunk?) -> R): R {
     val chunkX: ChunkCoord = worldX.worldToChunk()

@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.world.chunks
 
 import com.badlogic.gdx.utils.Disposable
-import io.github.oshai.kotlinlogging.KotlinLogging
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.events.BlockChangedEvent

@@ -78,6 +78,8 @@ object Settings {
 
   /**
    * Make sure entities have unique uuid when added to the engine
+   *
+   * Not changeable after the engine is created
    */
   var enableUniquenessEntityIdCheck = true
 

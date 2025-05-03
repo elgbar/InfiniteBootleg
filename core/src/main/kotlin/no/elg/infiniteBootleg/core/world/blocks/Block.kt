@@ -64,11 +64,11 @@ interface Block :
     const val BLOCK_TEXTURE_SIZE_F = BLOCK_TEXTURE_SIZE.toFloat()
     const val HALF_BLOCK_TEXTURE_SIZE_F = BLOCK_TEXTURE_SIZE_F * 0.5f
 
-    val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
-    val Block.worldX: WorldCoord get() = chunk.chunkX.chunkToWorld(localX)
-    val Block.worldY: WorldCoord get() = chunk.chunkY.chunkToWorld(localY)
-    val Block.chunkX: WorldCoord get() = chunk.chunkX
-    val Block.chunkY: WorldCoord get() = chunk.chunkY
+    inline val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
+    inline val Block.worldX: WorldCoord get() = chunk.chunkX.chunkToWorld(localX)
+    inline val Block.worldY: WorldCoord get() = chunk.chunkY.chunkToWorld(localY)
+    inline val Block.chunkX: WorldCoord get() = chunk.chunkX
+    inline val Block.chunkY: WorldCoord get() = chunk.chunkY
 
     /**
      * Get the chunk of this block or the current valid chunk, which might be different from the chunk of this block or null if there is no longer a valid chunk for this block
@@ -122,6 +122,25 @@ interface Block :
         world.getRawBlock(newWorldX, newWorldY, load)
       }
     }
+
+    fun Block.forEachNeighbor(load: Boolean = true, func: (Block) -> Unit) {
+      for (dir in Direction.NEIGHBORS) {
+        val block = getRawRelative(dir, load)
+        if (block != null) {
+          func(block)
+        }
+      }
+    }
+
+    fun Block.sequenceOfNeighbors(load: Boolean = true): Sequence<Block> =
+      sequence {
+        for (dir in Direction.NEIGHBORS) {
+          val block = getRawRelative(dir, load)
+          if (block != null) {
+            yield(block)
+          }
+        }
+      }
 
     fun Block?.materialOrAir(): Material = this?.material ?: Material.Air
 

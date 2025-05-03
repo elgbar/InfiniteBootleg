@@ -82,6 +82,8 @@ fun Int.stringSize(): Int {
   return 10 + d
 }
 
+inline fun Block?.isMaterial(material: Material): Boolean = this?.material == material
+
 inline fun Block?.isAir(markerIsAir: Boolean = true): Boolean {
   contract { returns(false) implies (this@isAir != null) }
   return this == null || (markerIsAir && this.isMarkerBlock()) || this.material == Material.Air
