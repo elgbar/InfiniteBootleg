@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import no.elg.infiniteBootleg.client.main.ClientMain
-import no.elg.infiniteBootleg.client.world.ecs.components.transients.TextureComponent.Companion.textureRegion
+import no.elg.infiniteBootleg.client.world.ecs.components.transients.RotatableTextureRegionComponent.Companion.rotatableTextureRegion
 import no.elg.infiniteBootleg.client.world.ecs.system.FollowEntitySystem
 import no.elg.infiniteBootleg.client.world.textureRegion
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
@@ -76,12 +76,13 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         ClientMain.inst().assets.playerTexture
       }
     } else {
-      this.textureRegion
+      this.rotatableTextureRegion
     }
-    val texture: TextureRegion = rotatableTextureRegion.textureRegion
-    val shouldFlipX = lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && texture.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !texture.isFlipX))
-    texture.flip(shouldFlipX, false)
-    return texture
+    val textureRegion: TextureRegion = rotatableTextureRegion.textureRegion
+    val shouldFlipX =
+      lookDirectionOrNull != null && ((lookDirectionOrNull.direction.dx < 0 && textureRegion.isFlipX) || (lookDirectionOrNull.direction.dx > 0 && !textureRegion.isFlipX))
+    textureRegion.flip(shouldFlipX, false)
+    return textureRegion
   }
 
   private fun setupEntityLight(centerPos: Vector2, box2d: Box2DBodyComponent) {

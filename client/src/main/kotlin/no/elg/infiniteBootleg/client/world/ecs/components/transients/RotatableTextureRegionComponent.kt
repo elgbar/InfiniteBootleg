@@ -9,17 +9,17 @@ import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientCom
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent.Companion.textureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
-data class TextureComponent(val textureRegion: RotatableTextureRegion) : ClientComponent {
+data class RotatableTextureRegionComponent(val rotatableTextureRegion: RotatableTextureRegion) : ClientComponent {
   override fun hudDebug(): String = "TextureComponent"
 
-  companion object : Mapper<TextureComponent>() {
+  companion object : Mapper<RotatableTextureRegionComponent>() {
     var Entity.textureComponent by propertyFor(mapper)
     var Entity.textureComponentOrNull by optionalPropertyFor(mapper)
 
-    val Entity.textureRegion: RotatableTextureRegion
-      get() = textureComponentOrNull?.textureRegion ?: let {
+    val Entity.rotatableTextureRegion: RotatableTextureRegion
+      get() = textureComponentOrNull?.rotatableTextureRegion ?: let {
         val textureRegion = ClientMain.inst().assets.findTexture(textureRegionNameComponent.textureName)
-        textureComponent = TextureComponent(textureRegion)
+        textureComponent = RotatableTextureRegionComponent(textureRegion)
         textureRegion
       }
   }
