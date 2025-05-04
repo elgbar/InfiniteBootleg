@@ -10,7 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.elg.infiniteBootleg.core.api.Ticking
 import no.elg.infiniteBootleg.core.events.api.ThreadType
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
-import no.elg.infiniteBootleg.core.util.EntityFlags.IS_SCHEDULED_FOR_REMOVAL
+import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
 import no.elg.infiniteBootleg.core.util.EntityFlags.enableFlag
 import no.elg.infiniteBootleg.core.util.FailureWatchdog
 import no.elg.infiniteBootleg.core.util.IllegalAction
@@ -77,11 +77,11 @@ open class WorldBody(private val world: World) :
     if (entity.isBeingRemoved) {
       return
     }
+    entity.enableFlag(INVALID_FLAG)
     if (ThreadType.Companion.isCurrentThreadType(ThreadType.PHYSICS)) {
       // OK to remove at once since this is the only thread we can remove entities from
       world.engine.removeEntity(entity)
     } else {
-      entity.enableFlag(IS_SCHEDULED_FOR_REMOVAL)
       postRunnable.postRunnable { world.engine.removeEntity(entity) }
     }
   }
