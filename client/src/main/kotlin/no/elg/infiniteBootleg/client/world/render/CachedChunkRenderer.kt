@@ -9,6 +9,8 @@ import no.elg.infiniteBootleg.client.world.chunks.TexturedChunkImpl
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
+import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE_F
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 
 class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer {
@@ -21,6 +23,16 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
   }
   val chunksToDrawIterator: OrderedMap.OrderedMapEntries<Chunk, Texture> = OrderedMap.OrderedMapEntries(chunksToDraw)
 
+  private var regionHasBeenSetup = false
+  private fun setupRegion() {
+    if (!regionHasBeenSetup) {
+      regionHasBeenSetup = true
+
+      region.setRegion(0, 0, CHUNK_TEXTURE_SIZE, CHUNK_TEXTURE_SIZE)
+      region.flip(false, true)
+    }
+  }
+
   private fun prepareChunks() {
     val chunksInView = worldRender.chunksInView
     chunksToDraw.clear(chunksInView.size)
@@ -30,11 +42,12 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
       val horizontalStart = chunksInView.horizontalStart
       val horizontalEnd = chunksInView.horizontalEnd
       for (chunkX in horizontalStart until horizontalEnd) {
-        val chunk = worldRender.world.getChunk(chunkX, chunkY, false) as? TexturedChunkImpl?
-        if (chunk == null) {
+        val maybeLoadedChunk = worldRender.world.getChunk(chunkX, chunkY, false)
+        if (maybeLoadedChunk == null) {
           launchOnAsync { worldRender.world.loadChunk(chunkX, chunkY) }
           continue
         }
+        val chunk = maybeLoadedChunk as? TexturedChunkImpl ?: error("Chunk is not a TexturedChunkImpl: $maybeLoadedChunk")
         chunk.view()
 
         // No need to update texture when out of view, but in loaded zone
@@ -59,17 +72,12 @@ class CachedChunkRenderer(private val worldRender: ClientWorldRender) : Renderer
     batch.disableBlending()
     chunksToDrawIterator.reset()
     for ((chunk, texture) in chunksToDrawIterator) {
-      if (region.texture == null) {
-        region.setRegion(texture)
-        region.flip(false, true)
-      } else {
-        region.texture = texture
-      }
-      val dx = chunk.chunkX * Chunk.Companion.CHUNK_TEXTURE_SIZE
-      val dy = chunk.chunkY * Chunk.Companion.CHUNK_TEXTURE_SIZE
-      batch.draw(region, dx.toFloat(), dy.toFloat(), Chunk.Companion.CHUNK_TEXTURE_SIZE.toFloat(), Chunk.Companion.CHUNK_TEXTURE_SIZE.toFloat())
+      region.texture = texture
+      setupRegion() // must be called after setting texture
+      val dx = chunk.chunkX * CHUNK_TEXTURE_SIZE_F
+      val dy = chunk.chunkY * CHUNK_TEXTURE_SIZE_F
+      batch.draw(region, dx, dy, CHUNK_TEXTURE_SIZE_F, CHUNK_TEXTURE_SIZE_F)
     }
-    region.texture = null
     batch.enableBlending()
   }
 }
