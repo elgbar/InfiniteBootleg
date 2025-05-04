@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.EntityListener
 import ktx.math.component1
 import ktx.math.component2
 import no.elg.infiniteBootleg.core.Settings
+import no.elg.infiniteBootleg.core.util.EntityFlags.INVALID_FLAG
+import no.elg.infiniteBootleg.core.util.EntityFlags.hasFlag
 import no.elg.infiniteBootleg.core.world.ecs.components.required.PositionComponent.Companion.position
 import no.elg.infiniteBootleg.core.world.ecs.components.required.WorldComponent.Companion.world
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.IgnorePlaceableCheckTag.Companion.ignorePlaceableCheck
@@ -61,6 +63,27 @@ fun Entity.placeableBlocks(world: World, centerBlockX: WorldCoord, centerBlockY:
 
 fun Entity.toComponentsString() = "${components.filterNotNull().map { it.javaClass.simpleName.removeSuffix("Component") }.sorted()}"
 
-val Entity.isBeingRemoved: Boolean get() = isRemoving || isScheduledForRemoval
+val Entity.isBeingRemoved: Boolean get() = isRemoving || isScheduledForRemoval || hasFlag(INVALID_FLAG)
 
 fun Entity.removeSelf(reason: DespawnReason = DespawnReason.UNKNOWN_REASON) = this.world.removeEntity(this, reason)
+
+typealias EntityFlag = Int
+
+object EntityFlags {
+
+  /**
+   * This entity is scheduled for removal, or has been removed.
+   *
+   * Marks the entity as not valid anymore
+   */
+  const val INVALID_FLAG: EntityFlag = Int.MIN_VALUE
+
+  fun Entity.hasFlag(flag: EntityFlag): Boolean = flags and flag != 0
+  fun Entity.enableFlag(flag: EntityFlag) {
+    flags = flags or flag
+  }
+
+  fun Entity.disableFlag(flag: EntityFlag) {
+    flags = flags and flag.inv()
+  }
+}
