@@ -19,7 +19,7 @@ import no.elg.infiniteBootleg.core.world.BOX2D_LOCK
 import no.elg.infiniteBootleg.core.world.box2d.WorldBody.Companion.WORLD_MOVE_OFFSET_THRESHOLD
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.ticker.PostRunnableHandler
-import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker
+import no.elg.infiniteBootleg.core.world.ticker.WorldBox2DTicker.Companion.BOX2D_TIME_STEP
 import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.protobuf.Packets.DespawnEntity.DespawnReason
 import kotlin.math.abs
@@ -140,11 +140,11 @@ open class WorldBody(private val world: World) :
     }
     synchronized(BOX2D_LOCK) {
       box2dWatchdog.watch {
-        box2dWorld.step(WorldBox2DTicker.Companion.BOX2D_TIME_STEP, 10, 10)
+        box2dWorld.step(BOX2D_TIME_STEP, 6, 6)
       }
 
       ashleyWatchdog.watch {
-        world.engine.update(WorldBox2DTicker.Companion.BOX2D_TIME_STEP)
+        world.engine.update(BOX2D_TIME_STEP)
       }
 
       postRunnable.executeRunnables()
