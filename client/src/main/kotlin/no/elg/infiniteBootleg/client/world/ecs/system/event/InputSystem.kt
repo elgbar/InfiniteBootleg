@@ -10,6 +10,7 @@ import no.elg.infiniteBootleg.client.util.breakBlocks
 import no.elg.infiniteBootleg.client.util.inputMouseLocator
 import no.elg.infiniteBootleg.client.util.interpolate
 import no.elg.infiniteBootleg.client.util.isAltPressed
+import no.elg.infiniteBootleg.client.util.jump
 import no.elg.infiniteBootleg.client.util.placeBlocks
 import no.elg.infiniteBootleg.client.util.setVel
 import no.elg.infiniteBootleg.client.world.world.ClientWorld
@@ -17,7 +18,6 @@ import no.elg.infiniteBootleg.core.inventory.container.ContainerOwner
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundUpdateSelectedSlot
 import no.elg.infiniteBootleg.core.util.FLY_VEL
-import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
@@ -45,10 +45,13 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
   InputEventQueueComponent.Companion.mapper
 ) {
 
+  override fun beforeAllHandle() {
+    ClientMain.inst().world?.let(inputMouseLocator::update)
+  }
+
   override fun handleEvent(entity: Entity, event: InputEvent) {
     val entityWorld = entity.world as? ClientWorld ?: return
     val worldEntity = WorldEntity.ClientWorldEntity(entityWorld, entity)
-    inputMouseLocator.update(entityWorld)
     when (event) {
       is InputEvent.KeyDownEvent -> worldEntity.keyDown(event.keycode)
       is InputEvent.TouchDownEvent -> worldEntity.openChest(event.button)
@@ -57,7 +60,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
       is InputEvent.KeyUpEvent -> Unit
       is InputEvent.MouseMovedEvent -> Unit
       is InputEvent.ScrolledEvent -> worldEntity.scrolled(event.amountY)
-      is InputEvent.TouchDraggedEvent -> worldEntity.mouseDragged(event.buttons)
+      is InputEvent.TouchDraggedEvent -> worldEntity.mouseDragged(event.buttons, event.justPressed)
       is InputEvent.TouchUpEvent -> Unit
       is InputEvent.SpellCastEvent -> Unit
     }
@@ -77,11 +80,11 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     }
   }
 
-  private fun WorldEntity.mouseDragged(set: Set<Int>) {
+  private fun WorldEntity.mouseDragged(set: Set<Int>, justPressed: Boolean) {
     val update = if (Input.Buttons.LEFT in set) {
-      interpolate(true, ::breakBlocks)
+      interpolate(justPressed, ::breakBlocks)
     } else if (Input.Buttons.RIGHT in set) {
-      interpolate(true, ::placeBlocks)
+      interpolate(justPressed, ::placeBlocks)
     } else {
       false
     }
@@ -100,7 +103,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
       }
     } else {
       when (keycode) {
-        Input.Keys.W -> if (entity.groundedComponent.onGround) setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
+        Input.Keys.W -> jump()
         Input.Keys.A -> moveHorz(-1f)
         Input.Keys.D -> moveHorz(1f)
       }

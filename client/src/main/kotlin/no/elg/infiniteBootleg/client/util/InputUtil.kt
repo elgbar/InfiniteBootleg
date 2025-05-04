@@ -98,7 +98,7 @@ fun canNotInteract(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean 
   }
 
 fun WorldEntity.jump() {
-  if (entity.groundedComponent.onGround && Gdx.input.isKeyPressed(Input.Keys.W)) {
+  if (entity.groundedComponent.onGround) {
     setVel { oldX, _ -> oldX to JUMP_VERTICAL_VEL }
   }
 }

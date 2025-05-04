@@ -40,7 +40,7 @@ class ECSInputListener(val world: World) :
   override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
     buttonsDownSet += button
     handleEvent(InputEvent.TouchDownEvent(screenX, screenY, pointer, button))
-    return handleEvent(InputEvent.TouchDraggedEvent(screenX, screenY, pointer, buttonsDownSet))
+    return handleEvent(InputEvent.TouchDraggedEvent(screenX, screenY, pointer, buttonsDownSet, justPressed = true))
   }
 
   override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -52,7 +52,9 @@ class ECSInputListener(val world: World) :
   override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean =
     false // handleEvent(InputEvent.TouchCancelledEvent(screenX, screenY, pointer, button))
 
-  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = handleEvent(InputEvent.TouchDraggedEvent(screenX, screenY, pointer, buttonsDownSet))
+  override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean =
+    handleEvent(InputEvent.TouchDraggedEvent(screenX, screenY, pointer, buttonsDownSet, justPressed = false))
+
   override fun mouseMoved(screenX: Int, screenY: Int): Boolean = false // handleEvent(InputEvent.MouseMovedEvent(screenX, screenY))
   override fun scrolled(amountX: Float, amountY: Float): Boolean = handleEvent(InputEvent.ScrolledEvent(amountX, amountY))
 

@@ -26,12 +26,42 @@ abstract class ConditionalIteratingSystem(private val family: Family, priority: 
 
   final override fun update(deltaTime: Float) {
     if (entities.size() == 0) return
-    entities.filter(::condition).forEach { processEntity(it, deltaTime) }
+    val filteredEntities: Sequence<Entity> = entities.asSequence().filter(::condition)
+    if (filteredEntities.none()) return
+    beforeAllHandle()
+    for (entity in filteredEntities) {
+      processEntity(entity, deltaTime)
+    }
+    afterAllHandle()
   }
 
+  /**
+   * Check if the entity should be processed
+   *
+   * @param entity The entity to check
+   * @return true if the entity should be processed, false otherwise
+   */
   abstract fun condition(entity: Entity): Boolean
 
   abstract fun processEntity(entity: Entity, deltaTime: Float)
+
+  /**
+   * Called before processing all entities
+   *
+   * Will not be called if no entities are processed
+   *
+   * @see afterAllHandle
+   */
+  open fun beforeAllHandle(): Unit = Unit
+
+  /**
+   * Called after processing all entities
+   *
+   * Will not be called if no entities are processed
+   *
+   * @see beforeAllHandle
+   */
+  open fun afterAllHandle(): Unit = Unit
 
   companion object {
     private val EMPTY_ENTITIES = ImmutableArray<Entity>(Array.with())
