@@ -56,18 +56,25 @@ object FollowEntitySystem : FamilyEntitySystem(followEntityFamily, UPDATE_PRIORI
       val diffX = x - camera.position.x
       val diffY = y - camera.position.y
       val teleportCam = !Settings.enableCameraFollowLerp || abs(diffX) > Gdx.graphics.width || abs(diffY) > Gdx.graphics.height
-      if (teleportCam) {
-        camera.position.x = x
-        camera.position.y = y
-      } else {
-        val dx = diffX * CAMERA_LERP
-        val dy = diffY * CAMERA_LERP
-        if (abs(dx) > LERP_CUTOFF || abs(dy) > LERP_CUTOFF) {
-          camera.position.x += dx * deltaTime
-          camera.position.y += dy * deltaTime
+      val update =
+        if (teleportCam) {
+          camera.position.x = x
+          camera.position.y = y
+          true
+        } else {
+          val dx = diffX * CAMERA_LERP
+          val dy = diffY * CAMERA_LERP
+          if (abs(dx) > LERP_CUTOFF || abs(dy) > LERP_CUTOFF) {
+            camera.position.x += dx * deltaTime
+            camera.position.y += dy * deltaTime
+            true
+          } else {
+            false
+          }
         }
+      if (update) {
+        worldRender.update()
       }
-      worldRender.update()
     }
   }
 }
