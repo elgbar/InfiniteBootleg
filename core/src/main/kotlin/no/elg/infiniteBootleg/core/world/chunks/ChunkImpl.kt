@@ -27,6 +27,7 @@ import no.elg.infiniteBootleg.core.util.compactLoc
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.dst2
+import no.elg.infiniteBootleg.core.util.isAir
 import no.elg.infiniteBootleg.core.util.isInsideChunk
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.launchOnAsync
@@ -36,7 +37,6 @@ import no.elg.infiniteBootleg.core.util.stringifyChunkToWorld
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.materialOrAir
 import no.elg.infiniteBootleg.core.world.blocks.BlockLight
 import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.ecs.load
@@ -540,13 +540,14 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   }
 
   companion object {
-    val AIR_BLOCK_PROTO = Block.Companion.save(Material.Air).build()
+    val AIR_BLOCK_PROTO: ProtoWorld.Block = Block.Companion.save(Material.Air).build()
     val NOT_CHECKING_DISTANCE = LongArray(0)
 
+    @Suppress("NOTHING_TO_INLINE")
     @Contract(pure = true)
     private inline fun blockMapIndex(localX: LocalCoord, localY: LocalCoord): Int = localX * Chunk.Companion.CHUNK_SIZE + localY
 
     @Contract(pure = true)
-    private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.materialOrAir() === Material.Air && blockB.materialOrAir() === Material.Air
+    private fun areBothAirish(blockA: Block?, blockB: Block?): Boolean = blockA.isAir(markerIsAir = false) && blockB.isAir(markerIsAir = false)
   }
 }

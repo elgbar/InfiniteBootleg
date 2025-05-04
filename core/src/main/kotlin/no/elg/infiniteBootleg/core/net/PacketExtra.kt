@@ -13,9 +13,9 @@ import no.elg.infiniteBootleg.core.util.toProtoEntityRef
 import no.elg.infiniteBootleg.core.util.toVector2i
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.asProto
-import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.ChunkImpl.Companion.AIR_BLOCK_PROTO
 import no.elg.infiniteBootleg.core.world.ecs.components.LookDirectionComponent.Companion.lookDirectionComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.HotbarComponent
@@ -112,7 +112,7 @@ fun ServerClient.serverBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, 
   serverBoundPacketBuilder(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
-      .setBlock(block?.save() ?: PROTO_AIR_BLOCK)
+      .setBlock(block?.save() ?: AIR_BLOCK_PROTO)
   ).build()
 
 fun ServerClient.serverBoundClientSecretResponse(sharedInformation: SharedInformation): Packet =
@@ -183,12 +183,10 @@ fun ServerClient.serverBoundUpdateSelectedSlot(slot: HotbarComponent.Companion.H
 // client bound //
 // ////////////////
 
-private val PROTO_AIR_BLOCK = Block.Companion.save(Material.Air).build()
-
 fun clientBoundBlockUpdate(worldX: WorldCoord, worldY: WorldCoord, block: Block?): Packet =
   clientBoundPacketBuilder(DX_BLOCK_UPDATE).setUpdateBlock(
     UpdateBlock.newBuilder()
-      .setBlock(block?.save() ?: PROTO_AIR_BLOCK)
+      .setBlock(block?.save() ?: AIR_BLOCK_PROTO)
       .setPos(Vector2i.newBuilder().setX(worldX).setY(worldY))
   ).build()
 
