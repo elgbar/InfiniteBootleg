@@ -52,7 +52,7 @@ interface Block :
 
   override val isDisposed: Boolean get() = chunk.getRawBlock(localX, localY) !== this
 
-  override fun hudDebug(): String = "Block $material, pos ${stringifyCompactLoc(this)}"
+  override fun hudDebug(): String = "Block ${material.displayName}, pos ${stringifyCompactLoc(this)}"
 
   companion object {
 
