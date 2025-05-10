@@ -1,6 +1,8 @@
 package no.elg.infiniteBootleg.client.world.render
 
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color.WHITE_FLOAT_BITS
+import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
@@ -128,18 +130,23 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     batch.safeUse(camera.combined) {
       for (renderer in renderers) {
         if (renderer.isInactive) continue
+
         if (!batch.projectionMatrix.values.contentEquals(camera.combined.values)) {
-          @Suppress("GDXKotlinFlushInsideLoop")
           batch.projectionMatrix = camera.combined
         }
-        batch.color = Color.WHITE
-        if (!batch.isDrawing) {
+
+        if (batch.isDrawing) {
+          // Flush to make sure everything is drawn before the next renderer
+          batch.flush()
+        } else {
           batch.begin()
         }
+
+        // reset between renderers
+        batch.packedColor = WHITE_FLOAT_BITS
         Gdx.gl.glEnable(GL30.GL_BLEND)
+
         renderer.render()
-        // Flush to make sure everything is drawn before the next renderer
-        batch.flush()
 
         if (!batch.isDrawing) {
           logger.warn { "Batch is no longer drawing after ${renderer::class}" }
