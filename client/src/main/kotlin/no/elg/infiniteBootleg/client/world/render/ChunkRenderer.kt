@@ -142,24 +142,32 @@ class ChunkRenderer(private val worldRender: WorldRender) :
     }
   }
 
+  private fun isNothingToRender(): Boolean {
+    // fast return if there is nothing to render
+    if (chunkLocToTimeAdded.isEmpty()) {
+      chunksInRenderQueue = 0
+      return true
+    }
+    return false
+  }
+
   fun renderMultiple() {
+    if (isNothingToRender()) {
+      return
+    }
     repeat(Settings.chunksToRenderEachFrame) {
       render()
     }
   }
 
   override fun render() {
-    // fast return if there is nothing to render
-    if (chunkLocToTimeAdded.isEmpty()) {
-      chunksInRenderQueue = 0
+    if (isNothingToRender()) {
       return
     }
     // get the first valid chunk to render
     val chunk: TexturedChunk = synchronized(QUEUE_LOCK) {
       do {
-        if (chunkLocToTimeAdded.isEmpty()) {
-          chunksInRenderQueue = 0
-          // nothing to render
+        if (isNothingToRender()) {
           return
         }
         val candidateChunk = nextChunk() ?: return
@@ -197,6 +205,7 @@ class ChunkRenderer(private val worldRender: WorldRender) :
         curr = candidateChunk
         return@synchronized candidateChunk
       } while (true)
+      @Suppress("KotlinUnreachableCode") // compiler issue
       error("Should never reach here")
     }
     doRenderChunk(chunk)

@@ -49,7 +49,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
 
   private val entities: ImmutableArray<Entity> = worldRender.world.engine.getEntitiesFor(drawableEntitiesFamily)
 
-  private val layout = GlyphLayout()
+  private val nameLayout = GlyphLayout()
   private val lightVector: Vector2 = Vector2()
 
   private val shapeRenderer: ShapeRenderer = ShapeRenderer().also {
@@ -116,13 +116,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
     }
   }
 
-  fun drawBox2d(
-    batch: Batch,
-    box2d: Box2DBodyComponent,
-    texture: TextureRegion,
-    screenX: Float,
-    screenY: Float
-  ) {
+  fun drawBox2d(box2d: Box2DBodyComponent, texture: TextureRegion, screenX: Float, screenY: Float) {
     if (box2d.fixedRotation) {
       batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
     } else {
@@ -162,8 +156,8 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
   fun drawName(entity: Entity, box2d: Box2DBodyComponent, screenX: Float, screenY: Float) {
     entity.nameOrNull?.let { name ->
       val font = ClientMain.inst().assets.font10pt
-      layout.setText(font, name, batch.color, 0f, Align.center, false)
-      font.draw(batch, layout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
+      nameLayout.setText(font, name, batch.color, 0f, Align.center, false)
+      font.draw(batch, nameLayout, screenX + box2d.worldWidth / 2f, screenY + box2d.worldHeight + font.capHeight + font.lineHeight / 2f)
     }
   }
 
@@ -201,7 +195,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
         val position = box2d.body.position
         val ashleyScreenX = (position.x - box2d.halfBox2dWidth).worldToScreen()
         val ashleyScreenY = (position.y - box2d.halfBox2dHeight).worldToScreen()
-        drawBox2d(batch, box2d, texture, ashleyScreenX, ashleyScreenY)
+        drawBox2d(box2d, texture, ashleyScreenX, ashleyScreenY)
         batch.color = Color.WHITE
       }
 
@@ -215,7 +209,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       val screenX = (centerPos.x - box2d.halfBox2dWidth).worldToScreen()
       val screenY = (centerPos.y - box2d.halfBox2dHeight).worldToScreen()
 
-      drawBox2d(batch, box2d, texture, screenX, screenY)
+      drawBox2d(box2d, texture, screenX, screenY)
       drawHolding(entity, entity.selectedElement, screenX, screenY)
       drawName(entity, box2d, screenX, screenY)
       debugEntityLight()
