@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.utils.ImmutableArray
 import io.github.oshai.kotlinlogging.KotlinLogging
-import it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR
+import it.unimi.dsi.fastutil.Hash.DEFAULT_LOAD_FACTOR
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import ktx.ashley.allOf
@@ -25,7 +25,7 @@ abstract class ECSEventQueueComponent<T : ECSEvent> : EntitySavableComponent {
   /**
    * Must only be accessed on the box2d thread!
    */
-  private val events = ObjectOpenHashSet<T>(0, FAST_LOAD_FACTOR)
+  private val events = ObjectOpenHashSet<T>(0, DEFAULT_LOAD_FACTOR)
 
   override fun hudDebug(): String = "Event queue size: ${events.size}"
 

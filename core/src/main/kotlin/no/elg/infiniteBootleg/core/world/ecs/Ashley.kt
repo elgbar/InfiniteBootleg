@@ -38,6 +38,7 @@ import no.elg.infiniteBootleg.core.world.ecs.components.tags.FollowedByCameraTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.GravityAffectedTag
 import no.elg.infiniteBootleg.core.world.ecs.components.tags.LeafDecayTag
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent
+import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ReactToEventTag
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.tags.ToBeDestroyedTag
 import kotlin.reflect.KClass
 
@@ -98,6 +99,7 @@ val blockEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY).buildAlive()
 val doorEntityFamily: Family = allOf(*BASIC_BLOCK_ENTITY, DoorComponent::class).buildAlive()
 
 val gravityAffectedBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class).buildAlive()
+val gravityAffectedBlockFamilyActive: Family = allOf(*BASIC_BLOCK_ENTITY, GravityAffectedTag::class, ReactToEventTag::class).buildAlive()
 val explosiveBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, ExplosiveComponent::class).buildAlive()
 val leafBlockFamily: Family = allOf(*BASIC_BLOCK_ENTITY, LeafDecayTag::class).buildAlive()
 
@@ -156,9 +158,9 @@ fun ensureUniquenessListener(engine: Engine) {
         logger.warn {
           val componentsString = newlyAddedEntity.toComponentsString()
           "Duplicate entity with id '$newId' removed: Components $componentsString"
-      }
-      newlyAddedEntity.removeSelf()
-    } else {
+        }
+        newlyAddedEntity.removeSelf()
+      } else {
         knownIds += newId
       }
     }

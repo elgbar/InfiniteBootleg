@@ -20,7 +20,7 @@ sealed interface PhysicsEvent : ECSEvent {
   /**
    * Material of block changed
    */
-  class BlockRemovedEvent(override val fixtureA: Fixture, val compactLocation: Long) : PhysicsEvent {
+  data class BlockRemovedEvent(override val fixtureA: Fixture, val compactLocation: Long) : PhysicsEvent {
     override val fixtureB: Fixture? = null
   }
 }
