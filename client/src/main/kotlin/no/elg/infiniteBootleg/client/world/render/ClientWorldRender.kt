@@ -83,7 +83,9 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     }
 
   val chunksInView: ClientChunksInView = ClientChunksInView()
-  val batch: SpriteBatch = SpriteBatch()
+  val batch: SpriteBatch = SpriteBatch().also {
+    it.enableBlending()
+  }
   val camera: OrthographicCamera = OrthographicCamera().also {
     it.setToOrtho(false)
     it.zoom = 1f
@@ -134,6 +136,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
         if (!batch.isDrawing) {
           batch.begin()
         }
+        Gdx.gl.glEnable(GL30.GL_BLEND)
         renderer.render()
         if (!batch.isDrawing) {
           logger.warn { "Batch is no longer drawing after ${renderer::class}" }

@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.client.world.render.debug
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
@@ -56,7 +54,6 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
     val yEnd = chunksInView.verticalEnd
     val xEnd = chunksInView.horizontalEnd
 
-    Gdx.gl.glEnable(GL30.GL_BLEND)
     shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
       for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
         for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {

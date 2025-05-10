@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.client.world.render.debug
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
@@ -16,7 +15,7 @@ import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangedEvent
 import no.elg.infiniteBootleg.core.util.ProgressHandler
 import no.elg.infiniteBootleg.core.util.compactLoc
 import no.elg.infiniteBootleg.core.util.safeUse
-import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
 
 class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
   OverlayRenderer,
@@ -37,11 +36,9 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
     val chunksInView = worldRender.chunksInView
     val yEnd = chunksInView.verticalEnd
     val xEnd = chunksInView.horizontalEnd
-    val textureSize = Chunk.CHUNK_TEXTURE_SIZE
 
     if (Settings.renderChunkUpdates) {
       shapeRenderer.color = CHUNK_UPDATE_COLOR
-      Gdx.gl.glEnable(GL30.GL_BLEND)
       shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
         for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
           for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
@@ -52,7 +49,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
               newlyUpdatedChunks.remove(compactLoc)
               continue
             }
-            shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
+            shapeRenderer.rect(x * CHUNK_TEXTURE_SIZE + 0.5f, y * CHUNK_TEXTURE_SIZE + 0.5f, CHUNK_TEXTURE_SIZE - 1f, CHUNK_TEXTURE_SIZE - 1f)
           }
         }
       }
@@ -71,7 +68,7 @@ class DebugChunkRenderer(private val worldRender: ClientWorldRender) :
                 NOT_LOADED_COLOR
               }
             }
-            shapeRenderer.rect(x * textureSize + 0.5f, y * textureSize + 0.5f, textureSize - 1f, textureSize - 1f)
+            shapeRenderer.rect(x * CHUNK_TEXTURE_SIZE + 0.5f, y * CHUNK_TEXTURE_SIZE + 0.5f, CHUNK_TEXTURE_SIZE - 1f, CHUNK_TEXTURE_SIZE - 1f)
           }
         }
       }

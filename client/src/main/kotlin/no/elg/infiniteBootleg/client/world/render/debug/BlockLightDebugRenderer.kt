@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.client.world.render.debug
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
@@ -58,7 +57,6 @@ class BlockLightDebugRenderer(private val worldRender: ClientWorldRender) :
 
   private fun renderLightUpdates() {
     newlyUpdatedChunks.removeAll { (_, it: ProgressHandler?) -> it == null || it.isDone() }
-    Gdx.gl.glEnable(GL30.GL_BLEND)
     shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
       for ((compactLoc, visualizeUpdate: ProgressHandler?) in newlyUpdatedChunks.entries()) {
         val (worldX, worldY) = compactLoc

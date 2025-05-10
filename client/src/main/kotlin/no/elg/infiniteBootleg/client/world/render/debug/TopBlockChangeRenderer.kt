@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.client.world.render.debug
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
@@ -83,7 +82,6 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) :
   }
 
   override fun render() {
-    Gdx.gl.glEnable(GL30.GL_BLEND)
     shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
       for ((progressHandler, index, worldX, worldNewY, worldOldY, flagSetting, diff) in newlyUpdatedChunks.values) {
         val progress = progressHandler.updateAndGetProgress(Gdx.graphics.deltaTime)

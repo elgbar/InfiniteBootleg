@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.client.world.render.debug
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import no.elg.infiniteBootleg.client.main.ClientMain
@@ -29,7 +27,6 @@ class ClosestBlockToChunkDebugRenderer(private val worldRender: ClientWorldRende
     get() = Settings.renderClosestBlockToPlayerChunk
 
   override fun render() {
-    Gdx.gl.glEnable(GL30.GL_BLEND)
     shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
       val playerChunk = worldRender.world.playersEntities.firstOrNull()?.getChunkOrNull() ?: return
       val pointingAtBlock = ClientMain.inst().mouseLocator.mouseBlockCompactLoc

@@ -2,7 +2,6 @@ package no.elg.infiniteBootleg.client.world.render.debug
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Disposable
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
@@ -61,7 +60,6 @@ class LeafDecayDebugRenderer(private val worldRender: ClientWorldRender) :
 
   override fun render() {
     if (srcBlocks.isNotEmpty() || seenBlocks.isNotEmpty()) {
-      Gdx.gl.glEnable(GL30.GL_BLEND)
       shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, worldRender.camera.combined) {
         render(srcBlocks, LEAF_DECAY_CHECK_SRC_COLOR)
         render(seenBlocks, LEAF_DECAY_CHECK_SEEN_COLOR)
