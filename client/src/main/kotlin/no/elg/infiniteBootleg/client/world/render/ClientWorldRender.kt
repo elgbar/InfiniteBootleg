@@ -138,6 +138,9 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
         }
         Gdx.gl.glEnable(GL30.GL_BLEND)
         renderer.render()
+        // Flush to make sure everything is drawn before the next renderer
+        batch.flush()
+
         if (!batch.isDrawing) {
           logger.warn { "Batch is no longer drawing after ${renderer::class}" }
         }
