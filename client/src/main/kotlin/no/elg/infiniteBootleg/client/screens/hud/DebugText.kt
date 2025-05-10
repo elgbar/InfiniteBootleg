@@ -202,8 +202,9 @@ object DebugText {
 
   fun counters(builder: StringBuilder, world: ClientWorld) {
     builder.append("Chunk reads/writes: ").append(world.chunkReads.get()).append(" / ").append(world.chunkWrites.get())
-      .append(" | active listeners: ").append(EventManager.activeListeners.get()).append(", removed ").append(EventManager.unregisteredListeners.get())
-      .append(", weak/1sh: ").append(EventManager.registeredWeakListeners.get()).append(" / ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ")
+      .append(" | active listeners: ").append(EventManager.activeListeners.get())
+      .append(", added/removed ").append(EventManager.registeredListeners.get()).append(" / ").append(EventManager.unregisteredListeners.get())
+      .append(", active 1sh: ").append(EventManager.activeOneTimeRefListeners.get()).append(" | Dispatched events: ")
       .append(EventManager.dispatchedEvents.get()).append(" listened to: ").append(EventManager.listenerListenedToEvent.get())
       .appendLine()
       .append(" > Chunk Rdr Q: ").append(ChunkRenderer.chunksInRenderQueue).append(" | Chunk size avg: ")

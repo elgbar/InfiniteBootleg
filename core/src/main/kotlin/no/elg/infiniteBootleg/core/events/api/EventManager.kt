@@ -28,19 +28,19 @@ object EventManager {
     private set
 
   val activeListeners = AtomicLong(0) // active number of listeners
-  val activeOneTimeRefListeners = AtomicLong(0)
-  val registeredWeakListeners = AtomicLong(0)
+  val activeOneTimeRefListeners = AtomicLong(0) // active number of one time listeners
 
-  val unregisteredListeners = AtomicLong(0)
-  val dispatchedEvents = AtomicLong(0)
-  val listenerListenedToEvent = AtomicLong(0)
+  val registeredListeners = AtomicLong(0) // total number of listeners registered
+  val unregisteredListeners = AtomicLong(0) // total number of listeners unregistered
+  val dispatchedEvents = AtomicLong(0) // total number of events dispatched
+  val listenerListenedToEvent = AtomicLong(0) // total number of times all listeners has listened to events
 
   fun getOrCreateEventsTracker(): EventsTracker = eventsTracker ?: EventsTracker().also { eventsTracker = it }
 
   /**
    * React to events [dispatchEvent]-ed by someone else.
    *
-   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
+   * Note that the listeners are stored as [java.lang.ref.WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
   inline fun <reified T : Event> registerListener(listener: EventListener<T>): RegisteredEventListener = registerListener(T::class, listener)
@@ -48,14 +48,14 @@ object EventManager {
   /**
    * React to events [dispatchEvent]-ed by someone else.
    *
-   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
+   * Note that the listeners are stored as [java.lang.ref.WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
   fun <T : Event> registerListener(eventClass: KClass<T>, listener: EventListener<T>): RegisteredEventListener {
     activeListeners.incrementAndGet()
     val eventListeners: Cache<EventListener<out Event>, Boolean> =
       weakListeners.get(eventClass) { Caffeine.newBuilder().weakKeys().build<EventListener<out Event>, Boolean>() }.also {
-        registeredWeakListeners.incrementAndGet()
+        registeredListeners.incrementAndGet()
       }
 
     eventListeners.put(listener, TRUE)
@@ -66,7 +66,7 @@ object EventManager {
   /**
    * React to events [dispatchEvent]-ed by someone else.
    *
-   * Note that the listeners are stored as [WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
+   * Note that the listeners are stored as [java.lang.ref.WeakReference]s, which mean that they might be garbage-collected if they are not stored as references somewhere.
    * This is to automatically un-register listeners which no longer can react to events.
    */
   inline fun <reified T : Event> registerListener(crossinline filter: (T) -> Boolean, crossinline listener: T.() -> Unit): RegisteredEventListener =
