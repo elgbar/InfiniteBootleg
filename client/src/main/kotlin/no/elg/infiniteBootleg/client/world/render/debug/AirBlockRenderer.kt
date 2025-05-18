@@ -7,7 +7,7 @@ import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
-class AirBlockRenderer(worldRender: ClientWorldRender) : SingleBlockDebugRenderer(worldRender) {
+class AirBlockRenderer(worldRender: ClientWorldRender) : UnitSingleBlockDebugRenderer(worldRender) {
 
   override val isActive: Boolean
     get() = renderAirBlocks

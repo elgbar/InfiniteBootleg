@@ -74,6 +74,8 @@ object Settings {
 
   var renderBox2dEntityDifference = false
 
+  var renderGroundedTouchingBlocks = false
+
   var enableThreadCheck = false
 
   /**

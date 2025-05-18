@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.worldY
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn.Companion.FeatureFlag
 import no.elg.infiniteBootleg.core.world.render.texture.RotatableTextureRegion
 
-class TopBlockChunkColumnRenderer(worldRender: ClientWorldRender) : SingleBlockDebugRenderer(worldRender) {
+class TopBlockChunkColumnRenderer(worldRender: ClientWorldRender) : UnitSingleBlockDebugRenderer(worldRender) {
   val chunkColumnsManager = worldRender.world.chunkColumnsManager
 
   override val alpha: Float = 1f
