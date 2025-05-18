@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
+import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.box2d.LongContactTracker
 import no.elg.infiniteBootleg.core.world.ecs.api.EntityLoadableMapper
@@ -41,6 +42,21 @@ class GroundedComponent :
 
   fun clearContacts() {
     contacts.forEach { it.clear() }
+  }
+
+  operator fun contains(worldPos: WorldCompactLoc): Boolean {
+    for (contact in contacts) {
+      if (worldPos in contact) {
+        return true
+      }
+    }
+    return false
+  }
+
+  fun validate(entityPos: WorldCompactLoc, cutoffRadius: Double) {
+    for (contact in contacts) {
+      contact.validate(entityPos, cutoffRadius)
+    }
   }
 
   override fun hudDebug(): String = "On Ground? $onGround, canMoveLeft? $canMoveLeft, canMoveRight? $canMoveRight"

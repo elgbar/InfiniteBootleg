@@ -26,15 +26,11 @@ object OnGroundService {
     handleBodyEvents(entity, event, LongContactTracker::add)
   }
 
-  fun handleOnGroundContactEndsEvent(entity: Entity, event: PhysicsEvent.ContactEndsEvent) {
-    handleBodyEvents(entity, event, LongContactTracker::remove)
-  }
-
   fun handleOnGroundBlockRemovedEvent(entity: Entity, event: PhysicsEvent.BlockRemovedEvent) {
     val grounded = entity.groundedComponentOrNull ?: return
     val blockWorldLoc = event.compactLocation
     for (contact in grounded.contacts) {
-      contact.removeAll(blockWorldLoc)
+      contact.remove(blockWorldLoc)
     }
   }
 }

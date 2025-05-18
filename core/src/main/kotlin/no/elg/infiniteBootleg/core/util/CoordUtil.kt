@@ -309,6 +309,15 @@ fun isBlockInsideRadius(
 ): Boolean = distCubed(worldX, worldY, targetBlockX + HALF_BLOCK_SIZE_D, targetBlockY + HALF_BLOCK_SIZE_D) < radius * radius
 
 @Contract(pure = true)
+fun isBlockInsideRadius(
+  worldX: WorldCoord,
+  worldY: WorldCoord,
+  targetBlockX: WorldCoord,
+  targetBlockY: WorldCoord,
+  radius: Double
+): Boolean = distCubed(worldX, worldY, targetBlockX, targetBlockY) < radius * radius
+
+@Contract(pure = true)
 inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long {
   val (dx, dy) = dir.compact
   return compactLoc(x + dx, y + dy)

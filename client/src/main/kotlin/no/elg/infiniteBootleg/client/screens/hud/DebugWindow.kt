@@ -223,9 +223,18 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           onAnyElementChanged = onAnyElementChanged,
           property = Settings::renderTopBlocks
         )
-
-        // Room for one more button
+        toggleableDebugButton(
+          "Render grounded touching block",
+          "Render the blocks the player is touching",
+          onAnyElementChanged = onAnyElementChanged,
+          property = Settings::renderGroundedTouchingBlocks
+        )
       }
+
+//      section {
+      // Room for one four buttons
+//      }
+
       sep()
       // Future positions renderers
       section {

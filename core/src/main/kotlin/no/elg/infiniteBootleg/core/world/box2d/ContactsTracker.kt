@@ -1,31 +1,40 @@
 package no.elg.infiniteBootleg.core.world.box2d
 
+import it.unimi.dsi.fastutil.longs.LongArraySet
 import ktx.collections.GdxArray
-import ktx.collections.GdxLongArray
+import no.elg.infiniteBootleg.core.util.WorldCompactLoc
+import no.elg.infiniteBootleg.core.util.WorldCoord
+import no.elg.infiniteBootleg.core.util.component1
+import no.elg.infiniteBootleg.core.util.component2
+import no.elg.infiniteBootleg.core.util.isBlockInsideRadius
 
 class LongContactTracker(private val userData: Any) {
 
   val filter: (userData: Any?) -> Boolean = { it == userData }
-  private val contactFixtures = GdxLongArray(false, 16)
+  private val contactFixtures = LongArraySet()
 
   val size: Int
     get() = contactFixtures.size
   val isEmpty: Boolean
-    get() = contactFixtures.isEmpty
+    get() = contactFixtures.isEmpty()
   val isNotEmpty: Boolean
-    get() = !contactFixtures.isEmpty
+    get() = !contactFixtures.isEmpty()
 
   fun clear() = contactFixtures.clear()
 
-  fun add(value: Long) {
+  fun add(value: WorldCompactLoc) {
     contactFixtures.add(value)
   }
 
-  fun remove(value: Long) = contactFixtures.removeValue(value)
+  fun remove(value: WorldCompactLoc) = contactFixtures.remove(value)
 
-  fun removeAll(value: Long) {
-    while (contactFixtures.removeValue(value)) {
-      // Empty on purpose, removeValue has side effects
+  operator fun contains(value: Long) = contactFixtures.contains(value)
+
+  fun validate(entityPos: WorldCompactLoc, cutoffRadius: Double) {
+    val (x2: WorldCoord, y2: WorldCoord) = entityPos
+    contactFixtures.removeIf { contactPos ->
+      val (x1: WorldCoord, y1: WorldCoord) = contactPos
+      !isBlockInsideRadius(x1, y1, x2, y2, cutoffRadius)
     }
   }
 }
@@ -46,10 +55,4 @@ class ObjectContactTracker<T : Any> {
   }
 
   fun remove(value: T) = contactFixtures.removeValue(value, true)
-
-  fun removeAll(value: T) {
-    while (contactFixtures.removeValue(value, true)) {
-      // Empty on purpose, removeValue has side effects
-    }
-  }
 }

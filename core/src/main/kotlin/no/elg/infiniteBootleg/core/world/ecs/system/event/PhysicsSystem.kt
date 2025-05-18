@@ -40,7 +40,6 @@ object PhysicsSystem : EventSystem<PhysicsEvent, PhysicsEventQueueComponent>(
       }
 
       is PhysicsEvent.ContactEndsEvent -> {
-        OnGroundService.handleOnGroundContactEndsEvent(entity, event)
         DoorService.handleDoorContactEndsEvent(entity, event)
       }
 
