@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.2.0"
 gdx = "1.13.5"
-gdx-box2d = "3.1.1-0"
+gdx-box2d = "1.13.5"
 ktx = "1.13.1-rc1"
 protobuf = "4.31.1"
 vis = "1.5.5"
