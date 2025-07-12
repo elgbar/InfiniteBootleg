@@ -99,10 +99,20 @@ subprojects {
       extraWarnings.set(false)
       optIn.add("kotlin.contracts.ExperimentalContracts")
       freeCompilerArgs.add("-Xdebug")
-      freeCompilerArgs.add("-Xwhen-guards") // https://github.com/Kotlin/KEEP/blob/guards/proposals/guards.md
-      freeCompilerArgs.add("-Xnon-local-break-continue") // https://github.com/Kotlin/KEEP/blob/guards/proposals/break-continue-in-inline-lambdas.md (beta in 2.1)
       freeCompilerArgs.add("-Xsuppress-warning=UNUSED_VARIABLE") // https://kotlinlang.org/docs/whatsnew21.html#extra-compiler-checks
 //      allWarningsAsErrors = true
+
+      // https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions
+      freeCompilerArgs.add("-jvm-default=no-compatibility")
+
+      // https://kotlinlang.org/docs/whatsnew22.html#preview-of-context-sensitive-resolution (experimental in 2.2)
+      freeCompilerArgs.add("-Xcontext-sensitive-resolution")
+      // https://kotlinlang.org/docs/whatsnew22.html#all-meta-target-for-properties (experimental in 2.2)
+      freeCompilerArgs.add("-Xannotation-target-all")
+      // https://kotlinlang.org/docs/whatsnew22.html#support-for-nested-type-aliases (beta in 2.2)
+      freeCompilerArgs.add("-Xnested-type-aliases")
+      // https://kotlinlang.org/docs/whatsnew22.html#new-defaulting-rules-for-use-site-annotation-targets (experimental in 2.2)
+      freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
   }
 
