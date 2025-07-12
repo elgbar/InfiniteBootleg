@@ -928,7 +928,7 @@ abstract class World(
   val loadedChunks: GdxArray<Chunk>
     get() {
       return readChunks<GdxArray<Chunk>>({ GdxArray<Chunk>(0) }) { readableChunks ->
-        val loadedChunks = GdxArray<Chunk>(true, readableChunks.size, Chunk::class.java)
+        val loadedChunks = GdxArray<Chunk>(true, readableChunks.size)
         for (chunk in readableChunks.values()) {
           if (chunk != null && chunk.isNotDisposed) {
             loadedChunks.add(chunk)

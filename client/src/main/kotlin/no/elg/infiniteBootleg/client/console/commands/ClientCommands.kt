@@ -27,9 +27,9 @@ import no.elg.infiniteBootleg.core.inventory.container.impl.ContainerImpl
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.net.ServerClient.Companion.sendServerBoundPacket
 import no.elg.infiniteBootleg.core.net.serverBoundClientDisconnectPacket
-import no.elg.infiniteBootleg.core.util.ReflectionUtil
 import no.elg.infiniteBootleg.core.util.asWorldSeed
 import no.elg.infiniteBootleg.core.util.chunkToWorld
+import no.elg.infiniteBootleg.core.util.getStaticField
 import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -157,7 +157,7 @@ class ClientCommands : CommonCommands() {
     val world = world ?: return
     val skylight = world.worldTime.baseColor
     try {
-      val color = ReflectionUtil.getStaticField(Color::class.java, colorName.uppercase(Locale.getDefault())) as Color
+      val color = getStaticField(Color::class.java, colorName.uppercase(Locale.getDefault())) as Color
       skylight.set(color)
       logger.info { "Sky color changed to ${colorName.lowercase()} ($color)" }
     } catch (e: Exception) {

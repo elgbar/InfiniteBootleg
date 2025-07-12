@@ -90,13 +90,13 @@ abstract class GameConsoleHandler :
     if (numArgs == 0) {
       try {
         // Try to execute with default params if no args are given
-        val filter = exec.javaClass.kotlin.memberFunctions.filter {
-          it.name.startsWith(commandPart, ignoreCase = true) &&
+        val validFuncs = exec.javaClass.kotlin.memberFunctions.filter { func ->
+          func.name.startsWith(commandPart, ignoreCase = true) &&
             // Find the function with the same name
-            it.parameters.filter { it.kind == Kind.VALUE }.all { it.isOptional && !it.isVararg } // All parameters must be optional and not vararg
+            func.parameters.filter { param -> param.kind == Kind.VALUE }.all { param -> param.isOptional && !param.isVararg } // All parameters must be optional and not vararg
         }
-        if (filter.size == 1) {
-          val func = filter.first()
+        if (validFuncs.size == 1) {
+          val func = validFuncs.first()
           // Call the function with all default parameters (i.e., they are omitted) and the instance as the first parameter
           func.callBy(mapOf(func.parameters[0] to exec))
         } else {
@@ -104,7 +104,7 @@ abstract class GameConsoleHandler :
         }
         return true
       } catch (e: Exception) {
-        logger.debug(e) { "Error executing function with all default parameters" }
+        logger.debug(e) { "Error executing function with all default parameters. command: " }
       }
     }
     for (argNr in 0 until size) {

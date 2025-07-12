@@ -99,7 +99,9 @@ subprojects {
       extraWarnings.set(false)
       optIn.add("kotlin.contracts.ExperimentalContracts")
       freeCompilerArgs.add("-Xdebug")
-      freeCompilerArgs.add("-Xsuppress-warning=UNUSED_VARIABLE") // https://kotlinlang.org/docs/whatsnew21.html#extra-compiler-checks
+      freeCompilerArgs.add("-Xwarning-level=UNUSED_VARIABLE:disabled")
+      freeCompilerArgs.add("-Xwarning-level=NOTHING_TO_INLINE:disabled")
+      freeCompilerArgs.add("-Xwarning-level=MISSING_DEPENDENCY_SUPERCLASS_IN_TYPE_ARGUMENT:disabled")
 //      allWarningsAsErrors = true
 
       // https://kotlinlang.org/docs/whatsnew22.html#changes-to-default-method-generation-for-interface-functions
