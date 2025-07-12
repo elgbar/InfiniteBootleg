@@ -114,7 +114,9 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
           "UI debug",
           "Toggles debugging for scene 2d",
           onAnyElementChanged = onAnyElementChanged,
-          property = this@addDebugOverlay::isDebugAll
+          // cant use property here, as kotlin no longer support accessing methods named the same as the synthetic property
+          booleanGetter = { this@addDebugOverlay.isDebugAll },
+          onToggle = { this@addDebugOverlay.isDebugAll = !this@addDebugOverlay.isDebugAll }
         )
       }
 
