@@ -112,7 +112,7 @@ abstract class GameConsoleHandler :
       val params: Array<Class<*>> = method.parameterTypes
       if (numArgs == params.size) {
         val args = mutableListOf<Any>()
-        return try {
+        try {
           try {
             for (j in params.indices) {
               val value = commandArgs[j]
