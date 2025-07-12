@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.core.world
 
 import com.badlogic.gdx.utils.LongMap
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.protobuf.ProtoWorld
 import no.elg.infiniteBootleg.protobuf.vector2i
 
@@ -23,7 +23,7 @@ enum class Direction(val dx: Int, val dy: Int) {
 
   val horizontalDirection: HorizontalDirection = HorizontalDirection.of(dx)
   val verticalDirection: VerticalDirection = VerticalDirection.of(dy)
-  val compact: Long = compactLoc(dx, dy)
+  val compact: Long = compactInt(dx, dy)
 
   fun toProtoVector2i(): ProtoWorld.Vector2i =
     vector2i {
@@ -40,7 +40,7 @@ enum class Direction(val dx: Int, val dy: Int) {
 
     init {
       for (dir in entries) {
-        directionMap.put(compactLoc(dir.dx, dir.dy), dir)
+        directionMap.put(compactInt(dir.dx, dir.dy), dir)
       }
     }
 
@@ -78,7 +78,7 @@ enum class Direction(val dx: Int, val dy: Int) {
       }
     }
 
-    fun valueOf(dx: Int, dy: Int): Direction = directionMap[compactLoc(dx, dy)] ?: throw IllegalArgumentException("No direction with dx=$dx and dy=$dy")
+    fun valueOf(dx: Int, dy: Int): Direction = directionMap[compactInt(dx, dy)] ?: throw IllegalArgumentException("No direction with dx=$dx and dy=$dy")
     fun valueOf(vec: ProtoWorld.Vector2i): Direction = valueOf(vec.x, vec.y)
   }
 }

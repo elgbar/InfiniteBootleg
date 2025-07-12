@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.world.world.World
 import no.elg.infiniteBootleg.core.world.world.World.Companion.HALF_BLOCK_SIZE_D
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2i
 import org.jetbrains.annotations.Contract
+import java.lang.Float.intBitsToFloat
 import java.lang.Short.SIZE
 import kotlin.math.abs
 import kotlin.math.floor
@@ -36,7 +37,7 @@ inline fun WorldCoord.worldToChunk(): ChunkCoord = this shr Chunk.Companion.CHUN
 inline fun Number.worldToChunk(): ChunkCoord = toInt().worldToChunk()
 
 @Contract(pure = true)
-inline fun WorldCompactLoc.worldToChunk(): ChunkCompactLoc = compactLoc(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
+inline fun WorldCompactLoc.worldToChunk(): ChunkCompactLoc = compactInt(decompactLocX().worldToChunk(), decompactLocY().worldToChunk())
 
 @Contract(pure = true)
 inline fun WorldCompactLoc.worldToChunkX(): ChunkCoord = decompactLocX().worldToChunk()
@@ -156,7 +157,7 @@ fun Chunk.closestBlockTo(block: Block): LocalCompactLoc {
     VerticalDirection.VERTICALLY_ALIGNED -> block.localY
     VerticalDirection.SOUTHWARD -> 0
   }
-  return compactLoc(localX, localY)
+  return compactInt(localX, localY)
 }
 
 @Contract(pure = true)
@@ -174,7 +175,7 @@ fun Chunk.isWithinRadius(block: Block, radius: Float): Boolean = shortestDistanc
  * @return The chunk location for the given world coordinates
  */
 @Contract(pure = true)
-inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): ChunkCompactLoc = compactLoc(worldX.worldToChunk(), worldY.worldToChunk())
+inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): ChunkCompactLoc = compactInt(worldX.worldToChunk(), worldY.worldToChunk())
 
 /**
  * An int have 32 bits and long 64, we can store two ints inside a long
@@ -184,57 +185,72 @@ inline fun worldXYtoChunkCompactLoc(worldX: WorldCoord, worldY: WorldCoord): Chu
  * @return A long containing both the x and y int
  */
 @Contract(pure = true)
-inline fun compactLoc(x: Int, y: Int): Long = x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
+inline fun compactInt(x: Int, y: Int): Compacted2Int = x.toLong() shl Integer.SIZE or (y.toLong() and 0xffffffffL)
 
 /**
  * An int have 32 bits and long 64, we can store two ints inside a long
+ *
+ * @param x The x coordinate of the location
+ * @param y The y coordinate of the location
+ * @return A long containing both the x and y int
+ */
+@Contract(pure = true)
+inline fun compactFloat(x: Float, y: Float): Compacted2Float = compactInt(x.toRawBits(), y.toRawBits())
+
+/**
+ * An int have 32 bits and long 64, we can store two ints inside a long.
+ *
+ * This is a lossy conversion, as the two longs cannot fit into an int.
  *
  * @param x The x coordinate of the location, acts as a long keep
  * @param y The y coordinate of the location
  * @return A long containing both the x and y int
  */
 @Contract(pure = true)
-inline fun compactLoc(x: Long, y: Long): Long = x shl Integer.SIZE or (y and 0xffffffffL)
+inline fun compactLong(x: Long, y: Long): Compacted2Int = x shl Integer.SIZE or (y and 0xffffffffL)
 
 /**
- * @param this@decompactLocX A long created by [compactLoc]
+ * @param this@decompactLocX A long created by [compactFloat]
  * @return The x coordinate of the compacted location
  */
 
 @Contract(pure = true)
-inline fun Long.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
+inline fun Compacted2Int.decompactLocX(): Int = (this shr Integer.SIZE).toInt()
 
 /**
- * @param this@decompactLocY A long created by [compactLoc]
+ * @param this@decompactLocY A long created by [compactFloat]
  * @return The y coordinate of the compacted location
  */
 
 @Contract(pure = true)
-inline fun Long.decompactLocY(): Int = toInt()
+inline fun Compacted2Int.decompactLocY(): Int = toInt()
 
-@Contract(pure = true)
-inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
+inline fun Compacted2Float.decompactLocXf(): Float = intBitsToFloat(decompactLocX())
+inline fun Compacted2Float.decompactLocYf(): Float = intBitsToFloat(decompactLocY())
+
+// @Contract(pure = true)
+// inline fun compactShort(a: Short, b: Short, c: Short, d: Short): Long = compactLoc(compactShort(a, b), compactShort(c, d))
 
 @Contract(pure = true)
 inline fun compactShort(a: Short, b: Short): Int = a.toInt() shl SIZE or (b.toInt() and 0xffff)
 
 @Contract(pure = true)
 inline fun compactChunkToWorld(chunkPos: ChunkCompactLoc, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
-  compactLoc(chunkPos.decompactLocX().chunkToWorld(localX), chunkPos.decompactLocY().chunkToWorld(localY))
+  compactInt(chunkPos.decompactLocX().chunkToWorld(localX), chunkPos.decompactLocY().chunkToWorld(localY))
 
 @Contract(pure = true)
 inline fun compactChunkToWorld(chunk: Chunk, localX: LocalCoord, localY: LocalCoord): WorldCompactLoc =
-  compactLoc(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
+  compactInt(chunk.chunkX.chunkToWorld(localX), chunk.chunkY.chunkToWorld(localY))
 
 /**
- * @param this@decompactShortA A long created by [compactLoc]
+ * @param this@decompactShortA A long created by [compactFloat]
  * @return The x coordinate of the compacted location
  */
 @Contract(pure = true)
 inline fun Int.decompactShortA(): Short = (this shr SIZE).toShort()
 
 /**
- * @param this@decompactShortB A long created by [compactLoc]
+ * @param this@decompactShortB A long created by [compactFloat]
  * @return The y coordinate of the compacted location
  */
 @Contract(pure = true)
@@ -244,7 +260,7 @@ inline fun Int.decompactShortB(): Short = toShort()
 inline fun stringifyCompactLoc(x: Number, y: Number): String = "($x,$y)"
 
 @Contract(pure = true)
-inline fun stringifyCompactLoc(compactLoc: Long): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
+inline fun stringifyCompactLoc(compactLoc: Compacted2Int): String = stringifyCompactLoc(compactLoc.decompactLocX(), compactLoc.decompactLocY())
 
 @Contract(pure = true)
 inline fun stringifyCompactLoc(posComp: PositionComponent): String = stringifyCompactLoc(posComp.blockX, posComp.blockY)
@@ -276,10 +292,10 @@ inline fun stringifyChunkToWorld(chunk: Chunk, localLoc: LocalCompactLoc): Strin
   "(${chunk.chunkX.chunkToWorld(localLoc.decompactLocX())},${chunk.chunkY.chunkToWorld(localLoc.decompactLocY())})"
 
 @Contract(pure = true)
-inline operator fun Long.component1(): Int = this.decompactLocX()
+inline operator fun Compacted2Int.component1(): Int = this.decompactLocX()
 
 @Contract(pure = true)
-inline operator fun Long.component2(): Int = this.decompactLocY()
+inline operator fun Compacted2Int.component2(): Int = this.decompactLocY()
 
 @Contract(pure = true)
 inline fun isBlockInsideRadius(
@@ -318,22 +334,40 @@ fun isBlockInsideRadius(
 ): Boolean = distCubed(worldX, worldY, targetBlockX, targetBlockY) < radius * radius
 
 @Contract(pure = true)
-inline fun relativeCompact(x: Int, y: Int, dir: Direction): Long {
+inline fun relativeCompact(x: Int, y: Int, dir: Direction): Compacted2Int {
   val (dx, dy) = dir.compact
-  return compactLoc(x + dx, y + dy)
+  return compactInt(x + dx, y + dy)
 }
 
 @Contract(pure = true)
-inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Long = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
+inline fun distCubed(x1: Int, y1: Int, x2: Int, y2: Int): Compacted2Int = (x2 - x1).toLong() * (x2 - x1) + (y2 - y1).toLong() * (y2 - y1)
 
 @Contract(pure = true)
 inline fun distCubed(x1: Double, y1: Double, x2: Double, y2: Double): Double = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 
 typealias Progress = Float
 
-typealias LocalCompactLoc = Long
-typealias WorldCompactLoc = Long
-typealias ChunkCompactLoc = Long
+/**
+ * Indicate two float has been compacted into a long
+ *
+ * Use [decompactLocXf] and [decompactLocYf] to get the original float values
+ */
+typealias Compacted2Float = Long
+
+/**
+ * Indicate two int has been compacted into a long
+ *
+ * Use [decompactLocX] and [decompactLocY] to get the original int values
+ */
+typealias Compacted2Int = Long
+
+typealias LocalCompactLocF = Compacted2Float
+typealias WorldCompactLocF = Compacted2Float
+typealias ChunkCompactLocF = Compacted2Float
+
+typealias LocalCompactLoc = Compacted2Int
+typealias WorldCompactLoc = Compacted2Int
+typealias ChunkCompactLoc = Compacted2Int
 
 typealias LocalCoord = Int
 typealias WorldCoord = Int

@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.core.world.chunks
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.box2d.structs.b2BodyId
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -23,7 +23,7 @@ import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkOffset
 import no.elg.infiniteBootleg.core.util.chunkToWorld
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.dst2
@@ -330,7 +330,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     get() = world.getChunkColumn(chunkX)
 
   @get:Contract(pure = true)
-  override val compactLocation: ChunkCompactLoc = compactLoc(chunkX, chunkY)
+  override val compactLocation: ChunkCompactLoc = compactInt(chunkX, chunkY)
 
   override val worldX: WorldCoord
     get() = chunkX.chunkToWorld()
@@ -383,7 +383,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
   }
 
   override fun getBlock(worldX: WorldCoord, worldY: WorldCoord, loadChunk: Boolean): Block? {
-    if (compactLocation == compactLoc(worldX, worldY)) {
+    if (compactLocation == compactInt(worldX, worldY)) {
       return getBlock(worldX.chunkOffset(), worldY.chunkOffset())
     }
     return world.getBlock(worldX, worldY, loadChunk)
@@ -433,7 +433,7 @@ open class ChunkImpl(final override val world: World, final override val chunkX:
     }
   }
 
-  override fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) =
+  override fun queryEntities(callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit)) =
     world.worldBody.queryEntities(
       chunkX.chunkToWorld(),
       chunkY.chunkToWorld(),

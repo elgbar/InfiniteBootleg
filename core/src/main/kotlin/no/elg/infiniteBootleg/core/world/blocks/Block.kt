@@ -1,14 +1,14 @@
 package no.elg.infiniteBootleg.core.world.blocks
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.box2d.structs.b2BodyId
 import no.elg.infiniteBootleg.core.api.HUDDebuggable
 import no.elg.infiniteBootleg.core.api.Savable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.LocalCoord
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkToWorld
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.isInsideChunk
 import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
@@ -64,7 +64,7 @@ interface Block :
     const val BLOCK_TEXTURE_SIZE_F = BLOCK_TEXTURE_SIZE.toFloat()
     const val HALF_BLOCK_TEXTURE_SIZE_F = BLOCK_TEXTURE_SIZE_F * 0.5f
 
-    inline val Block.compactWorldLoc: Long get() = compactLoc(worldX, worldY)
+    inline val Block.compactWorldLoc: Long get() = compactInt(worldX, worldY)
     inline val Block.worldX: WorldCoord get() = chunk.chunkX.chunkToWorld(localX)
     inline val Block.worldY: WorldCoord get() = chunk.chunkY.chunkToWorld(localY)
     inline val Block.chunkX: WorldCoord get() = chunk.chunkX
@@ -79,7 +79,7 @@ interface Block :
     /**
      * Find all entities in the block
      */
-    fun Block.queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit)) = world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback)
+    fun Block.queryEntities(callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit)) = world.worldBody.queryEntities(worldX, worldY, worldX + BLOCK_SIZE, worldY + BLOCK_SIZE, callback)
 
     /**
      * Remove this block by setting it to air

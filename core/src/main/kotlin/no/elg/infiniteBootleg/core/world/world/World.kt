@@ -38,7 +38,8 @@ import no.elg.infiniteBootleg.core.util.WorldCompactLocArray
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
 import no.elg.infiniteBootleg.core.util.chunkOffset
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
+import no.elg.infiniteBootleg.core.util.compactLong
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.decompactLocX
@@ -172,7 +173,7 @@ abstract class World(
   protected val metadata: WorldMetadata = WorldMetadata(
     name = name,
     seed = seed,
-    spawn = compactLoc(0, generator.getHeight(0)),
+    spawn = compactInt(0, generator.getHeight(0)),
     isTransient = forceTransient || !Settings.loadWorldFromDisk || Main.Companion.isServerClient
   )
 
@@ -540,7 +541,7 @@ abstract class World(
     return toReturn
   }
 
-  fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? = getChunk(compactLoc(chunkX, chunkY), load)
+  fun getChunk(chunkX: ChunkCoord, chunkY: ChunkCoord, load: Boolean): Chunk? = getChunk(compactInt(chunkX, chunkY), load)
 
   private val threadLocalChunksView = ThreadLocal.withInitial<Long2ObjectMap<WeakReference<Chunk>>> {
     CHUNK_THREAD_LOCAL.incrementAndGet()
@@ -592,7 +593,7 @@ abstract class World(
    * @param chunkY The y-coordinate of the chunk to load (in Chunk coordinate-view)
    * @return The loaded chunk
    */
-  fun loadChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? = loadChunk(compactLoc(chunkX, chunkY))
+  fun loadChunk(chunkX: ChunkCoord, chunkY: ChunkCoord): Chunk? = loadChunk(compactInt(chunkX, chunkY))
 
   /**
    * Load a chunk into memory, either from disk or generate the chunk from its position
@@ -758,7 +759,7 @@ abstract class World(
   ): R {
     val chunkX: ChunkCoord = worldX.worldToChunk()
     val chunkY: ChunkCoord = worldY.worldToChunk()
-    val chunk: Chunk? = if (maybeChunk.isValid && compactLoc(chunkX, chunkY) == maybeChunk.compactLocation) {
+    val chunk: Chunk? = if (maybeChunk.isValid && compactInt(chunkX, chunkY) == maybeChunk.compactLocation) {
       maybeChunk
     } else {
       getChunk(chunkX, chunkY, loadChunk)
@@ -920,7 +921,7 @@ abstract class World(
   /**
    * @return If the given chunk is loaded in memory
    */
-  fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = isChunkLoaded(compactLoc(chunkX, chunkY))
+  fun isChunkLoaded(chunkX: ChunkCoord, chunkY: ChunkCoord): Boolean = isChunkLoaded(compactInt(chunkX, chunkY))
 
   /**
    * @return Copy of currently loaded chunks
@@ -1106,7 +1107,7 @@ abstract class World(
         if (cancel !== NEVER_CANCEL && cancel()) {
           return blocks ?: EMPTY_BLOCKS_ARRAY
         }
-        val chunkPos = compactLoc(x.worldToChunk(), y.worldToChunk())
+        val chunkPos = compactInt(x.worldToChunk(), y.worldToChunk())
         if (invalidChunks.containsKey(chunkPos)) {
           y++
           // No point in checking this chunk again
@@ -1266,7 +1267,7 @@ abstract class World(
       while (x <= maxX) {
         var y = startY
         while (y <= maxY) {
-          blocks[i++] = compactLoc(x, y)
+          blocks[i++] = compactLong(x, y)
           y++
         }
         x++
@@ -1287,7 +1288,7 @@ abstract class World(
     fun getLocationsWithin(worldX: WorldCoordNumber, worldY: WorldCoordNumber, radius: Double): LongOpenHashSet {
       require(radius >= 0) { "Radius should be a non-negative number" }
       if (radius <= 1.0) {
-        val coord = compactLoc(worldX.worldToBlock(), worldY.worldToBlock())
+        val coord = compactInt(worldX.worldToBlock(), worldY.worldToBlock())
         return LongOpenHashSet(1).apply { add(coord) }
       } else {
         val expected = (radius * radius * Math.PI).toInt()

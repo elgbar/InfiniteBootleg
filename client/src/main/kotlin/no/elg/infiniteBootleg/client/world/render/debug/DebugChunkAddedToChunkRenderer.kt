@@ -13,7 +13,7 @@ import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.events.chunks.ChunkAddedToChunkRendererEvent
 import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangeRejectedEvent
 import no.elg.infiniteBootleg.core.events.chunks.ChunkTextureChangedEvent
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.safeUse
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_TEXTURE_SIZE_HALF
@@ -57,7 +57,7 @@ class DebugChunkAddedToChunkRenderer(private val worldRender: ClientWorldRender)
     shapeRenderer.safeUse(ShapeRenderer.ShapeType.Filled, camera.combined) {
       for (y in chunksInView.verticalStart - 1 until yEnd - 1) {
         for (x in chunksInView.horizontalStart - 1 until xEnd - 1) {
-          val compactLoc = compactLoc(x, y)
+          val compactLoc = compactInt(x, y)
 
           val prioritization = newlyUpdatedChunks.get(compactLoc) // Get should be safe since we are not removing any elements
 

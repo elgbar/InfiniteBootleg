@@ -1,7 +1,6 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.Body
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
@@ -34,11 +33,11 @@ import no.elg.infiniteBootleg.protobuf.ProtoWorld.Entity.Box2D.BodyType.SPELL
  * @param box2dWidth  The height of this entity in box2d view
  * @param box2dHeight The width of this entity in box2d view
  */
-class Box2DBodyComponent(body: Body, val type: ProtoWorld.Entity.Box2D.BodyType, private val box2dWidth: Float, private val box2dHeight: Float, val fixedRotation: Boolean) :
+class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyType, private val box2dWidth: Float, private val box2dHeight: Float, val fixedRotation: Boolean) :
   EntitySavableComponent,
   CheckableDisposable {
 
-  private var internalBody: Body? = body
+  private var internalBody: b2BodyId? = body
   private var disposed = false
 
   val halfBox2dWidth: Float get() = box2dWidth / 2f
@@ -49,7 +48,7 @@ class Box2DBodyComponent(body: Body, val type: ProtoWorld.Entity.Box2D.BodyType,
 
   override val isDisposed get() = disposed
 
-  val body: Body = (if (disposed) null else internalBody) ?: error("Tried to access a disposed body!")
+  val body: b2BodyId = (if (disposed) null else internalBody) ?: error("Tried to access a disposed body!")
 
   fun disableGravity() {
     body.gravityScale = 0f

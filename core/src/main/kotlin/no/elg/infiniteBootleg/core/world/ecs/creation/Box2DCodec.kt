@@ -2,12 +2,11 @@ package no.elg.infiniteBootleg.core.world.ecs.creation
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.box2d.Box2d
+import com.badlogic.gdx.box2d.enums.b2BodyType
+import com.badlogic.gdx.box2d.structs.b2BodyDef
+import com.badlogic.gdx.box2d.structs.b2BodyId
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.Fixture
-import com.badlogic.gdx.physics.box2d.FixtureDef
-import com.badlogic.gdx.physics.box2d.PolygonShape
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
@@ -19,6 +18,7 @@ import no.elg.infiniteBootleg.core.util.toRadians
 import no.elg.infiniteBootleg.core.util.useDispose
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.box2d.Filters
+import no.elg.infiniteBootleg.core.world.box2d.set
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.blockEntityFamily
@@ -223,15 +223,16 @@ internal fun createBody2DBodyComponent(
   width: Float,
   height: Float,
   wantedFamilies: Array<Pair<Family, String>> = emptyArray(),
-  bodyDefModifier: BodyDef.() -> Unit = {},
+  bodyDefModifier: b2BodyDef.() -> Unit = {},
   afterBodyComponentAdded: (Entity) -> Unit = {},
-  beforeBodyComponentAdded: Body.() -> Unit
+  beforeBodyComponentAdded: b2BodyId.() -> Unit
 ) {
-  val bodyDef = BodyDef()
-  bodyDef.type = BodyDef.BodyType.DynamicBody
+  val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef()
+  bodyDef.type(b2BodyType.b2_dynamicBody)
   bodyDef.position.set(worldX, worldY)
   bodyDef.linearVelocity.set(dx, dy)
-  bodyDef.fixedRotation = true
+  val fixedRotation = true
+  bodyDef.fixedRotation(fixedRotation)
   bodyDefModifier(bodyDef)
 
   world.worldBody.createBody(bodyDef) {
@@ -240,10 +241,10 @@ internal fun createBody2DBodyComponent(
       entity.world.worldBody.destroyBody(it)
       return@createBody
     }
-    it.userData = entity
+//    it.userData = entity
 
     beforeBodyComponentAdded(it)
-    entity += Box2DBodyComponent(it, serializationType, width, height, it.isFixedRotation)
+    entity += Box2DBodyComponent(it, serializationType, width, height, fixedRotation)
     afterBodyComponentAdded(entity)
     if (Settings.debug) {
       check(basicStandaloneEntityFamily.matches(entity)) { "Finished entity does not match the basic entity family" }
@@ -252,7 +253,7 @@ internal fun createBody2DBodyComponent(
   }
 }
 
-private fun createPlayerFixture(body: Body, userData: Any, friction: Float, defineShape: PolygonShape.() -> Unit) {
+private fun createPlayerFixture(body: b2BodyId, userData: Any, friction: Float, defineShape: PolygonShape.() -> Unit) {
   PolygonShape().useDispose {
     defineShape(it)
     playerFixtureDef.shape = it
@@ -265,7 +266,7 @@ private fun createPlayerFixture(body: Body, userData: Any, friction: Float, defi
 }
 
 private fun createSecondaryPlayerFixture(
-  body: Body,
+  body: b2BodyId,
   userData: String,
   halfWidth: Float,
   halfHeight: Float,
@@ -286,7 +287,7 @@ private fun createSecondaryPlayerFixture(
   shape.dispose()
 }
 
-private fun createPlayerTouchAreaFixture(body: Body, userData: String, side: Int) {
+private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, side: Int) {
   createSecondaryPlayerFixture(body, userData, halfWidth = ESSENTIALLY_ZERO, halfHeight = PLAYER_HEIGHT / 2.3f, centerX = PLAYER_WIDTH * side / 1.5f)
 }
 

@@ -12,7 +12,7 @@ fun Vector2.dstd(v: Vector2): Double {
 
 fun Vector2.dst2(v: Vector2): Float = this.dst2(v.x, v.y)
 
-fun Vector2.toCompactLoc(): Long = compactLoc(x.roundToInt(), y.roundToInt())
+fun Vector2.toCompactLoc(): Long = compactInt(x.roundToInt(), y.roundToInt())
 
 fun isWithin(loc1: Long, loc2: Long, radius: Number): Boolean = isWithin(loc1.decompactLocX(), loc1.decompactLocY(), loc2.decompactLocX(), loc2.decompactLocY(), radius)
 

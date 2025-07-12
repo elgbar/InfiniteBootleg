@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.core.world.render
 
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.ChunkCoord
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.world.World
 
@@ -45,7 +45,7 @@ interface ChunksInView {
       sequence {
         for (y in verticalStart until verticalEnd) {
           for (x in horizontalStart until horizontalEnd) {
-            yield(compactLoc(x, y))
+            yield(compactInt(x, y))
           }
         }
       }

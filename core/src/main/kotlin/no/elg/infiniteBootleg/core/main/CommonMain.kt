@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.box2d.Box2d
 import com.badlogic.gdx.utils.Collections
 import com.strongjoshua.console.CommandExecutor
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -47,6 +48,7 @@ abstract class CommonMain<CONSOLE : GameConsoleHandler>(private val progArgs: Pr
   override fun create() {
     AnsiConsole.systemInstall()
     KtxAsync.initiate()
+    Box2d.initialize()
     renderThreadName = Thread.currentThread().name
     console = createConsole().apply {
       alpha = 0.85f

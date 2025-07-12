@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.chunkOffset
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.fastIntFormat
 import no.elg.infiniteBootleg.core.util.toComponentsString
 import no.elg.infiniteBootleg.core.util.worldToChunk
@@ -58,7 +58,7 @@ object DebugText {
     val rawX = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldX)
     val rawY = calcSubCell(ClientMain.inst().mouseLocator.mouseWorldY)
 
-    val chunk = world.getChunk(compactLoc(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
+    val chunk = world.getChunk(compactInt(mouseBlockX.worldToChunk(), mouseBlockY.worldToChunk()), false)
     val blockLight = chunk?.getBlockLight(localX, localY)
 
     val isLit = blockLight?.isLit ?: "maybe"
@@ -75,7 +75,7 @@ object DebugText {
     val localX = mouseBlockX.chunkOffset()
     val localY = mouseBlockY.chunkOffset()
     val chunkX = mouseBlockX.worldToChunk()
-    val chunk = world.getChunk(compactLoc(chunkX, mouseBlockY.worldToChunk()), false)
+    val chunk = world.getChunk(compactInt(chunkX, mouseBlockY.worldToChunk()), false)
     val block = chunk?.getRawBlock(localX, localY)
     val material = block.materialOrAir()
     val rawX = ClientMain.inst().mouseLocator.mouseWorldX

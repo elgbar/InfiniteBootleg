@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.util.WorldCompactLoc
 import no.elg.infiniteBootleg.core.util.WorldCoord
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.toProtoEntityRef
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.world.blocks.Block
@@ -51,8 +51,8 @@ sealed interface ContainerOwner {
 
   companion object : OptionalProtoConverter<ContainerOwner, ProtoContainerOwner> {
     fun from(entity: Entity): ContainerOwner = EntityOwner(entity.id)
-    fun from(worldX: WorldCoord, worldY: WorldCoord): ContainerOwner = BlockOwner(compactLoc(worldX, worldY))
-    fun from(block: Block): ContainerOwner = BlockOwner(compactLoc(block.worldX, block.worldY))
+    fun from(worldX: WorldCoord, worldY: WorldCoord): ContainerOwner = BlockOwner(compactInt(worldX, worldY))
+    fun from(block: Block): ContainerOwner = BlockOwner(compactInt(block.worldX, block.worldY))
 
     fun toInterfaceId(entity: Entity): InterfaceId = from(entity).toInterfaceId()
     fun toInterfaceId(worldX: WorldCoord, worldY: WorldCoord): InterfaceId = from(worldX, worldY).toInterfaceId()

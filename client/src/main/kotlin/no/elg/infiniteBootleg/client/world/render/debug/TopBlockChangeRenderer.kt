@@ -14,7 +14,7 @@ import no.elg.infiniteBootleg.core.events.api.EventManager
 import no.elg.infiniteBootleg.core.util.ProgressHandler
 import no.elg.infiniteBootleg.core.util.blend
 import no.elg.infiniteBootleg.core.util.chunkToWorld
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.component1
 import no.elg.infiniteBootleg.core.util.component2
 import no.elg.infiniteBootleg.core.util.safeUse
@@ -64,7 +64,7 @@ class TopBlockChangeRenderer(private val worldRender: ClientWorldRender) :
     if (Settings.renderTopBlockChanges) {
       for (flag in chunkColumnFeatureFlags) {
         if (e.flag and flag != 0) {
-          val index = compactLoc(e.chunkX.chunkToWorld(e.localX), flag)
+          val index = compactInt(e.chunkX.chunkToWorld(e.localX), flag)
           val flagSetting = flagSettings[flag] ?: continue
           val chunkColumnUpdate = ChunkColumnUpdate(
             progress = ProgressHandler(2f),

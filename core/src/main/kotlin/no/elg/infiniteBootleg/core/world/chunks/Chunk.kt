@@ -1,7 +1,7 @@
 package no.elg.infiniteBootleg.core.world.chunks
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.box2d.structs.b2BodyId
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.ChunkCompactLoc
 import no.elg.infiniteBootleg.core.util.ChunkCoord
@@ -174,7 +174,7 @@ interface Chunk :
   /**
    * Find all entities in the chunk
    */
-  fun queryEntities(callback: ((Set<Pair<Body, Entity>>) -> Unit))
+  fun queryEntities(callback: ((Set<Pair<b2BodyId, Entity>>) -> Unit))
 
   /**
    * @return If the chunk has been modified since creation
@@ -192,6 +192,7 @@ interface Chunk :
      * Chunks size in blocks
      */
     const val CHUNK_SIZE: LocalCoord = 16
+    const val CHUNK_SIZE_F: Float = CHUNK_SIZE.toFloat()
     const val CHUNK_TEXTURE_SIZE = CHUNK_SIZE * Block.Companion.BLOCK_TEXTURE_SIZE
     const val CHUNK_TEXTURE_SIZE_F = CHUNK_TEXTURE_SIZE.toFloat()
     const val CHUNK_TEXTURE_SIZE_HALF = CHUNK_TEXTURE_SIZE / 2

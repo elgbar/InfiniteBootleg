@@ -1,8 +1,6 @@
 package no.elg.infiniteBootleg.core.console.commands
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.utils.Array
 import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.annotation.ConsoleDoc
 import com.strongjoshua.console.annotation.HiddenCommand
@@ -22,7 +20,6 @@ import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.toAbled
 import no.elg.infiniteBootleg.core.util.toTitleCase
 import no.elg.infiniteBootleg.core.world.WorldTime
-import no.elg.infiniteBootleg.core.world.box2d.ChunkBody
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.AuthoritativeOnlyComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.ClientComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.restriction.component.DebuggableComponent.Companion.debugString
@@ -202,46 +199,46 @@ open class CommonCommands : CommandExecutor() {
     logger.info { "Changed time from $old to $time" }
   }
 
-  @HiddenCommand
-  @ConsoleDoc(description = "check dangling entities")
-  fun cde() {
-    val world = world ?: return
-    world.postBox2dRunnable {
-      val worldBox2dWorld = world.worldBody.box2dWorld
-      val bodies = Array<Body>(worldBox2dWorld.bodyCount)
-      worldBox2dWorld.getBodies(bodies)
-      var invalid = 0
-      var nullUserData = 0
-      for (body in bodies) {
-        val userData = body.userData
-        if (userData is Entity) {
-          val id: String = userData.id
-          if (world.containsEntity(id)) {
-            continue
-          }
-          invalid++
-          logger.error { "Found entity not added to the world! $id" }
-        } else if (userData is ChunkBody) {
-          val chunk = userData.chunk
-          val worldChunk = world.getChunk(chunk.compactLocation, load = false)
-          if (chunk !== worldChunk) {
-            invalid++
-            logger.error { "Found chunk body that is not the same as the world's chunk. chunk userdata: $chunk, world chunk: $worldChunk" }
-          }
-        } else if (userData == null) {
-          nullUserData++
-        } else {
-          logger.warn { "Found body with non-entity userdata: $userData" }
-        }
-      }
-      if (nullUserData > 0) {
-        logger.warn { "Found bodies $nullUserData with null as userdata" }
-      }
-      if (invalid == 0) {
-        logger.info { "No invalid bodies found!" }
-      }
-    }
-  }
+//  @HiddenCommand
+//  @ConsoleDoc(description = "check dangling entities")
+//  fun cde() {
+//    val world = world ?: return
+//    world.postBox2dRunnable {
+//      val worldBox2dWorld = world.worldBody.box2dWorld
+//      val bodies = Array<b2BodyId>(worldBox2dWorld.bodyCount)
+//      worldBox2dWorld.getBodies(bodies)
+//      var invalid = 0
+//      var nullUserData = 0
+//      for (body in bodies) {
+//        val userData = body.userData
+//        if (userData is Entity) {
+//          val id: String = userData.id
+//          if (world.containsEntity(id)) {
+//            continue
+//          }
+//          invalid++
+//          logger.error { "Found entity not added to the world! $id" }
+//        } else if (userData is ChunkBody) {
+//          val chunk = userData.chunk
+//          val worldChunk = world.getChunk(chunk.compactLocation, load = false)
+//          if (chunk !== worldChunk) {
+//            invalid++
+//            logger.error { "Found chunk body that is not the same as the world's chunk. chunk userdata: $chunk, world chunk: $worldChunk" }
+//          }
+//        } else if (userData == null) {
+//          nullUserData++
+//        } else {
+//          logger.warn { "Found body with non-entity userdata: $userData" }
+//        }
+//      }
+//      if (nullUserData > 0) {
+//        logger.warn { "Found bodies $nullUserData with null as userdata" }
+//      }
+//      if (invalid == 0) {
+//        logger.info { "No invalid bodies found!" }
+//      }
+//    }
+//  }
 
   @HiddenCommand
   @CmdArgNames("action")

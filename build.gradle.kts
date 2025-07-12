@@ -143,6 +143,7 @@ subprojects {
   dependencies {
     implementation(rootProject.libs.gdx.core)
     implementation(rootProject.libs.gdx.box2d)
+    implementation(rootProject.libs.gdx.box2d.utils)
     implementation(rootProject.libs.gdx.freetype)
     implementation(rootProject.libs.uuid)
     implementation(rootProject.libs.caffeine)

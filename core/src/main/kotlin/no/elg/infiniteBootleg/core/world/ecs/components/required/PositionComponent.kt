@@ -7,7 +7,7 @@ import ktx.ashley.propertyFor
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.WorldCoordFloat
 import no.elg.infiniteBootleg.core.util.WorldCoordNumber
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.util.worldToBlock
@@ -59,8 +59,8 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
 
   companion object : EntityLoadableMapper<PositionComponent>() {
     val Entity.position: Vector2 get() = positionComponent.toVector2()
-    val Entity.compactBlockLoc: Long get() = positionComponent.run { compactLoc(blockX, blockY) }
-    val Entity.compactChunkLoc: Long get() = positionComponent.run { compactLoc(chunkX, chunkY) }
+    val Entity.compactBlockLoc: Long get() = positionComponent.run { compactInt(blockX, blockY) }
+    val Entity.compactChunkLoc: Long get() = positionComponent.run { compactInt(chunkX, chunkY) }
     val Entity.positionComponent by propertyFor(mapper)
 
     /**

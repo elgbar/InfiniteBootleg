@@ -2,7 +2,7 @@ package no.elg.infiniteBootleg.core.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.box2d.structs.b2BodyId
 import ktx.math.component1
 import ktx.math.component2
 import no.elg.infiniteBootleg.core.main.Main
@@ -29,14 +29,14 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
     readVelocity(entity, body)
   }
 
-  private fun readPosition(entity: Entity, body: Body) {
+  private fun readPosition(entity: Entity, body: b2BodyId) {
     if (!entity.updateBox2DPosition) {
       val newPosition = body.position
       entity.positionComponent.setPosition(newPosition)
     }
   }
 
-  private fun readVelocity(entity: Entity, body: Body) {
+  private fun readVelocity(entity: Entity, body: b2BodyId) {
     val newVelocity = body.linearVelocity
     val (newDx, newDy) = newVelocity
 

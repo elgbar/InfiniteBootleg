@@ -1,26 +1,24 @@
 package no.elg.infiniteBootleg.core.world.box2d
 
-import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType.StaticBody
-import com.badlogic.gdx.physics.box2d.ChainShape
-import com.badlogic.gdx.physics.box2d.Fixture
+import com.badlogic.gdx.box2d.Box2d
+import com.badlogic.gdx.box2d.enums.b2BodyType
+import com.badlogic.gdx.box2d.structs.b2BodyDef
+import com.badlogic.gdx.box2d.structs.b2BodyId
+import com.badlogic.gdx.box2d.structs.b2Rot
+import com.badlogic.gdx.box2d.structs.b2ShapeId
+import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.utils.LongMap
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import no.elg.infiniteBootleg.core.api.Updatable
 import no.elg.infiniteBootleg.core.util.CheckableDisposable
-import no.elg.infiniteBootleg.core.util.LocalCompactLoc
-import no.elg.infiniteBootleg.core.util.compactLoc
-import no.elg.infiniteBootleg.core.util.decompactLocX
-import no.elg.infiniteBootleg.core.util.decompactLocY
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
 import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
+import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE_F
 import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.queuePhysicsEvent
 import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.world.World
@@ -34,7 +32,7 @@ class ChunkBody(val chunk: Chunk) :
   Updatable,
   CheckableDisposable {
 
-  private val fixtureMap = LongMap<Fixture>()
+  private val shapeMap = LongMap<b2ShapeId>()
 
   private val chunkBodyLock = Any()
 
@@ -46,13 +44,13 @@ class ChunkBody(val chunk: Chunk) :
    * The getter is **not** locked under [bodyLock]
    */
   @field:Volatile
-  private var box2dBody: Body? = null
+  private var box2dBody: b2BodyId? = null
     set(value) {
-      val oldBody: Body?
+      val oldBody: b2BodyId?
       synchronized(chunkBodyLock) {
         oldBody = field
         field = value
-        fixtureMap.clear()
+        shapeMap.clear()
       }
       if (oldBody != null) {
         // We should now be fine to destroy the old body
@@ -67,10 +65,10 @@ class ChunkBody(val chunk: Chunk) :
     get() = disposed
 
   /**calculate the shape of the chunk (box2d)*/
-  val bodyDef = BodyDef().also {
-    it.position.set(chunk.chunkX * Chunk.Companion.CHUNK_SIZE.toFloat(), chunk.chunkY * Chunk.Companion.CHUNK_SIZE.toFloat())
-    it.fixedRotation = true
-    it.type = StaticBody
+  val bodyDef: b2BodyDef = Box2d.b2DefaultBodyDef().apply {
+    position.set(chunk.chunkX * CHUNK_SIZE_F, chunk.chunkY * CHUNK_SIZE_F)
+    fixedRotation(true)
+    type(b2BodyType.b2_staticBody)
   }
 
   /**
@@ -99,10 +97,10 @@ class ChunkBody(val chunk: Chunk) :
    * @see WorldBody.postBox2dRunnable
    */
   @GuardedBy("BOX2D_LOCK")
-  fun onBodyCreated(tmpBody: Body) {
+  fun onBodyCreated(tmpBody: b2BodyId) {
     val blocks = chunk.asSequence().filterNotNull().filter(Block::isNotAir)
     addBlocks(blocks, tmpBody)
-    tmpBody.userData = this
+//    tmpBody.userData = this //FIXME userdata
 
     // if this got disposed while creating the new chunk fixture, this is the easiest cleanup solution
     if (isDisposed) {
@@ -117,34 +115,31 @@ class ChunkBody(val chunk: Chunk) :
   fun removeBlock(block: Block) {
     val world = chunk.world
     world.postBox2dRunnable {
-      fixtureMap.get(compactLoc(block.localX, block.localY))?.also { fixture ->
-        fixture.filterData = Filters.NON_INTERACTIVE__GROUND_FILTER
-        fixture.userData = null
+      shapeMap.get(compactInt(block.localX, block.localY))?.also { fixture ->
+//        Box2d.fixture.filter(Filters.NON_INTERACTIVE__GROUND_FILTER)
+        Box2d.b2Shape_SetFilter(fixture, Filters.NON_INTERACTIVE__GROUND_FILTER)
+//        fixture.userData = null //TODO userdata
         world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc))
       }
     }
   }
 
-  private fun getFixture(body: Body, localX: Int, localY: Int): Fixture {
-    val compactLoc = compactLoc(localX, localY)
-    val cacheFix: Fixture? = fixtureMap.get(compactLoc)
-    return cacheFix ?: body.createFixture(getChainShape(compactLoc), 0f).also {
-      fixtureMap.put(compactLoc, it)
-    }
-  }
-
-  private fun addBlockNow(block: Block, body: Body) {
-    val fixture: Fixture = getFixture(body, block.localX, block.localY)
-//      chunk.world.engine.queuePhysicsEvent(PhysicsEvent.BlockChangedEvent(fixture, material))
-    fixture.userData = block
-    fixture.filterData = when {
+  private fun addBlockNow(block: Block, bodyId: b2BodyId) {
+    val filter = when {
       block.isMarkerBlock() -> Filters.NON_INTERACTIVE__GROUND_FILTER
       block.material.isCollidable -> Filters.GR_FB_EN__GROUND_FILTER
       else -> Filters.GR_FB__GROUND_FILTER
     }
+
+    val chainShape = Box2d.b2DefaultShapeDef().apply {
+      filter(filter)
+//      userData(block)//TODO userdata
+    }
+    val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, b2Vec2().set(block.localX.toFloat(), block.localY.toFloat()), NO_ROTATION)
+    Box2d.b2CreatePolygonShape(bodyId, chainShape.asPointer(), polygon.asPointer())
   }
 
-  fun addBlocks(blocks: Sequence<Block>, box2dBody: Body? = null) {
+  fun addBlocks(blocks: Sequence<Block>, box2dBody: b2BodyId? = null) {
     chunk.world.postBox2dRunnable {
       val body = box2dBody ?: this.box2dBody
       if (body == null) {
@@ -157,7 +152,7 @@ class ChunkBody(val chunk: Chunk) :
     }
   }
 
-  fun addBlock(block: Block, box2dBody: Body? = null) {
+  fun addBlock(block: Block, box2dBody: b2BodyId? = null) {
     chunk.world.postBox2dRunnable {
       val body = box2dBody ?: this.box2dBody
       if (body == null) {
@@ -183,29 +178,27 @@ class ChunkBody(val chunk: Chunk) :
   override fun hashCode(): Int = chunk.hashCode()
 
   companion object {
-    private val chainCache: Long2ObjectMap<ChainShape> = Long2ObjectOpenHashMap()
-    private val mappingFunction: java.util.function.LongFunction<ChainShape> = java.util.function.LongFunction { v ->
-      ChainShape().also {
-        val localX = v.decompactLocX()
-        val localY = v.decompactLocY()
-        it.createLoop(
-          floatArrayOf(
-            localX + 0f,
-            localY + 0f,
-
-            localX + 0f,
-            localY + 1f,
-
-            localX + 1f,
-            localY + 1f,
-
-            localX + 1f,
-            localY + 0f
-          )
-        )
-      }
-    }
-
-    private fun getChainShape(compactLoc: LocalCompactLoc): ChainShape = chainCache.computeIfAbsent(compactLoc, mappingFunction)
+    val NO_ROTATION = b2Rot()
+//    private val chainCache: Long2ObjectMap<b2ChainDef> = Long2ObjectOpenHashMap()
+//    private val mappingFunction: LongFunction<b2ChainDef> = LongFunction { loc ->
+//      Box2d.b2DefaultChainDef().also {
+//        val localX = loc.decompactLocX().toFloat()
+//        val localY = loc.decompactLocY().toFloat()
+//        it.isLoop(true)
+//
+//        val points = b2Vec2Pointer(b2Vec2().pointer, true, 4)
+//        val vec = b2Vec2()
+//        points.set(vec.set(localX + 0f, localY + 0f), 0)
+//        points.set(vec.set(localX + 0f, localY + 1f), 1)
+//        points.set(vec.set(localX + 1f, localY + 1f), 2)
+//        points.set(vec.set(localX + 1f, localY + 0f), 3)
+//
+//        it.points(points)
+//        it.count(4)
+//      }
+// //      Box2d.b2MakeSquare(0.5f)
+//    }
+//
+//    private fun getChainShape(compactLoc: LocalCompactLoc): b2ChainDef = chainCache.computeIfAbsent(compactLoc, mappingFunction)
   }
 }

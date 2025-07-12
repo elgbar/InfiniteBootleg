@@ -10,7 +10,7 @@ import no.elg.infiniteBootleg.client.world.world.ClientWorld
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.JUMP_VERTICAL_VEL
 import no.elg.infiniteBootleg.core.util.breakableLocs
-import no.elg.infiniteBootleg.core.util.compactLoc
+import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.dstd
 import no.elg.infiniteBootleg.core.util.placeableBlocks
 import no.elg.infiniteBootleg.core.util.worldToBlock
@@ -87,7 +87,7 @@ fun placeBlocks(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
 
 fun canNotInteract(worldEntity: WorldEntity, blockX: Int, blockY: Int): Boolean =
   with(worldEntity) {
-    val compactLoc = compactLoc(blockX, blockY)
+    val compactLoc = compactInt(blockX, blockY)
     val tick = world.tick
     if (lastCreateBlockLoc == compactLoc && world.tick - lastCreateBlockTick < WorldBox2DTicker.BOX2D_TPS / 10f) {
       return true

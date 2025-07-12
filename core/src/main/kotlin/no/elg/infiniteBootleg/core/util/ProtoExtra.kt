@@ -14,9 +14,9 @@ fun Vector2.toVector2f(): Vector2f = Vector2f.newBuilder().setX(x).setY(y).build
 fun vector2iOf(x: Int, y: Int): Vector2i = Vector2i.newBuilder().setX(x).setY(y).build()
 
 fun Vector2f.toVector2(): Vector2 = Vector2(x, y)
-fun Vector2f.toCompact(): Long = compactLoc(x.toInt(), y.toInt())
+fun Vector2f.toCompact(): Long = compactInt(x.toInt(), y.toInt())
 
-fun Vector2i.toCompact(): Long = compactLoc(x, y)
+fun Vector2i.toCompact(): Long = compactInt(x, y)
 
 fun Long.toVector2i(): Vector2i =
   vector2i {
