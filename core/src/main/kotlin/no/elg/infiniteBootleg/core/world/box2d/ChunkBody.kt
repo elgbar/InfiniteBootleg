@@ -127,8 +127,8 @@ class ChunkBody(val chunk: Chunk) :
       else -> Filters.GR_FB__GROUND_FILTER
     }
 
-    val chainShape = Box2d.b2DefaultShapeDef().apply {
-      filter(filter)
+    val chainShape = Box2d.b2DefaultShapeDef().also { def ->
+      def.filter = filter
 //      userData(block)//TODO userdata
     }
     val polygon = Box2d.b2MakeOffsetBox(0.5f, 0.5f, b2Vec2().set(block.localX.toFloat(), block.localY.toFloat()), NO_ROTATION)

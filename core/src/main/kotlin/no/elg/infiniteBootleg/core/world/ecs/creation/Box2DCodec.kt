@@ -122,7 +122,7 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
     val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
       def.isSensor(true)
       def.enableSensorEvents(true)
-      def.filter(Filters.EN__GROUND_FILTER)
+      def.filter = Filters.EN__GROUND_FILTER
 //    def.userData(userData) // TODO userdata
     }
     Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
@@ -160,7 +160,7 @@ fun EngineEntity.createFallingBlockBodyComponent(
 //    def.userData(userData) // TODO userdata
       def.isSensor(true)
       def.enableSensorEvents(true)
-      def.filter(Filters.GR_FB__FALLING_BLOCK_FILTER)
+      def.filter = Filters.GR_FB__FALLING_BLOCK_FILTER
       def.material().apply {
         restitution(0f)
         friction(Constants.DEFAULT_FIXTURE_FRICTION)
@@ -211,7 +211,7 @@ fun EngineEntity.createSpellBodyComponent(
 //    def.userData(userData) // TODO userdata
       def.isSensor(true)
       def.enableSensorEvents(true)
-      def.filter(Filters.GR_FB__FALLING_BLOCK_FILTER)
+      def.filter = Filters.GR_FB__FALLING_BLOCK_FILTER
     }
     Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), polygon.asPointer())
   }
@@ -295,7 +295,7 @@ private fun createSecondaryPlayerFixture(
   val shapeDef = Box2d.b2DefaultShapeDef().apply {
     isSensor(true)
     enableSensorEvents(true)
-    filter(Filters.GR__ENTITY_FILTER)
+    filter = Filters.GR__ENTITY_FILTER
 //  userData(userData) // TODO userdata
   }
 
@@ -307,7 +307,7 @@ private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, side:
 }
 
 private val playerShapeDef: b2ShapeDef = Box2d.b2DefaultShapeDef().also { def ->
-  def.filter(Filters.GR_EN_ENTITY_FILTER)
+  def.filter = Filters.GR_EN_ENTITY_FILTER
 //  def.fixedRotation(true)
 //  density = Constants.DEFAULT_FIXTURE_DENSITY
   def.material().restitution(0f)
