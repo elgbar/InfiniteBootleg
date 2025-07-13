@@ -26,11 +26,12 @@ gdx-core = { group = "com.badlogicgames.gdx", name = "gdx", version.ref = "gdx" 
 gdx-freetype = { group = "com.badlogicgames.gdx", name = "gdx-freetype", version.ref = "gdx" }
 gdx-backend-headless = { group = "com.badlogicgames.gdx", name = "gdx-backend-headless", version.ref = "gdx" }
 gdx-backend-lwjgl3 = { group = "com.badlogicgames.gdx", name = "gdx-backend-lwjgl3", version.ref = "gdx" }
-gdx-box2d-platform = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdx" }
 gdx-freetype-platform = { group = "com.badlogicgames.gdx", name = "gdx-freetype-platform", version.ref = "gdx" }
 gdx-platform = { group = "com.badlogicgames.gdx", name = "gdx-platform", version.ref = "gdx" }
+
 gdx-box2d = { group = "com.badlogicgames.gdx", name = "gdx-box2d", version.ref = "gdx-box2d" }
 gdx-box2d-utils = { group = "com.badlogicgames.gdx", name = "gdx-box2d-utils", version.ref = "gdx-box2d" }
+gdx-box2d-platform = { group = "com.badlogicgames.gdx", name = "gdx-box2d-platform", version.ref = "gdx-box2d" }
 
 ktx-actors = { group = "io.github.libktx", name = "ktx-actors", version.ref = "ktx" }
 ktx-app = { group = "io.github.libktx", name = "ktx-app", version.ref = "ktx" }

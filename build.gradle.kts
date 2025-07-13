@@ -211,8 +211,9 @@ project(":client") {
   dependencies {
     implementation(project(":core"))
     implementation(rootProject.libs.gdx.backend.lwjgl3)
-    implementation(variantOf(rootProject.libs.gdx.box2d.platform) { classifier("natives-desktop") })
     implementation(variantOf(rootProject.libs.gdx.freetype.platform) { classifier("natives-desktop") })
+    implementation(variantOf(rootProject.libs.gdx.box2d.platform) { classifier("natives-desktop") })
+    implementation(variantOf(rootProject.libs.gdx.box2d.platform) { classifier("natives-x86_64") })
     implementation(variantOf(rootProject.libs.gdx.platform) { classifier("natives-desktop") })
   }
 }
