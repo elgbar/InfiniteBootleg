@@ -4,7 +4,6 @@ import com.badlogic.gdx.box2d.Box2d
 import com.badlogic.gdx.box2d.enums.b2BodyType
 import com.badlogic.gdx.box2d.structs.b2BodyDef
 import com.badlogic.gdx.box2d.structs.b2BodyId
-import com.badlogic.gdx.box2d.structs.b2Rot
 import com.badlogic.gdx.box2d.structs.b2ShapeId
 import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.utils.LongMap
@@ -16,11 +15,8 @@ import no.elg.infiniteBootleg.core.util.compactInt
 import no.elg.infiniteBootleg.core.util.isMarkerBlock
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.world.blocks.Block
-import no.elg.infiniteBootleg.core.world.blocks.Block.Companion.compactWorldLoc
 import no.elg.infiniteBootleg.core.world.chunks.Chunk
 import no.elg.infiniteBootleg.core.world.chunks.Chunk.Companion.CHUNK_SIZE_F
-import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.queuePhysicsEvent
-import no.elg.infiniteBootleg.core.world.ecs.components.events.PhysicsEvent
 import no.elg.infiniteBootleg.core.world.world.World
 
 private val logger = KotlinLogging.logger {}
@@ -119,7 +115,7 @@ class ChunkBody(val chunk: Chunk) :
 //        Box2d.fixture.filter(Filters.NON_INTERACTIVE__GROUND_FILTER)
         Box2d.b2Shape_SetFilter(fixture, Filters.NON_INTERACTIVE__GROUND_FILTER)
 //        fixture.userData = null //TODO userdata
-        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc))
+//        world.engine.queuePhysicsEvent(PhysicsEvent.BlockRemovedEvent(fixture, block.compactWorldLoc)) //TODO events
       }
     }
   }
@@ -178,7 +174,6 @@ class ChunkBody(val chunk: Chunk) :
   override fun hashCode(): Int = chunk.hashCode()
 
   companion object {
-    val NO_ROTATION = b2Rot()
 //    private val chainCache: Long2ObjectMap<b2ChainDef> = Long2ObjectOpenHashMap()
 //    private val mappingFunction: LongFunction<b2ChainDef> = LongFunction { loc ->
 //      Box2d.b2DefaultChainDef().also {

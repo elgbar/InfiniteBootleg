@@ -105,7 +105,6 @@ import no.elg.infiniteBootleg.core.world.ecs.system.block.ExplosiveBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.FallingBlockSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.LeavesDecaySystem
 import no.elg.infiniteBootleg.core.world.ecs.system.block.UpdateGridBlockSystem
-import no.elg.infiniteBootleg.core.world.ecs.system.event.PhysicsSystem
 import no.elg.infiniteBootleg.core.world.ecs.system.magic.SpellRemovalSystem
 import no.elg.infiniteBootleg.core.world.generator.chunk.ChunkGenerator
 import no.elg.infiniteBootleg.core.world.loader.WorldLoader
@@ -280,7 +279,7 @@ abstract class World(
     engine.addSystem(MaxVelocitySystem)
     engine.addSystem(ReadBox2DStateSystem)
     engine.addSystem(WriteBox2DStateSystem)
-    engine.addSystem(PhysicsSystem)
+//    engine.addSystem(PhysicsSystem)
     engine.addSystem(UpdateGridBlockSystem)
     engine.addSystem(OutOfBoundsSystem)
     engine.addSystem(FallingBlockSystem())

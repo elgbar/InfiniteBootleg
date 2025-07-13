@@ -3,10 +3,12 @@ package no.elg.infiniteBootleg.core.world.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.box2d.structs.b2BodyId
-import ktx.math.component1
-import ktx.math.component2
 import no.elg.infiniteBootleg.core.main.Main
 import no.elg.infiniteBootleg.core.world.Direction
+import no.elg.infiniteBootleg.core.world.box2d.component1
+import no.elg.infiniteBootleg.core.world.box2d.component2
+import no.elg.infiniteBootleg.core.world.box2d.position
+import no.elg.infiniteBootleg.core.world.box2d.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_BEFORE_EVENTS
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
@@ -37,8 +39,7 @@ object ReadBox2DStateSystem : IteratingSystem(basicDynamicEntityFamily, UPDATE_P
   }
 
   private fun readVelocity(entity: Entity, body: b2BodyId) {
-    val newVelocity = body.linearVelocity
-    val (newDx, newDy) = newVelocity
+    val (newDx, newDy) = body.velocity
 
     if (!entity.updateBox2DVelocity) {
       entity.setVelocity(newDx, newDy)

@@ -7,6 +7,11 @@ import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.isNotAir
 import no.elg.infiniteBootleg.core.util.withColor
 import no.elg.infiniteBootleg.core.util.worldToScreen
+import no.elg.infiniteBootleg.core.world.box2d.gravity
+import no.elg.infiniteBootleg.core.world.box2d.gravityScale
+import no.elg.infiniteBootleg.core.world.box2d.world
+import no.elg.infiniteBootleg.core.world.box2d.x
+import no.elg.infiniteBootleg.core.world.box2d.y
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
 import no.elg.infiniteBootleg.core.world.ecs.components.transients.SpellStateComponent.Companion.spellStateComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.spellEntityFamily
@@ -32,8 +37,9 @@ class FuturePositionRenderer(private val worldRender: ClientWorldRender) : Rende
           val body = box2dComp.body
           val spawn = entity.spellStateComponentOrNull ?: continue
 
-          val gravityX = body.world.gravity.x.toDouble() * body.gravityScale
-          val gravityY = body.world.gravity.y.toDouble() * body.gravityScale
+          val gravity = body.world.gravity
+          val gravityX = gravity.x.toDouble() * body.gravityScale
+          val gravityY = gravity.y.toDouble() * body.gravityScale
 
           val worldX = spawn.spawnX.toDouble()
           val worldY = spawn.spawnY.toDouble()

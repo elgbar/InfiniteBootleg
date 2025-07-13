@@ -211,53 +211,54 @@ class ClientCommands : CommonCommands() {
     }
   }
 
-  @ConsoleDoc(description = "Toggle drawBodies for box2d debug rendering")
-  fun drawBodies() {
+  @ConsoleDoc(description = "Toggle debug drawing of box2d shapes")
+  fun drawShapes() {
     val world = clientWorld ?: return
-    val box2dDebugRenderer = world.render.box2DDebugRenderer
-    box2dDebugRenderer.isDrawBodies = !box2dDebugRenderer.isDrawBodies
-    logger.info { "Box2D debug draw Bodies is ${box2dDebugRenderer.isDrawBodies.toAbled()}" }
+    val box2dDebugRenderer = world.render.box2DDebugRenderer.b2DebugDraw
+    val bool = !box2dDebugRenderer.drawShapes()
+    box2dDebugRenderer.drawShapes(bool)
+    logger.info { "Box2D debug draw shapes is ${bool.toAbled()}" }
   }
 
-  @ConsoleDoc(description = "Toggle drawJoints for box2d debug rendering")
-  fun drawJoints() {
-    val world = clientWorld ?: return
-    val box2dDebugRenderer = world.render.box2DDebugRenderer
-    box2dDebugRenderer.isDrawJoints = !box2dDebugRenderer.isDrawJoints
-    logger.info { "Box2D debug draw Joints is ${box2dDebugRenderer.isDrawJoints.toAbled()}" }
-  }
-
-  @ConsoleDoc(description = "Toggle drawAABBs for box2d debug rendering")
-  fun drawAABBs() {
-    val world = clientWorld ?: return
-    val box2dDebugRenderer = world.render.box2DDebugRenderer
-    box2dDebugRenderer.isDrawAABBs = !box2dDebugRenderer.isDrawAABBs
-    logger.info { "Box2D debug draw AABBs is ${box2dDebugRenderer.isDrawAABBs.toAbled()}" }
-  }
-
-  @ConsoleDoc(description = "Toggle drawInactiveBodies for box2d debug rendering")
-  fun drawInactiveBodies() {
-    val world = clientWorld ?: return
-    val box2dDebugRenderer = world.render.box2DDebugRenderer
-    box2dDebugRenderer.isDrawInactiveBodies = !box2dDebugRenderer.isDrawInactiveBodies
-    logger.info { "Box2D debug draw InactiveBodies is ${box2dDebugRenderer.isDrawInactiveBodies.toAbled()}" }
-  }
-
-  @ConsoleDoc(description = "Toggle drawVelocities for box2d debug rendering")
-  fun drawVelocities() {
-    val world = clientWorld ?: return
-    val box2dDebugRenderer = world.render.box2DDebugRenderer
-    box2dDebugRenderer.isDrawVelocities = !box2dDebugRenderer.isDrawVelocities
-    logger.info { "Box2D debug draw Velocities is ${box2dDebugRenderer.isDrawVelocities.toAbled()}" }
-  }
-
-  @ConsoleDoc(description = "Toggle drawContacts for box2d debug rendering")
-  fun drawContacts() {
-    val world = clientWorld ?: return
-    val box2dDebugRenderer = world.render.box2DDebugRenderer
-    box2dDebugRenderer.isDrawContacts = !box2dDebugRenderer.isDrawContacts
-    logger.info { "Box2D debug draw Contacts is ${box2dDebugRenderer.isDrawContacts.toAbled()}" }
-  }
+//  @ConsoleDoc(description = "Toggle drawJoints for box2d debug rendering")
+//  fun drawJoints() {
+//    val world = clientWorld ?: return
+//    val box2dDebugRenderer = world.render.box2DDebugRenderer
+//    box2dDebugRenderer.isDrawJoints = !box2dDebugRenderer.isDrawJoints
+//    logger.info { "Box2D debug draw Joints is ${box2dDebugRenderer.isDrawJoints.toAbled()}" }
+//  }
+//
+//  @ConsoleDoc(description = "Toggle drawAABBs for box2d debug rendering")
+//  fun drawAABBs() {
+//    val world = clientWorld ?: return
+//    val box2dDebugRenderer = world.render.box2DDebugRenderer
+//    box2dDebugRenderer.isDrawAABBs = !box2dDebugRenderer.isDrawAABBs
+//    logger.info { "Box2D debug draw AABBs is ${box2dDebugRenderer.isDrawAABBs.toAbled()}" }
+//  }
+//
+//  @ConsoleDoc(description = "Toggle drawInactiveBodies for box2d debug rendering")
+//  fun drawInactiveBodies() {
+//    val world = clientWorld ?: return
+//    val box2dDebugRenderer = world.render.box2DDebugRenderer
+//    box2dDebugRenderer.isDrawInactiveBodies = !box2dDebugRenderer.isDrawInactiveBodies
+//    logger.info { "Box2D debug draw InactiveBodies is ${box2dDebugRenderer.isDrawInactiveBodies.toAbled()}" }
+//  }
+//
+//  @ConsoleDoc(description = "Toggle drawVelocities for box2d debug rendering")
+//  fun drawVelocities() {
+//    val world = clientWorld ?: return
+//    val box2dDebugRenderer = world.render.box2DDebugRenderer
+//    box2dDebugRenderer.isDrawVelocities = !box2dDebugRenderer.isDrawVelocities
+//    logger.info { "Box2D debug draw Velocities is ${box2dDebugRenderer.isDrawVelocities.toAbled()}" }
+//  }
+//
+//  @ConsoleDoc(description = "Toggle drawContacts for box2d debug rendering")
+//  fun drawContacts() {
+//    val world = clientWorld ?: return
+//    val box2dDebugRenderer = world.render.box2DDebugRenderer
+//    box2dDebugRenderer.isDrawContacts = !box2dDebugRenderer.isDrawContacts
+//    logger.info { "Box2D debug draw Contacts is ${box2dDebugRenderer.isDrawContacts.toAbled()}" }
+//  }
 
   @ConsoleDoc(description = "Toggles debug rendering of chunk bounds")
   fun renderChunkBorders() {

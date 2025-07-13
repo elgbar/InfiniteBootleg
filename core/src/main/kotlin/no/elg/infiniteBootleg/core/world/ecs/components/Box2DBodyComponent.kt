@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.ecs.components
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.box2d.structs.b2BodyId
 import ktx.ashley.EngineEntity
 import ktx.ashley.optionalPropertyFor
 import ktx.ashley.propertyFor
@@ -10,6 +11,7 @@ import no.elg.infiniteBootleg.core.util.CheckableDisposable
 import no.elg.infiniteBootleg.core.util.stringifyCompactLoc
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.box2d.gravityScale
 import no.elg.infiniteBootleg.core.world.ecs.api.EntitySavableComponent
 import no.elg.infiniteBootleg.core.world.ecs.api.LoadableMapper
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent.Companion.velocityOrZero
@@ -63,13 +65,13 @@ class Box2DBodyComponent(body: b2BodyId, val type: ProtoWorld.Entity.Box2D.BodyT
       disposed = true
       val currentBody = internalBody ?: return
       this.internalBody = null
-      val entity = currentBody.userData as Entity
-      entity.world.worldBody.destroyBody(currentBody)
+//      val entity = currentBody.userData as Entity //todo userdata
+//      entity.world.worldBody.destroyBody(currentBody)
     }
   }
 
   override fun hudDebug(): String =
-    "type: $type, gravity ${body.gravityScale}, size ${stringifyCompactLoc(box2dWidth, box2dHeight)}, disposed? $disposed, userdata ${internalBody?.userData}"
+    "type: $type, gravity ${body.gravityScale}, size ${stringifyCompactLoc(box2dWidth, box2dHeight)}, disposed? $disposed" // , userdata ${internalBody?.userData}" //TODO userdata
 
   companion object : LoadableMapper<Box2DBodyComponent, ProtoWorld.Entity, (Entity) -> Unit>() {
     val Entity.box2dBody get() = box2d.body

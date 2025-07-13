@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.client.world.render
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.box2d.utils.Box2dDebugRenderer
 import com.badlogic.gdx.graphics.Color.WHITE_FLOAT_BITS
 import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -8,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop
 import com.badlogic.gdx.utils.Disposable
@@ -97,7 +97,7 @@ class ClientWorldRender(override val world: ClientWorld) : WorldRender {
     it.position.y = 0f
   }
   val chunkRenderer: ChunkRenderer = ChunkRenderer(this)
-  val box2DDebugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer(true, false, false, false, true, false) }
+  val box2DDebugRenderer: Box2dDebugRenderer by lazy { Box2dDebugRenderer() }
 
   private val dad: DragAndDrop = DragAndDrop().apply {
     setButton(-1)

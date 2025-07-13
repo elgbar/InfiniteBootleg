@@ -1,8 +1,10 @@
 package no.elg.infiniteBootleg.core.util
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.math.Vector2
 import com.google.protobuf.TextFormat
+import no.elg.infiniteBootleg.core.world.box2d.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.ecs.components.required.IdComponent.Companion.id
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.EntityRef
 import no.elg.infiniteBootleg.protobuf.ProtoWorld.Vector2f
@@ -15,6 +17,7 @@ fun vector2iOf(x: Int, y: Int): Vector2i = Vector2i.newBuilder().setX(x).setY(y)
 
 fun Vector2f.toVector2(): Vector2 = Vector2(x, y)
 fun Vector2f.toCompact(): Long = compactInt(x.toInt(), y.toInt())
+fun Vector2f.toB2Vec2(): b2Vec2 = makeB2Vec2(x, y)
 
 fun Vector2i.toCompact(): Long = compactInt(x, y)
 

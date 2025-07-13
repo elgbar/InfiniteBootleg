@@ -1,6 +1,7 @@
 package no.elg.infiniteBootleg.core.world.ecs.components.required
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.box2d.structs.b2Vec2
 import com.badlogic.gdx.math.Vector2
 import ktx.ashley.EngineEntity
 import ktx.ashley.propertyFor
@@ -35,6 +36,11 @@ data class PositionComponent(var x: WorldCoordFloat, var y: WorldCoordFloat) : E
   fun setPosition(vector2: Vector2) {
     x = vector2.x
     y = vector2.y
+  }
+
+  fun setPosition(vector2: b2Vec2) {
+    x = vector2.x()
+    y = vector2.y()
   }
 
   fun toProtoVector2f(): ProtoVector2f =

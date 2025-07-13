@@ -16,6 +16,7 @@ import no.elg.infiniteBootleg.core.util.placeableBlocks
 import no.elg.infiniteBootleg.core.util.worldToBlock
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
+import no.elg.infiniteBootleg.core.world.box2d.velocity
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledComponent.Companion.locallyControlledComponent
@@ -105,8 +106,8 @@ fun WorldEntity.jump() {
 
 fun WorldEntity.setVel(modify: (oldX: Float, oldY: Float) -> (Pair<Float, Float>)) {
   val body = entity.box2dBody
-  val vel = body.linearVelocity
-  val (nx, ny) = modify(vel.x, vel.y)
+  val vel = body.velocity
+  val (nx, ny) = modify(vel.x(), vel.y())
   entity.setVelocity(nx, ny)
 }
 

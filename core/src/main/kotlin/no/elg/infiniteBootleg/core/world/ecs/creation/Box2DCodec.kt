@@ -6,18 +6,22 @@ import com.badlogic.gdx.box2d.Box2d
 import com.badlogic.gdx.box2d.enums.b2BodyType
 import com.badlogic.gdx.box2d.structs.b2BodyDef
 import com.badlogic.gdx.box2d.structs.b2BodyId
+import com.badlogic.gdx.box2d.structs.b2Capsule
+import com.badlogic.gdx.box2d.structs.b2Circle
+import com.badlogic.gdx.box2d.structs.b2Polygon
+import com.badlogic.gdx.box2d.structs.b2ShapeDef
 import com.badlogic.gdx.math.Vector2
 import io.github.oshai.kotlinlogging.KotlinLogging
 import ktx.ashley.EngineEntity
 import ktx.ashley.plusAssign
-import ktx.box2d.circle
 import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.util.WorldCoord
 import no.elg.infiniteBootleg.core.util.isBeingRemoved
 import no.elg.infiniteBootleg.core.util.toRadians
-import no.elg.infiniteBootleg.core.util.useDispose
 import no.elg.infiniteBootleg.core.world.Constants
 import no.elg.infiniteBootleg.core.world.box2d.Filters
+import no.elg.infiniteBootleg.core.world.box2d.NO_ROTATION
+import no.elg.infiniteBootleg.core.world.box2d.makeB2Vec2
 import no.elg.infiniteBootleg.core.world.box2d.set
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.basicStandaloneEntityFamily
@@ -58,25 +62,32 @@ fun EngineEntity.createPlayerBodyComponent(
     PLAYER_HEIGHT,
     wantedFamilies,
     bodyDefModifier = {
-      linearDamping = 0.5f
-      bullet = true
+//      linearDamping(0.5f)
+      isBullet(true)
     },
     afterBodyComponentAdded = whenReady
   ) {
     val body = this
-    createPlayerFixture(body, body, 0f) { set(playerVertices) }
-    createPlayerFixture(body, PLAYERS_FOOT_USER_DATA, Constants.DEFAULT_FIXTURE_FRICTION) {
-      setAsBox(
-        /* hx = */
-        PLAYER_WIDTH / 4f,
-        /* hy = */
-        ESSENTIALLY_ZERO,
-        /* center = */
-        Vector2(0f, -PLAYER_HEIGHT / 2f - A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO),
-        /* angle = */
-        0f
-      )
+    createPlayerCapsule(body, body) {
+//      set(playerVertices)
+      b2Capsule().apply {
+        center1.set(0f, 0f)
+        center2.set(PLAYER_HEIGHT / 2f, 0f)
+        radius(PLAYER_WIDTH / 2f)
+      }
     }
+//    createPlayerPolygon(body, PLAYERS_FOOT_USER_DATA) {
+//      Box2d.b2MakeOffsetBox(
+//        /* halfWidth = */
+//        PLAYER_WIDTH / 4f,
+//        /* halfHeight = */
+//        ESSENTIALLY_ZERO,
+//        /* center = */
+//        makeB2Vec2(0f, -PLAYER_HEIGHT / 2f - A_LITTLE_MORE_THAN_ESSENTIALLY_ZERO),
+//        /* rotation = */
+//        NO_ROTATION
+//      )
+//    }
     val radius = 0.5f
     createSecondaryPlayerFixture(body, HOLE_DETECTOR_USER_DATA, halfWidth = radius, halfHeight = radius, centerY = -(PLAYER_HEIGHT) / 2f - radius)
     createPlayerTouchAreaFixture(body, PLAYERS_LEFT_ARM_USER_DATA, -1)
@@ -103,25 +114,18 @@ fun EngineEntity.createDoorBodyComponent(world: World, worldX: WorldCoord, world
       standaloneGridOccupyingBlocksFamily to "standaloneGridOccupyingBlocksFamily"
     ),
     bodyDefModifier = {
-      type = BodyDef.BodyType.StaticBody
+      type(b2BodyType.b2_staticBody)
     },
     afterBodyComponentAdded = whenReady
   ) {
-    val shape = PolygonShape()
-    shape.setAsBox(DOOR_WIDTH / 2f, DOOR_HEIGHT / 2f)
-
-    val def = FixtureDef()
-    def.shape = shape
-    def.density = Constants.DEFAULT_FIXTURE_DENSITY
-    def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-    def.restitution = 0f
-
-    val fix: Fixture = createFixture(def)
-    fix.filterData = Filters.EN__GROUND_FILTER
-    fix.userData = this.userData
-    fix.isSensor = true
-
-    shape.dispose()
+    val polygon = Box2d.b2MakeBox(DOOR_WIDTH / 2f, DOOR_HEIGHT / 2f)
+    val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
+      def.isSensor(true)
+      def.enableSensorEvents(true)
+      def.filter(Filters.EN__GROUND_FILTER)
+//    def.userData(userData) // TODO userdata
+    }
+    Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
   }
 }
 
@@ -151,19 +155,18 @@ fun EngineEntity.createFallingBlockBodyComponent(
     ),
     afterBodyComponentAdded = onReady
   ) {
-    val shape = PolygonShape()
-    shape.setAsBox(0.45f, 0.45f)
-
-    val def = FixtureDef()
-    def.shape = shape
-    def.density = Constants.DEFAULT_FIXTURE_DENSITY
-    def.friction = Constants.DEFAULT_FIXTURE_FRICTION
-    def.restitution = 0f
-
-    val fix: Fixture = createFixture(def)
-    fix.filterData = Filters.GR_FB__FALLING_BLOCK_FILTER
-    fix.userData = this.userData
-    shape.dispose()
+    val polygon = Box2d.b2MakeSquare(0.45f)
+    val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
+//    def.userData(userData) // TODO userdata
+      def.isSensor(true)
+      def.enableSensorEvents(true)
+      def.filter(Filters.GR_FB__FALLING_BLOCK_FILTER)
+      def.material().apply {
+        restitution(0f)
+        friction(Constants.DEFAULT_FIXTURE_FRICTION)
+      }
+    }
+    Box2d.b2CreatePolygonShape(this, shapeDef.asPointer(), polygon.asPointer())
   }
 }
 
@@ -192,19 +195,25 @@ fun EngineEntity.createSpellBodyComponent(
       entityWithPhysicsEventFamily to "entityWithPhysicsEventFamily"
     ),
     bodyDefModifier = {
-      bullet = true
-      fixedRotation = false
-      angle = 22.5f.toRadians()
-      angularVelocity = (90f * sqrt(dx * dx + dy * dy)).toRadians()
+      this.isBullet(true)
+      fixedRotation(false)
+      angularVelocity((90f * sqrt(dx * dx + dy * dy)).toRadians())
+      angularDamping(0f)
+      rotation(Box2d.b2MakeRot(22.5f.toRadians()))
+      gravityScale(0f)
     },
     afterBodyComponentAdded = onReady
   ) {
-    gravityScale = 0f
-    circle(size) {
-      filter.set(Filters.GR_FB__FALLING_BLOCK_FILTER)
-      isSensor = true
-      userData = this@createBody2DBodyComponent.userData
+    val polygon = b2Circle().apply {
+      radius(size)
     }
+    val shapeDef = Box2d.b2DefaultShapeDef().also { def ->
+//    def.userData(userData) // TODO userdata
+      def.isSensor(true)
+      def.enableSensorEvents(true)
+      def.filter(Filters.GR_FB__FALLING_BLOCK_FILTER)
+    }
+    Box2d.b2CreateCircleShape(this, shapeDef.asPointer(), polygon.asPointer())
   }
 }
 
@@ -253,16 +262,19 @@ internal fun createBody2DBodyComponent(
   }
 }
 
-private fun createPlayerFixture(body: b2BodyId, userData: Any, friction: Float, defineShape: PolygonShape.() -> Unit) {
-  PolygonShape().useDispose {
-    defineShape(it)
-    playerFixtureDef.shape = it
-    playerFixtureDef.friction = friction
+private fun createPlayerCapsule(body: b2BodyId, userData: Any, friction: Float = Constants.DEFAULT_FIXTURE_FRICTION, defineShape: () -> b2Capsule) {
+  val shape = defineShape()
+  playerShapeDef.material().friction(friction)
+//  playerShapeDef.userData(userData) // TODO userdata
+  Box2d.b2CreateCapsuleShape(body, playerShapeDef.asPointer(), shape.asPointer())
+}
 
-    body.createFixture(playerFixtureDef).also { fix ->
-      fix.userData = userData
-    }
-  }
+private fun createPlayerPolygon(body: b2BodyId, userData: Any, friction: Float = Constants.DEFAULT_FIXTURE_FRICTION, defineShape: () -> b2Polygon) {
+  val shape = defineShape()
+  playerShapeDef.material().friction(friction)
+//  playerShapeDef.userData(userData) // TODO userdata
+
+  Box2d.b2CreatePolygonShape(body, playerShapeDef.asPointer(), shape.asPointer())
 }
 
 private fun createSecondaryPlayerFixture(
@@ -273,28 +285,32 @@ private fun createSecondaryPlayerFixture(
   centerX: Float = 0f,
   centerY: Float = 0f
 ) {
-  val shape = PolygonShape()
-  shape.setAsBox(halfWidth.coerceAtLeast(ESSENTIALLY_ZERO), halfHeight.coerceAtLeast(ESSENTIALLY_ZERO), Vector2(centerX, centerY), 0f)
+  val polygon = Box2d.b2MakeOffsetBox(
+    halfWidth.coerceAtLeast(ESSENTIALLY_ZERO),
+    halfHeight.coerceAtLeast(ESSENTIALLY_ZERO),
+    makeB2Vec2(centerX, centerY),
+    NO_ROTATION
+  )
 
-  val def = FixtureDef().apply {
-    this.shape = shape
-    isSensor = true
-    filter.set(Filters.GR__ENTITY_FILTER)
+  val shapeDef = Box2d.b2DefaultShapeDef().apply {
+    isSensor(true)
+    enableSensorEvents(true)
+    filter(Filters.GR__ENTITY_FILTER)
+//  userData(userData) // TODO userdata
   }
-  body.createFixture(def).apply {
-    this.userData = userData
-  }
-  shape.dispose()
+
+  Box2d.b2CreatePolygonShape(body, shapeDef.asPointer(), polygon.asPointer())
 }
 
 private fun createPlayerTouchAreaFixture(body: b2BodyId, userData: String, side: Int) {
   createSecondaryPlayerFixture(body, userData, halfWidth = ESSENTIALLY_ZERO, halfHeight = PLAYER_HEIGHT / 2.3f, centerX = PLAYER_WIDTH * side / 1.5f)
 }
 
-private val playerFixtureDef = FixtureDef().apply {
-  filter.set(Filters.GR_EN_ENTITY_FILTER)
-  density = Constants.DEFAULT_FIXTURE_DENSITY
-  restitution = 0f
+private val playerShapeDef: b2ShapeDef = Box2d.b2DefaultShapeDef().also { def ->
+  def.filter(Filters.GR_EN_ENTITY_FILTER)
+//  def.fixedRotation(true)
+//  density = Constants.DEFAULT_FIXTURE_DENSITY
+  def.material().restitution(0f)
 }
 
 private val playerVertices = Array(8) { Vector2() }.also { vertices ->

@@ -1,5 +1,6 @@
 package no.elg.infiniteBootleg.client.screens.hud
 
+import com.badlogic.gdx.box2d.structs.b2DebugDraw
 import com.badlogic.gdx.scenes.scene2d.Stage
 import ktx.actors.isShown
 import ktx.scene2d.Scene2dDsl
@@ -326,7 +327,7 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
       }
       sep()
 
-      val box2dDebug = world.render.box2DDebugRenderer
+      val box2dDebug: b2DebugDraw = world.render.box2DDebugRenderer.b2DebugDraw
       section {
         toggleableDebugButton(
           "Debug Box2D",
@@ -337,43 +338,43 @@ fun Stage.addDebugOverlay(world: ClientWorld, staffMenu: IBVisWindow): DebugWind
       }
       section {
         toggleableDebugButton(
-          "Box2D draw bodies",
+          "Box2D draw shapes",
           onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = box2dDebug::isDrawBodies,
-          onToggle = ClientMain.inst().console.exec::drawBodies
+          booleanGetter = box2dDebug::drawShapes,
+          onToggle = ClientMain.inst().console.exec::drawShapes
         )
-        toggleableDebugButton(
-          "Box2D draw joints",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = box2dDebug::isDrawJoints,
-          onToggle = ClientMain.inst().console.exec::drawJoints
-        )
-        toggleableDebugButton(
-          "Box2D draw AABBs",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = box2dDebug::isDrawAABBs,
-          onToggle = ClientMain.inst().console.exec::drawAABBs
-        )
-        toggleableDebugButton(
-          "Box2D draw inactiveBodies",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = box2dDebug::isDrawInactiveBodies,
-          onToggle = ClientMain.inst().console.exec::drawInactiveBodies
-        )
+//        toggleableDebugButton(
+//          "Box2D draw joints",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::isDrawJoints,
+//          onToggle = ClientMain.inst().console.exec::drawJoints
+//        )
+//        toggleableDebugButton(
+//          "Box2D draw AABBs",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::isDrawAABBs,
+//          onToggle = ClientMain.inst().console.exec::drawAABBs
+//        )
+//        toggleableDebugButton(
+//          "Box2D draw inactiveBodies",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::isDrawInactiveBodies,
+//          onToggle = ClientMain.inst().console.exec::drawInactiveBodies
+//        )
       }
       section {
-        toggleableDebugButton(
-          "Box2D draw velocities",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = box2dDebug::isDrawVelocities,
-          onToggle = ClientMain.inst().console.exec::drawVelocities
-        )
-        toggleableDebugButton(
-          "Box2D draw contacts",
-          onAnyElementChanged = onAnyElementChanged,
-          booleanGetter = box2dDebug::isDrawContacts,
-          onToggle = ClientMain.inst().console.exec::drawContacts
-        )
+//        toggleableDebugButton(
+//          "Box2D draw velocities",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::isDrawVelocities,
+//          onToggle = ClientMain.inst().console.exec::drawVelocities
+//        )
+//        toggleableDebugButton(
+//          "Box2D draw contacts",
+//          onAnyElementChanged = onAnyElementChanged,
+//          booleanGetter = box2dDebug::isDrawContacts,
+//          onToggle = ClientMain.inst().console.exec::drawContacts
+//        )
       }
       sep()
       section {

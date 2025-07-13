@@ -1,7 +1,11 @@
 package no.elg.infiniteBootleg.core.world.ecs.system
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.box2d.structs.b2BodyId
+import no.elg.infiniteBootleg.core.world.box2d.isAwake
+import no.elg.infiniteBootleg.core.world.box2d.makeB2Vec2
+import no.elg.infiniteBootleg.core.world.box2d.position
+import no.elg.infiniteBootleg.core.world.box2d.velocity
 import no.elg.infiniteBootleg.core.world.ecs.UPDATE_PRIORITY_LAST
 import no.elg.infiniteBootleg.core.world.ecs.basicDynamicEntityFamily
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
@@ -16,8 +20,6 @@ import no.elg.infiniteBootleg.core.world.ecs.system.api.AuthorizedEntitiesIterat
  * Write the position of the entity from the box2D entity
  */
 object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEntityFamily, UPDATE_PRIORITY_LAST) {
-
-  private val tmp = Vector2()
 
   override fun processEntity(entity: Entity, deltaTime: Float) {
     val body = entity.box2dBody
@@ -38,9 +40,8 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
 
       entity.groundedComponentOrNull?.clearContacts()
 
-      tmp.x = entity.positionComponent.x
-      tmp.y = entity.positionComponent.y
-      updatePosition(body, tmp)
+      val posComp = entity.positionComponent
+      updatePosition(body, posComp.x, posComp.y)
     }
   }
 
@@ -50,7 +51,7 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
    * MUST BE CALLED ON BOX2D THREAD!
    */
   fun updateVelocity(body: b2BodyId, dx: Float, dy: Float) {
-    body.setLinearVelocity(dx, dy)
+    body.velocity = makeB2Vec2(dx, dy)
   }
 
   /**
@@ -58,8 +59,8 @@ object WriteBox2DStateSystem : AuthorizedEntitiesIteratingSystem(basicDynamicEnt
    *
    * MUST BE CALLED ON BOX2D THREAD!
    */
-  fun updatePosition(body: b2BodyId, pos: Vector2) {
-    body.setTransform(pos, 0f)
+  fun updatePosition(body: b2BodyId, x: Float, y: Float) {
+    body.position = makeB2Vec2(x, y)
     body.isAwake = true
   }
 }

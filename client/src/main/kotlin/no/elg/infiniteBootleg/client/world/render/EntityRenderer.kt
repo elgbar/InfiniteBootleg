@@ -19,11 +19,15 @@ import no.elg.infiniteBootleg.core.Settings
 import no.elg.infiniteBootleg.core.Settings.renderBox2dEntityDifference
 import no.elg.infiniteBootleg.core.api.Renderer
 import no.elg.infiniteBootleg.core.util.safeUse
-import no.elg.infiniteBootleg.core.util.toDegrees
 import no.elg.infiniteBootleg.core.util.worldToScreen
 import no.elg.infiniteBootleg.core.world.ContainerElement
 import no.elg.infiniteBootleg.core.world.Staff
 import no.elg.infiniteBootleg.core.world.blocks.Block
+import no.elg.infiniteBootleg.core.world.box2d.degrees
+import no.elg.infiniteBootleg.core.world.box2d.position
+import no.elg.infiniteBootleg.core.world.box2d.rotation
+import no.elg.infiniteBootleg.core.world.box2d.x
+import no.elg.infiniteBootleg.core.world.box2d.y
 import no.elg.infiniteBootleg.core.world.chunks.ChunkColumn
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2d
@@ -121,7 +125,7 @@ class EntityRenderer(private val worldRender: ClientWorldRender) : Renderer {
       batch.draw(texture, screenX, screenY, box2d.worldWidth, box2d.worldHeight)
     } else {
       batch.draw(
-        texture, screenX, screenY, box2d.worldWidth / 2f, box2d.worldHeight / 2f, box2d.worldWidth, box2d.worldHeight, 1f, 1f, box2d.body.angle.toDegrees()
+        texture, screenX, screenY, box2d.worldWidth / 2f, box2d.worldHeight / 2f, box2d.worldWidth, box2d.worldHeight, 1f, 1f, box2d.body.rotation.degrees
       )
     }
   }

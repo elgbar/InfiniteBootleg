@@ -2,7 +2,8 @@ package no.elg.infiniteBootleg.client.world.ecs.system.event
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.box2d.Box2d
+import com.badlogic.gdx.box2d.structs.b2Vec2
 import no.elg.infiniteBootleg.client.inventory.container.open
 import no.elg.infiniteBootleg.client.main.ClientMain
 import no.elg.infiniteBootleg.client.util.WorldEntity
@@ -21,6 +22,9 @@ import no.elg.infiniteBootleg.core.util.FLY_VEL
 import no.elg.infiniteBootleg.core.util.MAX_X_VEL
 import no.elg.infiniteBootleg.core.world.Material
 import no.elg.infiniteBootleg.core.world.Tool
+import no.elg.infiniteBootleg.core.world.box2d.mass
+import no.elg.infiniteBootleg.core.world.box2d.set
+import no.elg.infiniteBootleg.core.world.box2d.velocity
 import no.elg.infiniteBootleg.core.world.ecs.components.Box2DBodyComponent.Companion.box2dBody
 import no.elg.infiniteBootleg.core.world.ecs.components.GroundedComponent.Companion.groundedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.InputEventQueueComponent
@@ -154,7 +158,7 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     ClientMain.inst().serverClient.sendServerBoundPacket { serverBoundUpdateSelectedSlot(slot) }
   }
 
-  private val tmpVec = Vector2()
+  private val tmpVec = b2Vec2()
 
   private fun WorldEntity.fly(dx: Float = 0f, dy: Float = 0f) {
     setVel { oldX, oldY -> oldX + dx to oldY + dy }
@@ -164,18 +168,18 @@ object InputSystem : EventSystem<InputEvent, InputEventQueueComponent>(
     world.postBox2dRunnable {
       val groundedComponent = entity.groundedComponent
       if (groundedComponent.canMove(dir)) {
-        val body = entity.box2dBody
-        val currSpeed = body.linearVelocity.x
+        val bodyId = entity.box2dBody
+        val currSpeed = bodyId.velocity.x()
         val wantedSpeed = dir * if (groundedComponent.onGround) {
           MAX_X_VEL
         } else {
           MAX_X_VEL * (2f / 3f)
         }
-        val impulse = body.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
+        val impulse = bodyId.mass * (wantedSpeed - (dir * min(abs(currSpeed), abs(wantedSpeed))))
 
         tmpVec.set(impulse, entity.velocityComponent.dy)
 
-        body.applyLinearImpulse(tmpVec, body.worldCenter, true)
+        Box2d.b2Body_ApplyForceToCenter(bodyId, tmpVec, true)
       }
     }
   }

@@ -3,7 +3,9 @@ package no.elg.infiniteBootleg.core.world.box2d
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.box2d.Box2d
 import com.badlogic.gdx.box2d.structs.b2BodyDef
+import com.badlogic.gdx.box2d.structs.b2BodyEvents
 import com.badlogic.gdx.box2d.structs.b2BodyId
+import com.badlogic.gdx.box2d.structs.b2BodyMoveEvent
 import com.badlogic.gdx.box2d.structs.b2WorldId
 import com.google.errorprone.annotations.concurrent.GuardedBy
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -138,9 +140,11 @@ open class WorldBody(private val world: World) :
 //      require(!box2dWorld.isLocked) {
 //        "Cannot destroy body when box2d world is locked, to fix this schedule the destruction either sync or async, userData: ${body.userData}"
 //      }
-//      if (!body.isActive) {
-//        logger.error { "Trying to destroy an inactive body, the program will probably crash, userData: ${body.userData}" }
-//      }
+      if (!Box2d.b2Body_IsEnabled(bodyId)) {
+        logger.error {
+          "Trying to destroy an disabled body, the program will probably crash" // , userData: ${body.userData}"
+        }
+      }
 
       // TODO do cleanup entities when the body is destroyed
 //      body.fixtureList.asSequence().map { it.userData }.filterIsInstance<Entity>().forEach { world.removeEntity(it, DespawnReason.CHUNK_UNLOADED) }
@@ -163,11 +167,22 @@ open class WorldBody(private val world: World) :
         Box2d.b2World_Step(box2dWorld, BOX2D_TIME_STEP, BOX2D_SUB_STEP_COUNT)
       }
 
+//      handlePhysicsBodyEvents()
+
       ashleyWatchdog.watch {
         world.engine.update(BOX2D_TIME_STEP)
       }
 
       postRunnable.executeRunnables()
+    }
+  }
+
+  fun handlePhysicsBodyEvents() {
+    val events: b2BodyEvents = Box2d.b2World_GetBodyEvents(box2dWorld)
+    val moveEvents = events.moveEvents()
+    for (i in 0 until events.moveCount()) {
+      val event: b2BodyMoveEvent = moveEvents[i]
+      // TODO ?
     }
   }
 

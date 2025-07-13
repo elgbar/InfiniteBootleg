@@ -31,8 +31,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent.Companion.nameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent.Companion.occupyingBlocksComponentOrNull
-import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent.Companion.physicsEventQueueOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent.Companion.textureRegionNameComponentOrNull
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent
@@ -124,7 +122,7 @@ fun Entity.save(toAuthoritative: Boolean, ignoreTransient: Boolean = false): Pro
     trySave(this@save.materialComponentOrNull)
     trySave(this@save.nameComponentOrNull)
     trySave(this@save.occupyingBlocksComponentOrNull)
-    trySave(this@save.physicsEventQueueOrNull)
+//    trySave(this@save.physicsEventQueueOrNull)
     trySave(this@save.textureRegionNameComponentOrNull)
     trySave(this@save.tintedComponentOrNull)
     trySave(this@save.velocityComponentOrNull)
@@ -175,7 +173,7 @@ fun World.load(protoEntity: ProtoWorld.Entity, chunk: Chunk? = null, configure: 
     MaterialComponent.Companion.load(this, protoEntity)
     NameComponent.Companion.load(this, protoEntity)
     OccupyingBlocksComponent.Companion.load(this, protoEntity)
-    PhysicsEventQueueComponent.Companion.load(this, protoEntity)
+//    PhysicsEventQueueComponent.Companion.load(this, protoEntity)
     TextureRegionNameComponent.Companion.load(this, protoEntity)
     TintedComponent.Companion.load(this, protoEntity)
     VelocityComponent.Companion.load(this, protoEntity)

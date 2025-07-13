@@ -88,9 +88,9 @@ subprojects {
 
   ext["assetsDir"] = File("../core/src/main/resources")
 
-  tasks.named("classes") {
-    dependsOn("spotlessApply")
-  }
+//  tasks.named("classes") {
+//    dependsOn("spotlessApply")
+//  }
 
   tasks.withType<KotlinCompilationTask<*>> {
     compilerOptions {

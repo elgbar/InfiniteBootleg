@@ -23,7 +23,6 @@ import no.elg.infiniteBootleg.core.world.ecs.components.LocallyControlledCompone
 import no.elg.infiniteBootleg.core.world.ecs.components.MaterialComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.NameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.inventory.ContainerComponent
@@ -81,8 +80,8 @@ val CONTROLLED_STANDALONE_ENTITY = arrayOf(
 val PLAYERS_ENTITY_ARRAY = arrayOf(
   *DYNAMIC_STANDALONE_ENTITY,
   NameComponent::class,
-  KillableComponent::class,
-  PhysicsEventQueueComponent::class
+  KillableComponent::class
+//  PhysicsEventQueueComponent::class
 )
 val INVENTORY_COMPONENTS = arrayOf(ContainerComponent::class, HotbarComponent::class)
 
@@ -113,8 +112,8 @@ val localPlayerFamily: Family = allOf(
   LocallyControlledComponent::class,
   FollowedByCameraTag::class,
   TextureRegionNameComponent::class,
-  InputEventQueueComponent::class,
-  PhysicsEventQueueComponent::class
+  InputEventQueueComponent::class
+//  PhysicsEventQueueComponent::class
 ).buildAlive()
 
 val basicRequiredEntityFamily: Family = allOf(*REQUIRED_COMPONENTS).buildAlive()
@@ -128,7 +127,10 @@ val followEntityFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, FollowedByCamer
 val controlledEntityFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY).buildAlive()
 
 val controlledEntityWithInputEventFamily: Family = allOf(*CONTROLLED_STANDALONE_ENTITY, InputEventQueueComponent::class).buildAlive()
-val entityWithPhysicsEventFamily: Family = allOf(*BASIC_STANDALONE_ENTITY, PhysicsEventQueueComponent::class).buildAlive()
+val entityWithPhysicsEventFamily: Family = allOf(
+  *BASIC_STANDALONE_ENTITY
+//  PhysicsEventQueueComponent::class
+).buildAlive()
 
 val staleEntityFamily: Family = allOf(ToBeDestroyedTag::class).get()
 

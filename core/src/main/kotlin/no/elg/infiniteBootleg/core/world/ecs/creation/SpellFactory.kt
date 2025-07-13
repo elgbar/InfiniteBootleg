@@ -8,7 +8,6 @@ import no.elg.infiniteBootleg.core.assets.InfAssets
 import no.elg.infiniteBootleg.core.util.futureEntity
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.world.ecs.components.OccupyingBlocksComponent
-import no.elg.infiniteBootleg.core.world.ecs.components.PhysicsEventQueueComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TextureRegionNameComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.TintedComponent
 import no.elg.infiniteBootleg.core.world.ecs.components.VelocityComponent
@@ -38,7 +37,7 @@ fun Engine.createSpellEntity(
     this.entity.isTransientEntity = true
 
     // This entity will handle input events
-    with<PhysicsEventQueueComponent>()
+//    with<PhysicsEventQueueComponent>()
     with<OccupyingBlocksComponent>()
     safeWith { SpellStateComponent(spellState, worldX, worldY, dx, dy) }
     createSpellBodyComponent(world, worldX, worldY, dx, dy) { entity ->

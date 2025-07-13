@@ -26,7 +26,6 @@ import no.elg.infiniteBootleg.core.util.launchOnAsync
 import no.elg.infiniteBootleg.core.util.launchOnMain
 import no.elg.infiniteBootleg.core.util.safeWith
 import no.elg.infiniteBootleg.core.util.toCompact
-import no.elg.infiniteBootleg.core.util.toVector2
 import no.elg.infiniteBootleg.core.util.worldToChunk
 import no.elg.infiniteBootleg.core.util.worldXYtoChunkCompactLoc
 import no.elg.infiniteBootleg.core.world.ContainerElement.Companion.fromProto
@@ -370,7 +369,7 @@ private fun ServerClient.asyncHandleMoveEntity(moveEntity: MoveEntity) {
     entity.setVelocity(moveEntity.velocity)
     world.postBox2dRunnable {
       val body = entity.box2dBody
-      WriteBox2DStateSystem.updatePosition(body, serverPos.toVector2())
+      WriteBox2DStateSystem.updatePosition(body, serverPos.x, serverPos.y)
       WriteBox2DStateSystem.updateVelocity(body, moveEntity.velocity.x, moveEntity.velocity.y)
     }
     // Only set look direction if it exists on the entity from before
